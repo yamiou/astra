@@ -68,7 +68,7 @@ sensor_handle_t* _create_openni_adapter()
 
 void _destroy_openni_adapter(sensor_handle_t* handle)
 {
-	if (handle == nullptr)
+	if (handle == NULL)
 	{
 		return;
 	}
