@@ -11,6 +11,10 @@ set (SenseKit_VERSION_BUILD 1)
 include_directories ("${PROJECT_SOURCE_DIR}/include")
 include_directories ("$ENV{OPENNI2_INCLUDE}")
 
-find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.dylib" HINTS "$ENV{OPENNI2_REDIST}" PATH_SUFFIXES lib)
-add_subdirectory(src)
+if (WIN32)
+	find_library(OpenNI2_LIBRARY NAMES "OpenNI2.lib" HINTS "$ENV{OPENNI2_LIB}" PATH_SUFFIXES lib)	
+elseif (APPLE)
+	find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.dylib" HINTS "$ENV{OPENNI2_REDIST}" PATH_SUFFIXES lib)
+endif()
 
+add_subdirectory(src)
