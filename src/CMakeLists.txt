@@ -1,9 +1,11 @@
 set(SenseKit_SOURCES
-  SenseKit-adapter-private.h
-  SenseKit-openni-private.h
-  SenseKit-openni.c
+  Context.h
+  Context.cpp
+  Sensor.h
+  Sensor.cpp
+  SensorAdapter.h
   SenseKit-private.h
-  SenseKit.c
+  SenseKit.cpp
   SenseKitTypes.h
   openni/OpenNIAdapter.cpp
   openni/OpenNIAdapter.hpp)

@@ -1,7 +1,7 @@
 #ifndef SENSEKIT_OPENNI_H
 #define SENSEKIT_OPENNI_H
 
-#include "SenseKit.h"
+#include <SenseKit.h>
 #include "SenseKit-adapter-private.h"
 
 sensor_handle_t* _create_openni_adapter();
@@ -14,4 +14,3 @@ sensekit_depthstream_t * _open_openni_depthstream(sensekit_sensor_t * sensor);
 void _close_openni_depthstream(sensekit_depthstream_t * depthstream);
 
 #endif // SENSEKIT_OPENNI_H
-

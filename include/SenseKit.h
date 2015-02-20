@@ -20,24 +20,38 @@
 SENSEKIT_BEGIN_DECLS
 
 typedef enum _sensekit_status {
-	SENSEKIT_STATUS_SUCCESS = 0,
-	SENSEKIT_STATUS_INVALID_PARAMETER = 1,
-	SENSEKIT_STATUS_DEVICE_ERROR = 2
+    SENSEKIT_STATUS_SUCCESS = 0,
+    SENSEKIT_STATUS_INVALID_PARAMETER = 1,
+    SENSEKIT_STATUS_DEVICE_ERROR = 2
 } sensekit_status_t;
 
 typedef struct _sensekit_sensor sensekit_sensor_t;
 typedef struct _sensekit_depthstream sensekit_depthstream_t;
 typedef struct _sensekit_depthframe sensekit_depthframe_t;
 
-SENSEKIT_API sensekit_status_t sensekit_open_sensor(char* connection_string, /*out*/ sensekit_sensor_t** sensor);
-SENSEKIT_API sensekit_status_t sensekit_close_sensor(sensekit_sensor_t * sensor);
+SENSEKIT_API sensekit_status_t sensekit_open_sensor(
+    char* connection_string,
+    /*out*/ sensekit_sensor_t** sensor);
+
+SENSEKIT_API sensekit_status_t sensekit_close_sensor(
+    sensekit_sensor_t** sensor);
+
 SENSEKIT_API char * sensekit_get_status_string(sensekit_status_t status);
 
-SENSEKIT_API sensekit_status_t sensekit_depth_open(sensekit_sensor_t* sensor, sensekit_depthstream_t** stream);
-SENSEKIT_API sensekit_status_t sensekit_depth_close(sensekit_depthstream_t** stream);
+SENSEKIT_API sensekit_status_t sensekit_depth_open(
+    sensekit_sensor_t* sensor,
+    sensekit_depthstream_t** stream);
 
-SENSEKIT_API sensekit_status_t sensekit_depth_open_frame(sensekit_depthstream_t* stream, int timeout_milliseconds, sensekit_depthframe_t** frame); //0 = return immediately
-SENSEKIT_API sensekit_status_t sensekit_depth_close_frame(sensekit_depthframe_t** frame); //frame set to null
+SENSEKIT_API sensekit_status_t sensekit_depth_close(
+    sensekit_depthstream_t** stream);
+
+SENSEKIT_API sensekit_status_t sensekit_depth_open_frame(
+    sensekit_depthstream_t* stream,
+    int timeout_milliseconds,
+    sensekit_depthframe_t** frame); //0 = return immediately
+
+SENSEKIT_API sensekit_status_t sensekit_depth_close_frame(
+    sensekit_depthframe_t** frame); //frame set to null
 
 SENSEKIT_END_DECLS
 

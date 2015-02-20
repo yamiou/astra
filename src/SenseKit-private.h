@@ -18,16 +18,9 @@
 #include <limits.h>
 #include <stdio.h>
 
-#include "SenseKit.h"
+#include <SenseKit.h>
 
 SENSEKIT_BEGIN_DECLS
-
-typedef struct _sensekit_sensor_adapter sensekit_sensor_adapter_t;
-
-struct _sensekit_sensor
-{
-	sensekit_sensor_adapter_t * adapter;
-};
 
 struct _sensekit_depthstream;
 
@@ -68,5 +61,3 @@ struct _sensekit_depthstream;
 SENSEKIT_END_DECLS
 
 #endif // SENSEKIT_PRIVATE_H
-
-
