@@ -1,9 +1,9 @@
-#include "OpenNIAdapter.hpp"
-#include "../SenseKit-adapter-private.h"
+#include "OpenNIAdapter.h"
+#include "../Device.h"
 
 namespace sensekit {
 
-    sensekit_status_t OpenNIAdapter::Open()
+    sensekit_status_t OpenNIAdapter::initialize()
     {
         openni::Status rc = openni::STATUS_OK;
 
@@ -52,35 +52,34 @@ namespace sensekit {
                 return SENSEKIT_STATUS_DEVICE_ERROR;
         }
 
+        m_initialized = true;
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t OpenNIAdapter::Close()
+    sensekit_status_t OpenNIAdapter::destroy()
     {
-
-    }
-}
-
-
-SENSEKIT_BEGIN_DECLS
-
-sensor_handle_t* _create_openni_adapter()
-{
-    sensekit::OpenNIAdapter* adapter = new sensekit::OpenNIAdapter();
-    adapter->Open();
-
-        return reinterpret_cast<sensor_handle_t*>(adapter);
-}
-
-void _destroy_openni_adapter(sensor_handle_t* handle)
-{
-        if (handle == NULL)
+        if (m_initialized)
         {
-                return;
+            openni::OpenNI::shutdown();
         }
 
-        sensekit::OpenNIAdapter* adapter = reinterpret_cast<sensekit::OpenNIAdapter*>(handle);
-        delete adapter;
-}
+        m_initialized = false;
 
-SENSEKIT_END_DECLS
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t OpenNIAdapter::has_device_for_uri(char *uri, bool &deviceAvailable)
+    {
+        deviceAvailable = true;
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t OpenNIAdapter::query_for_device(char *uri, sensekit::Device **device)
+    {
+        *device = new Device(*this);
+        return SENSEKIT_STATUS_SUCCESS;
+
+    }
+
+}

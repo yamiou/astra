@@ -5,10 +5,11 @@
 #include <vector>
 #include "Sensor.h"
 #include "SensorAdapter.h"
+#include "DeviceManager.h"
 
 struct _sensekit_sensor
 {
-    sensekit::Sensor* sensor_ptr;
+    sensekit::Device* p_deviceHandle;
 };
 
 using std::vector;
@@ -25,16 +26,17 @@ namespace sensekit {
 
         virtual ~Context() {};
 
-        sensekit_status_t Initialize();
-        sensekit_status_t OpenSensor(char* uri, sensekit_sensor_t** sensor);
-        sensekit_status_t CloseSensor(sensekit_sensor_t** sensor);
+        sensekit_status_t initialize();
+        sensekit_status_t open_sensor(char* uri, sensekit_sensor_t** sensor);
+        sensekit_status_t close_sensor(sensekit_sensor_t** sensor);
 
     private:
         vector<Sensor*> m_sensors;
+        DeviceManager m_deviceManager;
         bool m_initialized;
 
-        SensorAdapter* GetSensorAdapter();
-        void EnsureInitialized();
+        SensorAdapter* get_sensor_adapter();
+        void ensure_initialized();
     };
 }
 

@@ -9,16 +9,13 @@ namespace sensekit {
     class Sensor
     {
     public:
-        Sensor(SensorAdapter* adapter) :
-            m_adapter(adapter)
-            {}
-
+        Sensor() { }
         virtual ~Sensor() { }
 
-        sensekit_status_t Open(void);
-        sensekit_status_t Close(void);
+        sensekit_status_t open(void);
+        sensekit_status_t close(void);
     private:
-        SensorAdapter* m_adapter;
+
     };
 
 }

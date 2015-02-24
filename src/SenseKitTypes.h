@@ -1,8 +1,0 @@
-﻿#ifndef SENSEKITTYPES_H
-#define SENSEKITTYPES_H
-
-
-
-
-#endif // SENSEKITTYPES_H
-

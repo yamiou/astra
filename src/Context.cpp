@@ -1,60 +1,58 @@
 #include "Context.h"
 #include <cstdlib>
-#include "openni/OpenNIAdapter.hpp"
+#include "openni/OpenNIAdapter.h"
 
 namespace sensekit {
 
-    sensekit_status_t Context::Initialize()
+    sensekit_status_t Context::initialize()
     {
+        m_deviceManager.initialize();
         m_initialized = true;
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    void Context::EnsureInitialized()
+    void Context::ensure_initialized()
     {
         if (!m_initialized)
         {
-            Initialize();
+            initialize();
         }
     }
 
-    sensekit_status_t Context::OpenSensor(char* uri, sensekit_sensor_t** sensor)
+    sensekit_status_t Context::open_sensor(char* uri, sensekit_sensor_t** sensor)
     {
         if (NULL == uri)
         {
             return SENSEKIT_STATUS_INVALID_PARAMETER;
         }
 
-        EnsureInitialized();
+        ensure_initialized();
 
-        Sensor* s = new Sensor(GetSensorAdapter());
-        s->Open();
+        Device* device = NULL;
+        m_deviceManager.query_for_device(uri, &device);
 
         *sensor  = (sensekit_sensor_t*)malloc(sizeof(sensekit_sensor_t));
-        (*sensor)->sensor_ptr = s;
+        (*sensor)->p_deviceHandle = device;
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t Context::CloseSensor(sensekit_sensor_t** sensor)
+    sensekit_status_t Context::close_sensor(sensekit_sensor_t** sensor)
     {
-        EnsureInitialized();
+        ensure_initialized();
 
-        Sensor* s = (*sensor)->sensor_ptr;
-        s->Close();
-
-        delete s;
+        Device* device = (*sensor)->p_deviceHandle;
+        
+        if (NULL != device)
+        {
+            delete device;
+        }
 
         free(*sensor);
 
         *sensor = NULL;
 
         return SENSEKIT_STATUS_SUCCESS;
-    }
-
-    SensorAdapter* Context::GetSensorAdapter()
-    {
-        return new OpenNIAdapter();
     }
 }

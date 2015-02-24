@@ -7,12 +7,12 @@ SENSEKIT_BEGIN_DECLS
 
 SENSEKIT_API sensekit_status_t sensekit_open_sensor(char* connection_string, /*out*/ sensekit_sensor_t** sensor)
 {
-    return g_Context.OpenSensor(connection_string, sensor);
+    return g_Context.open_sensor(connection_string, sensor);
 }
 
 SENSEKIT_API sensekit_status_t sensekit_close_sensor(sensekit_sensor_t** sensor)
 {
-    return g_Context.CloseSensor(sensor);
+    return g_Context.close_sensor(sensor);
 }
 
 SENSEKIT_API sensekit_status_t sensekit_depth_open(sensekit_sensor_t* sensor, sensekit_depthstream_t** stream)

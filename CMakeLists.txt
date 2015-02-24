@@ -8,6 +8,10 @@ set (SenseKit_VERSION_MINOR 1)
 set (SenseKit_VERSION_PATCH 0)
 set (SenseKit_VERSION_BUILD 1)
 
+if (NOT WIN32)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+endif()
+
 include_directories ("${PROJECT_SOURCE_DIR}/include")
 include_directories ("$ENV{OPENNI2_INCLUDE}")
 
