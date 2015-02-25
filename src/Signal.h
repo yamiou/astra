@@ -31,7 +31,7 @@ public:
 
     void deactivate()
         {
-            m_callback = NULL;
+            m_callback = nullptr;
         }
 
     void remove_self()
@@ -145,7 +145,7 @@ public:
             if (!m_head)
                 return 0;
 
-            unsigned int count;
+            unsigned int count = 0;
             for (node_type* node = m_head->m_next ? m_head->m_next : m_head;
                  node != m_head;
                  node = node->m_next)
