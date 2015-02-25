@@ -224,7 +224,7 @@ template<>
 class Signal<void>
 {
     typedef CallbackList<void, bool> callback_list_t;
-    typedef typename std::function<void ()> callback_type;
+    typedef std::function<void ()> callback_type;
 
 public:
     Signal()
