@@ -50,11 +50,6 @@ public:
 
 private:
 
-
-
-
-
-
     CallbackNode* m_prev;
     CallbackNode* m_next;
     callback_type m_callback;

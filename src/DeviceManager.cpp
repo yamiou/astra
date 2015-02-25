@@ -1,6 +1,5 @@
 #include "DeviceManager.h"
 #include "openni/OpenNIAdapter.h"
-#include "Signal.h"
 
 namespace sensekit {
 

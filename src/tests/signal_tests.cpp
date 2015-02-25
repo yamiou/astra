@@ -40,7 +40,7 @@ TEST_CASE("Can raise two signals", "[signal]") {
 TEST_CASE("Can raise void signal", "[signal]") {
     Signal<void> signal;
     int test = 0;
-    signal += [&test] { test++; };
+    signal += [&test] () { test++; };
 
     signal.raise();
     REQUIRE(test == 1);
