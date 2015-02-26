@@ -57,7 +57,7 @@ namespace sensekit {
 
         m_initialized = true;
 
-        m_deviceConnectedCallback(m_callbackContext);
+        m_deviceConnectedCallback(this, &m_device, m_callbackContext);
 
         return SENSEKIT_STATUS_SUCCESS;
     }

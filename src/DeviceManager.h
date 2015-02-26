@@ -5,6 +5,7 @@
 #include <vector>
 #include "Device.h"
 #include "DriverAdapter.h"
+#include "DriverService.h"
 
 namespace sensekit {
 

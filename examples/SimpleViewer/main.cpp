@@ -12,7 +12,6 @@ int main(int argc, char** argv)
     sensekit_depthstream_t* depthStream;
     status = sensekit_depth_open(sensor, &depthStream);
 
-
     status = sensekit_depth_close(&depthStream);
 
     status = sensekit_close_sensor(&sensor);

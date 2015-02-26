@@ -1,5 +1,6 @@
 #include "DriverService.h"
 #include <iostream>
+#include "Signal.h"
 
 using std::cout;
 using std::endl;
@@ -21,14 +22,23 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    void DriverService::adapter_deviceConnected(void *context)
+    void DriverService::adapter_deviceConnected(DriverAdapter* adapter, device_handle_t deviceHandle, void* context)
     {
-        cout << "device connected" << endl;
+        DriverService* service = static_cast<DriverService*>(context);
+        Device* device = new Device(*adapter, deviceHandle);
+        service->m_connectedSignal.raise(device);
     }
 
-    void DriverService::adapter_deviceDisconnected(void *context)
+    void DriverService::adapter_deviceDisconnected(void* context)
     {
+        DriverService* service = static_cast<DriverService*>(context);
+        service->m_disconnectedSignal.raise();
+    }
 
+    void DriverService::adapter_deviceChanged(void* context)
+    {
+        DriverService* service = static_cast<DriverService*>(context);
+        service->m_changedSignal.raise();
     }
 
 

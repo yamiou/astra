@@ -1,7 +1,7 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
-#include "DriverService.h"
+#include "DriverAdapter.h"
 #include "Stream.h"
 
 namespace sensekit {
@@ -9,8 +9,8 @@ namespace sensekit {
     class Device
     {
     public:
-        Device(DriverService& driverService)
-            : m_driverService(driverService)
+        Device(DriverAdapter& adapter, device_handle_t deviceHandle)
+            : m_driverAdapter(adapter), m_deviceHandle(deviceHandle)
             {}
 
         virtual ~Device() {}
@@ -19,7 +19,8 @@ namespace sensekit {
 
     private:
 
-        DriverService& m_driverService;
+        DriverAdapter& m_driverAdapter;
+        device_handle_t m_deviceHandle;
     };
 
 }

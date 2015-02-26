@@ -191,9 +191,11 @@ template<typename... Args>
 class Signal
 {
     typedef CallbackList<void, Args...> callback_list_t;
-    typedef typename callback_list_t::callback_type callback_type;
 
 public:
+
+    typedef typename callback_list_t::callback_type callback_type;
+
     Signal()
         : m_callbackList() { }
 
@@ -219,9 +221,10 @@ template<>
 class Signal<void>
 {
     typedef CallbackList<void, bool> callback_list_t;
-    typedef std::function<void ()> callback_type;
 
 public:
+    typedef std::function<void ()> callback_type;
+
     Signal()
         : m_callbackList() { }
 
