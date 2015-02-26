@@ -1,6 +1,8 @@
 #include "DriverService.h"
 #include "Signal.h"
 
+#include <algorithm>
+
 namespace sensekit {
 
     sensekit_status_t DriverService::initialize()
