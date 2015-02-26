@@ -14,7 +14,8 @@ namespace sensekit {
 
     typedef void* device_handle_t;
     typedef void (*device_connected_callback_t)(DriverAdapter* adapter, device_handle_t deviceHandle, void* callbackContext);
-typedef void (*device_disconnected_callback_t)(device_handle_t deviceHandle, void* callbackContext);
+    typedef void (*device_disconnected_callback_t)(device_handle_t deviceHandle, void* callbackContext);
+    typedef void (*device_changed_callback_t)(device_handle_t deviceHandle, void* callbackContext);
 
     class DriverAdapter
     {
@@ -25,10 +26,12 @@ typedef void (*device_disconnected_callback_t)(device_handle_t deviceHandle, voi
         virtual sensekit_status_t initialize(
             device_connected_callback_t connectedCallback,
             device_disconnected_callback_t disconnectedCallback,
+            device_changed_callback_t changedCallback,
             void* callbackContext)
             {
                 m_deviceConnectedCallback = connectedCallback;
                 m_deviceDisconnectedCallback = disconnectedCallback;
+                m_deviceChangedCallback = changedCallback;
                 m_callbackContext = callbackContext;
 
                 return SENSEKIT_STATUS_SUCCESS;
@@ -40,12 +43,12 @@ typedef void (*device_disconnected_callback_t)(device_handle_t deviceHandle, voi
     protected:
         device_connected_callback_t m_deviceConnectedCallback;
         device_disconnected_callback_t m_deviceDisconnectedCallback;
+        device_changed_callback_t m_deviceChangedCallback;
         void* m_callbackContext;
 
     private:
 
     };
-
 }
 
 #endif /* DEVICEADAPTER_H */

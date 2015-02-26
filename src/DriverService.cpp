@@ -1,9 +1,5 @@
 #include "DriverService.h"
-#include <iostream>
 #include "Signal.h"
-
-using std::cout;
-using std::endl;
 
 namespace sensekit {
 
@@ -12,13 +8,9 @@ namespace sensekit {
         m_driverAdapter.initialize(
             DriverService::adapter_deviceConnected,
             DriverService::adapter_deviceDisconnected,
+            DriverService::adapter_deviceChanged,
             this);
 
-        return SENSEKIT_STATUS_SUCCESS;
-    }
-
-    sensekit_status_t DriverService::destroy()
-    {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
@@ -110,7 +102,10 @@ namespace sensekit {
         }
     }
 
+    sensekit_status_t DriverService::terminate()
+    {
+        m_driverAdapter.terminate();
 
-
-
+        return SENSEKIT_STATUS_SUCCESS;
+    }
 }

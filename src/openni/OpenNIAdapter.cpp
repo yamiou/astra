@@ -4,9 +4,11 @@ namespace sensekit {
 
     sensekit_status_t OpenNIAdapter::initialize(
         device_connected_callback_t connectedCallback,
-        device_disconnected_callback_t disconnectedCallback, void* callbackContext)
+        device_disconnected_callback_t disconnectedCallback,
+        device_changed_callback_t changedCallback,
+        void* callbackContext)
     {
-        DriverAdapter::initialize(connectedCallback, disconnectedCallback, callbackContext);
+        DriverAdapter::initialize(connectedCallback, disconnectedCallback, changedCallback, callbackContext);
 
         openni::Status rc = openni::STATUS_OK;
 
@@ -64,8 +66,10 @@ namespace sensekit {
 
     sensekit_status_t OpenNIAdapter::terminate()
     {
+
         if (m_initialized)
         {
+            m_deviceDisconnectedCallback(&m_device, m_callbackContext);
             openni::OpenNI::shutdown();
         }
 

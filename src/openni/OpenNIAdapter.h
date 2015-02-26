@@ -17,6 +17,7 @@ namespace sensekit {
 
         virtual sensekit_status_t initialize(device_connected_callback_t connectedCallback,
                                              device_disconnected_callback_t disconnectedCallback,
+                                             device_changed_callback_t changedCallback,
                                              void* callbackContext) override;
 
         virtual sensekit_status_t terminate() override;

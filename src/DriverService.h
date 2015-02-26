@@ -31,7 +31,7 @@ namespace sensekit {
         ~DriverService() {}
 
         sensekit_status_t initialize();
-        sensekit_status_t destroy();
+        sensekit_status_t terminate();
         const DeviceList& get_devices() { return m_devices; }
 
         CallbackId registerDeviceConnectedCallback(DeviceConnectedCallback callback)
