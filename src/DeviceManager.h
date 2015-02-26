@@ -27,6 +27,9 @@ namespace sensekit {
         DeviceList m_devices;
 
         sensekit_status_t add_driver(DriverAdapter* driver);
+        void on_device_connected(Device* device);
+        void on_device_disconnected(Device* device);
+        void on_device_changed(Device* device);
     };
 
 }

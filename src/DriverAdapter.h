@@ -14,7 +14,7 @@ namespace sensekit {
 
     typedef void* device_handle_t;
     typedef void (*device_connected_callback_t)(DriverAdapter* adapter, device_handle_t deviceHandle, void* callbackContext);
-    typedef void (*device_disconnected_callback_t)(void* callbackContext);
+typedef void (*device_disconnected_callback_t)(device_handle_t deviceHandle, void* callbackContext);
 
     class DriverAdapter
     {

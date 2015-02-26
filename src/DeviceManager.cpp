@@ -24,10 +24,35 @@ namespace sensekit {
 
         DriverService* service = new DriverService(*driver);
         m_drivers.push_back(service);
-        service->registerDeviceConnectedCallback([this] (Device* d) { this->m_devices.push_back(d);});
+
+        service->registerDeviceConnectedCallback(
+            std::bind(&DeviceManager::on_device_connected, this, std::placeholders::_1));
+
+        service->registerDeviceDisconnectedCallback(
+            std::bind(&DeviceManager::on_device_disconnected, this, std::placeholders::_1));
+
+        service->registerDeviceChangedCallback(
+            std::bind(&DeviceManager::on_device_changed, this, std::placeholders::_1));
+
         service->initialize();
 
         return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    void DeviceManager::on_device_connected(Device* device)
+    {
+        cout << "device connected." << endl;
+        m_devices.push_back(device);
+    }
+
+    void DeviceManager::on_device_disconnected(Device* device)
+    {
+        cout << "device disconnected." << endl;
+    }
+
+    void DeviceManager::on_device_changed(Device* device)
+    {
+        cout << "device changed." << endl;
     }
 
     sensekit_status_t DeviceManager::query_for_device(char* uri, Device** device)
