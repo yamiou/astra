@@ -140,12 +140,12 @@ public:
             return false;
         }
 
-    unsigned int debug_count()
+    unsigned debug_count()
         {
             if (!m_head)
                 return 0;
 
-            unsigned int count = 0;
+            unsigned count = 0;
             for (node_type* node = m_head->m_next ? m_head->m_next : m_head;
                  node != m_head;
                  node = node->m_next)

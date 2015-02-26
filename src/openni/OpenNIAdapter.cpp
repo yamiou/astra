@@ -1,10 +1,13 @@
 #include "OpenNIAdapter.h"
-#include "../Device.h"
 
 namespace sensekit {
 
-    sensekit_status_t OpenNIAdapter::initialize()
+    sensekit_status_t OpenNIAdapter::initialize(
+        device_connected_callback_t connectedCallback,
+        device_disconnected_callback_t disconnectedCallback, void* callbackContext)
     {
+        DriverAdapter::initialize(connectedCallback, disconnectedCallback, callbackContext);
+
         openni::Status rc = openni::STATUS_OK;
 
         const char* deviceURI = openni::ANY_DEVICE;
@@ -54,10 +57,12 @@ namespace sensekit {
 
         m_initialized = true;
 
+        m_deviceConnectedCallback(m_callbackContext);
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t OpenNIAdapter::destroy()
+    sensekit_status_t OpenNIAdapter::terminate()
     {
         if (m_initialized)
         {
@@ -75,11 +80,16 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t OpenNIAdapter::query_for_device(char *uri, sensekit::Device **device)
+    device_handle_t OpenNIAdapter::open_device(char *uri)
     {
-        *device = new Device(*this);
-        return SENSEKIT_STATUS_SUCCESS;
-
+        return &m_device;
     }
 
+    driver_status_t OpenNIAdapter::close_device(device_handle_t deviceHandle)
+    {
+        openni::Device* device = static_cast<openni::Device*>(deviceHandle);
+        device->close();
+
+        return DRIVER_STATUS_SUCCESS;
+    }
 }

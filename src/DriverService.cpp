@@ -1,9 +1,18 @@
 #include "DriverService.h"
+#include <iostream>
+
+using std::cout;
+using std::endl;
 
 namespace sensekit {
 
     sensekit_status_t DriverService::initialize()
     {
+        m_driverAdapter.initialize(
+            DriverService::adapter_deviceConnected,
+            DriverService::adapter_deviceDisconnected,
+            this);
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 
@@ -12,15 +21,17 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t DriverService::has_device_for_uri(char *uri, bool &deviceAvailable)
+    void DriverService::adapter_deviceConnected(void *context)
     {
-        deviceAvailable = true;
-        return SENSEKIT_STATUS_SUCCESS;
+        cout << "device connected" << endl;
     }
 
-    sensekit_status_t DriverService::query_for_device(char* uri, Device** device)
+    void DriverService::adapter_deviceDisconnected(void *context)
     {
-        return SENSEKIT_STATUS_SUCCESS;
+
     }
+
+
+
 
 }

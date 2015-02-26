@@ -4,7 +4,7 @@
 #include <SenseKit.h>
 #include <vector>
 #include "Device.h"
-#include "DriverService.h"
+#include "DriverAdapter.h"
 
 namespace sensekit {
 
@@ -20,13 +20,12 @@ namespace sensekit {
     private:
 
         typedef std::vector<DriverService*> DriverList;
+        typedef std::vector<Device*> DeviceList;
 
         DriverList m_drivers;
-        sensekit_status_t add_driver(DriverService* driver);
-        sensekit_status_t find_driver(char* uri, DriverService** service);
+        DeviceList m_devices;
 
-
-
+        sensekit_status_t add_driver(DriverAdapter* driver);
     };
 
 }

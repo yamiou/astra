@@ -2,11 +2,11 @@
 #define OPENNIADAPTER_H
 
 #include <OpenNI.h>
-#include "../DriverService.h"
+#include "../DriverAdapter.h"
 
 namespace sensekit {
 
-    class OpenNIAdapter : public DriverService
+    class OpenNIAdapter : public DriverAdapter
     {
     public:
         OpenNIAdapter()
@@ -15,10 +15,14 @@ namespace sensekit {
 
         virtual ~OpenNIAdapter() {}
 
-        virtual sensekit_status_t initialize() override;
-        virtual sensekit_status_t destroy() override;
+        virtual sensekit_status_t initialize(device_connected_callback_t connectedCallback,
+                                             device_disconnected_callback_t disconnectedCallback,
+                                             void* callbackContext) override;
+
+        virtual sensekit_status_t terminate() override;
         virtual sensekit_status_t has_device_for_uri(char* uri, bool& deviceAvailable) override;
-        virtual sensekit_status_t query_for_device(char* uri, Device** device) override;
+        virtual device_handle_t open_device(char* uri) override;
+        virtual driver_status_t close_device(device_handle_t deviceHandle) override;
 
     private:
         bool m_initialized;

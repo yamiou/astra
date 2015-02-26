@@ -3,6 +3,7 @@ set(SenseKit_SOURCES
   Context.cpp
   Sensor.h
   Sensor.cpp
+  DriverAdapter.h
   ../include/SenseKit.h
   SenseKit.cpp
   DeviceManager.h

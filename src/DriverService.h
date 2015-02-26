@@ -2,6 +2,7 @@
 #define DRIVERSERVICE_H
 
 #include <SenseKit.h>
+#include "DriverAdapter.h"
 
 namespace sensekit {
 
@@ -10,13 +11,22 @@ namespace sensekit {
     class DriverService
     {
     public:
-        DriverService() {}
+        DriverService(DriverAdapter& driverAdapter)
+            : m_driverAdapter(driverAdapter)
+            {}
+
         virtual ~DriverService() {}
 
         virtual sensekit_status_t initialize();
         virtual sensekit_status_t destroy();
-        virtual sensekit_status_t has_device_for_uri(char *uri, bool& deviceAvailable);
-        virtual sensekit_status_t query_for_device(char* uri, Device** device);
+
+
+    private:
+
+        DriverAdapter& m_driverAdapter;
+
+        static void adapter_deviceConnected(void* context);
+        static void adapter_deviceDisconnected(void* context);
     };
 }
 
