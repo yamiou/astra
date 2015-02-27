@@ -16,7 +16,30 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    Device* DriverService::find_device(size_t deviceId)
+    sensekit_status_t DriverService::query_for_device(const char* uri, Device** device)
+    {
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    Device* DriverService::find_device_by_uri(const char* uri)
+    {
+        auto it = std::find_if(m_devices.begin(),
+                               m_devices.end(),
+                               [uri] (Device* d) -> bool
+                               {
+                                   const char* d_uri = d->get_description().uri;
+                                   return strncmp(d_uri, uri, MAX_STRING_FIELD_LENGTH) == 0;
+                               });
+
+        if (it == m_devices.end())
+        {
+            return nullptr;
+        }
+
+        return *it;
+    }
+
+    Device* DriverService::find_device_by_id(size_t deviceId)
     {
         auto it = std::find_if(m_devices.begin(),
                                m_devices.end(),
@@ -25,15 +48,12 @@ namespace sensekit {
                                    return d->get_device_id() == deviceId;
                                });
 
-        if (it != m_devices.end())
-        {
-            return *it;
-        }
-        else
+        if (it == m_devices.end())
         {
             return nullptr;
         }
 
+        return *it;
     }
 
     bool DriverService::device_exists(const Device& device)
@@ -61,27 +81,24 @@ namespace sensekit {
         return false;
     }
 
-    void DriverService::adapter_deviceConnected(DriverAdapter* adapter, device_handle_t deviceHandle, void* context)
+    void DriverService::adapter_deviceConnected(DriverAdapter* adapter, const sensekit_device_desc_t& desc, void* context)
     {
         DriverService* service = static_cast<DriverService*>(context);
-        Device* device = new Device(*adapter, deviceHandle);
+        Device* device = service->find_device_by_uri(desc.uri);
 
-        if (!service->device_exists(*device))
+        if (device == nullptr)
         {
+            device = new Device(*adapter, desc);
             service->m_devices.push_back(device);
             service->m_connectedSignal.raise(device);
         }
-        else
-        {
-            delete device;
-        }
     }
 
-    void DriverService::adapter_deviceDisconnected(device_handle_t deviceHandle, void* context)
+    void DriverService::adapter_deviceDisconnected(const sensekit_device_desc_t& desc, void* context)
     {
         DriverService* service = static_cast<DriverService*>(context);
 
-        Device* device = service->find_device(Device::DeviceId(deviceHandle));
+        Device* device = service->find_device_by_uri(desc.uri);
 
         if (device != nullptr)
         {
@@ -92,11 +109,11 @@ namespace sensekit {
         }
     }
 
-    void DriverService::adapter_deviceChanged(device_handle_t deviceHandle, void* context)
+    void DriverService::adapter_deviceChanged(const sensekit_device_desc_t& desc, void* context)
     {
         DriverService* service = static_cast<DriverService*>(context);
 
-        Device* device = service->find_device(Device::DeviceId(deviceHandle));
+        Device* device = service->find_device_by_uri(desc.uri);
 
         if (device != nullptr)
         {

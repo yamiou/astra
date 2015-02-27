@@ -59,7 +59,15 @@ namespace sensekit {
 
         m_initialized = true;
 
-        m_deviceConnectedCallback(this, &m_device, m_callbackContext);
+        const openni::DeviceInfo& info = m_device.getDeviceInfo();
+
+        strncpy(m_desc.uri, info.getUri(), MAX_STRING_FIELD_LENGTH);
+        strncpy(m_desc.name, info.getName(), MAX_STRING_FIELD_LENGTH);
+        strncpy(m_desc.vendor, info.getVendor(), MAX_STRING_FIELD_LENGTH);
+        m_desc.usb_vendor_id = info.getUsbVendorId();
+        m_desc.usb_product_id = info.getUsbProductId();
+
+        m_deviceConnectedCallback(this, m_desc, m_callbackContext);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -69,7 +77,7 @@ namespace sensekit {
 
         if (m_initialized)
         {
-            m_deviceDisconnectedCallback(&m_device, m_callbackContext);
+            m_deviceDisconnectedCallback(m_desc, m_callbackContext);
             openni::OpenNI::shutdown();
         }
 

@@ -28,6 +28,7 @@ namespace sensekit {
     private:
         bool m_initialized;
         openni::Device m_device;
+        sensekit_device_desc_t m_desc;
         openni::VideoStream m_colorStream;
         openni::VideoStream m_depthStream;
     };

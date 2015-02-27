@@ -4,9 +4,11 @@
 #ifdef  __cplusplus
 # define SENSEKIT_BEGIN_DECLS  extern "C" {
 # define SENSEKIT_END_DECLS    }
+# include <cstdint>
 #else
 # define SENSEKIT_BEGIN_DECLS
 # define SENSEKIT_END_DECLS
+# include <stdint.h>
 #endif
 
 #ifndef SENSEKIT_API
@@ -19,18 +21,28 @@
 
 SENSEKIT_BEGIN_DECLS
 
+const unsigned MAX_STRING_FIELD_LENGTH = 256;
+
 typedef enum _sensekit_status {
     SENSEKIT_STATUS_SUCCESS = 0,
     SENSEKIT_STATUS_INVALID_PARAMETER = 1,
     SENSEKIT_STATUS_DEVICE_ERROR = 2
 } sensekit_status_t;
 
+typedef struct _sensekit_device_desc {
+    char uri[MAX_STRING_FIELD_LENGTH];
+    char vendor[MAX_STRING_FIELD_LENGTH];
+    char name[MAX_STRING_FIELD_LENGTH];
+    uint16_t usb_vendor_id;
+    uint16_t usb_product_id;
+} sensekit_device_desc_t;
+
 typedef struct _sensekit_sensor sensekit_sensor_t;
 typedef struct _sensekit_depthstream sensekit_depthstream_t;
 typedef struct _sensekit_depthframe sensekit_depthframe_t;
 
 SENSEKIT_API sensekit_status_t sensekit_open_sensor(
-    char* connection_string,
+    const char* connection_string,
     /*out*/ sensekit_sensor_t** sensor);
 
 SENSEKIT_API sensekit_status_t sensekit_close_sensor(

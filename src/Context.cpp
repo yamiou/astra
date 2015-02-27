@@ -20,7 +20,7 @@ namespace sensekit {
         }
     }
 
-    sensekit_status_t Context::open_sensor(char* uri, sensekit_sensor_t** sensor)
+    sensekit_status_t Context::open_sensor(const char* uri, sensekit_sensor_t** sensor)
     {
         if (NULL == uri)
         {
@@ -43,7 +43,7 @@ namespace sensekit {
         ensure_initialized();
 
         Device* device = (*sensor)->p_deviceHandle;
-        
+
         if (NULL != device)
         {
             delete device;

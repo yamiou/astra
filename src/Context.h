@@ -27,7 +27,7 @@ namespace sensekit {
         virtual ~Context() {};
 
         sensekit_status_t initialize();
-        sensekit_status_t open_sensor(char* uri, sensekit_sensor_t** sensor);
+        sensekit_status_t open_sensor(const char* uri, sensekit_sensor_t** sensor);
         sensekit_status_t close_sensor(sensekit_sensor_t** sensor);
 
     private:

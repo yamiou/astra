@@ -41,8 +41,11 @@ namespace sensekit {
 
     void DeviceManager::on_device_connected(Device* device)
     {
-        cout << "device connected." << endl;
-        m_devices.push_back(device);
+        cout << "device connected: "
+             << device->get_description().vendor
+             << " "
+             << device->get_description().name
+             << endl;
     }
 
     void DeviceManager::on_device_disconnected(Device* device)
@@ -55,10 +58,8 @@ namespace sensekit {
         cout << "device changed." << endl;
     }
 
-    sensekit_status_t DeviceManager::query_for_device(char* uri, Device** device)
+    sensekit_status_t DeviceManager::query_for_device(const char* uri, Device** device)
     {
-
-        *device = m_devices[0];
         return SENSEKIT_STATUS_SUCCESS;
     }
 
