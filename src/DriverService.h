@@ -50,6 +50,8 @@ namespace sensekit {
         bool unregisterDeviceChangedCallback(CallbackId callbackId)
             { return m_changedSignal -= callbackId; };
 
+        sensekit_status_t open_device(const char *uri, Device** device);
+
     private:
 
         DriverAdapter& m_driverAdapter;
@@ -67,6 +69,7 @@ namespace sensekit {
         Device* find_device_by_id(Device::DeviceId deviceId);
         Device* find_device_by_uri(const char* uri);
         bool remove_device(const Device* device);
+        bool add_device(DriverAdapter* adapter, const sensekit_device_desc_t& desc);
     };
 }
 

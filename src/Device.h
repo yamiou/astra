@@ -18,6 +18,18 @@ namespace sensekit {
 
         virtual ~Device() {}
 
+        void open()
+            {
+                m_deviceHandle = m_driverAdapter.open_device(m_deviceDesc.uri);
+            }
+        void close()
+            {
+                if (is_open())
+                {
+                    m_driverAdapter.close_device(m_deviceHandle);
+                }
+            }
+
         Stream* create_stream();
 
         inline bool operator==(const Device& rhs)
@@ -27,6 +39,8 @@ namespace sensekit {
 
         const sensekit_device_desc_t& get_description() const { return m_deviceDesc; }
         DeviceId get_device_id() { return DeviceId(m_deviceHandle); }
+
+        bool is_open() const { return m_deviceHandle != nullptr; }
 
     private:
 

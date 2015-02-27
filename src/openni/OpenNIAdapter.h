@@ -22,7 +22,7 @@ namespace sensekit {
 
         virtual sensekit_status_t terminate() override;
         virtual sensekit_status_t has_device_for_uri(char* uri, bool& deviceAvailable) override;
-        virtual device_handle_t open_device(char* uri) override;
+        virtual device_handle_t open_device(const char* uri) override;
         virtual driver_status_t close_device(device_handle_t deviceHandle) override;
 
     private:

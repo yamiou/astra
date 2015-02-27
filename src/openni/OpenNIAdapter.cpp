@@ -92,7 +92,7 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    device_handle_t OpenNIAdapter::open_device(char *uri)
+    device_handle_t OpenNIAdapter::open_device(const char *uri)
     {
         return &m_device;
     }

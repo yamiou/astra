@@ -39,6 +39,33 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
+    sensekit_status_t DeviceManager::open_device(const char *uri, sensekit::Device **device)
+    {
+        *device = NULL;
+        for(auto* service : m_drivers)
+        {
+            Device* d;
+            service->query_for_device(uri, &d);
+
+            if (d)
+            {
+                d->open();
+                *device = d;
+                return SENSEKIT_STATUS_SUCCESS;
+            }
+        }
+
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t DeviceManager::close_device(sensekit::Device **device)
+    {
+        (*device)->close();
+        *device = NULL;
+
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
     void DeviceManager::on_device_connected(Device* device)
     {
         cout << "device connected: "

@@ -35,9 +35,10 @@ namespace sensekit {
                 m_callbackContext = callbackContext;
 
                 return SENSEKIT_STATUS_SUCCESS;
-};
+            };
+
         virtual sensekit_status_t terminate() = 0;
-        virtual device_handle_t open_device(char* uri) = 0;
+        virtual device_handle_t open_device(const char* uri) = 0;
         virtual driver_status_t close_device(device_handle_t handle) = 0;
         virtual sensekit_status_t has_device_for_uri(char *uri, bool& deviceAvailable) = 0;
 

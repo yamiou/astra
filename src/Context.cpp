@@ -29,10 +29,15 @@ namespace sensekit {
 
         ensure_initialized();
 
-        Device* device = NULL;
+        Device* device = nullptr;
         m_deviceManager.query_for_device(uri, &device);
 
-        *sensor  = (sensekit_sensor_t*)malloc(sizeof(sensekit_sensor_t));
+        if (device != nullptr)
+        {
+            device->open();
+        }
+
+        *sensor  = new sensekit_sensor_t;
         (*sensor)->p_deviceHandle = device;
 
         return SENSEKIT_STATUS_SUCCESS;
@@ -44,9 +49,9 @@ namespace sensekit {
 
         Device* device = (*sensor)->p_deviceHandle;
 
-        if (NULL != device)
+        if (device != nullptr)
         {
-            delete device;
+            device->close();
         }
 
         free(*sensor);
