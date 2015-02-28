@@ -1,8 +1,11 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
+#include <vector>
 #include "DriverAdapter.h"
 #include "Stream.h"
+
+class StreamSource;
 
 namespace sensekit {
 
@@ -10,7 +13,7 @@ namespace sensekit {
     {
     public:
 
-        typedef size_t DeviceId;
+        typedef size_t device_id;
 
         Device(DriverAdapter& adapter, const sensekit_device_desc_t& desc)
             : m_driverAdapter(adapter), m_deviceDesc(desc), m_deviceHandle(nullptr)
@@ -18,34 +21,28 @@ namespace sensekit {
 
         virtual ~Device() {}
 
-        void open()
-            {
-                m_deviceHandle = m_driverAdapter.open_device(m_deviceDesc.uri);
-            }
-        void close()
-            {
-                if (is_open())
-                {
-                    m_driverAdapter.close_device(m_deviceHandle);
-                }
-            }
-
-        Stream* create_stream();
-
         inline bool operator==(const Device& rhs)
             {
                 return m_deviceHandle == rhs.m_deviceHandle;
             }
 
         const sensekit_device_desc_t& get_description() const { return m_deviceDesc; }
-        DeviceId get_device_id() { return DeviceId(m_deviceHandle); }
-
+        device_id get_device_id() const { return device_id(m_deviceHandle); }
         bool is_open() const { return m_deviceHandle != nullptr; }
+
+        Stream* open_stream();
+        void close_stream(Stream* stream);
+        void open();
+        void close();
 
     private:
 
+        typedef std::vector<StreamSource*> StreamSourceList;
+
         DriverAdapter& m_driverAdapter;
+        StreamSourceList  m_streamSources;
         device_handle_t m_deviceHandle;
+
         const sensekit_device_desc_t& m_deviceDesc;
     };
 

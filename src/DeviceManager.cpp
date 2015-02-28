@@ -17,7 +17,7 @@ namespace sensekit {
 
     sensekit_status_t DeviceManager::add_driver(DriverAdapter* driver)
     {
-        if (NULL == driver)
+        if (driver == nullptr)
         {
             return SENSEKIT_STATUS_INVALID_PARAMETER;
         }
@@ -39,7 +39,7 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t DeviceManager::open_device(const char *uri, sensekit::Device **device)
+    sensekit_status_t DeviceManager::open_device(const char *uri, Device **device)
     {
         *device = NULL;
         for(auto* service : m_drivers)
@@ -58,7 +58,7 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t DeviceManager::close_device(sensekit::Device **device)
+    sensekit_status_t DeviceManager::close_device(Device **device)
     {
         (*device)->close();
         *device = NULL;

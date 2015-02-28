@@ -33,9 +33,18 @@ typedef struct _sensekit_device_desc {
     char uri[MAX_STRING_FIELD_LENGTH];
     char vendor[MAX_STRING_FIELD_LENGTH];
     char name[MAX_STRING_FIELD_LENGTH];
-    uint16_t usb_vendor_id;
-    uint16_t usb_product_id;
+    uint16_t usbVendorId;
+    uint16_t usbProductId;
 } sensekit_device_desc_t;
+
+typedef struct _sensekit_frame_desc {
+    unsigned bitsPerPixel;
+    unsigned width;
+    unsigned height;
+    unsigned length;
+    float hFOV;
+    float vFOV;
+} sensekit_frame_desc;
 
 typedef struct _sensekit_sensor sensekit_sensor_t;
 typedef struct _sensekit_depthstream sensekit_depthstream_t;

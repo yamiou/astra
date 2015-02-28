@@ -54,7 +54,7 @@ namespace sensekit {
             device->close();
         }
 
-        free(*sensor);
+        delete *sensor;
 
         *sensor = NULL;
 

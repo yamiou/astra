@@ -6,9 +6,9 @@ namespace sensekit {
         device_connected_callback_t connectedCallback,
         device_disconnected_callback_t disconnectedCallback,
         device_changed_callback_t changedCallback,
-        void* callbackContext)
+        void* context)
     {
-        DriverAdapter::initialize(connectedCallback, disconnectedCallback, changedCallback, callbackContext);
+        DriverAdapter::initialize(connectedCallback, disconnectedCallback, changedCallback, context);
 
         openni::Status rc = openni::STATUS_OK;
 
@@ -64,10 +64,10 @@ namespace sensekit {
         strncpy(m_desc.uri, info.getUri(), MAX_STRING_FIELD_LENGTH);
         strncpy(m_desc.name, info.getName(), MAX_STRING_FIELD_LENGTH);
         strncpy(m_desc.vendor, info.getVendor(), MAX_STRING_FIELD_LENGTH);
-        m_desc.usb_vendor_id = info.getUsbVendorId();
-        m_desc.usb_product_id = info.getUsbProductId();
+        m_desc.usbVendorId = info.getUsbVendorId();
+        m_desc.usbProductId = info.getUsbProductId();
 
-        m_deviceConnectedCallback(this, m_desc, m_callbackContext);
+        m_deviceConnectedCallback(this, m_desc, m_context);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -77,7 +77,7 @@ namespace sensekit {
 
         if (m_initialized)
         {
-            m_deviceDisconnectedCallback(m_desc, m_callbackContext);
+            m_deviceDisconnectedCallback(m_desc, m_context);
             openni::OpenNI::shutdown();
         }
 
@@ -86,7 +86,7 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t OpenNIAdapter::has_device_for_uri(char *uri, bool &deviceAvailable)
+    sensekit_status_t OpenNIAdapter::has_device_for_uri(const char* uri, bool &deviceAvailable)
     {
         deviceAvailable = true;
         return SENSEKIT_STATUS_SUCCESS;
@@ -103,5 +103,15 @@ namespace sensekit {
         device->close();
 
         return DRIVER_STATUS_SUCCESS;
+    }
+
+    stream_handle_t OpenNIAdapter::open_stream(device_handle_t deviceHandle, int streamType)
+    {
+        return nullptr;
+    }
+
+    void OpenNIAdapter::close_stream(device_handle_t deviceHandle, stream_handle_t streamHandle)
+    {
+
     }
 }

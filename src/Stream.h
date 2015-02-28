@@ -6,8 +6,8 @@ namespace sensekit {
     class Stream
     {
     public:
-        Stream();
-        virtual ~Stream();
+        Stream() {};
+        virtual ~Stream() { };
     };
 
 

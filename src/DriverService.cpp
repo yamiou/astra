@@ -83,7 +83,7 @@ namespace sensekit {
     {
         auto it = std::find_if(m_devices.begin(),
                                m_devices.end(),
-                               [device] (Device* d) -> bool
+                               [&device] (Device* d) -> bool
                                {
                                    return *d == device;
                                });

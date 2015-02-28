@@ -13,9 +13,11 @@ namespace sensekit {
     class DriverAdapter;
 
     typedef void* device_handle_t;
-    typedef void (*device_connected_callback_t)(DriverAdapter* adapter, const sensekit_device_desc_t& desc, void* callbackContext);
-    typedef void (*device_disconnected_callback_t)(const sensekit_device_desc_t& desc, void* callbackContext);
-    typedef void (*device_changed_callback_t)(const sensekit_device_desc_t& desc, void* callbackContext);
+    typedef void* stream_handle_t;
+
+    typedef void (*device_connected_callback_t)(DriverAdapter* adapter, const sensekit_device_desc_t& desc, void* context);
+    typedef void (*device_disconnected_callback_t)(const sensekit_device_desc_t& desc, void* context);
+    typedef void (*device_changed_callback_t)(const sensekit_device_desc_t& desc, void* context);
 
     class DriverAdapter
     {
@@ -27,12 +29,12 @@ namespace sensekit {
             device_connected_callback_t connectedCallback,
             device_disconnected_callback_t disconnectedCallback,
             device_changed_callback_t changedCallback,
-            void* callbackContext)
+            void* context)
             {
                 m_deviceConnectedCallback = connectedCallback;
                 m_deviceDisconnectedCallback = disconnectedCallback;
                 m_deviceChangedCallback = changedCallback;
-                m_callbackContext = callbackContext;
+                m_context = context;
 
                 return SENSEKIT_STATUS_SUCCESS;
             };
@@ -40,13 +42,16 @@ namespace sensekit {
         virtual sensekit_status_t terminate() = 0;
         virtual device_handle_t open_device(const char* uri) = 0;
         virtual driver_status_t close_device(device_handle_t handle) = 0;
-        virtual sensekit_status_t has_device_for_uri(char *uri, bool& deviceAvailable) = 0;
+        virtual stream_handle_t open_stream(device_handle_t deviceHandle, int streamType) = 0;
+        virtual void close_stream(device_handle_t deviceHandle, stream_handle_t streamHandle) = 0;
+        virtual sensekit_status_t has_device_for_uri(const char *uri, bool& deviceAvailable) = 0;
 
     protected:
+
         device_connected_callback_t m_deviceConnectedCallback;
         device_disconnected_callback_t m_deviceDisconnectedCallback;
         device_changed_callback_t m_deviceChangedCallback;
-        void* m_callbackContext;
+        void* m_context;
 
     private:
 

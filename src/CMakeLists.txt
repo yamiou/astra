@@ -1,6 +1,8 @@
 set(SenseKit_SOURCES
   Context.h
   Context.cpp
+  Device.h
+  Device.cpp
   Sensor.h
   Sensor.cpp
   DriverAdapter.h
@@ -10,6 +12,8 @@ set(SenseKit_SOURCES
   DeviceManager.cpp
   DriverService.h
   DriverService.cpp
+  StreamSource.h
+  StreamSource.cpp
   Stream.h
   Stream.cpp
   openni/OpenNIAdapter.h
