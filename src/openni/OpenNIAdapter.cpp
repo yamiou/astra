@@ -105,8 +105,18 @@ namespace sensekit {
         return DRIVER_STATUS_SUCCESS;
     }
 
-    stream_handle_t OpenNIAdapter::open_stream(device_handle_t deviceHandle, int streamType)
+    stream_handle_t OpenNIAdapter::open_stream(device_handle_t deviceHandle, stream_type_t streamType)
     {
+        switch (streamType)
+        {
+        case SENSEKIT_STREAM_RGB:
+            return &m_colorStream;
+            break;
+        case SENSEKIT_STREAM_DEPTH:
+            return &m_depthStream;
+            break;
+        }
+
         return nullptr;
     }
 

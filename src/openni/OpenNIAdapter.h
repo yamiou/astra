@@ -24,7 +24,7 @@ namespace sensekit {
         virtual sensekit_status_t has_device_for_uri(const char* uri, bool& deviceAvailable) override;
         virtual device_handle_t open_device(const char* uri) override;
         virtual driver_status_t close_device(device_handle_t deviceHandle) override;
-        virtual stream_handle_t open_stream(device_handle_t deviceHandle, int streamType) override;
+        virtual stream_handle_t open_stream(device_handle_t deviceHandle, stream_type_t streamType) override;
         virtual void close_stream(device_handle_t deviceHandle, stream_handle_t streamHandle) override;
 
     private:

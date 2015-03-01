@@ -15,6 +15,12 @@ namespace sensekit {
     typedef void* device_handle_t;
     typedef void* stream_handle_t;
 
+    enum stream_type_t
+        {
+            SENSEKIT_STREAM_RGB,
+            SENSEKIT_STREAM_DEPTH
+        };
+
     typedef void (*device_connected_callback_t)(DriverAdapter* adapter, const sensekit_device_desc_t& desc, void* context);
     typedef void (*device_disconnected_callback_t)(const sensekit_device_desc_t& desc, void* context);
     typedef void (*device_changed_callback_t)(const sensekit_device_desc_t& desc, void* context);
@@ -42,7 +48,7 @@ namespace sensekit {
         virtual sensekit_status_t terminate() = 0;
         virtual device_handle_t open_device(const char* uri) = 0;
         virtual driver_status_t close_device(device_handle_t handle) = 0;
-        virtual stream_handle_t open_stream(device_handle_t deviceHandle, int streamType) = 0;
+        virtual stream_handle_t open_stream(device_handle_t deviceHandle, stream_type_t steamType) = 0;
         virtual void close_stream(device_handle_t deviceHandle, stream_handle_t streamHandle) = 0;
         virtual sensekit_status_t has_device_for_uri(const char *uri, bool& deviceAvailable) = 0;
 
