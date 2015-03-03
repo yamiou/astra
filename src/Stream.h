@@ -3,11 +3,18 @@
 
 namespace sensekit {
 
+    class StreamSource;
+
     class Stream
     {
     public:
-        Stream() {};
-        virtual ~Stream() { };
+        Stream(StreamSource& source)
+            : m_source(source) { }
+
+
+    protected:
+        StreamSource& m_source;
+
     };
 
 

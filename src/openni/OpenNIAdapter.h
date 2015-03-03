@@ -26,6 +26,10 @@ namespace sensekit {
         virtual driver_status_t close_device(device_handle_t deviceHandle) override;
         virtual stream_handle_t open_stream(device_handle_t deviceHandle, stream_type_t streamType) override;
         virtual void close_stream(device_handle_t deviceHandle, stream_handle_t streamHandle) override;
+        virtual driver_status_t get_available_streams(
+            device_handle_t deviceHandle,
+            const sensekit_stream_desc_t* descArray,
+            size_t* count) override;
 
     private:
         bool m_initialized;

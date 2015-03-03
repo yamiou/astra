@@ -12,18 +12,18 @@ namespace sensekit {
 
     class DriverAdapter;
 
-    typedef void* device_handle_t;
-    typedef void* stream_handle_t;
+    using device_handle_t =  void*;
+    using stream_handle_t = void*;
 
     enum stream_type_t
         {
-            SENSEKIT_STREAM_RGB,
-            SENSEKIT_STREAM_DEPTH
+            SENSEKIT_STREAM_COLOR = 1,
+            SENSEKIT_STREAM_DEPTH = 2
         };
 
-    typedef void (*device_connected_callback_t)(DriverAdapter* adapter, const sensekit_device_desc_t& desc, void* context);
-    typedef void (*device_disconnected_callback_t)(const sensekit_device_desc_t& desc, void* context);
-    typedef void (*device_changed_callback_t)(const sensekit_device_desc_t& desc, void* context);
+    using device_connected_callback_t = void (*)(DriverAdapter*, const sensekit_device_desc_t&, void*);
+    using device_disconnected_callback_t = void (*)(const sensekit_device_desc_t&, void* context);
+    using device_changed_callback_t = void (*)(const sensekit_device_desc_t&, void*);
 
     class DriverAdapter
     {
@@ -48,6 +48,11 @@ namespace sensekit {
         virtual sensekit_status_t terminate() = 0;
         virtual device_handle_t open_device(const char* uri) = 0;
         virtual driver_status_t close_device(device_handle_t handle) = 0;
+        virtual driver_status_t get_available_streams(
+            device_handle_t deviceHandle,
+            const sensekit_stream_desc_t* descArray,
+            size_t* count) = 0;
+
         virtual stream_handle_t open_stream(device_handle_t deviceHandle, stream_type_t steamType) = 0;
         virtual void close_stream(device_handle_t deviceHandle, stream_handle_t streamHandle) = 0;
         virtual sensekit_status_t has_device_for_uri(const char *uri, bool& deviceAvailable) = 0;

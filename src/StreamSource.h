@@ -1,25 +1,20 @@
 #ifndef STREAMSOURCE_H
 #define STREAMSOURCE_H
 
-#include "Device.h"
-#include "DriverAdapter.h"
+#include "Stream.h"
 
 namespace sensekit {
 
     class StreamSource
     {
     public:
+        StreamSource() {};
+        virtual ~StreamSource() {};
 
-        StreamSource(DriverAdapter& adapter, Device& device);
-        virtual ~StreamSource() {}
-
-    private:
-
-        DriverAdapter& m_adapter;
-        Device& m_device;
-
+        virtual Stream* create_stream() = 0;
+        virtual void destroy_stream(Stream* stream) = 0;
     };
-}
 
+}
 
 #endif /* STREAMSOURCE_H */

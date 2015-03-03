@@ -12,10 +12,12 @@ set(SenseKit_SOURCES
   DeviceManager.cpp
   DriverService.h
   DriverService.cpp
-  StreamSource.h
-  StreamSource.cpp
+  DeviceStreamSource.h
+  DeviceStreamSource.cpp
   Stream.h
   Stream.cpp
+  ColorStream.h
+  DepthStream.h
   openni/OpenNIAdapter.h
   openni/OpenNIAdapter.cpp)
 

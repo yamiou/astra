@@ -38,13 +38,17 @@ typedef struct _sensekit_device_desc {
 } sensekit_device_desc_t;
 
 typedef struct _sensekit_frame_desc {
-    unsigned bitsPerPixel;
+    unsigned bytesPerPixel;
     unsigned width;
     unsigned height;
     unsigned length;
     float hFOV;
     float vFOV;
 } sensekit_frame_desc;
+
+typedef struct _sensekit_stream_desc {
+    sensekit_frame_desc frameDescription;
+} sensekit_stream_desc_t;
 
 typedef struct _sensekit_sensor sensekit_sensor_t;
 typedef struct _sensekit_depthstream sensekit_depthstream_t;

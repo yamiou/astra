@@ -109,7 +109,7 @@ namespace sensekit {
     {
         switch (streamType)
         {
-        case SENSEKIT_STREAM_RGB:
+        case SENSEKIT_STREAM_COLOR:
             return &m_colorStream;
             break;
         case SENSEKIT_STREAM_DEPTH:
@@ -124,4 +124,13 @@ namespace sensekit {
     {
 
     }
+
+    driver_status_t OpenNIAdapter::get_available_streams(
+        device_handle_t deviceHandle,
+        const sensekit_stream_desc_t* descArray,
+        size_t* arraySize)
+    {
+
+    }
+
 }
