@@ -8,11 +8,20 @@ using std::endl;
 
 namespace sensekit {
 
-    sensekit_status_t DeviceManager::initialize()
+    void DeviceManager::initialize()
     {
         add_driver(new OpenNIAdapter());
+    }
 
-        return SENSEKIT_STATUS_SUCCESS;
+    void DeviceManager::terminate()
+    {
+        for(auto& entry : m_adapters)
+        {
+            DriverAdapter* pAdapter = entry.adapter;
+            pAdapter->terminate();
+
+            unregister_for_device_events(*pAdapter, entry.callbackList);
+        }
     }
 
     sensekit_status_t DeviceManager::add_driver(DriverAdapter* driver)
@@ -22,53 +31,47 @@ namespace sensekit {
             return SENSEKIT_STATUS_INVALID_PARAMETER;
         }
 
-        DriverService* service = new DriverService(*driver);
-        m_drivers.push_back(service);
+        CallbackIdList idList = register_for_device_events(*driver);
 
-        service->registerDeviceConnectedCallback(
-            std::bind(&DeviceManager::on_device_connected, this, std::placeholders::_1));
+        DriverEntry entry;
+        entry.adapter = driver;
+        entry.callbackList = idList;
 
-        service->registerDeviceDisconnectedCallback(
-            std::bind(&DeviceManager::on_device_disconnected, this, std::placeholders::_1));
+        m_adapters.push_back(entry);
 
-        service->registerDeviceChangedCallback(
-            std::bind(&DeviceManager::on_device_changed, this, std::placeholders::_1));
-
-        service->initialize();
+        driver->initialize();
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t DeviceManager::open_device(const char *uri, Device **device)
+    DeviceManager::CallbackIdList DeviceManager::register_for_device_events(DriverAdapter& driver)
     {
-        *device = NULL;
-        for(auto* service : m_drivers)
-        {
-            Device* d;
-            service->query_for_device(uri, &d);
+        DeviceManager::CallbackIdList idList;
 
-            if (d)
-            {
-                d->open();
-                *device = d;
-                return SENSEKIT_STATUS_SUCCESS;
-            }
-        }
+        idList[0] = driver.connectedSignal() +=
+            [this] (DeviceConnectedEventArgs args) { on_device_connected(args.device); };
 
-        return SENSEKIT_STATUS_SUCCESS;
+        idList[1] = driver.disconnectedSignal() +=
+            [this] (DeviceDisconnectedEventArgs args) { on_device_disconnected(args.device); };
+
+        idList[2] = driver.changedSignal() +=
+            [this] (DeviceChangedEventArgs args) { on_device_changed(args.device); };
+
+        return idList;
     }
 
-    sensekit_status_t DeviceManager::close_device(Device **device)
+    void DeviceManager::unregister_for_device_events(DriverAdapter& adapter, const CallbackIdList& callbackList)
     {
-        (*device)->close();
-        *device = NULL;
-
-        return SENSEKIT_STATUS_SUCCESS;
+        adapter.connectedSignal() -= callbackList[0];
+        adapter.disconnectedSignal() -= callbackList[1];
+        adapter.changedSignal() -= callbackList[2];
     }
 
     void DeviceManager::on_device_connected(Device* device)
     {
-        cout << "device connected: "
+        cout << "deviceManager: device connected: "
+             << device->get_description().uri
+             << ": "
              << device->get_description().vendor
              << " "
              << device->get_description().name
@@ -77,17 +80,35 @@ namespace sensekit {
 
     void DeviceManager::on_device_disconnected(Device* device)
     {
-        cout << "device disconnected." << endl;
+        cout << "deviceManager: device disconnected: " << device->get_description().uri << endl;
     }
 
     void DeviceManager::on_device_changed(Device* device)
     {
-        cout << "device changed." << endl;
+        cout << "deviceManager: device changed." << endl;
     }
 
-    sensekit_status_t DeviceManager::query_for_device(const char* uri, Device** device)
+    Device* DeviceManager::query_for_device(const char* uri)
     {
-        return SENSEKIT_STATUS_SUCCESS;
+        cout << "deviceManager: searching for " << uri;
+
+        for(auto& entry : m_adapters)
+        {
+            DriverAdapter* pAdapter = entry.adapter;
+
+            Device* pDevice = nullptr;
+            pDevice = pAdapter->query_for_device(uri);
+
+            if (pDevice)
+            {
+                cout << " ... found." << endl;
+                return pDevice;
+            }
+        }
+
+        cout << "... not found." << endl;
+
+        return nullptr;
     }
 
 }

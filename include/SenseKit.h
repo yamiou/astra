@@ -54,6 +54,8 @@ typedef struct _sensekit_sensor sensekit_sensor_t;
 typedef struct _sensekit_depthstream sensekit_depthstream_t;
 typedef struct _sensekit_depthframe sensekit_depthframe_t;
 
+SENSEKIT_API void sensekit_terminate();
+
 SENSEKIT_API sensekit_status_t sensekit_open_sensor(
     const char* connection_string,
     /*out*/ sensekit_sensor_t** sensor);

@@ -2,12 +2,28 @@
 #include <cstdlib>
 #include "openni/OpenNIAdapter.h"
 
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
 namespace sensekit {
 
     sensekit_status_t Context::initialize()
     {
         m_deviceManager.initialize();
         m_initialized = true;
+
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t Context::terminate()
+    {
+        if (!m_initialized)
+            return SENSEKIT_STATUS_SUCCESS;
+
+        m_deviceManager.terminate();
+        m_initialized = false;
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -22,15 +38,14 @@ namespace sensekit {
 
     sensekit_status_t Context::open_sensor(const char* uri, sensekit_sensor_t** sensor)
     {
-        if (NULL == uri)
-        {
+        if (uri == nullptr)
             return SENSEKIT_STATUS_INVALID_PARAMETER;
-        }
 
         ensure_initialized();
 
-        Device* device = nullptr;
-        m_deviceManager.query_for_device(uri, &device);
+        cout << "api: opening device: " << uri << endl;
+
+        Device* device = m_deviceManager.query_for_device(uri);
 
         if (device != nullptr)
         {
@@ -49,14 +64,13 @@ namespace sensekit {
 
         Device* device = (*sensor)->p_deviceHandle;
 
-        if (device != nullptr)
-        {
-            device->close();
-        }
-
         delete *sensor;
+        *sensor = nullptr;
 
-        *sensor = NULL;
+        cout << "api: close sensor: " << device->get_description().uri << endl;
+
+        if (device != nullptr)
+            device->close();
 
         return SENSEKIT_STATUS_SUCCESS;
     }

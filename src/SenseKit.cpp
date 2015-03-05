@@ -5,6 +5,11 @@ static sensekit::Context g_Context;
 
 SENSEKIT_BEGIN_DECLS
 
+SENSEKIT_API void sensekit_terminate()
+{
+    g_Context.terminate();
+}
+
 SENSEKIT_API sensekit_status_t sensekit_open_sensor(const char* connection_string, /*out*/ sensekit_sensor_t** sensor)
 {
     return g_Context.open_sensor(connection_string, sensor);

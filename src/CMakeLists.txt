@@ -3,15 +3,12 @@ set(SenseKit_SOURCES
   Context.cpp
   Device.h
   Device.cpp
-  Sensor.h
-  Sensor.cpp
   DriverAdapter.h
+  DriverAdapter.cpp
   ../include/SenseKit.h
   SenseKit.cpp
   DeviceManager.h
   DeviceManager.cpp
-  DriverService.h
-  DriverService.cpp
   DeviceStreamSource.h
   DeviceStreamSource.cpp
   Stream.h
@@ -34,3 +31,7 @@ install(TARGETS SenseKit
   ARCHIVE DESTINATION lib)
 
 add_subdirectory(tests)
+
+add_executable(OpenNITest "openni/test.cpp")
+
+target_link_libraries(OpenNITest ${OpenNI2_LIBRARY})

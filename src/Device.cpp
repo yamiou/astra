@@ -29,12 +29,13 @@ namespace sensekit {
 
     void Device::open()
     {
-        m_deviceHandle = m_driverAdapter.open_device(m_deviceDesc.uri);
+        m_driverAdapter.open_device(this);
     }
 
     void Device::close()
     {
         if (!is_open()) return;
-        m_driverAdapter.close_device(m_deviceHandle);
+
+        m_driverAdapter.close_device(this);
     }
 }

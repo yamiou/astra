@@ -13,7 +13,7 @@ namespace sensekit {
     {
     public:
 
-        typedef std::vector<Device*> DeviceList;
+        using DeviceList = std::vector<Device*>;
 
         typedef Signal<Device*> DeviceConnectedSignal;
         typedef DeviceConnectedSignal::callback_type DeviceConnectedCallback;
@@ -33,7 +33,6 @@ namespace sensekit {
         sensekit_status_t initialize();
         sensekit_status_t terminate();
 
-        const DeviceList& get_devices() { return m_devices; }
         sensekit_status_t query_for_device(const char* uri, Device** device);
 
         CallbackId registerDeviceConnectedCallback(DeviceConnectedCallback callback)
@@ -55,21 +54,18 @@ namespace sensekit {
     private:
 
         DriverAdapter& m_driverAdapter;
-        DeviceList m_devices;
 
         DeviceConnectedSignal m_connectedSignal;
         DeviceDisconnectedSignal m_disconnectedSignal;
         DeviceChangedSignal m_changedSignal;
 
-        static void adapter_deviceConnected(DriverAdapter* adapter,const sensekit_device_desc_t& desc, void* context);
-        static void adapter_deviceDisconnected(const sensekit_device_desc_t& desc, void* context);
-        static void adapter_deviceChanged(const sensekit_device_desc_t& desc, void* context);
+        void adapter_deviceConnected(DeviceConnectedEventArgs args);
+        void adapter_deviceDisconnected(DeviceDisconnectedEventArgs args);
+        void adapter_deviceChanged(DeviceChangedEventArgs args);
 
         bool device_exists(const Device& device);
         Device* find_device_by_id(Device::device_id deviceId);
         Device* find_device_by_uri(const char* uri);
-        bool remove_device(const Device* device);
-        bool add_device(DriverAdapter* adapter, const sensekit_device_desc_t& desc);
     };
 }
 
