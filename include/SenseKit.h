@@ -5,10 +5,12 @@
 # define SENSEKIT_BEGIN_DECLS  extern "C" {
 # define SENSEKIT_END_DECLS    }
 # include <cstdint>
+# include <cstddef>
 #else
 # define SENSEKIT_BEGIN_DECLS
 # define SENSEKIT_END_DECLS
 # include <stdint.h>
+# include <stddef.h>
 #endif
 
 #ifndef SENSEKIT_API
@@ -44,11 +46,34 @@ typedef struct _sensekit_frame_desc {
     unsigned length;
     float hFOV;
     float vFOV;
-} sensekit_frame_desc;
+} sensekit_frame_desc_t;
 
-typedef struct _sensekit_stream_desc {
-    sensekit_frame_desc frameDescription;
-} sensekit_stream_desc_t;
+typedef enum _sensekit_pixel_format {
+    SENSEKIT_PIXEL_FORMAT_UNKNOWN = 0,
+    SENSEKIT_PIXEL_FORMAT_DEPTH_MM = 1,
+    SENSEKIT_PIXEL_FORMAT_GRAY8 = 2,
+    SENSEKIT_PIXEL_FORMAT_GRAY16 = 3,
+    SENSEKIT_PIXEL_FORMAT_RGB888 = 4
+} sensekit_pixel_format_t;
+
+typedef struct _sensekit_stream_mode_desc {
+    sensekit_pixel_format_t pixelFormat;
+    sensekit_frame_desc_t frameDescription;
+    float framesPerSecond;
+} sensekit_stream_mode_desc_t;
+
+typedef enum sensekit_streamtype {
+    SENSEKIT_STREAM_UNKNOWN = 0,
+    SENSEKIT_STREAM_DEPTH,
+    SENSEKIT_STREAM_COLOR,
+    SENSEKIT_STREAM_CUSTOM
+} sensekit_streamtype;
+
+typedef struct _sensekit_streamsource_desc {
+    size_t modeCount;
+    sensekit_stream_mode_desc_t* modes;
+    sensekit_streamtype type;
+} sensekit_streamsource_desc_t;
 
 typedef struct _sensekit_sensor sensekit_sensor_t;
 typedef struct _sensekit_depthstream sensekit_depthstream_t;

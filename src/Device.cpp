@@ -4,26 +4,58 @@
 
 namespace sensekit {
 
-    Device::StreamDescriptionList Device::get_available_streams()
+    Stream* Device::open_stream(sensekit_streamtype streamType)
     {
+        // Stream* stream;
 
+        // auto it = m_streams.find(streamType);
+        // if (it != m_streams.end())
+        // {
+        //     stream = it->second;
+        // }
+        // else
+        // {
+        //     auto source = new DeviceStreamSource(m_driverAdapter, *this);
+        //     ColorStream* stream = new ColorStream(*source);
+
+        //     m_streams[streamType] = stream;
+        // }
     }
 
-    Stream* Device::open_stream(stream_type_t streamType)
+    StreamSourceList& Device::get_stream_sources()
     {
-        Stream* stream;
-
-        auto it = m_streams.find(streamType);
-        if (it != m_streams.end())
+        if (!m_streamSources)
         {
-            stream = it->second;
+            m_streamSources = new StreamSourceList();
+            auto descs =
+                m_driverAdapter.get_device_stream_sources(this);
+
+            for(auto& desc : descs)
+            {
+                StreamSource* streamSource =
+                    new DeviceStreamSource(m_driverAdapter, *this, desc);
+                m_streamSources->push_back(streamSource);
+            }
         }
-        else
-        {
-            auto source = new DeviceStreamSource(m_driverAdapter, *this);
-            ColorStream* stream = new ColorStream(*source);
 
-            m_streams[streamType] = stream;
+        return *m_streamSources;
+    }
+
+    Device::~Device()
+    {
+        delete m_deviceDesc;
+
+        if (m_streamSources)
+        {
+            auto it = m_streamSources->begin();
+            while (it != m_streamSources->end())
+            {
+                StreamSource* source = *it;
+                it = m_streamSources->erase(it);
+
+                delete source;
+            }
+            delete m_streamSources;
         }
     }
 

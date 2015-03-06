@@ -8,27 +8,28 @@
 
 namespace sensekit {
 
-    class DeviceStreamSource;
     class Stream;
+    class StreamSource;
+
+    using StreamSourceList = std::vector<StreamSource*>;
 
     class Device
     {
     public:
 
+
         using device_id = size_t;
-        using StreamDescriptionList = std::vector<sensekit_stream_desc_t>;
 
         Device(DriverAdapter& adapter, const sensekit_device_desc_t* desc)
             : m_driverAdapter(adapter),
               m_deviceDesc(desc),
               m_deviceHandle(nullptr),
+              m_streamSources(nullptr),
               m_connected(false)
             { }
 
-        virtual ~Device()
-        {
-            delete m_deviceDesc;
-        }
+        virtual ~Device();
+
 
         inline bool operator==(const Device& rhs)
             {
@@ -39,13 +40,15 @@ namespace sensekit {
         device_id get_device_id() const { return device_id(m_deviceHandle); }
         bool is_open() const { return m_deviceHandle != nullptr; }
         const bool& is_connected() const { return m_connected; }
-        StreamDescriptionList get_available_streams();
 
-        Stream* open_stream(stream_type_t streamType);
+
+        Stream* open_stream(sensekit_streamtype streamType);
         void close_stream(Stream* stream);
 
         void open();
         void close();
+
+        StreamSourceList& get_stream_sources();
 
         void set_handle(device_handle_t handle)
             {
@@ -69,10 +72,9 @@ namespace sensekit {
 
     private:
 
-        using StreamMap = std::unordered_map<stream_type_t, Stream*, std::hash<int> >;
-
         DriverAdapter& m_driverAdapter;
-        StreamMap  m_streams;
+        StreamSourceList* m_streamSources;
+
         device_handle_t m_deviceHandle;
         bool m_connected;
         const sensekit_device_desc_t* m_deviceDesc;

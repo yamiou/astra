@@ -11,6 +11,9 @@ namespace sensekit {
         Stream(StreamSource& source)
             : m_source(source) { }
 
+        void open();
+        void close();
+
 
     protected:
         StreamSource& m_source;

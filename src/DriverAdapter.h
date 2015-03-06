@@ -9,6 +9,8 @@ namespace sensekit {
 
     class DriverAdapter;
     class Device;
+    class DeviceStreamSource;
+    class Stream;
 
     struct DeviceConnectedEventArgs
     {
@@ -35,7 +37,6 @@ namespace sensekit {
 
         DeviceChangedEventArgs(DriverAdapter* a, Device* d)
             : adapter(a), device(d) {}
-
     };
 
     enum driver_status_t
@@ -46,17 +47,12 @@ namespace sensekit {
     using device_handle_t =  void*;
     using stream_handle_t = void*;
 
-    enum stream_type_t
-        {
-            SENSEKIT_STREAM_COLOR = 1,
-            SENSEKIT_STREAM_DEPTH = 2
-        };
-
     using device_connected_callback_t = void (*)(DriverAdapter*, const sensekit_device_desc_t&, void*);
     using device_disconnected_callback_t = void (*)(const sensekit_device_desc_t&, void* context);
     using device_changed_callback_t = void (*)(const sensekit_device_desc_t&, void*);
 
     using DeviceList = std::vector<Device*>;
+    using StreamSourceDescList = std::vector<sensekit_streamsource_desc_t>;
 
     class DriverAdapter
     {
@@ -65,26 +61,19 @@ namespace sensekit {
         DriverAdapter() {};
         virtual ~DriverAdapter() {}
 
-        virtual sensekit_status_t initialize()
-            {
-                return SENSEKIT_STATUS_SUCCESS;
-            };
-
-        virtual sensekit_status_t terminate() = 0;
+        virtual sensekit_status_t initialize() { return SENSEKIT_STATUS_SUCCESS; };
+        virtual sensekit_status_t terminate() { return SENSEKIT_STATUS_SUCCESS; };
 
         virtual void open_device(Device* device) = 0;
-
         virtual driver_status_t close_device(Device* device) = 0;
 
         const DeviceList& get_devices() { return m_devices; }
 
-        virtual driver_status_t get_available_streams(
-            device_handle_t deviceHandle,
-            const sensekit_stream_desc_t* descArray,
-            size_t* count) = 0;
+        virtual StreamSourceDescList get_device_stream_sources(Device* device) = 0;
 
-        virtual stream_handle_t open_stream(device_handle_t deviceHandle, stream_type_t steamType) = 0;
-        virtual void close_stream(device_handle_t deviceHandle, stream_handle_t streamHandle) = 0;
+        virtual stream_handle_t open_stream(DeviceStreamSource* source) = 0;
+        virtual void close_stream(Stream* stream) = 0;
+
         virtual sensekit_status_t has_device_for_uri(const char *uri, bool& deviceAvailable) = 0;
         Device* query_for_device(const char* uri);
 

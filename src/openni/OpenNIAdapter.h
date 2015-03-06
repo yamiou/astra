@@ -22,12 +22,11 @@ namespace sensekit {
         virtual sensekit_status_t has_device_for_uri(const char* uri, bool& deviceAvailable) override;
         virtual void open_device(Device* device) override;
         virtual driver_status_t close_device(Device* device) override;
-        virtual stream_handle_t open_stream(device_handle_t deviceHandle, stream_type_t streamType) override;
-        virtual void close_stream(device_handle_t deviceHandle, stream_handle_t streamHandle) override;
-        virtual driver_status_t get_available_streams(
-            device_handle_t deviceHandle,
-            const sensekit_stream_desc_t* descArray,
-            size_t* count) override;
+
+        virtual StreamSourceDescList get_device_stream_sources(Device* device) override;
+
+        virtual stream_handle_t open_stream(DeviceStreamSource* source) override;
+        virtual void close_stream(Stream* stream) override;
 
     private:
 

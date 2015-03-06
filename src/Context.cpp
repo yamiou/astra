@@ -1,6 +1,7 @@
 #include "Context.h"
 #include <cstdlib>
 #include "openni/OpenNIAdapter.h"
+#include "StreamSource.h"
 
 #include <iostream>
 
@@ -50,7 +51,12 @@ namespace sensekit {
         if (device != nullptr)
         {
             device->open();
+            auto srcs = device->get_stream_sources();
+            Stream* stream = srcs[0]->create_stream();
+            stream->open();
+
         }
+
 
         *sensor  = new sensekit_sensor_t;
         (*sensor)->p_deviceHandle = device;

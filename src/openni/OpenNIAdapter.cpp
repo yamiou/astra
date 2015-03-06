@@ -1,5 +1,7 @@
 #include "OpenNIAdapter.h"
 #include "../Device.h"
+#include "../Stream.h"
+#include "../DeviceStreamSource.h"
 #include <iostream>
 
 using std::cout;
@@ -20,9 +22,95 @@ namespace sensekit {
         return desc;
     }
 
+    sensekit_stream_mode_desc_t create_stream_mode_desc(const openni::VideoMode& mode)
+    {
+        sensekit_stream_mode_desc_t modeDesc;
+        unsigned bytesPerPixel = 0;
+        sensekit_pixel_format_t pixelFormat = (sensekit_pixel_format_t)0;
+
+        switch (mode.getPixelFormat())
+        {
+        case ONI_PIXEL_FORMAT_RGB888:
+            pixelFormat = SENSEKIT_PIXEL_FORMAT_RGB888;
+            bytesPerPixel = 3;
+            break;
+        case ONI_PIXEL_FORMAT_DEPTH_1_MM:
+            pixelFormat = SENSEKIT_PIXEL_FORMAT_DEPTH_MM;
+            bytesPerPixel = 2;
+            break;
+        case ONI_PIXEL_FORMAT_GRAY8:
+            pixelFormat = SENSEKIT_PIXEL_FORMAT_GRAY8;
+            bytesPerPixel = 1;
+            break;
+        case ONI_PIXEL_FORMAT_GRAY16:
+            pixelFormat = SENSEKIT_PIXEL_FORMAT_GRAY16;
+            bytesPerPixel = 2;
+            break;
+        }
+
+        modeDesc.pixelFormat = pixelFormat;
+        sensekit_frame_desc_t& desc = modeDesc.frameDescription;
+
+        modeDesc.framesPerSecond = mode.getFps();
+        desc.height = mode.getResolutionY();
+        desc.width = mode.getResolutionX();
+        desc.bytesPerPixel = bytesPerPixel;
+        desc.length = desc.width * desc.height;
+
+        return modeDesc;
+    }
+
+    sensekit_streamsource_desc_t create_streamsource_desc(const openni::SensorInfo& info)
+    {
+        const openni::Array<openni::VideoMode>& niModes = info.getSupportedVideoModes();
+
+        std::vector<sensekit_stream_mode_desc_t> modes;
+
+        size_t count = niModes.getSize();
+        for (size_t i = 0; i < count; i++)
+        {
+            const openni::VideoMode& niMode = niModes[i];
+            sensekit_stream_mode_desc_t d = create_stream_mode_desc(niMode);
+
+            if (d.frameDescription.bytesPerPixel > 0)
+            {
+                modes.push_back(d);
+            }
+            else
+            {
+                cout << "adapter: unsupported mode" << endl;
+            }
+        }
+
+        count = modes.size();
+
+        sensekit_streamsource_desc_t streamDesc;
+
+        if (count > 0)
+        {
+            sensekit_stream_mode_desc_t* modeArray =
+                new sensekit_stream_mode_desc_t[count];
+
+            std::copy(modes.begin(), modes.end(), modeArray);
+            streamDesc.modes = modeArray;
+            streamDesc.modeCount = count;
+        }
+        else
+        {
+            streamDesc.modes = nullptr;
+            streamDesc.modeCount = 0;
+        }
+
+        return streamDesc;
+    }
+
+    openni::Device* unwrap_device(Device& device)
+    {
+        return static_cast<openni::Device*>(device.get_handle());
+    }
+
     sensekit_status_t OpenNIAdapter::initialize()
     {
-
         register_for_events();
         openni::Status rc = openni::STATUS_OK;
 
@@ -102,7 +190,8 @@ namespace sensekit {
 
     void OpenNIAdapter::destroy_device(Device* device)
     {
-        openni::Device* niDevice = static_cast<openni::Device*>(device->get_handle());
+        openni::Device* niDevice = unwrap_device(*device);
+
         device->set_handle(nullptr);
 
         if (niDevice)
@@ -164,30 +253,79 @@ namespace sensekit {
         openni::OpenNI::removeDeviceStateChangedListener(&m_listener);
     }
 
-    stream_handle_t OpenNIAdapter::open_stream(device_handle_t deviceHandle, stream_type_t streamType)
+    StreamSourceDescList OpenNIAdapter::get_device_stream_sources(Device* device)
     {
-        switch (streamType)
+        openni::Device* niDevice = unwrap_device(*device);
+
+        const openni::SensorInfo* colorInfo =
+            niDevice->getSensorInfo(openni::SensorType::SENSOR_COLOR);
+
+        const openni::SensorInfo* depthInfo =
+            niDevice->getSensorInfo(openni::SensorType::SENSOR_DEPTH);
+
+        StreamSourceDescList sourceList;
+
+        if (colorInfo)
         {
-        case SENSEKIT_STREAM_COLOR:
-            return &m_colorStream;
-            break;
-        case SENSEKIT_STREAM_DEPTH:
-            return &m_depthStream;
-            break;
+            sensekit_streamsource_desc_t desc =
+                create_streamsource_desc(*colorInfo);
+            desc.type = SENSEKIT_STREAM_COLOR;
+
+            sourceList.push_back(desc);
         }
 
-        return nullptr;
+        if (depthInfo)
+        {
+            sensekit_streamsource_desc_t desc =
+                create_streamsource_desc(*depthInfo);
+            desc.type = SENSEKIT_STREAM_DEPTH;
+
+            sourceList.push_back(desc);
+        }
+
+        for(auto& ms : sourceList)
+        {
+            for(size_t i = 0; i < ms.modeCount; i++)
+            {
+                auto& d = ms.modes[i];
+                cout << "adapter: supported mode: "
+                     << d.frameDescription.width
+                     << "x"
+                     << d.frameDescription.height
+                     << "x"
+                     << d.frameDescription.bytesPerPixel
+                     << " (" << d.framesPerSecond << " fps)"
+                     <<  endl;
+            }
+        }
+
+        return sourceList;
     }
 
-    void OpenNIAdapter::close_stream(device_handle_t deviceHandle, stream_handle_t streamHandle)
+
+    stream_handle_t OpenNIAdapter::open_stream(DeviceStreamSource* source)
     {
+        Device& device = source->get_device();
+        openni::Device* niDevice = unwrap_device(device);
 
+        openni::VideoStream* stream = new openni::VideoStream();
+
+        const sensekit_streamsource_desc_t& desc = source->get_description();
+        if (desc.type == SENSEKIT_STREAM_COLOR)
+        {
+            cout << "adapter: opening color stream." << endl;
+            stream->create(*niDevice, openni::SensorType::SENSOR_COLOR);
+        }
+        else
+        {
+            cout << "adapter: opening depth stream." << endl;
+            stream->create(*niDevice, openni::SensorType::SENSOR_DEPTH);
+        }
+
+        return stream_handle_t(stream);
     }
 
-    driver_status_t OpenNIAdapter::get_available_streams(
-        device_handle_t deviceHandle,
-        const sensekit_stream_desc_t* descArray,
-        size_t* arraySize)
+    void OpenNIAdapter::close_stream(Stream* stream)
     {
 
     }
