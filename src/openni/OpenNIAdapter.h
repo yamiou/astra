@@ -23,7 +23,7 @@ namespace sensekit {
         virtual void open_device(Device* device) override;
         virtual driver_status_t close_device(Device* device) override;
 
-        virtual StreamSourceDescList get_device_stream_sources(Device* device) override;
+        virtual StreamDescList get_device_streams(Device* device) override;
 
         virtual stream_handle_t open_stream(DeviceStreamSource* source) override;
         virtual void close_stream(Stream* stream) override;

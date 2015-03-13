@@ -1,9 +1,9 @@
 #include "Context.h"
 #include <cstdlib>
-#include "openni/OpenNIAdapter.h"
 #include "StreamSource.h"
-
+#include "Device.h"
 #include <iostream>
+#include "openni/OniStreamServer.h"
 
 using std::cout;
 using std::endl;
@@ -12,7 +12,12 @@ namespace sensekit {
 
     sensekit_status_t Context::initialize()
     {
-        m_deviceManager.initialize();
+        if (m_initialized)
+            return SENSEKIT_STATUS_SUCCESS;
+
+        m_serverRegistry.register_stream_server(new openni::OniStreamServer());
+
+        m_serverRegistry.initialize();
         m_initialized = true;
 
         return SENSEKIT_STATUS_SUCCESS;
@@ -23,7 +28,7 @@ namespace sensekit {
         if (!m_initialized)
             return SENSEKIT_STATUS_SUCCESS;
 
-        m_deviceManager.terminate();
+        m_serverRegistry.terminate();
         m_initialized = false;
 
         return SENSEKIT_STATUS_SUCCESS;
@@ -46,20 +51,19 @@ namespace sensekit {
 
         cout << "api: opening device: " << uri << endl;
 
-        Device* device = m_deviceManager.query_for_device(uri);
+        // Device* device = m_serverRegistry.query_for_device(uri);
 
-        if (device != nullptr)
-        {
-            device->open();
-            auto srcs = device->get_stream_sources();
-            Stream* stream = srcs[0]->create_stream();
-            stream->open();
+        // if (device != nullptr)
+        // {
+        //     device->open();
+        //     auto streams = device->get_streams();
+        //     //Stream* stream = srcs[0]->create_stream();
+        //     //stream->open();
 
-        }
+        // }
 
-
-        *sensor  = new sensekit_sensor_t;
-        (*sensor)->p_deviceHandle = device;
+        // *sensor  = new sensekit_sensor_t;
+        // (*sensor)->p_deviceHandle = device;
 
         return SENSEKIT_STATUS_SUCCESS;
     }

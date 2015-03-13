@@ -11,7 +11,7 @@ namespace sensekit {
     class Stream;
     class StreamSource;
 
-    using StreamSourceList = std::vector<StreamSource*>;
+    using StreamList = std::vector<Stream*>;
 
     class Device
     {
@@ -24,7 +24,7 @@ namespace sensekit {
             : m_driverAdapter(adapter),
               m_deviceDesc(desc),
               m_deviceHandle(nullptr),
-              m_streamSources(nullptr),
+              m_streams(nullptr),
               m_connected(false)
             { }
 
@@ -41,14 +41,10 @@ namespace sensekit {
         bool is_open() const { return m_deviceHandle != nullptr; }
         const bool& is_connected() const { return m_connected; }
 
-
-        Stream* open_stream(sensekit_streamtype streamType);
-        void close_stream(Stream* stream);
-
         void open();
         void close();
 
-        StreamSourceList& get_stream_sources();
+        StreamList& get_streams();
 
         void set_handle(device_handle_t handle)
             {
@@ -73,7 +69,7 @@ namespace sensekit {
     private:
 
         DriverAdapter& m_driverAdapter;
-        StreamSourceList* m_streamSources;
+        StreamList* m_streams;
 
         device_handle_t m_deviceHandle;
         bool m_connected;

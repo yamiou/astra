@@ -253,8 +253,8 @@ namespace sensekit {
         openni::OpenNI::removeDeviceStateChangedListener(&m_listener);
     }
 
-    StreamSourceDescList OpenNIAdapter::get_device_stream_sources(Device* device)
-    {
+    StreamDescList OpenNIAdapter::get_device_streams(Device* device)
+                                  {
         openni::Device* niDevice = unwrap_device(*device);
 
         const openni::SensorInfo* colorInfo =
@@ -263,7 +263,7 @@ namespace sensekit {
         const openni::SensorInfo* depthInfo =
             niDevice->getSensorInfo(openni::SensorType::SENSOR_DEPTH);
 
-        StreamSourceDescList sourceList;
+        StreamDescList streamList;
 
         if (colorInfo)
         {
@@ -271,7 +271,7 @@ namespace sensekit {
                 create_streamsource_desc(*colorInfo);
             desc.type = SENSEKIT_STREAM_COLOR;
 
-            sourceList.push_back(desc);
+            streamList.push_back(desc);
         }
 
         if (depthInfo)
@@ -280,10 +280,10 @@ namespace sensekit {
                 create_streamsource_desc(*depthInfo);
             desc.type = SENSEKIT_STREAM_DEPTH;
 
-            sourceList.push_back(desc);
+            streamList.push_back(desc);
         }
 
-        for(auto& ms : sourceList)
+        for(auto& ms : streamList)
         {
             for(size_t i = 0; i < ms.modeCount; i++)
             {
@@ -299,7 +299,7 @@ namespace sensekit {
             }
         }
 
-        return sourceList;
+        return streamList;
     }
 
 

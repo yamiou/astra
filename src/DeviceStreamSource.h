@@ -20,6 +20,7 @@ namespace sensekit {
         virtual Stream* create_stream() override;
         virtual void open_stream(Stream* stream) override;
         virtual void destroy_stream(Stream* stream) override;
+        virtual void close_stream(Stream* stream) override;
 
         Device& get_device() { return m_device; };
 

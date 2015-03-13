@@ -1,5 +1,5 @@
-#ifndef DEVICEADAPTER_H
-#define DEVICEADAPTER_H
+#ifndef DRIVERADAPTER_H
+#define DRIVERADAPTER_H
 
 #include <SenseKit.h>
 #include "Signal.h"
@@ -52,7 +52,7 @@ namespace sensekit {
     using device_changed_callback_t = void (*)(const sensekit_device_desc_t&, void*);
 
     using DeviceList = std::vector<Device*>;
-    using StreamSourceDescList = std::vector<sensekit_streamsource_desc_t>;
+    using StreamDescList = std::vector<sensekit_streamsource_desc_t>;
 
     class DriverAdapter
     {
@@ -69,7 +69,7 @@ namespace sensekit {
 
         const DeviceList& get_devices() { return m_devices; }
 
-        virtual StreamSourceDescList get_device_stream_sources(Device* device) = 0;
+        virtual StreamDescList get_device_streams(Device* device) = 0;
 
         virtual stream_handle_t open_stream(DeviceStreamSource* source) = 0;
         virtual void close_stream(Stream* stream) = 0;
@@ -119,4 +119,4 @@ namespace sensekit {
     };
 }
 
-#endif /* DEVICEADAPTER_H */
+#endif /* DRIVERADAPTER_H */

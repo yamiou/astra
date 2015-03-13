@@ -2,6 +2,7 @@
 #define STREAMSOURCE_H
 
 #include <Sensekit.h>
+#include <string>
 #include "Stream.h"
 
 namespace sensekit {
@@ -9,27 +10,46 @@ namespace sensekit {
     class StreamSource
     {
     public:
-        StreamSource(sensekit_streamsource_desc_t desc)
+        StreamSource(std::string shortName)
             : m_activeStreams(0),
-              m_sourceDesc(desc)
-            { }
+              m_shortName(shortName),
+              m_initialized(false) {}
 
-        virtual ~StreamSource() {};
+        virtual ~StreamSource() {}
+
+        void initialize()
+            {
+                if (m_initialized)
+                    return;
+
+                on_initialized();
+
+                m_initialized = true;
+            }
+
+        void terminate()
+            {
+                if (!m_initialized)
+                    return;
+
+                on_terminated();
+
+                m_initialized = false;
+            }
 
         virtual Stream* create_stream() = 0;
-
         virtual void destroy_stream(Stream* stream) = 0;
 
-        virtual void open_stream(Stream* stream) = 0;
-
-        const sensekit_streamsource_desc_t& get_description() { return m_sourceDesc; }
+        const std::string& get_shortName() const { return m_shortName; }
 
     protected:
+        virtual void on_initialized() {};
+        virtual void on_terminated() {};
+
+        bool m_initialized;
         unsigned m_activeStreams;
-        sensekit_streamsource_desc_t m_sourceDesc;
-
+        std::string m_shortName;
     };
-
 }
 
 #endif /* STREAMSOURCE_H */

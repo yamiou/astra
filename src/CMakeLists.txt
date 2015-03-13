@@ -1,22 +1,35 @@
 set(SenseKit_SOURCES
   Context.h
   Context.cpp
+  StreamSourceRegistry.h
+  StreamSourceRegistry.cpp
+  StreamServerRegistry.h
+  StreamServerRegistry.cpp
+  StreamServer.h
+  StreamServer.cpp
   Device.h
   Device.cpp
   DriverAdapter.h
   DriverAdapter.cpp
   ../include/SenseKit.h
   SenseKit.cpp
-  DeviceManager.h
-  DeviceManager.cpp
-  DeviceStreamSource.h
-  DeviceStreamSource.cpp
+  DeviceRegistry.h
+  DeviceRegistry.cpp
   Stream.h
   Stream.cpp
   ColorStream.h
   DepthStream.h
-  openni/OpenNIAdapter.h
-  openni/OpenNIAdapter.cpp)
+  openni/OniStreamServer.h
+  openni/OniStreamServer.cpp
+  openni/OniStreamSource.h
+  openni/OniStreamSource.cpp
+  driver/DeviceAdapter.h
+  driver/Driver.h
+  driver/openni/OpenNIDriver.h
+  driver/openni/OpenNIDriver.cpp
+  driver/openni/OpenNIDeviceAdapter.h
+  driver/openni/OpenNIDeviceAdapter.cpp
+  )
 
 add_library(SenseKit SHARED ${SenseKit_SOURCES})
 

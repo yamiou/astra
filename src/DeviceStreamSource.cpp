@@ -21,6 +21,11 @@ namespace sensekit {
         }
     }
 
+    void DeviceStreamSource::close_stream(Stream* stream)
+    {
+
+    }
+
     Stream* DeviceStreamSource::create_stream()
     {
         m_activeStreams++;
