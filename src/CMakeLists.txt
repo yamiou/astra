@@ -21,6 +21,10 @@ set(SenseKit_SOURCES
   Stream.cpp
   ColorStream.h
   DepthStream.h
+  PluginBase.cpp
+  PluginBase.h
+  PluginService.cpp
+  PluginService.h
   openni/OniStreamServer.h
   openni/OniStreamServer.cpp
   openni/OniStreamSource.h
