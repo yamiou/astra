@@ -1,6 +1,8 @@
 set(SenseKit_SOURCES
   Context.h
   Context.cpp
+  MockContext.h
+  MockContext.cpp
   StreamSourceRegistry.h
   StreamSourceRegistry.cpp
   StreamServerRegistry.h

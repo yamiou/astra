@@ -1,7 +1,7 @@
 ﻿#include "SenseKit-private.h"
-#include "Context.h"
+#include "MockContext.h"
 
-static sensekit::Context g_Context;
+static sensekit::MockContext g_Context;
 
 SENSEKIT_BEGIN_DECLS
 
@@ -22,19 +22,29 @@ SENSEKIT_API sensekit_status_t sensekit_close_sensor(sensekit_sensor_t** sensor)
 
 SENSEKIT_API sensekit_status_t sensekit_depth_open(sensekit_sensor_t* sensor, sensekit_depthstream_t** stream)
 {
-    if (NULL == sensor)
-            return SENSEKIT_STATUS_INVALID_PARAMETER;
+    g_Context.open_depth_stream(sensor, stream);
 
     return SENSEKIT_STATUS_SUCCESS;
 }
 
 SENSEKIT_API sensekit_status_t sensekit_depth_close(sensekit_depthstream_t** stream)
 {
-    if (NULL == stream)
-            return SENSEKIT_STATUS_INVALID_PARAMETER;
+    g_Context.close_depth_stream(stream);
 
-    stream = NULL;
+    return SENSEKIT_STATUS_SUCCESS;
+}
 
+SENSEKIT_API sensekit_status_t sensekit_depth_frame_open(sensekit_depthstream_t* stream, int timeout, sensekit_depthframe_t** frame)
+{
+
+    g_Context.open_depth_frame(stream, timeout,  frame);
+
+    return SENSEKIT_STATUS_SUCCESS;
+}
+
+SENSEKIT_API sensekit_status_t sensekit_depth_frame_close(sensekit_depthframe_t** frame)
+{
+    g_Context.close_depth_frame(frame);
     return SENSEKIT_STATUS_SUCCESS;
 }
 

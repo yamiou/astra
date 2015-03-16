@@ -1,6 +1,8 @@
 ﻿// Orbbec (c) 2015
 
 #include <SenseKit.h>
+#include <cstdio>
+#include <iostream>
 
 int main(int argc, char** argv)
 {
@@ -11,6 +13,20 @@ int main(int argc, char** argv)
 
     sensekit_depthstream_t* depthStream;
     status = sensekit_depth_open(sensor, &depthStream);
+
+    char c = 0;
+
+    do
+    {
+        sensekit_depthframe_t* depthFrame;
+        sensekit_depth_frame_open(depthStream,
+                                  30, &depthFrame);
+
+        std::cout << "index: " << depthFrame->frameIndex << " value: " << depthFrame->sampleValue << std::endl;
+
+        sensekit_depth_frame_close(&depthFrame);
+
+    } while (c != 'q');
 
     status = sensekit_depth_close(&depthStream);
 

@@ -75,6 +75,15 @@ typedef struct _sensekit_streamsource_desc {
     sensekit_streamtype type;
 } sensekit_streamsource_desc_t;
 
+struct _sensekit_depthstream {
+    int temp;
+};
+
+struct _sensekit_depthframe {
+    int frameIndex;
+    short sampleValue;
+};
+
 typedef struct _sensekit_sensor sensekit_sensor_t;
 typedef struct _sensekit_depthstream sensekit_depthstream_t;
 typedef struct _sensekit_depthframe sensekit_depthframe_t;
@@ -97,12 +106,12 @@ SENSEKIT_API sensekit_status_t sensekit_depth_open(
 SENSEKIT_API sensekit_status_t sensekit_depth_close(
     sensekit_depthstream_t** stream);
 
-SENSEKIT_API sensekit_status_t sensekit_depth_open_frame(
+SENSEKIT_API sensekit_status_t sensekit_depth_frame_open(
     sensekit_depthstream_t* stream,
     int timeout_milliseconds,
     sensekit_depthframe_t** frame); //0 = return immediately
 
-SENSEKIT_API sensekit_status_t sensekit_depth_close_frame(
+SENSEKIT_API sensekit_status_t sensekit_depth_frame_close(
     sensekit_depthframe_t** frame); //frame set to null
 
 SENSEKIT_END_DECLS

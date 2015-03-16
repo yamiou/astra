@@ -22,8 +22,6 @@
 
 SENSEKIT_BEGIN_DECLS
 
-struct _sensekit_depthstream;
-
 #undef MIN
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
