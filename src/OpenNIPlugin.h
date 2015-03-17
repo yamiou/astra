@@ -14,8 +14,8 @@ namespace sensekit
             OpenNIPlugin();
             ~OpenNIPlugin();
 
-            virtual void orbbec_plugin_init(void* context, PluginService* pluginService) override;
-            virtual void orbbec_plugin_cleanup() override;
+            virtual void initialize(Context* context, PluginService* pluginService) override;
+            virtual void cleanup() override;
             virtual void temp_update() override;
 
         private:

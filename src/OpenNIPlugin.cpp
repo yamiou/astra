@@ -16,7 +16,7 @@ namespace sensekit
         {
         }
 
-        void OpenNIPlugin::orbbec_plugin_init(void* context, PluginService* pluginService)
+        void OpenNIPlugin::initialize(Context* context, PluginService* pluginService)
         {
             m_context = context;
             m_pluginService = pluginService;
@@ -41,7 +41,7 @@ namespace sensekit
             open_depth_stream();
         }
 
-        void OpenNIPlugin::orbbec_plugin_cleanup()
+        void OpenNIPlugin::cleanup()
         {
             close_depth_stream();
 
