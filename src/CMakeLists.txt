@@ -25,6 +25,10 @@ set(SenseKit_SOURCES
   PluginBase.h
   PluginService.cpp
   PluginService.h
+  OpenNIPlugin.cpp
+  OpenNIPlugin.h
+  PluginContext.h
+  PluginContext.cpp
   openni/OniStreamServer.h
   openni/OniStreamServer.cpp
   openni/OniStreamSource.h

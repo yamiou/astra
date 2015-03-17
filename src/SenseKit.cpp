@@ -1,7 +1,7 @@
 ﻿#include "SenseKit-private.h"
-#include "MockContext.h"
+#include "PluginContext.h"
 
-static sensekit::MockContext g_Context;
+static sensekit::PluginContext g_Context;
 
 SENSEKIT_BEGIN_DECLS
 
