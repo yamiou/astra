@@ -4,8 +4,64 @@
 #include <cstdio>
 #include <iostream>
 
+#ifdef _WIN32
+
+#include <windows.h> 
+
+#else //_WIN32 -> OS X, LINUX
+
+#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#endif //_WIN32
+
+bool shouldContinue = true;
+
+void signal_stop_processing(){
+	printf("quitting...\n\n");
+	shouldContinue = false;
+}
+
+#ifdef _WIN32
+
+BOOL CtrlHandler(DWORD fdwCtrlType)
+{
+	switch (fdwCtrlType)
+	{
+		// Handle the CTRL-C signal. 
+	case CTRL_C_EVENT:
+		signal_stop_processing();
+		return(TRUE);
+	default:
+		return FALSE;
+	}
+}
+
+#else //_WIN32 -> OSX, LINUX
+
+void signal_handler(int s){
+	signal_stop_processing();
+}
+
+#endif //_WIN32
+
 int main(int argc, char** argv)
 {
+#ifdef _WIN32
+	SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler, TRUE);
+#else //_WIN32 -> OS X, LINUX
+	struct sigaction sigIntHandler;
+
+	sigIntHandler.sa_handler = my_handler;
+	sigemptyset(&sigIntHandler.sa_mask);
+	sigIntHandler.sa_flags = 0;
+
+	sigaction(SIGINT, &sigIntHandler, NULL);
+#endif //_WIN32
+
+	sensekit_initialize();
+
 	sensekit_sensor_t* sensor;
 	sensekit_status_t status = SENSEKIT_STATUS_SUCCESS;
 
@@ -18,20 +74,21 @@ int main(int argc, char** argv)
 	//client service stores latest frame until requested (via open or event)
 	status = sensekit_depth_open(sensor, &depthStream);
 
-	char c = 0;
-
 	do
 	{
+		//Needed for now until backend plugins have their own thread and we figure out a thread/dispatch model
+		sensekit_temp_update();
+
 		sensekit_depthframe_t* depthFrame;
 		//
 		sensekit_depth_frame_open(depthStream,
-								  30, &depthFrame);
+								  30, depthFrame);
 
 		std::cout << "index: " << depthFrame->frameIndex << " value: " << depthFrame->sampleValue << std::endl;
 
-		sensekit_depth_frame_close(&depthFrame);
+		sensekit_depth_frame_close(depthFrame);
 
-	} while (c != 'q');
+	} while (shouldContinue);
 
 	status = sensekit_depth_close(&depthStream);
 

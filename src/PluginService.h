@@ -58,7 +58,11 @@ namespace sensekit
 		//orbbec_error orbbec_stream_register_set_parameter_callback(component_handle handle, client_id client, ...);
 
 		//internal:
-		sensekit_status_t get_bin(bin_id id, buffer*& buf) { buf = m_frontBuffer; }
+		sensekit_status_t get_bin(bin_id id, buffer*& buf)
+		{
+			buf = m_frontBuffer;
+			return SENSEKIT_STATUS_SUCCESS;
+		}
 
 	private:
 		buffer* m_frontBuffer;

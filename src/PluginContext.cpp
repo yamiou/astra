@@ -2,6 +2,8 @@
 #include "SenseKit-private.h"
 #include <iostream>
 
+#include "OpenNIPlugin.h"
+
 using std::cout;
 using std::endl;
 
@@ -9,125 +11,93 @@ namespace sensekit {
 
 	sensekit_status_t PluginContext::initialize()
 	{
+		m_pluginService = new PluginService();
+
+		//later this would involve dlopen and fptables and other stuff
+		m_plugin = new sensekit::OpenNI::OpenNIPlugin();
+		m_plugin->orbbec_plugin_init(this, m_pluginService);
+
 		return SENSEKIT_STATUS_SUCCESS;
 	}
 
 	sensekit_status_t PluginContext::terminate()
 	{
+		if (nullptr != m_plugin)
+		{
+			m_plugin->orbbec_plugin_cleanup();
+			delete m_plugin;
+			m_plugin = nullptr;
+		}
+		
+		if (nullptr != m_pluginService)
+		{
+			delete m_pluginService;
+			m_pluginService = nullptr;
+		}
+
 		return SENSEKIT_STATUS_SUCCESS;
 	}
 
 	sensekit_status_t PluginContext::open_sensor(const char *uri, sensekit_sensor_t **sensor)
 	{
-		openni::Status rc = openni::STATUS_OK;
-
-		const char* deviceURI = openni::ANY_DEVICE;
-
-		cout << "Initializing openni" << endl;
-		rc = openni::OpenNI::initialize();
-		cout << "Opening device" << endl;
-		rc = m_device.open(deviceURI);
-
-		if (rc != openni::STATUS_OK)
-		{
-			cout << "Failed to open" << endl;
-			openni::OpenNI::shutdown();
-		}
-
-		m_deviceInfo = m_device.getDeviceInfo();
+		//do nothing for now
+		//would connect to the daemon and register interest in the uri
 
 		return SENSEKIT_STATUS_SUCCESS;
 	}
 
 	sensekit_status_t PluginContext::close_sensor(sensekit_sensor_t **sensor)
 	{
-		cout << "closing device" << endl;
-		m_device.close();
-		cout << "shutting down openni" << endl;
-		openni::OpenNI::shutdown();
-
+		//reverse the nothing we did above
 		return SENSEKIT_STATUS_SUCCESS;
 	}
 
 	sensekit_status_t PluginContext::open_depth_stream(sensekit_sensor_t *sensor, sensekit_depthstream_t **stream)
 	{
-		openni::Status rc = openni::STATUS_OK;
-
-		cout << "opening depth stream" << endl;
-		rc = m_depthStream.create(m_device, openni::SENSOR_DEPTH);
-		if (rc == openni::STATUS_OK)
-		{
-			cout << "starting depth stream." << endl;
-			rc = m_depthStream.start();
-			if (rc != openni::STATUS_OK)
-			{
-				cout << "failed to start depth stream" << endl;
-				m_depthStream.destroy();
-			}
-		}
-		else
-		{
-			cout << "Failed to open depth stream" << endl;
-		}
-
-		if (!m_depthStream.isValid())
-		{
-			cout << "shutting down openni because of failure" << endl;
-			openni::OpenNI::shutdown();
-		}
-
-		m_currentFrame = new sensekit_depthframe_t;
-		m_currentFrame->sampleValue = 0;
-		m_currentFrame->frameIndex = 0;
-
+		//trollolol nothing to do for now
+		//would find the depth plugin for the context(sensor) and call client added event, and 
+		//then the plugin would create a bin if necessary and assign the client to the bin
 		return SENSEKIT_STATUS_SUCCESS;
 	}
 
 	sensekit_status_t PluginContext::close_depth_stream(sensekit_depthstream_t **stream)
 	{
-		cout << "stoping depth stream" << endl;
-		m_depthStream.stop();
-		cout << "destroying depth stream" << endl;
-		m_depthStream.destroy();
-
-		delete m_currentFrame;
-
+		//would find the depth plugin and call client removed event, and the plugin might destroy a bin
 		return SENSEKIT_STATUS_SUCCESS;
 	}
 
-	sensekit_status_t PluginContext::open_depth_frame(sensekit_depthstream_t *stream, int timeout, sensekit_depthframe_t **frame)
+	sensekit_status_t PluginContext::open_depth_frame(sensekit_depthstream_t *stream, int timeout, sensekit_depthframe_t*& frame)
 	{
-		int dummy;
-
-		openni::VideoStream* pStream = &m_depthStream;
-		openni::OpenNI::waitForAnyStream(&pStream, 1, &dummy, timeout);
-
-		openni::VideoFrameRef ref;
-		m_depthStream.readFrame(&ref);
-
-		int halfHeight = ref.getHeight() / 2;
-		int halfWidth = ref.getWidth() / 2;
-
-		int index = halfHeight * ref.getWidth() + halfWidth;
-		const short* datData = static_cast<const short*>(ref.getData());
-
-		short depthSon = datData[index];
-
-		m_currentFrame->sampleValue = depthSon;
-		m_currentFrame->frameIndex++;
-
-		ref.release();
-
-		*frame = m_currentFrame;
-
+		//we got the actual frame in the temp_update call.
+		//for real, we would do some type of double buffer swap on the client side, copy the latest frame (if newer) from the daemon
+		//the daemon might reference count this
+		frame = m_currentFrame;
 		return SENSEKIT_STATUS_SUCCESS;
 	}
 
-	sensekit_status_t PluginContext::close_depth_frame(sensekit_depthframe_t** frame)
+	sensekit_status_t PluginContext::close_depth_frame(sensekit_depthframe_t*& frame)
 	{
-		*frame = nullptr;
+		//later, would decrement the reference count
+		//TODO: how does the daemon recover from a client crashing while a frame is open? (reference count does go to 0)
+
+		frame = nullptr;
 
 		return SENSEKIT_STATUS_SUCCESS;
 	}
 
+	sensekit_status_t PluginContext::temp_update()
+	{
+		m_plugin->temp_update();
+
+		bin_id id = nullptr;
+		buffer* buf;
+		//get the bin front buffer for this client, with a dummy bin id
+		//later, we would have bookkeeping for client/streams to bin, and the bin storage would be outside pluginservice
+		m_pluginService->get_bin(id, buf);
+
+		//this part would be in the depth client side wrapper, since it knows about depth stuff
+		m_currentFrame = static_cast<sensekit_depthframe_t*>(buf->data);
+
+		return SENSEKIT_STATUS_SUCCESS;
+	}
 }
