@@ -13,4 +13,14 @@ namespace sensekit {
 
     }
 
+    void Stream::initialize()
+    {
+
+    }
+
+    void Stream::terminate()
+    {
+
+    }
+
 }

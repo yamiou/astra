@@ -1,17 +1,40 @@
 ﻿#include "PluginService.h"
+#include "Stream.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace sensekit
 {
-
-    sensekit_status_t PluginService::orbbec_stream_register(context_id ctx, stream_type_id id, stream_handle& handle)
+    sensekit_status_t PluginService::register_stream(context_id ctx, stream_type_id id, stream_handle& handle)
     {
-        handle = nullptr;
+        Stream* stream = new Stream(id);
+
+        m_streamRegistry.register_stream(ctx, stream);
+
+        handle = stream;
+
+        cout << "registering stream." << endl;
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::orbbec_stream_unregister(stream_handle& handle)
+    sensekit_status_t PluginService::unregister_stream(stream_handle& handle)
     {
+        Stream* stream = static_cast<Stream*>(handle);
+
+        if (handle == nullptr)
+            return SENSEKIT_STATUS_INVALID_PARAMETER;
+
+        m_streamRegistry.unregister_stream(stream);
+
+        delete stream;
+
         handle = nullptr;
+
+        cout << "unregistering stream." << endl;
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 

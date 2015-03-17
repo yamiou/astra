@@ -3,25 +3,25 @@
 
 namespace sensekit {
 
-    class StreamSource;
+    struct stream_type_id
+    {
+        int type{0};
+    };
 
     class Stream
     {
     public:
-        Stream(StreamSource& source)
-            : m_source(source) { }
+        Stream(stream_type_id typeId)
+            : m_typeId(typeId) {}
 
+        void initialize();
+        void terminate();
         void open();
         void close();
 
-
-    protected:
-        StreamSource& m_source;
-
+    private:
+        stream_type_id m_typeId;
     };
-
-
 }
-
 
 #endif /* STREAM_H */

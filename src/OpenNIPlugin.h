@@ -34,6 +34,7 @@ namespace sensekit
 
             buffer* m_currentBuffer{nullptr};
             sensekit_depthframe_t* m_currentFrame{nullptr};
+            stream_handle m_handle{nullptr};
         };
     }
 }

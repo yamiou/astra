@@ -15,7 +15,7 @@ namespace sensekit
 
         //stream core calls these on plugins
         //TODO transition this init call to the PluginBase ctor
-        virtual void initialize(Context* context, PluginService* pluginService)
+        void initialize(Context* context, PluginService* pluginService)
             {
                 if (m_initialized)
                     return;
@@ -28,7 +28,7 @@ namespace sensekit
                 m_initialized = true;
             }
 
-        virtual void cleanup()
+        void cleanup()
             {
                 if (!m_initialized)
                     return;
@@ -42,8 +42,8 @@ namespace sensekit
         bool is_initialized() const { return m_initialized; }
 
     protected:
-        inline Context* get_context() const { return m_frameworkContext; }
-        inline PluginService* get_pluginService() const  { return m_pluginService; }
+        inline Context& get_context() const { return *m_frameworkContext; }
+        inline PluginService& get_pluginService() const  { return *m_pluginService; }
 
         virtual void on_initialize() {}
         virtual void on_cleanup() {}
