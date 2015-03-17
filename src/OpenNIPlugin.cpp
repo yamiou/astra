@@ -16,11 +16,8 @@ namespace sensekit
         {
         }
 
-        void OpenNIPlugin::initialize(Context* context, PluginService* pluginService)
+        void OpenNIPlugin::on_initialize()
         {
-            m_context = context;
-            m_pluginService = pluginService;
-
             ::openni::Status rc = ::openni::STATUS_OK;
 
             const char* deviceURI = ::openni::ANY_DEVICE;
@@ -41,7 +38,7 @@ namespace sensekit
             open_depth_stream();
         }
 
-        void OpenNIPlugin::cleanup()
+        void OpenNIPlugin::on_cleanup()
         {
             close_depth_stream();
 
@@ -81,7 +78,7 @@ namespace sensekit
             stream_handle handle = nullptr;
             buffer* nextBuffer = nullptr;
             bin_id id = nullptr;
-            m_pluginService->orbbec_stream_create_bin(handle, sizeof(sensekit_depthframe_t), id, nextBuffer);
+            get_pluginService()->orbbec_stream_create_bin(handle, sizeof(sensekit_depthframe_t), id, nextBuffer);
             set_new_buffer(nextBuffer);
 
             return SENSEKIT_STATUS_SUCCESS;
@@ -91,9 +88,9 @@ namespace sensekit
         {
             stream_handle handle = nullptr;
             bin_id id = nullptr;
-            m_pluginService->orbbec_stream_destroy_bin(handle, id, m_currentBuffer);
+            get_pluginService()->orbbec_stream_destroy_bin(handle, id, m_currentBuffer);
 
-            cout << "stoping depth stream" << endl;
+            cout << "stopping depth stream" << endl;
             m_depthStream.stop();
             cout << "destroying depth stream" << endl;
             m_depthStream.destroy();
@@ -119,7 +116,7 @@ namespace sensekit
             {
                 stream_handle handle = nullptr;
                 buffer* nextBuffer = nullptr;
-                m_pluginService->orbbec_swap_bin_buffer(handle, m_currentBuffer, nextBuffer);
+                get_pluginService()->orbbec_swap_bin_buffer(handle, m_currentBuffer, nextBuffer);
                 set_new_buffer(nextBuffer);
             }
         }
