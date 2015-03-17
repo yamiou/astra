@@ -129,5 +129,4 @@ namespace sensekit {
 
         return SENSEKIT_STATUS_SUCCESS;
     }
-
 }

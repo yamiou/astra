@@ -1,74 +1,72 @@
 ﻿#ifndef PLUGINSERVICE_H
 #define PLUGINSERVICE_H
-	
+
 #include "SenseKit-private.h"
 
 namespace sensekit
 {
-	struct context_id
-	{
-		int dummy;
-	};
+    struct context_id
+    {
+        int dummy;
+    };
 
-	struct stream_type_id
-	{
-		int type;
-	};
+    struct stream_type_id
+    {
+        int type;
+    };
 
-	using stream_handle = void*;
+    using stream_handle = void*;
 
-	struct stream_data
-	{
-		context_id context;
-		stream_type_id type;
-	};
+    struct stream_data
+    {
+        context_id context;
+        stream_type_id type;
+    };
 
-	struct buffer
-	{
-		unsigned int byteLength;
-		void* data;
-	};
+    struct buffer
+    {
+        unsigned int byteLength;
+        void* data;
+    };
 
-	using bin_id = void*;
+    using bin_id = void*;
 
-	class PluginService
-	{
-	public:
-		//plugins internally call this on the stream core
-		//orbbec_plugin_create_context(...); //unregister
+    class PluginService
+    {
+    public:
+        //plugins internally call this on the stream core
+        //orbbec_plugin_create_context(...); //unregister
 
-		//metadata = int num_steam_types, stream_type_id[] ids
-		//for generators (no requirements, i.e. depth sensor and color sensor) plugin would directly create and register the streams, without using stream_factory
-		//orbbec_error orbbec_register_stream_factory(stream_type_id id, transformer_metadata md, stream_factory__callback); //callback gets passed a context_id
-		//orbbec_error orbbec_unregister_stream_factory(...); //nominally on plugin shutdown
-		//factory is called, plugin creates streams, then calls the stream_register to let the fx know about them
-		sensekit_status_t orbbec_stream_register(context_id ctx, stream_type_id id, /*out*/stream_handle& handle);// , stream_antifactory_callback); //I created the stream, I'm letting the core fx know about it
-		sensekit_status_t orbbec_stream_unregister(stream_handle& handle); //stream no longer available, nominally on plugin shutdown
-		sensekit_status_t orbbec_stream_create_bin(stream_handle handle, unsigned int byte_length, /*out*/ bin_id& id, /*out*/buffer*& new_buf);
-		sensekit_status_t orbbec_stream_destroy_bin(stream_handle handle, bin_id& id, buffer*& old_buf);
-		//orbbec_error orbbec_stream_subscribe_client_added_event(stream_handle handle, ...); //and unsubscribe...
-		//orbbec_error orbbec_stream_subscribe_client_removed_event(stream_handle handle, ...); //and unsubscribe...
-		//orbbec_error orbbec_stream_assign_client_to_bin(stream_handle handle, client_id id, bin_id id);
+        //metadata = int num_steam_types, stream_type_id[] ids
+        //for generators (no requirements, i.e. depth sensor and color sensor) plugin would directly create and register the streams, without using stream_factory
+        //orbbec_error orbbec_register_stream_factory(stream_type_id id, transformer_metadata md, stream_factory__callback); //callback gets passed a context_id
+        //orbbec_error orbbec_unregister_stream_factory(...); //nominally on plugin shutdown
+        //factory is called, plugin creates streams, then calls the stream_register to let the fx know about them
+        sensekit_status_t orbbec_stream_register(context_id ctx, stream_type_id id, /*out*/stream_handle& handle);// , stream_antifactory_callback); //I created the stream, I'm letting the core fx know about it
+        sensekit_status_t orbbec_stream_unregister(stream_handle& handle); //stream no longer available, nominally on plugin shutdown
+        sensekit_status_t orbbec_stream_create_bin(stream_handle handle, unsigned int byte_length, /*out*/ bin_id& id, /*out*/buffer*& new_buf);
+        sensekit_status_t orbbec_stream_destroy_bin(stream_handle handle, bin_id& id, buffer*& old_buf);
+        //orbbec_error orbbec_stream_subscribe_client_added_event(stream_handle handle, ...); //and unsubscribe...
+        //orbbec_error orbbec_stream_subscribe_client_removed_event(stream_handle handle, ...); //and unsubscribe...
+        //orbbec_error orbbec_stream_assign_client_to_bin(stream_handle handle, client_id id, bin_id id);
 
-		sensekit_status_t orbbec_swap_bin_buffer(stream_handle handle, buffer*& old_buf, /*out*/buffer*& new_buf);
-			
-		
-		//sensekit_status_t orbbec_stream_swap_bin_buffers(stream_handle handle, /*bin_id id,*/ unsigned int byte_length, void** m_frontBuffer, void** backBuffer);
-		//orbbec_error orbbec_stream_register_get_parameter_callback(component_handle handle, client_id client, ...);
-		//orbbec_error orbbec_stream_register_set_parameter_callback(component_handle handle, client_id client, ...);
+        sensekit_status_t orbbec_swap_bin_buffer(stream_handle handle, buffer*& old_buf, /*out*/buffer*& new_buf);
 
-		//internal:
-		sensekit_status_t get_bin(bin_id id, buffer*& buf)
-		{
-			buf = m_frontBuffer;
-			return SENSEKIT_STATUS_SUCCESS;
-		}
+        //sensekit_status_t orbbec_stream_swap_bin_buffers(stream_handle handle, /*bin_id id,*/ unsigned int byte_length, void** m_frontBuffer, void** backBuffer);
+        //orbbec_error orbbec_stream_register_get_parameter_callback(component_handle handle, client_id client, ...);
+        //orbbec_error orbbec_stream_register_set_parameter_callback(component_handle handle, client_id client, ...);
 
-	private:
-		buffer* m_frontBuffer;
-		buffer* m_backBuffer;
-	};
+        //internal:
+        sensekit_status_t get_bin(bin_id id, buffer*& buf)
+            {
+                buf = m_frontBuffer;
+                return SENSEKIT_STATUS_SUCCESS;
+            }
 
+    private:
+        buffer* m_frontBuffer;
+        buffer* m_backBuffer;
+    };
 }
 
 #endif /* PLUGINSERVICE_H */

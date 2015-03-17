@@ -40,7 +40,7 @@ BOOL CtrlHandler(DWORD fdwCtrlType)
 
 #else //_WIN32 -> OSX, LINUX
 
-static void signal_handler(int s){
+static void signal_handler(int s) {
     signal_stop_processing();
 }
 
