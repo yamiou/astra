@@ -9,14 +9,6 @@ namespace sensekit
 {
     namespace openni
     {
-        OpenNIPlugin::OpenNIPlugin()
-        {
-        }
-
-        OpenNIPlugin::~OpenNIPlugin()
-        {
-        }
-
         void OpenNIPlugin::on_initialize()
         {
             ::openni::Status rc = ::openni::STATUS_OK;
@@ -117,7 +109,11 @@ namespace sensekit
 
         void OpenNIPlugin::temp_update()
         {
-            if (nullptr != m_currentFrame && read_next_depth_frame(m_currentFrame) == SENSEKIT_STATUS_SUCCESS)
+            if (!is_initialized())
+                return;
+
+            if (nullptr != m_currentFrame
+                && read_next_depth_frame(m_currentFrame) == SENSEKIT_STATUS_SUCCESS)
             {
                 stream_handle handle = nullptr;
                 buffer* nextBuffer = nullptr;

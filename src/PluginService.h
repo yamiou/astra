@@ -3,9 +3,12 @@
 
 #include "SenseKit-private.h"
 #include "StreamRegistry.h"
+#include "StreamContextFactory.h"
 
 namespace sensekit
 {
+    class SenseKitContext;
+
     struct stream_type_id;
 
     using stream_handle = void*;
@@ -22,8 +25,11 @@ namespace sensekit
     {
     public:
 
-        //plugins internally call this on the stream core
-        //orbbec_plugin_create_context(...); //unregister
+        PluginService(SenseKitContext& context)
+            : m_context(context)
+            {}
+
+        StreamContextId create_context();
 
         //metadata = int num_steam_types, stream_type_id[] ids
         //for generators (no requirements, i.e. depth sensor and color sensor) plugin would directly create and register the streams, without using stream_factory
@@ -55,7 +61,8 @@ namespace sensekit
         buffer* m_frontBuffer;
         buffer* m_backBuffer;
 
-        StreamRegistry m_streamRegistry;
+        SenseKitContext& m_context;
+
     };
 }
 

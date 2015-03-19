@@ -1,17 +1,21 @@
-#ifndef CONTEXT_H
-#define CONTEXT_H
+#ifndef SENSEKITCONTEXT_H
+#define SENSEKITCONTEXT_H
 
 #include <SenseKit.h>
+#include <atomic>
 #include "PluginBase.h"
 #include "PluginService.h"
+#include "StreamRegistry.h"
+#include "StreamContextFactory.h"
 
 namespace sensekit {
 
-    class Context
+    class SenseKitContext
     {
     public:
-        Context() {}
-        virtual ~Context() {}
+        SenseKitContext()
+            : m_pluginService(*this) {}
+        virtual ~SenseKitContext() {}
 
         sensekit_status_t initialize();
         sensekit_status_t terminate();
@@ -24,18 +28,25 @@ namespace sensekit {
         sensekit_status_t close_depth_frame(sensekit_depthframe_t*& frame);
 
         sensekit_status_t temp_update();
+
+        StreamRegistry& get_streamRegistry() { return m_streamRegistry; }
+        StreamContextFactory& get_contextFactory() { return m_contextFactory; }
+
     private:
 
-        PluginService* m_pluginService;
+        StreamContextFactory m_contextFactory;
+        StreamRegistry m_streamRegistry;
+
+        PluginService m_pluginService;
         PluginBase* m_plugin;
 
         sensekit_depthframe_t* m_currentFrame{ nullptr };
 
     };
 
-    class PluginContext : public Context
+    class PluginContext : public SenseKitContext
     {
     };
 }
 
-#endif /* CONTEXT_H */
+#endif /* SENSEKITCONTEXT_H */

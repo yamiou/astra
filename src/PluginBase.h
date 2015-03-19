@@ -5,23 +5,24 @@
 
 namespace sensekit
 {
-    class Context;
+    class SenseKitContext;
 
     class PluginBase
     {
     public:
-        PluginBase() { };
-        virtual ~PluginBase() { };
+        PluginBase(SenseKitContext& context, PluginService& pluginService)
+            : m_frameworkContext(context),
+              m_pluginService(pluginService)
+            {};
+
+        virtual ~PluginBase() = default;
 
         //stream core calls these on plugins
         //TODO transition this init call to the PluginBase ctor
-        void initialize(Context* context, PluginService* pluginService)
+        void initialize()
             {
                 if (m_initialized)
                     return;
-
-                m_frameworkContext = context;
-                m_pluginService = pluginService;
 
                 on_initialize();
 
@@ -42,16 +43,16 @@ namespace sensekit
         bool is_initialized() const { return m_initialized; }
 
     protected:
-        inline Context& get_context() const { return *m_frameworkContext; }
-        inline PluginService& get_pluginService() const  { return *m_pluginService; }
+        inline SenseKitContext& get_context() const { return m_frameworkContext; }
+        inline PluginService& get_pluginService() const  { return m_pluginService; }
 
         virtual void on_initialize() {}
         virtual void on_cleanup() {}
 
     private:
         bool m_initialized{false};
-        Context* m_frameworkContext{nullptr};
-        PluginService* m_pluginService{nullptr};
+        SenseKitContext& m_frameworkContext;
+        PluginService& m_pluginService;
     };
 }
 

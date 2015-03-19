@@ -11,10 +11,14 @@ namespace sensekit
         class OpenNIPlugin : public sensekit::PluginBase
         {
         public:
-            OpenNIPlugin();
-            ~OpenNIPlugin();
+            OpenNIPlugin(SenseKitContext& context, PluginService& service)
+                : sensekit::PluginBase(context, service) {}
 
             virtual void temp_update() override;
+
+            // disable copying
+            OpenNIPlugin(const OpenNIPlugin&) = delete;
+            OpenNIPlugin& operator=(const OpenNIPlugin&) = delete;
 
         protected:
             virtual void on_initialize() override;
@@ -30,7 +34,7 @@ namespace sensekit
             ::openni::VideoStream m_depthStream;
             ::openni::DeviceInfo m_deviceInfo;
 
-            int m_frameIndex{ 0 };
+            int m_frameIndex{0};
 
             buffer* m_currentBuffer{nullptr};
             sensekit_depthframe_t* m_currentFrame{nullptr};

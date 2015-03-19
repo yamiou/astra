@@ -1,5 +1,6 @@
 ﻿#include "PluginService.h"
 #include "Stream.h"
+#include "SenseKitContext.h"
 
 #include <iostream>
 using std::cout;
@@ -7,11 +8,16 @@ using std::endl;
 
 namespace sensekit
 {
+    StreamContextId PluginService::create_context()
+    {
+        return m_context.get_contextFactory().create();
+    }
+
     sensekit_status_t PluginService::register_stream(context_id ctx, stream_type_id id, stream_handle& handle)
     {
         Stream* stream = new Stream(id);
 
-        m_streamRegistry.register_stream(ctx, stream);
+        m_context.get_streamRegistry().register_stream(ctx, stream);
 
         handle = stream;
 
@@ -27,7 +33,7 @@ namespace sensekit
         if (handle == nullptr)
             return SENSEKIT_STATUS_INVALID_PARAMETER;
 
-        m_streamRegistry.unregister_stream(stream);
+        m_context.get_streamRegistry().unregister_stream(stream);
 
         delete stream;
 
@@ -40,6 +46,8 @@ namespace sensekit
 
     sensekit_status_t PluginService::orbbec_stream_create_bin(stream_handle handle, unsigned byteLength, bin_id& id, buffer*& new_buf)
     {
+        cout << "creating bin." << endl;
+
         int* bin_data = new int();
         *bin_data = 42;
         id = static_cast<void*>(bin_data);

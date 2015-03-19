@@ -1,7 +1,7 @@
 ﻿#include "SenseKit-private.h"
-#include "Context.h"
+#include "SenseKitContext.h"
 
-static sensekit::Context g_Context;
+static sensekit::SenseKitContext g_Context;
 
 SENSEKIT_BEGIN_DECLS
 
