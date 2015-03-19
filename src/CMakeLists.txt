@@ -29,6 +29,7 @@ set(SenseKit_SOURCES
   PluginService.h
   OpenNIPlugin.cpp
   OpenNIPlugin.h
+  StreamContextFactory.h
   openni/OniStreamServer.h
   openni/OniStreamServer.cpp
   openni/OniStreamSource.h
