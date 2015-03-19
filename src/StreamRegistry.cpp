@@ -1,5 +1,6 @@
 #include "StreamRegistry.h"
 #include "Stream.h"
+#include <algorithm>
 
 namespace sensekit {
 
