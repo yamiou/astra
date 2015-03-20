@@ -43,4 +43,19 @@ namespace sensekit {
     {
         return m_frontBuffer;
     }
+
+    StreamBin::~StreamBin()
+    {
+        if (m_frontBuffer)
+        {
+            delete[] (uint8_t*)m_frontBuffer->data;
+            delete m_frontBuffer;
+        }
+
+        if (m_backBuffer)
+        {
+            delete[] (uint8_t*)m_backBuffer->data;
+            delete m_backBuffer;
+        }
+    }
 }
