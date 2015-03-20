@@ -3,6 +3,7 @@
 
 #include "PluginBase.h"
 #include <OpenNI.h>
+#include "DepthTypes.h"
 
 namespace sensekit
 {

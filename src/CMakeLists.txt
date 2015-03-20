@@ -1,9 +1,9 @@
 set(SenseKit_SOURCES
   SenseKitContext.h
   SenseKitContext.cpp
-  MockContext.h
-  MockContext.cpp
   ../include/SenseKit.h
+  ../include/ClientDepth.h
+  ../include/DepthTypes.h
   SenseKit.cpp
   Stream.h
   Stream.cpp

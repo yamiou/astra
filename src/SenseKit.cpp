@@ -15,41 +15,40 @@ SENSEKIT_API void sensekit_terminate()
     g_Context.terminate();
 }
 
-SENSEKIT_API sensekit_status_t sensekit_open_sensor(const char* connection_string, /*out*/ sensekit_sensor_t** sensor)
+SENSEKIT_API sensekit_status_t sensekit_open_streamset(const char* connection_string, /*out*/ sensekit_streamset_t** streamset)
 {
-    return g_Context.open_sensor(connection_string, sensor);
+    return g_Context.open_streamset(connection_string, streamset);
 }
 
-SENSEKIT_API sensekit_status_t sensekit_close_sensor(sensekit_sensor_t** sensor)
+SENSEKIT_API sensekit_status_t sensekit_close_streamset(sensekit_streamset_t** streamset)
 {
-    return g_Context.close_sensor(sensor);
+    return g_Context.close_streamset(streamset);
 }
 
-SENSEKIT_API sensekit_status_t sensekit_depth_open(sensekit_sensor_t* sensor, sensekit_depthstream_t** stream)
+SENSEKIT_API sensekit_status_t sensekit_stream_open(sensekit_streamset_t* streamset, sensekit_stream_t** stream)
 {
-    g_Context.open_depth_stream(sensor, stream);
+    g_Context.open_stream(streamset, stream);
 
     return SENSEKIT_STATUS_SUCCESS;
 }
 
-SENSEKIT_API sensekit_status_t sensekit_depth_close(sensekit_depthstream_t** stream)
+SENSEKIT_API sensekit_status_t sensekit_stream_close(sensekit_stream_t** stream)
 {
-    g_Context.close_depth_stream(stream);
+    g_Context.close_stream(stream);
 
     return SENSEKIT_STATUS_SUCCESS;
 }
 
-SENSEKIT_API sensekit_status_t sensekit_depth_frame_open(sensekit_depthstream_t* stream, int timeout, sensekit_depthframe_t*& frame)
+SENSEKIT_API sensekit_status_t sensekit_stream_frame_open(sensekit_stream_t* stream, int timeout, sensekit_frame_t** frame)
 {
-
-    g_Context.open_depth_frame(stream, timeout, frame);
+    g_Context.open_frame(stream, timeout, *frame);
 
     return SENSEKIT_STATUS_SUCCESS;
 }
 
-SENSEKIT_API sensekit_status_t sensekit_depth_frame_close(sensekit_depthframe_t*& frame)
+SENSEKIT_API sensekit_status_t sensekit_stream_frame_close(sensekit_frame_t** frame)
 {
-    g_Context.close_depth_frame(frame);
+    g_Context.close_frame(*frame);
     return SENSEKIT_STATUS_SUCCESS;
 }
 

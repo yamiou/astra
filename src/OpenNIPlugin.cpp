@@ -1,6 +1,6 @@
-﻿#include "OpenNIPlugin.h"
+﻿
+#include "OpenNIPlugin.h"
 #include <iostream>
-#include "Stream.h"
 
 using std::cout;
 using std::endl;
@@ -100,7 +100,7 @@ namespace sensekit
             m_currentBuffer = nextBuffer;
             m_currentFrame = static_cast<sensekit_depthframe_t*>(m_currentBuffer->data);
             m_currentFrame->sampleValue = 0;
-            m_currentFrame->frameIndex = m_frameIndex;
+            m_currentFrame->header.frameIndex = m_frameIndex;
             //TODO use placement new for m_currentFrame?
             //m_currentFrame = new(m_currentBuffer->data) sensekit_depthframe_t();
         }
@@ -143,7 +143,7 @@ namespace sensekit
             short depthSon = datData[index];
 
             frame->sampleValue = depthSon;
-            frame->frameIndex = m_frameIndex;
+            frame->header.frameIndex = m_frameIndex;
             ++m_frameIndex;
 
             ref.release();
