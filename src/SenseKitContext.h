@@ -5,8 +5,7 @@
 #include <atomic>
 #include "PluginBase.h"
 #include "PluginService.h"
-#include "StreamRegistry.h"
-#include "StreamContextFactory.h"
+#include "StreamSetFactory.h"
 
 namespace sensekit {
 
@@ -29,14 +28,12 @@ namespace sensekit {
 
         sensekit_status_t temp_update();
 
-        StreamRegistry& get_streamRegistry() { return m_streamRegistry; }
-        StreamContextFactory& get_contextFactory() { return m_contextFactory; }
+        StreamSetFactory& get_contextFactory() { return m_contextFactory; }
 
     private:
 
-        StreamContextFactory m_contextFactory;
-        StreamRegistry m_streamRegistry;
-
+        StreamSetFactory m_contextFactory;
+        
         PluginService m_pluginService;
         PluginBase* m_plugin;
 

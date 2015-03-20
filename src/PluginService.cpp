@@ -8,16 +8,17 @@ using std::endl;
 
 namespace sensekit
 {
-    StreamContextId PluginService::create_context()
+    StreamSet* PluginService::create_stream_set()
     {
         return m_context.get_contextFactory().create();
     }
 
-    sensekit_status_t PluginService::register_stream(context_id ctx, stream_type_id id, stream_handle& handle)
+    sensekit_status_t PluginService::register_stream(StreamSetId setId, StreamTypeId typeId, stream_handle& handle)
     {
-        Stream* stream = new Stream(id);
+        StreamId streamId = 0; //TODO assign via factory
+        Stream* stream = new Stream(streamId, typeId, 0);
 
-        m_context.get_streamRegistry().register_stream(ctx, stream);
+        //TODO add stream to streamset
 
         handle = stream;
 
@@ -32,8 +33,6 @@ namespace sensekit
 
         if (handle == nullptr)
             return SENSEKIT_STATUS_INVALID_PARAMETER;
-
-        m_context.get_streamRegistry().unregister_stream(stream);
 
         delete stream;
 

@@ -3,14 +3,13 @@
 
 #include "SenseKit-private.h"
 #include "StreamRegistry.h"
-#include "StreamContextFactory.h"
+#include "StreamSetFactory.h"
+#include "Stream.h"
 
 namespace sensekit
 {
     class SenseKitContext;
-
-    struct stream_type_id;
-
+    
     using stream_handle = void*;
 
     struct buffer
@@ -29,14 +28,14 @@ namespace sensekit
             : m_context(context)
             {}
 
-        StreamContextId create_context();
+        StreamSet* create_stream_set();
 
-        //metadata = int num_steam_types, stream_type_id[] ids
+        //metadata = int num_steam_types, StreamTypeId[] ids
         //for generators (no requirements, i.e. depth sensor and color sensor) plugin would directly create and register the streams, without using stream_factory
-        //orbbec_error orbbec_register_stream_factory(stream_type_id id, transformer_metadata md, stream_factory__callback); //callback gets passed a context_id
+        //orbbec_error orbbec_register_stream_factory(StreamTypeId id, transformer_metadata md, stream_factory__callback); //callback gets passed a context_id
         //orbbec_error orbbec_unregister_stream_factory(...); //nominally on plugin shutdown
         //factory is called, plugin creates streams, then calls the stream_register to let the fx know about them
-        sensekit_status_t register_stream(context_id ctx, stream_type_id id, /*out*/stream_handle& handle);// , stream_antifactory_callback); //I created the stream, I'm letting the core fx know about it
+        sensekit_status_t register_stream(StreamSetId setId, StreamTypeId typeId, /*out*/stream_handle& handle);// , stream_antifactory_callback); //I created the stream, I'm letting the core fx know about it
         sensekit_status_t unregister_stream(stream_handle& handle); //stream no longer available, nominally on plugin shutdown
         sensekit_status_t orbbec_stream_create_bin(stream_handle handle, unsigned int byte_length, /*out*/ bin_id& id, /*out*/buffer*& new_buf);
         sensekit_status_t orbbec_stream_destroy_bin(stream_handle handle, bin_id& id, buffer*& old_buf);

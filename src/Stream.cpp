@@ -1,26 +1,24 @@
 #include "Stream.h"
-#include "StreamSource.h"
+#include "StreamConnection.h"
 
 namespace sensekit {
 
-    void Stream::open()
+    StreamConnection* Stream::open()
+    {
+        return nullptr;
+    }
+
+    void Stream::close(StreamConnection* connection)
     {
 
     }
 
-    void Stream::close()
+    StreamBin* Stream::create_bin(size_t byteLength)
     {
-
+        return nullptr;
     }
 
-    void Stream::initialize()
+    void Stream::destroy_bin(StreamBin* bin)
     {
-
     }
-
-    void Stream::terminate()
-    {
-
-    }
-
 }

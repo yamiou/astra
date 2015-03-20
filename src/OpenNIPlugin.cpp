@@ -28,8 +28,6 @@ namespace sensekit
 
             m_deviceInfo = m_device.getDeviceInfo();
 
-            get_pluginService().register_stream(context_id{}, stream_type_id{}, m_handle);
-
             open_depth_stream();
         }
 

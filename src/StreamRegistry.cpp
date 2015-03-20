@@ -1,18 +1,19 @@
 #include "StreamRegistry.h"
 #include "Stream.h"
+#include "StreamSet.h"
 #include <algorithm>
 
 namespace sensekit {
 
-    int operator<(context_id lhs, context_id rhs)
-    {
-        return lhs.dummy < rhs.dummy;
-    }
+    //int operator<(StreamId lhs, StreamId rhs)
+    //{
+    //    return lhs.dummy < rhs.dummy;
+    //}
 
     StreamRegistry::StreamRegistry() { }
     StreamRegistry::~StreamRegistry() { }
 
-    bool StreamRegistry::register_stream(context_id contextId, Stream* stream)
+    bool StreamRegistry::register_stream(Stream* stream)
     {
         if (stream == nullptr)
             return false;
@@ -20,7 +21,7 @@ namespace sensekit {
         if (is_stream_registered(stream))
             return false;
 
-        m_streamContextMap.insert(StreamContextMap::value_type(contextId, stream));
+        m_streamContextMap.insert(StreamSetMap::value_type(stream->id(), stream));
 
         raise_registered(stream);
 
@@ -36,7 +37,7 @@ namespace sensekit {
             return false;
 
         auto it = std::find_if(m_streamContextMap.begin(), m_streamContextMap.end(),
-                               [&stream] (StreamContextMap::value_type& p) {
+                               [&stream] (StreamSetMap::value_type& p) {
                                    return p.second == stream;
                                });
 
@@ -53,7 +54,7 @@ namespace sensekit {
             return false;
 
         auto it = std::find_if(m_streamContextMap.begin(), m_streamContextMap.end(),
-                               [&stream] (StreamContextMap::value_type& p) {
+                               [&stream] (StreamSetMap::value_type& p) {
                                    return p.second == stream;
                                });
 

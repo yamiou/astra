@@ -3,16 +3,10 @@
 
 #include <map>
 #include "Signal.h"
+#include "Stream.h"
 
 namespace sensekit {
-
-    class Stream;
-
-    struct context_id
-    {
-        int dummy;
-    };
-
+    
     class StreamRegistry
     {
 
@@ -21,7 +15,7 @@ namespace sensekit {
         StreamRegistry();
         ~StreamRegistry();
 
-        bool register_stream(context_id contextId, Stream* stream);
+        bool register_stream(Stream* stream);
         bool unregister_stream(Stream* stream);
         bool is_stream_registered(Stream* stream);
 
@@ -45,9 +39,9 @@ namespace sensekit {
                 m_streamUnregisteredSignal.raise(stream);
             }
 
-        using StreamContextMap = std::multimap<context_id, Stream*>;
+        using StreamSetMap = std::multimap<StreamId, Stream*>;
 
-        StreamContextMap m_streamContextMap;
+        StreamSetMap m_streamContextMap;
 
         Signal<Stream*> m_streamRegisteredSignal;
         Signal<Stream*> m_streamUnregisteredSignal;
