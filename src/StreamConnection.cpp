@@ -16,4 +16,9 @@ namespace sensekit {
             m_bin->add_ref();
         }
     }
+
+    StreamConnection::~StreamConnection()
+    {
+        set_bin(nullptr);
+    }
 }

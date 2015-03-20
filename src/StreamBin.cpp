@@ -1,18 +1,46 @@
 #include "StreamBin.h"
 
 namespace sensekit {
-    buffer* StreamBin::get_back_buffer()
+
+    StreamBin::StreamBin(size_t bufferLengthInBytes)
     {
-        return nullptr;
+        allocate_buffers(bufferLengthInBytes);
     }
 
-    void StreamBin::swap_bin_buffers(buffer*& old_back_buf, buffer*& new_back_buf)
+    void StreamBin::allocate_buffers(size_t bufferLengthInBytes)
+    {
+        if (m_frontBuffer != nullptr)
+        {
+            delete m_frontBuffer;
+        }
+
+        m_backBuffer = new sensekit_frame_t;
+        m_backBuffer->byteLength = bufferLengthInBytes;
+        m_backBuffer->data = new uint8_t[bufferLengthInBytes];
+
+        if (m_frontBuffer != nullptr)
+        {
+            delete m_frontBuffer;
+        }
+
+        m_frontBuffer = new sensekit_frame_t;
+        m_frontBuffer->byteLength = bufferLengthInBytes;
+        m_frontBuffer->data = new uint8_t[bufferLengthInBytes];
+    }
+
+
+    sensekit_frame_t* StreamBin::get_back_buffer()
+    {
+        return m_backBuffer;
+    }
+
+    void StreamBin::swap_bin_buffers(sensekit_frame_t*& old_back_buf, sensekit_frame_t*& new_back_buf)
     {
 
     }
 
-    buffer* StreamBin::get_front_buffer()
+    sensekit_frame_t* StreamBin::get_front_buffer()
     {
-        return nullptr;
+        return m_frontBuffer;
     }
 }

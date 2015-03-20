@@ -11,11 +11,11 @@ namespace sensekit {
     class StreamConnection
     {
     public:
-        explicit StreamConnection(const Stream* stream)
+        StreamConnection(const Stream* stream)
             : m_stream(stream)
-        {
-            
-        }
+        { }
+
+        ~StreamConnection();
 
         void set_bin(StreamBin* new_bin);
 

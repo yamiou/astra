@@ -4,6 +4,7 @@
 #include "Signal.h"
 
 namespace sensekit {
+
     class StreamBin;
     class StreamConnection;
 
@@ -19,6 +20,7 @@ namespace sensekit {
             {}
         StreamConnection* open();
         void close(StreamConnection* connection);
+
         StreamId id() { return m_id; }
         StreamTypeId typeId() { return m_typeId; }
 

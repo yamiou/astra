@@ -87,8 +87,7 @@ namespace sensekit {
         StreamBin* bin = stream_connection->get_bin();
         if (bin != nullptr)
         {
-            buffer* buf = bin->get_front_buffer();
-            frame = (sensekit_frame_t*)m_currentFrame;
+            frame = bin->get_front_buffer();
         }
 
         return SENSEKIT_STATUS_SUCCESS;
