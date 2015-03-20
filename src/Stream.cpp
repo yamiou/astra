@@ -23,12 +23,18 @@ namespace sensekit {
     StreamBin* Stream::create_bin(size_t bufferLengthInBytes)
     {
         cout << "creating bin." << endl;
+        int newBinId = m_nextBinId++;
 
-        return new StreamBin(bufferLengthInBytes);
+        return new StreamBin(newBinId, bufferLengthInBytes);
     }
 
     void Stream::destroy_bin(StreamBin* bin)
     {
         delete bin;
+    }
+
+    StreamBin* Stream::get_bin_by_id(StreamBinId id)
+    {
+        return m_bin;
     }
 }

@@ -2,60 +2,50 @@
 
 namespace sensekit {
 
-    StreamBin::StreamBin(size_t bufferLengthInBytes)
+    StreamBin::StreamBin(StreamBinId id, size_t bufferLengthInBytes)
+        : m_id(id)
     {
         allocate_buffers(bufferLengthInBytes);
     }
 
     void StreamBin::allocate_buffers(size_t bufferLengthInBytes)
     {
-        if (m_frontBuffer != nullptr)
+        for(auto* frame : m_buffers)
         {
-            delete m_frontBuffer;
+            frame = new sensekit_frame_t;
+            frame->byteLength = bufferLengthInBytes;
+            frame->data = new uint8_t[bufferLengthInBytes];
         }
-
-        m_backBuffer = new sensekit_frame_t;
-        m_backBuffer->byteLength = bufferLengthInBytes;
-        m_backBuffer->data = new uint8_t[bufferLengthInBytes];
-
-        if (m_frontBuffer != nullptr)
-        {
-            delete m_frontBuffer;
-        }
-
-        m_frontBuffer = new sensekit_frame_t;
-        m_frontBuffer->byteLength = bufferLengthInBytes;
-        m_frontBuffer->data = new uint8_t[bufferLengthInBytes];
     }
-
 
     sensekit_frame_t* StreamBin::get_back_buffer()
     {
-        return m_backBuffer;
+        return m_buffers[m_currentBackBufferIndex];
     }
 
-    void StreamBin::swap_bin_buffers(sensekit_frame_t*& old_back_buf, sensekit_frame_t*& new_back_buf)
+    sensekit_frame_t* StreamBin::cycle_buffers()
     {
+        m_currentBackBufferIndex =
+            m_currentBackBufferIndex + 1 < m_buffers.size() ? m_currentBackBufferIndex + 1 : 0;
 
+        m_currentFrontBufferIndex =
+            m_currentFrontBufferIndex + 1 < m_buffers.size() ? m_currentFrontBufferIndex + 1 : 0;
+
+        return m_buffers[m_currentBackBufferIndex];
     }
 
     sensekit_frame_t* StreamBin::get_front_buffer()
     {
-        return m_frontBuffer;
+        return m_buffers[m_currentFrontBufferIndex];
     }
 
     StreamBin::~StreamBin()
     {
-        if (m_frontBuffer)
+        for(auto* frame : m_buffers)
         {
-            delete[] (uint8_t*)m_frontBuffer->data;
-            delete m_frontBuffer;
-        }
-
-        if (m_backBuffer)
-        {
-            delete[] (uint8_t*)m_backBuffer->data;
-            delete m_backBuffer;
+            delete[] (uint8_t*)frame->data;
+            delete frame;
+            frame = nullptr;
         }
     }
 }

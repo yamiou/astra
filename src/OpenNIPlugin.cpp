@@ -1,5 +1,4 @@
-﻿
-#include "OpenNIPlugin.h"
+﻿#include "OpenNIPlugin.h"
 #include <iostream>
 
 using std::cout;
@@ -71,9 +70,11 @@ namespace sensekit
             }
 
             stream_handle handle = nullptr;
-            buffer* nextBuffer = nullptr;
-            bin_id id = nullptr;
-            get_pluginService().orbbec_stream_create_bin(handle, sizeof(sensekit_depthframe_t), id, nextBuffer);
+            sensekit_frame_t* nextBuffer = nullptr;
+
+            get_pluginService()
+                .orbbec_stream_create_bin(handle, sizeof(sensekit_depthframe_t), m_id, nextBuffer);
+
             set_new_buffer(nextBuffer);
 
             return SENSEKIT_STATUS_SUCCESS;
@@ -82,8 +83,9 @@ namespace sensekit
         sensekit_status_t OpenNIPlugin::close_depth_stream()
         {
             stream_handle handle = nullptr;
-            bin_id id = nullptr;
-            get_pluginService().orbbec_stream_destroy_bin(handle, id, m_currentBuffer);
+            StreamBinId id = -1;
+
+            get_pluginService().orbbec_stream_destroy_bin(handle, m_id, m_currentBuffer);
 
             cout << "stopping depth stream" << endl;
             m_depthStream.stop();
@@ -95,7 +97,7 @@ namespace sensekit
             return SENSEKIT_STATUS_SUCCESS;
         }
 
-        void OpenNIPlugin::set_new_buffer(buffer* nextBuffer)
+        void OpenNIPlugin::set_new_buffer(sensekit_frame_t* nextBuffer)
         {
             m_currentBuffer = nextBuffer;
             m_currentFrame = static_cast<sensekit_depthframe_t*>(m_currentBuffer->data);
@@ -114,8 +116,8 @@ namespace sensekit
                 && read_next_depth_frame(m_currentFrame) == SENSEKIT_STATUS_SUCCESS)
             {
                 stream_handle handle = nullptr;
-                buffer* nextBuffer = nullptr;
-                get_pluginService().orbbec_swap_bin_buffer(handle, m_currentBuffer, nextBuffer);
+                sensekit_frame_t* nextBuffer = nullptr;
+                get_pluginService().orbbec_swap_bin_buffer(handle, m_id, nextBuffer);
                 set_new_buffer(nextBuffer);
             }
         }

@@ -2,19 +2,22 @@
 #define STREAMBIN_H
 #include <exception>
 #include <SenseKit.h>
+#include <array>
 
 namespace sensekit {
-    struct buffer;
+
+    using StreamBinId = int;
 
     class StreamBin
     {
     public:
-        StreamBin(size_t bufferSizeInBytes);
+        StreamBin(StreamBinId id, size_t bufferSizeInBytes);
         ~StreamBin();
 
     //exposed to plugins
         sensekit_frame_t* get_back_buffer();
-        void swap_bin_buffers(sensekit_frame_t*& old_back_buf, sensekit_frame_t*& new_back_buf);
+        sensekit_frame_t* cycle_buffers();
+
         int get_ref_count() { return m_refCount; }
 
     //internal use by framework
@@ -29,12 +32,20 @@ namespace sensekit {
                 throw std::exception();
             }
         }
+
+        StreamBinId get_id() { return m_id; }
     private:
-        sensekit_frame_t* m_frontBuffer;
-        sensekit_frame_t* m_backBuffer;
+        StreamBinId m_id{-1};
 
+        using FrameBufferArray = std::array<sensekit_frame_t*, 2>;
 
-        int m_refCount{ 0 };
+        size_t m_currentBackBufferIndex{0};
+        size_t m_currentFrontBufferIndex{std::tuple_size<FrameBufferArray>::value - 1};
+        sensekit_frame_t* m_frontBuffer{nullptr};
+        sensekit_frame_t* m_backBuffer{nullptr};
+
+        std::array<sensekit_frame_t*, 2> m_buffers;
+        int m_refCount{0};
 
         void allocate_buffers(size_t bufferLengthInBytes);
     };

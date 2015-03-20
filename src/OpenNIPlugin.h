@@ -28,7 +28,7 @@ namespace sensekit
         private:
             sensekit_status_t open_depth_stream();
             sensekit_status_t close_depth_stream();
-            void set_new_buffer(buffer* nextBuffer);
+            void set_new_buffer(sensekit_frame_t* nextBuffer);
             sensekit_status_t read_next_depth_frame(sensekit_depthframe_t* frame);
 
             ::openni::Device m_device;
@@ -37,7 +37,8 @@ namespace sensekit
 
             int m_frameIndex{0};
 
-            buffer* m_currentBuffer{nullptr};
+            sensekit_frame_t* m_currentBuffer{nullptr};
+            StreamBinId m_id{0};
             sensekit_depthframe_t* m_currentFrame{nullptr};
             stream_handle m_handle{nullptr};
         };
