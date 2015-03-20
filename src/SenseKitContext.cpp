@@ -32,7 +32,7 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::open_streamset(const char *uri, sensekit_streamset_t **sensor)
+    sensekit_status_t SenseKitContext::open_streamset(const char* uri, sensekit_streamset_t*& streamset)
     {
         //do nothing for now
         //would connect to the daemon and register interest in the uri
@@ -40,36 +40,36 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::close_streamset(sensekit_streamset_t **streamset)
+    sensekit_status_t SenseKitContext::close_streamset(sensekit_streamset_t*& streamset)
     {
         //reverse the nothing we did above
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::open_stream(sensekit_streamset_t *streamset, sensekit_stream_t **stream)
+    sensekit_status_t SenseKitContext::open_stream(sensekit_streamset_t *streamset, sensekit_stream_t*& stream)
     {
         //trollolol nothing to do for now
-        //would find the depth plugin for the context(sensor) and call client added event, and
+        //would find the depth plugin for the context(streamset) and call client added event, and
         //then the plugin would create a bin if necessary and assign the client to the bin
         Stream* str = new Stream(0, 0, 0);
 
         StreamConnection* stream_connection = new StreamConnection(str);
 
-        *stream = (sensekit_stream_t*)stream_connection;
+        stream = (sensekit_stream_t*)stream_connection;
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::close_stream(sensekit_stream_t **stream)
+    sensekit_status_t SenseKitContext::close_stream(sensekit_stream_t*& stream)
     {
-        StreamConnection* stream_connection = (StreamConnection*)(*stream);
+        StreamConnection* stream_connection = (StreamConnection*)(stream);
 
         const Stream* str = stream_connection->get_stream();
         //TODO stream bookkeeping and lifetime would be elsewhere
         delete str;
         delete stream_connection;
 
-        *stream = nullptr;
+        stream = nullptr;
         //would find the depth plugin and call client removed event, and the plugin might destroy a bin
         return SENSEKIT_STATUS_SUCCESS;
     }

@@ -19,10 +19,10 @@ namespace sensekit {
         sensekit_status_t initialize();
         sensekit_status_t terminate();
 
-        sensekit_status_t open_streamset(const char* uri, sensekit_streamset_t** streamset);
-        sensekit_status_t close_streamset(sensekit_streamset_t** streamset);
-        sensekit_status_t open_stream(sensekit_streamset_t* streamset, sensekit_stream_t** stream);
-        sensekit_status_t close_stream(sensekit_stream_t** stream);
+        sensekit_status_t open_streamset(const char* uri, sensekit_streamset_t*& streamset);
+        sensekit_status_t close_streamset(sensekit_streamset_t*& streamset);
+        sensekit_status_t open_stream(sensekit_streamset_t* streamset, sensekit_stream_t*& stream);
+        sensekit_status_t close_stream(sensekit_stream_t*& stream);
         sensekit_status_t open_frame(sensekit_stream_t* stream, int timeout, sensekit_frame_t*& frame);
         sensekit_status_t close_frame(sensekit_frame_t*& frame);
 

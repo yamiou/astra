@@ -17,24 +17,24 @@ SENSEKIT_API void sensekit_terminate()
 
 SENSEKIT_API sensekit_status_t sensekit_open_streamset(const char* connection_string, /*out*/ sensekit_streamset_t** streamset)
 {
-    return g_Context.open_streamset(connection_string, streamset);
+    return g_Context.open_streamset(connection_string, *streamset);
 }
 
 SENSEKIT_API sensekit_status_t sensekit_close_streamset(sensekit_streamset_t** streamset)
 {
-    return g_Context.close_streamset(streamset);
+    return g_Context.close_streamset(*streamset);
 }
 
 SENSEKIT_API sensekit_status_t sensekit_stream_open(sensekit_streamset_t* streamset, sensekit_stream_t** stream)
 {
-    g_Context.open_stream(streamset, stream);
+    g_Context.open_stream(streamset, *stream);
 
     return SENSEKIT_STATUS_SUCCESS;
 }
 
 SENSEKIT_API sensekit_status_t sensekit_stream_close(sensekit_stream_t** stream)
 {
-    g_Context.close_stream(stream);
+    g_Context.close_stream(*stream);
 
     return SENSEKIT_STATUS_SUCCESS;
 }
