@@ -33,7 +33,7 @@ namespace sensekit {
     private:
 
         StreamSetFactory m_contextFactory;
-        
+
         PluginService m_pluginService;
         PluginBase* m_plugin;
 

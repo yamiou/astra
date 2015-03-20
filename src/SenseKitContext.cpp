@@ -16,7 +16,7 @@ namespace sensekit {
         //later this would involve dlopen and fptables and other stuff
         m_plugin = new sensekit::openni::OpenNIPlugin(*this, m_pluginService);
         m_plugin->initialize();
-        
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 
