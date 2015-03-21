@@ -40,7 +40,7 @@ namespace sensekit
             sensekit_frame_t* m_currentBuffer{nullptr};
             StreamBinId m_id{0};
             sensekit_depthframe_t* m_currentFrame{nullptr};
-            stream_handle m_handle{nullptr};
+            StreamHandle m_handle{nullptr};
         };
     }
 }

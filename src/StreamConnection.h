@@ -5,7 +5,6 @@
 
 namespace sensekit {
 
-    using StreamHandle = unsigned;
     class StreamBin;
 
     class StreamConnection

@@ -11,7 +11,7 @@ namespace sensekit {
     class StreamConnection;
 
     using StreamId = unsigned;
-
+    using StreamHandle = void*;
     using StreamTypeId = unsigned;
 
     class Stream
