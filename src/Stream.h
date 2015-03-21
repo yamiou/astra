@@ -27,8 +27,8 @@ namespace sensekit {
         StreamConnection* open();
         void close(StreamConnection* connection);
 
-        StreamId id() { return m_id; }
-        StreamTypeId typeId() { return m_typeId; }
+        StreamId get_id() { return m_id; }
+        StreamTypeId get_typeId() { return m_typeId; }
 
         StreamBin* create_bin(size_t byteLength);
         void destroy_bin(StreamBin* bin);
