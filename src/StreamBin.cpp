@@ -14,12 +14,10 @@ namespace sensekit {
 
     void StreamBin::allocate_buffers(size_t bufferLengthInBytes)
     {
-        m_buffers.fill(nullptr);
         for(auto& frame : m_buffers)
         {
             frame = new sensekit_frame_t;
             frame->byteLength = bufferLengthInBytes;
-            frame->data = nullptr;
             frame->data = new uint8_t[bufferLengthInBytes];
         }
     }
