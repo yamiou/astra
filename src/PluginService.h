@@ -2,7 +2,6 @@
 #define PLUGINSERVICE_H
 
 #include "SenseKit-private.h"
-#include "StreamRegistry.h"
 #include "StreamSetFactory.h"
 #include "Stream.h"
 #include "StreamBin.h"
