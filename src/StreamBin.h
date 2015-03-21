@@ -16,9 +16,11 @@ namespace sensekit {
         StreamBin(StreamBinId id, size_t bufferSizeInBytes);
         ~StreamBin();
 
-    //exposed to plugins
+        //exposed to plugins
         sensekit_frame_t* get_back_buffer();
         sensekit_frame_t* cycle_buffers();
+
+        //TODO support reference counting for multi-client scenarios
         sensekit_frame_t* lock_front_buffer()
             {
                 m_frontBufferLocked = true;
@@ -32,18 +34,18 @@ namespace sensekit {
 
         int get_ref_count() { return m_refCount; }
 
-    //internal use by framework
+        //internal use by framework
         sensekit_frame_t* get_front_buffer();
 
         void add_ref() { m_refCount++; }
         void dec_ref()
-        {
-            m_refCount--;
-            if (m_refCount < 0)
             {
-                throw std::exception();
+                m_refCount--;
+                if (m_refCount < 0)
+                {
+                    throw std::exception();
+                }
             }
-        }
 
         StreamBinId get_id() { return m_id; }
 
