@@ -1,6 +1,7 @@
 #include "StreamConnection.h"
 #include "StreamBin.h"
 #include <iostream>
+
 using std::cout;
 using std::endl;
 

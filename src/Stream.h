@@ -4,6 +4,9 @@
 #include "Signal.h"
 #include "StreamBin.h"
 #include <atomic>
+#include <memory>
+#include <vector>
+#include "StreamConnection.h"
 
 namespace sensekit {
 
@@ -11,14 +14,14 @@ namespace sensekit {
     class StreamConnection;
 
     using StreamId = unsigned;
-    using StreamHandle = void*;
     using StreamTypeId = unsigned;
 
     class Stream
     {
     public:
         Stream(StreamId id, StreamTypeId typeId, int index)
-            : m_id(id), m_typeId(typeId)
+            : m_id(id),
+              m_typeId(typeId)
             {}
         ~Stream();
 
@@ -34,9 +37,12 @@ namespace sensekit {
         StreamBin* get_bin_by_id(StreamBinId id);
 
     private:
+        using ConnectionList = std::vector<std::unique_ptr<StreamConnection> >;
 
         const StreamId m_id{0};
         const StreamTypeId m_typeId{0};
+
+        ConnectionList m_connections;
 
         // make it work, only one bin
         StreamBin* m_bin{nullptr};

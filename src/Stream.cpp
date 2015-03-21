@@ -1,10 +1,11 @@
 #include <SenseKit.h>
 #include "Stream.h"
-#include "StreamConnection.h"
 #include "StreamBin.h"
-#include <cstdint>
 
+#include <cstdint>
+#include <algorithm>
 #include <iostream>
+
 using std::cout;
 using std::endl;
 
@@ -12,15 +13,28 @@ namespace sensekit {
 
     StreamConnection* Stream::open()
     {
-        auto connection = new StreamConnection(this);
-        connection->set_bin(m_bin);
+        std::unique_ptr<StreamConnection> conn(new StreamConnection(this));
+        conn->set_bin(m_bin);
 
-        return connection;
+        StreamConnection* rawPtr = conn.get();
+
+        m_connections.push_back(std::move(conn));
+
+        return rawPtr;
     }
 
     void Stream::close(StreamConnection* connection)
     {
-        delete connection;
+        auto it = std::find_if(m_connections.cbegin(),
+                               m_connections.cend(),
+                               [connection] (const std::unique_ptr<StreamConnection>& sc)
+                               -> bool
+                               {
+                                   return sc.get() == connection;
+                               });
+
+        if (it != m_connections.cend())
+            m_connections.erase(it);
     }
 
     StreamBin* Stream::create_bin(size_t bufferLengthInBytes)

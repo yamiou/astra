@@ -1,11 +1,12 @@
 #ifndef STREAMCONNECTION_H
 #define STREAMCONNECTION_H
 
-#include "Stream.h"
-
 namespace sensekit {
 
     class StreamBin;
+    class Stream;
+
+    using StreamHandle = void*;
 
     class StreamConnection
     {
