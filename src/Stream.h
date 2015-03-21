@@ -24,6 +24,8 @@ namespace sensekit {
               m_typeId(typeId)
             {}
 
+        ~Stream();
+
         StreamConnection* open();
         void close(StreamConnection* connection);
 

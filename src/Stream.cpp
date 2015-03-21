@@ -78,4 +78,10 @@ namespace sensekit {
         auto it = m_bins.find(id);
         return it != m_bins.end() ? it->second.get() : nullptr;
     }
+
+    Stream::~Stream()
+    {
+        m_connections.clear();
+        m_bins.clear();
+    }
 }
