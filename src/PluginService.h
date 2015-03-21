@@ -42,13 +42,6 @@ namespace sensekit
         //orbbec_error orbbec_stream_register_get_parameter_callback(component_handle handle, client_id client, ...);
         //orbbec_error orbbec_stream_register_set_parameter_callback(component_handle handle, client_id client, ...);
 
-        //internal:
-        sensekit_status_t get_bin(StreamBinId id, sensekit_frame_t*& buffer)
-            {
-                m_stream->get_bin_by_id(id);
-                return SENSEKIT_STATUS_SUCCESS;
-            }
-
         Stream* get_temp_stream() { return m_stream; }
 
     private:
