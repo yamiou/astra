@@ -1,7 +1,7 @@
 set(SenseKit_SOURCES
   ../include/SenseKit.h
-  ../include/ClientDepth.h
-  ../include/DepthTypes.h
+  ../include/streams/depth.h
+  ../include/streams/depth_types.h
   SenseKitContext.h
   SenseKitContext.cpp
   SenseKit.cpp

@@ -1,9 +1,7 @@
 ﻿// Orbbec (c) 2015
 
 #include <SenseKit.h>
-#include <ClientDepth.h>
-//link against SenseKit.so/lib
-
+#include <streams/depth.h>
 #include <cstdio>
 #include <iostream>
 

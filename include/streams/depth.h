@@ -1,8 +1,8 @@
-#ifndef CLIENTDEPTH_H
-#define CLIENTDEPTH_H
+#ifndef DEPTH_H
+#define DEPTH_H
 
 #include <SenseKit.h>
-#include "DepthTypes.h"
+#include "depth_types.h"
 
 SENSEKIT_BEGIN_DECLS
 
@@ -31,7 +31,7 @@ sensekit_status_t sensekit_depth_frame_open(sensekit_depthstream_t* stream, int 
     sensekit_frame_t* sk_frame = NULL;
 
     sensekit_stream_frame_open(sk_stream, timeout, &sk_frame);
-        
+
     //SOOON...
     //sensekit_depthframe_header_t* header = (sensekit_depthframe_header_t*)(sk_frame->data);
     //interrogate header, optionally decompress, etc...
@@ -62,4 +62,4 @@ sensekit_status_t sensekit_depth_frame_close(sensekit_depthframe_t** frame)
 
 SENSEKIT_END_DECLS
 
-#endif // CLIENTDEPTH_H
+#endif // DEPTH_H
