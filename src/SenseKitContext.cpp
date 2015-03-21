@@ -81,21 +81,27 @@ namespace sensekit {
 
         StreamConnection* stream_connection = (StreamConnection*)(stream);
 
-        const Stream* str = stream_connection->get_stream();
-
         StreamBin* bin = stream_connection->get_bin();
         if (bin != nullptr)
         {
-            frame = bin->get_front_buffer();
+            frame = bin->lock_front_buffer();
         }
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::close_frame(sensekit_frame_t*& frame)
+    sensekit_status_t SenseKitContext::close_frame(sensekit_stream_t* stream, sensekit_frame_t*& frame)
     {
         //later, would decrement the reference count
         //TODO: how does the daemon recover from a client crashing while a frame is open? (reference count does go to 0)
+
+        StreamConnection* stream_connection = (StreamConnection*)(stream);
+
+        StreamBin* bin = stream_connection->get_bin();
+        if (bin != nullptr)
+        {
+            bin->unlock_front_buffer();
+        }
 
         frame = nullptr;
 

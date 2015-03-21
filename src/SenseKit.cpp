@@ -46,9 +46,9 @@ SENSEKIT_API sensekit_status_t sensekit_stream_frame_open(sensekit_stream_t* str
     return SENSEKIT_STATUS_SUCCESS;
 }
 
-SENSEKIT_API sensekit_status_t sensekit_stream_frame_close(sensekit_frame_t** frame)
+SENSEKIT_API sensekit_status_t sensekit_stream_frame_close(sensekit_stream_t* stream, sensekit_frame_t** frame)
 {
-    g_Context.close_frame(*frame);
+    g_Context.close_frame(stream, *frame);
     return SENSEKIT_STATUS_SUCCESS;
 }
 

@@ -4,10 +4,11 @@
 #include <exception>
 #include <SenseKit.h>
 #include <array>
+#include <atomic>
 
 namespace sensekit {
 
-    using StreamBinId = int;
+    using StreamBinId = bin_id_t;
 
     class StreamBin
     {
@@ -18,6 +19,16 @@ namespace sensekit {
     //exposed to plugins
         sensekit_frame_t* get_back_buffer();
         sensekit_frame_t* cycle_buffers();
+        sensekit_frame_t* lock_front_buffer()
+            {
+                m_frontBufferLocked = true;
+                return m_buffers[m_currentFrontBufferIndex];
+            }
+
+        void unlock_front_buffer()
+            {
+                m_frontBufferLocked = false;
+            }
 
         int get_ref_count() { return m_refCount; }
 
@@ -35,8 +46,10 @@ namespace sensekit {
         }
 
         StreamBinId get_id() { return m_id; }
+
     private:
         StreamBinId m_id{-1};
+        std::atomic_bool m_frontBufferLocked{ATOMIC_VAR_INIT(false)};
 
         const static size_t BUFFER_COUNT = 2;
         using FrameBufferArray = std::array<sensekit_frame_t*, BUFFER_COUNT>;

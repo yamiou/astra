@@ -90,7 +90,7 @@ int main(int argc, char** argv)
 
         std::cout << "index: " << depthFrame->header.frameIndex << " value: " << depthFrame->sampleValue << std::endl;
 
-        sensekit_depth_frame_close(&depthFrame);
+        sensekit_depth_frame_close(depthStream, &depthFrame);
 
     } while (shouldContinue);
 

@@ -32,6 +32,7 @@ SENSEKIT_API sensekit_status_t sensekit_stream_frame_open(
     sensekit_frame_t** frame); //0 = return immediately
 
 SENSEKIT_API sensekit_status_t sensekit_stream_frame_close(
+    sensekit_stream_t* stream,
     sensekit_frame_t** frame); //frame set to null
 
 SENSEKIT_API sensekit_status_t sensekit_temp_update();

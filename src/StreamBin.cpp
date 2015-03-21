@@ -14,10 +14,12 @@ namespace sensekit {
 
     void StreamBin::allocate_buffers(size_t bufferLengthInBytes)
     {
+        m_buffers.fill(nullptr);
         for(auto& frame : m_buffers)
         {
             frame = new sensekit_frame_t;
             frame->byteLength = bufferLengthInBytes;
+            frame->data = nullptr;
             frame->data = new uint8_t[bufferLengthInBytes];
         }
     }
@@ -29,11 +31,17 @@ namespace sensekit {
 
     sensekit_frame_t* StreamBin::cycle_buffers()
     {
-        m_currentBackBufferIndex =
-            m_currentBackBufferIndex + 1 < m_buffers.size() ? m_currentBackBufferIndex + 1 : 0;
+        if (!m_frontBufferLocked)
+        {
+            m_currentFrontBufferIndex = m_currentBackBufferIndex;
+        }
 
-        m_currentFrontBufferIndex =
-            m_currentFrontBufferIndex + 1 < m_buffers.size() ? m_currentFrontBufferIndex + 1 : 0;
+        do
+        {
+            m_currentBackBufferIndex =
+                m_currentBackBufferIndex + 1 < BUFFER_COUNT ? m_currentBackBufferIndex + 1 : 0;
+
+        } while (m_currentBackBufferIndex == m_currentFrontBufferIndex);
 
         return m_buffers[m_currentBackBufferIndex];
     }
