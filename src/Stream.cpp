@@ -14,7 +14,17 @@ namespace sensekit {
     StreamConnection* Stream::open()
     {
         std::unique_ptr<StreamConnection> conn(new StreamConnection(this));
-        conn->set_bin(m_bin);
+        // TODO: stream connection needs an initial bin? default bin concept?
+        // created when stream is created? or lazily when connection is opened?
+
+        if (m_bins.cbegin() != m_bins.cend())
+        {
+            conn->set_bin(m_bins.cbegin()->second.get());
+        }
+        else
+        {
+            cout << "warn: opening connection, but no bins!" << endl;
+        }
 
         StreamConnection* rawPtr = conn.get();
 
@@ -27,10 +37,10 @@ namespace sensekit {
     {
         auto it = std::find_if(m_connections.cbegin(),
                                m_connections.cend(),
-                               [connection] (const std::unique_ptr<StreamConnection>& sc)
+                               [connection] (const std::unique_ptr<StreamConnection>& element)
                                -> bool
                                {
-                                   return sc.get() == connection;
+                                   return element.get() == connection;
                                });
 
         if (it != m_connections.cend())
@@ -41,23 +51,31 @@ namespace sensekit {
     {
         int newBinId = m_nextBinId++;
 
-        m_bin = new StreamBin(newBinId, bufferLengthInBytes);
-        return m_bin;
+        BinPtr bin(new StreamBin(newBinId, bufferLengthInBytes));
+        StreamBin* rawPtr = bin.get();
+
+        m_bins.insert(std::make_pair(newBinId, std::move(bin)));
+
+        return rawPtr;
     }
 
     void Stream::destroy_bin(StreamBin* bin)
     {
-        delete bin;
+        auto it = std::find_if(m_bins.cbegin(),
+                               m_bins.cend(),
+                               [bin] (const BinMap::value_type& element)
+                               -> bool
+                               {
+                                   return element.second.get() == bin;
+                               });
+
+        if (it != m_bins.cend())
+            m_bins.erase(it);
     }
 
     StreamBin* Stream::get_bin_by_id(StreamBinId id)
     {
-        return m_bin;
-    }
-
-    Stream::~Stream()
-    {
-        if (m_bin)
-            delete m_bin;
+        auto it = m_bins.find(id);
+        return it != m_bins.end() ? it->second.get() : nullptr;
     }
 }

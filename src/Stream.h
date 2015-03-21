@@ -6,6 +6,7 @@
 #include <atomic>
 #include <memory>
 #include <vector>
+#include <map>
 #include "StreamConnection.h"
 
 namespace sensekit {
@@ -23,7 +24,6 @@ namespace sensekit {
             : m_id(id),
               m_typeId(typeId)
             {}
-        ~Stream();
 
         StreamConnection* open();
         void close(StreamConnection* connection);
@@ -37,15 +37,18 @@ namespace sensekit {
         StreamBin* get_bin_by_id(StreamBinId id);
 
     private:
-        using ConnectionList = std::vector<std::unique_ptr<StreamConnection> >;
+        using ConnPtr = std::unique_ptr<StreamConnection>;
+        using ConnectionList = std::vector<ConnPtr>;
+
+        using BinPtr = std::unique_ptr<StreamBin>;
+        using BinMap = std::map<StreamBinId, BinPtr>;
 
         const StreamId m_id{0};
         const StreamTypeId m_typeId{0};
 
         ConnectionList m_connections;
+        BinMap m_bins;
 
-        // make it work, only one bin
-        StreamBin* m_bin{nullptr};
         std::atomic_int m_nextBinId{0};
 
         Signal<StreamConnection*> m_connectionAddedSignal;
