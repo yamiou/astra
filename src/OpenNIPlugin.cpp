@@ -74,7 +74,7 @@ namespace sensekit
             get_pluginService().register_stream(/*bogus*/0, /*bogus*/0, m_handle);
 
             get_pluginService()
-                .orbbec_stream_create_bin(m_handle, sizeof(sensekit_depthframe_t), m_id, nextBuffer);
+                .create_stream_bin(m_handle, sizeof(sensekit_depthframe_t), m_id, nextBuffer);
 
             set_new_buffer(nextBuffer);
 
@@ -110,7 +110,7 @@ namespace sensekit
                 && read_next_depth_frame(m_currentFrame) == SENSEKIT_STATUS_SUCCESS)
             {
                 sensekit_frame_t* nextBuffer = nullptr;
-                get_pluginService().orbbec_swap_bin_buffer(m_handle, m_id, nextBuffer);
+                get_pluginService().cycle_bin_buffers(m_handle, m_id, nextBuffer);
                 set_new_buffer(nextBuffer);
             }
         }

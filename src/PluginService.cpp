@@ -44,7 +44,7 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::orbbec_stream_create_bin(stream_handle handle, unsigned byteLength, StreamBinId& id, sensekit_frame_t*& binBuffer)
+    sensekit_status_t PluginService::create_stream_bin(stream_handle handle, unsigned byteLength, StreamBinId& id, sensekit_frame_t*& binBuffer)
     {
         Stream* stream = static_cast<Stream*>(handle);
         StreamBin* bin = stream->create_bin(byteLength);
@@ -55,7 +55,7 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::orbbec_stream_destroy_bin(stream_handle handle, StreamBinId& id, sensekit_frame_t*& buffer)
+    sensekit_status_t PluginService::destroy_stream_bin(stream_handle handle, StreamBinId& id, sensekit_frame_t*& buffer)
     {
         Stream* stream = static_cast<Stream*>(handle);
         StreamBin* bin = stream->get_bin_by_id(id);
@@ -68,7 +68,7 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::orbbec_swap_bin_buffer(stream_handle handle, StreamBinId id, sensekit_frame_t*& new_buf)
+    sensekit_status_t PluginService::cycle_bin_buffers(stream_handle handle, StreamBinId id, sensekit_frame_t*& new_buf)
     {
         Stream* stream = static_cast<Stream*>(handle);
         StreamBin* bin = stream->get_bin_by_id(id);

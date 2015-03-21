@@ -1,5 +1,6 @@
 #ifndef STREAMBIN_H
 #define STREAMBIN_H
+
 #include <exception>
 #include <SenseKit.h>
 #include <array>
