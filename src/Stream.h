@@ -12,7 +12,6 @@
 namespace sensekit {
 
     class StreamBin;
-    class StreamConnection;
 
     using StreamId = unsigned;
     using StreamTypeId = unsigned;
