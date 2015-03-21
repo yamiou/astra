@@ -22,11 +22,6 @@ namespace sensekit {
         }
     }
 
-    sensekit_frame_t* StreamBin::get_back_buffer()
-    {
-        return m_buffers[m_currentBackBufferIndex];
-    }
-
     sensekit_frame_t* StreamBin::cycle_buffers()
     {
         if (!m_frontBufferLocked)
@@ -42,11 +37,6 @@ namespace sensekit {
         } while (m_currentBackBufferIndex == m_currentFrontBufferIndex);
 
         return m_buffers[m_currentBackBufferIndex];
-    }
-
-    sensekit_frame_t* StreamBin::get_front_buffer()
-    {
-        return m_buffers[m_currentFrontBufferIndex];
     }
 
     StreamBin::~StreamBin()

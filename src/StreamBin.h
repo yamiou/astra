@@ -17,14 +17,18 @@ namespace sensekit {
         ~StreamBin();
 
         //exposed to plugins
-        sensekit_frame_t* get_back_buffer();
+        sensekit_frame_t* get_backBuffer()
+            {
+                return m_buffers[m_currentBackBufferIndex];
+            }
+
         sensekit_frame_t* cycle_buffers();
 
         //TODO support reference counting for multi-client scenarios
         sensekit_frame_t* lock_front_buffer()
             {
                 m_frontBufferLocked = true;
-                return m_buffers[m_currentFrontBufferIndex];
+                return get_frontBuffer();
             }
 
         void unlock_front_buffer()
@@ -33,9 +37,6 @@ namespace sensekit {
             }
 
         int get_ref_count() { return m_refCount; }
-
-        //internal use by framework
-        sensekit_frame_t* get_front_buffer();
 
         void add_ref() { m_refCount++; }
         void dec_ref()
@@ -63,6 +64,11 @@ namespace sensekit {
         int m_refCount{0};
 
         void allocate_buffers(size_t bufferLengthInBytes);
+
+        sensekit_frame_t* get_frontBuffer()
+            {
+                return m_buffers[m_currentFrontBufferIndex];
+            }
     };
 }
 
