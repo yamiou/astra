@@ -50,7 +50,7 @@ namespace sensekit
         StreamBin* bin = stream->create_bin(byteLength);
 
         id = bin->get_id();
-        binBuffer = bin->get_front_buffer();
+        binBuffer = bin->get_back_buffer();
 
         return SENSEKIT_STATUS_SUCCESS;
     }
