@@ -51,9 +51,8 @@ namespace sensekit {
         //trollolol nothing to do for now
         //would find the depth plugin for the context(streamset) and call client added event, and
         //then the plugin would create a bin if necessary and assign the client to the bin
-        Stream* str = new Stream(0, 0, 0);
-
-        StreamConnection* stream_connection = new StreamConnection(str);
+        Stream* str = m_pluginService.get_temp_stream();
+        StreamConnection* stream_connection = str->open();
 
         stream = (sensekit_stream_t*)stream_connection;
 
@@ -64,13 +63,13 @@ namespace sensekit {
     {
         StreamConnection* stream_connection = (StreamConnection*)(stream);
 
-        const Stream* str = stream_connection->get_stream();
+        Stream* str = stream_connection->get_stream();
         //TODO stream bookkeeping and lifetime would be elsewhere
-        delete str;
-        delete stream_connection;
+        str->close(stream_connection);
 
         stream = nullptr;
         //would find the depth plugin and call client removed event, and the plugin might destroy a bin
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 
@@ -106,7 +105,6 @@ namespace sensekit {
     sensekit_status_t SenseKitContext::temp_update()
     {
         m_plugin->temp_update();
-
         return SENSEKIT_STATUS_SUCCESS;
     }
 }

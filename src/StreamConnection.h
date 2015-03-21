@@ -11,7 +11,7 @@ namespace sensekit {
     class StreamConnection
     {
     public:
-        StreamConnection(const Stream* stream)
+        StreamConnection(Stream* stream)
             : m_stream(stream)
         { }
 
@@ -23,11 +23,12 @@ namespace sensekit {
 
         StreamHandle get_handle() { return m_handle; }
 
-        const Stream* get_stream()  { return m_stream; }
+        Stream* get_stream() { return m_stream; }
+
     private:
-        const Stream* m_stream;
-        StreamBin* m_bin;
-        StreamHandle m_handle;
+        Stream* m_stream;
+        StreamBin* m_bin{nullptr};
+        StreamHandle m_handle{0};
     };
 }
 

@@ -12,7 +12,10 @@ namespace sensekit {
 
     StreamConnection* Stream::open()
     {
-        return new StreamConnection(this);
+        auto connection = new StreamConnection(this);
+        connection->set_bin(m_bin);
+
+        return connection;
     }
 
     void Stream::close(StreamConnection* connection)
@@ -22,10 +25,10 @@ namespace sensekit {
 
     StreamBin* Stream::create_bin(size_t bufferLengthInBytes)
     {
-        cout << "creating bin." << endl;
         int newBinId = m_nextBinId++;
 
-        return new StreamBin(newBinId, bufferLengthInBytes);
+        m_bin = new StreamBin(newBinId, bufferLengthInBytes);
+        return m_bin;
     }
 
     void Stream::destroy_bin(StreamBin* bin)
@@ -36,5 +39,11 @@ namespace sensekit {
     StreamBin* Stream::get_bin_by_id(StreamBinId id)
     {
         return m_bin;
+    }
+
+    Stream::~Stream()
+    {
+        if (m_bin)
+            delete m_bin;
     }
 }

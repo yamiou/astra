@@ -1,5 +1,9 @@
 #include "StreamBin.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace sensekit {
 
     StreamBin::StreamBin(StreamBinId id, size_t bufferLengthInBytes)
@@ -10,7 +14,7 @@ namespace sensekit {
 
     void StreamBin::allocate_buffers(size_t bufferLengthInBytes)
     {
-        for(auto* frame : m_buffers)
+        for(auto& frame : m_buffers)
         {
             frame = new sensekit_frame_t;
             frame->byteLength = bufferLengthInBytes;
@@ -41,7 +45,7 @@ namespace sensekit {
 
     StreamBin::~StreamBin()
     {
-        for(auto* frame : m_buffers)
+        for(auto& frame : m_buffers)
         {
             delete[] (uint8_t*)frame->data;
             delete frame;

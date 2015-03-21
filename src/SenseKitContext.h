@@ -36,9 +36,6 @@ namespace sensekit {
 
         PluginService m_pluginService;
         PluginBase* m_plugin;
-
-        sensekit_frame_t* m_currentFrame{ nullptr };
-
     };
 
     class PluginContext : public SenseKitContext

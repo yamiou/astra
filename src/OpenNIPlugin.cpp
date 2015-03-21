@@ -69,11 +69,12 @@ namespace sensekit
                 ::openni::OpenNI::shutdown();
             }
 
-            stream_handle handle = nullptr;
             sensekit_frame_t* nextBuffer = nullptr;
 
+            get_pluginService().register_stream(/*bogus*/0, /*bogus*/0, m_handle);
+
             get_pluginService()
-                .orbbec_stream_create_bin(handle, sizeof(sensekit_depthframe_t), m_id, nextBuffer);
+                .orbbec_stream_create_bin(m_handle, sizeof(sensekit_depthframe_t), m_id, nextBuffer);
 
             set_new_buffer(nextBuffer);
 
@@ -82,17 +83,10 @@ namespace sensekit
 
         sensekit_status_t OpenNIPlugin::close_depth_stream()
         {
-            stream_handle handle = nullptr;
-            StreamBinId id = -1;
-
-            get_pluginService().orbbec_stream_destroy_bin(handle, m_id, m_currentBuffer);
-
             cout << "stopping depth stream" << endl;
             m_depthStream.stop();
             cout << "destroying depth stream" << endl;
             m_depthStream.destroy();
-
-            delete m_currentFrame;
 
             return SENSEKIT_STATUS_SUCCESS;
         }
@@ -115,9 +109,8 @@ namespace sensekit
             if (nullptr != m_currentFrame
                 && read_next_depth_frame(m_currentFrame) == SENSEKIT_STATUS_SUCCESS)
             {
-                stream_handle handle = nullptr;
                 sensekit_frame_t* nextBuffer = nullptr;
-                get_pluginService().orbbec_swap_bin_buffer(handle, m_id, nextBuffer);
+                get_pluginService().orbbec_swap_bin_buffer(m_handle, m_id, nextBuffer);
                 set_new_buffer(nextBuffer);
             }
         }

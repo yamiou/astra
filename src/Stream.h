@@ -20,6 +20,8 @@ namespace sensekit {
         Stream(StreamId id, StreamTypeId typeId, int index)
             : m_id(id), m_typeId(typeId)
             {}
+        ~Stream();
+
         StreamConnection* open();
         void close(StreamConnection* connection);
 

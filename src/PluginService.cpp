@@ -40,8 +40,7 @@ namespace sensekit
         handle = nullptr;
         m_stream = nullptr;
 
-        cout << "unregistering stream." << endl;
-
+        cout << "unregistered stream." << endl;
         return SENSEKIT_STATUS_SUCCESS;
     }
 

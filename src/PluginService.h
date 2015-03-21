@@ -49,6 +49,8 @@ namespace sensekit
                 return SENSEKIT_STATUS_SUCCESS;
             }
 
+        Stream* get_temp_stream() { return m_stream; }
+
     private:
 
         Stream* m_stream{nullptr};

@@ -23,8 +23,8 @@ namespace sensekit {
     //internal use by framework
         sensekit_frame_t* get_front_buffer();
 
-        void dec_ref() { m_refCount++; }
-        void add_ref()
+        void add_ref() { m_refCount++; }
+        void dec_ref()
         {
             m_refCount--;
             if (m_refCount < 0)
@@ -37,14 +37,13 @@ namespace sensekit {
     private:
         StreamBinId m_id{-1};
 
-        using FrameBufferArray = std::array<sensekit_frame_t*, 2>;
+        const static size_t BUFFER_COUNT = 2;
+        using FrameBufferArray = std::array<sensekit_frame_t*, BUFFER_COUNT>;
 
         size_t m_currentBackBufferIndex{0};
-        size_t m_currentFrontBufferIndex{std::tuple_size<FrameBufferArray>::value - 1};
-        sensekit_frame_t* m_frontBuffer{nullptr};
-        sensekit_frame_t* m_backBuffer{nullptr};
+        size_t m_currentFrontBufferIndex{BUFFER_COUNT - 1};
 
-        std::array<sensekit_frame_t*, 2> m_buffers;
+        FrameBufferArray m_buffers;
         int m_refCount{0};
 
         void allocate_buffers(size_t bufferLengthInBytes);
