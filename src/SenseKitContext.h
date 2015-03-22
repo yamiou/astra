@@ -6,6 +6,7 @@
 #include "PluginBase.h"
 #include "PluginService.h"
 #include "StreamSetFactory.h"
+#include "StreamSet.h"
 
 namespace sensekit {
 
@@ -28,11 +29,13 @@ namespace sensekit {
 
         sensekit_status_t temp_update();
 
-        StreamSetFactory& get_contextFactory() { return m_contextFactory; }
+        StreamSetFactory& get_setFactory() { return m_setFactory; }
+        StreamSet& get_rootSet() { return m_rootSet; }
 
     private:
 
-        StreamSetFactory m_contextFactory;
+        StreamSetFactory m_setFactory;
+        StreamSet m_rootSet{0};
 
         PluginService m_pluginService;
         PluginBase* m_plugin;

@@ -46,12 +46,12 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::open_stream(sensekit_streamset_t *streamset, sensekit_stream_t*& stream)
+    sensekit_status_t SenseKitContext::open_stream(sensekit_streamset_t* streamset, sensekit_stream_t*& stream)
     {
         //trollolol nothing to do for now
         //would find the depth plugin for the context(streamset) and call client added event, and
         //then the plugin would create a bin if necessary and assign the client to the bin
-        Stream* str = m_pluginService.get_temp_stream();
+        Stream* str = m_rootSet.get_stream_by_id(0);
         StreamConnection* stream_connection = str->open();
 
         stream = (sensekit_stream_t*)stream_connection;

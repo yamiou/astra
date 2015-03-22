@@ -10,7 +10,7 @@ namespace sensekit
 {
     StreamSet* PluginService::create_stream_set()
     {
-        return m_context.get_contextFactory().create();
+        return m_context.get_setFactory().create();
     }
 
     sensekit_status_t PluginService::register_stream(StreamSetId setId, StreamTypeId typeId, StreamHandle& handle)
@@ -18,9 +18,9 @@ namespace sensekit
         StreamId streamId = 0; //TODO assign via factory
         Stream* stream = new Stream(streamId, typeId, 0);
 
-        //TODO add stream to streamset
+        // TODO add to specific streamset
+        m_context.get_rootSet().add_stream(stream);
 
-        m_stream = stream;
         handle = stream;
 
         cout << "registering stream." << endl;
@@ -35,12 +35,14 @@ namespace sensekit
         if (handle == nullptr)
             return SENSEKIT_STATUS_INVALID_PARAMETER;
 
+        m_context.get_rootSet().remove_stream(stream);
+
         delete stream;
 
         handle = nullptr;
-        m_stream = nullptr;
 
         cout << "unregistered stream." << endl;
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 
