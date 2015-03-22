@@ -1,4 +1,4 @@
-﻿#ifndef PLUGINSERVICE_H
+#ifndef PLUGINSERVICE_H
 #define PLUGINSERVICE_H
 
 #include "SenseKit-private.h"
@@ -41,6 +41,11 @@ namespace sensekit
 
         sensekit_status_t cycle_bin_buffers(StreamHandle handle, StreamBinId id, sensekit_frame_t*& binBuffer);
 
+        //orbbec_error orbbec_stream_subscribe_client_added_event(StreamHandle handle, ...); //and unsubscribe...
+        //orbbec_error orbbec_stream_subscribe_client_removed_event(StreamHandle handle, ...); //and unsubscribe...
+        //orbbec_error orbbec_stream_assign_connection_to_bin(StreamHandle handle, client_id id, bin_id id);
+        //orbbec_error orbbec_stream_register_get_parameter_callback(component_handle handle, client_id client, ...);
+        //orbbec_error orbbec_stream_register_set_parameter_callback(component_handle handle, client_id client, ...);
         //callback gets passed a context_id
 
         //orbbec_error orbbec_unregister_stream_factory(...);
