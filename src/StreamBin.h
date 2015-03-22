@@ -52,7 +52,7 @@ namespace sensekit {
 
     private:
         StreamBinId m_id{-1};
-        std::atomic_bool m_frontBufferLocked{ATOMIC_VAR_INIT(false)};
+        std::atomic_bool m_frontBufferLocked;
 
         const static size_t BUFFER_COUNT = 2;
         using FrameBufferArray = std::array<sensekit_frame_t*, BUFFER_COUNT>;

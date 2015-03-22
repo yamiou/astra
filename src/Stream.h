@@ -22,7 +22,9 @@ namespace sensekit {
         Stream(StreamId id, StreamTypeId typeId, int index)
             : m_id(id),
               m_typeId(typeId)
-            {}
+        {
+            m_nextBinId = 0;
+        }
 
         ~Stream();
 
@@ -50,7 +52,7 @@ namespace sensekit {
         ConnectionList m_connections;
         BinMap m_bins;
 
-        std::atomic_int m_nextBinId{0};
+        std::atomic_int m_nextBinId;
 
         Signal<StreamConnection*> m_connectionAddedSignal;
         Signal<StreamConnection*> m_connectionRemovedSignal;
