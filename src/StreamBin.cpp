@@ -24,19 +24,26 @@ namespace sensekit {
 
     sensekit_frame_t* StreamBin::cycle_buffers()
     {
-        if (!m_frontBufferLocked)
+        if (m_frontBufferLocked)
         {
-            m_currentFrontBufferIndex = m_currentBackBufferIndex;
+            m_backBufferTailIndex = inc_index(m_backBufferTailIndex);
+
+            if (m_backBufferTailIndex == m_backBufferHeadIndex)
+                m_backBufferHeadIndex = inc_index(m_backBufferHeadIndex);
+        }
+        else
+        {
+            size_t oldFBI = m_frontBufferIndex;
+            m_frontBufferIndex = m_backBufferHeadIndex;
+            m_backBufferTailIndex = oldFBI;
+            m_backBufferHeadIndex = inc_index(m_backBufferHeadIndex);
         }
 
-        do
-        {
-            m_currentBackBufferIndex =
-                m_currentBackBufferIndex + 1 < BUFFER_COUNT ? m_currentBackBufferIndex + 1 : 0;
+        // cout << "f: " << m_frontBufferIndex << " b-head: " << m_backBufferHeadIndex
+        //      << " b-tail: " << m_backBufferTailIndex << " locked: "
+        //      << (m_frontBufferLocked ? "yes" : "no") << endl;
 
-        } while (m_currentBackBufferIndex == m_currentFrontBufferIndex);
-
-        return m_buffers[m_currentBackBufferIndex];
+        return m_buffers[m_backBufferTailIndex];
     }
 
     StreamBin::~StreamBin()

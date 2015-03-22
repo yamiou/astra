@@ -9,6 +9,7 @@
 namespace sensekit
 {
     class SenseKitContext;
+    class StreamSet;
 
     using StreamHandle = void*;
 
@@ -34,7 +35,7 @@ namespace sensekit
         //orbbec_error orbbec_stream_subscribe_client_removed_event(StreamHandle handle, ...); //and unsubscribe...
         //orbbec_error orbbec_stream_assign_client_to_bin(StreamHandle handle, client_id id, bin_id id);
 
-        sensekit_status_t cycle_bin_buffers(StreamHandle handle, StreamBinId id, /*out*/sensekit_frame_t*& new_buf);
+        sensekit_status_t cycle_bin_buffers(StreamHandle handle, StreamBinId id, /*out*/sensekit_frame_t*& binBuffer);
 
         //sensekit_status_t orbbec_stream_swap_bin_buffers(StreamHandle handle, /*bin_id id,*/ unsigned int byte_length, void** m_frontBuffer, void** backBuffer);
         //orbbec_error orbbec_stream_register_get_parameter_callback(component_handle handle, client_id client, ...);

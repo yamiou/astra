@@ -68,11 +68,11 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::cycle_bin_buffers(StreamHandle handle, StreamBinId id, sensekit_frame_t*& new_buf)
+    sensekit_status_t PluginService::cycle_bin_buffers(StreamHandle handle, StreamBinId id, sensekit_frame_t*& binBuffer)
     {
         Stream* stream = static_cast<Stream*>(handle);
         StreamBin* bin = stream->get_bin_by_id(id);
-        new_buf = bin->cycle_buffers();
+        binBuffer = bin->cycle_buffers();
 
         return SENSEKIT_STATUS_SUCCESS;
     }

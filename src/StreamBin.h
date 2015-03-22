@@ -19,7 +19,7 @@ namespace sensekit {
         //exposed to plugins
         sensekit_frame_t* get_backBuffer()
             {
-                return m_buffers[m_currentBackBufferIndex];
+                return m_buffers[m_backBufferTailIndex];
             }
 
         sensekit_frame_t* cycle_buffers();
@@ -57,8 +57,9 @@ namespace sensekit {
         const static size_t BUFFER_COUNT = 2;
         using FrameBufferArray = std::array<sensekit_frame_t*, BUFFER_COUNT>;
 
-        size_t m_currentBackBufferIndex{0};
-        size_t m_currentFrontBufferIndex{BUFFER_COUNT - 1};
+        size_t m_frontBufferIndex{0};
+        size_t m_backBufferHeadIndex{1};
+        size_t m_backBufferTailIndex{1};
 
         FrameBufferArray m_buffers;
         int m_refCount{0};
@@ -67,7 +68,19 @@ namespace sensekit {
 
         sensekit_frame_t* get_frontBuffer()
             {
-                return m_buffers[m_currentFrontBufferIndex];
+                return m_buffers[m_frontBufferIndex];
+            }
+
+        size_t inc_index(size_t index)
+            {
+                size_t newIndex = index;
+
+                do
+                {
+                    newIndex = newIndex + 1 < BUFFER_COUNT ? newIndex + 1 : 0;
+                } while (newIndex == m_frontBufferIndex);
+
+                return newIndex;
             }
     };
 }
