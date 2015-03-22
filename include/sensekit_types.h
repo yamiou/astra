@@ -1,6 +1,8 @@
 #ifndef SENSEKIT_TYPES_H
 #define SENSEKIT_TYPES_H
 
+#include "sensekit_core.h"
+
 const unsigned MAX_STRING_FIELD_LENGTH = 256;
 
 typedef struct _sensekit_streamset sensekit_streamset_t;

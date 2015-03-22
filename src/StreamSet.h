@@ -31,6 +31,7 @@ namespace sensekit {
         StreamSet(StreamSetId id);
 
         StreamListPtr find_streams(StreamTypeId typeId);
+
         void add_stream(Stream* stream);
         bool remove_stream(Stream* stream);
         Stream* get_stream_by_id(StreamId id);

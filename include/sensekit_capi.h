@@ -39,6 +39,4 @@ SENSEKIT_API sensekit_status_t sensekit_temp_update();
 
 SENSEKIT_END_DECLS
 
-
-
 #endif /* SENSEKIT_CAPI_H */

@@ -38,12 +38,13 @@ sensekit_status_t sensekit_depth_frame_open(sensekit_depthstream_t* stream, int 
 
     //if (header->compressed)
     //{
-        //*frame = codec_decompress((sensekit_depthframe_compressed_t*)(sk_frame->data));
+    //*frame = codec_decompress((sensekit_depthframe_compressed_t*)(sk_frame->data));
     //}
     //else
     //{
-        *frame = (sensekit_depthframe_t*)(sk_frame->data);
-        (*frame)->header.sk_frame = sk_frame;
+    sensekit_depthframe_wrapper_t* wrapper = (sensekit_depthframe_wrapper_t*)(sk_frame->data);
+    *frame = &(wrapper->frame);
+    (*frame)->sk_frame = sk_frame;
     //}
 
     return SENSEKIT_STATUS_SUCCESS;
@@ -52,7 +53,7 @@ sensekit_status_t sensekit_depth_frame_open(sensekit_depthstream_t* stream, int 
 sensekit_status_t sensekit_depth_frame_close(sensekit_depthstream_t* stream, sensekit_depthframe_t** frame)
 {
     sensekit_stream_t* sk_stream = (sensekit_stream_t*)(stream);
-    sensekit_frame_t* sk_frame = (*frame)->header.sk_frame;
+    sensekit_frame_t* sk_frame = (*frame)->sk_frame;
 
     sensekit_stream_frame_close(sk_stream, &sk_frame);
 

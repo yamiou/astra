@@ -73,8 +73,19 @@ namespace sensekit
 
             get_pluginService().register_stream(/*bogus*/0, /*bogus*/0, m_handle);
 
+            const ::openni::VideoMode& mode = m_depthStream.getVideoMode();
+
+            m_width = mode.getResolutionX();
+            m_height = mode.getResolutionY();
+            m_bpp = 2;
+
+            m_bufferLength  = m_width * m_height * m_bpp;
+
             get_pluginService()
-                .create_stream_bin(m_handle, sizeof(sensekit_depthframe_t), m_id, nextBuffer);
+                .create_stream_bin(m_handle,
+                                   sizeof(sensekit_depthframe_t) + m_bufferLength,
+                                   m_id,
+                                   nextBuffer);
 
             set_new_buffer(nextBuffer);
 
@@ -94,9 +105,13 @@ namespace sensekit
         void OpenNIPlugin::set_new_buffer(sensekit_frame_t* nextBuffer)
         {
             m_currentBuffer = nextBuffer;
-            m_currentFrame = static_cast<sensekit_depthframe_t*>(m_currentBuffer->data);
-            m_currentFrame->sampleValue = 0;
-            m_currentFrame->header.frameIndex = m_frameIndex;
+            m_currentFrame = static_cast<sensekit_depthframe_wrapper_t*>(m_currentBuffer->data);
+            m_currentFrame->frame.data = (int16_t *)&(m_currentFrame->data_addr);
+            m_currentFrame->frame.frameIndex = m_frameIndex;
+            m_currentFrame->frame.width = m_width;
+            m_currentFrame->frame.height = m_height;
+            m_currentFrame->frame.bpp = m_bpp;
+
             //TODO use placement new for m_currentFrame?
             //m_currentFrame = new(m_currentBuffer->data) sensekit_depthframe_t();
         }
@@ -115,13 +130,13 @@ namespace sensekit
             }
         }
 
-        sensekit_status_t OpenNIPlugin::read_next_depth_frame(sensekit_depthframe_t* frame)
+        sensekit_status_t OpenNIPlugin::read_next_depth_frame(sensekit_depthframe_wrapper_t* frame)
         {
             int dummy;
-
             int timeout = 30;
             ::openni::VideoStream* pStream = &m_depthStream;
-            if (::openni::OpenNI::waitForAnyStream(&pStream, 1, &dummy, timeout) == ::openni::STATUS_TIME_OUT)
+            if (::openni::OpenNI::waitForAnyStream(&pStream, 1, &dummy, timeout)
+                == ::openni::STATUS_TIME_OUT)
             {
                 return SENSEKIT_STATUS_TIMEOUT;
             }
@@ -129,16 +144,17 @@ namespace sensekit
             ::openni::VideoFrameRef ref;
             m_depthStream.readFrame(&ref);
 
-            int halfHeight = ref.getHeight() / 2;
-            int halfWidth = ref.getWidth() / 2;
-
-            int index = halfHeight * ref.getWidth() + halfWidth;
             const short* datData = static_cast<const short*>(ref.getData());
 
-            short depthSon = datData[index];
+            int16_t* frameData = m_currentFrame->frame.data;
+            size_t bufferLength = m_width * m_height;
 
-            frame->sampleValue = depthSon;
-            frame->header.frameIndex = m_frameIndex;
+            for(int i = 0; i < bufferLength; i++)
+            {
+                frameData[i] = datData[i];
+            }
+
+            frame->frame.frameIndex = m_frameIndex;
             ++m_frameIndex;
 
             ref.release();

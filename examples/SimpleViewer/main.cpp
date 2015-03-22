@@ -88,7 +88,12 @@ int main(int argc, char** argv)
         sensekit_depth_frame_open(depthStream,
                                   30, &depthFrame);
 
-        std::cout << "index: " << depthFrame->header.frameIndex << " value: " << depthFrame->sampleValue << std::endl;
+        int width = depthFrame->width;
+        int height = depthFrame->height;
+
+        size_t index = ((width * (height / 2)) + (width / 2));
+        short middle = depthFrame->data[index];
+        std::cout << "index: " << depthFrame->frameIndex << " value: " << middle << std::endl;
 
         sensekit_depth_frame_close(depthStream, &depthFrame);
 

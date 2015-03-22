@@ -34,6 +34,7 @@ namespace sensekit
         // Plugin notifying framework of a stream no longer available
         sensekit_status_t unregister_stream(StreamHandle& handle);
 
+        // TODO: create BinHandle, retire BinId, pass BinHandles to plugins
         sensekit_status_t create_stream_bin(StreamHandle handle, size_t lengthInBytes,
                                             /*out*/ StreamBinId& id, /*out*/ sensekit_frame_t*& binBuffer);
 

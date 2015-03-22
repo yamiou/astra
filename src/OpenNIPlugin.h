@@ -29,17 +29,22 @@ namespace sensekit
             sensekit_status_t open_depth_stream();
             sensekit_status_t close_depth_stream();
             void set_new_buffer(sensekit_frame_t* nextBuffer);
-            sensekit_status_t read_next_depth_frame(sensekit_depthframe_t* frame);
+            sensekit_status_t read_next_depth_frame(sensekit_depthframe_wrapper_t* frame);
 
             ::openni::Device m_device;
             ::openni::VideoStream m_depthStream;
             ::openni::DeviceInfo m_deviceInfo;
 
+            unsigned m_width{0};
+            unsigned m_height{0};
+            unsigned m_bpp{0};
+            unsigned m_bufferLength{0};
+
             int m_frameIndex{0};
 
             sensekit_frame_t* m_currentBuffer{nullptr};
             StreamBinId m_id{0};
-            sensekit_depthframe_t* m_currentFrame{nullptr};
+            sensekit_depthframe_wrapper_t* m_currentFrame{nullptr};
             StreamHandle m_handle{nullptr};
         };
     }
