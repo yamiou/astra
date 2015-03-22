@@ -44,10 +44,11 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::create_stream_bin(StreamHandle handle, unsigned byteLength, StreamBinId& id, sensekit_frame_t*& binBuffer)
+    sensekit_status_t PluginService::create_stream_bin(StreamHandle handle, size_t lengthInBytes,
+                                                       StreamBinId& id, sensekit_frame_t*& binBuffer)
     {
         Stream* stream = static_cast<Stream*>(handle);
-        StreamBin* bin = stream->create_bin(byteLength);
+        StreamBin* bin = stream->create_bin(lengthInBytes);
 
         id = bin->get_id();
         binBuffer = bin->get_backBuffer();
