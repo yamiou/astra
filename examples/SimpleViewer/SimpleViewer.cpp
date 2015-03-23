@@ -85,6 +85,15 @@ void SampleViewer::init(int argc, char **argv)
     m_nTexMapY = MIN_CHUNKS_SIZE(m_height, TEXTURE_SIZE);
     m_pTexMap = new RGB888Pixel[m_nTexMapX * m_nTexMapY];
 
+    m_lightVector = Vector3::Normalize(Vector3(-1, 0.2, .5));
+    m_lightColor.r = 230;
+    m_lightColor.g = 230;
+    m_lightColor.b = 230;
+
+    m_ambientColor.r = 50;
+    m_ambientColor.g = 50;
+    m_ambientColor.b = 50;
+
     return initOpenGL(argc, argv);
 
 }
@@ -106,19 +115,34 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame)
     Vector3* normMap = m_normalMap;
     int16_t* depthData = frame.data;
 
-    for (int y = 0; y < m_height - 1; ++y)
+    //top row
+    for (int x = 0; x < m_width - 1; ++x)
     {
-        for (int x = 0; x < m_width - 1; ++x)
+        *normMap = Vector3();
+        ++normMap;
+    }
+    for (int y = 1; y < height - 1; ++y)
+    {
+        //first pixel at start of row
+        *normMap = Vector3();
+        ++normMap;
+
+        for (int x = 1; x < width - 1; ++x)
         {
-            int index = x + y * m_width;
+            int index = x + y * width;
             int rightIndex = index + 1;
-            int downIndex = index + m_width;
+            int leftIndex = index - 1;
+            int upIndex = index - width;
+            int downIndex = index + width;
 
             int16_t depth = *(depthData + index);
+            int16_t depthLeft = *(depthData + leftIndex);
             int16_t depthRight = *(depthData + rightIndex);
+            int16_t depthUp = *(depthData + upIndex);
             int16_t depthDown = *(depthData + downIndex);
 
-            Vector3 norm;
+            Vector3 normAvg;
+            int normAvgCount = 0;
 
             if (depth != 0 && depthRight != 0 && depthDown != 0)
             {
@@ -132,10 +156,79 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame)
                 Vector3 v1 = Vector3(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
                 Vector3 v2 = Vector3(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
 
-                norm = Vector3::CrossProduct(v1, v2);
+                Vector3 norm = Vector3::CrossProduct(v1, v2);
+                normAvg.x += norm.x;
+                normAvg.y += norm.y;
+                normAvg.z += norm.z;
+                normAvgCount++;
             }
 
-            *normMap = norm;
+            if (depth != 0 && depthRight != 0 && depthUp != 0)
+            {
+                float worldX1, worldY1, worldZ1;
+                float worldX2, worldY2, worldZ2;
+                float worldX3, worldY3, worldZ3;
+                convert_depth_to_world(x, y, depth, &worldX1, &worldY1, &worldZ1);
+                convert_depth_to_world(x, y - 1, depthUp, &worldX2, &worldY2, &worldZ2);
+                convert_depth_to_world(x + 1, y, depthRight, &worldX3, &worldY3, &worldZ3);
+
+                Vector3 v1 = Vector3(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
+                Vector3 v2 = Vector3(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
+
+                Vector3 norm = Vector3::CrossProduct(v1, v2);
+                normAvg.x += norm.x;
+                normAvg.y += norm.y;
+                normAvg.z += norm.z;
+                normAvgCount++;
+            }
+
+
+            if (depth != 0 && depthLeft != 0 && depthUp != 0)
+            {
+                float worldX1, worldY1, worldZ1;
+                float worldX2, worldY2, worldZ2;
+                float worldX3, worldY3, worldZ3;
+                convert_depth_to_world(x, y, depth, &worldX1, &worldY1, &worldZ1);
+                convert_depth_to_world(x - 1, y, depthLeft, &worldX2, &worldY2, &worldZ2);
+                convert_depth_to_world(x, y - 1, depthUp, &worldX3, &worldY3, &worldZ3);
+
+                Vector3 v1 = Vector3(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
+                Vector3 v2 = Vector3(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
+
+                Vector3 norm = Vector3::CrossProduct(v1, v2);
+                normAvg.x += norm.x;
+                normAvg.y += norm.y;
+                normAvg.z += norm.z;
+                normAvgCount++;
+            }
+
+            if (depth != 0 && depthLeft != 0 && depthDown != 0)
+            {
+                float worldX1, worldY1, worldZ1;
+                float worldX2, worldY2, worldZ2;
+                float worldX3, worldY3, worldZ3;
+                convert_depth_to_world(x, y, depth, &worldX1, &worldY1, &worldZ1);
+                convert_depth_to_world(x, y + 1, depthDown, &worldX2, &worldY2, &worldZ2);
+                convert_depth_to_world(x - 1, y, depthLeft, &worldX3, &worldY3, &worldZ3);
+
+                Vector3 v1 = Vector3(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
+                Vector3 v2 = Vector3(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
+
+                Vector3 norm = Vector3::CrossProduct(v1, v2);
+                normAvg.x += norm.x;
+                normAvg.y += norm.y;
+                normAvg.z += norm.z;
+                normAvgCount++;
+            }
+
+            if (normAvgCount>0)
+            {
+                normAvg.x /= normAvgCount;
+                normAvg.y /= normAvgCount;
+                normAvg.z /= normAvgCount;
+            }
+
+            *normMap = normAvg;
             ++normMap;
         }
         //last pixel at end of row
@@ -181,18 +274,33 @@ void SampleViewer::display()
 
         for (int x = 0; x < m_depthFrame->width; ++x, ++pDepth, ++normMap, ++pTex)
         {
-            //if (*pDepth != 0)
+            if (*pDepth != 0)
             {
-                Vector3 norm = *normMap;
                 /*
                 int nHistValue = m_pDepthHist[*pDepth];
                 pTex->r = nHistValue;
                 pTex->g = nHistValue;
                 pTex->b = 0;
                 */
-                pTex->r = norm.x * 255;
-                pTex->g = norm.y * 255;
-                pTex->b = norm.z * 255;
+            }
+
+            Vector3 norm = *normMap;
+            if (!norm.isEmpty())
+            {
+            /*    pTex->r = (norm.x * 0.5 + 1) * 255;
+                pTex->g = (norm.y * 0.5 + 1) * 255;
+                pTex->b = (norm.z * 0.5 + 1) * 255;
+            */
+
+                float diffuseFactor = Vector3::DotProduct(norm, m_lightVector);
+                RGB888Pixel diffuseColor = m_lightColor;
+                diffuseColor.r *= diffuseFactor;
+                diffuseColor.g *= diffuseFactor;
+                diffuseColor.b *= diffuseFactor;
+
+                pTex->r = m_ambientColor.r + diffuseColor.r;
+                pTex->g = m_ambientColor.g + diffuseColor.g;
+                pTex->b = m_ambientColor.b + diffuseColor.b;
             }
         }
 

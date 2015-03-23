@@ -42,20 +42,31 @@ struct Vector3
         return x == 0 && y == 0 && z == 0;
     }
 
+    static float DotProduct(Vector3 lhs, Vector3 rhs)
+    {
+        float result = lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
+        return result;
+    }
+
     static Vector3 CrossProduct(Vector3 lhs, Vector3 rhs)
     {
         float x = (lhs.y * rhs.z) - (lhs.z * rhs.y);
         float y = (lhs.z * rhs.x) - (lhs.x * rhs.z);
         float z = (lhs.x * rhs.y) - (lhs.y * rhs.x);
 
-        double length = sqrt(x*x + y*y + z*z);
-        if (length < 1e-6)
+        return Normalize(Vector3(x, y, z));
+    }
+
+    static Vector3 Normalize(Vector3 v)
+    {
+        double length = sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+        if (length < 1e-9)
         {
             return Vector3(0, 0, 0);
         }
         else
         {
-            return Vector3(x / length, y / length, z / length);
+            return Vector3(v.x / length, v.y / length, v.z / length);
         }
     }
 };
