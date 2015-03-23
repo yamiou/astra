@@ -3,6 +3,7 @@ find_package(OpenGL REQUIRED)
 
 set (SimpleViewer_SOURCES
   main.cpp
+  utils.h
   SimpleViewer.h
   SimpleViewer.cpp
   )
