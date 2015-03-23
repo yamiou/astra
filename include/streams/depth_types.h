@@ -4,7 +4,7 @@
 #include "../sensekit_types.h"
 
 typedef struct _sensekit_depthframe {
-    sensekit_frame_t* sk_frame;
+    sensekit_frame_ref_t* frameRef;
     uint32_t frameIndex;
     uint32_t width;
     uint32_t height;

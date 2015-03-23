@@ -73,37 +73,45 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::open_frame(sensekit_stream_t *stream, int timeout, sensekit_frame_t*& frame)
+    sensekit_status_t SenseKitContext::open_frame(sensekit_stream_t* stream, int timeout, sensekit_frame_ref_t*& frameRef)
     {
         //we got the actual frame in the temp_update call.
         //for real, we would do some type of double buffer swap on the client side, copy the latest frame (if newer) from the daemon
         //the daemon might reference count this
 
-        StreamConnection* stream_connection = (StreamConnection*)(stream);
+        StreamConnection* streamConnection = reinterpret_cast<StreamConnection*>(stream);
 
-        StreamBin* bin = stream_connection->get_bin();
+        StreamBin* bin = streamConnection->get_bin();
         if (bin != nullptr)
         {
-            frame = bin->lock_front_buffer();
+            frameRef = new sensekit_frame_ref_t;
+            frameRef->frame = bin->lock_front_buffer();
+            frameRef->stream = stream;
+        }
+        else
+        {
+            frameRef = nullptr;
         }
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::close_frame(sensekit_stream_t* stream, sensekit_frame_t*& frame)
+    sensekit_status_t SenseKitContext::close_frame(sensekit_frame_ref_t*& frameRef)
     {
         //later, would decrement the reference count
         //TODO: how does the daemon recover from a client crashing while a frame is open? (reference count does go to 0)
 
-        StreamConnection* stream_connection = (StreamConnection*)(stream);
+        StreamConnection* streamConnection = reinterpret_cast<StreamConnection*>(frameRef->stream);
 
-        StreamBin* bin = stream_connection->get_bin();
+        StreamBin* bin = streamConnection->get_bin();
         if (bin != nullptr)
         {
             bin->unlock_front_buffer();
         }
 
-        frame = nullptr;
+        delete frameRef;
+
+        frameRef = nullptr;
 
         return SENSEKIT_STATUS_SUCCESS;
     }

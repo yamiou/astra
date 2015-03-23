@@ -94,7 +94,7 @@ int main(int argc, char** argv)
         short middle = depthFrame->data[index];
         std::cout << "index: " << depthFrame->frameIndex << " value: " << middle << std::endl;
 
-        sensekit_depth_frame_close(depthStream, &depthFrame);
+        sensekit_depth_frame_close(&depthFrame);
 
     } while (shouldContinue);
 

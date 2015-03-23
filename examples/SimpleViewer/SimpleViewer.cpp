@@ -133,7 +133,7 @@ void SampleViewer::display()
         pTexRow += m_nTexMapX;
     }
 
-    sensekit_depth_frame_close(m_depthStream, &m_depthFrame);
+    sensekit_depth_frame_close(&m_depthFrame);
 
     glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);

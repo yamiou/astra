@@ -30,4 +30,8 @@ typedef struct _sensekit_frame {
     void* data;
 } sensekit_frame_t;
 
+typedef struct _sensekit_frame_ref {
+    sensekit_stream_t* stream;
+    sensekit_frame_t* frame;
+} sensekit_frame_ref_t;
 #endif /* SENSEKIT_TYPES_H */

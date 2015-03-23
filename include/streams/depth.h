@@ -6,7 +6,7 @@
 
 SENSEKIT_BEGIN_DECLS
 
-static sensekit_status_t sensekit_depth_open(sensekit_streamset_t* sensor, /*out*/sensekit_depthstream_t** stream)
+static inline sensekit_status_t sensekit_depth_open(sensekit_streamset_t* sensor, /*out*/sensekit_depthstream_t** stream)
 {
     sensekit_stream_t* sk_stream;
     sensekit_stream_open(sensor, &sk_stream);
@@ -15,7 +15,7 @@ static sensekit_status_t sensekit_depth_open(sensekit_streamset_t* sensor, /*out
     return SENSEKIT_STATUS_SUCCESS;
 }
 
-static sensekit_status_t sensekit_depth_close(/*inout*/sensekit_depthstream_t** stream)
+static inline sensekit_status_t sensekit_depth_close(/*inout*/sensekit_depthstream_t** stream)
 {
     sensekit_stream_t* sk_stream = (sensekit_stream_t*)(*stream);
 
@@ -25,12 +25,12 @@ static sensekit_status_t sensekit_depth_close(/*inout*/sensekit_depthstream_t** 
     return SENSEKIT_STATUS_SUCCESS;
 }
 
-static sensekit_status_t sensekit_depth_frame_open(sensekit_depthstream_t* stream, int timeout, sensekit_depthframe_t** frame)
+static inline sensekit_status_t sensekit_depth_frame_open(sensekit_depthstream_t* stream, int timeout, sensekit_depthframe_t** frame)
 {
-    sensekit_stream_t* sk_stream = (sensekit_stream_t*)(stream);
-    sensekit_frame_t* sk_frame = NULL;
+    sensekit_frame_ref_t* frameRef;
+    sensekit_stream_t* skStream = (sensekit_stream_t*)(stream);
 
-    sensekit_stream_frame_open(sk_stream, timeout, &sk_frame);
+    sensekit_stream_frame_open(skStream, timeout, &frameRef);
 
     //SOOON...
     //sensekit_depthframe_header_t* header = (sensekit_depthframe_header_t*)(sk_frame->data);
@@ -42,20 +42,19 @@ static sensekit_status_t sensekit_depth_frame_open(sensekit_depthstream_t* strea
     //}
     //else
     //{
-    sensekit_depthframe_wrapper_t* wrapper = (sensekit_depthframe_wrapper_t*)(sk_frame->data);
+    sensekit_depthframe_wrapper_t* wrapper = (sensekit_depthframe_wrapper_t*)(frameRef->frame->data);
     *frame = (sensekit_depthframe_t*)&(wrapper->frame);
-    (*frame)->sk_frame = sk_frame;
+    (*frame)->frameRef = frameRef;
     //}
 
     return SENSEKIT_STATUS_SUCCESS;
 }
 
-static sensekit_status_t sensekit_depth_frame_close(sensekit_depthstream_t* stream, sensekit_depthframe_t** frame)
+static inline sensekit_status_t sensekit_depth_frame_close(sensekit_depthframe_t** frame)
 {
-    sensekit_stream_t* sk_stream = (sensekit_stream_t*)(stream);
-    sensekit_frame_t* sk_frame = (*frame)->sk_frame;
+    sensekit_frame_ref_t* sk_frameRef = (*frame)->frameRef;
 
-    sensekit_stream_frame_close(sk_stream, &sk_frame);
+    sensekit_stream_frame_close(&sk_frameRef);
 
     *frame = nullptr;
 

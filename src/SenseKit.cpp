@@ -39,16 +39,16 @@ SENSEKIT_API sensekit_status_t sensekit_stream_close(sensekit_stream_t** stream)
     return SENSEKIT_STATUS_SUCCESS;
 }
 
-SENSEKIT_API sensekit_status_t sensekit_stream_frame_open(sensekit_stream_t* stream, int timeout, sensekit_frame_t** frame)
+SENSEKIT_API sensekit_status_t sensekit_stream_frame_open(sensekit_stream_t* stream, int timeout, sensekit_frame_ref_t** frame)
 {
     g_Context.open_frame(stream, timeout, *frame);
 
     return SENSEKIT_STATUS_SUCCESS;
 }
 
-SENSEKIT_API sensekit_status_t sensekit_stream_frame_close(sensekit_stream_t* stream, sensekit_frame_t** frame)
+SENSEKIT_API sensekit_status_t sensekit_stream_frame_close(sensekit_frame_ref_t** frame)
 {
-    g_Context.close_frame(stream, *frame);
+    g_Context.close_frame(*frame);
     return SENSEKIT_STATUS_SUCCESS;
 }
 
