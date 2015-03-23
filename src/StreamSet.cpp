@@ -1,6 +1,5 @@
 ﻿#include "StreamSet.h"
 
-
 namespace sensekit {
     StreamSet::StreamSet(StreamSetId id)
         : m_id(id)

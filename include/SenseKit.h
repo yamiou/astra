@@ -4,5 +4,6 @@
 #include "sensekit_core.h"
 #include "sensekit_types.h"
 #include "sensekit_capi.h"
+#include "streams/depth.h"
 
 #endif // SENSEKIT_H
