@@ -52,6 +52,8 @@ namespace sensekit
         //orbbec_error orbbec_unregister_stream_factory(...);
         //nominally on plugin shutdown
 
+
+
     private:
         SenseKitContext& m_context;
 
