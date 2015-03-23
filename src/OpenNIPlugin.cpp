@@ -106,7 +106,7 @@ namespace sensekit
         {
             m_currentBuffer = nextBuffer;
             m_currentFrame = static_cast<sensekit_depthframe_wrapper_t*>(m_currentBuffer->data);
-            m_currentFrame->frame.data = (int16_t *)&(m_currentFrame->data_addr);
+            m_currentFrame->frame.data = (int16_t *)&(m_currentFrame->frame_data);
             m_currentFrame->frame.frameIndex = m_frameIndex;
             m_currentFrame->frame.width = m_width;
             m_currentFrame->frame.height = m_height;

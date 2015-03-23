@@ -43,7 +43,7 @@ static sensekit_status_t sensekit_depth_frame_open(sensekit_depthstream_t* strea
     //else
     //{
     sensekit_depthframe_wrapper_t* wrapper = (sensekit_depthframe_wrapper_t*)(sk_frame->data);
-    *frame = &(wrapper->frame);
+    *frame = (sensekit_depthframe_t*)&(wrapper->frame);
     (*frame)->sk_frame = sk_frame;
     //}
 

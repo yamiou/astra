@@ -12,9 +12,10 @@ typedef struct _sensekit_depthframe {
     int16_t* data;
 } sensekit_depthframe_t;
 
+// https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
 typedef struct _sensekit_depthframe_wrapper {
     sensekit_depthframe_t frame;
-    void* data_addr;
+    char frame_data[]; // ISO C99, Visual Studio supports?
 } sensekit_depthframe_wrapper_t;
 
 typedef struct _sensekit_depthstream sensekit_depthstream_t;
