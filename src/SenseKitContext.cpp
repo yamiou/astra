@@ -22,7 +22,7 @@ namespace sensekit {
 
     sensekit_status_t SenseKitContext::terminate()
     {
-        if (nullptr != m_plugin)
+        if (m_plugin == nullptr)
         {
             m_plugin->cleanup();
             delete m_plugin;
