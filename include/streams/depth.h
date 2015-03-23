@@ -3,11 +3,55 @@
 
 #include <SenseKit.h>
 #include "depth_types.h"
+#include <math.h>
+
+static WorldConversionCache g_convertCache;
 
 SENSEKIT_BEGIN_DECLS
 
+static inline sensekit_status_t convert_depth_to_world(float depthX, float depthY, float depthZ, float* pWorldX, float* pWorldY, float* pWorldZ)
+{
+    float normalizedX = depthX / g_convertCache.resolutionX - .5f;
+    float normalizedY = .5f - depthY / g_convertCache.resolutionY;
+
+    *pWorldX = normalizedX * depthZ * g_convertCache.xzFactor;
+    *pWorldY = normalizedY * depthZ * g_convertCache.yzFactor;
+    *pWorldZ = depthZ;
+
+    return SENSEKIT_STATUS_SUCCESS;
+}
+
+static inline sensekit_status_t convert_world_to_depth(float worldX, float worldY, float worldZ, float* pDepthX, float* pDepthY, float* pDepthZ)
+{
+    *pDepthX = g_convertCache.coeffX * worldX / worldZ + g_convertCache.halfResX;
+    *pDepthY = g_convertCache.halfResY - g_convertCache.coeffY * worldY / worldZ;
+    *pDepthZ = worldZ;
+
+    return SENSEKIT_STATUS_SUCCESS;
+}
+
+static void refresh_conversion_cache()
+{
+    // the hardest of codings
+    float horizontalFov = 58.0f;
+    float verticalFov = 45.0f;
+    int resolutionX = 320;
+    int resolutionY = 240;
+
+    g_convertCache.xzFactor = tan(horizontalFov / 2) * 2;
+    g_convertCache.yzFactor = tan(verticalFov / 2) * 2;
+    g_convertCache.resolutionX = resolutionX;
+    g_convertCache.resolutionY = resolutionY;
+    g_convertCache.halfResX = g_convertCache.resolutionX / 2;
+    g_convertCache.halfResY = g_convertCache.resolutionY / 2;
+    g_convertCache.coeffX = g_convertCache.resolutionX / g_convertCache.xzFactor;
+    g_convertCache.coeffY = g_convertCache.resolutionY / g_convertCache.yzFactor;
+}
+
 static inline sensekit_status_t sensekit_depth_open(sensekit_streamset_t* sensor, /*out*/sensekit_depthstream_t** stream)
 {
+    refresh_conversion_cache();
+
     sensekit_stream_t* sk_stream;
     sensekit_stream_open(sensor, &sk_stream);
 
