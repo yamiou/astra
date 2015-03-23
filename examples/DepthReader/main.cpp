@@ -1,6 +1,7 @@
 ﻿// Orbbec (c) 2015
 
 #include <SenseKit.h>
+#include <SenseKitSL.h>
 #include <cstdio>
 #include <iostream>
 

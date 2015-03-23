@@ -4,6 +4,7 @@
 #define MAX_DEPTH 10000
 
 #include <SenseKit.h>
+#include <SenseKitSL.h>
 #include <stddef.h>
 
 typedef struct
