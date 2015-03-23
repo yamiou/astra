@@ -7,9 +7,24 @@
 #include "streams/depth.h"
 #include "SimpleViewer.h"
 #include <memory.h>
+
+#ifdef _WIN32
+#include <GL/glut.h>
+#else
 #include <GLUT/glut.h>
+#endif
+
+//from glext.h
+#ifndef GL_SGIS_generate_mipmap
+#define GL_GENERATE_MIPMAP_SGIS           0x8191
+#define GL_GENERATE_MIPMAP_HINT_SGIS      0x8192
+#endif
 
 #include "utils.h"
+#ifdef _WIN32
+//for strncpy
+#include <stdexcept>
+#endif
 
 #define GL_WIN_SIZE_X   1280
 #define GL_WIN_SIZE_Y   1024
