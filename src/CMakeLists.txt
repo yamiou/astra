@@ -30,6 +30,8 @@ set (SenseKitSL_SOURCES
   depthstream_capi.cpp
   )
 
+add_definitions(-DSENSEKIT_EXPORT)
+
 add_library(SenseKit SHARED ${SenseKit_SOURCES})
 add_library(SenseKitSL SHARED ${SenseKitSL_SOURCES})
 

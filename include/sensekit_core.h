@@ -15,7 +15,11 @@
 
 #ifndef SENSEKIT_API
 # if defined (_MSC_VER) && ! defined (SENSEKIT_WIN32_STATIC_BUILD)
-#  define SENSEKIT_API __declspec(dllimport)
+#  ifdef SENSEKIT_EXPORT
+#    define SENSEKIT_API __declspec(dllexport)
+#  else
+#    define SENSEKIT_API __declspec(dllimport)
+#  endif
 # else
 #  define SENSEKIT_API
 # endif
