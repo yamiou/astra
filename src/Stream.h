@@ -21,10 +21,9 @@ namespace sensekit {
     public:
         Stream(StreamId id, StreamTypeId typeId, int index)
             : m_id(id),
-              m_typeId(typeId)
-        {
-            m_nextBinId = 0;
-        }
+              m_typeId(typeId),
+              m_nextBinId(0)
+        { }
 
         ~Stream();
 
