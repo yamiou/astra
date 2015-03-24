@@ -1,7 +1,7 @@
 ﻿#ifndef PLUGINBASE_H
 #define PLUGINBASE_H
 
-#include "PluginService.h"
+#include "../PluginService.h"
 
 namespace sensekit
 {

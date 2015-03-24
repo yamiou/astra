@@ -2,7 +2,7 @@
 #include "SenseKit-private.h"
 #include <iostream>
 
-#include "OpenNIPlugin.h"
+#include "plugins/OpenNIPlugin.h"
 #include "StreamConnection.h"
 #include "StreamBin.h"
 

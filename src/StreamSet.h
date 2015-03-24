@@ -38,6 +38,8 @@ namespace sensekit {
 
         bool is_member(Stream* stream);
 
+        StreamSetId get_id() { return m_id; }
+
     private:
         using StreamMap = std::unordered_map<StreamId, Stream*, StreamIdHash<StreamId> >;
 

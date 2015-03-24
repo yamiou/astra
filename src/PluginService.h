@@ -13,6 +13,10 @@ namespace sensekit
 
     using StreamHandle = void*;
 
+    using StreamAddedCallback = void(*)(StreamSetId setId, StreamHandle streamHandle, StreamTypeId typeId);
+    using StreamRemovedCallback = void(*)(StreamSetId setId, StreamHandle streamHandle, StreamTypeId typeId);
+    using CallbackId = size_t;
+
     class PluginService
     {
     public:
@@ -26,7 +30,10 @@ namespace sensekit
         //for generators (no requirements, i.e. depth sensor and color sensor)
         //plugin would directly create and register the streams, without using stream_factory
 
-        //orbbec_error orbbec_register_stream_factory(StreamTypeId id, transformer_metadata md, stream_factory__callback)
+        sensekit_status_t register_stream_added_callback(StreamAddedCallback callback, CallbackId& callbackId);
+        sensekit_status_t register_stream_removed_callback(StreamRemovedCallback callback, CallbackId& callbackId);
+        sensekit_status_t unregister_stream_added_callback(CallbackId callbackId);
+        sensekit_status_t unregister_stream_removed_callback(CallbackId callbackId);
 
         // Plugin notifying framework of a newly available stream
         sensekit_status_t register_stream(StreamSetId setId, StreamTypeId typeId, /*out*/StreamHandle& handle);
@@ -52,10 +59,10 @@ namespace sensekit
         //orbbec_error orbbec_unregister_stream_factory(...);
         //nominally on plugin shutdown
 
-
-
     private:
         SenseKitContext& m_context;
+        Signal<StreamSetId, StreamHandle, StreamTypeId> m_streamAddedSignal;
+        Signal<StreamSetId, StreamHandle, StreamTypeId> m_streamRemovedSignal;
 
     };
 }

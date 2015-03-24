@@ -13,6 +13,34 @@ namespace sensekit
         return m_context.get_setFactory().create();
     }
 
+    sensekit_status_t PluginService::register_stream_added_callback(StreamAddedCallback callback, CallbackId& callbackId)
+    {
+        callbackId = m_streamAddedSignal += callback;
+
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t PluginService::register_stream_removed_callback(StreamRemovedCallback callback, CallbackId& callbackId)
+    {
+        callbackId = m_streamRemovedSignal += callback;
+
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t PluginService::unregister_stream_added_callback(CallbackId callbackId)
+    {
+        m_streamAddedSignal -= callbackId;
+
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t PluginService::unregister_stream_removed_callback(CallbackId callbackId)
+    {
+        m_streamRemovedSignal -= callbackId;
+
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
     sensekit_status_t PluginService::register_stream(StreamSetId setId, StreamTypeId typeId, StreamHandle& handle)
     {
         StreamId streamId = 0; //TODO assign via factory
@@ -22,6 +50,8 @@ namespace sensekit
         m_context.get_rootSet().add_stream(stream);
 
         handle = stream;
+
+        m_streamAddedSignal.raise(setId, handle, typeId);
 
         cout << "registering stream." << endl;
 
@@ -36,6 +66,8 @@ namespace sensekit
             return SENSEKIT_STATUS_INVALID_PARAMETER;
 
         m_context.get_rootSet().remove_stream(stream);
+
+        m_streamRemovedSignal.raise(m_context.get_rootSet().get_id(), handle, stream->get_typeId());
 
         delete stream;
 

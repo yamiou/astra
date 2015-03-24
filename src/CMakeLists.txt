@@ -8,12 +8,12 @@ set(SenseKit_SOURCES
   SenseKit.cpp
   Stream.h
   Stream.cpp
-  PluginBase.cpp
-  PluginBase.h
+  plugins/PluginBase.cpp
+  plugins/PluginBase.h
   PluginService.cpp
   PluginService.h
-  OpenNIPlugin.cpp
-  OpenNIPlugin.h
+  plugins/OpenNIPlugin.cpp
+  plugins/OpenNIPlugin.h
   StreamSetFactory.h
   StreamSet.cpp
   StreamSet.h

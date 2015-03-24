@@ -3,7 +3,7 @@
 
 #include <SenseKit.h>
 #include <atomic>
-#include "PluginBase.h"
+#include "plugins/PluginBase.h"
 #include "PluginService.h"
 #include "StreamSetFactory.h"
 #include "StreamSet.h"
