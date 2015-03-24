@@ -86,15 +86,15 @@ void SampleViewer::init(int argc, char **argv)
     m_nTexMapY = MIN_CHUNKS_SIZE(m_height, TEXTURE_SIZE);
     m_pTexMap = new RGB888Pixel[m_nTexMapX * m_nTexMapY];
 
-    m_lightVector = Vector3::Normalize(Vector3(.5, 0.2, 1));
-    m_lightVector = Vector3::Normalize(Vector3(0, 0, 1));
+    m_lightVector = Vector3::Normalize(Vector3(.5, -0.2, 1));
+    //m_lightVector = Vector3::Normalize(Vector3(0, 0, 1));
     m_lightColor.r = 210;
     m_lightColor.g = 210;
     m_lightColor.b = 210;
 
-    m_ambientColor.r = 10;
-    m_ambientColor.g = 10;
-    m_ambientColor.b = 10;
+    m_ambientColor.r = 30;
+    m_ambientColor.g = 30;
+    m_ambientColor.b = 30;
 
     return initOpenGL(argc, argv);
 
@@ -222,6 +222,8 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame)
 
             *normMap = Vector3::Normalize(normAvg);
             /*
+            //reference sphere
+            
             const float PI = 3.141592;
             float normX = 2*(x / (float)width)-1;
             float angleX = 0.5 * PI * normX;
@@ -300,10 +302,21 @@ void SampleViewer::display()
                     */
 
                 float diffuseFactor = Vector3::DotProduct(norm, m_lightVector);
-                RGB888Pixel diffuseColor = m_lightColor;
-                diffuseColor.r *= diffuseFactor;
-                diffuseColor.g *= diffuseFactor;
-                diffuseColor.b *= diffuseFactor;
+                RGB888Pixel diffuseColor;
+
+                if (diffuseFactor > 0)
+                {
+                    //only add diffuse when mesh is facing the light
+                    diffuseColor.r = m_lightColor.r * diffuseFactor;
+                    diffuseColor.g = m_lightColor.g * diffuseFactor;
+                    diffuseColor.b = m_lightColor.b * diffuseFactor;
+                }
+                else
+                {
+                    diffuseColor.r = 0;
+                    diffuseColor.g = 0;
+                    diffuseColor.b = 0;
+                }
 
                 pTex->r = std::max(0, std::min(255, m_ambientColor.r + diffuseColor.r));
                 pTex->g = std::max(0, std::min(255, m_ambientColor.g + diffuseColor.g));
