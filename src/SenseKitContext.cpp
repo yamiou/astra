@@ -46,47 +46,47 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::open_stream(sensekit_streamset_t* streamset, sensekit_stream_t*& stream)
+    sensekit_status_t SenseKitContext::open_stream(sensekit_streamset_t* streamset, sensekit_streamconnection_t*& streamConnection)
     {
         //trollolol nothing to do for now
         //would find the depth plugin for the context(streamset) and call client added event, and
         //then the plugin would create a bin if necessary and assign the client to the bin
         Stream* str = m_rootSet.get_stream_by_id(0);
-        StreamConnection* stream_connection = str->open();
+        StreamConnection* skStreamConnection = str->open();
 
-        stream = (sensekit_stream_t*)stream_connection;
+        streamConnection = reinterpret_cast<sensekit_streamconnection_t*>(skStreamConnection);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::close_stream(sensekit_stream_t*& stream)
+    sensekit_status_t SenseKitContext::close_stream(sensekit_streamconnection_t*& streamConnection)
     {
-        StreamConnection* stream_connection = (StreamConnection*)(stream);
+        StreamConnection* skStreamConnection = reinterpret_cast<StreamConnection*>(streamConnection);
 
-        Stream* str = stream_connection->get_stream();
+        Stream* str = skStreamConnection->get_stream();
         //TODO stream bookkeeping and lifetime would be elsewhere
-        str->close(stream_connection);
+        str->close(skStreamConnection);
 
-        stream = nullptr;
+        streamConnection = nullptr;
         //would find the depth plugin and call client removed event, and the plugin might destroy a bin
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::open_frame(sensekit_stream_t* stream, int timeout, sensekit_frame_ref_t*& frameRef)
+    sensekit_status_t SenseKitContext::open_frame(sensekit_streamconnection_t* streamConnection, int timeout, sensekit_frame_ref_t*& frameRef)
     {
         //we got the actual frame in the temp_update call.
         //for real, we would do some type of double buffer swap on the client side, copy the latest frame (if newer) from the daemon
         //the daemon might reference count this
 
-        StreamConnection* streamConnection = reinterpret_cast<StreamConnection*>(stream);
+        StreamConnection* skStreamConnection = reinterpret_cast<StreamConnection*>(streamConnection);
 
-        StreamBin* bin = streamConnection->get_bin();
+        StreamBin* bin = skStreamConnection->get_bin();
         if (bin != nullptr)
         {
             frameRef = new sensekit_frame_ref_t;
             frameRef->frame = bin->lock_front_buffer();
-            frameRef->stream = stream;
+            frameRef->streamConnection = streamConnection;
         }
         else
         {
@@ -101,9 +101,9 @@ namespace sensekit {
         //later, would decrement the reference count
         //TODO: how does the daemon recover from a client crashing while a frame is open? (reference count does go to 0)
 
-        StreamConnection* streamConnection = reinterpret_cast<StreamConnection*>(frameRef->stream);
+        StreamConnection* skStreamConnection = reinterpret_cast<StreamConnection*>(frameRef->streamConnection);
 
-        StreamBin* bin = streamConnection->get_bin();
+        StreamBin* bin = skStreamConnection->get_bin();
         if (bin != nullptr)
         {
             bin->unlock_front_buffer();
@@ -122,32 +122,32 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::set_parameter(sensekit_stream_t* stream, sensekit_parameter_id parameterId, size_t byteLength, sensekit_parameter_data_t* data)
+    sensekit_status_t SenseKitContext::set_parameter(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id parameterId, size_t byteLength, sensekit_parameter_data_t* data)
     {
-        StreamConnection* streamConnection = reinterpret_cast<StreamConnection*>(stream);
-        Stream* sk_stream = streamConnection->get_stream();
+        StreamConnection* skStreamConnection = reinterpret_cast<StreamConnection*>(streamConnection);
+        Stream* sk_stream = skStreamConnection->get_stream();
 
-        sk_stream->set_parameter(streamConnection, parameterId, byteLength, data);
+        sk_stream->set_parameter(skStreamConnection, parameterId, byteLength, data);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::get_parameter_size(sensekit_stream_t* stream, sensekit_parameter_id parameterId, size_t& byteLength)
+    sensekit_status_t SenseKitContext::get_parameter_size(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id parameterId, size_t& byteLength)
     {
-        StreamConnection* streamConnection = reinterpret_cast<StreamConnection*>(stream);
-        Stream* sk_stream = streamConnection->get_stream();
+        StreamConnection* skStreamConnection = reinterpret_cast<StreamConnection*>(streamConnection);
+        Stream* sk_stream = skStreamConnection->get_stream();
 
-        sk_stream->get_parameter_size(streamConnection, parameterId, byteLength);
+        sk_stream->get_parameter_size(skStreamConnection, parameterId, byteLength);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::get_parameter_data(sensekit_stream_t* stream, sensekit_parameter_id parameterId, size_t byteLength, sensekit_parameter_data_t*& data)
+    sensekit_status_t SenseKitContext::get_parameter_data(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id parameterId, size_t byteLength, sensekit_parameter_data_t* data)
     {
-        StreamConnection* streamConnection = reinterpret_cast<StreamConnection*>(stream);
-        Stream* sk_stream = streamConnection->get_stream();
+        StreamConnection* skStreamConnection = reinterpret_cast<StreamConnection*>(streamConnection);
+        Stream* sk_stream = skStreamConnection->get_stream();
 
-        sk_stream->get_parameter_data(streamConnection, parameterId, byteLength, data);
+        sk_stream->get_parameter_data(skStreamConnection, parameterId, byteLength, data);
 
         return SENSEKIT_STATUS_SUCCESS;
     }

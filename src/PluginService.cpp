@@ -41,10 +41,11 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::register_stream(StreamSetId setId, StreamTypeId typeId, StreamHandle& handle)
+    sensekit_status_t PluginService::register_stream(StreamSetId setId, StreamTypeId typeId, StreamPluginCallbacks pluginCallbacks, StreamHandle& handle)
     {
         StreamId streamId = 0; //TODO assign via factory
-        Stream* stream = new Stream(streamId, typeId, 0);
+
+        Stream* stream = new Stream(streamId, typeId, 0, pluginCallbacks);
 
         // TODO add to specific streamset
         m_context.get_rootSet().add_stream(stream);

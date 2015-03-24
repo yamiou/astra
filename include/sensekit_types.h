@@ -6,7 +6,7 @@
 const unsigned MAX_STRING_FIELD_LENGTH = 256;
 
 typedef struct _sensekit_streamset sensekit_streamset_t;
-typedef struct _sensekit_stream sensekit_stream_t;
+typedef struct _sensekit_stream sensekit_streamconnection_t;
 
 typedef struct _sensekit_parameter_data sensekit_parameter_data_t;
 typedef int32_t sensekit_parameter_id;
@@ -34,7 +34,7 @@ typedef struct _sensekit_frame {
 } sensekit_frame_t;
 
 typedef struct _sensekit_frame_ref {
-    sensekit_stream_t* stream;
+    sensekit_streamconnection_t* streamConnection;
     sensekit_frame_t* frame;
 } sensekit_frame_ref_t;
 #endif /* SENSEKIT_TYPES_H */

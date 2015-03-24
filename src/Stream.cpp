@@ -86,20 +86,31 @@ namespace sensekit {
     }
 
 
-    void Stream::set_parameter(StreamConnection* connection, sensekit_parameter_id parameterId, size_t byteLength, sensekit_parameter_data_t* data)
+    void Stream::set_parameter(StreamConnection* connection, sensekit_parameter_id id, size_t byteLength, sensekit_parameter_data_t* data)
     {
-        m_setParameterSignal.raise();
-        
+        sensekit_streamconnection_t* streamConnection = reinterpret_cast<sensekit_streamconnection_t*>(connection);
+        if (m_callbacks.setParameterCallback != nullptr)
+        {
+            m_callbacks.setParameterCallback(m_callbacks.context, streamConnection, id, byteLength, data);
+        }
     }
 
-    void Stream::get_parameter_size(StreamConnection* connection, sensekit_parameter_id parameterId, /*out*/size_t& byteLength)
+    void Stream::get_parameter_size(StreamConnection* connection, sensekit_parameter_id id, /*out*/size_t& byteLength)
     {
-        
+        sensekit_streamconnection_t* streamConnection = reinterpret_cast<sensekit_streamconnection_t*>(connection);
+        if (m_callbacks.getParameterSizeCallback != nullptr)
+        {
+            m_callbacks.getParameterSizeCallback(m_callbacks.context, streamConnection, id, &byteLength);
+        }
     }
 
-    void Stream::get_parameter_data(StreamConnection* connection, sensekit_parameter_id parameterId, size_t byteLength, /*out*/sensekit_parameter_data_t*& sensekitParameterData)
+    void Stream::get_parameter_data(StreamConnection* connection, sensekit_parameter_id parameterId, size_t byteLength, sensekit_parameter_data_t* data)
     {
-        
+        sensekit_streamconnection_t* streamConnection = reinterpret_cast<sensekit_streamconnection_t*>(connection);
+        if (m_callbacks.getParameterDataCallback != nullptr)
+        {
+            m_callbacks.getParameterDataCallback(m_callbacks.context, streamConnection, parameterId, byteLength, data);
+        }
     }
 
 }

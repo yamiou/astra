@@ -36,7 +36,7 @@ namespace sensekit
         sensekit_status_t unregister_stream_removed_callback(CallbackId callbackId);
 
         // Plugin notifying framework of a newly available stream
-        sensekit_status_t register_stream(StreamSetId setId, StreamTypeId typeId, /*out*/StreamHandle& handle);
+        sensekit_status_t register_stream(StreamSetId setId, StreamTypeId typeId, StreamPluginCallbacks pluginCallbacks, /*out*/StreamHandle& handle);
 
         // Plugin notifying framework of a stream no longer available
         sensekit_status_t unregister_stream(StreamHandle& handle);

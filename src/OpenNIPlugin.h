@@ -26,6 +26,14 @@ namespace sensekit
             virtual void on_cleanup() override;
 
         private:
+            static void set_parameter_thunk(void* instance, sensekit_streamconnection_t* streamConnection, sensekit_parameter_id, size_t, sensekit_parameter_data_t*);
+            static void get_parameter_size_thunk(void* instance, sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t* byteLength);
+            static void get_parameter_data_thunk(void* instance, sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t byteLength, sensekit_parameter_data_t* data);
+            
+            void set_parameter(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id, size_t, sensekit_parameter_data_t*);
+            void get_parameter_size(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t& byteLength);
+            void get_parameter_data(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t byteLength, sensekit_parameter_data_t* data);
+            
             sensekit_status_t open_depth_stream();
             sensekit_status_t close_depth_stream();
             void set_new_buffer(sensekit_frame_t* nextBuffer);

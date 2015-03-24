@@ -70,8 +70,14 @@ namespace sensekit
             }
 
             sensekit_frame_t* nextBuffer = nullptr;
+            
+            StreamPluginCallbacks pluginCallbacks(this);
+            
+            pluginCallbacks.setParameterCallback = &OpenNIPlugin::set_parameter_thunk;
+            pluginCallbacks.getParameterSizeCallback = &OpenNIPlugin::get_parameter_size_thunk;
+            pluginCallbacks.getParameterDataCallback = &OpenNIPlugin::get_parameter_data_thunk;
 
-            get_pluginService().register_stream(/*bogus*/0, /*bogus*/0, m_handle);
+            get_pluginService().register_stream(/*bogus*/0, /*bogus*/0, pluginCallbacks, m_handle);
 
             const ::openni::VideoMode& mode = m_depthStream.getVideoMode();
 
@@ -88,8 +94,45 @@ namespace sensekit
                                    nextBuffer);
 
             set_new_buffer(nextBuffer);
-
+            
             return SENSEKIT_STATUS_SUCCESS;
+        }
+
+        void OpenNIPlugin::set_parameter_thunk(void* instance, sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t byteLength, sensekit_parameter_data_t* data)
+        {
+            OpenNIPlugin* self = static_cast<OpenNIPlugin*>(instance);
+            self->set_parameter(streamConnection, id, byteLength, data);
+        }
+
+        void OpenNIPlugin::get_parameter_size_thunk(void* instance, sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, /*out*/size_t* byteLength)
+        {
+            OpenNIPlugin* self = static_cast<OpenNIPlugin*>(instance);
+            self->get_parameter_size(streamConnection, id, *byteLength);
+        }
+
+        void OpenNIPlugin::get_parameter_data_thunk(void* instance, sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t byteLength, sensekit_parameter_data_t* data)
+        {
+            OpenNIPlugin* self = static_cast<OpenNIPlugin*>(instance);
+            self->get_parameter_data(streamConnection, id, byteLength, data);
+        }
+
+
+        void OpenNIPlugin::set_parameter(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t byteLength, sensekit_parameter_data_t* data)
+        {
+        }
+
+        void OpenNIPlugin::get_parameter_size(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, /*out*/size_t& byteLength)
+        {
+            byteLength = 20;
+        }
+
+        void OpenNIPlugin::get_parameter_data(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t byteLength, sensekit_parameter_data_t* data)
+        {
+            char* charData = (char*)data;
+            for (int i = 0; i < byteLength; i++)
+            {
+                charData[i] = i;
+            }
         }
 
         sensekit_status_t OpenNIPlugin::close_depth_stream()

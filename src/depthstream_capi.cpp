@@ -49,29 +49,36 @@ SENSEKIT_API sensekit_status_t sensekit_depth_open(sensekit_streamset_t* sensor,
 {
     refresh_conversion_cache();
 
-    sensekit_stream_t* sk_stream;
-    sensekit_stream_open(sensor, &sk_stream);
+    sensekit_streamconnection_t* stream_connection;
+    sensekit_stream_open(sensor, &stream_connection);
 
-    *stream = (sensekit_depthstream_t*)sk_stream;
+    size_t len = 0;
+    sensekit_stream_get_parameter_size(stream_connection, 1, &len);
+    char* data = new char[len];
+    sensekit_stream_get_parameter_data(stream_connection, 1, len, (sensekit_parameter_data_t*)data);
+
+    sensekit_stream_set_parameter(stream_connection, 1, len, (sensekit_parameter_data_t*)data);
+    delete data;
+    *stream = (sensekit_depthstream_t*)stream_connection;
     return SENSEKIT_STATUS_SUCCESS;
 }
 
 SENSEKIT_API sensekit_status_t sensekit_depth_close(/*inout*/sensekit_depthstream_t** stream)
 {
-    sensekit_stream_t* sk_stream = (sensekit_stream_t*)(*stream);
+    sensekit_streamconnection_t* sk_stream_connection = (sensekit_streamconnection_t*)(*stream);
 
-    sensekit_stream_close(&sk_stream);
+    sensekit_stream_close(&sk_stream_connection);
 
-    *stream = (sensekit_depthstream_t*)sk_stream;
+    *stream = (sensekit_depthstream_t*)sk_stream_connection;
     return SENSEKIT_STATUS_SUCCESS;
 }
 
 SENSEKIT_API sensekit_status_t sensekit_depth_frame_open(sensekit_depthstream_t* stream, int timeout, sensekit_depthframe_t** frame)
 {
     sensekit_frame_ref_t* frameRef;
-    sensekit_stream_t* skStream = (sensekit_stream_t*)(stream);
+    sensekit_streamconnection_t* sk_stream_connection = (sensekit_streamconnection_t*)(stream);
 
-    sensekit_stream_frame_open(skStream, timeout, &frameRef);
+    sensekit_stream_frame_open(sk_stream_connection, timeout, &frameRef);
 
     //SOOON...
     //sensekit_depthframe_header_t* header = (sensekit_depthframe_header_t*)(sk_frame->data);

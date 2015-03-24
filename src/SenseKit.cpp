@@ -25,23 +25,23 @@ SENSEKIT_API sensekit_status_t sensekit_close_streamset(sensekit_streamset_t** s
     return g_Context.close_streamset(*streamset);
 }
 
-SENSEKIT_API sensekit_status_t sensekit_stream_open(sensekit_streamset_t* streamset, sensekit_stream_t** stream)
+SENSEKIT_API sensekit_status_t sensekit_stream_open(sensekit_streamset_t* streamset, sensekit_streamconnection_t** streamConnection)
 {
-    g_Context.open_stream(streamset, *stream);
+    g_Context.open_stream(streamset, *streamConnection);
 
     return SENSEKIT_STATUS_SUCCESS;
 }
 
-SENSEKIT_API sensekit_status_t sensekit_stream_close(sensekit_stream_t** stream)
+SENSEKIT_API sensekit_status_t sensekit_stream_close(sensekit_streamconnection_t** streamConnection)
 {
-    g_Context.close_stream(*stream);
+    g_Context.close_stream(*streamConnection);
 
     return SENSEKIT_STATUS_SUCCESS;
 }
 
-SENSEKIT_API sensekit_status_t sensekit_stream_frame_open(sensekit_stream_t* stream, int timeout, sensekit_frame_ref_t** frame)
+SENSEKIT_API sensekit_status_t sensekit_stream_frame_open(sensekit_streamconnection_t* streamConnection, int timeout, sensekit_frame_ref_t** frame)
 {
-    g_Context.open_frame(stream, timeout, *frame);
+    g_Context.open_frame(streamConnection, timeout, *frame);
 
     return SENSEKIT_STATUS_SUCCESS;
 }
@@ -57,19 +57,19 @@ SENSEKIT_API sensekit_status_t sensekit_temp_update()
     return g_Context.temp_update();
 }
 
-SENSEKIT_API sensekit_status_t sensekit_stream_set_parameter(sensekit_stream_t* stream, sensekit_parameter_id parameter_id, size_t byte_length, sensekit_parameter_data_t* data)
+SENSEKIT_API sensekit_status_t sensekit_stream_set_parameter(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id parameter_id, size_t byte_length, sensekit_parameter_data_t* data)
 {
-    return g_Context.set_parameter(stream, parameter_id, byte_length, data);
+    return g_Context.set_parameter(streamConnection, parameter_id, byte_length, data);
 }
 
-SENSEKIT_API sensekit_status_t sensekit_stream_get_parameter_size(sensekit_stream_t* stream, sensekit_parameter_id parameter_id, /*out*/size_t* byte_length)
+SENSEKIT_API sensekit_status_t sensekit_stream_get_parameter_size(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id parameter_id, /*out*/size_t* byte_length)
 {
-    return g_Context.get_parameter_size(stream, parameter_id, *byte_length);
+    return g_Context.get_parameter_size(streamConnection, parameter_id, *byte_length);
 }
 
-SENSEKIT_API sensekit_status_t sensekit_stream_get_parameter_data(sensekit_stream_t* stream, sensekit_parameter_id parameter_id, size_t byte_length, /*out*/sensekit_parameter_data_t** data)
+SENSEKIT_API sensekit_status_t sensekit_stream_get_parameter_data(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id parameter_id, size_t byte_length, sensekit_parameter_data_t* data)
 {
-    return g_Context.get_parameter_data(stream, parameter_id, byte_length, *data);
+    return g_Context.get_parameter_data(streamConnection, parameter_id, byte_length, data);
 }
 
 
