@@ -34,6 +34,11 @@ SENSEKIT_API sensekit_status_t sensekit_stream_frame_open(
 SENSEKIT_API sensekit_status_t sensekit_stream_frame_close(
     sensekit_frame_ref_t** frame); //frame set to null
 
+SENSEKIT_API sensekit_status_t sensekit_stream_set_parameter(sensekit_stream_t* stream, sensekit_parameter_id parameter_id, size_t byte_length, sensekit_parameter_data_t* data);
+
+SENSEKIT_API sensekit_status_t sensekit_stream_get_parameter_size(sensekit_stream_t* stream, sensekit_parameter_id parameter_id, /*out*/size_t* byte_length);
+SENSEKIT_API sensekit_status_t sensekit_stream_get_parameter_data(sensekit_stream_t* stream, sensekit_parameter_id parameter_id, size_t byte_length, /*out*/sensekit_parameter_data_t** data);
+
 SENSEKIT_API sensekit_status_t sensekit_temp_update();
 
 SENSEKIT_END_DECLS

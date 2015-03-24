@@ -121,4 +121,34 @@ namespace sensekit {
         m_plugin->temp_update();
         return SENSEKIT_STATUS_SUCCESS;
     }
+
+    sensekit_status_t SenseKitContext::set_parameter(sensekit_stream_t* stream, sensekit_parameter_id parameterId, size_t byteLength, sensekit_parameter_data_t* data)
+    {
+        StreamConnection* streamConnection = reinterpret_cast<StreamConnection*>(stream);
+        Stream* sk_stream = streamConnection->get_stream();
+
+        sk_stream->set_parameter(streamConnection, parameterId, byteLength, data);
+
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t SenseKitContext::get_parameter_size(sensekit_stream_t* stream, sensekit_parameter_id parameterId, size_t& byteLength)
+    {
+        StreamConnection* streamConnection = reinterpret_cast<StreamConnection*>(stream);
+        Stream* sk_stream = streamConnection->get_stream();
+
+        sk_stream->get_parameter_size(streamConnection, parameterId, byteLength);
+
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t SenseKitContext::get_parameter_data(sensekit_stream_t* stream, sensekit_parameter_id parameterId, size_t byteLength, sensekit_parameter_data_t*& data)
+    {
+        StreamConnection* streamConnection = reinterpret_cast<StreamConnection*>(stream);
+        Stream* sk_stream = streamConnection->get_stream();
+
+        sk_stream->get_parameter_data(streamConnection, parameterId, byteLength, data);
+
+        return SENSEKIT_STATUS_SUCCESS;
+    }
 }

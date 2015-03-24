@@ -32,6 +32,9 @@ namespace sensekit {
         StreamSetFactory& get_setFactory() { return m_setFactory; }
         StreamSet& get_rootSet() { return m_rootSet; }
 
+        sensekit_status_t set_parameter(sensekit_stream_t* stream, sensekit_parameter_id parameterId, size_t byteLength, sensekit_parameter_data_t* data);
+        sensekit_status_t get_parameter_size(sensekit_stream_t* stream, sensekit_parameter_id parameterId, /*out*/size_t& byteLength);
+        sensekit_status_t get_parameter_data(sensekit_stream_t* stream, sensekit_parameter_id parameterId, size_t byteLength, /*out*/sensekit_parameter_data_t*& data);
     private:
 
         StreamSetFactory m_setFactory;

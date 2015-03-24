@@ -57,4 +57,20 @@ SENSEKIT_API sensekit_status_t sensekit_temp_update()
     return g_Context.temp_update();
 }
 
+SENSEKIT_API sensekit_status_t sensekit_stream_set_parameter(sensekit_stream_t* stream, sensekit_parameter_id parameter_id, size_t byte_length, sensekit_parameter_data_t* data)
+{
+    return g_Context.set_parameter(stream, parameter_id, byte_length, data);
+}
+
+SENSEKIT_API sensekit_status_t sensekit_stream_get_parameter_size(sensekit_stream_t* stream, sensekit_parameter_id parameter_id, /*out*/size_t* byte_length)
+{
+    return g_Context.get_parameter_size(stream, parameter_id, *byte_length);
+}
+
+SENSEKIT_API sensekit_status_t sensekit_stream_get_parameter_data(sensekit_stream_t* stream, sensekit_parameter_id parameter_id, size_t byte_length, /*out*/sensekit_parameter_data_t** data)
+{
+    return g_Context.get_parameter_data(stream, parameter_id, byte_length, *data);
+}
+
+
 SENSEKIT_END_DECLS

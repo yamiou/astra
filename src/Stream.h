@@ -39,6 +39,10 @@ namespace sensekit {
 
         StreamBin* get_bin_by_id(StreamBinId id);
 
+        void set_parameter(StreamConnection* connection, sensekit_parameter_id parameterId, size_t byteLength, sensekit_parameter_data_t* data);
+        void get_parameter_size(StreamConnection* connection, sensekit_parameter_id parameterId, /*out*/size_t& byteLength);
+        void get_parameter_data(StreamConnection* connection, sensekit_parameter_id parameterId, size_t byteLength, /*out*/sensekit_parameter_data_t*& sensekitParameterData);
+
     private:
         using ConnPtr = std::unique_ptr<StreamConnection>;
         using ConnectionList = std::vector<ConnPtr>;

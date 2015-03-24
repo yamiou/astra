@@ -84,4 +84,22 @@ namespace sensekit {
         m_connections.clear();
         m_bins.clear();
     }
+
+
+    void Stream::set_parameter(StreamConnection* connection, sensekit_parameter_id parameterId, size_t byteLength, sensekit_parameter_data_t* data)
+    {
+        m_setParameterSignal.raise();
+        
+    }
+
+    void Stream::get_parameter_size(StreamConnection* connection, sensekit_parameter_id parameterId, /*out*/size_t& byteLength)
+    {
+        
+    }
+
+    void Stream::get_parameter_data(StreamConnection* connection, sensekit_parameter_id parameterId, size_t byteLength, /*out*/sensekit_parameter_data_t*& sensekitParameterData)
+    {
+        
+    }
+
 }

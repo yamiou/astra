@@ -8,6 +8,9 @@ const unsigned MAX_STRING_FIELD_LENGTH = 256;
 typedef struct _sensekit_streamset sensekit_streamset_t;
 typedef struct _sensekit_stream sensekit_stream_t;
 
+typedef struct _sensekit_parameter_data sensekit_parameter_data_t;
+typedef int32_t sensekit_parameter_id;
+
 typedef int32_t bin_id_t;
 
 typedef enum _sensekit_status {

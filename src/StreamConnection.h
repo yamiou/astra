@@ -1,6 +1,8 @@
 #ifndef STREAMCONNECTION_H
 #define STREAMCONNECTION_H
 
+#include "sensekit_types.h"
+
 namespace sensekit {
 
     class StreamBin;
@@ -13,7 +15,9 @@ namespace sensekit {
     public:
         StreamConnection(Stream* stream)
             : m_stream(stream)
-        { }
+        {
+            //TODO throw if stream is nullptr
+        }
 
         ~StreamConnection();
 
@@ -24,7 +28,6 @@ namespace sensekit {
         StreamHandle get_handle() { return m_handle; }
 
         Stream* get_stream() { return m_stream; }
-
     private:
         Stream* m_stream;
         StreamBin* m_bin{nullptr};
