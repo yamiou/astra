@@ -44,5 +44,16 @@ TEST_CASE("Can raise void signal", "[signal]") {
 
     signal.raise();
     REQUIRE(test == 1);
-    signal.raise();
+}
+
+TEST_CASE("Can raise multi param signal", "[signal]") {
+    Signal<bool, int, std::string> signal;
+    int test = 1;
+    signal += [&test] (bool one, int two, std::string three) { test+=two; };
+    size_t id = signal += [&test] (bool one, int two, std::string three) { test+=5; };
+    signal += [&test] (bool one, int two, std::string three) { test+=30; };
+    signal -= id;
+
+    signal.raise(false, 5, "Test");
+    REQUIRE(test == 36);
 }

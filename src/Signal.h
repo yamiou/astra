@@ -5,15 +5,15 @@
 
 //TODO: make add/remove callbacks threadsafe with mutex
 
-template<typename R, typename Signature> class CallbackList;
+template<typename R, typename... Signature> class CallbackList;
 
-template<typename R, typename Signature>
+template<typename R, typename... Signature>
 class CallbackNode
 {
 
 public:
 
-    typedef std::function<R (Signature)> callback_type;
+    typedef std::function<R (Signature...)> callback_type;
 
     CallbackNode(const callback_type& cb)
         : m_prev(NULL), m_next(NULL), m_callback(cb), m_refCount(1)
@@ -55,15 +55,15 @@ private:
     callback_type m_callback;
     unsigned int m_refCount;
 
-    friend class CallbackList<R, Signature>;
+    friend class CallbackList<R, Signature...>;
 };
 
-template<typename R, typename Signature>
+template<typename R, typename... Signature>
 class CallbackList
 {
 public:
 
-    typedef CallbackNode<R, Signature> node_type;
+    typedef CallbackNode<R, Signature...> node_type;
     typedef typename node_type::callback_type callback_type;
 
     CallbackList()
@@ -153,6 +153,8 @@ public:
                 count++;
             }
 
+            count++;
+
             return count;
         }
     unsigned int& count()
@@ -160,7 +162,7 @@ public:
             return m_count;
         }
 
-    void invoke(Signature sig)
+    void invoke(Signature... sig)
         {
             if (!m_head)
                 return;
@@ -171,7 +173,7 @@ public:
             {
                 if (node->m_callback != NULL)
                 {
-                    node->m_callback(sig);
+                    node->m_callback(sig...);
                 }
                 node_type* prev = node;
                 node = node->m_next;
