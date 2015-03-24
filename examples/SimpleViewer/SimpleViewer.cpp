@@ -34,6 +34,7 @@
 
 #define MIN_NUM_CHUNKS(data_size, chunk_size)   ((((data_size)-1) / (chunk_size) + 1))
 #define MIN_CHUNKS_SIZE(data_size, chunk_size)  (MIN_NUM_CHUNKS(data_size, chunk_size) * (chunk_size))
+#include <algorithm>
 
 SampleViewer* SampleViewer::ms_self = NULL;
 
@@ -85,14 +86,15 @@ void SampleViewer::init(int argc, char **argv)
     m_nTexMapY = MIN_CHUNKS_SIZE(m_height, TEXTURE_SIZE);
     m_pTexMap = new RGB888Pixel[m_nTexMapX * m_nTexMapY];
 
-    m_lightVector = Vector3::Normalize(Vector3(-1, 0.2, .5));
-    m_lightColor.r = 230;
-    m_lightColor.g = 230;
-    m_lightColor.b = 230;
+    m_lightVector = Vector3::Normalize(Vector3(.5, 0.2, 1));
+    m_lightVector = Vector3::Normalize(Vector3(0, 0, 1));
+    m_lightColor.r = 210;
+    m_lightColor.g = 210;
+    m_lightColor.b = 210;
 
-    m_ambientColor.r = 50;
-    m_ambientColor.g = 50;
-    m_ambientColor.b = 50;
+    m_ambientColor.r = 10;
+    m_ambientColor.g = 10;
+    m_ambientColor.b = 10;
 
     return initOpenGL(argc, argv);
 
@@ -142,7 +144,6 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame)
             int16_t depthDown = *(depthData + downIndex);
 
             Vector3 normAvg;
-            int normAvgCount = 0;
 
             if (depth != 0 && depthRight != 0 && depthDown != 0)
             {
@@ -156,11 +157,10 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame)
                 Vector3 v1 = Vector3(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
                 Vector3 v2 = Vector3(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
 
-                Vector3 norm = Vector3::CrossProduct(v1, v2);
+                Vector3 norm = Vector3::CrossProduct(v2, v1);
                 normAvg.x += norm.x;
                 normAvg.y += norm.y;
                 normAvg.z += norm.z;
-                normAvgCount++;
             }
 
             if (depth != 0 && depthRight != 0 && depthUp != 0)
@@ -175,11 +175,11 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame)
                 Vector3 v1 = Vector3(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
                 Vector3 v2 = Vector3(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
 
-                Vector3 norm = Vector3::CrossProduct(v1, v2);
+                Vector3 norm = Vector3::CrossProduct(v2, v1);
+
                 normAvg.x += norm.x;
                 normAvg.y += norm.y;
                 normAvg.z += norm.z;
-                normAvgCount++;
             }
 
 
@@ -195,11 +195,11 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame)
                 Vector3 v1 = Vector3(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
                 Vector3 v2 = Vector3(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
 
-                Vector3 norm = Vector3::CrossProduct(v1, v2);
+                Vector3 norm = Vector3::CrossProduct(v2, v1);
+
                 normAvg.x += norm.x;
                 normAvg.y += norm.y;
                 normAvg.z += norm.z;
-                normAvgCount++;
             }
 
             if (depth != 0 && depthLeft != 0 && depthDown != 0)
@@ -214,21 +214,28 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame)
                 Vector3 v1 = Vector3(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
                 Vector3 v2 = Vector3(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
 
-                Vector3 norm = Vector3::CrossProduct(v1, v2);
+                Vector3 norm = Vector3::CrossProduct(v2, v1);
                 normAvg.x += norm.x;
                 normAvg.y += norm.y;
                 normAvg.z += norm.z;
-                normAvgCount++;
             }
 
-            if (normAvgCount>0)
+            *normMap = Vector3::Normalize(normAvg);
+            /*
+            const float PI = 3.141592;
+            float normX = 2*(x / (float)width)-1;
+            float angleX = 0.5 * PI * normX;
+            float normY = 2*(y / (float)height)-1;
+            float angleY = 0.5 * PI * normY;
+            if (sqrt(normX*normX + normY*normY) < 1)
             {
-                normAvg.x /= normAvgCount;
-                normAvg.y /= normAvgCount;
-                normAvg.z /= normAvgCount;
+                *normMap = Vector3(sin(angleX)*cos(angleY), sin(angleY)*cos(angleX), cos(angleY)*cos(angleX));
             }
-
-            *normMap = normAvg;
+            else
+            {
+                *normMap = Vector3();
+            }
+            */
             ++normMap;
         }
         //last pixel at end of row
@@ -287,10 +294,10 @@ void SampleViewer::display()
             Vector3 norm = *normMap;
             if (!norm.isEmpty())
             {
-            /*    pTex->r = (norm.x * 0.5 + 1) * 255;
-                pTex->g = (norm.y * 0.5 + 1) * 255;
-                pTex->b = (norm.z * 0.5 + 1) * 255;
-            */
+                /*    pTex->r = (norm.x * 0.5 + 1) * 255;
+                    pTex->g = (norm.y * 0.5 + 1) * 255;
+                    pTex->b = (norm.z * 0.5 + 1) * 255;
+                    */
 
                 float diffuseFactor = Vector3::DotProduct(norm, m_lightVector);
                 RGB888Pixel diffuseColor = m_lightColor;
@@ -298,9 +305,9 @@ void SampleViewer::display()
                 diffuseColor.g *= diffuseFactor;
                 diffuseColor.b *= diffuseFactor;
 
-                pTex->r = m_ambientColor.r + diffuseColor.r;
-                pTex->g = m_ambientColor.g + diffuseColor.g;
-                pTex->b = m_ambientColor.b + diffuseColor.b;
+                pTex->r = std::max(0, std::min(255, m_ambientColor.r + diffuseColor.r));
+                pTex->g = std::max(0, std::min(255, m_ambientColor.g + diffuseColor.g));
+                pTex->b = std::max(0, std::min(255, m_ambientColor.b + diffuseColor.b));
             }
         }
 
