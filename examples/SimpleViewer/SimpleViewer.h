@@ -6,6 +6,7 @@
 #include <SenseKit.h>
 #include <SenseKitSL.h>
 #include <stddef.h>
+#include <math.h>
 
 typedef struct
 {

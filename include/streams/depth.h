@@ -3,7 +3,6 @@
 
 #include <SenseKit.h>
 #include "depth_types.h"
-#include <math.h>
 
 static WorldConversionCache g_convertCache;
 
@@ -15,7 +14,7 @@ SENSEKIT_API sensekit_status_t convert_depth_to_world(float depthX, float depthY
 SENSEKIT_API sensekit_status_t convert_world_to_depth(float worldX, float worldY, float worldZ,
                                                       float* pDepthX, float* pDepthY, float* pDepthZ);
 
-SENSEKIT_API sensekit_status_t sensekit_depth_open(sensekit_streamset_t* sensor,
+SENSEKIT_API sensekit_status_t sensekit_depth_open(sensekit_streamset_t* streamset,
                                                    sensekit_depthstream_t** stream);
 
 SENSEKIT_API sensekit_status_t sensekit_depth_close(sensekit_depthstream_t** stream);

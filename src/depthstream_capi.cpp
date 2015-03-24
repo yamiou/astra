@@ -45,20 +45,13 @@ static void refresh_conversion_cache()
     g_convertCache.coeffY = g_convertCache.resolutionY / g_convertCache.yzFactor;
 }
 
-SENSEKIT_API sensekit_status_t sensekit_depth_open(sensekit_streamset_t* sensor, /*out*/sensekit_depthstream_t** stream)
+SENSEKIT_API sensekit_status_t sensekit_depth_open(sensekit_streamset_t* streamset, /*out*/sensekit_depthstream_t** stream)
 {
     refresh_conversion_cache();
 
     sensekit_streamconnection_t* stream_connection;
-    sensekit_stream_open(sensor, &stream_connection);
+    sensekit_stream_open(streamset, &stream_connection);
 
-    size_t len = 0;
-    sensekit_stream_get_parameter_size(stream_connection, 1, &len);
-    char* data = new char[len];
-    sensekit_stream_get_parameter_data(stream_connection, 1, len, (sensekit_parameter_data_t*)data);
-
-    sensekit_stream_set_parameter(stream_connection, 1, len, (sensekit_parameter_data_t*)data);
-    delete data;
     *stream = (sensekit_depthstream_t*)stream_connection;
     return SENSEKIT_STATUS_SUCCESS;
 }

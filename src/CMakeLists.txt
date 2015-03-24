@@ -27,7 +27,10 @@ set (SenseKitSL_SOURCES
   ../include/SenseKitSL.h
   ../include/streams/depth.h
   ../include/streams/depth_types.h
+  ../include/streams/color.h
+  ../include/streams/color_types.h
   depthstream_capi.cpp
+  colorstream_capi.cpp
   )
 
 add_definitions(-DSENSEKIT_EXPORT)
