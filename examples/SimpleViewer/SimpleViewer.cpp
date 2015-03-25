@@ -283,7 +283,8 @@ void SampleViewer::display()
 
         for (int x = 0; x < m_depthFrame->width; ++x, ++pDepth, ++normMap, ++pTex)
         {
-            if (*pDepth != 0)
+            short depth = *pDepth;
+            if (depth != 0)
             {
                 /*
                 int nHistValue = m_pDepthHist[*pDepth];
@@ -301,9 +302,10 @@ void SampleViewer::display()
                     pTex->b = (norm.z * 0.5 + 1) * 255;
                     */
 
+                float fadeFactor = 1 - 0.6*std::max(0.0f,std::min(1.0f,((depth - 400) / 3200.0f)));
                 float diffuseFactor = Vector3::DotProduct(norm, m_lightVector);
                 RGB888Pixel diffuseColor;
-
+                
                 if (diffuseFactor > 0)
                 {
                     //only add diffuse when mesh is facing the light
@@ -318,9 +320,9 @@ void SampleViewer::display()
                     diffuseColor.b = 0;
                 }
 
-                pTex->r = std::max(0, std::min(255, m_ambientColor.r + diffuseColor.r));
-                pTex->g = std::max(0, std::min(255, m_ambientColor.g + diffuseColor.g));
-                pTex->b = std::max(0, std::min(255, m_ambientColor.b + diffuseColor.b));
+                pTex->r = std::max(0, std::min(255, (int)(fadeFactor*(m_ambientColor.r + diffuseColor.r))));
+                pTex->g = std::max(0, std::min(255, (int)(fadeFactor*(m_ambientColor.g + diffuseColor.g))));
+                pTex->b = std::max(0, std::min(255, (int)(fadeFactor*(m_ambientColor.b + diffuseColor.b))));
             }
         }
 
