@@ -38,7 +38,7 @@ SENSEKIT_API sensekit_status_t sensekit_stream_close(sensekit_streamconnection_t
 
 SENSEKIT_API sensekit_status_t sensekit_stream_frame_open(sensekit_streamconnection_t* stream_connection, int timeout, sensekit_frame_ref_t** frame)
 {
-    return _Context.open_frame(stream_connection, timeout, *frame);
+    return g_Context.open_frame(stream_connection, timeout, *frame);
 }
 
 SENSEKIT_API sensekit_status_t sensekit_stream_frame_close(sensekit_frame_ref_t** frame)
@@ -65,6 +65,5 @@ SENSEKIT_API sensekit_status_t sensekit_stream_get_parameter_data(sensekit_strea
 {
     return g_Context.get_parameter_data(stream_connection, parameter_id, byte_length, data);
 }
-
 
 SENSEKIT_END_DECLS
