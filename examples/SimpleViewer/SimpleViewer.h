@@ -109,8 +109,9 @@ private:
     int                     m_width;
     int                     m_height;
 
-    Vector3*                m_normalMap {nullptr};
-    size_t                  m_normalMapLen{0};
+    Vector3*                m_normalMap{ nullptr };
+    Vector3*                m_blurNormalMap{ nullptr };
+    size_t                  m_normalMapLen{ 0 };
     Vector3                 m_lightVector;
     RGB888Pixel             m_lightColor;
     RGB888Pixel             m_ambientColor;

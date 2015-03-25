@@ -112,13 +112,15 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame)
     if (m_normalMap == nullptr || m_normalMapLen != length)
     {
         m_normalMap = new Vector3[length];
+        m_blurNormalMap = new Vector3[length];
+        memset(m_blurNormalMap, 0, sizeof(Vector3)*length);
         m_normalMapLen = length;
     }
     Vector3* normMap = m_normalMap;
     int16_t* depthData = frame.data;
 
     //top row
-    for (int x = 0; x < m_width - 1; ++x)
+    for (int x = 0; x < width - 1; ++x)
     {
         *normMap = Vector3();
         ++normMap;
@@ -223,7 +225,7 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame)
             *normMap = Vector3::Normalize(normAvg);
             /*
             //reference sphere
-            
+
             const float PI = 3.141592;
             float normX = 2*(x / (float)width)-1;
             float angleX = 0.5 * PI * normX;
@@ -231,11 +233,11 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame)
             float angleY = 0.5 * PI * normY;
             if (sqrt(normX*normX + normY*normY) < 1)
             {
-                *normMap = Vector3(sin(angleX)*cos(angleY), sin(angleY)*cos(angleX), cos(angleY)*cos(angleX));
+            *normMap = Vector3(sin(angleX)*cos(angleY), sin(angleY)*cos(angleX), cos(angleY)*cos(angleX));
             }
             else
             {
-                *normMap = Vector3();
+            *normMap = Vector3();
             }
             */
             ++normMap;
@@ -245,10 +247,35 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame)
         ++normMap;
     }
     //bottom row
-    for (int x = 0; x < m_width - 1; ++x)
+    for (int x = 0; x < width - 1; ++x)
     {
         *normMap = Vector3();
         ++normMap;
+    }
+
+    const int blurRadius = 1;
+    //box blur
+    for (int y = blurRadius; y < height - blurRadius; y++)
+    {
+        for (int x = blurRadius; x < width - blurRadius; x++)
+        {
+            Vector3 normAvg;
+
+            for (int dy = -blurRadius; dy <= blurRadius; dy++)
+            {
+                for (int dx = -blurRadius; dx <= blurRadius; dx++)
+                {
+                    int index = x + dx + (y + dy) * width;
+                    Vector3 norm = *(m_normalMap + index);
+
+                    normAvg.x += norm.x;
+                    normAvg.y += norm.y;
+                    normAvg.z += norm.z;
+                }
+            }
+            int centerIndex = x + y*width;
+            *(m_blurNormalMap + centerIndex) = Vector3::Normalize(normAvg);
+        }
     }
 }
 
@@ -274,7 +301,7 @@ void SampleViewer::display()
     RGB888Pixel* pTexRow = m_pTexMap;
     int rowSize = m_depthFrame->width;
 
-    Vector3* normMap = m_normalMap;
+    Vector3* normMap = m_blurNormalMap;
 
     for (int y = 0; y < m_depthFrame->height; ++y)
     {
@@ -302,10 +329,10 @@ void SampleViewer::display()
                     pTex->b = (norm.z * 0.5 + 1) * 255;
                     */
 
-                float fadeFactor = 1 - 0.6*std::max(0.0f,std::min(1.0f,((depth - 400) / 3200.0f)));
+                float fadeFactor = 1 - 0.6*std::max(0.0f, std::min(1.0f, ((depth - 400) / 3200.0f)));
                 float diffuseFactor = Vector3::DotProduct(norm, m_lightVector);
                 RGB888Pixel diffuseColor;
-                
+
                 if (diffuseFactor > 0)
                 {
                     //only add diffuse when mesh is facing the light
