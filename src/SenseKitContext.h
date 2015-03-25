@@ -23,6 +23,13 @@ namespace sensekit {
         initialize_fn initialize{nullptr};
         terminate_fn terminate{nullptr};
         update_fn update{nullptr};
+
+        bool isValid()
+        {
+            return initialize != nullptr &&
+                   terminate != nullptr &&
+                   update != nullptr;
+        }
     };
 
     class SenseKitContext

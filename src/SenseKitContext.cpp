@@ -50,9 +50,16 @@ namespace sensekit {
             os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_terminate), (FarProc&)info.terminate);
             os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_update), (FarProc&)info.update);
 
-            info.initialize(m_streamServiceProxy, m_pluginServiceProxy);
+            if (info.isValid())
+            {
+                info.initialize(m_streamServiceProxy, m_pluginServiceProxy);
 
-            m_pluginList.push_back(info);
+                m_pluginList.push_back(info);
+            }
+            else
+            {
+                os_free_library(libHandle);
+            }
         }
 
         return SENSEKIT_STATUS_SUCCESS;
