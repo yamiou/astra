@@ -43,7 +43,12 @@ set (OpenNIPlugin_SOURCES
     plugins/PluginBase.h
     plugins/OpenNIPlugin.cpp
     plugins/OpenNIPlugin.h
-)
+    )
+
+  set (DummyPlugin_SOURCES
+    plugins/DummyPlugin.h
+    plugins/DummyPlugin.cpp
+    )
 
 add_definitions(-DSENSEKIT_EXPORT)
 
@@ -51,6 +56,7 @@ add_library(SenseKit SHARED ${SenseKit_SOURCES})
 add_library(SenseKitAL STATIC ${SenseKitAL_SOURCES})
 add_library(SenseKitSL SHARED ${SenseKitSL_SOURCES})
 add_library(OpenNIPlugin SHARED ${OpenNIPlugin_SOURCES})
+add_library(DummyPlugin SHARED ${DummyPlugin_SOURCES})
 
 # force c++11 (has no effect currently)
 #set_property(TARGET SenseKit PROPERTY CXX_STANDARD 11)
@@ -58,6 +64,7 @@ add_library(OpenNIPlugin SHARED ${OpenNIPlugin_SOURCES})
 
 target_link_libraries(SenseKitSL SenseKitAL)
 target_link_libraries(OpenNIPlugin ${OpenNI2_LIBRARY})
+target_link_libraries(DummyPlugin SenseKitSL)
 
 add_subdirectory(tests)
 
