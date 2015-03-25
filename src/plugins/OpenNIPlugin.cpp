@@ -10,18 +10,18 @@ static sensekit::openni::OpenNIPlugin* g_plugin;
 
 SENSEKIT_BEGIN_DECLS
 
-void initialize(PluginServiceProxyBase* proxy)
+SENSEKIT_API_EXPORT void sensekit_plugin_initialize(PluginServiceProxyBase* proxy)
 {
     g_plugin = new sensekit::openni::OpenNIPlugin(static_cast<sensekit::PluginServiceProxy*>(proxy));
     g_plugin->initialize();
 }
 
-void update()
+SENSEKIT_API_EXPORT void sensekit_plugin_update()
 {
     g_plugin->temp_update();
 }
 
-void terminate()
+SENSEKIT_API_EXPORT void sensekit_plugin_terminate()
 {
     g_plugin->cleanup();
     delete g_plugin;

@@ -44,9 +44,9 @@ namespace sensekit {
         using terminate_fn = void(*)();
         using update_fn = void(*)();
 
-        initialize_fn m_initialize{nullptr};
-        terminate_fn m_terminate{nullptr};
-        update_fn m_update{nullptr};
+        initialize_fn m_plugin_initialize{nullptr};
+        terminate_fn m_plugin_terminate{nullptr};
+        update_fn m_plugin_update{nullptr};
 
 
     };

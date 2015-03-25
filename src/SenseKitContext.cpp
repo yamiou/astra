@@ -45,22 +45,28 @@ sensekit_status_t SenseKitContext::initialize()
         //TODO: OMG ERROR HANDLING
         LibHandle libHandle = nullptr;
 
-        os_load_library("libOpenNIPlugin.dylib", libHandle);
+#ifdef _WIN32
+        const char* libName = "OpenNIPlugin.dll";
+#else
+        const char* libName = "libOpenNIPlugin.dylib";
+#endif
+        
+        os_load_library(libName, libHandle);
 
-        os_get_proc_address(libHandle, SK_STRINGIFY(initialize), (FarProc&)m_initialize);
-        os_get_proc_address(libHandle, SK_STRINGIFY(terminate), (FarProc&)m_terminate);
-        os_get_proc_address(libHandle, SK_STRINGIFY(update), (FarProc&)m_update);
+        os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_initialize), (FarProc&)m_plugin_initialize);
+        os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_terminate), (FarProc&)m_plugin_terminate);
+        os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_update), (FarProc&)m_plugin_update);
 
-        m_initialize(create_proxy(this, &m_pluginService));
+        m_plugin_initialize(create_proxy(this, &m_pluginService));
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
     sensekit_status_t SenseKitContext::terminate()
     {
-        if (m_terminate != nullptr)
+        if (m_plugin_terminate != nullptr)
         {
-            m_terminate();
+            m_plugin_terminate();
         }
 
         return SENSEKIT_STATUS_SUCCESS;
@@ -156,8 +162,8 @@ sensekit_status_t SenseKitContext::initialize()
 
     sensekit_status_t SenseKitContext::temp_update()
     {
-        if (m_update)
-            m_update();
+        if (m_plugin_update)
+            m_plugin_update();
 
         return SENSEKIT_STATUS_SUCCESS;
     }

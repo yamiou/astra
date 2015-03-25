@@ -1,3 +1,5 @@
+#ifdef __linux__
+
 #include <dlfcn.h>
 #include "shared_library.h"
 
@@ -26,3 +28,5 @@ void os_get_proc_address(const LibHandle libHandle, const char* procName, FarPro
     // Get the requested procedure address from the shared library via the OS
     procAddr = (FarProc)dlsym(libHandle, procName);
 }
+
+#endif

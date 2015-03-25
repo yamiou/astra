@@ -19,7 +19,8 @@ set(SenseKit_SOURCES
   StreamBin.h
   StreamBin.cpp
   shared_library.h
-  shared_library.cpp
+  shared_library_linux.cpp
+  shared_library_windows.cpp
   )
 
 set (SenseKitSL_SOURCES
