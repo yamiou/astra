@@ -28,29 +28,22 @@ SENSEKIT_API sensekit_status_t sensekit_close_streamset(sensekit_streamset_t** s
 SENSEKIT_API sensekit_status_t sensekit_stream_open(sensekit_streamset_t* streamset, sensekit_stream_type_t type,
                                                     sensekit_stream_subtype_t subtype, sensekit_streamconnection_t** stream_connection)
 {
-    g_Context.open_stream(streamset, type, subtype, *stream_connection);
-
-    return SENSEKIT_STATUS_SUCCESS;
+    return g_Context.open_stream(streamset, type, subtype, *stream_connection);
 }
 
 SENSEKIT_API sensekit_status_t sensekit_stream_close(sensekit_streamconnection_t** stream_connection)
 {
-    g_Context.close_stream(*stream_connection);
-
-    return SENSEKIT_STATUS_SUCCESS;
+    return g_Context.close_stream(*stream_connection);
 }
 
 SENSEKIT_API sensekit_status_t sensekit_stream_frame_open(sensekit_streamconnection_t* stream_connection, int timeout, sensekit_frame_ref_t** frame)
 {
-    g_Context.open_frame(stream_connection, timeout, *frame);
-
-    return SENSEKIT_STATUS_SUCCESS;
+    return _Context.open_frame(stream_connection, timeout, *frame);
 }
 
 SENSEKIT_API sensekit_status_t sensekit_stream_frame_close(sensekit_frame_ref_t** frame)
 {
-    g_Context.close_frame(*frame);
-    return SENSEKIT_STATUS_SUCCESS;
+    return g_Context.close_frame(*frame);
 }
 
 SENSEKIT_API sensekit_status_t sensekit_temp_update()
