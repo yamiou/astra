@@ -58,7 +58,7 @@ namespace sensekit
         void OpenNIPlugin::on_cleanup()
         {
             get_pluginService().destroy_stream(m_handle);
-
+            get_pluginService().destroy_stream_set(m_streamSetHandle);
             close_depth_stream();
 
             cout << "closing device" << endl;
@@ -102,7 +102,9 @@ namespace sensekit
             pluginCallbacks.getParameterSizeCallback = &OpenNIPlugin::get_parameter_size_thunk;
             pluginCallbacks.getParameterDataCallback = &OpenNIPlugin::get_parameter_data_thunk;
 
-            get_pluginService().create_stream(/*bogus*/nullptr, DEPTH_TYPE, DEPTH_DEFAULT_SUBTYPE, pluginCallbacks, m_handle);
+            get_pluginService().create_stream_set(m_streamSetHandle);
+
+            get_pluginService().create_stream(m_streamSetHandle, DEPTH_TYPE, DEPTH_DEFAULT_SUBTYPE, pluginCallbacks, m_handle);
 
             const ::openni::VideoMode& mode = m_depthStream.getVideoMode();
 

@@ -55,6 +55,7 @@ namespace sensekit
             StreamBinId m_id{ 0 };
             sensekit_depthframe_wrapper_t* m_currentFrame{ nullptr };
             StreamHandle* m_handle{ nullptr };
+            StreamSetHandle* m_streamSetHandle{ nullptr };
         };
     }
 }

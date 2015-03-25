@@ -53,6 +53,10 @@ SENSEKIT_API sensekit_status_t sensekit_depth_open(sensekit_streamset_t* streams
     sensekit_streamconnection_t* stream_connection;
     sensekit_stream_open(streamset, DEPTH_TYPE, ANY_SUBTYPE, &stream_connection);
 
+    sensekit_stream_set_parameter(stream_connection, 2, 4, nullptr);
+    size_t len;
+    sensekit_stream_get_parameter_size(stream_connection, 3, &len);
+
     *stream = (sensekit_depthstream_t*)stream_connection;
     return SENSEKIT_STATUS_SUCCESS;
 }

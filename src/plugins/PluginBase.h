@@ -30,6 +30,16 @@ public:
             return PluginServiceProxyBase::unregister_stream_removed_callback(pluginService, callbackId);
         }
 
+    sensekit_status_t create_stream_set(/*out*/StreamSetHandle*& setHandle)
+        {
+            return PluginServiceProxyBase::create_stream_set(pluginService, &setHandle);
+        }
+
+    sensekit_status_t destroy_stream_set(/*inout*/StreamSetHandle*& setHandle)
+        {
+            return PluginServiceProxyBase::destroy_stream_set(pluginService, &setHandle);
+        }
+
     sensekit_status_t create_stream(StreamSetHandle* setHandle, StreamType type, StreamSubtype subtype, StreamPluginCallbacks pluginCallbacks, /*out*/StreamHandle*& handle)
         {
             return PluginServiceProxyBase::create_stream(pluginService, setHandle, type, subtype, pluginCallbacks, &handle);

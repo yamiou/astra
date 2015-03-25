@@ -21,6 +21,8 @@ namespace sensekit {
         base->register_stream_removed_callback = &PluginServiceDelegate::register_stream_removed_callback;
         base->unregister_stream_added_callback = &PluginServiceDelegate::unregister_stream_added_callback;
         base->unregister_stream_removed_callback = &PluginServiceDelegate::unregister_stream_removed_callback;
+        base->create_stream_set = &PluginServiceDelegate::create_stream_set;
+        base->destroy_stream_set = &PluginServiceDelegate::destroy_stream_set;
         base->create_stream = &PluginServiceDelegate::create_stream;
         base->destroy_stream = &PluginServiceDelegate::destroy_stream;
         base->create_stream_bin = &PluginServiceDelegate::create_stream_bin;

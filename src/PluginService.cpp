@@ -25,6 +25,8 @@ namespace sensekit
         //if streamset has direct child streams, return error
         //if streamset has child streamsets, reparent them to this streamset's parent (or null parent)
         //then delete the streamset
+        
+        streamset = nullptr;
 
         return SENSEKIT_STATUS_SUCCESS;
     }

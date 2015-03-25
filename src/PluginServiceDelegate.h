@@ -25,6 +25,14 @@ public:
             {
                 return static_cast<PluginService*>(service)->unregister_stream_removing_callback(callbackId);
             }
+        static sensekit_status_t create_stream_set(void* service, /*out*/StreamSetHandle** setHandle)
+            {
+                return static_cast<PluginService*>(service)->create_stream_set(*setHandle);
+            }
+        static sensekit_status_t destroy_stream_set(void* service, /*inout*/StreamSetHandle** setHandle)
+            {
+                return static_cast<PluginService*>(service)->destroy_stream_set(*setHandle);
+            }
         static sensekit_status_t create_stream(void* service, StreamSetHandle* setHandle, StreamType type, StreamSubtype subtype, StreamPluginCallbacks pluginCallbacks, /*out*/StreamHandle** handle)
             {
                 return static_cast<PluginService*>(service)->create_stream(setHandle, type, subtype, pluginCallbacks, *handle);

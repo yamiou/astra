@@ -17,6 +17,8 @@ struct PluginServiceProxyBase
     sensekit_status_t (*register_stream_removed_callback)(void* service, StreamRemovingCallback callback, CallbackId* callbackId);
     sensekit_status_t (*unregister_stream_added_callback)(void* service, CallbackId callbackId);
     sensekit_status_t (*unregister_stream_removed_callback)(void* service, CallbackId callbackId);
+    sensekit_status_t (*create_stream_set)(void* service, sensekit_streamset_t** streamset);
+    sensekit_status_t (*destroy_stream_set)(void* service, sensekit_streamset_t** streamset);
     sensekit_status_t (*create_stream)(void* service, StreamSetHandle* setHandle, StreamType type, StreamSubtype subtype, StreamPluginCallbacks pluginCallbacks, /*out*/StreamHandle** handle);
     sensekit_status_t (*destroy_stream)(void* service, /*inout*/StreamHandle** handle);
     sensekit_status_t (*create_stream_bin)(void* service, StreamHandle* handle, size_t lengthInBytes,
