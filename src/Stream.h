@@ -48,13 +48,13 @@ namespace sensekit {
         using BinPtr = std::unique_ptr < StreamBin > ;
         using BinMap = std::map < StreamBinId, BinPtr > ;
 
-        const StreamType m_type{ 0 };
-        const StreamSubtype m_subtype{ -1 };
+        const StreamType m_type{0};
+        const StreamSubtype m_subtype{0};
 
         ConnectionList m_connections;
         BinMap m_bins;
         StreamPluginCallbacks m_callbacks;
-        
+
         std::atomic_int m_nextBinId;
     };
 }
