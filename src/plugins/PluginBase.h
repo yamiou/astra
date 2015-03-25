@@ -6,9 +6,6 @@
 
 namespace sensekit
 {
-
-
-
     class PluginBase
     {
     public:

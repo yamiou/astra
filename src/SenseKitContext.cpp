@@ -7,12 +7,12 @@
 #include "StreamServiceProxyBase.h"
 #include "PluginServiceProxyBase.h"
 #include "shared_library.h"
+#include "libs.h"
 
 using std::cout;
 using std::endl;
 
 namespace sensekit {
-
 
     StreamServiceProxyBase* create_stream_proxy(SenseKitContext* context)
     {
@@ -41,28 +41,28 @@ namespace sensekit {
         //TODO: OMG ERROR HANDLING
         LibHandle libHandle = nullptr;
 
-#ifdef _WIN32
-        const char* libName = "OpenNIPlugin.dll";
-#else
-        const char* libName = "libOpenNIPlugin.dylib";
-#endif
+        for(auto lib : get_libs())
+        {
+            os_load_library(lib.c_str(), libHandle);
 
-        os_load_library(libName, libHandle);
+            plugin_info info;
+            os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_initialize), (FarProc&)info.initialize);
+            os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_terminate), (FarProc&)info.terminate);
+            os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_update), (FarProc&)info.update);
 
-        os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_initialize), (FarProc&)m_plugin_initialize);
-        os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_terminate), (FarProc&)m_plugin_terminate);
-        os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_update), (FarProc&)m_plugin_update);
+            info.initialize(m_streamServiceProxy, m_pluginServiceProxy);
 
-        m_plugin_initialize(m_streamServiceProxy, m_pluginServiceProxy);
+            m_pluginList.push_back(info);
+        }
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
     sensekit_status_t SenseKitContext::terminate()
     {
-        if (m_plugin_terminate != nullptr)
+        for(auto plinfo : m_pluginList)
         {
-            m_plugin_terminate();
+            plinfo.terminate();
         }
 
         if (m_pluginServiceProxy)
@@ -164,8 +164,10 @@ namespace sensekit {
 
     sensekit_status_t SenseKitContext::temp_update()
     {
-        if (m_plugin_update)
-            m_plugin_update();
+        for(auto plinfo : m_pluginList)
+        {
+            plinfo.update();
+        }
 
         return SENSEKIT_STATUS_SUCCESS;
     }

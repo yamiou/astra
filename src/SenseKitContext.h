@@ -14,6 +14,17 @@ namespace sensekit {
 
     class SenseKitContext;
 
+    using initialize_fn = void(*)(StreamServiceProxyBase* streamProxy, PluginServiceProxyBase* pluginProxy);
+    using terminate_fn = void(*)();
+    using update_fn = void(*)();
+
+    struct plugin_info
+    {
+        initialize_fn initialize{nullptr};
+        terminate_fn terminate{nullptr};
+        update_fn update{nullptr};
+    };
+
     class SenseKitContext
     {
     public:
@@ -47,17 +58,9 @@ namespace sensekit {
         PluginService m_pluginService;
         PluginServiceProxyBase* m_pluginServiceProxy;
         StreamServiceProxyBase* m_streamServiceProxy;
-        PluginBase* m_plugin;
 
-        using initialize_fn = void(*)(StreamServiceProxyBase* streamProxy, PluginServiceProxyBase* pluginProxy);
-        using terminate_fn = void(*)();
-        using update_fn = void(*)();
-
-        initialize_fn m_plugin_initialize{nullptr};
-        terminate_fn m_plugin_terminate{nullptr};
-        update_fn m_plugin_update{nullptr};
-
-
+        using PluginList = std::vector<plugin_info>;
+        PluginList m_pluginList;
     };
 
     class PluginContext : public SenseKitContext

@@ -4,20 +4,23 @@
 #include "PluginBase.h"
 #include <SenseKitSL.h>
 
-    namespace sensekit {
+#include <iostream>
+using std::cout;
+using std::endl;
 
-        class DummyPlugin : public PluginBase
-        {
-        public:
-            DummyPlugin(StreamServiceProxy* streamProxy, PluginServiceProxy* pluginService)
-                : PluginBase(streamProxy, pluginService) { }
+namespace sensekit {
 
-            virtual void temp_update() override { }
+    class DummyPlugin : public PluginBase
+    {
+    public:
+        DummyPlugin(StreamServiceProxy* streamProxy, PluginServiceProxy* pluginService)
+            : PluginBase(streamProxy, pluginService) { }
 
-        private:
-            StreamServiceProxyBase* m_streamProxy;
-        };
-    }
+        virtual void temp_update() override { cout << "dumb." << endl; }
 
+    private:
+        StreamServiceProxyBase* m_streamProxy;
+    };
+}
 
 #endif /* DUMMYPLUGIN_H */
