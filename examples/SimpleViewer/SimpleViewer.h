@@ -77,7 +77,6 @@ class SampleViewer
 public:
     SampleViewer(const char* strSampleName);
     virtual ~SampleViewer();
-    
 
     virtual void init(int argc, char **argv);
     virtual void run();   //Does not return
@@ -115,7 +114,7 @@ private:
     Vector3                 m_lightVector;
     RGB888Pixel             m_lightColor;
     RGB888Pixel             m_ambientColor;
-    
+
     sensekit_streamset_t* m_sensor;
     sensekit_depthstream_t* m_depthStream;
     sensekit_depthframe_t* m_depthFrame;

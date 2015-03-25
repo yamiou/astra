@@ -10,9 +10,13 @@ static sensekit::openni::OpenNIPlugin* g_plugin;
 
 SENSEKIT_BEGIN_DECLS
 
-SENSEKIT_API_EXPORT void sensekit_plugin_initialize(PluginServiceProxyBase* proxy)
+SENSEKIT_API_EXPORT void sensekit_plugin_initialize(StreamServiceProxyBase* streamProxy,
+                                                    PluginServiceProxyBase* pluginProxy)
 {
-    g_plugin = new sensekit::openni::OpenNIPlugin(static_cast<sensekit::PluginServiceProxy*>(proxy));
+    g_plugin = new sensekit::openni::OpenNIPlugin(
+        static_cast<sensekit::StreamServiceProxy*>(streamProxy),
+        static_cast<sensekit::PluginServiceProxy*>(pluginProxy));
+
     g_plugin->initialize();
 }
 
@@ -95,9 +99,9 @@ namespace sensekit
             }
 
             sensekit_frame_t* nextBuffer = nullptr;
-            
+
             StreamPluginCallbacks pluginCallbacks(this);
-            
+
             pluginCallbacks.setParameterCallback = &OpenNIPlugin::set_parameter_thunk;
             pluginCallbacks.getParameterSizeCallback = &OpenNIPlugin::get_parameter_size_thunk;
             pluginCallbacks.getParameterDataCallback = &OpenNIPlugin::get_parameter_data_thunk;
@@ -121,7 +125,7 @@ namespace sensekit
                                    &nextBuffer);
 
             set_new_buffer(nextBuffer);
-            
+
             return SENSEKIT_STATUS_SUCCESS;
         }
 

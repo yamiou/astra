@@ -7,7 +7,12 @@
 #include "PluginService.h"
 #include "StreamSet.h"
 
+struct StreamServiceProxyBase;
+struct PluginServiceProxyBase;
+
 namespace sensekit {
+
+    class SenseKitContext;
 
     class SenseKitContext
     {
@@ -38,9 +43,11 @@ namespace sensekit {
         StreamSet m_rootSet;
 
         PluginService m_pluginService;
+        PluginServiceProxyBase* m_pluginServiceProxy;
+        StreamServiceProxyBase* m_streamServiceProxy;
         PluginBase* m_plugin;
 
-        using initialize_fn = void(*)(PluginServiceProxyBase* proxy);
+        using initialize_fn = void(*)(StreamServiceProxyBase* streamProxy, PluginServiceProxyBase* pluginProxy);
         using terminate_fn = void(*)();
         using update_fn = void(*)();
 

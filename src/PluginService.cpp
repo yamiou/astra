@@ -1,13 +1,34 @@
 ﻿#include "PluginService.h"
 #include "Stream.h"
 #include "SenseKitContext.h"
-
+#include "PluginServiceDelegate.h"
 #include <iostream>
 using std::cout;
 using std::endl;
 
 namespace sensekit
 {
+    PluginServiceProxyBase* PluginService::create_proxy()
+    {
+        PluginServiceProxyBase* base = new PluginServiceProxyBase;
+
+        base->register_stream_added_callback = &PluginServiceDelegate::register_stream_added_callback;
+        base->register_stream_removed_callback = &PluginServiceDelegate::register_stream_removed_callback;
+        base->unregister_stream_added_callback = &PluginServiceDelegate::unregister_stream_added_callback;
+        base->unregister_stream_removed_callback = &PluginServiceDelegate::unregister_stream_removed_callback;
+        base->create_stream_set = &PluginServiceDelegate::create_stream_set;
+        base->destroy_stream_set = &PluginServiceDelegate::destroy_stream_set;
+        base->create_stream = &PluginServiceDelegate::create_stream;
+        base->destroy_stream = &PluginServiceDelegate::destroy_stream;
+        base->create_stream_bin = &PluginServiceDelegate::create_stream_bin;
+        base->destroy_stream_bin = &PluginServiceDelegate::destroy_stream_bin;
+        base->cycle_bin_buffers = &PluginServiceDelegate::cycle_bin_buffers;
+
+        base->pluginService = this;
+
+        return base;
+    }
+
     sensekit_status_t PluginService::create_stream_set(sensekit_streamset_t*& streamset)
     {
         //normally would create a new streamset
@@ -25,7 +46,7 @@ namespace sensekit
         //if streamset has direct child streams, return error
         //if streamset has child streamsets, reparent them to this streamset's parent (or null parent)
         //then delete the streamset
-        
+
         streamset = nullptr;
 
         return SENSEKIT_STATUS_SUCCESS;

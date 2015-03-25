@@ -6,7 +6,7 @@
 
 SENSEKIT_BEGIN_DECLS
 
-SENSEKIT_API void sensekit_initialize();
+SENSEKIT_API sensekit_context_t* sensekit_initialize();
 
 SENSEKIT_API void sensekit_terminate();
 

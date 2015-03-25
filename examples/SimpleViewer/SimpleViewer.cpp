@@ -4,7 +4,7 @@
 #endif
 
 #include "SenseKit.h"
-#include "streams/depth.h"
+#include "SenseKitSL.h"
 #include "SimpleViewer.h"
 #include <memory.h>
 
@@ -71,7 +71,8 @@ SampleViewer::~SampleViewer()
 
 void SampleViewer::init(int argc, char **argv)
 {
-    sensekit_initialize();
+    sensekit_context_t* context = sensekit_initialize();
+    sensekitSL_initialize(context);
 
     sensekit_open_streamset("1d27/0601@20/30", &m_sensor);
     sensekit_depth_open(m_sensor, &m_depthStream);

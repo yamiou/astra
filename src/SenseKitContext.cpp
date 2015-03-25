@@ -1,10 +1,11 @@
 #include "SenseKitContext.h"
 #include <iostream>
 
-#include "plugins/PluginTypes.h"
 #include "StreamConnection.h"
 #include "StreamBin.h"
-#include "PluginServiceDelegate.h"
+#include "StreamServiceDelegate.h"
+#include "StreamServiceProxyBase.h"
+#include "PluginServiceProxyBase.h"
 #include "shared_library.h"
 
 using std::cout;
@@ -12,38 +13,31 @@ using std::endl;
 
 namespace sensekit {
 
-    PluginServiceProxy* create_proxy(SenseKitContext* context, PluginService* service)
+
+    StreamServiceProxyBase* create_stream_proxy(SenseKitContext* context)
     {
-        PluginServiceProxy* proxy = new PluginServiceProxy();
-        PluginServiceProxyBase* base = static_cast<PluginServiceProxyBase*>(proxy);
+        StreamServiceProxyBase* proxy = new StreamServiceProxyBase;
 
-        base->register_stream_added_callback = &PluginServiceDelegate::register_stream_added_callback;
-        base->register_stream_removed_callback = &PluginServiceDelegate::register_stream_removed_callback;
-        base->unregister_stream_added_callback = &PluginServiceDelegate::unregister_stream_added_callback;
-        base->unregister_stream_removed_callback = &PluginServiceDelegate::unregister_stream_removed_callback;
-        base->create_stream_set = &PluginServiceDelegate::create_stream_set;
-        base->destroy_stream_set = &PluginServiceDelegate::destroy_stream_set;
-        base->create_stream = &PluginServiceDelegate::create_stream;
-        base->destroy_stream = &PluginServiceDelegate::destroy_stream;
-        base->create_stream_bin = &PluginServiceDelegate::create_stream_bin;
-        base->destroy_stream_bin = &PluginServiceDelegate::destroy_stream_bin;
-        base->cycle_bin_buffers = &PluginServiceDelegate::cycle_bin_buffers;
-        base->open_streamset = &PluginServiceDelegate::open_streamset;
-        base->close_streamset = &PluginServiceDelegate::close_streamset;
-        base->open_stream = &PluginServiceDelegate::open_stream;
-        base->close_stream = &PluginServiceDelegate::close_stream;
-        base->open_frame = &PluginServiceDelegate::open_frame;
-        base->close_frame = &PluginServiceDelegate::close_frame;
-
-        base->pluginService = service;
-        base->streamService = context;
+        proxy->open_streamset = &StreamServiceDelegate::open_streamset;
+        proxy->close_streamset = &StreamServiceDelegate::close_streamset;
+        proxy->open_stream = &StreamServiceDelegate::open_stream;
+        proxy->close_stream = &StreamServiceDelegate::close_stream;
+        proxy->open_frame = &StreamServiceDelegate::open_frame;
+        proxy->close_frame = &StreamServiceDelegate::close_frame;
+        proxy->set_parameter = &StreamServiceDelegate::set_parameter;
+        proxy->get_parameter_data = &StreamServiceDelegate::get_parameter_data;
+        proxy->get_parameter_size = &StreamServiceDelegate::get_parameter_size;
+        proxy->temp_update = &StreamServiceDelegate::temp_update;
+        proxy->streamService = context;
 
         return proxy;
     }
 
-
-sensekit_status_t SenseKitContext::initialize()
+    sensekit_status_t SenseKitContext::initialize()
     {
+        m_pluginServiceProxy = m_pluginService.create_proxy();
+        m_streamServiceProxy = create_stream_proxy(this);
+
         //TODO: OMG ERROR HANDLING
         LibHandle libHandle = nullptr;
 
@@ -52,14 +46,14 @@ sensekit_status_t SenseKitContext::initialize()
 #else
         const char* libName = "libOpenNIPlugin.dylib";
 #endif
-        
+
         os_load_library(libName, libHandle);
 
         os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_initialize), (FarProc&)m_plugin_initialize);
         os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_terminate), (FarProc&)m_plugin_terminate);
         os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_update), (FarProc&)m_plugin_update);
 
-        m_plugin_initialize(create_proxy(this, &m_pluginService));
+        m_plugin_initialize(m_streamServiceProxy, m_pluginServiceProxy);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -70,6 +64,12 @@ sensekit_status_t SenseKitContext::initialize()
         {
             m_plugin_terminate();
         }
+
+        if (m_pluginServiceProxy)
+            delete m_pluginServiceProxy;
+
+        if (m_streamServiceProxy)
+            delete m_streamServiceProxy;
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -89,7 +89,7 @@ sensekit_status_t SenseKitContext::initialize()
     }
 
     sensekit_status_t SenseKitContext::open_stream(sensekit_streamset_t* streamset, sensekit_stream_type_t type,
-                                                    sensekit_stream_subtype_t subtype, sensekit_streamconnection_t*& streamConnection)
+                                                   sensekit_stream_subtype_t subtype, sensekit_streamconnection_t*& streamConnection)
     {
         StreamConnection* skStreamConnection = get_rootSet().open_stream_connection(static_cast<StreamType>(type), static_cast<StreamSubtype>(subtype));
 

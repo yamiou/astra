@@ -15,12 +15,13 @@ typedef struct _sensekit_stream sensekit_stream_t;
 typedef unsigned sensekit_stream_type_t;
 typedef unsigned sensekit_stream_subtype_t;
 
-using StreamType = sensekit_stream_type_t;
-using StreamSubtype = sensekit_stream_subtype_t;
-using StreamHandle = sensekit_stream_t;
+typedef sensekit_stream_type_t StreamType;
+typedef sensekit_stream_subtype_t StreamSubtype;
+typedef sensekit_stream_t StreamHandle;
 
-using StreamSetHandle = sensekit_streamset_t;
+typedef sensekit_streamset_t StreamSetHandle;
 
+typedef struct _sensekit_context sensekit_context_t;
 
 typedef enum _sensekit_status {
     SENSEKIT_STATUS_SUCCESS = 0,

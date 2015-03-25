@@ -7,8 +7,9 @@
 
 namespace sensekit {
 
-class PluginServiceDelegate {
-public:
+    class PluginServiceDelegate {
+
+    public:
         static sensekit_status_t register_stream_added_callback(void* service, StreamAddedCallback callback, CallbackId* callbackId)
             {
                 return static_cast<PluginService*>(service)->register_stream_added_callback(callback, *callbackId);
@@ -42,7 +43,7 @@ public:
                 return static_cast<PluginService*>(service)->destroy_stream(*handle);
             }
         static sensekit_status_t create_stream_bin(void* service, StreamHandle* handle, size_t lengthInBytes,
-                                           /*out*/ StreamBinId* id, /*out*/ sensekit_frame_t** binBuffer)
+                                                   /*out*/ StreamBinId* id, /*out*/ sensekit_frame_t** binBuffer)
             {
                 return static_cast<PluginService*>(service)->create_stream_bin(handle, lengthInBytes, *id, *binBuffer);
             }
@@ -53,31 +54,6 @@ public:
         static sensekit_status_t cycle_bin_buffers(void* service, StreamHandle* handle, StreamBinId id, sensekit_frame_t** binBuffer)
             {
                 return static_cast<PluginService*>(service)->cycle_bin_buffers(handle, id, *binBuffer);
-            }
-
-        static sensekit_status_t open_streamset(void* service, const char* uri, sensekit_streamset_t** streamset)
-            {
-                return static_cast<SenseKitContext*>(service)->open_streamset(uri, *streamset);
-            }
-        static sensekit_status_t close_streamset(void* service, sensekit_streamset_t** streamset)
-            {
-                return static_cast<SenseKitContext*>(service)->close_streamset(*streamset);
-            }
-        static sensekit_status_t open_stream(void* service, sensekit_streamset_t* streamset, sensekit_stream_type_t type, sensekit_stream_subtype_t subtype, sensekit_streamconnection_t** stream_connection)
-            {
-                return static_cast<SenseKitContext*>(service)->open_stream(streamset, type, subtype, *stream_connection);
-            }
-        static sensekit_status_t close_stream(void* service, sensekit_streamconnection_t** stream_connection)
-            {
-                return static_cast<SenseKitContext*>(service)->close_stream(*stream_connection);
-            }
-        static sensekit_status_t open_frame(void* service, sensekit_streamconnection_t* stream_connection, int timeout, sensekit_frame_ref_t** frameRef)
-            {
-                return static_cast<SenseKitContext*>(service)->open_frame(stream_connection, timeout, *frameRef);
-            }
-        static sensekit_status_t close_frame(void* service, sensekit_frame_ref_t** frameRef)
-            {
-                return static_cast<SenseKitContext*>(service)->close_frame(*frameRef);
             }
     };
 }

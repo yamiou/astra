@@ -23,6 +23,11 @@ set(SenseKit_SOURCES
   shared_library_windows.cpp
   )
 
+set (SenseKitAL_SOURCES
+  SenseKitAL.h
+  SenseKitAL.cpp
+  )
+
 set (SenseKitSL_SOURCES
   ../include/SenseKitSL.h
   ../include/streams/depth.h
@@ -31,6 +36,7 @@ set (SenseKitSL_SOURCES
   ../include/streams/color_types.h
   depthstream_capi.cpp
   colorstream_capi.cpp
+  SenseKitSL.cpp
   )
 
 set (OpenNIPlugin_SOURCES
@@ -44,6 +50,7 @@ set (OpenNIPlugin_SOURCES
 add_definitions(-DSENSEKIT_EXPORT)
 
 add_library(SenseKit SHARED ${SenseKit_SOURCES})
+add_library(SenseKitAL STATIC ${SenseKitAL_SOURCES})
 add_library(SenseKitSL SHARED ${SenseKitSL_SOURCES})
 add_library(OpenNIPlugin SHARED ${OpenNIPlugin_SOURCES})
 
@@ -51,8 +58,7 @@ add_library(OpenNIPlugin SHARED ${OpenNIPlugin_SOURCES})
 #set_property(TARGET SenseKit PROPERTY CXX_STANDARD 11)
 #set_property(TARGET SenseKit PROPERTY CXX_STANDARD_REQUIRED ON)
 
-#target_link_libraries(SenseKit ${OpenNI2_LIBRARY})
-target_link_libraries(SenseKitSL SenseKit ${OpenNI2_LIBRARY})
+target_link_libraries(SenseKitSL SenseKitAL)
 target_link_libraries(OpenNIPlugin ${OpenNI2_LIBRARY})
 
 add_subdirectory(tests)
