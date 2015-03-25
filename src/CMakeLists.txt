@@ -10,18 +10,16 @@ set(SenseKit_SOURCES
   SenseKit.cpp
   Stream.h
   Stream.cpp
-  plugins/PluginBase.cpp
-  plugins/PluginBase.h
   PluginService.cpp
   PluginService.h
-  plugins/OpenNIPlugin.cpp
-  plugins/OpenNIPlugin.h
   StreamSet.cpp
   StreamSet.h
   StreamConnection.h
   StreamConnection.cpp
   StreamBin.h
   StreamBin.cpp
+  shared_library.h
+  shared_library.cpp
   )
 
 set (SenseKitSL_SOURCES
@@ -34,25 +32,27 @@ set (SenseKitSL_SOURCES
   colorstream_capi.cpp
   )
 
+set (OpenNIPlugin_SOURCES
+    plugins/PluginTypes.h
+    plugins/PluginBase.cpp
+    plugins/PluginBase.h
+    plugins/OpenNIPlugin.cpp
+    plugins/OpenNIPlugin.h
+)
+
 add_definitions(-DSENSEKIT_EXPORT)
 
 add_library(SenseKit SHARED ${SenseKit_SOURCES})
 add_library(SenseKitSL SHARED ${SenseKitSL_SOURCES})
+add_library(OpenNIPlugin SHARED ${OpenNIPlugin_SOURCES})
 
 # force c++11 (has no effect currently)
 #set_property(TARGET SenseKit PROPERTY CXX_STANDARD 11)
 #set_property(TARGET SenseKit PROPERTY CXX_STANDARD_REQUIRED ON)
 
-target_link_libraries(SenseKit ${OpenNI2_LIBRARY})
-target_link_libraries(SenseKitSL SenseKit)
-
-install(TARGETS SenseKit
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
-
-install(TARGETS SenseKitSL
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+#target_link_libraries(SenseKit ${OpenNI2_LIBRARY})
+target_link_libraries(SenseKitSL SenseKit ${OpenNI2_LIBRARY})
+target_link_libraries(OpenNIPlugin ${OpenNI2_LIBRARY})
 
 add_subdirectory(tests)
 

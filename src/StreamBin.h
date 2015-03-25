@@ -8,8 +8,6 @@
 
 namespace sensekit {
 
-    using StreamBinId = bin_id_t;
-
     class StreamBin
     {
     public:

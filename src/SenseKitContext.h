@@ -39,6 +39,16 @@ namespace sensekit {
 
         PluginService m_pluginService;
         PluginBase* m_plugin;
+
+        using initialize_fn = void(*)(PluginServiceProxyBase* proxy);
+        using terminate_fn = void(*)();
+        using update_fn = void(*)();
+
+        initialize_fn m_initialize{nullptr};
+        terminate_fn m_terminate{nullptr};
+        update_fn m_update{nullptr};
+
+
     };
 
     class PluginContext : public SenseKitContext

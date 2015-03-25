@@ -1,9 +1,33 @@
 ﻿#include "OpenNIPlugin.h"
+#include "PluginBase.h"
 #include <iostream>
 #include <sensekit_known_streams.h>
 
 using std::cout;
 using std::endl;
+
+static sensekit::openni::OpenNIPlugin* g_plugin;
+
+SENSEKIT_BEGIN_DECLS
+
+void initialize(PluginServiceProxyBase* proxy)
+{
+    g_plugin = new sensekit::openni::OpenNIPlugin(static_cast<sensekit::PluginServiceProxy*>(proxy));
+    g_plugin->initialize();
+}
+
+void update()
+{
+    g_plugin->temp_update();
+}
+
+void terminate()
+{
+    g_plugin->cleanup();
+    delete g_plugin;
+}
+
+SENSEKIT_END_DECLS
 
 namespace sensekit
 {
@@ -91,8 +115,8 @@ namespace sensekit
             get_pluginService()
                 .create_stream_bin(m_handle,
                                    sizeof(sensekit_depthframe_t) + m_bufferLength,
-                                   m_id,
-                                   nextBuffer);
+                                   &m_id,
+                                   &nextBuffer);
 
             set_new_buffer(nextBuffer);
             
@@ -169,7 +193,7 @@ namespace sensekit
                 && read_next_depth_frame(m_currentFrame) == SENSEKIT_STATUS_SUCCESS)
             {
                 sensekit_frame_t* nextBuffer = nullptr;
-                get_pluginService().cycle_bin_buffers(m_handle, m_id, nextBuffer);
+                get_pluginService().cycle_bin_buffers(m_handle, m_id, &nextBuffer);
                 set_new_buffer(nextBuffer);
             }
         }

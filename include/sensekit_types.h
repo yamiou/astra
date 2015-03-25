@@ -11,7 +11,6 @@ typedef struct _sensekit_streamconnection sensekit_streamconnection_t;
 typedef struct _sensekit_parameter_data sensekit_parameter_data_t;
 typedef int32_t sensekit_parameter_id;
 
-
 typedef struct _sensekit_stream sensekit_stream_t;
 typedef unsigned sensekit_stream_type_t;
 typedef unsigned sensekit_stream_subtype_t;

@@ -8,8 +8,6 @@ namespace sensekit {
     class StreamBin;
     class Stream;
 
-    using StreamHandle = void*;
-
     class StreamConnection
     {
     public:
@@ -25,13 +23,13 @@ namespace sensekit {
 
         StreamBin* get_bin() { return m_bin; }
 
-        StreamHandle get_handle() { return m_handle; }
+        StreamHandle* get_handle() { return m_handle; }
 
         Stream* get_stream() { return m_stream; }
     private:
         Stream* m_stream;
         StreamBin* m_bin{nullptr};
-        StreamHandle m_handle{0};
+        StreamHandle* m_handle{nullptr};
     };
 }
 

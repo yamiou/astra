@@ -12,9 +12,10 @@ namespace sensekit
         class OpenNIPlugin : public sensekit::PluginBase
         {
         public:
-            OpenNIPlugin(SenseKitContext& context, PluginService& service)
-                : sensekit::PluginBase(context, service) {}
+            OpenNIPlugin(PluginServiceProxy* service)
+                : sensekit::PluginBase(service) {}
 
+            virtual ~OpenNIPlugin() = default;
             virtual void temp_update() override;
 
             // disable copying

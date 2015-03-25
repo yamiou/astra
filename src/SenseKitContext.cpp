@@ -1,31 +1,66 @@
 #include "SenseKitContext.h"
 #include <iostream>
 
-#include "plugins/OpenNIPlugin.h"
+#include "plugins/PluginTypes.h"
 #include "StreamConnection.h"
 #include "StreamBin.h"
+#include "PluginServiceDelegate.h"
+#include "shared_library.h"
 
 using std::cout;
 using std::endl;
 
 namespace sensekit {
 
-    sensekit_status_t SenseKitContext::initialize()
+    PluginServiceProxy* create_proxy(SenseKitContext* context, PluginService* service)
     {
-        //later this would involve dlopen and fptables and other stuff
-        m_plugin = new sensekit::openni::OpenNIPlugin(*this, m_pluginService);
-        m_plugin->initialize();
+        PluginServiceProxy* proxy = new PluginServiceProxy();
+        PluginServiceProxyBase* base = static_cast<PluginServiceProxyBase*>(proxy);
+
+        base->register_stream_added_callback = &PluginServiceDelegate::register_stream_added_callback;
+        base->register_stream_removed_callback = &PluginServiceDelegate::register_stream_removed_callback;
+        base->unregister_stream_added_callback = &PluginServiceDelegate::unregister_stream_added_callback;
+        base->unregister_stream_removed_callback = &PluginServiceDelegate::unregister_stream_removed_callback;
+        base->create_stream = &PluginServiceDelegate::create_stream;
+        base->destroy_stream = &PluginServiceDelegate::destroy_stream;
+        base->create_stream_bin = &PluginServiceDelegate::create_stream_bin;
+        base->destroy_stream_bin = &PluginServiceDelegate::destroy_stream_bin;
+        base->cycle_bin_buffers = &PluginServiceDelegate::cycle_bin_buffers;
+        base->open_streamset = &PluginServiceDelegate::open_streamset;
+        base->close_streamset = &PluginServiceDelegate::close_streamset;
+        base->open_stream = &PluginServiceDelegate::open_stream;
+        base->close_stream = &PluginServiceDelegate::close_stream;
+        base->open_frame = &PluginServiceDelegate::open_frame;
+        base->close_frame = &PluginServiceDelegate::close_frame;
+
+        base->pluginService = service;
+        base->streamService = context;
+
+        return proxy;
+    }
+
+
+sensekit_status_t SenseKitContext::initialize()
+    {
+        //TODO: OMG ERROR HANDLING
+        LibHandle libHandle = nullptr;
+
+        os_load_library("libOpenNIPlugin.dylib", libHandle);
+
+        os_get_proc_address(libHandle, SK_STRINGIFY(initialize), (FarProc&)m_initialize);
+        os_get_proc_address(libHandle, SK_STRINGIFY(terminate), (FarProc&)m_terminate);
+        os_get_proc_address(libHandle, SK_STRINGIFY(update), (FarProc&)m_update);
+
+        m_initialize(create_proxy(this, &m_pluginService));
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
     sensekit_status_t SenseKitContext::terminate()
     {
-        if (m_plugin != nullptr)
+        if (m_terminate != nullptr)
         {
-            m_plugin->cleanup();
-            delete m_plugin;
-            m_plugin = nullptr;
+            m_terminate();
         }
 
         return SENSEKIT_STATUS_SUCCESS;
@@ -121,7 +156,9 @@ namespace sensekit {
 
     sensekit_status_t SenseKitContext::temp_update()
     {
-        m_plugin->temp_update();
+        if (m_update)
+            m_update();
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 

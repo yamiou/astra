@@ -4,16 +4,19 @@
 #include "Stream.h"
 #include "StreamBin.h"
 #include "sensekit_types.h"
+//typedef void(*StreamAddedCallback)(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType typeId, StreamSubtype subtype);
+//typedef void(*StreamRemovingCallback)(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType typeId, StreamSubtype subtype);
+//typedef size_t CallbackId;
+using StreamAddedCallback = void(*)(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType typeId, StreamSubtype subtype);
+using StreamRemovingCallback = void(*)(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType typeId, StreamSubtype subtype);
+using CallbackId = size_t;
 
 namespace sensekit
 {
     class SenseKitContext;
     class StreamSet;
 
-    using StreamAddedCallback = void(*)(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType typeId, StreamSubtype subtype);
-    using StreamRemovingCallback = void(*)(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType typeId, StreamSubtype subtype);
-    using CallbackId = size_t;
-
+    
     class PluginService
     {
     public:
