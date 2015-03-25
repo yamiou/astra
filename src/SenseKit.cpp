@@ -7,7 +7,7 @@ SENSEKIT_BEGIN_DECLS
 SENSEKIT_API sensekit_context_t* sensekit_initialize()
 {
     g_Context.initialize();
-    return reinterpret_cast<sensekit_context_t*>(sensekit::create_stream_proxy(&g_Context));
+    return reinterpret_cast<sensekit_context_t*>(g_Context.get_streamServiceProxy());
 }
 
 SENSEKIT_API void sensekit_terminate()

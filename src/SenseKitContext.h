@@ -38,6 +38,8 @@ namespace sensekit {
         sensekit_status_t set_parameter(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id parameterId, size_t byteLength, sensekit_parameter_data_t* data);
         sensekit_status_t get_parameter_size(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id parameterId, /*out*/size_t& byteLength);
         sensekit_status_t get_parameter_data(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id parameterId, size_t byteLength, sensekit_parameter_data_t* data);
+
+        StreamServiceProxyBase* get_streamServiceProxy() { return m_streamServiceProxy; }
     private:
 
         StreamSet m_rootSet;
