@@ -40,8 +40,6 @@ set (SenseKitSL_SOURCES
   )
 
 set (OpenNIPlugin_SOURCES
-    plugins/PluginTypes.h
-    plugins/PluginBase.cpp
     plugins/PluginBase.h
     plugins/OpenNIPlugin.cpp
     plugins/OpenNIPlugin.h
