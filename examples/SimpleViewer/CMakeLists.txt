@@ -35,5 +35,8 @@ if (WIN32)
 				$<TARGET_FILE_DIR:SimpleViewer>
 			COMMAND ${CMAKE_COMMAND} -E copy_if_different  
 				"$<TARGET_FILE_DIR:SenseKitSL>/SenseKitSL.dll"  
+				$<TARGET_FILE_DIR:SimpleViewer>
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different  
+				"$<TARGET_FILE_DIR:OpenNIPlugin>/OpenNIPlugin.dll"  
 				$<TARGET_FILE_DIR:SimpleViewer>)
 endif()
