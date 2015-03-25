@@ -1,5 +1,4 @@
 #include "SenseKitContext.h"
-#include "SenseKit-private.h"
 #include <iostream>
 
 #include "plugins/OpenNIPlugin.h"
@@ -46,17 +45,21 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::open_stream(sensekit_streamset_t* streamset, sensekit_streamconnection_t*& streamConnection)
+    sensekit_status_t SenseKitContext::open_stream(sensekit_streamset_t* streamset, sensekit_stream_type_t type,
+                                                    sensekit_stream_subtype_t subtype, sensekit_streamconnection_t*& streamConnection)
     {
-        //trollolol nothing to do for now
-        //would find the depth plugin for the context(streamset) and call client added event, and
-        //then the plugin would create a bin if necessary and assign the client to the bin
-        Stream* str = m_rootSet.get_stream_by_id(0);
-        StreamConnection* skStreamConnection = str->open();
+        StreamConnection* skStreamConnection = get_rootSet().open_stream_connection(static_cast<StreamType>(type), static_cast<StreamSubtype>(subtype));
 
-        streamConnection = reinterpret_cast<sensekit_streamconnection_t*>(skStreamConnection);
-
-        return SENSEKIT_STATUS_SUCCESS;
+        if (skStreamConnection == nullptr)
+        {
+            streamConnection = nullptr;
+            return SENSEKIT_STATUS_INVALID_PARAMETER;
+        }
+        else
+        {
+            streamConnection = reinterpret_cast<sensekit_streamconnection_t*>(skStreamConnection);
+            return SENSEKIT_STATUS_SUCCESS;
+        }
     }
 
     sensekit_status_t SenseKitContext::close_stream(sensekit_streamconnection_t*& streamConnection)

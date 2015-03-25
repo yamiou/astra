@@ -1,5 +1,6 @@
 ﻿#include "OpenNIPlugin.h"
 #include <iostream>
+#include <sensekit_known_streams.h>
 
 using std::cout;
 using std::endl;
@@ -32,7 +33,7 @@ namespace sensekit
 
         void OpenNIPlugin::on_cleanup()
         {
-            get_pluginService().unregister_stream(m_handle);
+            get_pluginService().destroy_stream(m_handle);
 
             close_depth_stream();
 
@@ -77,7 +78,7 @@ namespace sensekit
             pluginCallbacks.getParameterSizeCallback = &OpenNIPlugin::get_parameter_size_thunk;
             pluginCallbacks.getParameterDataCallback = &OpenNIPlugin::get_parameter_data_thunk;
 
-            get_pluginService().register_stream(/*bogus*/0, /*bogus*/0, pluginCallbacks, m_handle);
+            get_pluginService().create_stream(/*bogus*/nullptr, DEPTH_TYPE, DEPTH_DEFAULT_SUBTYPE, pluginCallbacks, m_handle);
 
             const ::openni::VideoMode& mode = m_depthStream.getVideoMode();
 

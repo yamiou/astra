@@ -2,9 +2,9 @@
 #define STREAMBIN_H
 
 #include <exception>
-#include <SenseKit.h>
 #include <array>
 #include <atomic>
+#include <sensekit_plugin_types.h>
 
 namespace sensekit {
 

@@ -1,13 +1,14 @@
 #include <SenseKit.h>
 #include <streams/color_types.h>
 #include <math.h>
+#include <sensekit_known_streams.h>
 
 SENSEKIT_BEGIN_DECLS
 
 SENSEKIT_API sensekit_status_t sensekit_color_open(sensekit_streamset_t* streamset, /*out*/sensekit_colorstream_t** stream)
 {
     sensekit_streamconnection_t* stream_connection;
-    sensekit_stream_open(streamset, &stream_connection);
+    sensekit_stream_open(streamset, COLOR_TYPE, ANY_SUBTYPE, &stream_connection);
 
     *stream = (sensekit_colorstream_t*)stream_connection;
     return SENSEKIT_STATUS_SUCCESS;

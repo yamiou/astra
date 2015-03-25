@@ -1,6 +1,7 @@
 #include <SenseKit.h>
 #include <streams/depth_types.h>
 #include <math.h>
+#include <sensekit_known_streams.h>
 
 static WorldConversionCache g_convertCache;
 
@@ -50,7 +51,7 @@ SENSEKIT_API sensekit_status_t sensekit_depth_open(sensekit_streamset_t* streams
     refresh_conversion_cache();
 
     sensekit_streamconnection_t* stream_connection;
-    sensekit_stream_open(streamset, &stream_connection);
+    sensekit_stream_open(streamset, DEPTH_TYPE, ANY_SUBTYPE, &stream_connection);
 
     *stream = (sensekit_depthstream_t*)stream_connection;
     return SENSEKIT_STATUS_SUCCESS;

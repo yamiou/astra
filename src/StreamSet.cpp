@@ -1,53 +1,80 @@
 ﻿#include "StreamSet.h"
+#include <sensekit_known_streams.h>
 
 namespace sensekit {
-    StreamSet::StreamSet(StreamSetId id)
-        : m_id(id)
+    StreamSet::StreamSet()
     {}
 
-    StreamSet::StreamListPtr StreamSet::find_streams(StreamTypeId typeId)
+    StreamConnection* StreamSet::open_stream_connection(StreamType type, StreamSubtype subtype)
     {
-        StreamSet::StreamListPtr streams(new std::vector<Stream*>());
+        Stream* sk_stream = find_stream_by_type_subtype_impl(type, subtype);
 
-        auto pred = [typeId] (const StreamMap::value_type& el) -> bool
-            {
-                return el.second->get_typeId() == typeId;
-            };
-
-        for(auto& el : m_streamMap)
+        if (sk_stream == nullptr)
         {
-            if (pred(el))
-                streams->push_back(el.second);
+            return nullptr;
         }
 
-        return streams;
+        return sk_stream->open();
     }
 
-    void StreamSet::add_stream(Stream* stream)
+    bool StreamSet::has_stream_of_type_subtype(StreamType type, StreamSubtype subtype)
     {
-        if (!stream || is_member(stream))
-            return;
-
-        m_streamMap.insert(std::make_pair(stream->get_id(), stream));
+        return find_stream_by_type_subtype(type, subtype) != nullptr;
     }
 
-    bool StreamSet::remove_stream(Stream* stream)
+    void StreamSet::get_stream_type_subtype(StreamHandle* stream, /*out*/StreamType& type, /*out*/StreamSubtype& subtype)
     {
-        if (!stream)
-            return false;
+        Stream* sk_stream = reinterpret_cast<Stream*>(stream);
 
-        return m_streamMap.erase(stream->get_id()) > 0;
+        type = sk_stream->get_type();
+        subtype = sk_stream->get_subtype();
     }
 
-    bool StreamSet::is_member(Stream* stream)
+    StreamHandle* StreamSet::create_stream(StreamType type, StreamSubtype subtype, StreamPluginCallbacks pluginCallbacks)
     {
-        return m_streamMap.find(stream->get_id()) != m_streamMap.end();
+        Stream* sk_stream = new Stream(type, subtype, pluginCallbacks);
+
+        m_streamCollection.insert(sk_stream);
+
+        StreamHandle* stream = reinterpret_cast<StreamHandle*>(sk_stream);
+        return stream;
     }
 
-    Stream* StreamSet::get_stream_by_id(StreamId id)
+    void StreamSet::destroy_stream(StreamHandle* stream)
     {
-        auto it = m_streamMap.find(id);
+        //TODO: check for nullptr
+        Stream* sk_stream = reinterpret_cast<Stream*>(stream);
 
-        return it != m_streamMap.end() ? it->second : nullptr;
+        m_streamCollection.erase(m_streamCollection.find(sk_stream));
+    }
+
+    bool StreamSet::is_member(StreamHandle* stream)
+    {
+        //TODO: check for nullptr
+        Stream* sk_stream = reinterpret_cast<Stream*>(stream);
+
+        return m_streamCollection.find(sk_stream) != m_streamCollection.end();
+    }
+
+    StreamHandle* StreamSet::find_stream_by_type_subtype(StreamType type, StreamSubtype subtype)
+    {
+        Stream* sk_stream = find_stream_by_type_subtype_impl(type, subtype);
+
+        StreamHandle* stream = reinterpret_cast<StreamHandle*>(sk_stream);
+        return stream;
+    }
+
+    Stream* StreamSet::find_stream_by_type_subtype_impl(StreamType type, StreamSubtype subtype)
+    {
+        for (auto it = m_streamCollection.begin(); it != m_streamCollection.end(); ++it)
+        {
+            Stream* sk_stream = *it;
+            if (sk_stream->get_type() == type && (subtype == ANY_SUBTYPE || sk_stream->get_subtype() == subtype))
+            {
+                return sk_stream;
+            }
+        }
+
+        return nullptr;
     }
 }

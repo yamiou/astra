@@ -2,7 +2,9 @@ set(SenseKit_SOURCES
   ../include/SenseKit.h
   ../include/sensekit_core.h
   ../include/sensekit_types.h
+  ../include/sensekit_plugin_types.h
   ../include/sensekit_capi.h
+  ../include/sensekit_known_streams.h
   SenseKitContext.h
   SenseKitContext.cpp
   SenseKit.cpp
@@ -14,7 +16,6 @@ set(SenseKit_SOURCES
   PluginService.h
   plugins/OpenNIPlugin.cpp
   plugins/OpenNIPlugin.h
-  StreamSetFactory.h
   StreamSet.cpp
   StreamSet.h
   StreamConnection.h

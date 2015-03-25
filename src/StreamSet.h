@@ -2,49 +2,41 @@
 #define STREAMSET_H
 
 #include "Stream.h"
-#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 #include <memory>
 
 namespace sensekit {
-
-    template<typename T>
-    class StreamIdHash;
-
-    template<>
-    class StreamIdHash<StreamId>
-    {
-    public:
-        size_t operator()(StreamId const& id) const
-            {
-                return std::hash<unsigned>()(id);
-            }
-    };
-
-    using StreamSetId = unsigned;
 
     class StreamSet
     {
     public:
         using StreamListPtr = std::unique_ptr<std::vector<Stream*> >;
 
-        StreamSet(StreamSetId id);
+        StreamSet();
 
-        StreamListPtr find_streams(StreamTypeId typeId);
+        StreamConnection* open_stream_connection(StreamType type, StreamSubtype subtype);
 
-        void add_stream(Stream* stream);
-        bool remove_stream(Stream* stream);
-        Stream* get_stream_by_id(StreamId id);
+        bool has_stream_of_type_subtype(StreamType type, StreamSubtype subtype);
 
-        bool is_member(Stream* stream);
+        void get_stream_type_subtype(StreamHandle* stream, /*out*/StreamType& type, /*out*/StreamSubtype& subtype);
 
-        StreamSetId get_id() { return m_id; }
+        //plugins only below
+
+        StreamHandle* create_stream(StreamType type, StreamSubtype subtype, StreamPluginCallbacks pluginCallbacks);
+        void destroy_stream(StreamHandle* stream);
+
+        bool is_member(StreamHandle* stream);
+
+        StreamHandle* find_stream_by_type_subtype(StreamType type, StreamSubtype subtype);
 
     private:
-        using StreamMap = std::unordered_map<StreamId, Stream*, StreamIdHash<StreamId> >;
 
-        const StreamSetId m_id;
-        StreamMap m_streamMap;
+        Stream* find_stream_by_type_subtype_impl(StreamType type, StreamSubtype subtype);
+
+        using StreamCollection = std::unordered_set<Stream*>;
+
+        StreamCollection m_streamCollection;
     };
 
 }

@@ -9,7 +9,7 @@ typedef struct _sensekit_colorframe {
     uint32_t width;
     uint32_t height;
     uint8_t bpp;
-    int8_t* data;
+    uint8_t* data;
 } sensekit_colorframe_t;
 
 // https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
