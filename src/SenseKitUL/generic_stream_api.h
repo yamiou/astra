@@ -18,7 +18,8 @@ sensekit_status_t sensekit_generic_stream_open(sensekit_streamset_t* streamset, 
 template<typename TStreamType>
 sensekit_status_t sensekit_generic_stream_closes(TStreamType** stream)
 {
-    sensekit_streamconnection_t* sk_stream_connection = (sensekit_streamconnection_t*)(*stream);
+    sensekit_streamconnection_t* sk_stream_connection =
+        reinterpret_cast<sensekit_streamconnection_t*>(*stream);
 
     sensekit_stream_close(&sk_stream_connection);
 
@@ -30,7 +31,7 @@ template<typename TFrameWrapperType, typename TStreamType, typename TFrameType>
 sensekit_status_t sensekit_generic_frame_open(TStreamType* stream, int timeout, TFrameType** frame)
 {
     sensekit_frame_ref_t* frameRef;
-    sensekit_streamconnection_t* sk_stream_connection = (sensekit_streamconnection_t*)(stream);
+    sensekit_streamconnection_t* sk_stream_connection = reinterpret_cast<sensekit_streamconnection_t*>(stream);
 
     sensekit_stream_frame_open(sk_stream_connection, timeout, &frameRef);
 
