@@ -16,15 +16,15 @@ set(include_PATHS
   ${PROJECT_SOURCE_DIR}/include
   ${PROJECT_SOURCE_DIR}/include/SenseKit
   ${PROJECT_SOURCE_DIR}/include/SenseKitUL
-  ${PROJECT_SOURCE_DIR}/include/SenseKitBridge
+  ${PROJECT_SOURCE_DIR}/include/SenseKitAPI
   $ENV{OPENNI2_INCLUDE}
   )
 include_directories ("${include_PATHS}")
 
 if (WIN32)
-	find_library(OpenNI2_LIBRARY NAMES "OpenNI2.lib" HINTS "$ENV{OPENNI2_LIB}" PATH_SUFFIXES lib)	
+  find_library(OpenNI2_LIBRARY NAMES "OpenNI2.lib" HINTS "$ENV{OPENNI2_LIB}" PATH_SUFFIXES lib)
 elseif (APPLE)
-	find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.dylib" HINTS "$ENV{OPENNI2_REDIST}" PATH_SUFFIXES lib)
+  find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.dylib" HINTS "$ENV{OPENNI2_REDIST}" PATH_SUFFIXES lib)
 endif()
 
 add_subdirectory(src)

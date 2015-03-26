@@ -2,7 +2,7 @@
 #define DUMMYPLUGIN_H
 
 #include "PluginBase.h"
-#include <SenseKitSL.h>
+#include <SenseKitUL.h>
 
 #include <iostream>
 using std::cout;

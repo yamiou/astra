@@ -3,8 +3,8 @@
 #define _CRT_SECURE_NO_DEPRECATE 1
 #endif
 
-#include "SenseKit.h"
-#include "SenseKitSL.h"
+#include <SenseKit.h>
+#include <SenseKitUL.h>
 #include "SimpleViewer.h"
 #include <memory.h>
 
@@ -72,7 +72,7 @@ SampleViewer::~SampleViewer()
 void SampleViewer::init(int argc, char **argv)
 {
     sensekit_context_t* context = sensekit_initialize();
-    sensekitSL_initialize(context);
+    sensekit_ul_initialize(context);
 
     sensekit_open_streamset("1d27/0601@20/30", &m_sensor);
     sensekit_depth_open(m_sensor, &m_depthStream);

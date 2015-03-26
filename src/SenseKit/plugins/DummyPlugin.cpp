@@ -7,7 +7,7 @@ SENSEKIT_BEGIN_DECLS
 SENSEKIT_API_EXPORT void sensekit_plugin_initialize(StreamServiceProxyBase* streamProxy,
                                                     PluginServiceProxyBase* pluginProxy)
 {
-    sensekitSL_initialize(reinterpret_cast<sensekit_context_t*>(streamProxy));
+    sensekit_ul_initialize(reinterpret_cast<sensekit_context_t*>(streamProxy));
     g_plugin = new sensekit::DummyPlugin(
         static_cast<sensekit::StreamServiceProxy*>(streamProxy),
         static_cast<sensekit::PluginServiceProxy*>(pluginProxy));

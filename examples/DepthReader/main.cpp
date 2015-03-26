@@ -1,7 +1,7 @@
 ﻿// Orbbec (c) 2015
 
 #include <SenseKit.h>
-#include <SenseKitSL.h>
+#include <SenseKitUL.h>
 #include <cstdio>
 #include <iostream>
 
@@ -65,7 +65,7 @@ int main(int argc, char** argv)
 #endif //_WIN32
 
     sensekit_context_t* context = sensekit_initialize();
-    sensekitSL_initialize(context);
+    sensekit_ul_initialize(context);
 
     sensekit_streamset_t* sensor;
     sensekit_status_t status = SENSEKIT_STATUS_SUCCESS;

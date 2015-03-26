@@ -1,11 +1,12 @@
-#include "SenseKitAL.h"
+#include <SenseKit.h>
+#include <SenseKitAPI.h>
 #include "../SenseKit/StreamServiceProxy.h"
 
 static sensekit::StreamServiceProxy* g_proxyPtr;
 
 SENSEKIT_BEGIN_DECLS
 
-SENSEKIT_API void sensekitAL_initialize(sensekit_context_t* context)
+SENSEKIT_API void sensekit_api_initialize(sensekit_context_t* context)
 {
     g_proxyPtr = reinterpret_cast<sensekit::StreamServiceProxy*>(context);
 }

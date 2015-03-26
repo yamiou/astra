@@ -1,8 +1,8 @@
-set(SenseKitBridge_SOURCES
-  SenseKitAL.cpp
+set(SenseKitAPI_SOURCES
+  SenseKitAPI.cpp
   )
 
-add_library(SenseKitBridge STATIC ${SenseKitBridge_SOURCES})
+add_library(SenseKitAPI STATIC ${SenseKitAPI_SOURCES})
 
 # force c++11 (has no effect currently)
 #set_property(TARGET SenseKit PROPERTY CXX_STANDARD 11)
