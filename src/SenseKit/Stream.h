@@ -1,12 +1,12 @@
 #ifndef STREAM_H
 #define STREAM_H
 
-#include "Signal.h"
-#include "StreamBin.h"
 #include <atomic>
 #include <memory>
 #include <vector>
 #include <map>
+#include "Signal.h"
+#include "StreamBin.h"
 #include "StreamConnection.h"
 
 namespace sensekit {

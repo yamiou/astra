@@ -1,7 +1,7 @@
 #ifndef STREAMSERVICEDELEGATE_H
 #define STREAMSERVICEDELEGATE_H
 
-#include "sensekit_types.h"
+#include <SenseKit.h>
 #include "SenseKitContext.h"
 
 namespace sensekit {

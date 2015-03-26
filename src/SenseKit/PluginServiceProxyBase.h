@@ -1,8 +1,8 @@
 #ifndef PLUGINSERVICEPROXYBASE_H
 #define PLUGINSERVICEPROXYBASE_H
 
-#include "sensekit_types.h"
-#include "sensekit_plugin_types.h"
+#include <SenseKit.h>
+#include <sensekit_plugin_types.h>
 
 typedef void(*StreamAddedCallback)(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType typeId, StreamSubtype subtype);
 typedef void(*StreamRemovingCallback)(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType typeId, StreamSubtype subtype);

@@ -1,5 +1,5 @@
 #include "SenseKitAL.h"
-#include "StreamServiceProxy.h"
+#include "../SenseKit/StreamServiceProxy.h"
 
 static sensekit::StreamServiceProxy* g_proxyPtr;
 

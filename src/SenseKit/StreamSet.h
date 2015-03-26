@@ -2,6 +2,7 @@
 #define STREAMSET_H
 
 #include "Stream.h"
+
 #include <unordered_set>
 #include <vector>
 #include <memory>

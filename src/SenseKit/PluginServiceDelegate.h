@@ -1,7 +1,7 @@
 #ifndef PLUGINSERVICEDELEGATE_H
 #define PLUGINSERVICEDELEGATE_H
 
-#include "sensekit_types.h"
+#include <SenseKit.h>
 #include "PluginService.h"
 #include "SenseKitContext.h"
 

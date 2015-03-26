@@ -1,5 +1,4 @@
-#include "sensekit_core.h"
-#include "sensekit_types.h"
+#include <SenseKit.h>
 #include "SenseKitAL.h"
 
 SENSEKIT_BEGIN_DECLS

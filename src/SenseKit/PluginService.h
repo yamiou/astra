@@ -1,9 +1,10 @@
 #ifndef PLUGINSERVICE_H
 #define PLUGINSERVICE_H
 
+#include <SenseKit.h>
 #include "Stream.h"
 #include "StreamBin.h"
-#include "sensekit_types.h"
+#include "Core/Signal.h"
 
 //typedef void(*StreamAddedCallback)(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType typeId, StreamSubtype subtype);
 //typedef void(*StreamRemovingCallback)(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType typeId, StreamSubtype subtype);

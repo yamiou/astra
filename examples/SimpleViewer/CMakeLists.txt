@@ -12,7 +12,7 @@ add_executable(SimpleViewer ${SimpleViewer_SOURCES})
 
 include_directories(SimpleViewer ${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIR})
 
-target_link_libraries(SimpleViewer SenseKit SenseKitSL ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
+target_link_libraries(SimpleViewer SenseKit SenseKitUL ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
 
 if (WIN32)
   SET (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")

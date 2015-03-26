@@ -12,8 +12,14 @@ if (NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif()
 
-include_directories ("${PROJECT_SOURCE_DIR}/include")
-include_directories ("$ENV{OPENNI2_INCLUDE}")
+set(include_PATHS
+  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_SOURCE_DIR}/include/SenseKit
+  ${PROJECT_SOURCE_DIR}/include/SenseKitUL
+  ${PROJECT_SOURCE_DIR}/include/SenseKitBridge
+  $ENV{OPENNI2_INCLUDE}
+  )
+include_directories ("${include_PATHS}")
 
 if (WIN32)
 	find_library(OpenNI2_LIBRARY NAMES "OpenNI2.lib" HINTS "$ENV{OPENNI2_LIB}" PATH_SUFFIXES lib)	

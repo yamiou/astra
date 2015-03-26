@@ -6,8 +6,8 @@
 #include "StreamServiceDelegate.h"
 #include "StreamServiceProxyBase.h"
 #include "PluginServiceProxyBase.h"
-#include "shared_library.h"
-#include "libs.h"
+#include "Core/shared_library.h"
+#include "Core/libs.h"
 
 using std::cout;
 using std::endl;

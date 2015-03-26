@@ -1,8 +1,7 @@
 #ifndef STREAMKITAL_H
 #define STREAMKITAL_H
 
-#include "sensekit_core.h"
-#include "sensekit_types.h"
+#include <SenseKit.h>
 
 SENSEKIT_BEGIN_DECLS
 

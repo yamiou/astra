@@ -1,7 +1,7 @@
 #ifndef DIR_H
 #define DIR_H
 
-#include "vendor/tinydir.h"
+#include "../vendor/tinydir.h"
 #include <vector>
 #include <string>
 
