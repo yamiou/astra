@@ -35,20 +35,24 @@ sensekit_status_t sensekit_generic_frame_open(TStreamType* stream, int timeout, 
 
     sensekit_stream_frame_open(sk_stream_connection, timeout, &frameRef);
 
-    //SOOON...
-    //sensekit_depthframe_header_t* header = (sensekit_depthframe_header_t*)(sk_frame->data);
-    //interrogate header, optionally decompress, etc...
-
-    //if (header->compressed)
-    //{
-    //*frame = codec_decompress((sensekit_depthframe_compressed_t*)(sk_frame->data));
-    //}
-    //else
-    //{
     TFrameWrapperType* wrapper = reinterpret_cast<TFrameWrapperType*>(frameRef->frame->data);
     *frame = reinterpret_cast<TFrameType*>(&(wrapper->frame));
     (*frame)->frameRef = frameRef;
-    //}
+
+    return SENSEKIT_STATUS_SUCCESS;
+}
+
+template<typename TStreamType, typename TFrameType>
+sensekit_status_t sensekit_generic_frame_open(TStreamType* stream, int timeout, TFrameType** frame)
+{
+    sensekit_frame_ref_t* frameRef;
+    sensekit_streamconnection_t* sk_stream_connection = reinterpret_cast<sensekit_streamconnection_t*>(stream);
+
+    sensekit_stream_frame_open(sk_stream_connection, timeout, &frameRef);
+
+    *frame = reinterpret_cast<TFrameType*>(frameRef->frame->data);
+    (*frame)->frameRef = frameRef;
+
     return SENSEKIT_STATUS_SUCCESS;
 }
 
