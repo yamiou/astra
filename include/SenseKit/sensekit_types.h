@@ -12,8 +12,8 @@ typedef struct _sensekit_parameter_data sensekit_parameter_data_t;
 typedef int32_t sensekit_parameter_id;
 
 typedef struct _sensekit_stream sensekit_stream_t;
-typedef unsigned sensekit_stream_type_t;
-typedef unsigned sensekit_stream_subtype_t;
+typedef int32_t sensekit_stream_type_t;
+typedef int32_t sensekit_stream_subtype_t;
 
 typedef sensekit_stream_type_t StreamType;
 typedef sensekit_stream_subtype_t StreamSubtype;
@@ -47,4 +47,5 @@ typedef struct _sensekit_frame_ref {
     sensekit_streamconnection_t* streamConnection;
     sensekit_frame_t* frame;
 } sensekit_frame_ref_t;
+
 #endif /* SENSEKIT_TYPES_H */
