@@ -1,4 +1,5 @@
 #include <SenseKit.h>
+#include "generic_stream_api.h"
 #include <streams/depth_types.h>
 #include <math.h>
 #include <sensekit_known_streams.h>
@@ -58,65 +59,27 @@ static void refresh_conversion_cache()
     g_conversionCache.coeffY = g_conversionCache.resolutionY / g_conversionCache.yzFactor;
 }
 
-SENSEKIT_API sensekit_status_t sensekit_depth_open(sensekit_streamset_t* streamset, /*out*/sensekit_depthstream_t** stream)
+SENSEKIT_API sensekit_status_t sensekit_depth_open(sensekit_streamset_t* streamset,
+                                                   sensekit_depthstream_t** stream)
 {
     refresh_conversion_cache();
-
-    sensekit_streamconnection_t* stream_connection;
-    sensekit_stream_open(streamset, DEPTH_TYPE, ANY_SUBTYPE, &stream_connection);
-
-    sensekit_stream_set_parameter(stream_connection, 2, 4, nullptr);
-    size_t len;
-    sensekit_stream_get_parameter_size(stream_connection, 3, &len);
-
-    *stream = (sensekit_depthstream_t*)stream_connection;
-    return SENSEKIT_STATUS_SUCCESS;
+    return sensekit_generic_stream_open(streamset, stream, DEPTH_TYPE, ANY_SUBTYPE);
 }
 
-SENSEKIT_API sensekit_status_t sensekit_depth_close(/*inout*/sensekit_depthstream_t** stream)
+SENSEKIT_API sensekit_status_t sensekit_depth_close(sensekit_depthstream_t** stream)
 {
-    sensekit_streamconnection_t* sk_stream_connection = (sensekit_streamconnection_t*)(*stream);
-
-    sensekit_stream_close(&sk_stream_connection);
-
-    *stream = (sensekit_depthstream_t*)sk_stream_connection;
-    return SENSEKIT_STATUS_SUCCESS;
+    return sensekit_generic_stream_closes(stream);
 }
 
-SENSEKIT_API sensekit_status_t sensekit_depth_frame_open(sensekit_depthstream_t* stream, int timeout, sensekit_depthframe_t** frame)
+SENSEKIT_API sensekit_status_t sensekit_depth_frame_open(sensekit_depthstream_t* stream,
+                                                         int timeout, sensekit_depthframe_t** frame)
 {
-    sensekit_frame_ref_t* frameRef;
-    sensekit_streamconnection_t* sk_stream_connection = (sensekit_streamconnection_t*)(stream);
-
-    sensekit_stream_frame_open(sk_stream_connection, timeout, &frameRef);
-
-    //SOOON...
-    //sensekit_depthframe_header_t* header = (sensekit_depthframe_header_t*)(sk_frame->data);
-    //interrogate header, optionally decompress, etc...
-
-    //if (header->compressed)
-    //{
-    //*frame = codec_decompress((sensekit_depthframe_compressed_t*)(sk_frame->data));
-    //}
-    //else
-    //{
-    sensekit_depthframe_wrapper_t* wrapper = (sensekit_depthframe_wrapper_t*)(frameRef->frame->data);
-    *frame = (sensekit_depthframe_t*)&(wrapper->frame);
-    (*frame)->frameRef = frameRef;
-    //}
-
-    return SENSEKIT_STATUS_SUCCESS;
+    return sensekit_generic_frame_open<sensekit_depthframe_wrapper_t>(stream, timeout, frame);
 }
 
 SENSEKIT_API sensekit_status_t sensekit_depth_frame_close(sensekit_depthframe_t** frame)
 {
-    sensekit_frame_ref_t* sk_frameRef = (*frame)->frameRef;
-
-    sensekit_stream_frame_close(&sk_frameRef);
-
-    *frame = nullptr;
-
-    return SENSEKIT_STATUS_SUCCESS;
+    return sensekit_generic_frame_close(frame);
 }
 
 SENSEKIT_END_DECLS
