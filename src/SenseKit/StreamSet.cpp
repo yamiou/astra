@@ -1,5 +1,5 @@
 ﻿#include "StreamSet.h"
-#include <sensekit_known_streams.h>
+#include <StreamTypes.h>
 
 namespace sensekit {
     StreamSet::StreamSet()

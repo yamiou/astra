@@ -16,7 +16,7 @@ sensekit_status_t sensekit_generic_stream_open(sensekit_streamset_t* streamset, 
 }
 
 template<typename TStreamType>
-sensekit_status_t sensekit_generic_stream_closes(TStreamType** stream)
+sensekit_status_t sensekit_generic_stream_close(TStreamType** stream)
 {
     sensekit_streamconnection_t* sk_stream_connection =
         reinterpret_cast<sensekit_streamconnection_t*>(*stream);

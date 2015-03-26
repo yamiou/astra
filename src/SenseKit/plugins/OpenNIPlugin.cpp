@@ -1,6 +1,6 @@
 ﻿#include "OpenNIPlugin.h"
 #include <iostream>
-#include <sensekit_known_streams.h>
+#include <StreamTypes.h>
 
 using std::cout;
 using std::endl;
@@ -107,7 +107,11 @@ namespace sensekit
 
             get_pluginService().create_stream_set(m_streamSetHandle);
 
-            get_pluginService().create_stream(m_streamSetHandle, DEPTH_TYPE, DEPTH_DEFAULT_SUBTYPE, pluginCallbacks, m_handle);
+            get_pluginService().create_stream(m_streamSetHandle,
+                                              SENSEKIT_STREAM_DEPTH,
+                                              DEPTH_DEFAULT_SUBTYPE,
+                                              pluginCallbacks,
+                                              m_handle);
 
             const ::openni::VideoMode& mode = m_depthStream.getVideoMode();
 

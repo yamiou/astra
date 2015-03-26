@@ -2,7 +2,7 @@
 #include "generic_stream_api.h"
 #include <streams/depth_types.h>
 #include <math.h>
-#include <sensekit_known_streams.h>
+#include <StreamTypes.h>
 
 struct coonversion_cache_t
 {
@@ -63,12 +63,14 @@ SENSEKIT_API sensekit_status_t sensekit_depth_open(sensekit_streamset_t* streams
                                                    sensekit_depthstream_t** stream)
 {
     refresh_conversion_cache();
-    return sensekit_generic_stream_open(streamset, stream, DEPTH_TYPE, ANY_SUBTYPE);
+    return sensekit_generic_stream_open(streamset, stream,
+                                        SENSEKIT_STREAM_TYPE::SENSEKIT_STREAM_DEPTH,
+                                        ANY_SUBTYPE);
 }
 
 SENSEKIT_API sensekit_status_t sensekit_depth_close(sensekit_depthstream_t** stream)
 {
-    return sensekit_generic_stream_closes(stream);
+    return sensekit_generic_stream_close(stream);
 }
 
 SENSEKIT_API sensekit_status_t sensekit_depth_frame_open(sensekit_depthstream_t* stream,
