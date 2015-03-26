@@ -11,8 +11,6 @@ struct PluginServiceProxyBase;
 
 namespace sensekit {
 
-    class SenseKitContext;
-
     using initialize_fn = void(*)(StreamServiceProxyBase*, PluginServiceProxyBase*);
     using terminate_fn = void(*)();
     using update_fn = void(*)();
