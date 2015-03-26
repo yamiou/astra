@@ -6,11 +6,18 @@
 typedef int32_t bin_id_t;
 typedef bin_id_t StreamBinId;
 
-using SetParameterCallback = void(*)(void*, sensekit_streamconnection_t*, sensekit_parameter_id, size_t, sensekit_parameter_data_t*);
-using GetParameterSizeCallback = void(*)(void*, sensekit_streamconnection_t*, sensekit_parameter_id, /*out*/size_t*);
-using GetParameterDataCallback = void(*)(void*, sensekit_streamconnection_t*, sensekit_parameter_id, size_t, sensekit_parameter_data_t*);
-using ConnectionAddedCallback = void(*)(void*, sensekit_streamconnection_t*);
-using ConnectionRemovedCallback = void(*)(void*, sensekit_streamconnection_t*);
+typedef void(*SetParameterCallback)(void*, sensekit_streamconnection_t*,
+                                    sensekit_parameter_id, size_t,
+                                    sensekit_parameter_data_t*);
+
+typedef void(*GetParameterSizeCallback)(void*, sensekit_streamconnection_t*,
+                                        sensekit_parameter_id, size_t*);
+typedef void(*GetParameterDataCallback)(void*, sensekit_streamconnection_t*,
+                                        sensekit_parameter_id, size_t,
+                                        sensekit_parameter_data_t*);
+
+typedef void(*ConnectionAddedCallback)(void*, sensekit_streamconnection_t*);
+typedef void(*ConnectionRemovedCallback)(void*, sensekit_streamconnection_t*);
 
 struct StreamPluginCallbacks
 {
@@ -20,17 +27,6 @@ struct StreamPluginCallbacks
     GetParameterDataCallback getParameterDataCallback;
     ConnectionAddedCallback connectionAddedCallback;
     ConnectionRemovedCallback connectionRemovedCallback;
-
-    StreamPluginCallbacks(void* context) :
-        context(context),
-        setParameterCallback(nullptr),
-        getParameterSizeCallback(nullptr),
-        getParameterDataCallback(nullptr),
-        connectionAddedCallback(nullptr),
-        connectionRemovedCallback(nullptr)
-    {
-    }
 };
-
 
 #endif /* SENSEKIT_PLUGIN_TYPES_H */

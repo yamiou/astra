@@ -20,16 +20,4 @@ typedef struct _sensekit_depthframe_wrapper {
 
 typedef struct _sensekit_depthstream sensekit_depthstream_t;
 
-struct WorldConversionCache
-{
-    float xzFactor;
-    float yzFactor;
-    float coeffX;
-    float coeffY;
-    int resolutionX;
-    int resolutionY;
-    int halfResX;
-    int halfResY;
-};
-
 #endif // DEPTH_TYPES_H

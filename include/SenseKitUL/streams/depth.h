@@ -4,8 +4,6 @@
 #include <SenseKit.h>
 #include "depth_types.h"
 
-static WorldConversionCache g_convertCache;
-
 SENSEKIT_BEGIN_DECLS
 
 SENSEKIT_API sensekit_status_t convert_depth_to_world(float depthX, float depthY, float depthZ,

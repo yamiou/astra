@@ -3,9 +3,24 @@
 
 #include "../PluginServiceProxy.h"
 #include "../StreamServiceProxy.h"
+#include <sensekit_plugin_types.h>
 
 namespace sensekit
 {
+    StreamPluginCallbacks create_plugin_callbacks(void* context)
+    {
+        StreamPluginCallbacks callbacks;
+
+        callbacks.context = context;
+        callbacks.connectionAddedCallback = nullptr;
+        callbacks.connectionRemovedCallback = nullptr;
+        callbacks.getParameterDataCallback = nullptr;
+        callbacks.getParameterSizeCallback = nullptr;
+        callbacks.setParameterCallback = nullptr;
+
+        return callbacks;
+    }
+
     class PluginBase
     {
     public:

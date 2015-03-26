@@ -1,5 +1,4 @@
 ﻿#include "OpenNIPlugin.h"
-#include "PluginBase.h"
 #include <iostream>
 #include <sensekit_known_streams.h>
 
@@ -100,7 +99,7 @@ namespace sensekit
 
             sensekit_frame_t* nextBuffer = nullptr;
 
-            StreamPluginCallbacks pluginCallbacks(this);
+            StreamPluginCallbacks pluginCallbacks = create_plugin_callbacks(this);
 
             pluginCallbacks.setParameterCallback = &OpenNIPlugin::set_parameter_thunk;
             pluginCallbacks.getParameterSizeCallback = &OpenNIPlugin::get_parameter_size_thunk;

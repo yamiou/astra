@@ -1,7 +1,7 @@
 #ifndef SENSEKIT_KNOWN_STREAMS_H
 #define SENSEKIT_KNOWN_STREAMS_H
 
-#include "sensekit_types.h"
+#include <sensekit_types.h>
 
 const sensekit_stream_subtype_t ANY_SUBTYPE = -1;
 
