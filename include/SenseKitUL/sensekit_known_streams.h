@@ -5,7 +5,7 @@
 
 const sensekit_stream_subtype_t ANY_SUBTYPE = -1;
 
-const sensekit_stream_type_t DEPTH_TYPE = 1;
+const sensekit_stream_type_t DEPTH_TYPE = 0;
 const sensekit_stream_subtype_t DEPTH_DEFAULT_SUBTYPE = 0;
 
 const sensekit_stream_type_t COLOR_TYPE = 1;
