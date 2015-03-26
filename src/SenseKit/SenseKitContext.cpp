@@ -45,16 +45,15 @@ namespace sensekit {
         {
             os_load_library(lib.c_str(), libHandle);
 
-            plugin_info info;
-            os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_initialize), (FarProc&)info.initialize);
-            os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_terminate), (FarProc&)info.terminate);
-            os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_update), (FarProc&)info.update);
+            PluginFuncs pluginFuncs;
+            os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_initialize), (FarProc&)pluginFuncs.initialize);
+            os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_terminate), (FarProc&)pluginFuncs.terminate);
+            os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_update), (FarProc&)pluginFuncs.update);
 
-            if (info.isValid())
+            if (pluginFuncs.isValid())
             {
-                info.initialize(m_streamServiceProxy, m_pluginServiceProxy);
-
-                m_pluginList.push_back(info);
+                pluginFuncs.initialize(m_streamServiceProxy, m_pluginServiceProxy);
+                m_pluginList.push_back(pluginFuncs);
             }
             else
             {
@@ -67,9 +66,9 @@ namespace sensekit {
 
     sensekit_status_t SenseKitContext::terminate()
     {
-        for(auto plinfo : m_pluginList)
+        for(auto pluginFuncs : m_pluginList)
         {
-            plinfo.terminate();
+            pluginFuncs.terminate();
         }
 
         if (m_pluginServiceProxy)

@@ -13,11 +13,11 @@ namespace sensekit {
 
     class SenseKitContext;
 
-    using initialize_fn = void(*)(StreamServiceProxyBase* streamProxy, PluginServiceProxyBase* pluginProxy);
+    using initialize_fn = void(*)(StreamServiceProxyBase*, PluginServiceProxyBase*);
     using terminate_fn = void(*)();
     using update_fn = void(*)();
 
-    struct plugin_info
+    struct PluginFuncs
     {
         initialize_fn initialize{nullptr};
         terminate_fn terminate{nullptr};
@@ -43,34 +43,49 @@ namespace sensekit {
 
         sensekit_status_t open_streamset(const char* uri, sensekit_streamset_t*& streamset);
         sensekit_status_t close_streamset(sensekit_streamset_t*& streamset);
-        sensekit_status_t open_stream(sensekit_streamset_t* streamset, sensekit_stream_type_t type, sensekit_stream_subtype_t subtype, sensekit_streamconnection_t*& streamConnection);
+
+        sensekit_status_t open_stream(sensekit_streamset_t* streamset,
+                                      sensekit_stream_type_t type,
+                                      sensekit_stream_subtype_t subtype,
+                                      sensekit_streamconnection_t*& streamConnection);
+
         sensekit_status_t close_stream(sensekit_streamconnection_t*& streamConnection);
-        sensekit_status_t open_frame(sensekit_streamconnection_t* streamConnection, int timeout, sensekit_frame_ref_t*& frameRef);
+
+        sensekit_status_t open_frame(sensekit_streamconnection_t* streamConnection,
+                                     int timeout,
+                                     sensekit_frame_ref_t*& frameRef);
+
         sensekit_status_t close_frame(sensekit_frame_ref_t*& frameRef);
 
         sensekit_status_t temp_update();
 
         StreamSet& get_rootSet() { return m_rootSet; }
 
-        sensekit_status_t set_parameter(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id parameterId, size_t byteLength, sensekit_parameter_data_t* data);
-        sensekit_status_t get_parameter_size(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id parameterId, /*out*/size_t& byteLength);
-        sensekit_status_t get_parameter_data(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id parameterId, size_t byteLength, sensekit_parameter_data_t* data);
+        sensekit_status_t set_parameter(sensekit_streamconnection_t* streamConnection,
+                                        sensekit_parameter_id parameterId,
+                                        size_t byteLength,
+                                        sensekit_parameter_data_t* data);
+
+        sensekit_status_t get_parameter_size(sensekit_streamconnection_t* streamConnection,
+                                             sensekit_parameter_id parameterId,
+                                             size_t& byteLength);
+
+        sensekit_status_t get_parameter_data(sensekit_streamconnection_t* streamConnection,
+                                             sensekit_parameter_id parameterId,
+                                             size_t byteLength,
+                                             sensekit_parameter_data_t* data);
 
         StreamServiceProxyBase* get_streamServiceProxy() { return m_streamServiceProxy; }
-    private:
 
+    private:
         StreamSet m_rootSet;
 
         PluginService m_pluginService;
         PluginServiceProxyBase* m_pluginServiceProxy;
         StreamServiceProxyBase* m_streamServiceProxy;
 
-        using PluginList = std::vector<plugin_info>;
+        using PluginList = std::vector<PluginFuncs>;
         PluginList m_pluginList;
-    };
-
-    class PluginContext : public SenseKitContext
-    {
     };
 }
 
