@@ -35,7 +35,7 @@ if (WIN32)
                                 "$<TARGET_FILE_DIR:SenseKit>/SenseKit.dll"
                                 $<TARGET_FILE_DIR:SimpleViewer>
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                                "$<TARGET_FILE_DIR:SenseKitSL>/SenseKitSL.dll"
+                                "$<TARGET_FILE_DIR:SenseKitSL>/SenseKitUL.dll"
                                 $<TARGET_FILE_DIR:SimpleViewer>
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 "$<TARGET_FILE_DIR:OpenNIPlugin>/OpenNIPlugin.dll"
@@ -48,7 +48,7 @@ if (WIN32)
                                 "$<TARGET_FILE_DIR:SenseKit>/SenseKit.dll"
                                 $<TARGET_FILE_DIR:DepthReader>
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                                "$<TARGET_FILE_DIR:SenseKitSL>/SenseKitSL.dll"
+                                "$<TARGET_FILE_DIR:SenseKitSL>/SenseKitUL.dll"
                                 $<TARGET_FILE_DIR:DepthReader>
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 "$<TARGET_FILE_DIR:OpenNIPlugin>/OpenNIPlugin.dll"
