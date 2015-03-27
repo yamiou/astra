@@ -3,6 +3,7 @@
 #include <streams/depth_types.h>
 #include <math.h>
 #include <StreamTypes.h>
+#include "SenseKitUL_internal.h"
 
 struct coonversion_cache_t
 {

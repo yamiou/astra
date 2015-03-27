@@ -23,7 +23,7 @@ set(SenseKit_SOURCES
   )
 
 set(OpenNIPlugin_SOURCES
-  ../../include/SenseKitUL/sensekit_known_streams.h
+  ../../include/SenseKitUL/StreamTypes.h
   plugins/PluginBase.h
   plugins/OpenNIPlugin.cpp
   plugins/OpenNIPlugin.h

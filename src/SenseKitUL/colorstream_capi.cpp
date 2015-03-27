@@ -1,6 +1,7 @@
 #include <SenseKit.h>
 #include "generic_stream_api.h"
 #include <streams/color_types.h>
+#include "SenseKitUL_internal.h"
 #include <math.h>
 #include <StreamTypes.h>
 
@@ -28,7 +29,7 @@ SENSEKIT_API sensekit_status_t sensekit_color_frame_open(sensekit_colorstream_t*
 
 SENSEKIT_API sensekit_status_t sensekit_color_frame_close(sensekit_colorframe_t** frame)
 {
-    return sensekit_color_frame_close(frame);
+    return sensekit_generic_frame_close(frame);
 }
 
 SENSEKIT_END_DECLS

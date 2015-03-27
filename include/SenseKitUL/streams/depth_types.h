@@ -12,12 +12,6 @@ typedef struct _sensekit_depthframe {
     int16_t* data;
 } sensekit_depthframe_t;
 
-// https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
-typedef struct _sensekit_depthframe_wrapper {
-    sensekit_depthframe_t frame;
-    char frame_data[];
-} sensekit_depthframe_wrapper_t;
-
 typedef struct _sensekit_depthstream sensekit_depthstream_t;
 
 #endif // DEPTH_TYPES_H

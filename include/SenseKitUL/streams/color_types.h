@@ -12,12 +12,6 @@ typedef struct _sensekit_colorframe {
     uint8_t* data;
 } sensekit_colorframe_t;
 
-// https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
-typedef struct _sensekit_colorframe_wrapper {
-    sensekit_colorframe_t frame;
-    char frame_data[];
-} sensekit_colorframe_wrapper_t;
-
 typedef struct _sensekit_colorstream sensekit_colorstream_t;
 
 #endif // COLOR_TYPES_H
