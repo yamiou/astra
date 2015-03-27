@@ -18,60 +18,6 @@ typedef struct
     uint8_t b;
 } RGB888Pixel;
 
-struct Vector3
-{
-    float x;
-    float y;
-    float z;
-
-    Vector3()
-    {
-        x = 0;
-        y = 0;
-        z = 0;
-    }
-
-    Vector3(float xVal, float yVal, float zVal)
-    {
-        x = xVal;
-        y = yVal;
-        z = zVal;
-    }
-
-    bool isEmpty()
-    {
-        return x == 0 && y == 0 && z == 0;
-    }
-
-    static float DotProduct(Vector3 lhs, Vector3 rhs)
-    {
-        float result = lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
-        return result;
-    }
-
-    static Vector3 CrossProduct(Vector3 lhs, Vector3 rhs)
-    {
-        float x = (lhs.y * rhs.z) - (lhs.z * rhs.y);
-        float y = (lhs.z * rhs.x) - (lhs.x * rhs.z);
-        float z = (lhs.x * rhs.y) - (lhs.y * rhs.x);
-
-        return Normalize(Vector3(x, y, z));
-    }
-
-    static Vector3 Normalize(Vector3 v)
-    {
-        double length = sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
-        if (length < 1e-9)
-        {
-            return Vector3(0, 0, 0);
-        }
-        else
-        {
-            return Vector3(v.x / length, v.y / length, v.z / length);
-        }
-    }
-};
-
 class SampleViewer
 {
 public:
@@ -82,7 +28,6 @@ public:
     virtual void run();   //Does not return
 
 protected:
-    void calculateNormals(sensekit_depthframe_t& frame);
     virtual void display();
     virtual void displayPostDraw(){};       // Overload to draw over the screen image
 
@@ -107,13 +52,6 @@ private:
     RGB888Pixel*            m_pTexMap;
     int                     m_width;
     int                     m_height;
-
-    Vector3*                m_normalMap{ nullptr };
-    Vector3*                m_blurNormalMap{ nullptr };
-    size_t                  m_normalMapLen{ 0 };
-    Vector3                 m_lightVector;
-    RGB888Pixel             m_lightColor;
-    RGB888Pixel             m_ambientColor;
 
     sensekit_streamset_t* m_sensor;
     sensekit_colorstream_t* m_colorStream;

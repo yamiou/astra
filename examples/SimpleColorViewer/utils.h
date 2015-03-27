@@ -61,37 +61,4 @@ void Sleep(int millisecs)
 }
 #endif // WIN32
 
-void calculateHistogram(float* pHistogram, int histogramSize, sensekit_depthframe_t& frame)
-{
-        short* pDepth = frame.data;
-        // Calculate the accumulative histogram (the yellow display...)
-        memset(pHistogram, 0, histogramSize*sizeof(float));
-        int height = frame.height;
-        int width = frame.width;
-
-        unsigned int nNumberOfPoints = 0;
-        for (int y = 0; y < height; ++y)
-        {
-                for (int x = 0; x < width; ++x, ++pDepth)
-                {
-                        if (*pDepth != 0)
-                        {
-                                pHistogram[*pDepth]++;
-                                nNumberOfPoints++;
-                        }
-                }
-        }
-        for (int nIndex=1; nIndex<histogramSize; nIndex++)
-        {
-                pHistogram[nIndex] += pHistogram[nIndex-1];
-        }
-        if (nNumberOfPoints)
-        {
-                for (int nIndex=1; nIndex<histogramSize; nIndex++)
-                {
-                        pHistogram[nIndex] = (256 * (1.0f - (pHistogram[nIndex] / nNumberOfPoints)));
-                }
-        }
-}
-
 #endif /* UTILS_H */

@@ -7,7 +7,6 @@
 #include <SenseKitUL.h>
 #include "SimpleViewer.h"
 #include <memory.h>
-#include <iostream>
 
 #ifdef _WIN32
 #include <GL/glut.h>
@@ -72,7 +71,6 @@ SampleViewer::~SampleViewer()
 
 void SampleViewer::init(int argc, char **argv)
 {
-    std::cout << "woop" << std::endl;
     sensekit_context_t* context = sensekit_initialize();
     sensekit_ul_initialize(context);
 
@@ -89,197 +87,12 @@ void SampleViewer::init(int argc, char **argv)
     m_nTexMapY = MIN_CHUNKS_SIZE(m_height, TEXTURE_SIZE);
     m_pTexMap = new RGB888Pixel[m_nTexMapX * m_nTexMapY];
 
-    m_lightVector = Vector3::Normalize(Vector3(.5, -0.2, 1));
-    //m_lightVector = Vector3::Normalize(Vector3(0, 0, 1));
-    m_lightColor.r = 210;
-    m_lightColor.g = 210;
-    m_lightColor.b = 210;
-
-    m_ambientColor.r = 30;
-    m_ambientColor.g = 30;
-    m_ambientColor.b = 30;
-
     return initOpenGL(argc, argv);
 
 }
 void SampleViewer::run()      //Does not return
 {
     glutMainLoop();
-}
-
-void SampleViewer::calculateNormals(sensekit_depthframe_t& frame)
-{
-    int width = frame.width;
-    int height = frame.height;
-    int length = width * height;
-    if (m_normalMap == nullptr || m_normalMapLen != length)
-    {
-        m_normalMap = new Vector3[length];
-        m_blurNormalMap = new Vector3[length];
-        memset(m_blurNormalMap, 0, sizeof(Vector3)*length);
-        m_normalMapLen = length;
-    }
-    Vector3* normMap = m_normalMap;
-    int16_t* depthData = frame.data;
-
-    //top row
-    for (int x = 0; x < width - 1; ++x)
-    {
-        *normMap = Vector3();
-        ++normMap;
-    }
-    for (int y = 1; y < height - 1; ++y)
-    {
-        //first pixel at start of row
-        *normMap = Vector3();
-        ++normMap;
-
-        for (int x = 1; x < width - 1; ++x)
-        {
-            int index = x + y * width;
-            int rightIndex = index + 1;
-            int leftIndex = index - 1;
-            int upIndex = index - width;
-            int downIndex = index + width;
-
-            int16_t depth = *(depthData + index);
-            int16_t depthLeft = *(depthData + leftIndex);
-            int16_t depthRight = *(depthData + rightIndex);
-            int16_t depthUp = *(depthData + upIndex);
-            int16_t depthDown = *(depthData + downIndex);
-
-            Vector3 normAvg;
-
-            if (depth != 0 && depthRight != 0 && depthDown != 0)
-            {
-                float worldX1, worldY1, worldZ1;
-                float worldX2, worldY2, worldZ2;
-                float worldX3, worldY3, worldZ3;
-                convert_depth_to_world(x, y, depth, &worldX1, &worldY1, &worldZ1);
-                convert_depth_to_world(x + 1, y, depthRight, &worldX2, &worldY2, &worldZ2);
-                convert_depth_to_world(x, y + 1, depthDown, &worldX3, &worldY3, &worldZ3);
-
-                Vector3 v1 = Vector3(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
-                Vector3 v2 = Vector3(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
-
-                Vector3 norm = Vector3::CrossProduct(v2, v1);
-                normAvg.x += norm.x;
-                normAvg.y += norm.y;
-                normAvg.z += norm.z;
-            }
-
-            if (depth != 0 && depthRight != 0 && depthUp != 0)
-            {
-                float worldX1, worldY1, worldZ1;
-                float worldX2, worldY2, worldZ2;
-                float worldX3, worldY3, worldZ3;
-                convert_depth_to_world(x, y, depth, &worldX1, &worldY1, &worldZ1);
-                convert_depth_to_world(x, y - 1, depthUp, &worldX2, &worldY2, &worldZ2);
-                convert_depth_to_world(x + 1, y, depthRight, &worldX3, &worldY3, &worldZ3);
-
-                Vector3 v1 = Vector3(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
-                Vector3 v2 = Vector3(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
-
-                Vector3 norm = Vector3::CrossProduct(v2, v1);
-
-                normAvg.x += norm.x;
-                normAvg.y += norm.y;
-                normAvg.z += norm.z;
-            }
-
-
-            if (depth != 0 && depthLeft != 0 && depthUp != 0)
-            {
-                float worldX1, worldY1, worldZ1;
-                float worldX2, worldY2, worldZ2;
-                float worldX3, worldY3, worldZ3;
-                convert_depth_to_world(x, y, depth, &worldX1, &worldY1, &worldZ1);
-                convert_depth_to_world(x - 1, y, depthLeft, &worldX2, &worldY2, &worldZ2);
-                convert_depth_to_world(x, y - 1, depthUp, &worldX3, &worldY3, &worldZ3);
-
-                Vector3 v1 = Vector3(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
-                Vector3 v2 = Vector3(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
-
-                Vector3 norm = Vector3::CrossProduct(v2, v1);
-
-                normAvg.x += norm.x;
-                normAvg.y += norm.y;
-                normAvg.z += norm.z;
-            }
-
-            if (depth != 0 && depthLeft != 0 && depthDown != 0)
-            {
-                float worldX1, worldY1, worldZ1;
-                float worldX2, worldY2, worldZ2;
-                float worldX3, worldY3, worldZ3;
-                convert_depth_to_world(x, y, depth, &worldX1, &worldY1, &worldZ1);
-                convert_depth_to_world(x, y + 1, depthDown, &worldX2, &worldY2, &worldZ2);
-                convert_depth_to_world(x - 1, y, depthLeft, &worldX3, &worldY3, &worldZ3);
-
-                Vector3 v1 = Vector3(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
-                Vector3 v2 = Vector3(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
-
-                Vector3 norm = Vector3::CrossProduct(v2, v1);
-                normAvg.x += norm.x;
-                normAvg.y += norm.y;
-                normAvg.z += norm.z;
-            }
-
-            *normMap = Vector3::Normalize(normAvg);
-            /*
-            //reference sphere
-
-            const float PI = 3.141592;
-            float normX = 2*(x / (float)width)-1;
-            float angleX = 0.5 * PI * normX;
-            float normY = 2*(y / (float)height)-1;
-            float angleY = 0.5 * PI * normY;
-            if (sqrt(normX*normX + normY*normY) < 1)
-            {
-            *normMap = Vector3(sin(angleX)*cos(angleY), sin(angleY)*cos(angleX), cos(angleY)*cos(angleX));
-            }
-            else
-            {
-            *normMap = Vector3();
-            }
-            */
-            ++normMap;
-        }
-        //last pixel at end of row
-        *normMap = Vector3();
-        ++normMap;
-    }
-    //bottom row
-    for (int x = 0; x < width - 1; ++x)
-    {
-        *normMap = Vector3();
-        ++normMap;
-    }
-
-    const int blurRadius = 1;
-    //box blur
-    for (int y = blurRadius; y < height - blurRadius; y++)
-    {
-        for (int x = blurRadius; x < width - blurRadius; x++)
-        {
-            Vector3 normAvg;
-
-            for (int dy = -blurRadius; dy <= blurRadius; dy++)
-            {
-                for (int dx = -blurRadius; dx <= blurRadius; dx++)
-                {
-                    int index = x + dx + (y + dy) * width;
-                    Vector3 norm = *(m_normalMap + index);
-
-                    normAvg.x += norm.x;
-                    normAvg.y += norm.y;
-                    normAvg.z += norm.z;
-                }
-            }
-            int centerIndex = x + y*width;
-            *(m_blurNormalMap + centerIndex) = Vector3::Normalize(normAvg);
-        }
-    }
 }
 
 void SampleViewer::display()
@@ -299,7 +112,6 @@ void SampleViewer::display()
     RGB888Pixel* pColorRow = (RGB888Pixel*)m_colorFrame->data;
     RGB888Pixel* pTexRow = m_pTexMap;
     int rowSize = m_colorFrame->width;
-    //std::cout << rowSize << std::endl;
 
     for (int y = 0; y < m_colorFrame->height; ++y)
     {
@@ -350,7 +162,6 @@ void SampleViewer::display()
 
     // Swap the OpenGL display buffers
     glutSwapBuffers();
-
 }
 
 void SampleViewer::onKey(unsigned char key, int /*x*/, int /*y*/)
@@ -362,7 +173,6 @@ void SampleViewer::onKey(unsigned char key, int /*x*/, int /*y*/)
         sensekit_terminate();
         exit(1);
     }
-
 }
 
 void SampleViewer::initOpenGL(int argc, char **argv)
