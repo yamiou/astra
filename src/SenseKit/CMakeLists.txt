@@ -2,7 +2,7 @@ set(SenseKit_SOURCES
   ../../include/SenseKit/SenseKit.h
   ../../include/SenseKit/sensekit_core.h
   ../../include/SenseKit/sensekit_types.h
-  ../../include/SenseKit/sensekit_plugin_types.h
+  ../../include/SenseKit/Plugins/sensekit_plugin_types.h
   ../../include/SenseKit/sensekit_capi.h
   SenseKitContext.h
   SenseKitContext.cpp

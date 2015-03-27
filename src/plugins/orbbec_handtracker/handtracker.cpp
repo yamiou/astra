@@ -1,6 +1,5 @@
-
 // Undeprecate CRT functions
-#ifndef _CRT_SECURE_NO_DEPRECATE 
+#ifndef _CRT_SECURE_NO_DEPRECATE
 #define _CRT_SECURE_NO_DEPRECATE 1
 #endif
 
@@ -14,18 +13,18 @@
 
 using namespace std;
 
-#define GL_WIN_SIZE_X	640
-#define GL_WIN_SIZE_Y	480
+#define GL_WIN_SIZE_X   640
+#define GL_WIN_SIZE_Y   480
 
 #define PROCESSING_SIZE_X 80
 #define PROCESSING_SIZE_Y 60
 
-#define TEXTURE_SIZE	512
+#define TEXTURE_SIZE    512
 
-#define DEFAULT_DISPLAY_MODE	DISPLAY_MODE_DEPTH
+#define DEFAULT_DISPLAY_MODE    DISPLAY_MODE_DEPTH
 
-#define MIN_NUM_CHUNKS(data_size, chunk_size)	((((data_size)-1) / (chunk_size) + 1))
-#define MIN_CHUNKS_SIZE(data_size, chunk_size)	(MIN_NUM_CHUNKS(data_size, chunk_size) * (chunk_size))
+#define MIN_NUM_CHUNKS(data_size, chunk_size)   ((((data_size)-1) / (chunk_size) + 1))
+#define MIN_CHUNKS_SIZE(data_size, chunk_size)  (MIN_NUM_CHUNKS(data_size, chunk_size) * (chunk_size))
 
 HandTracker::HandTracker(sensekit_depthstream_t* depthStream) :
 m_depthStream(depthStream)
@@ -220,7 +219,7 @@ vector<TrackedPoint>& HandTracker::updateOriginalPoints(vector<TrackedPoint>& in
         TrackedPoint originalPoint = internalPoint;
         originalPoint.m_position.x *= m_resizeFactor;
         originalPoint.m_position.y *= m_resizeFactor;
-        
+
         m_originalTrackedPoints.push_back(originalPoint);
     }
 
@@ -942,7 +941,7 @@ void HandTracker::validateAndUpdateTrackedPoint(cv::Mat& matDepth, cv::Mat& matA
         float depth = matDepth.at<float>(targetPoint);
 
         cv::Point3f worldPosition = convertDepthToRealWorld(targetPoint.x, targetPoint.y, depth);
-        
+
         auto dist = cv::norm(worldPosition - tracked.m_worldPosition);
         auto deadbandDist = cv::norm(worldPosition - tracked.m_steadyWorldPosition);
 
@@ -1007,7 +1006,7 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
     //TODO-done try tracking without edge distance
     //TODO-done calculate global score once
     //TODO-done adjust scores so hand can go below elbow
-    //TODO-done use velocity to predict next position - search there as well 
+    //TODO-done use velocity to predict next position - search there as well
     //TODO-done adopt the min tracking id? or id of the most active parent?
     //TODO-done recover tracking IDs for recently lost points (maybe after focus gesture)
     //TODO-done look at head area being allowed
@@ -1035,7 +1034,7 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
     const float maxMatchDistLostActive = 500; //mm
     const float maxMatchDistDefault = 200; //mm
     const int iterationMaxTracking = 1;
-    const int iterationMaxInitial = 1; 
+    const int iterationMaxInitial = 1;
 
     calculateBasicScore(matDepth, matScore);
     calculateSegmentArea(matDepth, matArea, areaSqrt);
@@ -1107,8 +1106,8 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
     //if (m_internalTrackedPoints.size() == 0)
     while (findForegroundPixel(foregroundSearched, seedPosition))
     {
-        //	seedPosition.x = mouseX;
-        //	seedPosition.y = mouseY;
+        //      seedPosition.x = mouseX;
+        //      seedPosition.y = mouseY;
 
         float seedDepth = matDepth.at<float>(seedPosition);
         cv::Point targetPoint = convergeTrackPointFromSeed(matDepth, areaSqrt, matSegmentation, matScore, foregroundSearched, seedPosition, seedDepth, initialBandwidthDepth, TrackedPointType::CandidatePoint, iterationMaxInitial);
@@ -1212,9 +1211,9 @@ std::vector<TrackedPoint>& HandTracker::updateTracking(sensekit_depthframe_t* de
 {
     int width = depthFrame->width;
     int height = depthFrame->height;
- 
+
     verifyInit(width, height);
-    
+
     const int16_t* depthData = depthFrame->data;
 
     for (int y = 0; y < height; ++y)
@@ -1242,7 +1241,7 @@ std::vector<TrackedPoint>& HandTracker::updateTracking(sensekit_depthframe_t* de
     float minArea = 10000;
     float maxArea = 20000;
     trackPoints(m_matForeground, m_matDepthResized, m_matHandSegmentation, m_matScore, m_matEdgeDistance, m_matLocalArea);
-    
+
     if (m_outputSample)
     {
         float sampleDepth = m_matDepthResized.at<float>(mouseY, mouseX);

@@ -4,8 +4,8 @@
 #include "StreamConnection.h"
 #include "StreamBin.h"
 #include "StreamServiceDelegate.h"
-#include "StreamServiceProxyBase.h"
-#include "PluginServiceProxyBase.h"
+#include <Plugins/StreamServiceProxyBase.h>
+#include <Plugins/PluginServiceProxyBase.h>
 #include "Core/shared_library.h"
 #include "Core/libs.h"
 
