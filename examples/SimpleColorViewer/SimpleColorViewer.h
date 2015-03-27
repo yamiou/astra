@@ -1,5 +1,5 @@
-#ifndef SIMPLEVIEWER_H
-#define SIMPLEVIEWER_H
+#ifndef SIMPLE_COLOR_VIEWER_H
+#define SIMPLE_COLOR_VIEWER_H
 
 #define MAX_DEPTH 10000
 
@@ -18,11 +18,11 @@ typedef struct
     uint8_t b;
 } RGB888Pixel;
 
-class SampleViewer
+class SimpleColorViewer
 {
 public:
-    SampleViewer(const char* strSampleName);
-    virtual ~SampleViewer();
+    SimpleColorViewer(const char* strSampleName);
+    virtual ~SimpleColorViewer();
 
     virtual void init(int argc, char **argv);
     virtual void run();   //Does not return
@@ -37,15 +37,14 @@ protected:
     void initOpenGLHooks();
 
 private:
-    SampleViewer(const SampleViewer&);
-    SampleViewer& operator=(SampleViewer&);
+    SimpleColorViewer(const SimpleColorViewer&);
+    SimpleColorViewer& operator=(SimpleColorViewer&);
 
-    static SampleViewer* ms_self;
+    static SimpleColorViewer* ms_self;
     static void glutIdle();
     static void glutDisplay();
     static void glutKeyboard(unsigned char key, int x, int y);
 
-    float                   m_pDepthHist[MAX_DEPTH];
     char                    m_strSampleName[255];
     unsigned int            m_nTexMapX;
     unsigned int            m_nTexMapY;
@@ -59,4 +58,4 @@ private:
 };
 
 
-#endif /* SIMPLEVIEWER_H */
+#endif /* SIMPLE_COLOR_VIEWER_H */

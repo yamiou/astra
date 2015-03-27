@@ -1,10 +1,9 @@
-#include "SimpleViewer.h"
+#include "SimpleColorViewer.h"
 
 int main(int argc, char** argv)
 {
-    SampleViewer sampleViewer("Simple Viewer");
+    SimpleColorViewer colorViewer("Color Viewer");
 
-
-    sampleViewer.init(argc, argv);
-    sampleViewer.run();
+    colorViewer.init(argc, argv);
+    colorViewer.run();
 }

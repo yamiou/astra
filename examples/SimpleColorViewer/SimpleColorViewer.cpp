@@ -5,7 +5,7 @@
 
 #include <SenseKit.h>
 #include <SenseKitUL.h>
-#include "SimpleViewer.h"
+#include "SimpleColorViewer.h"
 #include <memory.h>
 
 #ifdef _WIN32
@@ -36,29 +36,29 @@
 #define MIN_CHUNKS_SIZE(data_size, chunk_size)  (MIN_NUM_CHUNKS(data_size, chunk_size) * (chunk_size))
 #include <algorithm>
 
-SampleViewer* SampleViewer::ms_self = NULL;
+SimpleColorViewer* SimpleColorViewer::ms_self = NULL;
 
-void SampleViewer::glutIdle()
+void SimpleColorViewer::glutIdle()
 {
     glutPostRedisplay();
 }
-void SampleViewer::glutDisplay()
+void SimpleColorViewer::glutDisplay()
 {
-    SampleViewer::ms_self->display();
+    SimpleColorViewer::ms_self->display();
 }
-void SampleViewer::glutKeyboard(unsigned char key, int x, int y)
+void SimpleColorViewer::glutKeyboard(unsigned char key, int x, int y)
 {
-    SampleViewer::ms_self->onKey(key, x, y);
+    SimpleColorViewer::ms_self->onKey(key, x, y);
 }
 
-SampleViewer::SampleViewer(const char* strSampleName) :
+SimpleColorViewer::SimpleColorViewer(const char* strSampleName) :
 m_pTexMap(NULL)
 {
     ms_self = this;
     strncpy(m_strSampleName, strSampleName, 255);
 }
 
-SampleViewer::~SampleViewer()
+SimpleColorViewer::~SimpleColorViewer()
 {
     sensekit_color_close(&m_colorStream);
     sensekit_close_streamset(&m_sensor);
@@ -69,7 +69,7 @@ SampleViewer::~SampleViewer()
     ms_self = NULL;
 }
 
-void SampleViewer::init(int argc, char **argv)
+void SimpleColorViewer::init(int argc, char **argv)
 {
     sensekit_context_t* context = sensekit_initialize();
     sensekit_ul_initialize(context);
@@ -90,12 +90,12 @@ void SampleViewer::init(int argc, char **argv)
     return initOpenGL(argc, argv);
 
 }
-void SampleViewer::run()      //Does not return
+void SimpleColorViewer::run()      //Does not return
 {
     glutMainLoop();
 }
 
-void SampleViewer::display()
+void SimpleColorViewer::display()
 {
     sensekit_temp_update();
     sensekit_color_frame_open(m_colorStream, 30, &m_colorFrame);
@@ -164,7 +164,7 @@ void SampleViewer::display()
     glutSwapBuffers();
 }
 
-void SampleViewer::onKey(unsigned char key, int /*x*/, int /*y*/)
+void SimpleColorViewer::onKey(unsigned char key, int /*x*/, int /*y*/)
 {
     switch (key)
     {
@@ -175,7 +175,7 @@ void SampleViewer::onKey(unsigned char key, int /*x*/, int /*y*/)
     }
 }
 
-void SampleViewer::initOpenGL(int argc, char **argv)
+void SimpleColorViewer::initOpenGL(int argc, char **argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
@@ -190,7 +190,7 @@ void SampleViewer::initOpenGL(int argc, char **argv)
     glEnable(GL_TEXTURE_2D);
 }
 
-void SampleViewer::initOpenGLHooks()
+void SimpleColorViewer::initOpenGLHooks()
 {
     glutKeyboardFunc(glutKeyboard);
     glutDisplayFunc(glutDisplay);

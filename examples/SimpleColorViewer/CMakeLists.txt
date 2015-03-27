@@ -4,8 +4,8 @@ find_package(OpenGL REQUIRED)
 set (SimpleColorViewer_SOURCES
   main.cpp
   utils.h
-  SimpleViewer.h
-  SimpleViewer.cpp
+  SimpleColorViewer.h
+  SimpleColorViewer.cpp
   )
 
 add_executable(SimpleColorViewer ${SimpleColorViewer_SOURCES})
