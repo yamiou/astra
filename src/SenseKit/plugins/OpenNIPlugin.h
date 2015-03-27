@@ -20,7 +20,6 @@ namespace sensekit
             virtual ~OpenNIPlugin() = default;
             virtual void temp_update() override;
 
-            // disable copying
             OpenNIPlugin(const OpenNIPlugin&) = delete;
             OpenNIPlugin& operator=(const OpenNIPlugin&) = delete;
 
@@ -29,18 +28,43 @@ namespace sensekit
             virtual void on_cleanup() override;
 
         private:
-            static void set_parameter_thunk(void* instance, sensekit_streamconnection_t* streamConnection, sensekit_parameter_id, size_t, sensekit_parameter_data_t*);
-            static void get_parameter_size_thunk(void* instance, sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t* byteLength);
-            static void get_parameter_data_thunk(void* instance, sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t byteLength, sensekit_parameter_data_t* data);
+            static void set_parameter_thunk(void* instance,
+                                            sensekit_streamconnection_t* connection,
+                                            sensekit_parameter_id id,
+                                            size_t byteLength,
+                                            sensekit_parameter_data_t* data);
 
-            void set_parameter(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id, size_t, sensekit_parameter_data_t*);
-            void get_parameter_size(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t& byteLength);
-            void get_parameter_data(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t byteLength, sensekit_parameter_data_t* data);
+            static void get_parameter_size_thunk(void* instance,
+                                                 sensekit_streamconnection_t* connection,
+                                                 sensekit_parameter_id id,
+                                                 size_t* byteLength);
+
+            static void get_parameter_data_thunk(void* instance,
+                                                 sensekit_streamconnection_t* connection,
+                                                 sensekit_parameter_id id,
+                                                 size_t byteLength,
+                                                 sensekit_parameter_data_t* data);
+
+            void set_parameter(sensekit_streamconnection_t* connection,
+                               sensekit_parameter_id id,
+                               size_t byteLength,
+                               sensekit_parameter_data_t* data);
+
+            void get_parameter_size(sensekit_streamconnection_t* connection,
+                                    sensekit_parameter_id id,
+                                    size_t& byteLength);
+
+            void get_parameter_data(sensekit_streamconnection_t* connection,
+                                    sensekit_parameter_id id,
+                                    size_t byteLength,
+                                    sensekit_parameter_data_t* data);
 
             sensekit_status_t open_sensor_streams();
             sensekit_status_t close_sensor_streams();
+
             void set_new_depth_buffer(sensekit_frame_t* nextBuffer);
             void set_new_color_buffer(sensekit_frame_t* nextBuffer);
+
             sensekit_status_t read_next_depth_frame(sensekit_depthframe_wrapper_t* frame);
             sensekit_status_t read_next_color_frame(sensekit_colorframe_wrapper_t* frame);
 
