@@ -50,3 +50,4 @@ add_subdirectory(Core/tests)
 add_executable(OpenNITest "openni/test.cpp")
 
 target_link_libraries(OpenNITest ${OpenNI2_LIBRARY})
+
