@@ -26,7 +26,7 @@ if (WIN32)
 #
 #       add_custom_command(TARGET SimpleViewer POST_BUILD
 #               COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#                       "$<TARGET_FILE_DIR:SenseKitSL>/SenseKitSL.dll"
+#                       "$<TARGET_FILE_DIR:SenseKitUL>/SenseKitUL.dll"
 #                       $<TARGET_FILE_DIR:SimpleViewer>)
 
         add_custom_target(copyoutput ALL
@@ -35,7 +35,7 @@ if (WIN32)
                                 "$<TARGET_FILE_DIR:SenseKit>/SenseKit.dll"
                                 $<TARGET_FILE_DIR:SimpleViewer>
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                                "$<TARGET_FILE_DIR:SenseKitSL>/SenseKitUL.dll"
+                                "$<TARGET_FILE_DIR:SenseKitUL>/SenseKitUL.dll"
                                 $<TARGET_FILE_DIR:SimpleViewer>
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 "$<TARGET_FILE_DIR:OpenNIPlugin>/OpenNIPlugin.dll"
@@ -48,7 +48,7 @@ if (WIN32)
                                 "$<TARGET_FILE_DIR:SenseKit>/SenseKit.dll"
                                 $<TARGET_FILE_DIR:DepthReader>
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                                "$<TARGET_FILE_DIR:SenseKitSL>/SenseKitUL.dll"
+                                "$<TARGET_FILE_DIR:SenseKitUL>/SenseKitUL.dll"
                                 $<TARGET_FILE_DIR:DepthReader>
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 "$<TARGET_FILE_DIR:OpenNIPlugin>/OpenNIPlugin.dll"
@@ -56,5 +56,18 @@ if (WIN32)
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 "$<TARGET_FILE_DIR:DummyPlugin>/DummyPlugin.dll"
                                 $<TARGET_FILE_DIR:DepthReader>
+                #SimpleColorViewer
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                "$<TARGET_FILE_DIR:SenseKit>/SenseKit.dll"
+                                $<TARGET_FILE_DIR:SimpleColorViewer>
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                "$<TARGET_FILE_DIR:SenseKitUL>/SenseKitUL.dll"
+                                $<TARGET_FILE_DIR:SimpleColorViewer>
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                "$<TARGET_FILE_DIR:OpenNIPlugin>/OpenNIPlugin.dll"
+                                $<TARGET_FILE_DIR:SimpleColorViewer>
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                "$<TARGET_FILE_DIR:DummyPlugin>/DummyPlugin.dll"
+                                $<TARGET_FILE_DIR:SimpleColorViewer>
                                 )
 endif()
