@@ -1,11 +1,4 @@
 set(orbbec_hands_SOURCES
-  ../../../include/SenseKit/SenseKit.h
-  ../../../include/SenseKit/sensekit_core.h
-  ../../../include/SenseKit/sensekit_types.h
-  ../../../include/SenseKit/sensekit_plugin_types.h
-  ../../../include/SenseKit/sensekit_capi.h
-  ../../../include/SenseKitUL/StreamTypes.h
-  ../../../include/SenseKitUL/SenseKitUL.h
   handtracker.cpp
   handtracker.h
   hands_plugin.cpp
