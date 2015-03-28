@@ -64,8 +64,7 @@ int main(int argc, char** argv)
 
 #endif //_WIN32
 
-    sensekit_context_t* context = sensekit_initialize();
-    sensekit_ul_initialize(context);
+    sensekit_initialize();
 
     sensekit_streamset_t* sensor;
     sensekit_status_t status = SENSEKIT_STATUS_SUCCESS;

@@ -2,10 +2,11 @@
 #define STREAMKITAPI_H
 
 #include <SenseKit.h>
+#include <Plugins/StreamServiceProxyBase.h>
 
 SENSEKIT_BEGIN_DECLS
 
-SENSEKIT_API void sensekit_api_initialize(sensekit_context_t* context);
+extern StreamServiceProxyBase* g_proxyPtr;
 
 SENSEKIT_END_DECLS
 

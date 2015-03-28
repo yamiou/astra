@@ -6,7 +6,7 @@ SENSEKIT_BEGIN_DECLS
 
 static HandTrackerPlugin* g_plugin;
 
-SENSEKIT_API_EXPORT void sensekit_plugin_initialize(StreamServiceProxyBase* streamProxy,
+SENSEKIT_EXPORT void sensekit_plugin_initialize(StreamServiceProxyBase* streamProxy,
                                                     PluginServiceProxyBase* pluginProxy)
 {
     g_plugin = new HandTrackerPlugin(
@@ -16,12 +16,12 @@ SENSEKIT_API_EXPORT void sensekit_plugin_initialize(StreamServiceProxyBase* stre
     g_plugin->initialize();
 }
 
-SENSEKIT_API_EXPORT void sensekit_plugin_update()
+SENSEKIT_EXPORT void sensekit_plugin_update()
 {
     g_plugin->temp_update();
 }
 
-SENSEKIT_API_EXPORT void sensekit_plugin_terminate()
+SENSEKIT_EXPORT void sensekit_plugin_terminate()
 {
     g_plugin->cleanup();
     delete g_plugin;

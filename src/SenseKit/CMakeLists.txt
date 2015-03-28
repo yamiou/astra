@@ -32,6 +32,8 @@ set (DummyPlugin_SOURCES
   plugins/DummyPlugin.cpp
   )
 
+add_definitions(-DSENSEKIT_BUILD)
+
 add_library(SenseKit SHARED ${SenseKit_SOURCES})
 add_library(OpenNIPlugin SHARED ${OpenNIPlugin_SOURCES})
 add_library(DummyPlugin SHARED ${DummyPlugin_SOURCES})
@@ -40,7 +42,8 @@ add_library(DummyPlugin SHARED ${DummyPlugin_SOURCES})
 #set_property(TARGET SenseKit PROPERTY CXX_STANDARD 11)
 #set_property(TARGET SenseKit PROPERTY CXX_STANDARD_REQUIRED ON)
 
-target_link_libraries(OpenNIPlugin ${OpenNI2_LIBRARY})
+target_link_libraries(SenseKit SenseKitAPI)
+target_link_libraries(OpenNIPlugin SenseKitAPI ${OpenNI2_LIBRARY})
 target_link_libraries(DummyPlugin SenseKitUL)
 
 add_subdirectory(Core/tests)

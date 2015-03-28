@@ -13,18 +13,25 @@
 # include <stddef.h>
 #endif
 
-#ifndef SENSEKIT_API
-# if defined (_MSC_VER) && ! defined (SENSEKIT_WIN32_STATIC_BUILD)
-#  define SENSEKIT_API_EXPORT __declspec(dllexport)
-#  ifdef SENSEKIT_EXPORT
-#    define SENSEKIT_API SENSEKIT_API_EXPORT
-#  else
-#    define SENSEKIT_API __declspec(dllimport)
-#  endif
+# if defined (_MSC_VER)
+#  define SENSEKIT_EXPORT __declspec(dllexport)
+#  define SENSEKIT_IMPORT __declspec(dllimport)
 # else
-#  define SENSEKIT_API
-#  define SENSEKIT_API_EXPORT
+#  if __GNUC__ >= 4
+#    define SENSEKIT_EXPORT __attribute__ ((visibility ("default")))
+#    define SENSEKIT_IMPORT
+#  else
+#    define SENSEKIT_EXPORT
+#    define SENSEKIT_IMPORT
+#  endif
 # endif
+
+#ifndef SENSEKIT_API
+#  ifdef SENSEKIT_BUILD
+#    define SENSEKIT_API SENSEKIT_EXPORT
+#  else
+#    define SENSEKIT_API SENSEKIT_IMPORT
+#  endif
 #endif
 
 #endif /* SENSEKIT_CORE_H */
