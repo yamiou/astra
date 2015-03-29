@@ -16,11 +16,17 @@
 # if defined (_MSC_VER)
 #  define SENSEKIT_EXPORT __declspec(dllexport)
 #  define SENSEKIT_IMPORT __declspec(dllimport)
+#  define SENSEKIT_PUBLIC
+#  define SENSEKIT_LOCAL
 # else
 #  if __GNUC__ >= 4
-#    define SENSEKIT_EXPORT __attribute__ ((visibility ("default")))
+#    define SENSEKIT_PUBLIC __attribute__ ((visibility ("default")))
+#    define SENSEKIT_LOCAL  __attribute__ ((visibility ("hidden")))
+#    define SENSEKIT_EXPORT SENSEKIT_PUBLIC
 #    define SENSEKIT_IMPORT
 #  else
+#    define SENSEKIT_PUBLIC
+#    define SENSEKIT_LOCAL
 #    define SENSEKIT_EXPORT
 #    define SENSEKIT_IMPORT
 #  endif
@@ -31,6 +37,14 @@
 #    define SENSEKIT_API SENSEKIT_EXPORT
 #  else
 #    define SENSEKIT_API SENSEKIT_IMPORT
+#  endif
+#endif
+
+#ifndef SENSEKIT_API_EX
+#  ifdef SENSEKIT_BUILD_EX
+#    define SENSEKIT_API_EX SENSEKIT_EXPORT
+#  else
+#    define SENSEKIT_API_EX SENSEKIT_IMPORT
 #  endif
 #endif
 

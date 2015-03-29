@@ -1,6 +1,10 @@
 set(SenseKitAPI_SOURCES
+  ../../include/SenseKitAPI/SenseKitAPI.h
   SenseKitAPI.cpp
   )
+
+add_definitions(-DSENSEKIT_BUILD)
+add_definitions(-DSENSEKIT_BUILD_API)
 
 add_library(SenseKitAPI SHARED ${SenseKitAPI_SOURCES})
 

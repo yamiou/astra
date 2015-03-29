@@ -4,8 +4,6 @@
 
 SENSEKIT_BEGIN_DECLS
 
-__attribute__ ((visibility ("default"))) StreamServiceProxyBase* g_proxyPtr = nullptr;
-
 SENSEKIT_API sensekit_status_t sensekit_open_streamset(const char* connection_string, /*out*/ sensekit_streamset_t** streamset)
 {
     return reinterpret_cast<sensekit::StreamServiceProxy*>(g_proxyPtr)->open_streamset(connection_string, streamset);

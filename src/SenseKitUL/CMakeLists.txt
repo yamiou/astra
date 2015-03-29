@@ -11,6 +11,8 @@ set(SenseKitUL_SOURCES
 
 add_library(SenseKitUL SHARED ${SenseKitUL_SOURCES})
 
+add_definitions(-DSENSEKIT_BUILD_EX)
+
 # force c++11 (has no effect currently)
 #set_property(TARGET SenseKit PROPERTY CXX_STANDARD 11)
 #set_property(TARGET SenseKit PROPERTY CXX_STANDARD_REQUIRED ON)

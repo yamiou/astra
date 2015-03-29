@@ -35,6 +35,9 @@ if (WIN32)
                                 "$<TARGET_FILE_DIR:SenseKit>/SenseKit.dll"
                                 $<TARGET_FILE_DIR:SimpleViewer>
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                "$<TARGET_FILE_DIR:SenseKitAPI>/SenseKitAPI.dll"
+                                $<TARGET_FILE_DIR:SimpleViewer>
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 "$<TARGET_FILE_DIR:SenseKitUL>/SenseKitUL.dll"
                                 $<TARGET_FILE_DIR:SimpleViewer>
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -48,6 +51,9 @@ if (WIN32)
                                 "$<TARGET_FILE_DIR:SenseKit>/SenseKit.dll"
                                 $<TARGET_FILE_DIR:DepthReader>
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                "$<TARGET_FILE_DIR:SenseKitAPI>/SenseKitAPI.dll"
+                                $<TARGET_FILE_DIR:DepthReader>
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 "$<TARGET_FILE_DIR:SenseKitUL>/SenseKitUL.dll"
                                 $<TARGET_FILE_DIR:DepthReader>
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -59,6 +65,9 @@ if (WIN32)
                 #SimpleColorViewer
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 "$<TARGET_FILE_DIR:SenseKit>/SenseKit.dll"
+                                $<TARGET_FILE_DIR:SimpleColorViewer>
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                "$<TARGET_FILE_DIR:SenseKitAPI>/SenseKitAPI.dll"
                                 $<TARGET_FILE_DIR:SimpleColorViewer>
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 "$<TARGET_FILE_DIR:SenseKitUL>/SenseKitUL.dll"

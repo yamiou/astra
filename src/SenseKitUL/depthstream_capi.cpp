@@ -21,7 +21,7 @@ static coonversion_cache_t g_conversionCache;
 
 SENSEKIT_BEGIN_DECLS
 
-SENSEKIT_API sensekit_status_t convert_depth_to_world(float depthX, float depthY, float depthZ, float* pWorldX, float* pWorldY, float* pWorldZ)
+SENSEKIT_API_EX sensekit_status_t convert_depth_to_world(float depthX, float depthY, float depthZ, float* pWorldX, float* pWorldY, float* pWorldZ)
 {
     float normalizedX = depthX / g_conversionCache.resolutionX - .5f;
     float normalizedY = .5f - depthY / g_conversionCache.resolutionY;
@@ -33,7 +33,7 @@ SENSEKIT_API sensekit_status_t convert_depth_to_world(float depthX, float depthY
     return SENSEKIT_STATUS_SUCCESS;
 }
 
-SENSEKIT_API sensekit_status_t convert_world_to_depth(float worldX, float worldY, float worldZ, float* pDepthX, float* pDepthY, float* pDepthZ)
+SENSEKIT_API_EX sensekit_status_t convert_world_to_depth(float worldX, float worldY, float worldZ, float* pDepthX, float* pDepthY, float* pDepthZ)
 {
     *pDepthX = g_conversionCache.coeffX * worldX / worldZ + g_conversionCache.halfResX;
     *pDepthY = g_conversionCache.halfResY - g_conversionCache.coeffY * worldY / worldZ;
@@ -60,7 +60,7 @@ static void refresh_conversion_cache()
     g_conversionCache.coeffY = g_conversionCache.resolutionY / g_conversionCache.yzFactor;
 }
 
-SENSEKIT_API sensekit_status_t sensekit_depth_open(sensekit_streamset_t* streamset,
+SENSEKIT_API_EX sensekit_status_t sensekit_depth_open(sensekit_streamset_t* streamset,
                                                    sensekit_depthstream_t** stream)
 {
     refresh_conversion_cache();
@@ -69,18 +69,18 @@ SENSEKIT_API sensekit_status_t sensekit_depth_open(sensekit_streamset_t* streams
                                         ANY_SUBTYPE);
 }
 
-SENSEKIT_API sensekit_status_t sensekit_depth_close(sensekit_depthstream_t** stream)
+SENSEKIT_API_EX sensekit_status_t sensekit_depth_close(sensekit_depthstream_t** stream)
 {
     return sensekit_generic_stream_close(stream);
 }
 
-SENSEKIT_API sensekit_status_t sensekit_depth_frame_open(sensekit_depthstream_t* stream,
+SENSEKIT_API_EX sensekit_status_t sensekit_depth_frame_open(sensekit_depthstream_t* stream,
                                                          int timeout, sensekit_depthframe_t** frame)
 {
     return sensekit_generic_frame_open<sensekit_depthframe_wrapper_t>(stream, timeout, frame);
 }
 
-SENSEKIT_API sensekit_status_t sensekit_depth_frame_close(sensekit_depthframe_t** frame)
+SENSEKIT_API_EX sensekit_status_t sensekit_depth_frame_close(sensekit_depthframe_t** frame)
 {
     return sensekit_generic_frame_close(frame);
 }

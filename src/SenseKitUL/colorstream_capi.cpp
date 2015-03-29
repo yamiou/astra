@@ -7,7 +7,7 @@
 
 SENSEKIT_BEGIN_DECLS
 
-SENSEKIT_API sensekit_status_t sensekit_color_open(sensekit_streamset_t* streamset,
+SENSEKIT_API_EX sensekit_status_t sensekit_color_open(sensekit_streamset_t* streamset,
                                                    sensekit_colorstream_t** stream)
 {
     return sensekit_generic_stream_open(streamset, stream,
@@ -15,19 +15,19 @@ SENSEKIT_API sensekit_status_t sensekit_color_open(sensekit_streamset_t* streams
                                         ANY_SUBTYPE);
 }
 
-SENSEKIT_API sensekit_status_t sensekit_color_close(sensekit_colorstream_t** stream)
+SENSEKIT_API_EX sensekit_status_t sensekit_color_close(sensekit_colorstream_t** stream)
 {
     return sensekit_generic_stream_close(stream);
 }
 
-SENSEKIT_API sensekit_status_t sensekit_color_frame_open(sensekit_colorstream_t* stream,
+SENSEKIT_API_EX sensekit_status_t sensekit_color_frame_open(sensekit_colorstream_t* stream,
                                                          int timeout,
                                                          sensekit_colorframe_t** frame)
 {
     return sensekit_generic_frame_open<sensekit_colorframe_wrapper_t>(stream, timeout, frame);
 }
 
-SENSEKIT_API sensekit_status_t sensekit_color_frame_close(sensekit_colorframe_t** frame)
+SENSEKIT_API_EX sensekit_status_t sensekit_color_frame_close(sensekit_colorframe_t** frame)
 {
     return sensekit_generic_frame_close(frame);
 }

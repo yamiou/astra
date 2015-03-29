@@ -4,6 +4,6 @@
 
 SENSEKIT_BEGIN_DECLS
 
-extern StreamServiceProxyBase* g_proxyPtr;
+extern SENSEKIT_API StreamServiceProxyBase* g_proxyPtr;
 
 SENSEKIT_END_DECLS
