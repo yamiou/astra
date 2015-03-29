@@ -3,8 +3,7 @@ set(SenseKitAPI_SOURCES
   SenseKitAPI.cpp
   )
 
-add_definitions(-DSENSEKIT_BUILD)
-add_definitions(-DSENSEKIT_BUILD_API)
+add_definitions(-DSENSEKIT_BUILD_API_PROXY)
 
 add_library(SenseKitAPI SHARED ${SenseKitAPI_SOURCES})
 
