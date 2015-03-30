@@ -24,7 +24,7 @@ void SegmentationTracker::segmentForeground(TrackingData data)
     float seedDepth = data.matDepth.at<float>(data.seedPosition);
     cv::Mat& matDepth = data.matDepth;
     cv::Mat& matForeground = data.matForegroundSearched;
-    cv::Mat& matAreaSqrt = data.matAreaSqrt;
+    cv::Mat& matArea = data.matArea;
     cv::Mat& matSegmentation = data.matGlobalSegmentation;
     bool isActivePoint = data.pointType == TrackedPointType::ActivePoint;
     std::queue<PointTTL> pointQueue;
@@ -69,7 +69,7 @@ void SegmentationTracker::segmentForeground(TrackingData data)
                 //If not active tracking, will always decrement TTL.
                 if (!isActivePoint || anyInRange)
                 {
-                    ttl -= matAreaSqrt.at<float>(p);
+                    ttl -= sqrt(matArea.at<float>(p));
                 }
 
                 if (pointInRange)

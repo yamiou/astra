@@ -29,7 +29,7 @@ enum TrackingStatus
 struct TrackingData
 {
     cv::Mat matDepth;
-    cv::Mat matAreaSqrt;
+    cv::Mat matArea;
     cv::Mat matGlobalSegmentation;
     cv::Mat matScore;
     cv::Mat matForegroundSearched;

@@ -92,12 +92,12 @@ private:
 
     static void calculateBasicScore(cv::Mat& matDepth, cv::Mat& matScore, const float heightFactor, const float depthFactor, const float resizeFactor);
 
-    static void calculateSegmentArea(cv::Mat& matDepth, cv::Mat& matArea, cv::Mat& matAreaSqrt, const float resizeFactor);
+    static void calculateSegmentArea(cv::Mat& matDepth, cv::Mat& matArea, const float resizeFactor);
     static float getDepthArea(cv::Point3f& p1, cv::Point3f& p2, cv::Point3f& p3, const float resizeFactor);
 
     static void calculateEdgeDistance(cv::Mat& matSegmentation, cv::Mat& matArea, cv::Mat& matEdgeDistance);
 
-    void trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat& matScore, cv::Mat& segmentation, cv::Mat& edgeDistance, cv::Mat& localArea);
+    void trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat& matGlobalSegmentation, cv::Mat& matScore, cv::Mat& matEdgeDistance, cv::Mat& matArea);
 
     //not sure
     
@@ -113,10 +113,10 @@ private:
     cv::Mat m_matDepthVel;
     cv::Mat m_matDepthVelErode;
     cv::Mat m_matForeground;
-    cv::Mat m_matHandSegmentation;
+    cv::Mat m_matGlobalSegmentation;
     cv::Mat m_matEdgeDistance;
     cv::Mat m_matScore;
-    cv::Mat m_tempLayerSegmentation;
+    cv::Mat m_layerSegmentation;
     cv::Mat m_matLocalArea;
     cv::Mat m_tempLocalArea;
 
