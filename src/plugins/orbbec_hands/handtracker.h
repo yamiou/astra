@@ -10,30 +10,7 @@
 #define MAX_DEPTH 10000
 
 #define HIST_LEN 4
-
-enum PixelType
-{
-    Background = 0,
-    Foreground = 1,
-    Searched = 2,
-    IntermediateClosest = 3,
-    Closest = 4,
-    Neighborhood = 5
-};
-
-enum TrackedPointType
-{
-    CandidatePoint,
-    ActivePoint
-};
-
-enum TrackingStatus
-{
-    NotTracking,
-    Tracking,
-    Lost,
-    Dead
-};
+#include "trackingdata.h"
 
 
 struct FitResult
@@ -41,21 +18,6 @@ struct FitResult
 public:
     cv::Point2f center;
     int radius;
-};
-
-struct PointTTL
-{
-public:
-    cv::Point m_point;
-    float m_ttl;
-    bool m_pathInRange;
-
-    PointTTL(cv::Point point, float ttl, bool pathInRange)
-    {
-        m_point = point;
-        m_ttl = ttl;
-        m_pathInRange = pathInRange;
-    }
 };
 
 struct TrackedPoint
@@ -89,28 +51,6 @@ public:
         m_avgArea = area;
         m_wrongAreaCount = 0;
     }
-};
-
-struct TrackingData
-{
-    cv::Mat matDepth;
-    cv::Mat matAreaSqrt;
-    cv::Mat matGlobalSegmentation;
-    cv::Mat matScore;
-    cv::Mat matForegroundSearched;
-    cv::Mat matLayerSegmentation;
-    cv::Point seedPosition;
-    const float referenceDepth;
-    const float bandwidthDepth;
-    const TrackedPointType pointType;
-    const int iterationMax;
-
-    TrackingData(const float referenceDepth, const float bandwidthDepth, const TrackedPointType pointType, const int iterationMax) :
-        referenceDepth(referenceDepth),
-        bandwidthDepth(bandwidthDepth),
-        pointType(pointType),
-        iterationMax(iterationMax)
-    {}
 };
 
 class HandTracker
@@ -152,10 +92,6 @@ private:
     bool findUnvisitedForegroundPoint(cv::Mat& matSegmentation, cv::Mat& matVisited, cv::Point& position);
     void processCircleAnalysis(cv::Mat& matSegmentation);
     
-    static cv::Point trackPointFromSeed(TrackingData data);
-    static cv::Point convergeTrackPointFromSeed(TrackingData data);
-    static void segmentForeground(TrackingData data);
-
     void validateAndUpdateTrackedPoint(cv::Mat& matDepth, cv::Mat& matArea, TrackedPoint& tracked, cv::Point targetPoint);
     void trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat& matScore, cv::Mat& segmentation, cv::Mat& edgeDistance, cv::Mat& localArea);
     bool isDepthInRange(const float bandwidth, const float bandwidthDepth, cv::Point& center, float startingDepth, cv::Point3f& position);
