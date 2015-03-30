@@ -71,9 +71,10 @@ private:
 
     std::vector<TrackedPoint>& updateOriginalPoints(std::vector<TrackedPoint>& mInternalTrackedPoints);
 
-    cv::Point3f convertDepthToRealWorld(cv::Point3f localPosition);
-    cv::Point3f convertDepthToRealWorld(float localX, float localY, float localZ);
-    cv::Point3f convertRealWorldToDepth(cv::Point3f worldPosition);
+    static cv::Point3f convertDepthToRealWorld(cv::Point3f localPosition, const float resizeFactor);
+    static cv::Point3f convertDepthToRealWorld(float localX, float localY, float localZ, const float resizeFactor);
+    static cv::Point3f convertRealWorldToDepth(cv::Point3f worldPosition, const float resizeFactor);
+    static cv::Point offsetPixelLocationByMM(cv::Point& position, float offsetX, float offsetY, float depth, const float resizeFactor);
 
     void setupVariables();
     void verifyInit(int width, int height);
@@ -81,23 +82,25 @@ private:
     static void filterZeroValuesAndJumps(cv::Mat depthCurrent, cv::Mat depthPrev, cv::Mat depthAvg, cv::Mat depthVel, float maxDepthJumpPercent);
     static void thresholdForeground(cv::Mat& matForeground, cv::Mat& matVelocity, float foregroundThresholdFactor);
 
+    static void removeDuplicatePoints(std::vector<TrackedPoint> trackedPoints);
+
+
+    static float countNeighborhoodArea(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat& matArea, cv::Point_<int> center, const float bandwidth, const float bandwidthDepth, const float resizeFactor);
+    static void validateAndUpdateTrackedPoint(cv::Mat& matDepth, cv::Mat& matArea, cv::Mat& matLayerSegmentation, TrackedPoint& tracked, cv::Point targetPoint, const float resizeFactor, const float minArea, const float maxArea, const float areaBandwidth, const float areaBandwidthDepth);
     bool findForegroundPixel(cv::Mat& matForeground, cv::Point& foregroundPosition);
     cv::Point shiftNearest(cv::Mat& matForeground, cv::Mat& matDepth, const float bandwidth, const float bandwidthDepth, cv::Point start, float& distance);
     cv::Point findClosestPixelFromSeed(cv::Mat& matForeground, cv::Mat& matDepth, cv::Point foregroundPosition);
     void calculateBasicScore(cv::Mat& matDepth, cv::Mat& matScore);
     void calculateEdgeDistance(cv::Mat& matSegmentation, cv::Mat& matArea, cv::Mat& matEdgeDistance);
     void calculateSegmentArea(cv::Mat& matDepth, cv::Mat& matArea, cv::Mat& matAreaSqrt);
-    void calculateLocalArea(cv::Mat& matSegmentation, cv::Mat& matDepth, cv::Mat& matArea, cv::Mat& matLocalArea, const float areaBandwidth, const float areaBandwidthDepth);
+    
     float calculatePercentForeground(cv::Mat& matSegmentation, cv::Point2f center, int radius);
     bool findUnvisitedForegroundPoint(cv::Mat& matSegmentation, cv::Mat& matVisited, cv::Point& position);
     void processCircleAnalysis(cv::Mat& matSegmentation);
     
-    void validateAndUpdateTrackedPoint(cv::Mat& matDepth, cv::Mat& matArea, TrackedPoint& tracked, cv::Point targetPoint);
     void trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat& matScore, cv::Mat& segmentation, cv::Mat& edgeDistance, cv::Mat& localArea);
     bool isDepthInRange(const float bandwidth, const float bandwidthDepth, cv::Point& center, float startingDepth, cv::Point3f& position);
     float getDepthArea(cv::Point3f& p1, cv::Point3f& p2, cv::Point3f& p3);
-    cv::Point offsetPixelLocationByMM(cv::Point& position, float offsetX, float offsetY, float depth);
-    float countNeighborhoodArea(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat& matArea, const float bandwidth, const float bandwidthDepth, cv::Point center);
     
     float m_resizeFactor;
 

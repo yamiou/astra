@@ -198,18 +198,6 @@ void HandTracker::thresholdForeground(cv::Mat& matForeground, cv::Mat& matVeloci
     }
 }
 
-cv::Point3f HandTracker::convertDepthToRealWorld(float localX, float localY, float localZ)
-{
-    float worldX, worldY, worldZ;
-
-    localX *= m_resizeFactor;
-    localY *= m_resizeFactor;
-
-    convert_depth_to_world(localX, localY, localZ, &worldX, &worldY, &worldZ);
-
-    return cv::Point3f(worldX, worldY, worldZ);
-}
-
 vector<TrackedPoint>& HandTracker::updateOriginalPoints(vector<TrackedPoint>& internalTrackedPoints)
 {
     m_originalTrackedPoints.clear();
@@ -228,21 +216,45 @@ vector<TrackedPoint>& HandTracker::updateOriginalPoints(vector<TrackedPoint>& in
     return m_originalTrackedPoints;
 }
 
-cv::Point3f HandTracker::convertDepthToRealWorld(cv::Point3f localPosition)
+cv::Point3f HandTracker::convertDepthToRealWorld(float localX, float localY, float localZ, const float resizeFactor)
 {
-    return convertDepthToRealWorld(localPosition.x, localPosition.y, localPosition.z);
+    float worldX, worldY, worldZ;
+
+    localX *= resizeFactor;
+    localY *= resizeFactor;
+
+    convert_depth_to_world(localX, localY, localZ, &worldX, &worldY, &worldZ);
+
+    return cv::Point3f(worldX, worldY, worldZ);
 }
 
-cv::Point3f HandTracker::convertRealWorldToDepth(cv::Point3f worldPosition)
+cv::Point3f HandTracker::convertDepthToRealWorld(cv::Point3f localPosition, const float resizeFactor)
+{
+    return convertDepthToRealWorld(localPosition.x, localPosition.y, localPosition.z, resizeFactor);
+}
+
+cv::Point3f HandTracker::convertRealWorldToDepth(cv::Point3f worldPosition, const float resizeFactor)
 {
     float localX, localY, localZ;
 
     convert_world_to_depth(worldPosition.x, worldPosition.y, worldPosition.z, &localX, &localY, &localZ);
 
-    localX /= m_resizeFactor;
-    localY /= m_resizeFactor;
+    localX /= resizeFactor;
+    localY /= resizeFactor;
 
     return cv::Point3f(localX, localY, localZ);
+}
+
+cv::Point HandTracker::offsetPixelLocationByMM(cv::Point& position, float offsetX, float offsetY, float depth, const float resizeFactor)
+{
+    cv::Point3f world = convertDepthToRealWorld(position.x, position.y, depth, resizeFactor);
+
+    world.x += offsetX;
+    world.y += offsetY;
+
+    cv::Point3f offsetLocal = convertRealWorldToDepth(world, resizeFactor);
+
+    return cv::Point(static_cast<int>(offsetLocal.x), static_cast<int>(offsetLocal.y));
 }
 
 bool HandTracker::findForegroundPixel(cv::Mat& matForeground, cv::Point& foregroundPosition)
@@ -276,8 +288,8 @@ cv::Point HandTracker::shiftNearest(cv::Mat& matForeground, cv::Mat& matDepth, c
 {
     float startingDepth = matDepth.at<float>(start.y, start.x);
 
-    cv::Point topLeft = offsetPixelLocationByMM(start, -bandwidth, bandwidth, startingDepth);
-    cv::Point bottomRight = offsetPixelLocationByMM(start, bandwidth, -bandwidth, startingDepth);
+    cv::Point topLeft = offsetPixelLocationByMM(start, -bandwidth, bandwidth, startingDepth, m_resizeFactor);
+    cv::Point bottomRight = offsetPixelLocationByMM(start, bandwidth, -bandwidth, startingDepth, m_resizeFactor);
     int32_t x0 = MAX(0, topLeft.x);
     int32_t y0 = MAX(0, topLeft.y);
     int32_t x1 = MIN(matDepth.cols - 1, bottomRight.x);
@@ -378,7 +390,7 @@ void HandTracker::calculateBasicScore(cv::Mat& matDepth, cv::Mat& matScore)
             float depth = *depthRow;
             if (depth != 0)
             {
-                cv::Point3f worldPosition = convertDepthToRealWorld(x, y, depth);
+                cv::Point3f worldPosition = convertDepthToRealWorld(x, y, depth, m_resizeFactor);
 
                 float score = worldPosition.y * heightFactor;
                 score += (MAX_DEPTH - worldPosition.z) * depthFactor;
@@ -540,96 +552,15 @@ float HandTracker::getDepthArea(cv::Point3f& p1, cv::Point3f& p2, cv::Point3f& p
     float worldX2, worldY2, worldZ2;
     float worldX3, worldY3, worldZ3;
 
-    cv::Point3f world1 = convertDepthToRealWorld(p1);
-    cv::Point3f world2 = convertDepthToRealWorld(p2);
-    cv::Point3f world3 = convertDepthToRealWorld(p3);
+    cv::Point3f world1 = convertDepthToRealWorld(p1, m_resizeFactor);
+    cv::Point3f world2 = convertDepthToRealWorld(p2, m_resizeFactor);
+    cv::Point3f world3 = convertDepthToRealWorld(p3, m_resizeFactor);
 
     cv::Point3f v1 = world2 - world1;
     cv::Point3f v2 = world3 - world1;
 
     float area = 0.5 * cv::norm(v1.cross(v2));
     return area;
-}
-
-cv::Point HandTracker::offsetPixelLocationByMM(cv::Point& position, float offsetX, float offsetY, float depth)
-{
-    cv::Point3f world = convertDepthToRealWorld(position.x, position.y, depth);
-
-    world.x += offsetX;
-    world.y += offsetY;
-
-    cv::Point3f offsetLocal = convertRealWorldToDepth(world);
-
-    return cv::Point(static_cast<int>(offsetLocal.x), static_cast<int>(offsetLocal.y));
-}
-
-float HandTracker::countNeighborhoodArea(cv::Mat& matSegmentation, cv::Mat& matDepth, cv::Mat& matArea, const float bandwidth, const float bandwidthDepth, cv::Point center)
-{
-    float startingDepth = matDepth.at<float>(center);
-
-    cv::Point topLeft = offsetPixelLocationByMM(center, -bandwidth, bandwidth, startingDepth);
-    cv::Point bottomRight = offsetPixelLocationByMM(center, bandwidth, -bandwidth, startingDepth);
-    int32_t x0 = MAX(0, topLeft.x);
-    int32_t y0 = MAX(0, topLeft.y);
-    int32_t x1 = MIN(matDepth.cols - 1, bottomRight.x);
-    int32_t y1 = MIN(matDepth.rows - 1, bottomRight.y);
-
-    float area = 0;
-
-    for (int y = y0; y < y1; y++)
-    {
-        float* depthRow = matDepth.ptr<float>(y);
-        char* segmentationRow = matSegmentation.ptr<char>(y);
-        float* areaRow = matArea.ptr<float>(y);
-
-        depthRow += x0;
-        segmentationRow += x0;
-        areaRow += x0;
-        for (int x = x0; x < x1; x++)
-        {
-            if (*segmentationRow == PixelType::Foreground)
-            {
-                float depth = *depthRow;
-                if (abs(depth - startingDepth) < bandwidthDepth)
-                {
-                    area += *areaRow;
-                }
-            }
-            ++depthRow;
-            ++areaRow;
-            ++segmentationRow;
-        }
-    }
-
-    return area;
-}
-
-void HandTracker::calculateLocalArea(cv::Mat& matSegmentation, cv::Mat& matDepth, cv::Mat& matArea, cv::Mat& matLocalArea, const float areaBandwidth, const float areaBandwidthDepth)
-{
-    int width = matDepth.cols;
-    int height = matDepth.rows;
-
-    for (int y = 0; y < height; y++)
-    {
-        float* depthRow = matDepth.ptr<float>(y);
-        char* segmentationRow = matSegmentation.ptr<char>(y);
-        float* localAreaRow = matLocalArea.ptr<float>(y);
-
-        for (int x = 0; x < width; x++)
-        {
-            float depth = *depthRow;
-            char segmentation = *segmentationRow;
-
-            if (depth != 0 && segmentation == PixelType::Foreground)
-            {
-                float localArea = countNeighborhoodArea(matSegmentation, matDepth, matArea, areaBandwidth, areaBandwidthDepth, cv::Point(x, y));
-                *localAreaRow = localArea;
-            }
-            ++depthRow;
-            ++segmentationRow;
-            ++localAreaRow;
-        }
-    }
 }
 
 float HandTracker::calculatePercentForeground(cv::Mat& matSegmentation, cv::Point2f center, int radius)
@@ -790,78 +721,122 @@ void HandTracker::processCircleAnalysis(cv::Mat& matSegmentation)
     }
 }
 
-void HandTracker::validateAndUpdateTrackedPoint(cv::Mat& matDepth, cv::Mat& matArea, TrackedPoint& tracked, cv::Point targetPoint)
+float HandTracker::countNeighborhoodArea(cv::Mat& matSegmentation, cv::Mat& matDepth, cv::Mat& matArea, cv::Point center, const float bandwidth, const float bandwidthDepth, const float resizeFactor)
 {
-    bool updatedPoint = false;
-    const float steadyDist = 150; //mm
+    float startingDepth = matDepth.at<float>(center);
 
-    const float maxJumpDist = 450; //mm
+    cv::Point topLeft = offsetPixelLocationByMM(center, -bandwidth, bandwidth, startingDepth, resizeFactor);
+    cv::Point bottomRight = offsetPixelLocationByMM(center, bandwidth, -bandwidth, startingDepth, resizeFactor);
+    int32_t x0 = MAX(0, topLeft.x);
+    int32_t y0 = MAX(0, topLeft.y);
+    int32_t x1 = MIN(matDepth.cols - 1, bottomRight.x);
+    int32_t y1 = MIN(matDepth.rows - 1, bottomRight.y);
 
-    const float areaAdaptationFactor = 0.1;
-    const float velocityAdaptationFactor = 0.5;
-    const float maxWrongAreaCount = 60;
+    float area = 0;
 
-    if (targetPoint.x != -1 && targetPoint.y != -1)
+    for (int y = y0; y < y1; y++)
     {
-        float depth = matDepth.at<float>(targetPoint);
+        float* depthRow = matDepth.ptr<float>(y);
+        char* segmentationRow = matSegmentation.ptr<char>(y);
+        float* areaRow = matArea.ptr<float>(y);
 
-        cv::Point3f worldPosition = convertDepthToRealWorld(targetPoint.x, targetPoint.y, depth);
-
-        auto dist = cv::norm(worldPosition - tracked.m_worldPosition);
-        auto deadbandDist = cv::norm(worldPosition - tracked.m_steadyWorldPosition);
-
-        float area = countNeighborhoodArea(m_tempLayerSegmentation, matDepth, matArea, m_areaBandwidth, m_areaBandwidthDepth, targetPoint);
-
-        if (dist < maxJumpDist && area > m_minArea && area < m_maxArea)
+        depthRow += x0;
+        segmentationRow += x0;
+        areaRow += x0;
+        for (int x = x0; x < x1; x++)
         {
-            updatedPoint = true;
-            cv::Point3f worldVelocity = worldPosition - tracked.m_worldPosition;
-            tracked.m_worldPosition = worldPosition;
-            tracked.m_worldVelocity = worldVelocity;
-
-            tracked.m_position = targetPoint;
-            if (deadbandDist > steadyDist)
+            if (*segmentationRow == PixelType::Foreground)
             {
-                tracked.m_steadyWorldPosition = worldPosition;
-                tracked.m_inactiveFrameCount = 0;
-            }
-
-            if (tracked.m_inactiveFrameCount < 10)
-            {
-                tracked.m_activeFrameCount++;
-                if (tracked.m_activeFrameCount > 120)
+                float depth = *depthRow;
+                if (abs(depth - startingDepth) < bandwidthDepth)
                 {
-                    tracked.m_type = TrackedPointType::ActivePoint;
+                    area += *areaRow;
                 }
             }
-
-            /*tracked.m_avgArea = (1 - areaAdaptationFactor) * tracked.m_avgArea + areaAdaptationFactor * area;
-
-            if (tracked.m_avgArea > m_minArea && tracked.m_avgArea < m_maxArea)
-            {
-            tracked.m_wrongAreaCount = 0;
-            }
-            else
-            {
-            tracked.m_wrongAreaCount++;
-            tracked.m_status = TrackingStatus::Lost;
-            if (tracked.m_wrongAreaCount > maxWrongAreaCount)
-            {
-            tracked.m_status = TrackingStatus::Dead;
-            }
-            }*/
+            ++depthRow;
+            ++areaRow;
+            ++segmentationRow;
         }
     }
 
-    if (tracked.m_status != TrackingStatus::Dead)
+    return area;
+}
+
+void HandTracker::validateAndUpdateTrackedPoint(cv::Mat& matDepth, cv::Mat& matArea, cv::Mat& matLayerSegmentation, TrackedPoint& trackedPoint, cv::Point newTargetPoint, const float resizeFactor, const float minArea, const float maxArea, const float areaBandwidth, const float areaBandwidthDepth)
+{
+    bool updatedPoint = false;
+    const float steadyDist = 150; //mm
+    const float maxJumpDist = 450; //mm
+
+    if (newTargetPoint.x != -1 && newTargetPoint.y != -1)
+    {
+        float depth = matDepth.at<float>(newTargetPoint);
+
+        cv::Point3f worldPosition = convertDepthToRealWorld(newTargetPoint.x, newTargetPoint.y, depth, resizeFactor);
+
+        auto dist = cv::norm(worldPosition - trackedPoint.m_worldPosition);
+        auto deadbandDist = cv::norm(worldPosition - trackedPoint.m_steadyWorldPosition);
+
+        float area = countNeighborhoodArea(matLayerSegmentation, matDepth, matArea, newTargetPoint, areaBandwidth, areaBandwidthDepth, resizeFactor);
+
+        if (dist < maxJumpDist && area > minArea && area < maxArea)
+        {
+            updatedPoint = true;
+            cv::Point3f worldVelocity = worldPosition - trackedPoint.m_worldPosition;
+            trackedPoint.m_worldPosition = worldPosition;
+            trackedPoint.m_worldVelocity = worldVelocity;
+
+            trackedPoint.m_position = newTargetPoint;
+            if (deadbandDist > steadyDist)
+            {
+                trackedPoint.m_steadyWorldPosition = worldPosition;
+                trackedPoint.m_inactiveFrameCount = 0;
+            }
+
+            if (trackedPoint.m_inactiveFrameCount < 10)
+            {
+                trackedPoint.m_activeFrameCount++;
+                if (trackedPoint.m_activeFrameCount > 120)
+                {
+                    trackedPoint.m_type = TrackedPointType::ActivePoint;
+                }
+            }
+        }
+    }
+
+    if (trackedPoint.m_status != TrackingStatus::Dead)
     {
         if (updatedPoint)
         {
-            tracked.m_status = TrackingStatus::Tracking;
+            trackedPoint.m_status = TrackingStatus::Tracking;
         }
         else
         {
-            tracked.m_status = TrackingStatus::Lost;
+            trackedPoint.m_status = TrackingStatus::Lost;
+        }
+    }
+}
+
+void HandTracker::removeDuplicatePoints(vector<TrackedPoint> trackedPoints)
+{
+    for (auto iter = trackedPoints.begin(); iter != trackedPoints.end(); ++iter)
+    {
+        TrackedPoint& tracked = *iter;
+        for (auto otherIter = trackedPoints.begin(); otherIter != trackedPoints.end(); ++otherIter)
+        {
+            TrackedPoint& otherTracked = *otherIter;
+            bool bothNotDead = tracked.m_status != TrackingStatus::Dead && otherTracked.m_status != TrackingStatus::Dead;
+            if (tracked.m_trackingId != otherTracked.m_trackingId && bothNotDead && tracked.m_position == otherTracked.m_position)
+            {
+                tracked.m_activeFrameCount = MAX(tracked.m_activeFrameCount, otherTracked.m_activeFrameCount);
+                tracked.m_inactiveFrameCount = MIN(tracked.m_inactiveFrameCount, otherTracked.m_inactiveFrameCount);
+                if (otherTracked.m_type == TrackedPointType::ActivePoint && tracked.m_type != TrackedPointType::ActivePoint)
+                {
+                    tracked.m_trackingId = otherTracked.m_trackingId;
+                    tracked.m_type = TrackedPointType::ActivePoint;
+                }
+                otherTracked.m_status = TrackingStatus::Dead;
+            }
         }
     }
 }
@@ -890,7 +865,7 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
     matScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
     edgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
     matArea = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-    cv::Mat areaSqrt = cv::Mat::zeros(matDepth.size(), CV_32FC1);
+    cv::Mat matAreaSqrt = cv::Mat::zeros(matDepth.size(), CV_32FC1);
 
     const float trackingBandwidthDepth = 150;
     const float initialBandwidthDepth = 450;
@@ -902,57 +877,57 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
     const int iterationMaxInitial = 1;
 
     calculateBasicScore(matDepth, matScore);
-    calculateSegmentArea(matDepth, matArea, areaSqrt);
+    calculateSegmentArea(matDepth, matArea, matAreaSqrt);
 
     //update existing points
     for (auto iter = m_internalTrackedPoints.begin(); iter != m_internalTrackedPoints.end(); ++iter)
     {
-        TrackedPoint& tracked = *iter;
-        tracked.m_inactiveFrameCount++;
-        seedPosition = tracked.m_position;
-        float referenceDepth = tracked.m_worldPosition.z;
+        TrackedPoint& trackedPoint = *iter;
+        trackedPoint.m_inactiveFrameCount++;
+        seedPosition = trackedPoint.m_position;
+        float referenceDepth = trackedPoint.m_worldPosition.z;
 
-        TrackingData updateTrackingData(referenceDepth, trackingBandwidthDepth, tracked.m_type, iterationMaxTracking);
+        TrackingData updateTrackingData(referenceDepth, trackingBandwidthDepth, trackedPoint.m_type, iterationMaxTracking);
 
         updateTrackingData.matDepth = matDepth;
-        updateTrackingData.matAreaSqrt = areaSqrt;
+        updateTrackingData.matAreaSqrt = matAreaSqrt;
         updateTrackingData.matGlobalSegmentation = matSegmentation;
         updateTrackingData.matScore = matScore;
         updateTrackingData.matForegroundSearched = foregroundSearched;
         updateTrackingData.matLayerSegmentation = m_tempLayerSegmentation;
         updateTrackingData.seedPosition = seedPosition;
 
-        cv::Point targetPoint = SegmentationTracker::convergeTrackPointFromSeed(updateTrackingData);
+        cv::Point newTargetPoint = SegmentationTracker::convergeTrackPointFromSeed(updateTrackingData);
 
-        validateAndUpdateTrackedPoint(matDepth, matArea, tracked, targetPoint);
+        validateAndUpdateTrackedPoint(matDepth, matArea, m_tempLayerSegmentation, trackedPoint, newTargetPoint, m_resizeFactor, m_minArea, m_maxArea, m_areaBandwidth, m_areaBandwidthDepth);
 
         //lost a tracked point, try to guest the position using previous velocity for second chance to recover
-        if (tracked.m_status != TrackingStatus::Tracking && cv::norm(tracked.m_worldVelocity) > 0)
+        if (trackedPoint.m_status != TrackingStatus::Tracking && cv::norm(trackedPoint.m_worldVelocity) > 0)
         {
-            auto estimatedWorldPosition = tracked.m_worldPosition + tracked.m_worldVelocity;
+            auto estimatedWorldPosition = trackedPoint.m_worldPosition + trackedPoint.m_worldVelocity;
 
-            cv::Point3f estimatedPosition = convertRealWorldToDepth(estimatedWorldPosition);
+            cv::Point3f estimatedPosition = convertRealWorldToDepth(estimatedWorldPosition, m_resizeFactor);
 
             seedPosition.x = MAX(0, MIN(width - 1, static_cast<int>(estimatedPosition.x)));
             seedPosition.y = MAX(0, MIN(height - 1, static_cast<int>(estimatedPosition.y)));
             referenceDepth = estimatedPosition.z;
 
-            TrackingData recoverTrackingData(referenceDepth, initialBandwidthDepth, tracked.m_type, iterationMaxTracking);
+            TrackingData recoverTrackingData(referenceDepth, initialBandwidthDepth, trackedPoint.m_type, iterationMaxTracking);
 
             recoverTrackingData.matDepth = matDepth;
-            recoverTrackingData.matAreaSqrt = areaSqrt;
+            recoverTrackingData.matAreaSqrt = matAreaSqrt;
             recoverTrackingData.matGlobalSegmentation = matSegmentation;
             recoverTrackingData.matScore = matScore;
             recoverTrackingData.matForegroundSearched = foregroundSearched;
             recoverTrackingData.matLayerSegmentation = m_tempLayerSegmentation;
             recoverTrackingData.seedPosition = seedPosition;
 
-            targetPoint = SegmentationTracker::convergeTrackPointFromSeed(recoverTrackingData);
-            validateAndUpdateTrackedPoint(matDepth, matArea, tracked, targetPoint);
+            newTargetPoint = SegmentationTracker::convergeTrackPointFromSeed(recoverTrackingData);
+            validateAndUpdateTrackedPoint(matDepth, matArea, m_tempLayerSegmentation, trackedPoint, newTargetPoint, m_resizeFactor, m_minArea, m_maxArea, m_areaBandwidth, m_areaBandwidthDepth);
 
-            if (tracked.m_status == TrackingStatus::Tracking)
+            if (trackedPoint.m_status == TrackingStatus::Tracking)
             {
-                printf("Recovered point %d\n", tracked.m_trackingId);
+                printf("Recovered point %d\n", trackedPoint.m_trackingId);
             }
             else
             {
@@ -963,27 +938,7 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
         }
     }
 
-    //remove duplicates
-    for (auto iter = m_internalTrackedPoints.begin(); iter != m_internalTrackedPoints.end(); ++iter)
-    {
-        TrackedPoint& tracked = *iter;
-        for (auto otherIter = m_internalTrackedPoints.begin(); otherIter != m_internalTrackedPoints.end(); ++otherIter)
-        {
-            TrackedPoint& otherTracked = *otherIter;
-            bool bothNotDead = tracked.m_status != TrackingStatus::Dead && otherTracked.m_status != TrackingStatus::Dead;
-            if (tracked.m_trackingId != otherTracked.m_trackingId && bothNotDead && tracked.m_position == otherTracked.m_position)
-            {
-                tracked.m_activeFrameCount = MAX(tracked.m_activeFrameCount, otherTracked.m_activeFrameCount);
-                tracked.m_inactiveFrameCount = MIN(tracked.m_inactiveFrameCount, otherTracked.m_inactiveFrameCount);
-                if (otherTracked.m_type == TrackedPointType::ActivePoint && tracked.m_type != TrackedPointType::ActivePoint)
-                {
-                    tracked.m_trackingId = otherTracked.m_trackingId;
-                    tracked.m_type = TrackedPointType::ActivePoint;
-                }
-                otherTracked.m_status = TrackingStatus::Dead;
-            }
-        }
-    }
+    removeDuplicatePoints(m_internalTrackedPoints);
 
     foregroundSearched = matForeground.clone();
 
@@ -998,7 +953,7 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
         TrackingData newTrackingData(seedDepth, initialBandwidthDepth, TrackedPointType::CandidatePoint, iterationMaxInitial);
 
         newTrackingData.matDepth = matDepth;
-        newTrackingData.matAreaSqrt = areaSqrt;
+        newTrackingData.matAreaSqrt = matAreaSqrt;
         newTrackingData.matGlobalSegmentation = matSegmentation;
         newTrackingData.matScore = matScore;
         newTrackingData.matForegroundSearched = foregroundSearched;
@@ -1009,7 +964,7 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
 
         if (targetPoint.x != -1 && targetPoint.y != -1)
         {
-            float area = countNeighborhoodArea(m_tempLayerSegmentation, matDepth, matArea, m_areaBandwidth, m_areaBandwidthDepth, targetPoint);
+            float area = countNeighborhoodArea(m_tempLayerSegmentation, matDepth, matArea, targetPoint, m_areaBandwidth, m_areaBandwidthDepth, m_resizeFactor);
 
             if (area > m_minArea && area < m_maxArea)
             {
@@ -1039,7 +994,7 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
                 {
                     float depth = matDepth.at<float>(targetPoint);
 
-                    cv::Point3f worldPosition = convertDepthToRealWorld(targetPoint.x, targetPoint.y, depth);
+                    cv::Point3f worldPosition = convertDepthToRealWorld(targetPoint.x, targetPoint.y, depth, m_resizeFactor);
 
                     TrackedPoint newPoint(targetPoint, worldPosition, m_nextTrackingId, area);
                     newPoint.m_type = TrackedPointType::CandidatePoint;
