@@ -2,6 +2,8 @@
 #define SENSEKIT_TYPES_H
 
 #include "sensekit_core.h"
+#include <stdint.h>
+#include <stddef.h>
 
 const unsigned MAX_STRING_FIELD_LENGTH = 256;
 
