@@ -7,8 +7,6 @@
 #include <string>
 #include <deque>
 
-#define MAX_DEPTH 10000
-
 #include "trackingdata.h"
 
 struct TrackedPoint
@@ -61,14 +59,6 @@ private:
 
     static float countNeighborhoodArea(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat& matArea, cv::Point_<int> center, const float bandwidth, const float bandwidthDepth, const float resizeFactor);
     static void validateAndUpdateTrackedPoint(cv::Mat& matDepth, cv::Mat& matArea, cv::Mat& matLayerSegmentation, TrackedPoint& tracked, cv::Point targetPoint, const float resizeFactor, const float minArea, const float maxArea, const float areaBandwidth, const float areaBandwidthDepth);
-
-    static float getDepthArea(cv::Point3f& p1, cv::Point3f& p2, cv::Point3f& p3, const float resizeFactor);
-    static void calculateSegmentArea(cv::Mat& matDepth, cv::Mat& matArea, const float resizeFactor);
-    static void calculateEdgeDistance(cv::Mat& matSegmentation, cv::Mat& matArea, cv::Mat& matEdgeDistance);
-
-    static void calculateBasicScore(cv::Mat& matDepth, cv::Mat& matScore, const float heightFactor, const float depthFactor, const float resizeFactor);
-
-    static bool findForegroundPixel(cv::Mat& matForeground, cv::Point& foregroundPosition);
 
     static void removeDuplicatePoints(std::vector<TrackedPoint>& trackedPoints);
     static void removeOldOrDeadPoints(std::vector<TrackedPoint>& trackedPoints);

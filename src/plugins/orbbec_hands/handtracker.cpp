@@ -11,7 +11,7 @@
 #include <queue>
 #include <ctime>
 #include "frameconverter.h"
-#include "segmentationtracker.h"
+#include "segmentationutility.h"
 #include "coordinateconversion.h"
 
 using namespace std;
@@ -217,156 +217,6 @@ vector<TrackedPoint>& HandTracker::updateOriginalPoints(vector<TrackedPoint>& in
     return m_originalTrackedPoints;
 }
 
-bool HandTracker::findForegroundPixel(cv::Mat& matForeground, cv::Point& foregroundPosition)
-{
-    int width = matForeground.cols;
-    int height = matForeground.rows;
-
-    for (int y = 0; y < height; y++)
-    {
-        char* foregroundRow = matForeground.ptr<char>(y);
-        for (int x = 0; x < width; x++)
-        {
-            char foreground = *foregroundRow;
-
-            if (foreground == PixelType::Foreground)
-            {
-                foregroundPosition.x = x;
-                foregroundPosition.y = y;
-                *foregroundRow = PixelType::Searched;
-                return true;
-            }
-            ++foregroundRow;
-        }
-    }
-    foregroundPosition.x = -1;
-    foregroundPosition.y = -1;
-    return false;
-}
-
-void HandTracker::calculateBasicScore(cv::Mat& matDepth, cv::Mat& matScore, const float heightFactor, const float depthFactor, const float resizeFactor)
-{
-    int width = matDepth.cols;
-    int height = matDepth.rows;
-
-    for (int y = 0; y < height; y++)
-    {
-        float* depthRow = matDepth.ptr<float>(y);
-        float* scoreRow = matScore.ptr<float>(y);
-
-        for (int x = 0; x < width; x++)
-        {
-            float depth = *depthRow;
-            if (depth != 0)
-            {
-                cv::Point3f worldPosition = CoordinateConversion::convertDepthToRealWorld(x, y, depth, resizeFactor);
-
-                float score = worldPosition.y * heightFactor;
-                score += (MAX_DEPTH - worldPosition.z) * depthFactor;
-
-                *scoreRow = score;
-            }
-            else
-            {
-                *scoreRow = 0;
-            }
-            ++depthRow;
-            ++scoreRow;
-        }
-    }
-}
-
-void HandTracker::calculateEdgeDistance(cv::Mat& matSegmentation, cv::Mat& matArea, cv::Mat& matEdgeDistance)
-{
-    cv::Mat eroded, temp;
-    cv::Mat crossElement = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
-
-
-    matEdgeDistance = cv::Mat::zeros(matSegmentation.size(), CV_32FC1);
-    cv::Mat ones = cv::Mat::ones(matSegmentation.size(), CV_32FC1);
-    matSegmentation.copyTo(eroded);
-
-    //close small holes
-    int dilateCount = 1;
-    for (int i = 0; i < dilateCount; i++)
-    {
-        cv::dilate(eroded, eroded, crossElement);
-    }
-
-    int nonZeroCount = 0;
-    const int imageLength = eroded.cols * eroded.rows;
-    int iterations = 0;
-    const int maxIterations = PROCESSING_SIZE_X / 2;
-    bool done;
-    do
-    {
-        //erode makes the image smaller
-        cv::erode(eroded, eroded, crossElement);
-        //accumulate the eroded image to the matGlobalSegmentation buffer
-        cv::add(matArea, matEdgeDistance, matEdgeDistance, eroded, CV_32FC1);
-
-        nonZeroCount = cv::countNonZero(eroded);
-        done = (nonZeroCount == 0);
-
-        //nonZerCount < imageLength guards against image with all 1's, which will never erode
-    } while (!done && nonZeroCount < imageLength && ++iterations < maxIterations);
-}
-
-void HandTracker::calculateSegmentArea(cv::Mat& matDepth, cv::Mat& matArea, const float resizeFactor)
-{
-    int width = matDepth.cols;
-    int height = matDepth.rows;
-
-    matArea = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-
-    for (int y = 0; y < height - 1; y++)
-    {
-        float* depthRow = matDepth.ptr<float>(y);
-        float* nextDepthRow = matDepth.ptr<float>(y + 1);
-        float* areaRow = matArea.ptr<float>(y);
-
-        for (int x = 0; x < width - 1; x++)
-        {
-            float area = 0;
-            float depth1 = *depthRow;
-
-            if (depth1 != 0)
-            {
-                cv::Point3f p1(x, y, depth1);
-                cv::Point3f p2(x + 1, y, depth1);
-                cv::Point3f p3(x, y + 1, depth1);
-                cv::Point3f p4(x + 1, y + 1, depth1);
-
-                area += getDepthArea(p1, p2, p3, resizeFactor);
-                area += getDepthArea(p2, p3, p4, resizeFactor);
-            }
-
-            *areaRow = area;
-
-            ++depthRow;
-            ++nextDepthRow;
-            ++areaRow;
-        }
-    }
-}
-
-float HandTracker::getDepthArea(cv::Point3f& p1, cv::Point3f& p2, cv::Point3f& p3, const float resizeFactor)
-{
-    float worldX1, worldY1, worldZ1;
-    float worldX2, worldY2, worldZ2;
-    float worldX3, worldY3, worldZ3;
-
-    cv::Point3f world1 = CoordinateConversion::convertDepthToRealWorld(p1, resizeFactor);
-    cv::Point3f world2 = CoordinateConversion::convertDepthToRealWorld(p2, resizeFactor);
-    cv::Point3f world3 = CoordinateConversion::convertDepthToRealWorld(p3, resizeFactor);
-
-    cv::Point3f v1 = world2 - world1;
-    cv::Point3f v2 = world3 - world1;
-
-    float area = 0.5 * cv::norm(v1.cross(v2));
-    return area;
-}
-
 float HandTracker::countNeighborhoodArea(cv::Mat& matSegmentation, cv::Mat& matDepth, cv::Mat& matArea, cv::Point center, const float bandwidth, const float bandwidthDepth, const float resizeFactor)
 {
     float startingDepth = matDepth.at<float>(center);
@@ -559,8 +409,8 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
     float heightFactor = 1 * m_factor1;
     float depthFactor = 1.5 * m_factor2;
 
-    calculateBasicScore(matDepth, matScore, heightFactor, depthFactor, m_resizeFactor);
-    calculateSegmentArea(matDepth, matArea, m_resizeFactor);
+    SegmentationUtility::calculateBasicScore(matDepth, matScore, heightFactor, depthFactor, m_resizeFactor);
+    SegmentationUtility::calculateSegmentArea(matDepth, matArea, m_resizeFactor);
 
     //update existing points
     for (auto iter = m_internalTrackedPoints.begin(); iter != m_internalTrackedPoints.end(); ++iter)
@@ -580,7 +430,7 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
         updateTrackingData.matLayerSegmentation = m_layerSegmentation;
         updateTrackingData.seedPosition = seedPosition;
 
-        cv::Point newTargetPoint = SegmentationTracker::convergeTrackPointFromSeed(updateTrackingData);
+        cv::Point newTargetPoint = SegmentationUtility::convergeTrackPointFromSeed(updateTrackingData);
 
         validateAndUpdateTrackedPoint(matDepth, matArea, m_layerSegmentation, trackedPoint, newTargetPoint, m_resizeFactor, m_minArea, m_maxArea, m_areaBandwidth, m_areaBandwidthDepth);
 
@@ -605,7 +455,7 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
             recoverTrackingData.matLayerSegmentation = m_layerSegmentation;
             recoverTrackingData.seedPosition = seedPosition;
 
-            newTargetPoint = SegmentationTracker::convergeTrackPointFromSeed(recoverTrackingData);
+            newTargetPoint = SegmentationUtility::convergeTrackPointFromSeed(recoverTrackingData);
             validateAndUpdateTrackedPoint(matDepth, matArea, m_layerSegmentation, trackedPoint, newTargetPoint, m_resizeFactor, m_minArea, m_maxArea, m_areaBandwidth, m_areaBandwidthDepth);
 
             if (trackedPoint.m_status == TrackingStatus::Tracking)
@@ -627,7 +477,7 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
 
     //add new points (unless already tracking)
     //if (m_internalTrackedPoints.size() == 0)
-    while (findForegroundPixel(foregroundSearched, seedPosition))
+    while (SegmentationUtility::findForegroundPixel(foregroundSearched, seedPosition))
     {
         //      seedPosition.x = mouseX;
         //      seedPosition.y = mouseY;
@@ -643,7 +493,7 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
         newTrackingData.matLayerSegmentation = m_layerSegmentation;
         newTrackingData.seedPosition = seedPosition;
 
-        cv::Point targetPoint = SegmentationTracker::convergeTrackPointFromSeed(newTrackingData);
+        cv::Point targetPoint = SegmentationUtility::convergeTrackPointFromSeed(newTrackingData);
 
         if (targetPoint.x != -1 && targetPoint.y != -1)
         {

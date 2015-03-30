@@ -2,8 +2,8 @@ set(orbbec_hands_SOURCES
   handtracker.cpp
   handtracker.h
   frameconverter.h
-  segmentationtracker.h
-  segmentationtracker.cpp
+  segmentationutility.h
+  segmentationutility.cpp
   trackingdata.h
   coordinateconversion.h
   hands_plugin.cpp
