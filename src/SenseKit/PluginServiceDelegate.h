@@ -14,7 +14,7 @@ namespace sensekit {
             {
                 return static_cast<PluginService*>(service)->register_stream_added_callback(callback, *callbackId);
             }
-        static sensekit_status_t register_stream_removed_callback(void* service, StreamRemovingCallback callback, CallbackId* callbackId)
+        static sensekit_status_t register_stream_removing_callback(void* service, StreamRemovingCallback callback, CallbackId* callbackId)
             {
                 return static_cast<PluginService*>(service)->register_stream_removing_callback(callback, *callbackId);
             }
@@ -22,7 +22,7 @@ namespace sensekit {
             {
                 return static_cast<PluginService*>(service)->unregister_stream_added_callback(callbackId);
             }
-        static sensekit_status_t unregister_stream_removed_callback(void* service, CallbackId callbackId)
+        static sensekit_status_t unregister_stream_removing_callback(void* service, CallbackId callbackId)
             {
                 return static_cast<PluginService*>(service)->unregister_stream_removing_callback(callbackId);
             }

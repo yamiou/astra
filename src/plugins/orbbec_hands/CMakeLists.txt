@@ -1,6 +1,7 @@
 set(orbbec_hands_SOURCES
   handtracker.cpp
   handtracker.h
+  frameconverter.h
   hands_plugin.cpp
   hands_plugin.h
 )

@@ -1,7 +1,6 @@
 ﻿#include "OpenNIPlugin.h"
 #include <iostream>
 #include <StreamTypes.h>
-#include <streams/color_types.h>
 
 using std::cout;
 using std::endl;

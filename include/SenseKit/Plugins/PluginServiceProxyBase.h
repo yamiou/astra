@@ -3,17 +3,17 @@
 
 #include <sensekit_core.h>
 
-typedef void(*StreamAddedCallback)(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType typeId, StreamSubtype subtype);
-typedef void(*StreamRemovingCallback)(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType typeId, StreamSubtype subtype);
+typedef void(*StreamAddedCallback)(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType type, StreamSubtype subtype);
+typedef void(*StreamRemovingCallback)(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType type, StreamSubtype subtype);
 typedef size_t CallbackId;
 
 struct PluginServiceProxyBase
 {
     void* pluginService;
     sensekit_status_t (*register_stream_added_callback)(void* service, StreamAddedCallback callback, CallbackId* callbackId);
-    sensekit_status_t (*register_stream_removed_callback)(void* service, StreamRemovingCallback callback, CallbackId* callbackId);
+    sensekit_status_t (*register_stream_removing_callback)(void* service, StreamRemovingCallback callback, CallbackId* callbackId);
     sensekit_status_t (*unregister_stream_added_callback)(void* service, CallbackId callbackId);
-    sensekit_status_t (*unregister_stream_removed_callback)(void* service, CallbackId callbackId);
+    sensekit_status_t (*unregister_stream_removing_callback)(void* service, CallbackId callbackId);
     sensekit_status_t (*create_stream_set)(void* service, sensekit_streamset_t** streamset);
     sensekit_status_t (*destroy_stream_set)(void* service, sensekit_streamset_t** streamset);
     sensekit_status_t (*create_stream)(void* service, StreamSetHandle* setHandle, StreamType type, StreamSubtype subtype, stream_callbacks_t pluginCallbacks, /*out*/StreamHandle** handle);
