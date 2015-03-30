@@ -30,6 +30,10 @@ namespace sensekit {
 
         m_connections.push_back(std::move(conn));
 
+        if (m_callbacks.connectionAddedCallback)
+            m_callbacks.connectionAddedCallback(m_callbacks.context,
+                                                reinterpret_cast<sensekit_streamconnection_t*>(rawPtr));
+
         return rawPtr;
     }
 
@@ -44,7 +48,13 @@ namespace sensekit {
                                });
 
         if (it != m_connections.cend())
+        {
+            if (m_callbacks.connectionRemovedCallback)
+                m_callbacks.connectionRemovedCallback(m_callbacks.context,
+                                                      reinterpret_cast<sensekit_streamconnection_t*>(connection));
+
             m_connections.erase(it);
+        }
     }
 
     StreamBin* Stream::create_bin(size_t bufferLengthInBytes)

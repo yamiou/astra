@@ -38,7 +38,7 @@ namespace sensekit {
                 return PluginServiceProxyBase::destroy_stream_set(pluginService, &setHandle);
             }
 
-        sensekit_status_t create_stream(StreamSetHandle* setHandle, StreamType type, StreamSubtype subtype, StreamPluginCallbacks pluginCallbacks, /*out*/StreamHandle*& handle)
+        sensekit_status_t create_stream(StreamSetHandle* setHandle, StreamType type, StreamSubtype subtype, stream_callbacks_t pluginCallbacks, /*out*/StreamHandle*& handle)
             {
                 return PluginServiceProxyBase::create_stream(pluginService, setHandle, type, subtype, pluginCallbacks, &handle);
             }

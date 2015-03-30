@@ -124,11 +124,7 @@ namespace sensekit
 
             sensekit_frame_t* nextBuffer = nullptr;
 
-            StreamPluginCallbacks pluginCallbacks = create_plugin_callbacks(this);
-
-            pluginCallbacks.setParameterCallback = &OpenNIPlugin::set_parameter_thunk;
-            pluginCallbacks.getParameterSizeCallback = &OpenNIPlugin::get_parameter_size_thunk;
-            pluginCallbacks.getParameterDataCallback = &OpenNIPlugin::get_parameter_data_thunk;
+            stream_callbacks_t pluginCallbacks = create_plugin_callbacks(this);
 
             get_pluginService().create_stream_set(m_streamSetHandle);
 
@@ -169,25 +165,6 @@ namespace sensekit
             return SENSEKIT_STATUS_SUCCESS;
         }
 
-        void OpenNIPlugin::set_parameter_thunk(void* instance, sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t byteLength, sensekit_parameter_data_t* data)
-        {
-            OpenNIPlugin* self = static_cast<OpenNIPlugin*>(instance);
-            self->set_parameter(streamConnection, id, byteLength, data);
-        }
-
-        void OpenNIPlugin::get_parameter_size_thunk(void* instance, sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, /*out*/size_t* byteLength)
-        {
-            OpenNIPlugin* self = static_cast<OpenNIPlugin*>(instance);
-            self->get_parameter_size(streamConnection, id, *byteLength);
-        }
-
-        void OpenNIPlugin::get_parameter_data_thunk(void* instance, sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t byteLength, sensekit_parameter_data_t* data)
-        {
-            OpenNIPlugin* self = static_cast<OpenNIPlugin*>(instance);
-            self->get_parameter_data(streamConnection, id, byteLength, data);
-        }
-
-
         void OpenNIPlugin::set_parameter(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t byteLength, sensekit_parameter_data_t* data)
         {
         }
@@ -204,6 +181,16 @@ namespace sensekit
             {
                 charData[i] = i;
             }
+        }
+
+        void OpenNIPlugin::connection_added(sensekit_streamconnection_t* connection)
+        {
+            cout << "openniplugin: new connection added" << endl;
+        }
+
+        void OpenNIPlugin::connection_removed(sensekit_streamconnection_t* connection)
+        {
+            cout << "openniplugin: connection removed" << endl;
         }
 
         sensekit_status_t OpenNIPlugin::close_sensor_streams()

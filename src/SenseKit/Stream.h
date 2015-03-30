@@ -16,7 +16,7 @@ namespace sensekit {
     class Stream
     {
     public:
-        Stream(StreamType type, StreamSubtype subtype, StreamPluginCallbacks pluginCallbacks) :
+        Stream(StreamType type, StreamSubtype subtype, stream_callbacks_t pluginCallbacks) :
             m_type(type),
             m_subtype(subtype),
             m_callbacks(pluginCallbacks)
@@ -53,7 +53,7 @@ namespace sensekit {
 
         ConnectionList m_connections;
         BinMap m_bins;
-        StreamPluginCallbacks m_callbacks;
+        stream_callbacks_t m_callbacks;
 
         std::atomic_int m_nextBinId;
     };

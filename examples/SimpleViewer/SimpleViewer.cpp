@@ -398,6 +398,8 @@ void SampleViewer::onKey(unsigned char key, int /*x*/, int /*y*/)
     {
     case 27:
         //shutdown sensekit
+        sensekit_depth_close(&m_depthStream);
+        sensekit_close_streamset(&m_sensor);
         sensekit_terminate();
         exit(1);
     }

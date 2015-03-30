@@ -82,7 +82,7 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::create_stream(StreamSetHandle* setHandle, StreamType type, StreamSubtype subtype, StreamPluginCallbacks pluginCallbacks, /*out*/StreamHandle*& handle)
+    sensekit_status_t PluginService::create_stream(StreamSetHandle* setHandle, StreamType type, StreamSubtype subtype, stream_callbacks_t pluginCallbacks, /*out*/StreamHandle*& handle)
     {
         // TODO add to specific streamset
         StreamHandle* stream = m_context.get_rootSet().create_stream(type, subtype, pluginCallbacks);

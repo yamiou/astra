@@ -169,6 +169,8 @@ void SimpleColorViewer::onKey(unsigned char key, int /*x*/, int /*y*/)
     {
     case 27:
         //shutdown sensekit
+        sensekit_color_close(&m_colorStream);
+        sensekit_close_streamset(&m_sensor);
         sensekit_terminate();
         exit(1);
     }

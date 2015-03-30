@@ -24,7 +24,7 @@ namespace sensekit {
 
         //plugins only below
 
-        StreamHandle* create_stream(StreamType type, StreamSubtype subtype, StreamPluginCallbacks pluginCallbacks);
+        StreamHandle* create_stream(StreamType type, StreamSubtype subtype, stream_callbacks_t pluginCallbacks);
         void destroy_stream(StreamHandle* stream);
 
         bool is_member(StreamHandle* stream);

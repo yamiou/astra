@@ -30,7 +30,7 @@ namespace sensekit {
         subtype = sk_stream->get_subtype();
     }
 
-    StreamHandle* StreamSet::create_stream(StreamType type, StreamSubtype subtype, StreamPluginCallbacks pluginCallbacks)
+    StreamHandle* StreamSet::create_stream(StreamType type, StreamSubtype subtype, stream_callbacks_t pluginCallbacks)
     {
         Stream* sk_stream = new Stream(type, subtype, pluginCallbacks);
 

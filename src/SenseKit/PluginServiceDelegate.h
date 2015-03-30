@@ -34,7 +34,7 @@ namespace sensekit {
             {
                 return static_cast<PluginService*>(service)->destroy_stream_set(*setHandle);
             }
-        static sensekit_status_t create_stream(void* service, StreamSetHandle* setHandle, StreamType type, StreamSubtype subtype, StreamPluginCallbacks pluginCallbacks, /*out*/StreamHandle** handle)
+        static sensekit_status_t create_stream(void* service, StreamSetHandle* setHandle, StreamType type, StreamSubtype subtype, stream_callbacks_t pluginCallbacks, /*out*/StreamHandle** handle)
             {
                 return static_cast<PluginService*>(service)->create_stream(setHandle, type, subtype, pluginCallbacks, *handle);
             }

@@ -19,7 +19,7 @@ typedef void(*GetParameterDataCallback)(void*, sensekit_streamconnection_t*,
 typedef void(*ConnectionAddedCallback)(void*, sensekit_streamconnection_t*);
 typedef void(*ConnectionRemovedCallback)(void*, sensekit_streamconnection_t*);
 
-struct StreamPluginCallbacks
+struct stream_callbacks_t
 {
     void* context;
     SetParameterCallback setParameterCallback;
