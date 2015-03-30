@@ -22,12 +22,12 @@ SENSEKIT_API void sensekit_terminate()
     g_Context.terminate();
 }
 
-SENSEKIT_API sensekit_status_t sensekit_open_streamset(const char* connection_string, /*out*/ sensekit_streamset_t** streamset)
+SENSEKIT_API sensekit_status_t sensekit_streamset_open(const char* connection_string, /*out*/ sensekit_streamset_t** streamset)
 {
     return g_Context.open_streamset(connection_string, *streamset);
 }
 
-SENSEKIT_API sensekit_status_t sensekit_close_streamset(sensekit_streamset_t** streamset)
+SENSEKIT_API sensekit_status_t sensekit_streamset_close(sensekit_streamset_t** streamset)
 {
     return g_Context.close_streamset(*streamset);
 }

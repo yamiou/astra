@@ -16,12 +16,12 @@ SENSEKIT_API_PROXY void sensekit_api_set_proxy(StreamServiceProxyBase* proxy)
     __sensekit_api_proxy_ptr = proxy;
 }
 
-SENSEKIT_API_PROXY sensekit_status_t sensekit_open_streamset(const char* connection_string, /*out*/ sensekit_streamset_t** streamset)
+SENSEKIT_API_PROXY sensekit_status_t sensekit_streamset_open(const char* connection_string, /*out*/ sensekit_streamset_t** streamset)
 {
     return reinterpret_cast<sensekit::StreamServiceProxy*>(__sensekit_api_proxy_ptr)->open_streamset(connection_string, streamset);
 }
 
-SENSEKIT_API_PROXY sensekit_status_t sensekit_close_streamset(sensekit_streamset_t** streamset)
+SENSEKIT_API_PROXY sensekit_status_t sensekit_streamset_close(sensekit_streamset_t** streamset)
 {
     return reinterpret_cast<sensekit::StreamServiceProxy*>(__sensekit_api_proxy_ptr)->close_streamset(streamset);
 }

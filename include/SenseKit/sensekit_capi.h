@@ -10,11 +10,11 @@ SENSEKIT_API sensekit_status_t sensekit_initialize();
 
 SENSEKIT_API void sensekit_terminate();
 
-SENSEKIT_API sensekit_status_t sensekit_open_streamset(
+SENSEKIT_API sensekit_status_t sensekit_streamset_open(
     const char* connection_string,
     /*out*/ sensekit_streamset_t** streamset);
 
-SENSEKIT_API sensekit_status_t sensekit_close_streamset(
+SENSEKIT_API sensekit_status_t sensekit_streamset_close(
     sensekit_streamset_t** streamset);
 
 SENSEKIT_API char * sensekit_get_status_string(sensekit_status_t status);
