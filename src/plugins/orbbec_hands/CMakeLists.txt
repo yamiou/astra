@@ -5,6 +5,7 @@ set(orbbec_hands_SOURCES
   segmentationtracker.h
   segmentationtracker.cpp
   trackingdata.h
+  coordinateconversion.h
   hands_plugin.cpp
   hands_plugin.h
 )

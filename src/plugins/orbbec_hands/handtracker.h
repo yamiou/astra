@@ -9,16 +9,7 @@
 
 #define MAX_DEPTH 10000
 
-#define HIST_LEN 4
 #include "trackingdata.h"
-
-
-struct FitResult
-{
-public:
-    cv::Point2f center;
-    int radius;
-};
 
 struct TrackedPoint
 {
@@ -61,46 +52,38 @@ public:
     void onKey(unsigned char key);
     std::vector<TrackedPoint>& updateTracking(sensekit_depthframe_t* depthFrame);
     void reset();
-protected:
-    sensekit_depthstream_t* m_depthStream;
 private:
     
-    int			m_width;
-    int			m_height;
-    float m_maxVelocity;
-    // in use:
     std::vector<TrackedPoint>& updateOriginalPoints(std::vector<TrackedPoint>& mInternalTrackedPoints);
-
-    static cv::Point3f convertDepthToRealWorld(cv::Point3f localPosition, const float resizeFactor);
-    static cv::Point3f convertDepthToRealWorld(float localX, float localY, float localZ, const float resizeFactor);
-    static cv::Point3f convertRealWorldToDepth(cv::Point3f worldPosition, const float resizeFactor);
-    static cv::Point offsetPixelLocationByMM(cv::Point& position, float offsetX, float offsetY, float depth, const float resizeFactor);
-
-    void setupVariables();
-    void verifyInit(int width, int height);
 
     static void filterZeroValuesAndJumps(cv::Mat depthCurrent, cv::Mat depthPrev, cv::Mat depthAvg, cv::Mat depthVel, float maxDepthJumpPercent);
     static void thresholdForeground(cv::Mat& matForeground, cv::Mat& matVelocity, float foregroundThresholdFactor);
 
-    static void removeDuplicatePoints(std::vector<TrackedPoint>& trackedPoints);
-    static void removeOldAndDeadPoints(std::vector<TrackedPoint>& trackedPoints);
-
     static float countNeighborhoodArea(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat& matArea, cv::Point_<int> center, const float bandwidth, const float bandwidthDepth, const float resizeFactor);
     static void validateAndUpdateTrackedPoint(cv::Mat& matDepth, cv::Mat& matArea, cv::Mat& matLayerSegmentation, TrackedPoint& tracked, cv::Point targetPoint, const float resizeFactor, const float minArea, const float maxArea, const float areaBandwidth, const float areaBandwidthDepth);
 
-    static bool findForegroundPixel(cv::Mat& matForeground, cv::Point& foregroundPosition);
+    static float getDepthArea(cv::Point3f& p1, cv::Point3f& p2, cv::Point3f& p3, const float resizeFactor);
+    static void calculateSegmentArea(cv::Mat& matDepth, cv::Mat& matArea, const float resizeFactor);
+    static void calculateEdgeDistance(cv::Mat& matSegmentation, cv::Mat& matArea, cv::Mat& matEdgeDistance);
 
     static void calculateBasicScore(cv::Mat& matDepth, cv::Mat& matScore, const float heightFactor, const float depthFactor, const float resizeFactor);
 
-    static void calculateSegmentArea(cv::Mat& matDepth, cv::Mat& matArea, const float resizeFactor);
-    static float getDepthArea(cv::Point3f& p1, cv::Point3f& p2, cv::Point3f& p3, const float resizeFactor);
+    static bool findForegroundPixel(cv::Mat& matForeground, cv::Point& foregroundPosition);
 
-    static void calculateEdgeDistance(cv::Mat& matSegmentation, cv::Mat& matArea, cv::Mat& matEdgeDistance);
+    static void removeDuplicatePoints(std::vector<TrackedPoint>& trackedPoints);
+    static void removeOldOrDeadPoints(std::vector<TrackedPoint>& trackedPoints);
 
     void trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat& matGlobalSegmentation, cv::Mat& matScore, cv::Mat& matEdgeDistance, cv::Mat& matArea);
+    void setupVariables();
+    void verifyInit(int width, int height);
 
-    //not sure
-    
+    //fields    
+    sensekit_depthstream_t* m_depthStream;
+
+    int			m_width;
+    int			m_height;
+    float m_maxVelocity;
+
     float m_resizeFactor;
 
     std::vector<TrackedPoint> m_internalTrackedPoints;

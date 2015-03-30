@@ -12,6 +12,7 @@
 #include <ctime>
 #include "frameconverter.h"
 #include "segmentationtracker.h"
+#include "coordinateconversion.h"
 
 using namespace std;
 
@@ -216,47 +217,6 @@ vector<TrackedPoint>& HandTracker::updateOriginalPoints(vector<TrackedPoint>& in
     return m_originalTrackedPoints;
 }
 
-cv::Point3f HandTracker::convertDepthToRealWorld(float localX, float localY, float localZ, const float resizeFactor)
-{
-    float worldX, worldY, worldZ;
-
-    localX *= resizeFactor;
-    localY *= resizeFactor;
-
-    convert_depth_to_world(localX, localY, localZ, &worldX, &worldY, &worldZ);
-
-    return cv::Point3f(worldX, worldY, worldZ);
-}
-
-cv::Point3f HandTracker::convertDepthToRealWorld(cv::Point3f localPosition, const float resizeFactor)
-{
-    return convertDepthToRealWorld(localPosition.x, localPosition.y, localPosition.z, resizeFactor);
-}
-
-cv::Point3f HandTracker::convertRealWorldToDepth(cv::Point3f worldPosition, const float resizeFactor)
-{
-    float localX, localY, localZ;
-
-    convert_world_to_depth(worldPosition.x, worldPosition.y, worldPosition.z, &localX, &localY, &localZ);
-
-    localX /= resizeFactor;
-    localY /= resizeFactor;
-
-    return cv::Point3f(localX, localY, localZ);
-}
-
-cv::Point HandTracker::offsetPixelLocationByMM(cv::Point& position, float offsetX, float offsetY, float depth, const float resizeFactor)
-{
-    cv::Point3f world = convertDepthToRealWorld(position.x, position.y, depth, resizeFactor);
-
-    world.x += offsetX;
-    world.y += offsetY;
-
-    cv::Point3f offsetLocal = convertRealWorldToDepth(world, resizeFactor);
-
-    return cv::Point(static_cast<int>(offsetLocal.x), static_cast<int>(offsetLocal.y));
-}
-
 bool HandTracker::findForegroundPixel(cv::Mat& matForeground, cv::Point& foregroundPosition)
 {
     int width = matForeground.cols;
@@ -299,7 +259,7 @@ void HandTracker::calculateBasicScore(cv::Mat& matDepth, cv::Mat& matScore, cons
             float depth = *depthRow;
             if (depth != 0)
             {
-                cv::Point3f worldPosition = convertDepthToRealWorld(x, y, depth, resizeFactor);
+                cv::Point3f worldPosition = CoordinateConversion::convertDepthToRealWorld(x, y, depth, resizeFactor);
 
                 float score = worldPosition.y * heightFactor;
                 score += (MAX_DEPTH - worldPosition.z) * depthFactor;
@@ -396,9 +356,9 @@ float HandTracker::getDepthArea(cv::Point3f& p1, cv::Point3f& p2, cv::Point3f& p
     float worldX2, worldY2, worldZ2;
     float worldX3, worldY3, worldZ3;
 
-    cv::Point3f world1 = convertDepthToRealWorld(p1, resizeFactor);
-    cv::Point3f world2 = convertDepthToRealWorld(p2, resizeFactor);
-    cv::Point3f world3 = convertDepthToRealWorld(p3, resizeFactor);
+    cv::Point3f world1 = CoordinateConversion::convertDepthToRealWorld(p1, resizeFactor);
+    cv::Point3f world2 = CoordinateConversion::convertDepthToRealWorld(p2, resizeFactor);
+    cv::Point3f world3 = CoordinateConversion::convertDepthToRealWorld(p3, resizeFactor);
 
     cv::Point3f v1 = world2 - world1;
     cv::Point3f v2 = world3 - world1;
@@ -411,8 +371,8 @@ float HandTracker::countNeighborhoodArea(cv::Mat& matSegmentation, cv::Mat& matD
 {
     float startingDepth = matDepth.at<float>(center);
 
-    cv::Point topLeft = offsetPixelLocationByMM(center, -bandwidth, bandwidth, startingDepth, resizeFactor);
-    cv::Point bottomRight = offsetPixelLocationByMM(center, bandwidth, -bandwidth, startingDepth, resizeFactor);
+    cv::Point topLeft = CoordinateConversion::offsetPixelLocationByMM(center, -bandwidth, bandwidth, startingDepth, resizeFactor);
+    cv::Point bottomRight = CoordinateConversion::offsetPixelLocationByMM(center, bandwidth, -bandwidth, startingDepth, resizeFactor);
     int32_t x0 = MAX(0, topLeft.x);
     int32_t y0 = MAX(0, topLeft.y);
     int32_t x1 = MIN(matDepth.cols - 1, bottomRight.x);
@@ -458,7 +418,7 @@ void HandTracker::validateAndUpdateTrackedPoint(cv::Mat& matDepth, cv::Mat& matA
     {
         float depth = matDepth.at<float>(newTargetPoint);
 
-        cv::Point3f worldPosition = convertDepthToRealWorld(newTargetPoint.x, newTargetPoint.y, depth, resizeFactor);
+        cv::Point3f worldPosition = CoordinateConversion::convertDepthToRealWorld(newTargetPoint.x, newTargetPoint.y, depth, resizeFactor);
 
         auto dist = cv::norm(worldPosition - trackedPoint.m_worldPosition);
         auto deadbandDist = cv::norm(worldPosition - trackedPoint.m_steadyWorldPosition);
@@ -527,7 +487,7 @@ void HandTracker::removeDuplicatePoints(vector<TrackedPoint>& trackedPoints)
     }
 }
 
-void HandTracker::removeOldAndDeadPoints(vector<TrackedPoint>& trackedPoints)
+void HandTracker::removeOldOrDeadPoints(vector<TrackedPoint>& trackedPoints)
 {
     const int maxInactiveFrames = 60;
     const int maxInactiveFramesForLostPoints = 240;
@@ -629,7 +589,7 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
         {
             auto estimatedWorldPosition = trackedPoint.m_worldPosition + trackedPoint.m_worldVelocity;
 
-            cv::Point3f estimatedPosition = convertRealWorldToDepth(estimatedWorldPosition, m_resizeFactor);
+            cv::Point3f estimatedPosition = CoordinateConversion::convertRealWorldToDepth(estimatedWorldPosition, m_resizeFactor);
 
             seedPosition.x = MAX(0, MIN(width - 1, static_cast<int>(estimatedPosition.x)));
             seedPosition.y = MAX(0, MIN(height - 1, static_cast<int>(estimatedPosition.y)));
@@ -717,7 +677,7 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
                 {
                     float depth = matDepth.at<float>(targetPoint);
 
-                    cv::Point3f worldPosition = convertDepthToRealWorld(targetPoint.x, targetPoint.y, depth, m_resizeFactor);
+                    cv::Point3f worldPosition = CoordinateConversion::convertDepthToRealWorld(targetPoint.x, targetPoint.y, depth, m_resizeFactor);
 
                     TrackedPoint newPoint(targetPoint, worldPosition, m_nextTrackingId, area);
                     newPoint.m_type = TrackedPointType::CandidatePoint;
@@ -731,7 +691,7 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
 
     
     //remove old points
-    removeOldAndDeadPoints(m_internalTrackedPoints);
+    removeOldOrDeadPoints(m_internalTrackedPoints);
 }
 
 void HandTracker::reset()
