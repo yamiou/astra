@@ -11,8 +11,7 @@ SENSEKIT_API sensekit_status_t sensekit_initialize()
     sensekit_status_t rc = g_Context.initialize();
     if (rc == SENSEKIT_STATUS_SUCCESS)
     {
-        StreamServiceProxyBase* proxyPtr = g_Context.get_streamServiceProxy();
-        sensekit_api_set_proxy(proxyPtr);
+        sensekit_api_set_proxy(g_Context.get_streamServiceProxy());
     }
 
     return rc;
