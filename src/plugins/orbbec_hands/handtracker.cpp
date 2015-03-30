@@ -284,101 +284,10 @@ bool HandTracker::findForegroundPixel(cv::Mat& matForeground, cv::Point& foregro
     return false;
 }
 
-cv::Point HandTracker::shiftNearest(cv::Mat& matForeground, cv::Mat& matDepth, const float bandwidth, const float bandwidthDepth, cv::Point start, float& distance)
-{
-    float startingDepth = matDepth.at<float>(start.y, start.x);
-
-    cv::Point topLeft = offsetPixelLocationByMM(start, -bandwidth, bandwidth, startingDepth, m_resizeFactor);
-    cv::Point bottomRight = offsetPixelLocationByMM(start, bandwidth, -bandwidth, startingDepth, m_resizeFactor);
-    int32_t x0 = MAX(0, topLeft.x);
-    int32_t y0 = MAX(0, topLeft.y);
-    int32_t x1 = MIN(matDepth.cols - 1, bottomRight.x);
-    int32_t y1 = MIN(matDepth.rows - 1, bottomRight.y);
-
-    float bandwidth2 = bandwidth * bandwidth;
-
-    if (0 == startingDepth)
-    {
-        startingDepth = MAX_DEPTH;
-    }
-
-    cv::Point closestPoint = start;
-    float closestDepth = startingDepth;
-
-    for (int y = y0; y < y1; y++)
-    {
-        float* depthRow = matDepth.ptr<float>(y);
-        char* foregroundRow = matForeground.ptr<char>(y);
-        depthRow += x0;
-        foregroundRow += x0;
-        for (int x = x0; x < x1; x++)
-        {
-            float depth = *depthRow;
-
-            cv::Point v(x, y);
-            auto delta = (start - v);
-            float deltaDepth = abs(depth - startingDepth);
-            if (delta.x * delta.x + delta.y * delta.y <= bandwidth2 &&
-                deltaDepth < bandwidthDepth)
-            {
-                if (*foregroundRow == PixelType::Foreground)
-                {
-                    *foregroundRow = PixelType::Searched;
-                }
-                if (depth != 0 && depth < closestDepth)
-                {
-                    closestPoint.x = x;
-                    closestPoint.y = y;
-                    closestDepth = depth;
-                }
-            }
-            ++foregroundRow;
-            ++depthRow;
-        }
-    }
-
-    //*matForeground.ptr<float>(closestPoint.y, closestPoint.x) = PixelType::IntermediateClosest;
-    auto deltaMoved = (closestPoint - start);
-    distance = sqrt(deltaMoved.x * deltaMoved.x + deltaMoved.y * deltaMoved.y);
-
-    return closestPoint;
-}
-
-cv::Point HandTracker::findClosestPixelFromSeed(cv::Mat& matForeground, cv::Mat& matDepth, cv::Point foregroundPosition)
-{
-    cv::Point closestPoint = foregroundPosition;
-
-    int width = matForeground.cols;
-    int height = matForeground.rows;
-
-    const float bandwidth = 200; //mm radius
-    const float bandwidthDepth = 200; //mm
-    const uint32_t maxIterations = 10;
-    const float maxTolerance = 0.5; //pixels
-
-    uint32_t iteration = 0;
-    float distance = FLT_MAX;
-
-    while (++iteration <= maxIterations
-        && distance > maxTolerance)
-    {
-        cv::Point previousClosestPoint = closestPoint;
-        closestPoint = shiftNearest(matForeground, matDepth, bandwidth, bandwidthDepth, closestPoint, distance);
-
-        if (previousClosestPoint == closestPoint)
-            break;
-    }
-
-    return closestPoint;
-}
-
-void HandTracker::calculateBasicScore(cv::Mat& matDepth, cv::Mat& matScore)
+void HandTracker::calculateBasicScore(cv::Mat& matDepth, cv::Mat& matScore, const float heightFactor, const float depthFactor, const float resizeFactor)
 {
     int width = matDepth.cols;
     int height = matDepth.rows;
-
-    float heightFactor = 1 * m_factor1;
-    float depthFactor = 1.5 * m_factor2;
 
     for (int y = 0; y < height; y++)
     {
@@ -390,7 +299,7 @@ void HandTracker::calculateBasicScore(cv::Mat& matDepth, cv::Mat& matScore)
             float depth = *depthRow;
             if (depth != 0)
             {
-                cv::Point3f worldPosition = convertDepthToRealWorld(x, y, depth, m_resizeFactor);
+                cv::Point3f worldPosition = convertDepthToRealWorld(x, y, depth, resizeFactor);
 
                 float score = worldPosition.y * heightFactor;
                 score += (MAX_DEPTH - worldPosition.z) * depthFactor;
@@ -410,6 +319,8 @@ void HandTracker::calculateBasicScore(cv::Mat& matDepth, cv::Mat& matScore)
 void HandTracker::calculateEdgeDistance(cv::Mat& matSegmentation, cv::Mat& matArea, cv::Mat& matEdgeDistance)
 {
     cv::Mat eroded, temp;
+    cv::Mat crossElement = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
+
 
     matEdgeDistance = cv::Mat::zeros(matSegmentation.size(), CV_32FC1);
     cv::Mat ones = cv::Mat::ones(matSegmentation.size(), CV_32FC1);
@@ -419,7 +330,7 @@ void HandTracker::calculateEdgeDistance(cv::Mat& matSegmentation, cv::Mat& matAr
     int dilateCount = 1;
     for (int i = 0; i < dilateCount; i++)
     {
-        cv::dilate(eroded, eroded, m_crossElement);
+        cv::dilate(eroded, eroded, crossElement);
     }
 
     int nonZeroCount = 0;
@@ -430,7 +341,7 @@ void HandTracker::calculateEdgeDistance(cv::Mat& matSegmentation, cv::Mat& matAr
     do
     {
         //erode makes the image smaller
-        cv::erode(eroded, eroded, m_crossElement);
+        cv::erode(eroded, eroded, crossElement);
         //accumulate the eroded image to the matGlobalSegmentation buffer
         cv::add(matArea, matEdgeDistance, matEdgeDistance, eroded, CV_32FC1);
 
@@ -439,72 +350,9 @@ void HandTracker::calculateEdgeDistance(cv::Mat& matSegmentation, cv::Mat& matAr
 
         //nonZerCount < imageLength guards against image with all 1's, which will never erode
     } while (!done && nonZeroCount < imageLength && ++iterations < maxIterations);
-
-    /*
-        for (int i = 0; i < 10; i++)
-        {
-        cv::dilate(matEdgeDistance, matEdgeDistance, element);
-        }
-        */
-    /*
-
-    cv::Mat skel;
-    cv::dilate(matGlobalSegmentation, skel, element);
-    thinning(skel, skel);
-
-    cv::Mat skelViz = skel * 255;
-    cv::namedWindow("skel", 0);
-    cv::resizeWindow("skel", 640, 480);
-    cv::imshow("skel", skelViz);
-
-    int width = matEdgeDistance.cols;
-    int height = matEdgeDistance.rows;
-
-    for (int i = 0; i < iterations; i++)
-    {
-    for (int y = 1; y < height - 1; y++)
-    {
-    float* lastEdgeRow = matEdgeDistance.ptr<float>(y - 1);
-    float* edgeRow = matEdgeDistance.ptr<float>(y);
-    float* nextEdgeRow = matEdgeDistance.ptr<float>(y + 1);
-    char* lastSkelRow = skel.ptr<char>(y - 1);
-    char* skelRow = skel.ptr<char>(y);
-    char* nextSkelRow = skel.ptr<char>(y + 1);
-    for (int x = 1; x < width - 1; x++)
-    {
-    if (0 == *skelRow && 0 != *edgeRow)
-    {
-    float right = FLT_MIN;
-    if (0 != *(skelRow+1)) right = *(edgeRow + 1);
-    float left = FLT_MIN;
-    if (0 != *(skelRow - 1)) left = *(edgeRow - 1);
-    float up = FLT_MIN;
-    if (0 != *lastSkelRow) up = *lastEdgeRow;
-    float down = FLT_MIN;
-    if (0 != *(nextSkelRow)) down = *nextEdgeRow;
-    float maxval = MAX(MAX(right, left), MAX(up, down));
-    if (maxval > 0)
-    {
-    *edgeRow = maxval;
-    *skelRow = 1;
-    }
-    else
-    {
-    *edgeRow = 0;
-    }
-    }
-    ++lastSkelRow;
-    ++skelRow;
-    ++nextSkelRow;
-    ++lastEdgeRow;
-    ++edgeRow;
-    ++nextEdgeRow;
-    }
-    }
-    }*/
 }
 
-void HandTracker::calculateSegmentArea(cv::Mat& matDepth, cv::Mat& matArea, cv::Mat& matAreaSqrt)
+void HandTracker::calculateSegmentArea(cv::Mat& matDepth, cv::Mat& matArea, cv::Mat& matAreaSqrt, const float resizeFactor)
 {
     int width = matDepth.cols;
     int height = matDepth.rows;
@@ -531,8 +379,8 @@ void HandTracker::calculateSegmentArea(cv::Mat& matDepth, cv::Mat& matArea, cv::
                 cv::Point3f p3(x, y + 1, depth1);
                 cv::Point3f p4(x + 1, y + 1, depth1);
 
-                area += getDepthArea(p1, p2, p3);
-                area += getDepthArea(p2, p3, p4);
+                area += getDepthArea(p1, p2, p3, resizeFactor);
+                area += getDepthArea(p2, p3, p4, resizeFactor);
             }
 
             *areaRow = area;
@@ -546,179 +394,21 @@ void HandTracker::calculateSegmentArea(cv::Mat& matDepth, cv::Mat& matArea, cv::
     }
 }
 
-float HandTracker::getDepthArea(cv::Point3f& p1, cv::Point3f& p2, cv::Point3f& p3)
+float HandTracker::getDepthArea(cv::Point3f& p1, cv::Point3f& p2, cv::Point3f& p3, const float resizeFactor)
 {
     float worldX1, worldY1, worldZ1;
     float worldX2, worldY2, worldZ2;
     float worldX3, worldY3, worldZ3;
 
-    cv::Point3f world1 = convertDepthToRealWorld(p1, m_resizeFactor);
-    cv::Point3f world2 = convertDepthToRealWorld(p2, m_resizeFactor);
-    cv::Point3f world3 = convertDepthToRealWorld(p3, m_resizeFactor);
+    cv::Point3f world1 = convertDepthToRealWorld(p1, resizeFactor);
+    cv::Point3f world2 = convertDepthToRealWorld(p2, resizeFactor);
+    cv::Point3f world3 = convertDepthToRealWorld(p3, resizeFactor);
 
     cv::Point3f v1 = world2 - world1;
     cv::Point3f v2 = world3 - world1;
 
     float area = 0.5 * cv::norm(v1.cross(v2));
     return area;
-}
-
-float HandTracker::calculatePercentForeground(cv::Mat& matSegmentation, cv::Point2f center, int radius)
-{
-    int width = matSegmentation.cols;
-    int height = matSegmentation.rows;
-
-    int cx = center.x;
-    int cy = center.y;
-    int x0 = MAX(0, cx - radius);
-    int y0 = MAX(0, cy - radius);
-    int x1 = MIN(matSegmentation.cols - 1, cx + radius);
-    int y1 = MIN(matSegmentation.rows - 1, cy + radius);
-
-    int totalCount = 0;
-    int foregroundCount = 0;
-    int radius2 = radius*radius;
-    for (int y = y0; y < y1; y++)
-    {
-        char* segmentationRow = matSegmentation.ptr<char>(y);
-
-        segmentationRow += x0;
-        for (int x = x0; x < x1; x++)
-        {
-            int dx = x - cx;
-            int dy = y - cy;
-            if (dx*dx + dy*dy < radius2)
-            {
-                if (*segmentationRow == PixelType::Foreground)
-                {
-                    ++foregroundCount;
-                }
-                ++totalCount;
-            }
-            ++segmentationRow;
-        }
-    }
-
-    return foregroundCount / static_cast<float>(totalCount);
-}
-
-bool HandTracker::findUnvisitedForegroundPoint(cv::Mat& matSegmentation, cv::Mat& matVisited, cv::Point& position)
-{
-    int width = matSegmentation.cols;
-    int height = matSegmentation.rows;
-
-    for (int y = 0; y < height; y++)
-    {
-        char* segmentationRow = matSegmentation.ptr<char>(y);
-        char* visitedRow = matVisited.ptr<char>(y);
-        for (int x = 0; x < width; x++)
-        {
-            if (*segmentationRow == PixelType::Foreground && *visitedRow == 0)
-            {
-                position = cv::Point(x, y);
-                return true;
-            }
-
-            ++segmentationRow;
-            ++visitedRow;
-        }
-    }
-    return false;
-}
-
-void HandTracker::processCircleAnalysis(cv::Mat& matSegmentation)
-{
-    cv::Mat matVisited = cv::Mat::zeros(PROCESSING_SIZE_Y, PROCESSING_SIZE_X, CV_8UC1);
-
-    int width = matSegmentation.cols;
-    int height = matSegmentation.rows;
-
-    cv::Mat gray, img, src;
-    gray.create(matSegmentation.size(), CV_8UC1);
-    src.create(matSegmentation.size(), CV_8UC3);
-    cv::inRange(matSegmentation, PixelType::Foreground, PixelType::Foreground, gray);
-    cv::cvtColor(gray, src, CV_GRAY2RGB);
-
-    cv::Point seed;
-    while (findUnvisitedForegroundPoint(matSegmentation, matVisited, seed))
-    {
-        queue<cv::Point> pointQueue;
-        vector<cv::Point> pointList;
-
-        pointQueue.push(seed);
-
-        int count = 0;
-        int countMax = 10;
-        float minFillPercent = 0.95;
-        int minListSize = 30;
-
-        bool shouldContinue = true;
-        while (shouldContinue && !pointQueue.empty())
-        {
-            cv::Point p = pointQueue.front();
-            pointQueue.pop();
-
-            char segmentation = matSegmentation.at<char>(p.y, p.x);
-
-            if (segmentation == PixelType::Foreground && matVisited.at<char>(p) == 0)
-            {
-                src.at<cv::Point3_<uchar>>(p) = cv::Point3_<uchar>(0, 0, 255);
-                matVisited.at<char>(p) = 1;
-                cv::Point2f center;
-                float radius = 0;
-
-                pointList.push_back(p);
-
-                cv::minEnclosingCircle(pointList, center, radius);
-                int radiusI = cvRound(radius);
-                src.copyTo(img);
-                circle(img, center, radiusI, cv::Scalar(255, 0, 0), 1, 8);
-
-                float percentForeground = calculatePercentForeground(matSegmentation, center, radiusI);
-
-                if (pointList.size() > minListSize && percentForeground < minFillPercent)
-                {
-                    shouldContinue = false;
-                }
-
-                cv::Point right(p.x + 1, p.y);
-                cv::Point left(p.x - 1, p.y);
-                cv::Point down(p.x, p.y + 1);
-                cv::Point up(p.x, p.y - 1);
-
-                if (right.x < width && 0 == matVisited.at<char>(right))
-                {
-                    //m_matVisited.at<char>(right) = 1;
-                    pointQueue.push(right);
-                }
-                if (left.x >= 0 && 0 == matVisited.at<char>(left))
-                {
-                    //m_matVisited.at<char>(left) = 1;
-                    pointQueue.push(left);
-                }
-                if (down.y < height && 0 == matVisited.at<char>(down))
-                {
-                    //m_matVisited.at<char>(down) = 1;
-                    pointQueue.push(down);
-                }
-                if (up.y >= 0 && 0 == matVisited.at<char>(up))
-                {
-                    //m_matVisited.at<char>(up) = 1;
-                    pointQueue.push(up);
-                }
-            }
-        }
-
-        img.copyTo(src);
-    }
-
-    if (m_showCircles)
-    {
-        cv::namedWindow("circles", 0);
-        cv::resizeWindow("circles", 640, 480);
-
-        cv::imshow("circles", src);
-    }
 }
 
 float HandTracker::countNeighborhoodArea(cv::Mat& matSegmentation, cv::Mat& matDepth, cv::Mat& matArea, cv::Point center, const float bandwidth, const float bandwidthDepth, const float resizeFactor)
@@ -817,7 +507,7 @@ void HandTracker::validateAndUpdateTrackedPoint(cv::Mat& matDepth, cv::Mat& matA
     }
 }
 
-void HandTracker::removeDuplicatePoints(vector<TrackedPoint> trackedPoints)
+void HandTracker::removeDuplicatePoints(vector<TrackedPoint>& trackedPoints)
 {
     for (auto iter = trackedPoints.begin(); iter != trackedPoints.end(); ++iter)
     {
@@ -837,6 +527,40 @@ void HandTracker::removeDuplicatePoints(vector<TrackedPoint> trackedPoints)
                 }
                 otherTracked.m_status = TrackingStatus::Dead;
             }
+        }
+    }
+}
+
+void HandTracker::removeOldAndDeadPoints(vector<TrackedPoint>& trackedPoints)
+{
+    const int maxInactiveFrames = 60;
+    const int maxInactiveFramesForLostPoints = 240;
+    const int maxInactiveFramesForActivePoints = 480;
+
+    for (auto iter = trackedPoints.begin(); iter != trackedPoints.end();)
+    {
+        TrackedPoint& tracked = *iter;
+
+        int max = maxInactiveFrames;
+        if (tracked.m_type == TrackedPointType::ActivePoint)
+        {
+            if (tracked.m_status == TrackingStatus::Lost)
+            {
+                max = maxInactiveFramesForLostPoints;
+            }
+            else
+            {
+                max = maxInactiveFramesForActivePoints;
+            }
+        }
+        //if inactive for more than a certain number of frames, or dead, remove point
+        if (tracked.m_inactiveFrameCount > max || tracked.m_status == TrackingStatus::Dead)
+        {
+            iter = trackedPoints.erase(iter);
+        }
+        else
+        {
+            ++iter;
         }
     }
 }
@@ -876,8 +600,12 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
     const int iterationMaxTracking = 1;
     const int iterationMaxInitial = 1;
 
-    calculateBasicScore(matDepth, matScore);
-    calculateSegmentArea(matDepth, matArea, matAreaSqrt);
+
+    float heightFactor = 1 * m_factor1;
+    float depthFactor = 1.5 * m_factor2;
+
+    calculateBasicScore(matDepth, matScore, heightFactor, depthFactor, m_resizeFactor);
+    calculateSegmentArea(matDepth, matArea, matAreaSqrt, m_resizeFactor);
 
     //update existing points
     for (auto iter = m_internalTrackedPoints.begin(); iter != m_internalTrackedPoints.end(); ++iter)
@@ -1006,49 +734,9 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
         }
     }
 
-    //filter by area
+    
     //remove old points
-    const int maxInactiveFrames = 60;
-    const int maxInactiveFramesForLostPoints = 240;
-    const int maxInactiveFramesForActivePoints = 480;
-
-    for (auto iter = m_internalTrackedPoints.begin(); iter != m_internalTrackedPoints.end();)
-    {
-        TrackedPoint& tracked = *iter;
-
-        int max = maxInactiveFrames;
-        if (tracked.m_type == TrackedPointType::ActivePoint)
-        {
-            if (tracked.m_status == TrackingStatus::Lost)
-            {
-                max = maxInactiveFramesForLostPoints;
-            }
-            else
-            {
-                max = maxInactiveFramesForActivePoints;
-            }
-        }
-        //if inactive for more than a certain number of frames, or dead, remove point
-        if (tracked.m_inactiveFrameCount > max || tracked.m_status == TrackingStatus::Dead)
-        {
-            iter = m_internalTrackedPoints.erase(iter);
-        }
-        else
-        {
-            ++iter;
-        }
-    }
-}
-
-bool HandTracker::isDepthInRange(const float bandwidth, const float bandwidthDepth, cv::Point& center, float startingDepth, cv::Point3f& position)
-{
-    cv::Point delta = cv::Point(center.x - position.x, center.y - position.y);
-    float len = cv::norm(delta);
-    float deltaDepth = abs(position.z - startingDepth);
-    bool isValidDepth = len < bandwidth &&
-        position.z != 0 &&
-        deltaDepth < bandwidthDepth;
-    return isValidDepth;
+    removeOldAndDeadPoints(m_internalTrackedPoints);
 }
 
 void HandTracker::reset()
@@ -1150,5 +838,4 @@ void HandTracker::setupVariables()
 
     int erodeNum = 1;
     m_rectElement = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(erodeNum * 2 + 1, erodeNum * 2 + 1), cv::Point(erodeNum, erodeNum));
-    m_crossElement = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
 }
