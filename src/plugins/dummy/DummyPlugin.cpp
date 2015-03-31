@@ -1,16 +1,14 @@
+#include <SenseKit.h>
 #include "DummyPlugin.h"
-#include "SenseKit.h"
+
 static sensekit::DummyPlugin* g_plugin;
 
 SENSEKIT_BEGIN_DECLS
 
 SENSEKIT_EXPORT void sensekit_plugin_initialize(StreamServiceProxyBase* streamProxy,
-                                                    PluginServiceProxyBase* pluginProxy)
+                                                PluginServiceProxyBase* pluginProxy)
 {
-    g_plugin = new sensekit::DummyPlugin(
-        static_cast<sensekit::StreamServiceProxy*>(streamProxy),
-        static_cast<sensekit::PluginServiceProxy*>(pluginProxy));
-
+    g_plugin = new sensekit::DummyPlugin(static_cast<sensekit::PluginServiceProxy*>(pluginProxy));
     g_plugin->initialize();
 }
 

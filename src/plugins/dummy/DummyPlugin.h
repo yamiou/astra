@@ -13,13 +13,10 @@ namespace sensekit {
     class DummyPlugin : public PluginBase
     {
     public:
-        DummyPlugin(StreamServiceProxy* streamProxy, PluginServiceProxy* pluginService)
+        DummyPlugin(PluginServiceProxy* pluginService)
             : PluginBase(pluginService) { }
 
         virtual void temp_update() override { cout << "dumb." << endl; }
-
-    private:
-        StreamServiceProxyBase* m_streamProxy;
     };
 }
 
