@@ -1,5 +1,6 @@
 ﻿#include "StreamSet.h"
 #include <StreamTypes.h>
+#include <iostream>
 
 namespace sensekit {
     StreamSet::StreamSet()
@@ -11,6 +12,7 @@ namespace sensekit {
 
         if (sk_stream == nullptr)
         {
+            std::cout << "not found" << std::endl;
             return nullptr;
         }
 

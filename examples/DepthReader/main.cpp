@@ -97,7 +97,7 @@ int main(int argc, char** argv)
 
         sensekit_depth_frame_close(&depthFrame);
 
-    } while (shouldContinue);
+     } while (shouldContinue);
 
     status = sensekit_depth_close(&depthStream);
 

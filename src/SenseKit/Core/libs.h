@@ -17,7 +17,7 @@ namespace sensekit {
 
         std::vector<std::string> result;
         tinydir_dir dir;
-        if (tinydir_open(&dir, ".") == -1)
+        if (tinydir_open(&dir, "./skPlugins") == -1)
         {
             goto bail;
         }

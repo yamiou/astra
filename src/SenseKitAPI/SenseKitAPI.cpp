@@ -1,6 +1,10 @@
 #include <SenseKit.h>
 #include <SenseKitAPI.h>
 #include <Plugins/StreamServiceProxy.h>
+#include <cassert>
+#include <iostream>
+using std::cout;
+using std::endl;
 
 SENSEKIT_BEGIN_DECLS
 

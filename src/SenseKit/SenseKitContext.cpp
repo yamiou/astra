@@ -43,7 +43,8 @@ namespace sensekit {
 
         for(auto lib : get_libs())
         {
-            os_load_library(lib.c_str(), libHandle);
+            cout << lib << endl;
+            os_load_library(("skPlugins/" + lib).c_str(), libHandle);
 
             PluginFuncs pluginFuncs;
             os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_initialize), (FarProc&)pluginFuncs.initialize);
@@ -172,7 +173,8 @@ namespace sensekit {
     {
         for(auto plinfo : m_pluginList)
         {
-            plinfo.update();
+            if (plinfo.update)
+                plinfo.update();
         }
 
         return SENSEKIT_STATUS_SUCCESS;

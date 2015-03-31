@@ -15,7 +15,7 @@
 #  define SENSEKIT_PUBLIC
 #  define SENSEKIT_LOCAL
 # else
-#  if __GNUC__ >= 4
+#  if __GNUC__ >= 4 || defined (__clang__)
 #    define SENSEKIT_PUBLIC __attribute__ ((visibility ("default")))
 #    define SENSEKIT_LOCAL  __attribute__ ((visibility ("hidden")))
 #    define SENSEKIT_EXPORT SENSEKIT_PUBLIC
@@ -30,7 +30,7 @@
 
 #ifndef SENSEKIT_API
 #  ifdef SENSEKIT_BUILD
-#    define SENSEKIT_API SENSEKIT_EXPORT
+#    define SENSEKIT_API SENSEKIT_PUBLIC SENSEKIT_EXPORT
 #  else
 #    define SENSEKIT_API SENSEKIT_IMPORT
 #  endif
