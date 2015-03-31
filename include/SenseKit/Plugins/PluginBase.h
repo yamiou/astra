@@ -123,4 +123,32 @@ namespace sensekit {
     }
 }
 
+#define EXPORT_PLUGIN(className)                                                          \
+                                                                                          \
+static className* g_plugin;                                                               \
+                                                                                          \
+SENSEKIT_BEGIN_DECLS                                                                      \
+                                                                                          \
+SENSEKIT_EXPORT void sensekit_plugin_initialize(PluginServiceProxyBase* pluginProxy)      \
+{                                                                                         \
+    g_plugin = new className(                                                             \
+        static_cast<sensekit::PluginServiceProxy*>(pluginProxy));                         \
+    g_plugin->initialize();                                                               \
+}                                                                                         \
+                                                                                          \
+SENSEKIT_EXPORT void sensekit_plugin_update()                                             \
+{                                                                                         \
+    g_plugin->temp_update();                                                              \
+}                                                                                         \
+                                                                                          \
+SENSEKIT_EXPORT void sensekit_plugin_terminate()                                          \
+{                                                                                         \
+    g_plugin->cleanup();                                                                  \
+    delete g_plugin;                                                                      \
+}                                                                                         \
+                                                                                          \
+SENSEKIT_END_DECLS                                                                        \
+                                                                                          \
+struct missing_semicolor ## __LINE__ {}
+
 #endif /* PLUGINBASE_H */

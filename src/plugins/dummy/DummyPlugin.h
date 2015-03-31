@@ -20,4 +20,6 @@ namespace sensekit {
     };
 }
 
+EXPORT_PLUGIN(sensekit::DummyPlugin);
+
 #endif /* DUMMYPLUGIN_H */

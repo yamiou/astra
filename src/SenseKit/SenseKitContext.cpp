@@ -43,7 +43,6 @@ namespace sensekit {
 
         for(auto lib : get_libs())
         {
-            cout << lib << endl;
             os_load_library((PLUGIN_DIRECTORY + lib).c_str(), libHandle);
 
             PluginFuncs pluginFuncs;
