@@ -7,6 +7,8 @@
 
 namespace sensekit {
 
+    const char PLUGIN_DIRECTORY[] = "./Plugins/";
+
     std::vector<std::string> get_libs()
     {
 #ifdef _WIN32
@@ -17,7 +19,7 @@ namespace sensekit {
 
         std::vector<std::string> result;
         tinydir_dir dir;
-        if (tinydir_open(&dir, "./skPlugins") == -1)
+        if (tinydir_open(&dir, PLUGIN_DIRECTORY) == -1)
         {
             goto bail;
         }

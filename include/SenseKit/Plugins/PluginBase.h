@@ -10,16 +10,12 @@ namespace sensekit {
     class PluginBase
     {
     public:
-        PluginBase(StreamServiceProxy* streamService, PluginServiceProxy* pluginService)
-            :
-            m_streamService(streamService),
-            m_pluginService(pluginService)
-            {};
+        PluginBase(PluginServiceProxy* pluginService)
+            :  m_pluginService(pluginService)
+            {}
 
         virtual ~PluginBase() = default;
 
-        //stream core calls these on plugins
-        //TODO transition this init call to the PluginBase ctor
         void initialize()
             {
                 if (m_initialized)
@@ -45,7 +41,6 @@ namespace sensekit {
 
     protected:
         inline PluginServiceProxy& get_pluginService() const  { return *m_pluginService; }
-        inline StreamServiceProxy& get_streamService() const { return *m_streamService; }
 
         virtual void on_initialize() {}
         virtual void on_cleanup() {}
@@ -53,7 +48,6 @@ namespace sensekit {
     private:
         bool m_initialized{false};
         PluginServiceProxy* m_pluginService;
-        StreamServiceProxy* m_streamService;
 
         static void set_parameter_thunk(void* instance,
                                         sensekit_streamconnection_t* connection,

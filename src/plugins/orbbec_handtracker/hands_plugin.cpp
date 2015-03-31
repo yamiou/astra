@@ -6,11 +6,9 @@ SENSEKIT_BEGIN_DECLS
 
 static HandTrackerPlugin* g_plugin;
 
-SENSEKIT_EXPORT void sensekit_plugin_initialize(StreamServiceProxyBase* streamProxy,
-                                                    PluginServiceProxyBase* pluginProxy)
+SENSEKIT_EXPORT void sensekit_plugin_initialize(PluginServiceProxyBase* pluginProxy)
 {
     g_plugin = new HandTrackerPlugin(
-        static_cast<sensekit::StreamServiceProxy*>(streamProxy),
         static_cast<sensekit::PluginServiceProxy*>(pluginProxy));
 
     g_plugin->initialize();

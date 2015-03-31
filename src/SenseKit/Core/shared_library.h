@@ -17,5 +17,4 @@ void os_load_library(const char* fileName, LibHandle& libHandle);
 void os_free_library(const LibHandle libHandle);
 void os_get_proc_address(const LibHandle libHandle, const char* procName, FarProc& procAddr);
 
-
 #endif /* SHARED_LIBRARY_H */

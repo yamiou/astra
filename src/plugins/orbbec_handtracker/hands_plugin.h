@@ -6,8 +6,8 @@
 class HandTrackerPlugin : public sensekit::PluginBase
 {
 public:
-    HandTrackerPlugin(sensekit::StreamServiceProxy* streamProxy, sensekit::PluginServiceProxy* pluginProxy)
-        : PluginBase(streamProxy, pluginProxy) { }
+    HandTrackerPlugin(sensekit::PluginServiceProxy* pluginProxy)
+        : PluginBase(pluginProxy) { }
 
     virtual void temp_update() override {}
 };

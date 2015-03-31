@@ -14,8 +14,8 @@ namespace sensekit
         class OpenNIPlugin : public sensekit::PluginBase
         {
         public:
-            OpenNIPlugin(StreamServiceProxy* streamService, PluginServiceProxy* pluginService)
-                : sensekit::PluginBase(streamService, pluginService) {}
+            OpenNIPlugin(PluginServiceProxy* pluginService)
+                : sensekit::PluginBase(pluginService) {}
 
             virtual ~OpenNIPlugin() = default;
             virtual void temp_update() override;

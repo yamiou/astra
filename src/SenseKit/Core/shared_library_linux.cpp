@@ -5,11 +5,9 @@
 #include <stdio.h>
 #include <dlfcn.h>
 #include "shared_library.h"
-#include <iostream>
 
 void os_load_library(const char* fileName, LibHandle& libHandle)
 {
-    std::cout << "opening library" << std::endl;
     libHandle = dlopen(fileName, RTLD_NOW);
 
     if (libHandle == nullptr)

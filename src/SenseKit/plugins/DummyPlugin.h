@@ -14,7 +14,7 @@ namespace sensekit {
     {
     public:
         DummyPlugin(StreamServiceProxy* streamProxy, PluginServiceProxy* pluginService)
-            : PluginBase(streamProxy, pluginService) { }
+            : PluginBase(pluginService) { }
 
         virtual void temp_update() override { cout << "dumb." << endl; }
 

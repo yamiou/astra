@@ -54,14 +54,16 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::register_stream_added_callback(StreamAddedCallback callback, CallbackId& callbackId)
+    sensekit_status_t PluginService::register_stream_added_callback(StreamAddedCallback callback,
+                                                                    CallbackId& callbackId)
     {
         callbackId = m_streamAddedSignal += callback;
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::register_stream_removing_callback(StreamRemovingCallback callback, CallbackId& callbackId)
+    sensekit_status_t PluginService::register_stream_removing_callback(StreamRemovingCallback callback,
+                                                                       CallbackId& callbackId)
     {
         callbackId = m_streamRemovingSignal += callback;
 
@@ -82,7 +84,11 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::create_stream(StreamSetHandle* setHandle, StreamType type, StreamSubtype subtype, stream_callbacks_t pluginCallbacks, /*out*/StreamHandle*& handle)
+    sensekit_status_t PluginService::create_stream(StreamSetHandle* setHandle,
+                                                   StreamType type,
+                                                   StreamSubtype subtype,
+                                                   stream_callbacks_t pluginCallbacks,
+                                                   StreamHandle*& handle)
     {
         // TODO add to specific streamset
         StreamHandle* stream = m_context.get_rootSet().create_stream(type, subtype, pluginCallbacks);
@@ -118,8 +124,10 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::create_stream_bin(StreamHandle* handle, size_t lengthInBytes,
-                                                       StreamBinId& id, sensekit_frame_t*& binBuffer)
+    sensekit_status_t PluginService::create_stream_bin(StreamHandle* handle,
+                                                       size_t lengthInBytes,
+                                                       StreamBinId& id,
+                                                       sensekit_frame_t*& binBuffer)
     {
         Stream* stream = reinterpret_cast<Stream*>(handle);
         StreamBin* bin = stream->create_bin(lengthInBytes);
@@ -130,7 +138,9 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::destroy_stream_bin(StreamHandle* handle, StreamBinId& id, sensekit_frame_t*& buffer)
+    sensekit_status_t PluginService::destroy_stream_bin(StreamHandle* handle,
+                                                        StreamBinId& id,
+                                                        sensekit_frame_t*& buffer)
     {
         Stream* stream = reinterpret_cast<Stream*>(handle);
         StreamBin* bin = stream->get_bin_by_id(id);
@@ -143,7 +153,9 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::cycle_bin_buffers(StreamHandle* handle, StreamBinId id, sensekit_frame_t*& binBuffer)
+    sensekit_status_t PluginService::cycle_bin_buffers(StreamHandle* handle,
+                                                       StreamBinId id,
+                                                       sensekit_frame_t*& binBuffer)
     {
         Stream* stream = reinterpret_cast<Stream*>(handle);
         StreamBin* bin = stream->get_bin_by_id(id);

@@ -10,11 +10,9 @@ static sensekit::openni::OpenNIPlugin* g_plugin;
 
 SENSEKIT_BEGIN_DECLS
 
-SENSEKIT_EXPORT void sensekit_plugin_initialize(StreamServiceProxyBase* streamProxy,
-                                                PluginServiceProxyBase* pluginProxy)
+SENSEKIT_EXPORT void sensekit_plugin_initialize(PluginServiceProxyBase* pluginProxy)
 {
     g_plugin = new sensekit::openni::OpenNIPlugin(
-        static_cast<sensekit::StreamServiceProxy*>(streamProxy),
         static_cast<sensekit::PluginServiceProxy*>(pluginProxy));
 
     g_plugin->initialize();
@@ -165,23 +163,21 @@ namespace sensekit
             return SENSEKIT_STATUS_SUCCESS;
         }
 
-        void OpenNIPlugin::set_parameter(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t byteLength, sensekit_parameter_data_t* data)
-        {
-        }
+        void OpenNIPlugin::set_parameter(sensekit_streamconnection_t* streamConnection,
+                                         sensekit_parameter_id id, size_t byteLength,
+                                         sensekit_parameter_data_t* data)
+        {}
 
-        void OpenNIPlugin::get_parameter_size(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, /*out*/size_t& byteLength)
-        {
-            byteLength = 20;
-        }
+        void OpenNIPlugin::get_parameter_size(sensekit_streamconnection_t* streamConnection,
+                                              sensekit_parameter_id id,
+                                              size_t& byteLength)
+        {}
 
-        void OpenNIPlugin::get_parameter_data(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t byteLength, sensekit_parameter_data_t* data)
-        {
-            char* charData = (char*)data;
-            for (int i = 0; i < byteLength; i++)
-            {
-                charData[i] = i;
-            }
-        }
+        void OpenNIPlugin::get_parameter_data(sensekit_streamconnection_t* streamConnection,
+                                              sensekit_parameter_id id,
+                                              size_t byteLength,
+                                              sensekit_parameter_data_t* data)
+        {}
 
         void OpenNIPlugin::connection_added(sensekit_streamconnection_t* connection)
         {
@@ -273,10 +269,7 @@ namespace sensekit
             int16_t* frameData = m_currentDepthFrame->frame.data;
             size_t bufferLength = m_depthMode.getResolutionX() * m_depthMode.getResolutionY();
 
-            for(int i = 0; i < bufferLength; i++)
-            {
-                frameData[i] = datData[i];
-            }
+            memcpy(frameData, datData, sizeof(int16_t)*bufferLength);
 
             frame->frame.frameIndex = m_frameIndex;
             ++m_frameIndex;
@@ -305,10 +298,7 @@ namespace sensekit
             uint8_t* frameData = m_currentColorFrame->frame.data;
             size_t bufferLength = m_colorMode.getResolutionX() * m_depthMode.getResolutionY() * 3;
 
-            for(int i = 0; i < bufferLength; i++)
-            {
-                frameData[i] = datData[i];
-            }
+            memcpy(frameData, datData, bufferLength);
 
             frame->frame.frameIndex = m_frameIndex;
             ++m_frameIndex;
