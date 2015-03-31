@@ -149,6 +149,6 @@ SENSEKIT_EXPORT void sensekit_plugin_terminate()                                
                                                                                           \
 SENSEKIT_END_DECLS                                                                        \
                                                                                           \
-struct missing_semicolor ## __LINE__ {}
+struct missing_semicolon ## __LINE__ {}
 
 #endif /* PLUGINBASE_H */
