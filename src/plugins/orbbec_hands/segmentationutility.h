@@ -17,6 +17,8 @@ public:
 
     static bool findForegroundPixel(cv::Mat& matForeground, cv::Point& foregroundPosition);
 
+    static float countNeighborhoodArea(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat& matArea, cv::Point_<int> center, const float bandwidth, const float bandwidthDepth, const float resizeFactor);
+
 private:
     static void segmentForeground(TrackingData data);
     static cv::Point trackPointFromSeed(TrackingData data);

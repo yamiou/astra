@@ -10,7 +10,7 @@
 #include <cstdint>
 #include <queue>
 #include <ctime>
-#include "frameconverter.h"
+#include "depthutility.h"
 #include "segmentationutility.h"
 #include "coordinateconversion.h"
 
@@ -19,8 +19,8 @@ using namespace std;
 #define GL_WIN_SIZE_X   640
 #define GL_WIN_SIZE_Y   480
 
-#define PROCESSING_SIZE_X 80
-#define PROCESSING_SIZE_Y 60
+#define PROCESSING_SIZE_WIDTH 80
+#define PROCESSING_SIZE_HEIGHT 60
 
 #define TEXTURE_SIZE    512
 
@@ -30,7 +30,8 @@ using namespace std;
 #define MIN_CHUNKS_SIZE(data_size, chunk_size)  (MIN_NUM_CHUNKS(data_size, chunk_size) * (chunk_size))
 
 HandTracker::HandTracker(sensekit_depthstream_t* depthStream) :
-m_depthStream(depthStream)
+m_depthStream(depthStream),
+m_depthUtility(PROCESSING_SIZE_WIDTH, PROCESSING_SIZE_HEIGHT)
 {
     mouseX = 0;
     mouseY = 0;
@@ -135,70 +136,6 @@ void HandTracker::onKey(unsigned char key)
 
 }
 
-void HandTracker::filterZeroValuesAndJumps(cv::Mat matDepth, cv::Mat matDepthPrevious, cv::Mat matDepthAvg, cv::Mat matDepthVel, float maxDepthJumpPercent)
-{
-    int width = matDepth.cols;
-    int height = matDepth.rows;
-
-    for (int y = 0; y < height; ++y)
-    {
-        float* resizedRow = matDepth.ptr<float>(y);
-        float* prevRow = matDepthPrevious.ptr<float>(y);
-        float* avgRow = matDepthAvg.ptr<float>(y);
-        float* velRow = matDepthVel.ptr<float>(y);
-
-        for (int x = 0; x < width; ++x)
-        {
-            float depth = *resizedRow;
-            float previousDepth = *prevRow;
-
-            //calculate percent change since last frame
-            float deltaPercent = abs(depth - previousDepth) / previousDepth;
-            //if this frame or last frame are zero depth, or there is a large jump
-            if (0 == depth || 0 == previousDepth || (deltaPercent > maxDepthJumpPercent && deltaPercent > 0))
-            {
-                //set the average to the current depth, and set velocity to zero
-                //this suppresses the velocity signal for edge jumping artifacts
-                avgRow[x] = depth;
-                velRow[x] = 0;
-            }
-
-            *prevRow = depth;
-
-            ++resizedRow;
-            ++prevRow;
-        }
-    }
-}
-
-void HandTracker::thresholdForeground(cv::Mat& matForeground, cv::Mat& matVelocity, float foregroundThresholdFactor)
-{
-    int width = matForeground.cols;
-    int height = matForeground.rows;
-
-    for (int y = 0; y < height; ++y)
-    {
-        float* velRow = matVelocity.ptr<float>(y);
-        char* foregroundRow = matForeground.ptr<char>(y);
-
-        for (int x = 0; x < width; ++x)
-        {
-            float vel = *velRow;
-            if (vel > foregroundThresholdFactor)
-            {
-                *foregroundRow = PixelType::Foreground;
-            }
-            else
-            {
-                *foregroundRow = PixelType::Background;
-            }
-
-            ++foregroundRow;
-            ++velRow;
-        }
-    }
-}
-
 vector<TrackedPoint>& HandTracker::updateOriginalPoints(vector<TrackedPoint>& internalTrackedPoints)
 {
     m_originalTrackedPoints.clear();
@@ -217,47 +154,6 @@ vector<TrackedPoint>& HandTracker::updateOriginalPoints(vector<TrackedPoint>& in
     return m_originalTrackedPoints;
 }
 
-float HandTracker::countNeighborhoodArea(cv::Mat& matSegmentation, cv::Mat& matDepth, cv::Mat& matArea, cv::Point center, const float bandwidth, const float bandwidthDepth, const float resizeFactor)
-{
-    float startingDepth = matDepth.at<float>(center);
-
-    cv::Point topLeft = CoordinateConversion::offsetPixelLocationByMM(center, -bandwidth, bandwidth, startingDepth, resizeFactor);
-    cv::Point bottomRight = CoordinateConversion::offsetPixelLocationByMM(center, bandwidth, -bandwidth, startingDepth, resizeFactor);
-    int32_t x0 = MAX(0, topLeft.x);
-    int32_t y0 = MAX(0, topLeft.y);
-    int32_t x1 = MIN(matDepth.cols - 1, bottomRight.x);
-    int32_t y1 = MIN(matDepth.rows - 1, bottomRight.y);
-
-    float area = 0;
-
-    for (int y = y0; y < y1; y++)
-    {
-        float* depthRow = matDepth.ptr<float>(y);
-        char* segmentationRow = matSegmentation.ptr<char>(y);
-        float* areaRow = matArea.ptr<float>(y);
-
-        depthRow += x0;
-        segmentationRow += x0;
-        areaRow += x0;
-        for (int x = x0; x < x1; x++)
-        {
-            if (*segmentationRow == PixelType::Foreground)
-            {
-                float depth = *depthRow;
-                if (abs(depth - startingDepth) < bandwidthDepth)
-                {
-                    area += *areaRow;
-                }
-            }
-            ++depthRow;
-            ++areaRow;
-            ++segmentationRow;
-        }
-    }
-
-    return area;
-}
-
 void HandTracker::validateAndUpdateTrackedPoint(cv::Mat& matDepth, cv::Mat& matArea, cv::Mat& matLayerSegmentation, TrackedPoint& trackedPoint, cv::Point newTargetPoint, const float resizeFactor, const float minArea, const float maxArea, const float areaBandwidth, const float areaBandwidthDepth)
 {
     bool updatedPoint = false;
@@ -273,7 +169,7 @@ void HandTracker::validateAndUpdateTrackedPoint(cv::Mat& matDepth, cv::Mat& matA
         auto dist = cv::norm(worldPosition - trackedPoint.m_worldPosition);
         auto deadbandDist = cv::norm(worldPosition - trackedPoint.m_steadyWorldPosition);
 
-        float area = countNeighborhoodArea(matLayerSegmentation, matDepth, matArea, newTargetPoint, areaBandwidth, areaBandwidthDepth, resizeFactor);
+        float area = SegmentationUtility::countNeighborhoodArea(matLayerSegmentation, matDepth, matArea, newTargetPoint, areaBandwidth, areaBandwidthDepth, resizeFactor);
 
         if (dist < maxJumpDist && area > minArea && area < maxArea)
         {
@@ -497,7 +393,7 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
 
         if (targetPoint.x != -1 && targetPoint.y != -1)
         {
-            float area = countNeighborhoodArea(m_layerSegmentation, matDepth, matArea, targetPoint, m_areaBandwidth, m_areaBandwidthDepth, m_resizeFactor);
+            float area = SegmentationUtility::countNeighborhoodArea(m_layerSegmentation, matDepth, matArea, targetPoint, m_areaBandwidth, m_areaBandwidthDepth, m_resizeFactor);
 
             if (area > m_minArea && area < m_maxArea)
             {
@@ -556,23 +452,7 @@ std::vector<TrackedPoint>& HandTracker::updateTracking(sensekit_depthframe_t* de
 
     verifyInit(width, height);
 
-    FrameConverter::depthFrameToMat(depthFrame, m_matDepthOriginal);
-
-    //convert to the target processing size with nearest neighbor
-    cv::resize(m_matDepthOriginal, m_matDepth, m_matDepth.size(), 0, 0, CV_INTER_NN);
-
-    //current minus average, scaled by average = velocity as a percent change
-    m_matDepthVel = (m_matDepth - m_matDepthAvg) / m_matDepthAvg;
-
-    //accumulate current frame to average using smoothing factor
-    cv::accumulateWeighted(m_matDepth, m_matDepthAvg, m_depthSmoothingFactor);
-
-    filterZeroValuesAndJumps(m_matDepth, m_matDepthPrevious, m_matDepthAvg, m_matDepthVel, m_maxDepthJumpPercent);
-
-    //erode to eliminate single pixel velocity artifacts
-    erode(abs(m_matDepthVel), m_matDepthVelErode, m_rectElement);
-
-    thresholdForeground(m_matForeground, m_matDepthVelErode, m_foregroundThresholdFactor);
+    m_depthUtility.processDepthToForeground(depthFrame, m_matDepth, m_matForeground, m_depthSmoothingFactor, m_foregroundThresholdFactor, m_maxDepthJumpPercent);
 
     float minArea = 10000;
     float maxArea = 20000;
@@ -581,12 +461,11 @@ std::vector<TrackedPoint>& HandTracker::updateTracking(sensekit_depthframe_t* de
     if (m_outputSample)
     {
         float sampleDepth = m_matDepth.at<float>(mouseY, mouseX);
-        float sampleVelocity = m_matDepthVel.at<float>(mouseY, mouseX);
         float edgeDist = m_matEdgeDistance.at<float>(mouseY, mouseX);
         float area = m_matLocalArea.at<float>(mouseY, mouseX);
         float score = m_matScore.at<float>(mouseY, mouseX);
 
-        printf("(%d, %d) depth: %.0f vel: %.3f score: %.3f edgeDist: %.1f area: %.0f\n", mouseX, mouseY, sampleDepth, sampleVelocity, score, edgeDist, area);
+        printf("(%d, %d) depth: %.0f score: %.3f edgeDist: %.1f area: %.0f\n", mouseX, mouseY, sampleDepth, score, edgeDist, area);
     }
 
     return updateOriginalPoints(m_internalTrackedPoints);
@@ -594,7 +473,7 @@ std::vector<TrackedPoint>& HandTracker::updateTracking(sensekit_depthframe_t* de
 
 void HandTracker::verifyInit(int width, int height)
 {
-    float newResizeFactor = width / static_cast<float>(PROCESSING_SIZE_X);
+    float newResizeFactor = width / static_cast<float>(PROCESSING_SIZE_WIDTH);
 
     if (m_isInitialized && m_resizeFactor == newResizeFactor)
     {
@@ -603,15 +482,9 @@ void HandTracker::verifyInit(int width, int height)
 
     m_resizeFactor = newResizeFactor;
 
-    m_matDepthOriginal.create(height, width, CV_32FC1);
-    m_matDepth.create(PROCESSING_SIZE_Y, PROCESSING_SIZE_X, CV_32FC1);
-    m_matDepthPrevious = cv::Mat::zeros(PROCESSING_SIZE_Y, PROCESSING_SIZE_X, CV_32FC1);
-    m_matDepthAvg = cv::Mat::zeros(PROCESSING_SIZE_Y, PROCESSING_SIZE_X, CV_32FC1);
-    m_matDepthVel.create(PROCESSING_SIZE_Y, PROCESSING_SIZE_X, CV_32FC1);
-    m_matDepthVelErode.create(PROCESSING_SIZE_Y, PROCESSING_SIZE_X, CV_32FC1);
-    m_matForeground = cv::Mat::zeros(PROCESSING_SIZE_Y, PROCESSING_SIZE_X, CV_8UC1);
-    m_matGlobalSegmentation.create(PROCESSING_SIZE_Y, PROCESSING_SIZE_X, CV_8UC1);
-    m_matScore.create(PROCESSING_SIZE_Y, PROCESSING_SIZE_X, CV_32FC1);
+    m_matGlobalSegmentation.create(PROCESSING_SIZE_HEIGHT, PROCESSING_SIZE_WIDTH, CV_8UC1);
+    m_matScore.create(PROCESSING_SIZE_HEIGHT, PROCESSING_SIZE_WIDTH, CV_32FC1);
+
     m_isInitialized = true;
 }
 
@@ -640,7 +513,4 @@ void HandTracker::setupVariables()
     m_areaBandwidthDepth = 100; //mm
 
     m_maxDepthJumpPercent = 0.1;
-
-    int erodeNum = 1;
-    m_rectElement = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(erodeNum * 2 + 1, erodeNum * 2 + 1), cv::Point(erodeNum, erodeNum));
 }

@@ -296,3 +296,44 @@ float SegmentationUtility::getDepthArea(cv::Point3f& p1, cv::Point3f& p2, cv::Po
     float area = 0.5 * cv::norm(v1.cross(v2));
     return area;
 }
+
+float SegmentationUtility::countNeighborhoodArea(cv::Mat& matSegmentation, cv::Mat& matDepth, cv::Mat& matArea, cv::Point center, const float bandwidth, const float bandwidthDepth, const float resizeFactor)
+{
+    float startingDepth = matDepth.at<float>(center);
+
+    cv::Point topLeft = CoordinateConversion::offsetPixelLocationByMM(center, -bandwidth, bandwidth, startingDepth, resizeFactor);
+    cv::Point bottomRight = CoordinateConversion::offsetPixelLocationByMM(center, bandwidth, -bandwidth, startingDepth, resizeFactor);
+    int32_t x0 = MAX(0, topLeft.x);
+    int32_t y0 = MAX(0, topLeft.y);
+    int32_t x1 = MIN(matDepth.cols - 1, bottomRight.x);
+    int32_t y1 = MIN(matDepth.rows - 1, bottomRight.y);
+
+    float area = 0;
+
+    for (int y = y0; y < y1; y++)
+    {
+        float* depthRow = matDepth.ptr<float>(y);
+        char* segmentationRow = matSegmentation.ptr<char>(y);
+        float* areaRow = matArea.ptr<float>(y);
+
+        depthRow += x0;
+        segmentationRow += x0;
+        areaRow += x0;
+        for (int x = x0; x < x1; x++)
+        {
+            if (*segmentationRow == PixelType::Foreground)
+            {
+                float depth = *depthRow;
+                if (abs(depth - startingDepth) < bandwidthDepth)
+                {
+                    area += *areaRow;
+                }
+            }
+            ++depthRow;
+            ++areaRow;
+            ++segmentationRow;
+        }
+    }
+
+    return area;
+}

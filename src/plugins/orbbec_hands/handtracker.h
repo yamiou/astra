@@ -8,6 +8,7 @@
 #include <deque>
 
 #include "trackingdata.h"
+#include "depthutility.h"
 
 struct TrackedPoint
 {
@@ -54,10 +55,6 @@ private:
     
     std::vector<TrackedPoint>& updateOriginalPoints(std::vector<TrackedPoint>& mInternalTrackedPoints);
 
-    static void filterZeroValuesAndJumps(cv::Mat depthCurrent, cv::Mat depthPrev, cv::Mat depthAvg, cv::Mat depthVel, float maxDepthJumpPercent);
-    static void thresholdForeground(cv::Mat& matForeground, cv::Mat& matVelocity, float foregroundThresholdFactor);
-
-    static float countNeighborhoodArea(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat& matArea, cv::Point_<int> center, const float bandwidth, const float bandwidthDepth, const float resizeFactor);
     static void validateAndUpdateTrackedPoint(cv::Mat& matDepth, cv::Mat& matArea, cv::Mat& matLayerSegmentation, TrackedPoint& tracked, cv::Point targetPoint, const float resizeFactor, const float minArea, const float maxArea, const float areaBandwidth, const float areaBandwidthDepth);
 
     static void removeDuplicatePoints(std::vector<TrackedPoint>& trackedPoints);
@@ -70,6 +67,8 @@ private:
     //fields    
     sensekit_depthstream_t* m_depthStream;
 
+    DepthUtility m_depthUtility;
+
     int			m_width;
     int			m_height;
     float m_maxVelocity;
@@ -79,13 +78,9 @@ private:
     std::vector<TrackedPoint> m_internalTrackedPoints;
     std::vector<TrackedPoint> m_originalTrackedPoints;
 
-    cv::Mat m_matDepthOriginal;
     cv::Mat m_matDepth;
-    cv::Mat m_matDepthPrevious;
-    cv::Mat m_matDepthAvg;
-    cv::Mat m_matDepthVel;
-    cv::Mat m_matDepthVelErode;
     cv::Mat m_matForeground;
+    
     cv::Mat m_matGlobalSegmentation;
     cv::Mat m_matEdgeDistance;
     cv::Mat m_matScore;
