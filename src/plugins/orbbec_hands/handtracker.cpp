@@ -8,6 +8,7 @@
 #include "depthutility.h"
 #include "segmentationutility.h"
 #include "coordinateconversion.h"
+#include "pointprocessor.h"
 
 using namespace std;
 
@@ -149,61 +150,6 @@ vector<TrackedPoint>& HandTracker::updateOriginalPoints(vector<TrackedPoint>& in
     return m_originalTrackedPoints;
 }
 
-void HandTracker::validateAndUpdateTrackedPoint(cv::Mat& matDepth, cv::Mat& matArea, cv::Mat& matLayerSegmentation, TrackedPoint& trackedPoint, cv::Point newTargetPoint, const float resizeFactor, const float minArea, const float maxArea, const float areaBandwidth, const float areaBandwidthDepth)
-{
-    bool updatedPoint = false;
-    const float steadyDist = 150; //mm
-    const float maxJumpDist = 450; //mm
-
-    if (newTargetPoint.x != -1 && newTargetPoint.y != -1)
-    {
-        float depth = matDepth.at<float>(newTargetPoint);
-
-        cv::Point3f worldPosition = CoordinateConversion::convertDepthToRealWorld(newTargetPoint.x, newTargetPoint.y, depth, resizeFactor);
-
-        auto dist = cv::norm(worldPosition - trackedPoint.m_worldPosition);
-        auto deadbandDist = cv::norm(worldPosition - trackedPoint.m_steadyWorldPosition);
-
-        float area = SegmentationUtility::countNeighborhoodArea(matLayerSegmentation, matDepth, matArea, newTargetPoint, areaBandwidth, areaBandwidthDepth, resizeFactor);
-
-        if (dist < maxJumpDist && area > minArea && area < maxArea)
-        {
-            updatedPoint = true;
-            cv::Point3f worldVelocity = worldPosition - trackedPoint.m_worldPosition;
-            trackedPoint.m_worldPosition = worldPosition;
-            trackedPoint.m_worldVelocity = worldVelocity;
-
-            trackedPoint.m_position = newTargetPoint;
-            if (deadbandDist > steadyDist)
-            {
-                trackedPoint.m_steadyWorldPosition = worldPosition;
-                trackedPoint.m_inactiveFrameCount = 0;
-            }
-
-            if (trackedPoint.m_inactiveFrameCount < 10)
-            {
-                trackedPoint.m_activeFrameCount++;
-                if (trackedPoint.m_activeFrameCount > 120)
-                {
-                    trackedPoint.m_type = TrackedPointType::ActivePoint;
-                }
-            }
-        }
-    }
-
-    if (trackedPoint.m_status != TrackingStatus::Dead)
-    {
-        if (updatedPoint)
-        {
-            trackedPoint.m_status = TrackingStatus::Tracking;
-        }
-        else
-        {
-            trackedPoint.m_status = TrackingStatus::Lost;
-        }
-    }
-}
-
 void HandTracker::removeDuplicatePoints(vector<TrackedPoint>& trackedPoints)
 {
     for (auto iter = trackedPoints.begin(); iter != trackedPoints.end(); ++iter)
@@ -262,7 +208,7 @@ void HandTracker::removeOldOrDeadPoints(vector<TrackedPoint>& trackedPoints)
     }
 }
 
-void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat& matScore, cv::Mat& matEdgeDistance, cv::Mat& matArea)
+void HandTracker::trackPoints(cv::Mat& matDepth, cv::Mat& matForeground)
 {
     //TODO-done try tracking without edge distance
     //TODO-done calculate global score once
@@ -279,22 +225,17 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
     //TODO ?make dead points go to lost tracking instead so they can recover (only use dead for duplicate...rename status?)
     //TODO look at initial points jumping to nearby desk instead of hand, then never leaving
 
-    cv::Mat foregroundSearched = matForeground.clone();
-    cv::Point seedPosition;
+    cv::Mat matScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
+    //cv::Mat matEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
+    cv::Mat matArea = cv::Mat::zeros(matDepth.size(), CV_32FC1);
+    cv::Mat layerSegmentation;
 
-    matScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-    matEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-    matArea = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-    
     const float trackingBandwidthDepth = 150;
     const float initialBandwidthDepth = 450;
-    const float width = matDepth.cols;
-    const float height = matDepth.rows;
     const float maxMatchDistLostActive = 500; //mm
     const float maxMatchDistDefault = 200; //mm
     const int iterationMaxTracking = 1;
     const int iterationMaxInitial = 1;
-
 
     float heightFactor = 1 * m_factor1;
     float depthFactor = 1.5 * m_factor2;
@@ -302,131 +243,27 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
     SegmentationUtility::calculateBasicScore(matDepth, matScore, heightFactor, depthFactor, m_resizeFactor);
     SegmentationUtility::calculateSegmentArea(matDepth, matArea, m_resizeFactor);
 
+    TrackingMatrices matrices(matDepth, matArea, matScore, matForeground, layerSegmentation);
+
     //update existing points
     for (auto iter = m_internalTrackedPoints.begin(); iter != m_internalTrackedPoints.end(); ++iter)
     {
+        //TODO take this and make it a method on TrackedPoint
         TrackedPoint& trackedPoint = *iter;
-        trackedPoint.m_inactiveFrameCount++;
-        seedPosition = trackedPoint.m_position;
-        float referenceDepth = trackedPoint.m_worldPosition.z;
-
-        TrackingData updateTrackingData(referenceDepth, trackingBandwidthDepth, trackedPoint.m_type, iterationMaxTracking);
-
-        updateTrackingData.matDepth = matDepth;
-        updateTrackingData.matArea = matArea;
-        updateTrackingData.matScore = matScore;
-        updateTrackingData.matForegroundSearched = foregroundSearched;
-        updateTrackingData.matLayerSegmentation = m_layerSegmentation;
-        updateTrackingData.seedPosition = seedPosition;
-
-        cv::Point newTargetPoint = SegmentationUtility::convergeTrackPointFromSeed(updateTrackingData);
-
-        validateAndUpdateTrackedPoint(matDepth, matArea, m_layerSegmentation, trackedPoint, newTargetPoint, m_resizeFactor, m_minArea, m_maxArea, m_areaBandwidth, m_areaBandwidthDepth);
-
-        //lost a tracked point, try to guest the position using previous velocity for second chance to recover
-        if (trackedPoint.m_status != TrackingStatus::Tracking && cv::norm(trackedPoint.m_worldVelocity) > 0)
-        {
-            auto estimatedWorldPosition = trackedPoint.m_worldPosition + trackedPoint.m_worldVelocity;
-
-            cv::Point3f estimatedPosition = CoordinateConversion::convertRealWorldToDepth(estimatedWorldPosition, m_resizeFactor);
-
-            seedPosition.x = MAX(0, MIN(width - 1, static_cast<int>(estimatedPosition.x)));
-            seedPosition.y = MAX(0, MIN(height - 1, static_cast<int>(estimatedPosition.y)));
-            referenceDepth = estimatedPosition.z;
-
-            TrackingData recoverTrackingData(referenceDepth, initialBandwidthDepth, trackedPoint.m_type, iterationMaxTracking);
-
-            recoverTrackingData.matDepth = matDepth;
-            recoverTrackingData.matArea = matArea;
-            recoverTrackingData.matScore = matScore;
-            recoverTrackingData.matForegroundSearched = foregroundSearched;
-            recoverTrackingData.matLayerSegmentation = m_layerSegmentation;
-            recoverTrackingData.seedPosition = seedPosition;
-
-            newTargetPoint = SegmentationUtility::convergeTrackPointFromSeed(recoverTrackingData);
-            validateAndUpdateTrackedPoint(matDepth, matArea, m_layerSegmentation, trackedPoint, newTargetPoint, m_resizeFactor, m_minArea, m_maxArea, m_areaBandwidth, m_areaBandwidthDepth);
-
-            if (trackedPoint.m_status == TrackingStatus::Tracking)
-            {
-                printf("Recovered point %d\n", trackedPoint.m_trackingId);
-            }
-            else
-            {
-                /*tracked.m_position = seedPosition;
-                tracked.m_worldPosition = estimatedWorldPosition;
-                tracked.m_worldVelocity = cv::Point3f();*/
-            }
-        }
+        m_pointProcessor.updateTrackedPoint(matrices, trackedPoint);
     }
 
     removeDuplicatePoints(m_internalTrackedPoints);
 
-    foregroundSearched = matForeground.clone();
+    cv::Mat foregroundSearched = matForeground.clone();
 
+    cv::Point seedPosition;
     //add new points (unless already tracking)
-    //if (m_internalTrackedPoints.size() == 0)
     while (SegmentationUtility::findForegroundPixel(foregroundSearched, seedPosition))
     {
-        //      seedPosition.x = mouseX;
-        //      seedPosition.y = mouseY;
-
-        float seedDepth = matDepth.at<float>(seedPosition);
-        TrackingData newTrackingData(seedDepth, initialBandwidthDepth, TrackedPointType::CandidatePoint, iterationMaxInitial);
-
-        newTrackingData.matDepth = matDepth;
-        newTrackingData.matArea = matArea;
-        newTrackingData.matScore = matScore;
-        newTrackingData.matForegroundSearched = foregroundSearched;
-        newTrackingData.matLayerSegmentation = m_layerSegmentation;
-        newTrackingData.seedPosition = seedPosition;
-
-        cv::Point targetPoint = SegmentationUtility::convergeTrackPointFromSeed(newTrackingData);
-
-        if (targetPoint.x != -1 && targetPoint.y != -1)
-        {
-            float area = SegmentationUtility::countNeighborhoodArea(m_layerSegmentation, matDepth, matArea, targetPoint, m_areaBandwidth, m_areaBandwidthDepth, m_resizeFactor);
-
-            if (area > m_minArea && area < m_maxArea)
-            {
-                bool existingPoint = false;
-
-                for (auto iter = m_internalTrackedPoints.begin(); iter != m_internalTrackedPoints.end(); ++iter)
-                {
-                    TrackedPoint& tracked = *iter;
-                    if (tracked.m_status != TrackingStatus::Dead)
-                    {
-                        float dist = cv::norm(tracked.m_position - targetPoint);
-                        float maxDist = maxMatchDistDefault;
-                        if (tracked.m_type == TrackedPointType::ActivePoint && tracked.m_status == TrackingStatus::Lost)
-                        {
-                            maxDist = maxMatchDistLostActive;
-                        }
-                        if (dist < maxDist)
-                        {
-                            tracked.m_inactiveFrameCount = 0;
-                            tracked.m_status = TrackingStatus::Tracking;
-                            existingPoint = true;
-                            break;
-                        }
-                    }
-                }
-                if (!existingPoint)
-                {
-                    float depth = matDepth.at<float>(targetPoint);
-
-                    cv::Point3f worldPosition = CoordinateConversion::convertDepthToRealWorld(targetPoint.x, targetPoint.y, depth, m_resizeFactor);
-
-                    TrackedPoint newPoint(targetPoint, worldPosition, m_nextTrackingId, area);
-                    newPoint.m_type = TrackedPointType::CandidatePoint;
-                    newPoint.m_status = TrackingStatus::Tracking;
-                    ++m_nextTrackingId;
-                    m_internalTrackedPoints.push_back(newPoint);
-                }
-            }
-        }
+        m_pointProcessor.updateTrackedPointOrCreateNewPointFromSeedPosition(matrices, m_internalTrackedPoints, seedPosition, m_nextTrackingId);
     }
 
-    
     //remove old points
     removeOldOrDeadPoints(m_internalTrackedPoints);
 }
@@ -447,17 +284,7 @@ std::vector<TrackedPoint>& HandTracker::updateTracking(sensekit_depthframe_t* de
 
     float minArea = 10000;
     float maxArea = 20000;
-    trackPoints(m_matForeground, m_matDepth, m_matScore, m_matEdgeDistance, m_matLocalArea);
-
-    if (m_outputSample)
-    {
-        float sampleDepth = m_matDepth.at<float>(mouseY, mouseX);
-        float edgeDist = m_matEdgeDistance.at<float>(mouseY, mouseX);
-        float area = m_matLocalArea.at<float>(mouseY, mouseX);
-        float score = m_matScore.at<float>(mouseY, mouseX);
-
-        printf("(%d, %d) depth: %.0f score: %.3f edgeDist: %.1f area: %.0f\n", mouseX, mouseY, sampleDepth, score, edgeDist, area);
-    }
+    trackPoints(m_matDepth, m_matForeground);
 
     return updateOriginalPoints(m_internalTrackedPoints);
 }
@@ -472,8 +299,6 @@ void HandTracker::verifyInit(int width, int height)
     }
 
     m_resizeFactor = newResizeFactor;
-
-    m_matScore.create(PROCESSING_SIZE_HEIGHT, PROCESSING_SIZE_WIDTH, CV_32FC1);
 
     m_isInitialized = true;
 }

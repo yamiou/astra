@@ -2,46 +2,12 @@
 #define HANDTRACKER_H
 
 #include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/opencv.hpp>
 #include <SenseKitUL.h>
-#include <string>
-#include <deque>
 
-#include "trackingdata.h"
 #include "depthutility.h"
+#include "trackedpoint.h"
+#include "pointprocessor.h"
 
-struct TrackedPoint
-{
-public:
-    cv::Point m_position;
-    cv::Point3f m_worldPosition;
-    cv::Point3f m_steadyWorldPosition;
-    cv::Point3f m_worldVelocity;
-    int m_trackingId;
-    int m_inactiveFrameCount;
-    float m_totalContributionArea;
-    float m_avgArea;
-    int m_wrongAreaCount;
-    int m_activeFrameCount;
-    TrackedPointType m_type;
-    TrackingStatus m_status;
-
-    TrackedPoint(cv::Point position, cv::Point3f worldPosition, int trackingId, float area)
-    {
-        m_type = TrackedPointType::CandidatePoint;
-        m_status = TrackingStatus::NotTracking;
-        m_position = position;
-        m_worldPosition = worldPosition;
-        m_steadyWorldPosition = worldPosition;
-        m_worldVelocity = cv::Point3f(0, 0, 0);
-        m_trackingId = trackingId;
-        m_inactiveFrameCount = 0;
-        m_activeFrameCount = 0;
-        m_totalContributionArea = 0;
-        m_avgArea = area;
-        m_wrongAreaCount = 0;
-    }
-};
 
 class HandTracker
 {
@@ -52,22 +18,21 @@ public:
     std::vector<TrackedPoint>& updateTracking(sensekit_depthframe_t* depthFrame);
     void reset();
 private:
-    
-    std::vector<TrackedPoint>& updateOriginalPoints(std::vector<TrackedPoint>& mInternalTrackedPoints);
 
-    static void validateAndUpdateTrackedPoint(cv::Mat& matDepth, cv::Mat& matArea, cv::Mat& matLayerSegmentation, TrackedPoint& tracked, cv::Point targetPoint, const float resizeFactor, const float minArea, const float maxArea, const float areaBandwidth, const float areaBandwidthDepth);
+    DepthUtility m_depthUtility;
+    PointProcessor m_pointProcessor;
+
+    std::vector<TrackedPoint>& updateOriginalPoints(std::vector<TrackedPoint>& mInternalTrackedPoints);
 
     static void removeDuplicatePoints(std::vector<TrackedPoint>& trackedPoints);
     static void removeOldOrDeadPoints(std::vector<TrackedPoint>& trackedPoints);
-
-    void trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat& matScore, cv::Mat& matEdgeDistance, cv::Mat& matArea);
+    
+    void trackPoints(cv::Mat& matDepth, cv::Mat& matForeground);
     void setupVariables();
     void verifyInit(int width, int height);
 
     //fields    
     sensekit_depthstream_t* m_depthStream;
-
-    DepthUtility m_depthUtility;
 
     int			m_width;
     int			m_height;
@@ -80,14 +45,6 @@ private:
 
     cv::Mat m_matDepth;
     cv::Mat m_matForeground;
-    
-    cv::Mat m_matEdgeDistance;
-    cv::Mat m_matScore;
-    cv::Mat m_layerSegmentation;
-    cv::Mat m_matLocalArea;
-    cv::Mat m_tempLocalArea;
-
-    cv::Mat m_rectElement;
     
     bool m_isInitialized{ false };
 

@@ -23,11 +23,11 @@ public:
 void SegmentationUtility::segmentForeground(TrackingData data)
 {
     const float maxTTL = 250; //mm
-    float seedDepth = data.matDepth.at<float>(data.seedPosition);
-    cv::Mat& matDepth = data.matDepth;
-    cv::Mat& matForeground = data.matForegroundSearched;
-    cv::Mat& matArea = data.matArea;
-    cv::Mat& matSegmentation = data.matLayerSegmentation;
+    float seedDepth = data.matrices.matDepth.at<float>(data.seedPosition);
+    cv::Mat& matDepth = data.matrices.matDepth;
+    cv::Mat& matForeground = data.matrices.matForeground;
+    cv::Mat& matArea = data.matrices.matArea;
+    cv::Mat& matSegmentation = data.matrices.matLayerSegmentation;
     bool isActivePoint = data.pointType == TrackedPointType::ActivePoint;
     std::queue<PointTTL> pointQueue;
 
@@ -39,10 +39,10 @@ void SegmentationUtility::segmentForeground(TrackingData data)
 
     pointQueue.push(PointTTL(data.seedPosition, maxTTL, seedInRange));
 
-    cv::Mat matVisited = cv::Mat::zeros(data.matDepth.size(), CV_8UC1);
+    cv::Mat matVisited = cv::Mat::zeros(matDepth.size(), CV_8UC1);
 
-    int width = data.matDepth.cols;
-    int height = data.matDepth.rows;
+    int width = matDepth.cols;
+    int height = matDepth.rows;
 
     matVisited.at<char>(data.seedPosition) = 1;
 
@@ -114,14 +114,14 @@ void SegmentationUtility::segmentForeground(TrackingData data)
 
 cv::Point SegmentationUtility::trackPointFromSeed(TrackingData data)
 {
-    data.matLayerSegmentation = cv::Mat::zeros(data.matDepth.size(), CV_8UC1);
+    data.matrices.matLayerSegmentation = cv::Mat::zeros(data.matrices.matDepth.size(), CV_8UC1);
 
     segmentForeground(data);
 
     double min, max;
     cv::Point minLoc, maxLoc;
 
-    cv::minMaxLoc(data.matScore, &min, &max, &minLoc, &maxLoc, data.matLayerSegmentation);
+    cv::minMaxLoc(data.matrices.matScore, &min, &max, &minLoc, &maxLoc, data.matrices.matLayerSegmentation);
 
     return maxLoc;
 }

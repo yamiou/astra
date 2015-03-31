@@ -26,20 +26,35 @@ enum TrackingStatus
     Dead
 };
 
+struct TrackingMatrices
+{
+    cv::Mat& matDepth;
+    cv::Mat& matArea;
+    cv::Mat& matScore;
+    cv::Mat& matForeground;
+    cv::Mat& matLayerSegmentation;
+    TrackingMatrices(cv::Mat& matDepth, cv::Mat& matArea, cv::Mat& matScore, cv::Mat& matForeground, cv::Mat& matLayerSegmentation)
+        :
+        matDepth(matDepth),
+        matArea(matArea),
+        matScore(matScore),
+        matForeground(matForeground),
+        matLayerSegmentation(matLayerSegmentation)
+    {}
+};
+
 struct TrackingData
 {
-    cv::Mat matDepth;
-    cv::Mat matArea;
-    cv::Mat matScore;
-    cv::Mat matForegroundSearched;
-    cv::Mat matLayerSegmentation;
+    TrackingMatrices matrices;
     cv::Point seedPosition;
     const float referenceDepth;
     const float bandwidthDepth;
     const TrackedPointType pointType;
     const int iterationMax;
 
-    TrackingData(const float referenceDepth, const float bandwidthDepth, const TrackedPointType pointType, const int iterationMax) :
+    TrackingData(TrackingMatrices matrices, cv::Point seedPosition, const float referenceDepth, const float bandwidthDepth, const TrackedPointType pointType, const int iterationMax) :
+        matrices(matrices),
+        seedPosition(seedPosition),
         referenceDepth(referenceDepth),
         bandwidthDepth(bandwidthDepth),
         pointType(pointType),
