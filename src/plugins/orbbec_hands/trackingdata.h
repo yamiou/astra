@@ -30,7 +30,6 @@ struct TrackingData
 {
     cv::Mat matDepth;
     cv::Mat matArea;
-    cv::Mat matGlobalSegmentation;
     cv::Mat matScore;
     cv::Mat matForegroundSearched;
     cv::Mat matLayerSegmentation;

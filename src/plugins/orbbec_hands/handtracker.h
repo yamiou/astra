@@ -60,7 +60,7 @@ private:
     static void removeDuplicatePoints(std::vector<TrackedPoint>& trackedPoints);
     static void removeOldOrDeadPoints(std::vector<TrackedPoint>& trackedPoints);
 
-    void trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat& matGlobalSegmentation, cv::Mat& matScore, cv::Mat& matEdgeDistance, cv::Mat& matArea);
+    void trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat& matScore, cv::Mat& matEdgeDistance, cv::Mat& matArea);
     void setupVariables();
     void verifyInit(int width, int height);
 
@@ -81,7 +81,6 @@ private:
     cv::Mat m_matDepth;
     cv::Mat m_matForeground;
     
-    cv::Mat m_matGlobalSegmentation;
     cv::Mat m_matEdgeDistance;
     cv::Mat m_matScore;
     cv::Mat m_layerSegmentation;

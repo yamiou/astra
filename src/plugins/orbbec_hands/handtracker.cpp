@@ -5,11 +5,6 @@
 
 
 #include "handtracker.h"
-#include <math.h>
-
-#include <cstdint>
-#include <queue>
-#include <ctime>
 #include "depthutility.h"
 #include "segmentationutility.h"
 #include "coordinateconversion.h"
@@ -267,7 +262,7 @@ void HandTracker::removeOldOrDeadPoints(vector<TrackedPoint>& trackedPoints)
     }
 }
 
-void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat& matGlobalSegmentation, cv::Mat& matScore, cv::Mat& matEdgeDistance, cv::Mat& matArea)
+void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat& matScore, cv::Mat& matEdgeDistance, cv::Mat& matArea)
 {
     //TODO-done try tracking without edge distance
     //TODO-done calculate global score once
@@ -287,7 +282,6 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
     cv::Mat foregroundSearched = matForeground.clone();
     cv::Point seedPosition;
 
-    matGlobalSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
     matScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
     matEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
     matArea = cv::Mat::zeros(matDepth.size(), CV_32FC1);
@@ -320,7 +314,6 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
 
         updateTrackingData.matDepth = matDepth;
         updateTrackingData.matArea = matArea;
-        updateTrackingData.matGlobalSegmentation = matGlobalSegmentation;
         updateTrackingData.matScore = matScore;
         updateTrackingData.matForegroundSearched = foregroundSearched;
         updateTrackingData.matLayerSegmentation = m_layerSegmentation;
@@ -345,7 +338,6 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
 
             recoverTrackingData.matDepth = matDepth;
             recoverTrackingData.matArea = matArea;
-            recoverTrackingData.matGlobalSegmentation = matGlobalSegmentation;
             recoverTrackingData.matScore = matScore;
             recoverTrackingData.matForegroundSearched = foregroundSearched;
             recoverTrackingData.matLayerSegmentation = m_layerSegmentation;
@@ -383,7 +375,6 @@ void HandTracker::trackPoints(cv::Mat& matForeground, cv::Mat& matDepth, cv::Mat
 
         newTrackingData.matDepth = matDepth;
         newTrackingData.matArea = matArea;
-        newTrackingData.matGlobalSegmentation = matGlobalSegmentation;
         newTrackingData.matScore = matScore;
         newTrackingData.matForegroundSearched = foregroundSearched;
         newTrackingData.matLayerSegmentation = m_layerSegmentation;
@@ -456,7 +447,7 @@ std::vector<TrackedPoint>& HandTracker::updateTracking(sensekit_depthframe_t* de
 
     float minArea = 10000;
     float maxArea = 20000;
-    trackPoints(m_matForeground, m_matDepth, m_matGlobalSegmentation, m_matScore, m_matEdgeDistance, m_matLocalArea);
+    trackPoints(m_matForeground, m_matDepth, m_matScore, m_matEdgeDistance, m_matLocalArea);
 
     if (m_outputSample)
     {
@@ -482,7 +473,6 @@ void HandTracker::verifyInit(int width, int height)
 
     m_resizeFactor = newResizeFactor;
 
-    m_matGlobalSegmentation.create(PROCESSING_SIZE_HEIGHT, PROCESSING_SIZE_WIDTH, CV_8UC1);
     m_matScore.create(PROCESSING_SIZE_HEIGHT, PROCESSING_SIZE_WIDTH, CV_32FC1);
 
     m_isInitialized = true;

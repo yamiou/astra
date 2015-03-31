@@ -27,7 +27,7 @@ void SegmentationUtility::segmentForeground(TrackingData data)
     cv::Mat& matDepth = data.matDepth;
     cv::Mat& matForeground = data.matForegroundSearched;
     cv::Mat& matArea = data.matArea;
-    cv::Mat& matSegmentation = data.matGlobalSegmentation;
+    cv::Mat& matSegmentation = data.matLayerSegmentation;
     bool isActivePoint = data.pointType == TrackedPointType::ActivePoint;
     std::queue<PointTTL> pointQueue;
 
@@ -114,15 +114,11 @@ void SegmentationUtility::segmentForeground(TrackingData data)
 
 cv::Point SegmentationUtility::trackPointFromSeed(TrackingData data)
 {
-    data.matLayerSegmentation = cv::Mat::zeros(data.matGlobalSegmentation.size(), CV_8UC1);
+    data.matLayerSegmentation = cv::Mat::zeros(data.matDepth.size(), CV_8UC1);
 
     segmentForeground(data);
 
     double min, max;
-    //for visualization/debugging only
-
-    cv::bitwise_or(data.matLayerSegmentation, data.matGlobalSegmentation, data.matGlobalSegmentation, data.matLayerSegmentation);
-
     cv::Point minLoc, maxLoc;
 
     cv::minMaxLoc(data.matScore, &min, &max, &minLoc, &maxLoc, data.matLayerSegmentation);
