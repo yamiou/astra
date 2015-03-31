@@ -1,9 +1,9 @@
 ﻿#ifndef PLUGINBASE_H
 #define PLUGINBASE_H
 
+#include <SenseKit.h>
 #include "PluginServiceProxy.h"
 #include "StreamServiceProxy.h"
-#include <Plugins/sensekit_plugin_types.h>
 
 namespace sensekit {
 

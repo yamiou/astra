@@ -4,7 +4,7 @@
 #include <exception>
 #include <array>
 #include <atomic>
-#include <Plugins/sensekit_plugin_types.h>
+#include <sensekit_types.h>
 
 namespace sensekit {
 
