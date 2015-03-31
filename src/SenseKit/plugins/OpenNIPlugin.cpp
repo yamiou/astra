@@ -11,7 +11,7 @@ static sensekit::openni::OpenNIPlugin* g_plugin;
 SENSEKIT_BEGIN_DECLS
 
 SENSEKIT_EXPORT void sensekit_plugin_initialize(StreamServiceProxyBase* streamProxy,
-                                                    PluginServiceProxyBase* pluginProxy)
+                                                PluginServiceProxyBase* pluginProxy)
 {
     g_plugin = new sensekit::openni::OpenNIPlugin(
         static_cast<sensekit::StreamServiceProxy*>(streamProxy),
@@ -271,7 +271,7 @@ namespace sensekit
             const short* datData = static_cast<const short*>(ref.getData());
 
             int16_t* frameData = m_currentDepthFrame->frame.data;
-            size_t bufferLength = m_colorMode.getResolutionX() * m_depthMode.getResolutionY();
+            size_t bufferLength = m_depthMode.getResolutionX() * m_depthMode.getResolutionY();
 
             for(int i = 0; i < bufferLength; i++)
             {
