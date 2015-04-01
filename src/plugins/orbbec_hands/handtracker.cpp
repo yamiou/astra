@@ -9,6 +9,7 @@
 #include "segmentationutility.h"
 #include "coordinateconversion.h"
 #include "pointprocessor.h"
+#include <SenseKitUL/streams/hand_types.h>
 
 using namespace std;
 
@@ -132,80 +133,77 @@ void HandTracker::onKey(unsigned char key)
 
 }
 
-vector<TrackedPoint>& HandTracker::updateOriginalPoints(vector<TrackedPoint>& internalTrackedPoints)
+void HandTracker::copyPosition(cv::Point3f& source, sensekit_vector3f_t& target)
 {
-    m_originalTrackedPoints.clear();
+    target.x = source.x;
+    target.y = source.y;
+    target.z = source.z;
+}
+
+sensekit_handstatus_t HandTracker::convertHandStatus(TrackingStatus status)
+{
+    switch (status)
+    {
+    case TrackingStatus::Tracking:
+        return sensekit_handstatus_t::HAND_STATUS_NOTTRACKING;
+        break;
+    case TrackingStatus::Lost:
+        return sensekit_handstatus_t::HAND_STATUS_NOTTRACKING;
+        break;
+    case TrackingStatus::Dead:
+    case TrackingStatus::NotTracking:
+    default:
+        return sensekit_handstatus_t::HAND_STATUS_NOTTRACKING;
+        break;
+    }
+}
+
+void HandTracker::resetHandPoint(sensekit_handpoint_t& point)
+{
+    point.trackingId = -1;
+    point.status = sensekit_handstatus_t::HAND_STATUS_NOTTRACKING;
+    point.depthPosition = sensekit_vector2i_t();
+    point.worldPosition = sensekit_vector3f_t();
+    point.worldDeltaPosition = sensekit_vector3f_t();
+}
+
+void HandTracker::updateHandFrame(vector<TrackedPoint>& internalTrackedPoints, sensekit_handframe_wrapper_t* wrapper)
+{
+    sensekit_handframe_t& frame = wrapper->frame;
+    frame.frameIndex++;
+    
+    int handIndex = 0;
+    int maxNumHands = frame.numHands;
 
     for (auto it = internalTrackedPoints.begin(); it != internalTrackedPoints.end(); ++it)
     {
         TrackedPoint internalPoint = *it;
 
-        TrackedPoint originalPoint = internalPoint;
-        originalPoint.m_position.x *= m_resizeFactor;
-        originalPoint.m_position.y *= m_resizeFactor;
+        TrackingStatus status = internalPoint.m_status;
+        if (internalPoint.m_type == TrackedPointType::ActivePoint && status != TrackingStatus::Dead && handIndex < maxNumHands)
+        {
+            sensekit_handpoint_t& point = frame.handpoints[handIndex];
+            ++handIndex;
 
-        m_originalTrackedPoints.push_back(originalPoint);
+            point.trackingId = internalPoint.m_trackingId;
+            
+            //convert from internal depth resolution to original depth resolution
+            point.depthPosition.x = internalPoint.m_position.x * m_resizeFactor;
+            point.depthPosition.y = internalPoint.m_position.y * m_resizeFactor;
+
+            copyPosition(internalPoint.m_worldPosition, point.worldPosition);
+            copyPosition(internalPoint.m_worldDeltaPosition, point.worldDeltaPosition);
+            
+            point.status = convertHandStatus(status);
+        }
     }
-
-    return m_originalTrackedPoints;
-}
-
-void HandTracker::removeDuplicatePoints(vector<TrackedPoint>& trackedPoints)
-{
-    for (auto iter = trackedPoints.begin(); iter != trackedPoints.end(); ++iter)
+    for (int i = handIndex; i < maxNumHands; ++i)
     {
-        TrackedPoint& tracked = *iter;
-        for (auto otherIter = trackedPoints.begin(); otherIter != trackedPoints.end(); ++otherIter)
-        {
-            TrackedPoint& otherTracked = *otherIter;
-            bool bothNotDead = tracked.m_status != TrackingStatus::Dead && otherTracked.m_status != TrackingStatus::Dead;
-            if (tracked.m_trackingId != otherTracked.m_trackingId && bothNotDead && tracked.m_position == otherTracked.m_position)
-            {
-                tracked.m_activeFrameCount = MAX(tracked.m_activeFrameCount, otherTracked.m_activeFrameCount);
-                tracked.m_inactiveFrameCount = MIN(tracked.m_inactiveFrameCount, otherTracked.m_inactiveFrameCount);
-                if (otherTracked.m_type == TrackedPointType::ActivePoint && tracked.m_type != TrackedPointType::ActivePoint)
-                {
-                    tracked.m_trackingId = otherTracked.m_trackingId;
-                    tracked.m_type = TrackedPointType::ActivePoint;
-                }
-                otherTracked.m_status = TrackingStatus::Dead;
-            }
-        }
+        sensekit_handpoint_t& point = frame.handpoints[i];
+        resetHandPoint(point);
     }
-}
 
-void HandTracker::removeOldOrDeadPoints(vector<TrackedPoint>& trackedPoints)
-{
-    const int maxInactiveFrames = 60;
-    const int maxInactiveFramesForLostPoints = 240;
-    const int maxInactiveFramesForActivePoints = 480;
-
-    for (auto iter = trackedPoints.begin(); iter != trackedPoints.end();)
-    {
-        TrackedPoint& tracked = *iter;
-
-        int max = maxInactiveFrames;
-        if (tracked.m_type == TrackedPointType::ActivePoint)
-        {
-            if (tracked.m_status == TrackingStatus::Lost)
-            {
-                max = maxInactiveFramesForLostPoints;
-            }
-            else
-            {
-                max = maxInactiveFramesForActivePoints;
-            }
-        }
-        //if inactive for more than a certain number of frames, or dead, remove point
-        if (tracked.m_inactiveFrameCount > max || tracked.m_status == TrackingStatus::Dead)
-        {
-            iter = trackedPoints.erase(iter);
-        }
-        else
-        {
-            ++iter;
-        }
-    }
+    frame.numHands = handIndex;
 }
 
 void HandTracker::trackPoints(cv::Mat& matDepth, cv::Mat& matForeground)
@@ -245,15 +243,9 @@ void HandTracker::trackPoints(cv::Mat& matDepth, cv::Mat& matForeground)
 
     TrackingMatrices matrices(matDepth, matArea, matScore, matForeground, layerSegmentation);
 
-    //update existing points
-    for (auto iter = m_internalTrackedPoints.begin(); iter != m_internalTrackedPoints.end(); ++iter)
-    {
-        //TODO take this and make it a method on TrackedPoint
-        TrackedPoint& trackedPoint = *iter;
-        m_pointProcessor.updateTrackedPoint(matrices, trackedPoint);
-    }
+    m_pointProcessor.updateTrackedPoints(matrices);
 
-    removeDuplicatePoints(m_internalTrackedPoints);
+    m_pointProcessor.removeDuplicatePoints();
 
     cv::Mat foregroundSearched = matForeground.clone();
 
@@ -261,11 +253,11 @@ void HandTracker::trackPoints(cv::Mat& matDepth, cv::Mat& matForeground)
     //add new points (unless already tracking)
     while (SegmentationUtility::findForegroundPixel(foregroundSearched, seedPosition))
     {
-        m_pointProcessor.updateTrackedPointOrCreateNewPointFromSeedPosition(matrices, m_internalTrackedPoints, seedPosition, m_nextTrackingId);
+        m_pointProcessor.updateTrackedPointOrCreateNewPointFromSeedPosition(matrices, seedPosition);
     }
 
     //remove old points
-    removeOldOrDeadPoints(m_internalTrackedPoints);
+    m_pointProcessor.removeOldOrDeadPoints();
 }
 
 void HandTracker::reset()
@@ -273,7 +265,7 @@ void HandTracker::reset()
     m_isInitialized = false;
 }
 
-std::vector<TrackedPoint>& HandTracker::updateTracking(sensekit_depthframe_t* depthFrame)
+void HandTracker::updateTracking(sensekit_depthframe_t* depthFrame)
 {
     int width = depthFrame->width;
     int height = depthFrame->height;
@@ -285,8 +277,8 @@ std::vector<TrackedPoint>& HandTracker::updateTracking(sensekit_depthframe_t* de
     float minArea = 10000;
     float maxArea = 20000;
     trackPoints(m_matDepth, m_matForeground);
-
-    return updateOriginalPoints(m_internalTrackedPoints);
+    
+    return updateHandFrame(m_pointProcessor.get_trackedPoints(), m_wrapper);
 }
 
 void HandTracker::verifyInit(int width, int height)
@@ -320,7 +312,6 @@ void HandTracker::setupVariables()
     m_foregroundThresholdFactor = 0.02;
     m_maxVelocityFactor = 10;// 0.001;
     m_outputSample = false;
-    m_nextTrackingId = 0;
 
     m_minArea = 5000; //mm^2
     m_maxArea = 20000;  //mm^2

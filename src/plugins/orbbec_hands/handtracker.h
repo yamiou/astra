@@ -7,6 +7,7 @@
 #include "depthutility.h"
 #include "trackedpoint.h"
 #include "pointprocessor.h"
+#include "../../SenseKitUL/SenseKitUL_internal.h"
 
 
 class HandTracker
@@ -15,18 +16,19 @@ public:
     HandTracker(sensekit_depthstream_t* depthStream);
     virtual ~HandTracker();
     void onKey(unsigned char key);
-    std::vector<TrackedPoint>& updateTracking(sensekit_depthframe_t* depthFrame);
     void reset();
 private:
 
     DepthUtility m_depthUtility;
     PointProcessor m_pointProcessor;
-
-    std::vector<TrackedPoint>& updateOriginalPoints(std::vector<TrackedPoint>& mInternalTrackedPoints);
-
-    static void removeDuplicatePoints(std::vector<TrackedPoint>& trackedPoints);
-    static void removeOldOrDeadPoints(std::vector<TrackedPoint>& trackedPoints);
     
+    static void copyPosition(cv::Point3f& source, sensekit_vector3f_t& target);
+    static sensekit_handstatus_t convertHandStatus(TrackingStatus status);
+    static void resetHandPoint(sensekit_handpoint_t& point);
+
+    void updateTracking(sensekit_depthframe_t* depthFrame);
+    void updateHandFrame(std::vector<TrackedPoint>& internalTrackedPoints, sensekit_handframe_wrapper_t* handframe_wrapper);
+
     void trackPoints(cv::Mat& matDepth, cv::Mat& matForeground);
     void setupVariables();
     void verifyInit(int width, int height);
@@ -40,9 +42,6 @@ private:
 
     float m_resizeFactor;
 
-    std::vector<TrackedPoint> m_internalTrackedPoints;
-    std::vector<TrackedPoint> m_originalTrackedPoints;
-
     cv::Mat m_matDepth;
     cv::Mat m_matForeground;
     
@@ -53,8 +52,6 @@ private:
     float m_maxVelocityFactor;
     float m_foregroundThresholdFactor;
     
-    int m_nextTrackingId;
-
     float m_maxDepthJumpPercent;
     bool m_outputSample;
     bool m_showCircles;
@@ -67,6 +64,7 @@ private:
     long double m_calcDuration, m_frameDuration;
     double m_fpsFactor;
 
+    sensekit_handframe_wrapper_t* m_wrapper { nullptr };
     float m_factor1;
     float m_factor2;
     float m_factor3;

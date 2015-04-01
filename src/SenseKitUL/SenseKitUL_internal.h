@@ -3,6 +3,7 @@
 
 #include <streams/depth_types.h>
 #include <streams/color_types.h>
+#include <streams/hand_types.h>
 
 // https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
 
@@ -19,5 +20,10 @@ typedef struct _sensekit_colorframe_wrapper {
     char frame_data[];
 } sensekit_colorframe_wrapper_t;
 #pragma warning( pop )
+
+typedef struct _sensekit_handframe_wrapper {
+    sensekit_handframe_t frame;
+    char frame_data[];
+} sensekit_handframe_wrapper_t;
 
 #endif /* SENSEKITUL_INTERNAL_H */

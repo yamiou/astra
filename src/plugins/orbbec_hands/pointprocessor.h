@@ -11,15 +11,20 @@ public:
     PointProcessor();
     virtual ~PointProcessor();
 
-    void updateTrackedPoint(TrackingMatrices matrices, TrackedPoint& trackedPoint);
+    void updateTrackedPoints(TrackingMatrices matrices);
 
-    void updateTrackedPointOrCreateNewPointFromSeedPosition(TrackingMatrices matrices, std::vector<TrackedPoint>& trackedPoints, cv::Point seedPosition, int& nextTrackingId);
+    void removeOldOrDeadPoints();
+    void removeDuplicatePoints();
+    void updateTrackedPointOrCreateNewPointFromSeedPosition(TrackingMatrices matrices, cv::Point seedPosition);
 
-
+    std::vector<TrackedPoint>& get_trackedPoints() { return m_trackedPoints; }
 
 private:
-    void validateAndUpdateTrackedPoint(TrackingMatrices matrices, TrackedPoint& tracked, cv::Point targetPoint);
 
+    void updateTrackedPoint(TrackingMatrices matrices, TrackedPoint& trackedPoint);
+    void validateAndUpdateTrackedPoint(TrackingMatrices matrices, TrackedPoint& tracked, cv::Point targetPoint);
+    bool isValidPointArea(TrackingMatrices& matrices, cv::Point targetPoint);
+    
     float maxMatchDistLostActive;
     float maxMatchDistDefault;
     float trackingBandwidthDepth;
@@ -31,6 +36,9 @@ private:
     float maxArea;
     float areaBandwidth;
     float areaBandwidthDepth;
+
+    int m_nextTrackingId{ 0 };
+    std::vector<TrackedPoint> m_trackedPoints;
 
 };
 

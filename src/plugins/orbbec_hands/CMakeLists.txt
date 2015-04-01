@@ -6,7 +6,9 @@ set(orbbec_hands_SOURCES
   segmentationutility.h
   segmentationutility.cpp
   trackedpoint.h
-  trackedpoint.cpp
+  vectorx.h
+  vector2.h
+  vector3.h
   pointprocessor.h
   pointprocessor.cpp
   trackingdata.h

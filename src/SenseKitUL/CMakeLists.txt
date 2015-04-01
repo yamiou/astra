@@ -5,9 +5,12 @@ set(SenseKitUL_SOURCES
   ../../include/SenseKitUL/streams/depth_types.h
   ../../include/SenseKitUL/streams/color.h
   ../../include/SenseKitUL/streams/color_types.h
+  ../../include/SenseKitUL/streams/hand_types.h
   depthstream_capi.cpp
   colorstream_capi.cpp
   SenseKitUL.cpp
+  generic_stream_api.h
+  SenseKitUL_internal.h
   )
 
 add_library(SenseKitUL SHARED ${SenseKitUL_SOURCES})

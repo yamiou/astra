@@ -12,6 +12,16 @@ PointProcessor::~PointProcessor()
 {
 }
 
+void PointProcessor::updateTrackedPoints(TrackingMatrices matrices)
+{
+    for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
+    {
+        //TODO take this and make it a method on TrackedPoint
+        TrackedPoint& trackedPoint = *iter;
+        updateTrackedPoint(matrices, trackedPoint);
+    }
+}
+
 void PointProcessor::updateTrackedPoint(TrackingMatrices matrices, TrackedPoint& trackedPoint)
 {
     const float width = matrices.matDepth.cols;
@@ -28,11 +38,11 @@ void PointProcessor::updateTrackedPoint(TrackingMatrices matrices, TrackedPoint&
 
     validateAndUpdateTrackedPoint(matrices, trackedPoint, newTargetPoint);
 
-    //lost a tracked point, try to guest the position using previous velocity for second chance to recover
+    //lost a tracked point, try to guest the position using previous position delta for second chance to recover
 
-    if (trackedPoint.m_status != TrackingStatus::Tracking && cv::norm(trackedPoint.m_worldVelocity) > 0)
+    if (trackedPoint.m_status != TrackingStatus::Tracking && cv::norm(trackedPoint.m_worldDeltaPosition) > 0)
     {
-        auto estimatedWorldPosition = trackedPoint.m_worldPosition + trackedPoint.m_worldVelocity;
+        auto estimatedWorldPosition = trackedPoint.m_worldPosition + trackedPoint.m_worldDeltaPosition;
 
         cv::Point3f estimatedPosition = CoordinateConversion::convertRealWorldToDepth(estimatedWorldPosition, resizeFactor);
 
@@ -53,7 +63,7 @@ void PointProcessor::updateTrackedPoint(TrackingMatrices matrices, TrackedPoint&
         {
             /*tracked.m_position = seedPosition;
             tracked.m_worldPosition = estimatedWorldPosition;
-            tracked.m_worldVelocity = cv::Point3f();*/
+            tracked.m_worldDeltaPosition = cv::Point3f();*/
         }
     }
 }
@@ -79,9 +89,9 @@ void PointProcessor::validateAndUpdateTrackedPoint(TrackingMatrices matrices, Tr
         if (dist < maxJumpDist && area > minArea && area < maxArea)
         {
             updatedPoint = true;
-            cv::Point3f worldVelocity = worldPosition - trackedPoint.m_worldPosition;
+            cv::Point3f deltaPosition = worldPosition - trackedPoint.m_worldPosition;
             trackedPoint.m_worldPosition = worldPosition;
-            trackedPoint.m_worldVelocity = worldVelocity;
+            trackedPoint.m_worldDeltaPosition = deltaPosition;
 
             trackedPoint.m_position = newTargetPoint;
             if (deadbandDist > steadyDist)
@@ -115,13 +125,8 @@ void PointProcessor::validateAndUpdateTrackedPoint(TrackingMatrices matrices, Tr
 }
 
 
-void PointProcessor::updateTrackedPointOrCreateNewPointFromSeedPosition(TrackingMatrices matrices, std::vector<TrackedPoint>& trackedPoints, cv::Point seedPosition, int& nextTrackingId)
+bool PointProcessor::isValidPointArea(TrackingMatrices& matrices, cv::Point targetPoint)
 {
-    float seedDepth = matrices.matDepth.at<float>(seedPosition);
-    TrackingData trackingData(matrices, seedPosition, seedDepth, initialBandwidthDepth, TrackedPointType::CandidatePoint, iterationMaxInitial);
-
-    cv::Point targetPoint = SegmentationUtility::convergeTrackPointFromSeed(trackingData);
-
     bool validPointArea = false;
     if (targetPoint.x != -1 && targetPoint.y != -1)
     {
@@ -132,12 +137,81 @@ void PointProcessor::updateTrackedPointOrCreateNewPointFromSeedPosition(Tracking
             validPointArea = true;
         }
     }
+    return validPointArea;
+}
+
+void PointProcessor::removeDuplicatePoints()
+{
+    for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
+    {
+        TrackedPoint& tracked = *iter;
+        for (auto otherIter = m_trackedPoints.begin(); otherIter != m_trackedPoints.end(); ++otherIter)
+        {
+            TrackedPoint& otherTracked = *otherIter;
+            bool bothNotDead = tracked.m_status != TrackingStatus::Dead && otherTracked.m_status != TrackingStatus::Dead;
+            if (tracked.m_trackingId != otherTracked.m_trackingId && bothNotDead && tracked.m_position == otherTracked.m_position)
+            {
+                tracked.m_activeFrameCount = MAX(tracked.m_activeFrameCount, otherTracked.m_activeFrameCount);
+                tracked.m_inactiveFrameCount = MIN(tracked.m_inactiveFrameCount, otherTracked.m_inactiveFrameCount);
+                if (otherTracked.m_type == TrackedPointType::ActivePoint && tracked.m_type != TrackedPointType::ActivePoint)
+                {
+                    tracked.m_trackingId = otherTracked.m_trackingId;
+                    tracked.m_type = TrackedPointType::ActivePoint;
+                }
+                otherTracked.m_status = TrackingStatus::Dead;
+            }
+        }
+    }
+}
+
+void PointProcessor::removeOldOrDeadPoints()
+{
+    const int maxInactiveFrames = 60;
+    const int maxInactiveFramesForLostPoints = 240;
+    const int maxInactiveFramesForActivePoints = 480;
+
+    for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end();)
+    {
+        TrackedPoint& tracked = *iter;
+
+        int max = maxInactiveFrames;
+        if (tracked.m_type == TrackedPointType::ActivePoint)
+        {
+            if (tracked.m_status == TrackingStatus::Lost)
+            {
+                max = maxInactiveFramesForLostPoints;
+            }
+            else
+            {
+                max = maxInactiveFramesForActivePoints;
+            }
+        }
+        //if inactive for more than a certain number of frames, or dead, remove point
+        if (tracked.m_inactiveFrameCount > max || tracked.m_status == TrackingStatus::Dead)
+        {
+            iter = m_trackedPoints.erase(iter);
+        }
+        else
+        {
+            ++iter;
+        }
+    }
+}
+
+void PointProcessor::updateTrackedPointOrCreateNewPointFromSeedPosition(TrackingMatrices matrices, cv::Point seedPosition)
+{
+    float seedDepth = matrices.matDepth.at<float>(seedPosition);
+    TrackingData trackingData(matrices, seedPosition, seedDepth, initialBandwidthDepth, TrackedPointType::CandidatePoint, iterationMaxInitial);
+
+    cv::Point targetPoint = SegmentationUtility::convergeTrackPointFromSeed(trackingData);
+
+    bool validPointArea = isValidPointArea(matrices, targetPoint);
 
     if (validPointArea)
     {
         bool existingPoint = false;
 
-        for (auto iter = trackedPoints.begin(); iter != trackedPoints.end(); ++iter)
+        for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
         {
             TrackedPoint& tracked = *iter;
             if (tracked.m_status != TrackingStatus::Dead)
@@ -163,11 +237,11 @@ void PointProcessor::updateTrackedPointOrCreateNewPointFromSeedPosition(Tracking
 
             cv::Point3f worldPosition = CoordinateConversion::convertDepthToRealWorld(targetPoint.x, targetPoint.y, depth, resizeFactor);
 
-            TrackedPoint newPoint(targetPoint, worldPosition, nextTrackingId);
+            TrackedPoint newPoint(targetPoint, worldPosition, m_nextTrackingId);
             newPoint.m_type = TrackedPointType::CandidatePoint;
             newPoint.m_status = TrackingStatus::Tracking;
-            ++nextTrackingId;
-            trackedPoints.push_back(newPoint);
+            ++m_nextTrackingId;
+            m_trackedPoints.push_back(newPoint);
         }
     }
 }

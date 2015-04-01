@@ -4,13 +4,13 @@
 #include <opencv2/core/affine.hpp>
 #include "trackingdata.h"
 
-class TrackedPoint
+struct TrackedPoint
 {
 public:
     cv::Point m_position;
     cv::Point3f m_worldPosition;
     cv::Point3f m_steadyWorldPosition;
-    cv::Point3f m_worldVelocity;
+    cv::Point3f m_worldDeltaPosition;
     int m_trackingId;
     int m_inactiveFrameCount;
     float m_totalContributionArea;
@@ -26,7 +26,7 @@ public:
         m_position = position;
         m_worldPosition = worldPosition;
         m_steadyWorldPosition = worldPosition;
-        m_worldVelocity = cv::Point3f(0, 0, 0);
+        m_worldDeltaPosition = cv::Point3f(0, 0, 0);
         m_trackingId = trackingId;
         m_inactiveFrameCount = 0;
         m_activeFrameCount = 0;
