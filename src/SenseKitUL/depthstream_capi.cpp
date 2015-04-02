@@ -72,6 +72,16 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depth_get(sensekit_reader_t* reader,
                                        DEFAULT_SUBTYPE);
 }
 
+SENSEKIT_API_EX sensekit_status_t sensekit_depth_start(sensekit_depthstream_t* stream)
+{
+    return sensekit_generic_stream_start(stream);
+}
+
+SENSEKIT_API_EX sensekit_status_t sensekit_depth_stop(sensekit_depthstream_t* stream)
+{
+    return sensekit_generic_stream_stop(stream);
+}
+
 SENSEKIT_API_EX sensekit_status_t sensekit_depth_frame_open(sensekit_depthstream_t* stream,
                                                             int timeoutMillis,
                                                             sensekit_depthframe_t** frame)

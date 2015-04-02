@@ -40,6 +40,16 @@ namespace sensekit {
                 return static_cast<SenseKitContext*>(service)->get_stream(reader, type, subType, *connection);
             }
 
+        static sensekit_status_t start_stream(void* service, sensekit_streamconnection_t* connection)
+            {
+                return static_cast<SenseKitContext*>(service)->start_stream(connection);
+            }
+
+        static sensekit_status_t stop_stream(void* service, sensekit_streamconnection_t* connection)
+            {
+                return static_cast<SenseKitContext*>(service)->stop_stream(connection);
+            }
+
         static sensekit_status_t open_frame(void* service,
                                             sensekit_streamconnection_t* connection,
                                             int timeoutMillis,

@@ -17,6 +17,20 @@ sensekit_status_t sensekit_generic_stream_get(sensekit_reader_t* reader,
     return SENSEKIT_STATUS_SUCCESS;
 }
 
+template<typename TStreamType>
+sensekit_status_t sensekit_generic_stream_start(TStreamType* stream)
+{
+    sensekit_streamconnection_t* connection = reinterpret_cast<sensekit_streamconnection_t*>(stream);
+    return sensekit_stream_start(connection);
+}
+
+template<typename TStreamType>
+sensekit_status_t sensekit_generic_stream_stop(TStreamType* stream)
+{
+    sensekit_streamconnection_t* connection = reinterpret_cast<sensekit_streamconnection_t*>(stream);
+    return sensekit_stream_stop(connection);
+}
+
 template<typename TFrameWrapperType, typename TStreamType, typename TFrameType>
 sensekit_status_t sensekit_generic_frame_open(TStreamType* stream, int timeout, TFrameType** frame)
 {

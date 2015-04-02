@@ -57,7 +57,15 @@ SENSEKIT_API_PROXY sensekit_status_t sensekit_stream_get(sensekit_reader_t* read
                                        connection);
 }
 
+SENSEKIT_API_PROXY sensekit_status_t sensekit_stream_start(sensekit_streamconnection_t* connection)
+{
+    return get_api_proxy()->start_stream(connection);
+}
 
+SENSEKIT_API_PROXY sensekit_status_t sensekit_stream_stop(sensekit_streamconnection_t* connection)
+{
+    return get_api_proxy()->stop_stream(connection);
+}
 
 SENSEKIT_API_PROXY sensekit_status_t sensekit_stream_frame_open(sensekit_streamconnection_t* connection,
                                                                 int timeout,

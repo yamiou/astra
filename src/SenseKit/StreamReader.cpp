@@ -3,8 +3,8 @@
 
 namespace sensekit {
 
-    StreamConnection* StreamReader::get_stream(sensekit_stream_type_t type,
-                                   sensekit_stream_subtype_t subType)
+    StreamConnection* StreamReader::find_stream_of_type(sensekit_stream_type_t type,
+                                                        sensekit_stream_subtype_t subType)
     {
         auto it = std::find_if(m_streamConnections.cbegin(),
                                m_streamConnections.cend(),
@@ -21,7 +21,18 @@ namespace sensekit {
             return *it;
         }
 
-        StreamConnection* connection = m_streamSet.open_stream_connection(type, subType);
+        return nullptr;
+    }
+
+    StreamConnection* StreamReader::get_stream(sensekit_stream_type_t type,
+                                               sensekit_stream_subtype_t subType)
+    {
+        StreamConnection* connection = find_stream_of_type(type, subType);
+
+        if (connection != nullptr)
+            return connection;
+
+        connection = m_streamSet.open_stream_connection(type, subType);
         if (connection != nullptr)
         {
             m_streamConnections.insert(connection);
@@ -40,6 +51,4 @@ namespace sensekit {
 
         return false;
     }
-
-
 }

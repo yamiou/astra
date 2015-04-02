@@ -1,5 +1,5 @@
-#ifndef DEPTH_H
-#define DEPTH_H
+#ifndef DEPTH_CAPI_H
+#define DEPTH_CAPI_H
 
 #include <sensekit_core.h>
 #include "depth_types.h"
@@ -15,6 +15,10 @@ SENSEKIT_API_EX sensekit_status_t convert_world_to_depth(float worldX, float wor
 SENSEKIT_API_EX sensekit_status_t sensekit_depth_get(sensekit_reader_t* reader,
                                                      sensekit_depthstream_t** stream);
 
+SENSEKIT_API_EX sensekit_status_t sensekit_depth_start(sensekit_depthstream_t* stream);
+
+SENSEKIT_API_EX sensekit_status_t sensekit_depth_stop(sensekit_depthstream_t* stream);
+
 SENSEKIT_API_EX sensekit_status_t sensekit_depth_frame_open(sensekit_depthstream_t* stream,
                                                             int timeoutMillis,
                                                             sensekit_depthframe_t** frame);
@@ -23,4 +27,4 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depth_frame_close(sensekit_depthframe
 
 SENSEKIT_END_DECLS
 
-#endif // DEPTH_H
+#endif // DEPTH_CAPI_H

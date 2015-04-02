@@ -31,6 +31,9 @@ SENSEKIT_API sensekit_status_t sensekit_stream_get(sensekit_reader_t* reader,
 SENSEKIT_API sensekit_status_t sensekit_stream_get_type(sensekit_streamconnection_t* connection,
                                                         sensekit_stream_typepair_t* typePair);
 
+SENSEKIT_API sensekit_status_t sensekit_stream_start(sensekit_streamconnection_t* connection);
+SENSEKIT_API sensekit_status_t sensekit_stream_stop(sensekit_streamconnection_t* connection);
+
 SENSEKIT_API sensekit_status_t sensekit_stream_frame_open(sensekit_streamconnection_t* connection,
                                                           int timeoutMillis,
                                                           sensekit_frame_ref_t** frame); //0 = return immediately

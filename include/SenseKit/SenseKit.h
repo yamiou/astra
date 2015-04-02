@@ -40,7 +40,24 @@ namespace sensekit {
         friend class StreamReader;
     };
 
-    class FrameRef;
+    class FrameRef
+    {
+    public:
+        FrameRef() { }
+
+        template<typename T>
+        T get()
+            {
+                return T();
+            }
+
+        void release()
+            {
+
+            }
+
+    private:
+    };
 
     class StreamReader
     {
@@ -85,13 +102,11 @@ namespace sensekit {
 
             }
 
-        FrameRef& next_frame()
+        FrameRef get_latest_frame(int timeoutMillis = -1)
             {
                 sensekit_temp_update();
-
-
+                return FrameRef();
             }
-
 
     private:
         Sensor& m_sensor;
@@ -101,43 +116,10 @@ namespace sensekit {
                  std::less<sensekit_stream_typepair_t> > m_streams;
     };
 
-    class DepthStream
-    {
-    public:
-        explicit DepthStream(sensekit_streamconnection_t* connection)
-            : m_pStreamConnection(connection) { }
-
-        static const sensekit_stream_type_t id = 0;
-
-        void start() { }
-        void stop() { }
-
-    private:
-        sensekit_streamconnection_t* m_pStreamConnection;
-    };
-
     StreamReader Sensor::create_reader()
     {
         return StreamReader(*this);
     }
-
-    class FrameRef
-    {
-    public:
-        FrameRef();
-        virtual ~FrameRef();
-    };
-
-    class DepthFrame
-    {
-    public:
-        explicit DepthFrame(FrameRef& frameRef)
-            {
-
-            }
-    };
-
-
 }
 
 #endif // SENSEKIT_H

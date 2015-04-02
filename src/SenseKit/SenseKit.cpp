@@ -51,6 +51,15 @@ SENSEKIT_API sensekit_status_t sensekit_stream_get(sensekit_reader_t* reader,
     return g_Context.get_stream(reader, type, subType, *connection);
 }
 
+SENSEKIT_API sensekit_status_t sensekit_stream_start(sensekit_streamconnection_t* connection)
+{
+
+}
+SENSEKIT_API sensekit_status_t sensekit_stream_stop(sensekit_streamconnection_t* connection)
+{
+
+}
+
 SENSEKIT_API sensekit_status_t sensekit_stream_frame_open(sensekit_streamconnection_t* connection,
                                                           int timeoutMillis,
                                                           sensekit_frame_ref_t** frame)

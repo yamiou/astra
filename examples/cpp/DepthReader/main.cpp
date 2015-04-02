@@ -69,33 +69,27 @@ int main(int argc, char** argv)
     sensekit::Sensor sensor;
     sensekit::StreamReader reader = sensor.create_reader();
 
-    auto ds = reader.stream<sensekit::DepthStream>();
-    ds.start();
+    reader.stream<sensekit::DepthStream>().start();
 
     do
     {
-        // //Needed for now until backend plugins have their own thread and we figure out a thread/dispatch model
-        // sensekit_temp_update();
+        sensekit_temp_update();
 
-        // sensekit_depthframe_t* depthFrame;
-        // //
-        // sensekit_depth_frame_open(depthStream,
-        //                           30, &depthFrame);
+        sensekit::FrameRef frameRef = reader.get_latest_frame(30);
 
-        // int width = depthFrame->width;
-        // int height = depthFrame->height;
+        sensekit::DepthFrame depthFrame = frameRef.get<sensekit::DepthFrame>();
 
-        // size_t index = ((width * (height / 2)) + (width / 2));
-        // short middle = depthFrame->data[index];
-        // std::cout << "index: " << depthFrame->frameIndex << " value: " << middle << std::endl;
+        int width = depthFrame.getResolutionX();
+        int height = depthFrame.getResolutionY();
+        int frameIndex = depthFrame.getFrameIndex();
 
-        // sensekit_depth_frame_close(&depthFrame);
+        size_t index = ((width * (height / 2)) + (width / 2));
+        short middle = depthFrame.data()[index];
+        std::cout << "index: " << frameIndex << " value: " << middle << std::endl;
+
+        frameRef.release();
 
      } while (shouldContinue);
-
-//    status = sensekit_depth_close(&depthStream);
-
-    //  status = sensekit_streamset_close(&sensor);
 
     sensekit_terminate();
 }

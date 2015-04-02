@@ -24,6 +24,8 @@ namespace sensekit {
         proxy->create_reader = &StreamServiceDelegate::create_reader;
         proxy->destroy_reader = &StreamServiceDelegate::destroy_reader;
         proxy->get_stream = &StreamServiceDelegate::get_stream;
+        proxy->start_stream = &StreamServiceDelegate::start_stream;
+        proxy->stop_stream = &StreamServiceDelegate::stop_stream;
         proxy->open_frame = &StreamServiceDelegate::open_frame;
         proxy->close_frame = &StreamServiceDelegate::close_frame;
         proxy->set_parameter = &StreamServiceDelegate::set_parameter;
@@ -129,6 +131,16 @@ namespace sensekit {
         connection = reinterpret_cast<sensekit_streamconnection_t*>(actualReader->get_stream(type, subType));
 
         return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t SenseKitContext::start_stream(sensekit_streamconnection_t* connection)
+    {
+
+    }
+
+    sensekit_status_t SenseKitContext::stop_stream(sensekit_streamconnection_t* connection)
+    {
+
     }
 
     sensekit_status_t SenseKitContext::open_frame(sensekit_streamconnection_t* streamConnection,

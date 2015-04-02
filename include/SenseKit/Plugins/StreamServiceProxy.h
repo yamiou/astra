@@ -43,6 +43,16 @@ namespace sensekit {
                 return StreamServiceProxyBase::open_frame(streamService, connection, timeoutMillis, frameRef);
             }
 
+        sensekit_status_t start_stream(sensekit_streamconnection_t* connection)
+            {
+                return StreamServiceProxyBase::stop_stream(streamService, connection);
+            }
+
+        sensekit_status_t stop_stream(sensekit_streamconnection_t* connection)
+            {
+                return StreamServiceProxyBase::stop_stream(streamService, connection);
+            }
+
         sensekit_status_t close_frame(sensekit_frame_ref_t** frameRef)
             {
                 return StreamServiceProxyBase::close_frame(streamService, frameRef);
