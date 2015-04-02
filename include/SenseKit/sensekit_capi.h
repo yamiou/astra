@@ -23,7 +23,7 @@ SENSEKIT_API sensekit_status_t sensekit_reader_create(sensekit_streamset_t* stre
 
 SENSEKIT_API sensekit_status_t sensekit_reader_destroy(sensekit_reader_t** reader);
 
-SENSEKIT_API sensekit_status_t sensekit_stream_get(sensekit_reader_t* reader,
+SENSEKIT_API sensekit_status_t sensekit_reader_get_stream(sensekit_reader_t* reader,
                                                    sensekit_stream_type_t type,
                                                    sensekit_stream_subtype_t subType,
                                                    sensekit_streamconnection_t** connection);

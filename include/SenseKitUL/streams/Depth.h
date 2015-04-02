@@ -2,6 +2,7 @@
 #define DEPTH_H
 
 #include <SenseKit.h>
+#include <StreamTypes.h>
 #include "depth_capi.h"
 
 namespace sensekit {
@@ -14,7 +15,7 @@ namespace sensekit {
                 m_pStreamConnection = reinterpret_cast<sensekit_depthstream_t*>(connection);
             }
 
-        static const sensekit_stream_type_t id = 0;
+        static const sensekit_stream_type_t id = SENSEKIT_STREAM_TYPE::SENSEKIT_STREAM_DEPTH;
 
         void start()
             {

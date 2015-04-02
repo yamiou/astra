@@ -86,26 +86,23 @@ namespace sensekit {
 
     sensekit_status_t SenseKitContext::open_streamset(const char* uri, sensekit_streamset_t*& streamset)
     {
-        //do nothing for now
-        //would connect to the daemon and register interest in the uri
+        streamset = reinterpret_cast<sensekit_streamset_t*>(&get_rootSet());
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
     sensekit_status_t SenseKitContext::close_streamset(sensekit_streamset_t*& streamset)
     {
-        //reverse the nothing we did above
+        streamset = nullptr;
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 
     sensekit_status_t SenseKitContext::create_reader(sensekit_streamset_t* streamSet,
-                                                    sensekit_reader_t*& reader)
+                                                     sensekit_reader_t*& reader)
     {
-        //TODO: Use this when streamSets are more than 1
-        //StreamSet* actualSet = static_cast<StreamSet*>(streamSet);
-        //reader = new StreamReader(actualSet);
-
-        reader = reinterpret_cast<sensekit_reader_t*>(new StreamReader(get_rootSet()));
+        StreamSet* actualSet = reinterpret_cast<StreamSet*>(streamSet);
+        reader = reinterpret_cast<sensekit_reader_t*>(new StreamReader(*actualSet));
 
         return SENSEKIT_STATUS_SUCCESS;
     }
