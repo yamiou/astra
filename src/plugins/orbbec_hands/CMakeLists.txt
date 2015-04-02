@@ -12,7 +12,7 @@ set(orbbec_hands_SOURCES
   pointprocessor.h
   pointprocessor.cpp
   trackingdata.h
-  coordinateconversion.h
+  coordinateconverter.h
   hands_plugin.cpp
   hands_plugin.h
 )

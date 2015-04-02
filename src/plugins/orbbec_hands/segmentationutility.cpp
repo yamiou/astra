@@ -1,7 +1,7 @@
 #include "segmentationutility.h"
 #include "trackingdata.h"
 #include <queue>
-#include "coordinateconversion.h"
+#include "coordinateconverter.h"
 
 #define MAX_DEPTH 10000
 
@@ -170,7 +170,7 @@ bool SegmentationUtility::findForegroundPixel(cv::Mat& matForeground, cv::Point&
     return false;
 }
 
-void SegmentationUtility::calculateBasicScore(cv::Mat& matDepth, cv::Mat& matScore, const float heightFactor, const float depthFactor, const float resizeFactor)
+void SegmentationUtility::calculateBasicScore(cv::Mat& matDepth, cv::Mat& matScore, const float heightFactor, const float depthFactor, const CoordinateConverter& converter)
 {
     int width = matDepth.cols;
     int height = matDepth.rows;
@@ -185,7 +185,7 @@ void SegmentationUtility::calculateBasicScore(cv::Mat& matDepth, cv::Mat& matSco
             float depth = *depthRow;
             if (depth != 0)
             {
-                cv::Point3f worldPosition = CoordinateConversion::convertDepthToRealWorld(x, y, depth, resizeFactor);
+                cv::Point3f worldPosition = converter.convertDepthToRealWorld(x, y, depth);
 
                 float score = worldPosition.y * heightFactor;
                 score += (MAX_DEPTH - worldPosition.z) * depthFactor;
@@ -276,15 +276,15 @@ void SegmentationUtility::calculateSegmentArea(cv::Mat& matDepth, cv::Mat& matAr
     }
 }
 
-float SegmentationUtility::getDepthArea(cv::Point3f& p1, cv::Point3f& p2, cv::Point3f& p3, const float resizeFactor)
+float SegmentationUtility::getDepthArea(cv::Point3f& p1, cv::Point3f& p2, cv::Point3f& p3, const CoordinateConverter& converter)
 {
     float worldX1, worldY1, worldZ1;
     float worldX2, worldY2, worldZ2;
     float worldX3, worldY3, worldZ3;
 
-    cv::Point3f world1 = CoordinateConversion::convertDepthToRealWorld(p1, resizeFactor);
-    cv::Point3f world2 = CoordinateConversion::convertDepthToRealWorld(p2, resizeFactor);
-    cv::Point3f world3 = CoordinateConversion::convertDepthToRealWorld(p3, resizeFactor);
+    cv::Point3f world1 = converter.convertDepthToRealWorld(p1);
+    cv::Point3f world2 = converter.convertDepthToRealWorld(p2);
+    cv::Point3f world3 = converter.convertDepthToRealWorld(p3);
 
     cv::Point3f v1 = world2 - world1;
     cv::Point3f v2 = world3 - world1;
@@ -293,12 +293,12 @@ float SegmentationUtility::getDepthArea(cv::Point3f& p1, cv::Point3f& p2, cv::Po
     return area;
 }
 
-float SegmentationUtility::countNeighborhoodArea(cv::Mat& matSegmentation, cv::Mat& matDepth, cv::Mat& matArea, cv::Point center, const float bandwidth, const float bandwidthDepth, const float resizeFactor)
+float SegmentationUtility::countNeighborhoodArea(cv::Mat& matSegmentation, cv::Mat& matDepth, cv::Mat& matArea, cv::Point center, const float bandwidth, const float bandwidthDepth, const CoordinateConverter& converter)
 {
     float startingDepth = matDepth.at<float>(center);
 
-    cv::Point topLeft = CoordinateConversion::offsetPixelLocationByMM(center, -bandwidth, bandwidth, startingDepth, resizeFactor);
-    cv::Point bottomRight = CoordinateConversion::offsetPixelLocationByMM(center, bandwidth, -bandwidth, startingDepth, resizeFactor);
+    cv::Point topLeft = converter.offsetPixelLocationByMM(center, -bandwidth, bandwidth, startingDepth);
+    cv::Point bottomRight = converter.offsetPixelLocationByMM(center, bandwidth, -bandwidth, startingDepth);
     int32_t x0 = MAX(0, topLeft.x);
     int32_t y0 = MAX(0, topLeft.y);
     int32_t x1 = MIN(matDepth.cols - 1, bottomRight.x);

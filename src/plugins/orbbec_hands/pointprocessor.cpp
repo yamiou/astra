@@ -1,10 +1,21 @@
 #include "trackedpoint.h"
 #include "pointprocessor.h"
 #include "segmentationutility.h"
-#include "coordinateconversion.h"
+#include "coordinateconverter.h"
 
 
-PointProcessor::PointProcessor()
+PointProcessor::PointProcessor(const CoordinateConverter& converter) :
+m_converter(converter),
+m_trackingBandwidthDepth(150),  //mm
+m_initialBandwidthDepth(450),   //mm
+m_maxMatchDistLostActive(500),  //mm
+m_maxMatchDistDefault(200),     //mm
+m_iterationMaxInitial(1),
+m_iterationMaxTracking(1),
+m_minArea(5000),            //mm^2
+m_maxArea(20000),           //mm^2
+m_areaBandwidth(150),       //mm
+m_areaBandwidthDepth(100)   //mm
 {
 }
 
@@ -22,6 +33,12 @@ void PointProcessor::updateTrackedPoints(TrackingMatrices matrices)
     }
 }
 
+void PointProcessor::reset()
+{
+    m_trackedPoints.clear();
+    m_nextTrackingId = 0;
+}
+
 void PointProcessor::updateTrackedPoint(TrackingMatrices matrices, TrackedPoint& trackedPoint)
 {
     const float width = matrices.matDepth.cols;
@@ -32,7 +49,7 @@ void PointProcessor::updateTrackedPoint(TrackingMatrices matrices, TrackedPoint&
     cv::Point seedPosition = trackedPoint.m_position;
     float referenceDepth = trackedPoint.m_worldPosition.z;
 
-    TrackingData updateTrackingData(matrices, seedPosition, referenceDepth, trackingBandwidthDepth, trackedPoint.m_type, iterationMaxTracking);
+    TrackingData updateTrackingData(matrices, seedPosition, referenceDepth, m_trackingBandwidthDepth, trackedPoint.m_type, m_iterationMaxTracking);
 
     cv::Point newTargetPoint = SegmentationUtility::convergeTrackPointFromSeed(updateTrackingData);
 
@@ -44,13 +61,13 @@ void PointProcessor::updateTrackedPoint(TrackingMatrices matrices, TrackedPoint&
     {
         auto estimatedWorldPosition = trackedPoint.m_worldPosition + trackedPoint.m_worldDeltaPosition;
 
-        cv::Point3f estimatedPosition = CoordinateConversion::convertRealWorldToDepth(estimatedWorldPosition, resizeFactor);
+        cv::Point3f estimatedPosition = m_converter.convertRealWorldToDepth(estimatedWorldPosition);
 
         seedPosition.x = MAX(0, MIN(width - 1, static_cast<int>(estimatedPosition.x)));
         seedPosition.y = MAX(0, MIN(height - 1, static_cast<int>(estimatedPosition.y)));
         referenceDepth = estimatedPosition.z;
 
-        TrackingData recoverTrackingData(matrices, seedPosition, referenceDepth, initialBandwidthDepth, trackedPoint.m_type, iterationMaxTracking);
+        TrackingData recoverTrackingData(matrices, seedPosition, referenceDepth, m_initialBandwidthDepth, trackedPoint.m_type, m_iterationMaxTracking);
 
         newTargetPoint = SegmentationUtility::convergeTrackPointFromSeed(recoverTrackingData);
         validateAndUpdateTrackedPoint(matrices, trackedPoint, newTargetPoint);
@@ -79,14 +96,14 @@ void PointProcessor::validateAndUpdateTrackedPoint(TrackingMatrices matrices, Tr
     {
         float depth = matrices.matDepth.at<float>(newTargetPoint);
 
-        cv::Point3f worldPosition = CoordinateConversion::convertDepthToRealWorld(newTargetPoint.x, newTargetPoint.y, depth, resizeFactor);
+        cv::Point3f worldPosition = m_converter.convertDepthToRealWorld(newTargetPoint.x, newTargetPoint.y, depth);
 
         auto dist = cv::norm(worldPosition - trackedPoint.m_worldPosition);
         auto deadbandDist = cv::norm(worldPosition - trackedPoint.m_steadyWorldPosition);
 
-        float area = SegmentationUtility::countNeighborhoodArea(matrices.matLayerSegmentation, matrices.matDepth, matrices.matArea, newTargetPoint, areaBandwidth, areaBandwidthDepth, resizeFactor);
+        float area = SegmentationUtility::countNeighborhoodArea(matrices.matLayerSegmentation, matrices.matDepth, matrices.matArea, newTargetPoint, m_areaBandwidth, m_areaBandwidthDepth, m_converter);
 
-        if (dist < maxJumpDist && area > minArea && area < maxArea)
+        if (dist < maxJumpDist && area > m_minArea && area < m_maxArea)
         {
             updatedPoint = true;
             cv::Point3f deltaPosition = worldPosition - trackedPoint.m_worldPosition;
@@ -130,9 +147,9 @@ bool PointProcessor::isValidPointArea(TrackingMatrices& matrices, cv::Point targ
     bool validPointArea = false;
     if (targetPoint.x != -1 && targetPoint.y != -1)
     {
-        float area = SegmentationUtility::countNeighborhoodArea(matrices.matLayerSegmentation, matrices.matDepth, matrices.matArea, targetPoint, areaBandwidth, areaBandwidthDepth, resizeFactor);
+        float area = SegmentationUtility::countNeighborhoodArea(matrices.matLayerSegmentation, matrices.matDepth, matrices.matArea, targetPoint, m_areaBandwidth, m_areaBandwidthDepth, m_converter);
 
-        if (area > minArea && area < maxArea)
+        if (area > m_minArea && area < m_maxArea)
         {
             validPointArea = true;
         }
@@ -201,7 +218,7 @@ void PointProcessor::removeOldOrDeadPoints()
 void PointProcessor::updateTrackedPointOrCreateNewPointFromSeedPosition(TrackingMatrices matrices, cv::Point seedPosition)
 {
     float seedDepth = matrices.matDepth.at<float>(seedPosition);
-    TrackingData trackingData(matrices, seedPosition, seedDepth, initialBandwidthDepth, TrackedPointType::CandidatePoint, iterationMaxInitial);
+    TrackingData trackingData(matrices, seedPosition, seedDepth, m_initialBandwidthDepth, TrackedPointType::CandidatePoint, m_iterationMaxInitial);
 
     cv::Point targetPoint = SegmentationUtility::convergeTrackPointFromSeed(trackingData);
 
@@ -217,10 +234,10 @@ void PointProcessor::updateTrackedPointOrCreateNewPointFromSeedPosition(Tracking
             if (tracked.m_status != TrackingStatus::Dead)
             {
                 float dist = cv::norm(tracked.m_position - targetPoint);
-                float maxDist = maxMatchDistDefault;
+                float maxDist = m_maxMatchDistDefault;
                 if (tracked.m_type == TrackedPointType::ActivePoint && tracked.m_status == TrackingStatus::Lost)
                 {
-                    maxDist = maxMatchDistLostActive;
+                    maxDist = m_maxMatchDistLostActive;
                 }
                 if (dist < maxDist)
                 {
@@ -235,7 +252,7 @@ void PointProcessor::updateTrackedPointOrCreateNewPointFromSeedPosition(Tracking
         {
             float depth = matrices.matDepth.at<float>(targetPoint);
 
-            cv::Point3f worldPosition = CoordinateConversion::convertDepthToRealWorld(targetPoint.x, targetPoint.y, depth, resizeFactor);
+            cv::Point3f worldPosition = m_converter.convertDepthToRealWorld(targetPoint.x, targetPoint.y, depth);
 
             TrackedPoint newPoint(targetPoint, worldPosition, m_nextTrackingId);
             newPoint.m_type = TrackedPointType::CandidatePoint;
