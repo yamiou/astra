@@ -3,6 +3,8 @@
 
 #include <SenseKit.h>
 
+#define SENSEKIT_HANDS_MAX_HANDPOINTS 20
+
 typedef enum _sensekit_handstatus
 {
     HAND_STATUS_NOTTRACKING,

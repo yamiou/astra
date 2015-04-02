@@ -5,19 +5,55 @@
 
 DepthUtility::DepthUtility(int width, int height) :
 m_processingWidth(width),
-m_processingHeight(height)
+m_processingHeight(height),
+m_depthSmoothingFactor(0.05),
+m_foregroundThresholdFactor(0.02),
+m_maxDepthJumpPercent(0.1)
+{
+    int erodeNum = 1;
+    m_rectElement = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(erodeNum * 2 + 1, erodeNum * 2 + 1), cv::Point(erodeNum, erodeNum));
+
+    reset();
+}
+
+DepthUtility::~DepthUtility()
+{
+}
+
+void DepthUtility::reset()
 {
     m_matDepthPrevious = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_32FC1);
     m_matDepthAvg = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_32FC1);
     m_matDepthVel.create(m_processingHeight, m_processingWidth, CV_32FC1);
     m_matDepthVelErode.create(m_processingHeight, m_processingWidth, CV_32FC1);
-
-    int erodeNum = 1;
-    m_rectElement = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(erodeNum * 2 + 1, erodeNum * 2 + 1), cv::Point(erodeNum, erodeNum));
 }
 
-DepthUtility::~DepthUtility()
+void DepthUtility::processDepthToForeground(sensekit_depthframe_t* depthFrame, cv::Mat matDepth, cv::Mat matForeground)
 {
+    matDepth.create(m_processingHeight, m_processingWidth, CV_32FC1);
+    matForeground = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_8UC1);
+
+    depthFrameToMat(depthFrame, m_matDepthOriginal);
+
+    //convert to the target processing size with nearest neighbor
+
+    cv::resize(m_matDepthOriginal, matDepth, matDepth.size(), 0, 0, CV_INTER_NN);
+
+    //current minus average, scaled by average = velocity as a percent change
+
+    m_matDepthVel = (matDepth - m_matDepthAvg) / m_matDepthAvg;
+
+    //accumulate current frame to average using smoothing factor
+
+    cv::accumulateWeighted(matDepth, m_matDepthAvg, m_depthSmoothingFactor);
+
+    filterZeroValuesAndJumps(matDepth, m_matDepthPrevious, m_matDepthAvg, m_matDepthVel, m_maxDepthJumpPercent);
+
+    //erode to eliminate single pixel velocity artifacts
+
+    cv::erode(abs(m_matDepthVel), m_matDepthVelErode, m_rectElement);
+
+    thresholdForeground(matForeground, m_matDepthVelErode, m_foregroundThresholdFactor);
 }
 
 void DepthUtility::depthFrameToMat(sensekit_depthframe_t* depthFrameSrc, cv::Mat matTarget)
@@ -103,32 +139,4 @@ void DepthUtility::thresholdForeground(cv::Mat& matForeground, cv::Mat& matVeloc
             ++velRow;
         }
     }
-}
-
-void DepthUtility::processDepthToForeground(sensekit_depthframe_t* depthFrame, cv::Mat matDepth, cv::Mat matForeground, const float depthSmoothingFactor, const float foregroundThresholdFactor, const float maxDepthJumpPercent)
-{
-    matDepth.create(m_processingHeight, m_processingWidth, CV_32FC1);
-    matForeground = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_8UC1);
-
-    depthFrameToMat(depthFrame, m_matDepthOriginal);
-
-    //convert to the target processing size with nearest neighbor
-
-    cv::resize(m_matDepthOriginal, matDepth, matDepth.size(), 0, 0, CV_INTER_NN);
-
-    //current minus average, scaled by average = velocity as a percent change
-
-    m_matDepthVel = (matDepth - m_matDepthAvg) / m_matDepthAvg;
-
-    //accumulate current frame to average using smoothing factor
-
-    cv::accumulateWeighted(matDepth, m_matDepthAvg, depthSmoothingFactor);
-
-    filterZeroValuesAndJumps(matDepth, m_matDepthPrevious, m_matDepthAvg, m_matDepthVel, maxDepthJumpPercent);
-
-    //erode to eliminate single pixel velocity artifacts
-
-    cv::erode(abs(m_matDepthVel), m_matDepthVelErode, m_rectElement);
-
-    thresholdForeground(matForeground, m_matDepthVelErode, foregroundThresholdFactor);
 }

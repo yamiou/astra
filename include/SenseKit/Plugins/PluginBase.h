@@ -16,13 +16,12 @@ namespace sensekit {
 
         virtual ~PluginBase() = default;
 
-        virtual void temp_update() = 0;
+        virtual void temp_update() { };
 
     protected:
         inline PluginServiceProxy& get_pluginService() const  { return *m_pluginService; }
 
     private:
-        bool m_initialized{false};
         PluginServiceProxy* m_pluginService;
 
         static void set_parameter_thunk(void* instance,
@@ -84,7 +83,7 @@ namespace sensekit {
 
     };
 
-    stream_callbacks_t create_plugin_callbacks(PluginBase* context)
+    inline stream_callbacks_t create_plugin_callbacks(PluginBase* context)
     {
         stream_callbacks_t callbacks;
 

@@ -31,7 +31,7 @@ namespace sensekit
             {
                 sensekit_depthstream_t* depthStream = reinterpret_cast<sensekit_depthstream_t*>(streamHandle);
 
-                HandTracker* tracker = new HandTracker(depthStream);
+                HandTracker* tracker = new HandTracker(&get_pluginService(), setHandle, depthStream);
                 m_streamTrackerMap[streamHandle] = tracker;
             }
         }

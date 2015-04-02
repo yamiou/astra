@@ -7,7 +7,8 @@ public:
     DepthUtility(int width, int height);
     virtual ~DepthUtility();
 
-    void processDepthToForeground(sensekit_depthframe_t* depthFrame, cv::Mat matDepth, cv::Mat matForeground, const float depthSmoothingFactor, const float foregroundThresholdFactor, const float maxDepthJumpPercent);
+    void processDepthToForeground(sensekit_depthframe_t* depthFrame, cv::Mat matDepth, cv::Mat matForeground);
+    void reset();
 
 private:
     static void depthFrameToMat(sensekit_depthframe_t* depthFrameSrc, cv::Mat matTarget);
@@ -24,6 +25,10 @@ private:
     cv::Mat m_matDepthAvg;
     cv::Mat m_matDepthVel;
     cv::Mat m_matDepthVelErode;
+
+    float m_depthSmoothingFactor;
+    float m_foregroundThresholdFactor;
+    float m_maxDepthJumpPercent;
 };
 
 #endif // DEPTHUTILITY_H

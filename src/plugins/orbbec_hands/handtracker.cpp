@@ -10,6 +10,8 @@
 #include "coordinateconverter.h"
 #include "pointprocessor.h"
 #include <SenseKitUL/streams/hand_types.h>
+#include <SenseKitUL/StreamTypes.h>
+#include <SenseKit/Plugins/PluginBase.h>
 
 using namespace std;
 
@@ -26,22 +28,33 @@ using namespace std;
 #define MIN_NUM_CHUNKS(data_size, chunk_size)   ((((data_size)-1) / (chunk_size) + 1))
 #define MIN_CHUNKS_SIZE(data_size, chunk_size)  (MIN_NUM_CHUNKS(data_size, chunk_size) * (chunk_size))
 
-HandTracker::HandTracker(sensekit_depthstream_t* depthStream) :
+HandTracker::HandTracker(sensekit::PluginServiceProxy* pluginService, sensekit_streamset_t* setHandle, sensekit_depthstream_t* depthStream) :
+PluginBase(pluginService),
+m_setHandle(setHandle),
 m_depthStream(depthStream),
 m_depthUtility(PROCESSING_SIZE_WIDTH, PROCESSING_SIZE_HEIGHT),
 m_converter(1.0),
 m_pointProcessor(m_converter)
 {
-    setupVariables();
+    setupStream();
 }
 
 HandTracker::~HandTracker()
 {
 }
 
+void HandTracker::setupStream()
+{
+    stream_callbacks_t pluginCallbacks = sensekit::create_plugin_callbacks(this);
+
+    get_pluginService().create_stream(m_setHandle, SENSEKIT_STREAM_HANDS, HANDS_DEFAULT_SUBTYPE, pluginCallbacks, m_handStream);
+    
+    //TODO subscribe to m_depthStream's frame ready event
+}
+
 void HandTracker::reset()
 {
-
+    m_depthUtility.reset();
     m_pointProcessor.reset();
 }
 
@@ -52,13 +65,16 @@ void HandTracker::updateTracking(sensekit_depthframe_t* depthFrame)
 
     m_resizeFactor = width / static_cast<float>(PROCESSING_SIZE_WIDTH);
 
-    m_depthUtility.processDepthToForeground(depthFrame, m_matDepth, m_matForeground, m_depthSmoothingFactor, m_foregroundThresholdFactor, m_maxDepthJumpPercent);
+    m_depthUtility.processDepthToForeground(depthFrame, m_matDepth, m_matForeground);
 
     float minArea = 10000;
     float maxArea = 20000;
     trackPoints(m_matDepth, m_matForeground);
 
-    return updateHandFrame(m_pointProcessor.get_trackedPoints(), m_wrapper);
+    if (m_currentHandFrame != nullptr)
+    {
+        updateHandFrame(m_pointProcessor.get_trackedPoints(), m_currentHandFrame);
+    }
 }
 
 void HandTracker::trackPoints(cv::Mat& matDepth, cv::Mat& matForeground)
@@ -83,11 +99,13 @@ void HandTracker::trackPoints(cv::Mat& matDepth, cv::Mat& matForeground)
     cv::Mat matArea = cv::Mat::zeros(matDepth.size(), CV_32FC1);
     cv::Mat layerSegmentation;
 
-    float heightFactor = 1 * m_factor1;
-    float depthFactor = 1.5 * m_factor2;
+    float heightFactor = 1;
+    float depthFactor = 1.5;
 
     SegmentationUtility::calculateBasicScore(matDepth, matScore, heightFactor, depthFactor, m_resizeFactor);
     SegmentationUtility::calculateSegmentArea(matDepth, matArea, m_resizeFactor);
+
+    cv::Mat foregroundCopy = matForeground.clone();
 
     TrackingMatrices matrices(matDepth, matArea, matScore, matForeground, layerSegmentation);
 
@@ -95,11 +113,9 @@ void HandTracker::trackPoints(cv::Mat& matDepth, cv::Mat& matForeground)
 
     m_pointProcessor.removeDuplicatePoints();
 
-    cv::Mat foregroundSearched = matForeground.clone();
-
     cv::Point seedPosition;
     //add new points (unless already tracking)
-    while (SegmentationUtility::findForegroundPixel(foregroundSearched, seedPosition))
+    while (SegmentationUtility::findForegroundPixel(foregroundCopy, seedPosition))
     {
         m_pointProcessor.updateTrackedPointOrCreateNewPointFromSeedPosition(matrices, seedPosition);
     }
@@ -181,12 +197,48 @@ void HandTracker::resetHandPoint(sensekit_handpoint_t& point)
     point.worldDeltaPosition = sensekit_vector3f_t();
 }
 
-void HandTracker::setupVariables()
+void HandTracker::setNextBuffer(sensekit_frame_t* nextBuffer)
 {
-    m_factor1 = 1;
-    m_factor2 = 1;
-    
-    m_depthSmoothingFactor = 0.05;
-    m_foregroundThresholdFactor = 0.02;
-    m_maxDepthJumpPercent = 0.1;
+    m_currentBuffer = nextBuffer;
+    m_currentHandFrame = static_cast<sensekit_handframe_wrapper_t*>(m_currentBuffer->data);
+    if (m_currentHandFrame != nullptr)
+    {
+        m_currentHandFrame->frame.handpoints = reinterpret_cast<sensekit_handpoint_t*>(&(m_currentHandFrame->frame_data));
+        m_currentHandFrame->frame.frameIndex = m_frameIndex;
+        m_currentHandFrame->frame.numHands = SENSEKIT_HANDS_MAX_HANDPOINTS;
+    }
+}
+
+void HandTracker::set_parameter(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t byteLength, sensekit_parameter_data_t* data)
+{
+}
+
+void HandTracker::get_parameter_size(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, /*out*/size_t& byteLength)
+{
+    byteLength = 20;
+}
+
+void HandTracker::get_parameter_data(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t byteLength, sensekit_parameter_data_t* data)
+{
+    char* charData = (char*)data;
+    for (int i = 0; i < byteLength; i++)
+    {
+        charData[i] = i;
+    }
+}
+
+void HandTracker::connection_added(sensekit_streamconnection_t* connection)
+{
+    int binLength = sizeof(sensekit_handframe_t) + SENSEKIT_HANDS_MAX_HANDPOINTS * sizeof(sensekit_handpoint_t);
+
+    sensekit_frame_t* nextBuffer = nullptr;
+    get_pluginService().create_stream_bin(m_handStream, binLength, &m_handBinId, &nextBuffer);
+    setNextBuffer(nextBuffer);
+}
+
+void HandTracker::connection_removed(sensekit_streamconnection_t* connection)
+{
+    //TODO need API for get bin client count...don't destroy if other clients assigned to it
+    get_pluginService().destroy_stream_bin(m_handStream, &m_handBinId, &m_currentBuffer);
+    setNextBuffer(m_currentBuffer);
 }
