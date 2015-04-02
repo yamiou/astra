@@ -1,7 +1,7 @@
 #ifndef SENSEKITCONTEXT_H
 #define SENSEKITCONTEXT_H
 
-#include <SenseKit.h>
+#include <sensekit_core.h>
 #include <atomic>
 #include "PluginService.h"
 #include "StreamSet.h"
@@ -22,11 +22,11 @@ namespace sensekit {
         update_fn update{nullptr};
 
         bool isValid()
-        {
-            return initialize != nullptr &&
-                   terminate != nullptr &&
-                   update != nullptr;
-        }
+            {
+                return initialize != nullptr &&
+                    terminate != nullptr &&
+                    update != nullptr;
+            }
     };
 
     class SenseKitContext
@@ -39,18 +39,19 @@ namespace sensekit {
         sensekit_status_t initialize();
         sensekit_status_t terminate();
 
-        sensekit_status_t open_streamset(const char* uri, sensekit_streamset_t*& streamset);
-        sensekit_status_t close_streamset(sensekit_streamset_t*& streamset);
+        sensekit_status_t open_streamset(const char* uri, sensekit_streamset_t*& streamSet);
+        sensekit_status_t close_streamset(sensekit_streamset_t*& streamSet);
 
-        sensekit_status_t open_stream(sensekit_streamset_t* streamset,
-                                      sensekit_stream_type_t type,
-                                      sensekit_stream_subtype_t subtype,
-                                      sensekit_streamconnection_t*& streamConnection);
+        sensekit_status_t create_reader(sensekit_streamset_t* streamSet, sensekit_reader_t*& reader);
+        sensekit_status_t destroy_reader(sensekit_reader_t*& reader);
 
-        sensekit_status_t close_stream(sensekit_streamconnection_t*& streamConnection);
+        sensekit_status_t get_stream(sensekit_reader_t* reader,
+                                     sensekit_stream_type_t type,
+                                     sensekit_stream_subtype_t subType,
+                                     sensekit_streamconnection_t*& streamConnection);
 
         sensekit_status_t open_frame(sensekit_streamconnection_t* streamConnection,
-                                     int timeout,
+                                     int timeoutMillis,
                                      sensekit_frame_ref_t*& frameRef);
 
         sensekit_status_t close_frame(sensekit_frame_ref_t*& frameRef);

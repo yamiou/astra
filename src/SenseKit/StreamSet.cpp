@@ -3,8 +3,6 @@
 #include <iostream>
 
 namespace sensekit {
-    StreamSet::StreamSet()
-    {}
 
     StreamConnection* StreamSet::open_stream_connection(StreamType type, StreamSubtype subtype)
     {
@@ -17,6 +15,14 @@ namespace sensekit {
         }
 
         return sk_stream->open();
+    }
+
+    bool StreamSet::close_stream_connection(StreamConnection* connection)
+    {
+        Stream* stream = connection->get_stream();
+        stream->close(connection);
+
+        return true;
     }
 
     bool StreamSet::has_stream_of_type_subtype(StreamType type, StreamSubtype subtype)
@@ -71,7 +77,7 @@ namespace sensekit {
         for (auto it = m_streamCollection.begin(); it != m_streamCollection.end(); ++it)
         {
             Stream* sk_stream = *it;
-            if (sk_stream->get_type() == type && (subtype == ANY_SUBTYPE || sk_stream->get_subtype() == subtype))
+            if (sk_stream->get_type() == type && (subtype == DEFAULT_SUBTYPE || sk_stream->get_subtype() == subtype))
             {
                 return sk_stream;
             }

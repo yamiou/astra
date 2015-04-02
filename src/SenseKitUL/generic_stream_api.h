@@ -1,29 +1,19 @@
 #ifndef GENERIC_STREAM_API_H
 #define GENERIC_STREAM_API_H
 
-#include "sensekit_types.h"
+#include "sensekit_core.h"
 
 template<typename TStreamType>
-sensekit_status_t sensekit_generic_stream_open(sensekit_streamset_t* streamset, TStreamType** stream,
-                                      sensekit_stream_type_t type, sensekit_stream_subtype_t subType)
+sensekit_status_t sensekit_generic_stream_get(sensekit_reader_t* reader,
+                                              TStreamType** stream,
+                                              sensekit_stream_type_t type,
+                                              sensekit_stream_subtype_t subType)
 {
-    sensekit_streamconnection_t* stream_connection;
-    sensekit_stream_open(streamset, type, subType, &stream_connection);
+    sensekit_streamconnection_t* connection;
+    sensekit_stream_get(reader, type, subType, &connection);
 
-    *stream = reinterpret_cast<TStreamType*>(stream_connection);
+    *stream = reinterpret_cast<TStreamType*>(connection);
 
-    return SENSEKIT_STATUS_SUCCESS;
-}
-
-template<typename TStreamType>
-sensekit_status_t sensekit_generic_stream_close(TStreamType** stream)
-{
-    sensekit_streamconnection_t* sk_stream_connection =
-        reinterpret_cast<sensekit_streamconnection_t*>(*stream);
-
-    sensekit_stream_close(&sk_stream_connection);
-
-    *stream = reinterpret_cast<TStreamType*>(sk_stream_connection);
     return SENSEKIT_STATUS_SUCCESS;
 }
 
@@ -31,9 +21,9 @@ template<typename TFrameWrapperType, typename TStreamType, typename TFrameType>
 sensekit_status_t sensekit_generic_frame_open(TStreamType* stream, int timeout, TFrameType** frame)
 {
     sensekit_frame_ref_t* frameRef;
-    sensekit_streamconnection_t* sk_stream_connection = reinterpret_cast<sensekit_streamconnection_t*>(stream);
+    sensekit_streamconnection_t* connection = reinterpret_cast<sensekit_streamconnection_t*>(stream);
 
-    sensekit_stream_frame_open(sk_stream_connection, timeout, &frameRef);
+    sensekit_stream_frame_open(connection, timeout, &frameRef);
 
     TFrameWrapperType* wrapper = reinterpret_cast<TFrameWrapperType*>(frameRef->frame->data);
     *frame = reinterpret_cast<TFrameType*>(&(wrapper->frame));
@@ -46,9 +36,9 @@ template<typename TStreamType, typename TFrameType>
 sensekit_status_t sensekit_generic_frame_open(TStreamType* stream, int timeout, TFrameType** frame)
 {
     sensekit_frame_ref_t* frameRef;
-    sensekit_streamconnection_t* sk_stream_connection = reinterpret_cast<sensekit_streamconnection_t*>(stream);
+    sensekit_streamconnection_t* connection = reinterpret_cast<sensekit_streamconnection_t*>(stream);
 
-    sensekit_stream_frame_open(sk_stream_connection, timeout, &frameRef);
+    sensekit_stream_frame_open(connection, timeout, &frameRef);
 
     *frame = reinterpret_cast<TFrameType*>(frameRef->frame->data);
     (*frame)->frameRef = frameRef;

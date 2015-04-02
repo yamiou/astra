@@ -1,7 +1,7 @@
 #ifndef PLUGINSERVICE_H
 #define PLUGINSERVICE_H
 
-#include <SenseKit.h>
+#include <sensekit_core.h>
 #include "Stream.h"
 #include "StreamBin.h"
 #include "Core/Signal.h"

@@ -1,4 +1,4 @@
-#include <SenseKit.h>
+#include <sensekit_core.h>
 #include "Stream.h"
 #include "StreamBin.h"
 

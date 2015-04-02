@@ -1,7 +1,6 @@
 #ifndef SENSEKIT_TYPES_H
 #define SENSEKIT_TYPES_H
 
-#include "sensekit_core.h"
 #include <stdint.h>
 #include <stddef.h>
 
@@ -9,6 +8,7 @@ const unsigned MAX_STRING_FIELD_LENGTH = 256;
 
 typedef struct _sensekit_streamset sensekit_streamset_t;
 typedef struct _sensekit_streamconnection sensekit_streamconnection_t;
+typedef struct _sensekit_reader sensekit_reader_t;
 
 typedef struct _sensekit_parameter_data sensekit_parameter_data_t;
 typedef int32_t sensekit_parameter_id;
@@ -17,8 +17,16 @@ typedef struct _sensekit_stream sensekit_stream_t;
 typedef int32_t sensekit_stream_type_t;
 typedef int32_t sensekit_stream_subtype_t;
 
+const sensekit_stream_subtype_t DEFAULT_SUBTYPE = -1;
+
 typedef sensekit_stream_type_t StreamType;
 typedef sensekit_stream_subtype_t StreamSubtype;
+
+struct sensekit_stream_typepair_t {
+    sensekit_stream_type_t type;
+    sensekit_stream_subtype_t subType;
+};
+
 typedef sensekit_stream_t StreamHandle;
 
 typedef sensekit_streamset_t StreamSetHandle;

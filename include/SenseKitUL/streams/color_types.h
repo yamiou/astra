@@ -1,7 +1,7 @@
 #ifndef COLOR_TYPES_H
 #define COLOR_TYPES_H
 
-#include <SenseKit.h>
+#include <sensekit_core.h>
 
 typedef struct _sensekit_colorframe {
     sensekit_frame_ref_t* frameRef;

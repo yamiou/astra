@@ -8,7 +8,6 @@ enum SENSEKIT_STREAM_TYPE {
     SENSEKIT_STREAM_COLOR = 2
 };
 
-const sensekit_stream_subtype_t ANY_SUBTYPE = -1;
 const sensekit_stream_subtype_t DEPTH_DEFAULT_SUBTYPE = 0;
 const sensekit_stream_subtype_t COLOR_DEFAULT_SUBTYPE = 0;
 

@@ -1,7 +1,7 @@
 ﻿#ifndef PLUGINBASE_H
 #define PLUGINBASE_H
 
-#include <SenseKit.h>
+#include <sensekit_core.h>
 #include "PluginServiceProxy.h"
 #include "StreamServiceProxy.h"
 

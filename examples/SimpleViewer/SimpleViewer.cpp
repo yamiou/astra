@@ -60,7 +60,7 @@ m_pTexMap(NULL)
 
 SampleViewer::~SampleViewer()
 {
-    sensekit_depth_close(&m_depthStream);
+    sensekit_reader_destroy(&m_reader);
     sensekit_streamset_close(&m_sensor);
     sensekit_terminate();
 
@@ -74,7 +74,9 @@ void SampleViewer::init(int argc, char **argv)
     sensekit_initialize();
 
     sensekit_streamset_open("1d27/0601@20/30", &m_sensor);
-    sensekit_depth_open(m_sensor, &m_depthStream);
+    sensekit_reader_create(m_sensor, &m_reader);
+
+    sensekit_depth_get(m_reader, &m_depthStream);
 
     int depthWidth = 320;
     int depthHeight = 240;
@@ -398,7 +400,7 @@ void SampleViewer::onKey(unsigned char key, int /*x*/, int /*y*/)
     {
     case 27:
         //shutdown sensekit
-        sensekit_depth_close(&m_depthStream);
+        sensekit_reader_destroy(&m_reader);
         sensekit_streamset_close(&m_sensor);
         sensekit_terminate();
         exit(1);

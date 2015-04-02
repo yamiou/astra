@@ -21,11 +21,11 @@ namespace sensekit {
 
         void set_bin(StreamBin* new_bin);
 
-        StreamBin* get_bin() { return m_bin; }
+        StreamBin* get_bin() const { return m_bin; }
 
-        StreamHandle* get_handle() { return m_handle; }
+        StreamHandle* get_handle() const { return m_handle; }
 
-        Stream* get_stream() { return m_stream; }
+        Stream* get_stream() const { return m_stream; }
     private:
         Stream* m_stream;
         StreamBin* m_bin{nullptr};

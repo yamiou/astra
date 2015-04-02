@@ -1,7 +1,7 @@
 #ifndef STREAMKITAPI_H
 #define STREAMKITAPI_H
 
-#include <SenseKit.h>
+#include <sensekit_defines.h>
 #include <Plugins/StreamServiceProxyBase.h>
 
 SENSEKIT_BEGIN_DECLS

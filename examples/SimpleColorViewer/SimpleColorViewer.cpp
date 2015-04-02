@@ -60,7 +60,7 @@ m_pTexMap(NULL)
 
 SimpleColorViewer::~SimpleColorViewer()
 {
-    sensekit_color_close(&m_colorStream);
+    sensekit_reader_destroy(&m_reader);
     sensekit_streamset_close(&m_sensor);
     sensekit_terminate();
 
@@ -74,7 +74,8 @@ void SimpleColorViewer::init(int argc, char **argv)
     sensekit_initialize();
 
     sensekit_streamset_open("1d27/0601@20/30", &m_sensor);
-    sensekit_color_open(m_sensor, &m_colorStream);
+    sensekit_reader_create(m_sensor, &m_reader);
+    sensekit_color_get(m_reader, &m_colorStream);
 
     int colorWidth = 320;
     int colorHeight = 240;
@@ -169,7 +170,7 @@ void SimpleColorViewer::onKey(unsigned char key, int /*x*/, int /*y*/)
     {
     case 27:
         //shutdown sensekit
-        sensekit_color_close(&m_colorStream);
+        sensekit_reader_destroy(&m_reader);
         sensekit_streamset_close(&m_sensor);
         sensekit_terminate();
         exit(1);

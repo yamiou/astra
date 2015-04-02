@@ -14,9 +14,8 @@ namespace sensekit {
     public:
         using StreamListPtr = std::unique_ptr<std::vector<Stream*> >;
 
-        StreamSet();
-
         StreamConnection* open_stream_connection(StreamType type, StreamSubtype subtype);
+        bool close_stream_connection(StreamConnection* connection);
 
         bool has_stream_of_type_subtype(StreamType type, StreamSubtype subtype);
 
@@ -39,7 +38,6 @@ namespace sensekit {
 
         StreamCollection m_streamCollection;
     };
-
 }
 
 #endif /* STREAMSET_H */

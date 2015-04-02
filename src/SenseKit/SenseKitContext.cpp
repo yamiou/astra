@@ -8,6 +8,7 @@
 #include <Plugins/PluginServiceProxyBase.h>
 #include "Core/shared_library.h"
 #include "Core/libs.h"
+#include "StreamReader.h"
 
 using std::cout;
 using std::endl;
@@ -20,8 +21,9 @@ namespace sensekit {
 
         proxy->open_streamset = &StreamServiceDelegate::open_streamset;
         proxy->close_streamset = &StreamServiceDelegate::close_streamset;
-        proxy->open_stream = &StreamServiceDelegate::open_stream;
-        proxy->close_stream = &StreamServiceDelegate::close_stream;
+        proxy->create_reader = &StreamServiceDelegate::create_reader;
+        proxy->destroy_reader = &StreamServiceDelegate::destroy_reader;
+        proxy->get_stream = &StreamServiceDelegate::get_stream;
         proxy->open_frame = &StreamServiceDelegate::open_frame;
         proxy->close_frame = &StreamServiceDelegate::close_frame;
         proxy->set_parameter = &StreamServiceDelegate::set_parameter;
@@ -94,43 +96,43 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::open_stream(sensekit_streamset_t* streamSet,
-                                                   sensekit_stream_type_t type,
-                                                   sensekit_stream_subtype_t subType,
-                                                   sensekit_streamconnection_t*& streamConnection)
+    sensekit_status_t SenseKitContext::create_reader(sensekit_streamset_t* streamSet,
+                                                    sensekit_reader_t*& reader)
     {
-        StreamConnection* connection = get_rootSet().open_stream_connection(
-            static_cast<StreamType>(type),
-            static_cast<StreamSubtype>(subType));
+        //TODO: Use this when streamSets are more than 1
+        //StreamSet* actualSet = static_cast<StreamSet*>(streamSet);
+        //reader = new StreamReader(actualSet);
 
-        if (connection)
-        {
-            streamConnection = reinterpret_cast<sensekit_streamconnection_t*>(connection);
-            return SENSEKIT_STATUS_SUCCESS;
-        }
-        else
-        {
-            streamConnection = nullptr;
-            return SENSEKIT_STATUS_INVALID_PARAMETER;
-        }
+        reader = reinterpret_cast<sensekit_reader_t*>(new StreamReader(get_rootSet()));
+
+        return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::close_stream(sensekit_streamconnection_t*& streamConnection)
+    sensekit_status_t SenseKitContext::destroy_reader(sensekit_reader_t*& reader)
     {
-        StreamConnection* connection = reinterpret_cast<StreamConnection*>(streamConnection);
+        StreamReader* actualReader = reinterpret_cast<StreamReader*>(reader);
+        if (actualReader != nullptr)
+        {
+            delete actualReader;
+            reader = nullptr;
+        }
 
-        Stream* stream = connection->get_stream();
-        //TODO stream bookkeeping and lifetime would be elsewhere
-        stream->close(connection);
+        return SENSEKIT_STATUS_SUCCESS;
+    }
 
-        streamConnection = nullptr;
-        //would find the depth plugin and call client removed event, and the plugin might destroy a bin
+    sensekit_status_t SenseKitContext::get_stream(sensekit_reader_t* reader,
+                                                  sensekit_stream_type_t type,
+                                                  sensekit_stream_subtype_t subType,
+                                                  sensekit_streamconnection_t*& connection)
+    {
+        StreamReader* actualReader = reinterpret_cast<StreamReader*>(reader);
+        connection = reinterpret_cast<sensekit_streamconnection_t*>(actualReader->get_stream(type, subType));
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
     sensekit_status_t SenseKitContext::open_frame(sensekit_streamconnection_t* streamConnection,
-                                                  int timeout,
+                                                  int timeoutMillis,
                                                   sensekit_frame_ref_t*& frameRef)
     {
         //we got the actual frame in the temp_update call.
@@ -186,40 +188,40 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::set_parameter(sensekit_streamconnection_t* streamConnection,
+    sensekit_status_t SenseKitContext::set_parameter(sensekit_streamconnection_t* connection,
                                                      sensekit_parameter_id parameterId,
                                                      size_t byteLength,
                                                      sensekit_parameter_data_t* data)
     {
-        StreamConnection* connection = reinterpret_cast<StreamConnection*>(streamConnection);
-        Stream* stream = connection->get_stream();
+        StreamConnection* actualConnection = reinterpret_cast<StreamConnection*>(connection);
+        Stream* stream = actualConnection->get_stream();
 
-        stream->set_parameter(connection, parameterId, byteLength, data);
+        stream->set_parameter(actualConnection, parameterId, byteLength, data);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::get_parameter_size(sensekit_streamconnection_t* streamConnection,
+    sensekit_status_t SenseKitContext::get_parameter_size(sensekit_streamconnection_t* connection,
                                                           sensekit_parameter_id parameterId,
                                                           size_t& byteLength)
     {
-        StreamConnection* connection = reinterpret_cast<StreamConnection*>(streamConnection);
-        Stream* stream = connection->get_stream();
+        StreamConnection* actualConnection = reinterpret_cast<StreamConnection*>(connection);
+        Stream* stream = actualConnection->get_stream();
 
-        stream->get_parameter_size(connection, parameterId, byteLength);
+        stream->get_parameter_size(actualConnection, parameterId, byteLength);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::get_parameter_data(sensekit_streamconnection_t* streamConnection,
+    sensekit_status_t SenseKitContext::get_parameter_data(sensekit_streamconnection_t* connection,
                                                           sensekit_parameter_id parameterId,
                                                           size_t byteLength,
                                                           sensekit_parameter_data_t* data)
     {
-        StreamConnection* connection = reinterpret_cast<StreamConnection*>(streamConnection);
-        Stream* stream = connection->get_stream();
+        StreamConnection* actualConnection = reinterpret_cast<StreamConnection*>(connection);
+        Stream* stream = actualConnection->get_stream();
 
-        stream->get_parameter_data(connection, parameterId, byteLength, data);
+        stream->get_parameter_data(actualConnection, parameterId, byteLength, data);
 
         return SENSEKIT_STATUS_SUCCESS;
     }

@@ -16,6 +16,8 @@ set(SenseKit_SOURCES
   StreamConnection.cpp
   StreamBin.h
   StreamBin.cpp
+  StreamReader.h
+  StreamReader.cpp
   Core/shared_library.h
   Core/shared_library_linux.cpp
   Core/shared_library_windows.cpp

@@ -1,4 +1,3 @@
-#include <SenseKit.h>
 #include <SenseKitAPI.h>
 #include <Plugins/StreamServiceProxy.h>
 #include <cassert>
@@ -37,21 +36,28 @@ SENSEKIT_API_PROXY sensekit_status_t sensekit_streamset_close(sensekit_streamset
     return get_api_proxy()->close_streamset(streamset);
 }
 
-SENSEKIT_API_PROXY sensekit_status_t sensekit_stream_open(sensekit_streamset_t* streamset,
-                                                          sensekit_stream_type_t type,
-                                                          sensekit_stream_subtype_t subtype,
-                                                          sensekit_streamconnection_t** connection)
+SENSEKIT_API_PROXY sensekit_status_t sensekit_reader_create(sensekit_streamset_t* streamSet, sensekit_reader_t** reader)
 {
-    return get_api_proxy()->open_stream(streamset,
-                                        type,
-                                        subtype,
-                                        connection);
+    return get_api_proxy()->create_reader(streamSet, reader);
 }
 
-SENSEKIT_API_PROXY sensekit_status_t sensekit_stream_close(sensekit_streamconnection_t** stream_connection)
+SENSEKIT_API_PROXY sensekit_status_t sensekit_reader_destroy(sensekit_reader_t** reader)
 {
-    return get_api_proxy()->close_stream(stream_connection);
+    return get_api_proxy()->destroy_reader(reader);
 }
+
+SENSEKIT_API_PROXY sensekit_status_t sensekit_stream_get(sensekit_reader_t* reader,
+                                                         sensekit_stream_type_t type,
+                                                         sensekit_stream_subtype_t subType,
+                                                         sensekit_streamconnection_t** connection)
+{
+    return get_api_proxy()->get_stream(reader,
+                                       type,
+                                       subType,
+                                       connection);
+}
+
+
 
 SENSEKIT_API_PROXY sensekit_status_t sensekit_stream_frame_open(sensekit_streamconnection_t* connection,
                                                                 int timeout,
