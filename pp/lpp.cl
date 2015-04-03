@@ -125,6 +125,8 @@ is replaced with replacement."
 	(newline)
 	nil
 )	
+(setq beginmarker "^^^BEGINREPLACE^^^")
+(setq endmarker "^^^ENDREPLACE^^^")
 
 ;(t)
 (let ((infile (open "test.cpp.lpp" :if-does-not-exist nil))
@@ -136,6 +138,7 @@ is replaced with replacement."
     (loop 
 		for line = (read-line infile nil)
         while line 
+		;TODO check for beginmarker and endmarker
 		do (setq currentpart (cons line currentpart))
 	)
 	(loop for line in (reverse currentpart)
