@@ -1,5 +1,5 @@
 
-(defstruct param type name)
+(defstruct param type name deref)
 (defstruct funcdef funcname params returntype)
 
 (defun partial (func &rest args1)
@@ -46,12 +46,17 @@ is replaced with replacement."
     )
 )
 
-(defun format-paramitem-name (p)
-	(format nil "~A" (param-name p))
+(defun format-paramitem-name (deref p)
+	(if (and deref (param-deref p))
+		;then
+		(format nil "*~A" (param-name p))
+		;else
+		(format nil "~A" (param-name p))
+	)
 )
 
-(defun format-paramlist-name (params)
-	(format nil "~{~A~^, ~}" (mapcar #'format-paramitem-name params))
+(defun format-paramlist-name (deref params)
+	(format nil "~{~A~^, ~}" (mapcar (partial #'format-paramitem-name deref) params))
 )
 
 (defun format-paramitem-full (p)
@@ -62,7 +67,26 @@ is replaced with replacement."
 	(format nil "~{~A~^, ~}" (mapcar #'format-paramitem-full params))
 )
 
-(defun formatmethod (lineformat funcdata) 
+(defstruct lppmacro macro filter)
+
+(setq replacement-macros (list
+	(make-lppmacro :macro "^RETURN^"				:filter (lambda (fd) (funcdef-returntype fd)))
+	(make-lppmacro :macro "^FUNC^"	 				:filter (lambda (fd) (funcdef-funcname fd)))
+	(make-lppmacro :macro "^PARAMS^"				:filter (lambda (fd) (format-paramlist-full (funcdef-params fd))))
+	(make-lppmacro :macro "^PARAMS-TYPES^" 			:filter (lambda (fd) (format-paramlist-type (funcdef-params fd))))
+	(make-lppmacro :macro "^PARAM-NAMES^" 			:filter (lambda (fd) (format-paramlist-name nil (funcdef-params fd))))
+	(make-lppmacro :macro "^PARAM-NAMES-DEREF^" 	:filter (lambda (fd) (format-paramlist-name T (funcdef-params fd))))
+))
+
+(defun formatmethod (lineformat funcdata)
+	(loop for m in replacement-macros
+			do
+				(setq lineformat (replace-all lineformat (lppmacro-macro m) (funcall (lppmacro-filter m) funcdata)))
+	)
+	lineformat
+)
+
+(defun formatmethod2 (lineformat funcdata) 
 	(replace-all 
 		(replace-all 
 			(replace-all 
@@ -110,15 +134,6 @@ is replaced with replacement."
 )
 
 (load "apidef.cl")
-
-(setq f1 "^RETURN^ ^FUNC^(^PARAMS^);
-")
-(setq f2 "^RETURN^ sensekit_^FUNC^(^PARAMS^) {
-	return g_Context->^FUNC^(^PARAM-NAMES^);
-}
-")
-(setq f3 "^RETURN^ (*^FUNC^)(void*^PARAM-TYPES^);
-")
 
 (defun concat-string-list (s)
 	(format nil "~{~A~^~%~}" s)
@@ -188,8 +203,7 @@ is replaced with replacement."
 				)
 		)
 		(loop for line in (reverse filelines)
-			  do ;(format t "~A~%" line)
-				(write-line line outfile)
+			  do (write-line line outfile)
 		)
 		(close infile)
 		(close outfile))

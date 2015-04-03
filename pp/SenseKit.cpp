@@ -8,11 +8,11 @@ static sensekit::SenseKitContext g_Context;
 SENSEKIT_BEGIN_DECLS
 
 SENSEKIT_API sensekit_status_t sensekit_open_frame(sk_stream* stream, sk_frame** frame) {
-	return g_Context.open_frame(stream, frame);
+	return g_Context.open_frame(stream, *frame);
 }
 
 SENSEKIT_API sensekit_status_t sensekit_close_frame(sk_frame** frame) {
-	return g_Context.close_frame(frame);
+	return g_Context.close_frame(*frame);
 }
 
 SENSEKIT_API sensekit_status_t sensekit_initialize() {
