@@ -26,9 +26,9 @@ int main(int argc, char** argv)
 
         sensekit::DepthFrame depthFrame = frameRef.get<sensekit::DepthFrame>();
 
-        int width = depthFrame.getResolutionX();
-        int height = depthFrame.getResolutionY();
-        int frameIndex = depthFrame.getFrameIndex();
+        int width = depthFrame.get_resolutionX();
+        int height = depthFrame.get_resolutionY();
+        int frameIndex = depthFrame.get_frameIndex();
 
         size_t index = ((width * (height / 2)) + (width / 2));
         short middle = depthFrame.data()[index];

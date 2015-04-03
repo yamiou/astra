@@ -14,21 +14,10 @@ namespace sensekit {
     {
         assert (stream != nullptr);
 
-        m_connection = new sensekit_streamconnection_t;
-        m_connection->handle =
+        m_connection.handle =
             reinterpret_cast<sensekit_streamconnection_handle*>(this);
-        m_connection->desc.type = m_stream->get_type();
-        m_connection->desc.subType = m_stream->get_subtype();
-    }
-
-    size_t StreamConnection::get_hash() const
-    {
-        assert(m_connection != nullptr);
-
-        std::size_t h1 = std::hash<sensekit_stream_type_t>()(m_connection->desc.type);
-        std::size_t h2 = std::hash<sensekit_stream_subtype_t>()(m_connection->desc.subType);
-
-        return h1 ^ (h2 << 1);
+        m_connection.desc.type = m_stream->get_type();
+        m_connection.desc.subType = m_stream->get_subtype();
     }
 
     sensekit_frame_ref_t* StreamConnection::lock()
@@ -37,7 +26,7 @@ namespace sensekit {
             return &m_currentFrame;
 
         m_currentFrame.frame = m_bin->lock_front_buffer();
-        m_currentFrame.streamConnection = m_connection;
+        m_currentFrame.streamConnection = &m_connection;
 
         m_locked = true;
 
@@ -68,9 +57,28 @@ namespace sensekit {
         }
     }
 
+    void StreamConnection::set_parameter(sensekit_parameter_id id,
+                                         size_t byteLength,
+                                         sensekit_parameter_data_t* data)
+    {
+        m_stream->set_parameter(this, id, byteLength, data);
+    }
+
+    void StreamConnection::get_parameter_size(sensekit_parameter_id id,
+                                              size_t& byteLength)
+    {
+        m_stream->get_parameter_size(this, id, byteLength);
+    }
+
+    void StreamConnection::get_parameter_data(sensekit_parameter_id id,
+                                              size_t byteLength,
+                                              sensekit_parameter_data_t* data)
+    {
+        m_stream->get_parameter_data(this, id, byteLength, data);
+    }
+
     StreamConnection::~StreamConnection()
     {
         set_bin(nullptr);
-        delete m_connection;
     }
 }

@@ -15,23 +15,31 @@ namespace sensekit {
         StreamConnection(Stream* stream);
         ~StreamConnection();
 
+        void start() {};
+        void stop() {};
+
         sensekit_frame_ref_t* lock();
         void unlock();
 
         void set_bin(StreamBin* new_bin);
-
         StreamBin* get_bin() const { return m_bin; }
 
-        StreamHandle* get_handle() const { return m_handle; }
+        sensekit_streamconnection_t* get_handle() { return &m_connection; }
+        const sensekit_stream_desc_t& get_description() { return m_connection.desc; }
 
-        Stream* get_stream() const { return m_stream; }
+        void set_parameter(sensekit_parameter_id id,
+                           size_t byteLength,
+                           sensekit_parameter_data_t* data);
 
-        sensekit_streamconnection_t* get_handle() { return m_connection; }
-        sensekit_stream_desc_t& get_description() const { return m_connection->desc; }
-        size_t get_hash() const;
+        void get_parameter_size(sensekit_parameter_id id,
+                                size_t& byteLength);
+
+        void get_parameter_data(sensekit_parameter_id id,
+                                size_t byteLength,
+                                sensekit_parameter_data_t* data);
 
     private:
-        sensekit_streamconnection_t* m_connection{nullptr};
+        sensekit_streamconnection_t m_connection;
         sensekit_frame_ref_t m_currentFrame;
 
         bool m_locked{false};

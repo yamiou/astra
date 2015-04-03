@@ -1,17 +1,12 @@
 #include "SenseKitContext.h"
-#include <iostream>
 #include <cassert>
-#include "StreamConnection.h"
-#include "StreamBin.h"
-#include "StreamServiceDelegate.h"
-#include <Plugins/StreamServiceProxyBase.h>
-#include <Plugins/PluginServiceProxyBase.h>
 #include "Core/shared_library.h"
 #include "Core/libs.h"
 #include "StreamReader.h"
-
-using std::cout;
-using std::endl;
+#include "StreamConnection.h"
+#include "StreamServiceDelegate.h"
+#include <Plugins/StreamServiceProxyBase.h>
+#include <Plugins/PluginServiceProxyBase.h>
 
 namespace sensekit {
 
@@ -145,11 +140,27 @@ namespace sensekit {
 
     sensekit_status_t SenseKitContext::start_stream(sensekit_streamconnection_t* connection)
     {
+        assert(connection != nullptr);
+        assert(connection->handle != nullptr);
+
+        StreamConnection* actualConnection =
+            reinterpret_cast<StreamConnection*>(connection->handle);
+
+        actualConnection->start();
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 
     sensekit_status_t SenseKitContext::stop_stream(sensekit_streamconnection_t* connection)
     {
+        assert(connection != nullptr);
+        assert(connection->handle != nullptr);
+
+        StreamConnection* actualConnection =
+            reinterpret_cast<StreamConnection*>(connection->handle);
+
+        actualConnection->stop();
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 
@@ -161,10 +172,6 @@ namespace sensekit {
 
         StreamReader* actualReader = reinterpret_cast<StreamReader*>(reader);
 
-        //we got the actual frame in the temp_update call.
-        //for real, we would do some type of double buffer swap on the client side,
-        //copy the latest frame (if newer) from the daemon
-        //the daemon might reference count this
         actualReader->lock();
         frame = reader;
 
@@ -223,10 +230,7 @@ namespace sensekit {
         StreamConnection* actualConnection =
             reinterpret_cast<StreamConnection*>(connection->handle);
 
-        Stream* stream = actualConnection->get_stream();
-
-        //TODO: This could perhaps change bin, thus underlying connection parameters (desc)
-        stream->set_parameter(actualConnection, parameterId, byteLength, data);
+        actualConnection->set_parameter(parameterId, byteLength, data);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -241,9 +245,7 @@ namespace sensekit {
         StreamConnection* actualConnection =
             reinterpret_cast<StreamConnection*>(connection->handle);
 
-        Stream* stream = actualConnection->get_stream();
-
-        stream->get_parameter_size(actualConnection, parameterId, byteLength);
+        actualConnection->get_parameter_size(parameterId, byteLength);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -259,9 +261,7 @@ namespace sensekit {
         StreamConnection* actualConnection =
             reinterpret_cast<StreamConnection*>(connection->handle);
 
-        Stream* stream = actualConnection->get_stream();
-
-        stream->get_parameter_data(actualConnection, parameterId, byteLength, data);
+        actualConnection->get_parameter_data(parameterId, byteLength, data);
 
         return SENSEKIT_STATUS_SUCCESS;
     }

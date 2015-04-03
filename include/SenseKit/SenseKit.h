@@ -92,6 +92,25 @@ namespace sensekit {
     {
         return StreamReader(*this);
     }
+
+    class DataStream
+    {
+    public:
+        DataStream(sensekit_streamconnection_t* connection)
+            : m_connection(connection) {}
+
+        void start()
+            {
+                sensekit_stream_start(m_connection);
+            }
+        void stop()
+            {
+                sensekit_stream_stop(m_connection);
+            }
+
+    private:
+        sensekit_streamconnection_t* m_connection;
+    };
 }
 
 #endif // SENSEKIT_H
