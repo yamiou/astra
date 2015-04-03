@@ -6,6 +6,16 @@
 #include <iostream>
 #include "../key_handler.h"
 
+void print_depth(sensekit_depthframe_t* depthFrame)
+{
+    int width = depthFrame->width;
+    int height = depthFrame->height;
+
+    size_t index = ((width * (height / 2)) + (width / 2));
+    short middle = depthFrame->data[index];
+    std::cout << "index: " << depthFrame->frameIndex << " value: " << middle << std::endl;
+}
+
 int main(int argc, char** argv)
 {
     set_key_handler();
@@ -37,12 +47,7 @@ int main(int argc, char** argv)
         sensekit_depthframe_t* depthFrame;
         sensekit_depth_frame_get(frame, &depthFrame);
 
-        int width = depthFrame->width;
-        int height = depthFrame->height;
-
-        size_t index = ((width * (height / 2)) + (width / 2));
-        short middle = depthFrame->data[index];
-        std::cout << "index: " << depthFrame->frameIndex << " value: " << middle << std::endl;
+        print_depth(depthFrame);
 
         sensekit_reader_close_frame(&frame);
 
