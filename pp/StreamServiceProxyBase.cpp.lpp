@@ -1,0 +1,17 @@
+/* ^^^AUTOGENHEADER^^^ */
+#ifndef STREAMSERVICEPROXYBASE_H
+#define STREAMSERVICEPROXYBASE_H
+
+#include <sensekit_core.h>
+
+struct StreamServiceProxyBase
+{
+    void* streamService;
+
+^^^BEGINREPLACE^^^
+    ^RETURN^ (*^FUNC^)(void*^PARAM-TYPES^);
+	
+^^^ENDREPLACE^^^
+};
+
+#endif /* STREAMSERVICEPROXYBASE_H */

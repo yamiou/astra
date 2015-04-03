@@ -1,4 +1,5 @@
-include "SenseKitContext.h"
+/* ^^^AUTOGENHEADER^^^ */
+#include "SenseKitContext.h"
 #include <Plugins/StreamServiceProxyBase.h>
 #include <SenseKitAPI.h>
 
@@ -7,9 +8,9 @@ static sensekit::SenseKitContext g_Context;
 SENSEKIT_BEGIN_DECLS
 
 ^^^BEGINREPLACE^^^
-^RETURN^ sensekit_^FUNC^(^PARAMS^) {
-	return g_Context->^FUNC^(^PARAMS^);
+SENSEKIT_API ^RETURN^ sensekit_^FUNC^(^PARAMS^) {
+	return g_Context.^FUNC^(^PARAM-NAMES^);
 }
-^^^ENDREPLACE^^^
 
+^^^ENDREPLACE^^^
 SENSEKIT_END_DECLS

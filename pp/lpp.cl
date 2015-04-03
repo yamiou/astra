@@ -1,8 +1,5 @@
-(defpackage :com.orbbec.sdk
-  (:use :common-lisp))
-
 (defstruct param type name)
-(defstruct code funcname params returntype)
+(defstruct funcdef funcname params returntype)
 
 (defun partial (func &rest args1)
    (lambda (&rest args2) (apply func (append args1 args2)))
@@ -29,9 +26,9 @@ is replaced with replacement."
 			
 (defun formatmethod2 (lineformat funcdata) 
 	(format nil lineformat 
-		(code-returntype funcdata) 
-		(code-funcname funcdata) 
-		(code-params funcdata)
+		(funcdef-returntype funcdata) 
+		(funcdef-funcname funcdata) 
+		(funcdef-params funcdata)
 	)
 )
 
@@ -40,7 +37,12 @@ is replaced with replacement."
 )
 
 (defun format-paramlist-type (params)
-	(format nil "~{~A~^, ~}" (mapcar #'format-paramitem-type params))
+	(if params
+		  (concatenate 'string ", " 
+			(format nil "~{~A~^, ~}" (mapcar #'format-paramitem-type params))
+		   )
+		   ""
+    )
 )
 
 (defun format-paramitem-name (p)
@@ -65,37 +67,35 @@ is replaced with replacement."
 			(replace-all 
 				(replace-all 
 					(replace-all lineformat 
-						"^RETURN^" (code-returntype funcdata)
+						"^RETURN^" (funcdef-returntype funcdata)
 					)
-					"^FUNC^" (code-funcname funcdata)
+					"^FUNC^" (funcdef-funcname funcdata)
 				)
-				"^PARAMS^" (format-paramlist-full (code-params funcdata))
+				"^PARAMS^" (format-paramlist-full (funcdef-params funcdata))
 			)
-			"^PARAM-NAMES^" (format-paramlist-name (code-params funcdata))
+			"^PARAM-NAMES^" (format-paramlist-name (funcdef-params funcdata))
 		)
-		"^PARAM-TYPES^" (format-paramlist-type (code-params funcdata))
+		"^PARAM-TYPES^" (format-paramlist-type (funcdef-params funcdata))
 	)
 )
 
 (defun formatmethods (lineformat funclist) 
-	(map 'list 
+	(mapcar 
 		(partial #'formatmethod lineformat) funclist
 	)
 )
 
-(setq c1 (make-code :returntype "sk_status"
-					:funcname "open_frame" 
-					:params (list (make-param :type "sk_stream*" :name "stream")
-								  (make-param :type "sk_frame**" :name "frame")
-							)
-		)
+(setq funcs '())
+
+(defun add-func (&rest args)
+	(setq funcs
+		  (cons 
+				(apply #'make-funcdef args)
+			funcs)
+	)
 )
 
-(setq c2 (make-code :returntype "sk_status"
-					:funcname "close_frame" 
-					:params (list (make-param :type "sk_frame**" :name "frame" ))
-		)
-)
+(load "apidef.cl")
 
 (setq f1 "^RETURN^ ^FUNC^(^PARAMS^);
 ")
@@ -103,13 +103,15 @@ is replaced with replacement."
 	return g_Context->^FUNC^(^PARAM-NAMES^);
 }
 ")
-(setq f3 "^RETURN^ (*^FUNC^)(void*, ^PARAM-TYPES^);
+(setq f3 "^RETURN^ (*^FUNC^)(void*^PARAM-TYPES^);
 ")
 
-(setq funcs (list c1 c2))
+(defun concat-string-list (s)
+	(format nil "~{~A~^~%~}" s)
+)
 
 (defun outputfuncs (f) 
-	(map nil #'write-string f)
+	(write-string (concat-string-list f))
 )
 
 (defun _ () (load "lpp.cl" :verbose nil))
@@ -125,24 +127,65 @@ is replaced with replacement."
 	(newline)
 	nil
 )	
-(setq beginmarker "^^^BEGINREPLACE^^^")
-(setq endmarker "^^^ENDREPLACE^^^")
+(setq begin-marker "^^^BEGINREPLACE^^^")
+(setq end-marker "^^^ENDREPLACE^^^")
+(setq auto-header-marker "^^^AUTOGENHEADER^^^")
+
+(defun filter-line (line filename)
+	(replace-all line auto-header-marker (format nil "THIS FILE AUTO-GENERATED FROM ~A. DO NOT EDIT." filename))
+)
+
+(defmacro prepend-into (var value)
+	`(setq ,var (cons ,value ,var))
+)
+
+(defun process-file (infilename)
+	(let ((infile (open infilename :if-does-not-exist nil))
+		  (filelines nil)
+		  (templatelines nil)
+		  (template-status 0)
+		  (doneparts ())
+		  )
+	  (when infile
+		(loop 
+			for line = (read-line infile nil)
+			while line 
+			do 
+				(if (= template-status 0)
+					(if (equal begin-marker line)
+						;then
+						(progn 
+							(setq template-status 1)
+						)
+						;else
+						(prepend-into filelines (filter-line line infilename))
+					)
+					(if (equal end-marker line)
+						;then
+						(progn 
+							(setq template-status 0)
+							;expand template
+							;(prepend-into filelines (concat-string-list (formatmethods templatelines funcs)))
+							(mapcar 
+								(lambda (v) (prepend-into filelines v))
+								(formatmethods (concat-string-list (reverse templatelines)) funcs)
+							)
+							;(outputfuncs (formatmethods (concat-string-list (reverse templatelines)) funcs))
+						)
+						;else
+						(prepend-into templatelines line)
+					)
+				)
+		)
+		(loop for line in (reverse filelines)
+			  do (format t "~A~%" line)
+		)
+		(close infile))
+	)
+)
 
 ;(t)
-(let ((infile (open "test.cpp.lpp" :if-does-not-exist nil))
-	  (parts '(nil nil))
-	  (currentpart nil)
-	  (doneparts ())
-	  )
-  (when infile
-    (loop 
-		for line = (read-line infile nil)
-        while line 
-		;TODO check for beginmarker and endmarker
-		do (setq currentpart (cons line currentpart))
-	)
-	(loop for line in (reverse currentpart)
-		  do (format t "~a~%" line)
-	)
-    (close infile))
+(defun t2 ()
+	(process-file "test2.cpp.lpp")
 )
+(t2)
