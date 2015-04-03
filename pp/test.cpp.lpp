@@ -1,0 +1,15 @@
+include "SenseKitContext.h"
+#include <Plugins/StreamServiceProxyBase.h>
+#include <SenseKitAPI.h>
+
+static sensekit::SenseKitContext g_Context;
+
+SENSEKIT_BEGIN_DECLS
+
+^^^BEGINREPLACE^^^
+^RETURN^ sensekit_^FUNC^(^PARAMS^) {
+	return g_Context->^FUNC^(^PARAMS^);
+}
+^^^ENDREPLACE^^^
+
+SENSEKIT_END_DECLS

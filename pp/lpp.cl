@@ -126,4 +126,20 @@ is replaced with replacement."
 	nil
 )	
 
-(t)
+;(t)
+(let ((infile (open "test.cpp.lpp" :if-does-not-exist nil))
+	  (parts '(nil nil))
+	  (currentpart nil)
+	  (doneparts ())
+	  )
+  (when infile
+    (loop 
+		for line = (read-line infile nil)
+        while line 
+		do (setq currentpart (cons line currentpart))
+	)
+	(loop for line in (reverse currentpart)
+		  do (format t "~a~%" line)
+	)
+    (close infile))
+)
