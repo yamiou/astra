@@ -5,6 +5,7 @@
 #include "StreamSet.h"
 #include "SynchronizedFrame.h"
 #include <set>
+#include <cassert>
 
 namespace sensekit {
 
@@ -16,13 +17,43 @@ namespace sensekit {
 
         StreamSet& get_streamSet() const { return m_streamSet; }
 
-        StreamConnection* get_stream(sensekit_stream_type_t type,
-                                     sensekit_stream_subtype_t subType);
+        sensekit_streamconnection_t* get_stream(sensekit_stream_desc_t description);
 
-        SynchronizedFrame* get_latest_frame()
+        sensekit_reader_frame_t* lock()
             {
+                sensekit_reader_frame_t* frame = new sensekit_reader_frame_t;
+                int count = 0;
 
-            };
+                for(auto connection : m_streamConnections)
+                {
+                    frame->streamFrames[count++] = connection->lock();
+                }
+
+                frame->reader =
+                    reinterpret_cast<sensekit_reader_t*>(this);
+
+                frame->numStreams = count;
+
+                return frame;
+            }
+
+        void unlock(sensekit_reader_frame_t* frame)
+            {
+                assert(frame != nullptr);
+
+                for(int i = 0; i < frame->numStreams; i++)
+                {
+                    StreamConnection* underlyingConnection =
+                        reinterpret_cast<StreamConnection*>(
+                            frame->streamFrames[i]->streamConnection);
+
+                    assert(underlyingConnection != nullptr);
+
+                    underlyingConnection->unlock(frame->streamFrames[i]);
+                }
+
+                delete frame;
+            }
 
     private:
         StreamConnection* find_stream_of_type(sensekit_stream_type_t type,

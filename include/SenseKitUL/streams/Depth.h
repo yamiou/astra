@@ -12,21 +12,23 @@ namespace sensekit {
     public:
         explicit DepthStream(sensekit_streamconnection_t* connection)
             {
+                m_connection = connection;
                 m_pStreamConnection = reinterpret_cast<sensekit_depthstream_t*>(connection);
             }
 
-        static const sensekit_stream_type_t id = SENSEKIT_STREAM_TYPE::SENSEKIT_STREAM_DEPTH;
+        static const sensekit_stream_type_t id = sensekit_core_stream_types::SENSEKIT_STREAM_DEPTH;
 
         void start()
             {
-                sensekit_depth_start(m_pStreamConnection);
+                sensekit_stream_start(m_connection);
             }
         void stop()
             {
-                sensekit_depth_stop(m_pStreamConnection);
+                sensekit_stream_stop(m_connection);
             }
 
     private:
+        sensekit_streamconnection_t* m_connection;
         sensekit_depthstream_t* m_pStreamConnection;
     };
 

@@ -6,14 +6,11 @@
 
 SENSEKIT_BEGIN_DECLS
 
-SENSEKIT_API_EX sensekit_status_t sensekit_color_get(sensekit_reader_t* reader,
-                                                     sensekit_colorstream_t** stream);
+SENSEKIT_API_EX sensekit_status_t sensekit_color_stream_get(sensekit_reader_t* reader,
+                                                           sensekit_colorstream_t** colorStream);
 
-SENSEKIT_API_EX sensekit_status_t sensekit_color_frame_open(sensekit_colorstream_t* stream,
-                                                            int timeoutMillis,
-                                                            sensekit_colorframe_t** frame);
-
-SENSEKIT_API_EX sensekit_status_t sensekit_color_frame_close(sensekit_colorframe_t** frame);
+SENSEKIT_API_EX sensekit_status_t sensekit_color_frame_get(sensekit_reader_frame_t* readerFrame,
+                                                           sensekit_colorframe_t** colorFrame);
 
 SENSEKIT_END_DECLS
 

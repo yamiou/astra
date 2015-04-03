@@ -75,7 +75,7 @@ void SimpleColorViewer::init(int argc, char **argv)
 
     sensekit_streamset_open("1d27/0601@20/30", &m_sensor);
     sensekit_reader_create(m_sensor, &m_reader);
-    sensekit_color_get(m_reader, &m_colorStream);
+    sensekit_color_stream_get(m_reader, &m_colorStream);
 
     int colorWidth = 320;
     int colorHeight = 240;
@@ -98,7 +98,9 @@ void SimpleColorViewer::run()      //Does not return
 void SimpleColorViewer::display()
 {
     sensekit_temp_update();
-    sensekit_color_frame_open(m_colorStream, 30, &m_colorFrame);
+    sensekit_reader_frame_t* frame;
+    sensekit_reader_open_frame(m_reader, 30, &frame);
+    sensekit_color_frame_get(frame, &m_colorFrame);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -130,7 +132,7 @@ void SimpleColorViewer::display()
         pTexRow += m_nTexMapX;
     }
 
-    sensekit_color_frame_close(&m_colorFrame);
+    sensekit_reader_close_frame(&frame);
 
     glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);

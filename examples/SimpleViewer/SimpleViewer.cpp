@@ -76,7 +76,7 @@ void SampleViewer::init(int argc, char **argv)
     sensekit_streamset_open("1d27/0601@20/30", &m_sensor);
     sensekit_reader_create(m_sensor, &m_reader);
 
-    sensekit_depth_get(m_reader, &m_depthStream);
+    sensekit_depth_stream_get(m_reader, &m_depthStream);
 
     int depthWidth = 320;
     int depthHeight = 240;
@@ -284,7 +284,9 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame)
 void SampleViewer::display()
 {
     sensekit_temp_update();
-    sensekit_depth_frame_open(m_depthStream, 30, &m_depthFrame);
+    sensekit_reader_frame_t* frame;
+    sensekit_reader_open_frame(m_reader, 30, &frame);
+    sensekit_depth_frame_get(frame, &m_depthFrame);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -359,7 +361,7 @@ void SampleViewer::display()
         pTexRow += m_nTexMapX;
     }
 
-    sensekit_depth_frame_close(&m_depthFrame);
+    sensekit_reader_close_frame(&frame);
 
     glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);

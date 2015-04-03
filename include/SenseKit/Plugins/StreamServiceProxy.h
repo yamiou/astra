@@ -36,12 +36,26 @@ namespace sensekit {
                 return StreamServiceProxyBase::destroy_reader(streamService, reader);
             }
 
-        sensekit_status_t open_frame(sensekit_streamconnection_t* connection,
+        sensekit_status_t open_frame(sensekit_reader_t* reader,
                                      int timeoutMillis,
-                                     sensekit_frame_ref_t** frameRef)
+                                     sensekit_reader_frame_t** frame)
             {
-                return StreamServiceProxyBase::open_frame(streamService, connection, timeoutMillis, frameRef);
+                return StreamServiceProxyBase::open_frame(streamService, reader, timeoutMillis, frame);
             }
+
+        sensekit_status_t close_frame(sensekit_reader_frame_t** frame)
+            {
+                return StreamServiceProxyBase::close_frame(streamService, frame);
+            }
+
+        sensekit_status_t get_frame(sensekit_reader_frame_t* frame,
+                                    sensekit_stream_type_t type,
+                                    sensekit_stream_subtype_t subType,
+                                    sensekit_frame_ref_t** frameRef)
+            {
+                return StreamServiceProxyBase::get_frame(streamService, frame, type, subType, frameRef);
+            }
+
 
         sensekit_status_t start_stream(sensekit_streamconnection_t* connection)
             {
@@ -51,11 +65,6 @@ namespace sensekit {
         sensekit_status_t stop_stream(sensekit_streamconnection_t* connection)
             {
                 return StreamServiceProxyBase::stop_stream(streamService, connection);
-            }
-
-        sensekit_status_t close_frame(sensekit_frame_ref_t** frameRef)
-            {
-                return StreamServiceProxyBase::close_frame(streamService, frameRef);
             }
 
         sensekit_status_t temp_update()

@@ -24,21 +24,21 @@ namespace sensekit {
         return nullptr;
     }
 
-    StreamConnection* StreamReader::get_stream(sensekit_stream_type_t type,
-                                               sensekit_stream_subtype_t subType)
+    sensekit_streamconnection_t* StreamReader::get_stream(sensekit_stream_desc_t description)
     {
-        StreamConnection* connection = find_stream_of_type(type, subType);
-
+        StreamConnection* connection = find_stream_of_type(description.type,
+                                                           description.subType);
         if (connection != nullptr)
-            return connection;
+            return connection->get_handle();
 
-        connection = m_streamSet.open_stream_connection(type, subType);
+        connection = m_streamSet.open_stream_connection(description.type,
+                                                        description.subType);
         if (connection != nullptr)
         {
             m_streamConnections.insert(connection);
         }
 
-        return connection;
+        return connection->get_handle();;
     }
 
     bool StreamReader::close_stream(StreamConnection* connection)

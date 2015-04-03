@@ -3,7 +3,7 @@
 
 #include <sensekit_types.h>
 
-enum SENSEKIT_STREAM_TYPE {
+enum sensekit_core_stream_types {
     SENSEKIT_STREAM_DEPTH = 1,
     SENSEKIT_STREAM_COLOR = 2
 };

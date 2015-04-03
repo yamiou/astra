@@ -60,16 +60,24 @@ SENSEKIT_API sensekit_status_t sensekit_stream_stop(sensekit_streamconnection_t*
 
 }
 
-SENSEKIT_API sensekit_status_t sensekit_stream_frame_open(sensekit_streamconnection_t* connection,
+SENSEKIT_API sensekit_status_t sensekit_reader_open_frame(sensekit_reader_t* reader,
                                                           int timeoutMillis,
-                                                          sensekit_frame_ref_t** frame)
+                                                          sensekit_reader_frame_t** frame)
 {
-    return g_Context.open_frame(connection, timeoutMillis, *frame);
+    return g_Context.open_frame(reader, timeoutMillis, *frame);
 }
 
-SENSEKIT_API sensekit_status_t sensekit_stream_frame_close(sensekit_frame_ref_t** frame)
+SENSEKIT_API sensekit_status_t sensekit_reader_close_frame(sensekit_reader_frame_t** frame)
 {
     return g_Context.close_frame(*frame);
+}
+
+SENSEKIT_API sensekit_status_t sensekit_reader_get_frame(sensekit_reader_frame_t* frame,
+                                                         sensekit_stream_type_t type,
+                                                         sensekit_stream_subtype_t subType,
+                                                         sensekit_frame_ref_t** frameRef)
+{
+
 }
 
 SENSEKIT_API sensekit_status_t sensekit_temp_update()

@@ -3,6 +3,7 @@
 
 #include <sensekit_core.h>
 
+typedef sensekit_streamconnection_t sensekit_colorstream_t;
 typedef struct _sensekit_colorframe {
     sensekit_frame_ref_t* frameRef;
     uint32_t frameIndex;
@@ -11,7 +12,5 @@ typedef struct _sensekit_colorframe {
     uint8_t bpp;
     uint8_t* data;
 } sensekit_colorframe_t;
-
-typedef struct _sensekit_colorstream sensekit_colorstream_t;
 
 #endif // COLOR_TYPES_H

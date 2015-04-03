@@ -53,11 +53,16 @@ namespace sensekit {
         sensekit_status_t start_stream(sensekit_streamconnection_t* connection);
         sensekit_status_t stop_stream(sensekit_streamconnection_t* connection);
 
-        sensekit_status_t open_frame(sensekit_streamconnection_t* connection,
+        sensekit_status_t open_frame(sensekit_reader_t* reader,
                                      int timeoutMillis,
-                                     sensekit_frame_ref_t*& frameRef);
+                                     sensekit_reader_frame_t*& frame);
 
-        sensekit_status_t close_frame(sensekit_frame_ref_t*& frameRef);
+        sensekit_status_t close_frame(sensekit_reader_frame_t*& frame);
+
+        sensekit_status_t get_frame(sensekit_reader_frame_t* frame,
+                                    sensekit_stream_type_t type,
+                                    sensekit_stream_subtype_t subType,
+                                    sensekit_frame_ref_t*& frameRef);
 
         sensekit_status_t temp_update();
 

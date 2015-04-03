@@ -30,15 +30,21 @@ struct StreamServiceProxyBase
                                       sensekit_streamconnection_t*);
 
     sensekit_status_t (*stop_stream)(void*,
-                                      sensekit_streamconnection_t*);
+                                     sensekit_streamconnection_t*);
 
     sensekit_status_t (*open_frame)(void*,
-                                    sensekit_streamconnection_t*,
+                                    sensekit_reader_t*,
                                     int,
-                                    sensekit_frame_ref_t**);
+                                    sensekit_reader_frame_t**);
 
     sensekit_status_t (*close_frame)(void*,
-                                     sensekit_frame_ref_t**);
+                                     sensekit_reader_frame_t**);
+
+    sensekit_status_t (*get_frame)(void*,
+                                   sensekit_reader_frame_t*,
+                                   sensekit_stream_type_t,
+                                   sensekit_stream_subtype_t,
+                                   sensekit_frame_ref_t**);
 
     sensekit_status_t (*temp_update)(void*);
 

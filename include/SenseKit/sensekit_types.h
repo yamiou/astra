@@ -5,13 +5,7 @@
 #include <stddef.h>
 
 const unsigned MAX_STRING_FIELD_LENGTH = 256;
-
-typedef struct _sensekit_streamset sensekit_streamset_t;
-typedef struct _sensekit_streamconnection sensekit_streamconnection_t;
-typedef struct _sensekit_reader sensekit_reader_t;
-
-typedef struct _sensekit_parameter_data sensekit_parameter_data_t;
-typedef int32_t sensekit_parameter_id;
+const uint8_t SENSEKIT_MAX_READER_STREAMS = 16;
 
 typedef struct _sensekit_stream sensekit_stream_t;
 typedef int32_t sensekit_stream_type_t;
@@ -22,16 +16,43 @@ const sensekit_stream_subtype_t DEFAULT_SUBTYPE = -1;
 typedef sensekit_stream_type_t StreamType;
 typedef sensekit_stream_subtype_t StreamSubtype;
 
-struct sensekit_stream_typepair_t {
+struct sensekit_stream_desc_t {
     sensekit_stream_type_t type;
     sensekit_stream_subtype_t subType;
 };
 
+typedef struct _sensekit_streamset sensekit_streamset_t;
+typedef struct _sensekit_streamconnection_handle sensekit_streamconnection_handle;
+
+typedef struct _sensekit_streamconnection {
+    sensekit_streamconnection_handle* handle;
+    sensekit_stream_desc_t desc;
+} sensekit_streamconnection_t;
+
+typedef struct _sensekit_frame {
+    size_t byteLength;
+    void* data;
+} sensekit_frame_t;
+
+typedef struct _sensekit_frame_ref {
+    sensekit_streamconnection_t* streamConnection;
+    sensekit_frame_t* frame;
+} sensekit_frame_ref_t;
+
+typedef struct _sensekit_reader sensekit_reader_t;
+
+typedef struct _sensekit_reader_frame_t {
+    uint8_t numStreams;
+    sensekit_reader_t* reader;
+    sensekit_frame_ref_t* streamFrames[SENSEKIT_MAX_READER_STREAMS];
+} sensekit_reader_frame_t;
+
+typedef struct _sensekit_parameter_data sensekit_parameter_data_t;
+typedef int32_t sensekit_parameter_id;
+
 typedef sensekit_stream_t StreamHandle;
 
 typedef sensekit_streamset_t StreamSetHandle;
-
-typedef struct _sensekit_context sensekit_context_t;
 
 typedef enum _sensekit_status {
     SENSEKIT_STATUS_SUCCESS = 0,
@@ -48,15 +69,7 @@ typedef struct _sensekit_device_desc {
     uint16_t usbProductId;
 } sensekit_device_desc_t;
 
-typedef struct _sensekit_frame {
-    size_t byteLength;
-    void* data;
-} sensekit_frame_t;
 
-typedef struct _sensekit_frame_ref {
-    sensekit_streamconnection_t* streamConnection;
-    sensekit_frame_t* frame;
-} sensekit_frame_ref_t;
 
 typedef int32_t bin_id_t;
 typedef bin_id_t StreamBinId;

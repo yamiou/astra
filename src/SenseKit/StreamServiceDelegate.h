@@ -51,17 +51,27 @@ namespace sensekit {
             }
 
         static sensekit_status_t open_frame(void* service,
-                                            sensekit_streamconnection_t* connection,
+                                            sensekit_reader_t* reader,
                                             int timeoutMillis,
-                                            sensekit_frame_ref_t** frameRef)
+                                            sensekit_reader_frame_t** frame)
             {
-                return static_cast<SenseKitContext*>(service)->open_frame(connection, timeoutMillis, *frameRef);
+                return static_cast<SenseKitContext*>(service)->open_frame(reader, timeoutMillis, *frame);
             }
 
-        static sensekit_status_t close_frame(void* service, sensekit_frame_ref_t** frameRef)
+        static sensekit_status_t close_frame(void* service, sensekit_reader_frame_t** frame)
             {
-                return static_cast<SenseKitContext*>(service)->close_frame(*frameRef);
+                return static_cast<SenseKitContext*>(service)->close_frame(*frame);
             }
+
+        static sensekit_status_t sensekit_reader_get_frame(void* service,
+                                                           sensekit_reader_frame_t* frame,
+                                                           sensekit_stream_type_t type,
+                                                           sensekit_stream_subtype_t subType,
+                                                           sensekit_frame_ref_t** frameRef)
+            {
+                return static_cast<SenseKitContext*>(service)->get_frame(frame, type, subType, *frameRef);
+            }
+
 
         static sensekit_status_t temp_update(void* service)
             {

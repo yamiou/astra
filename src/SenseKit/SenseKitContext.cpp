@@ -1,6 +1,6 @@
 #include "SenseKitContext.h"
 #include <iostream>
-
+#include <cassert>
 #include "StreamConnection.h"
 #include "StreamBin.h"
 #include "StreamServiceDelegate.h"
@@ -84,16 +84,16 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::open_streamset(const char* uri, sensekit_streamset_t*& streamset)
+    sensekit_status_t SenseKitContext::open_streamset(const char* uri, sensekit_streamset_t*& streamSet)
     {
-        streamset = reinterpret_cast<sensekit_streamset_t*>(&get_rootSet());
+        streamSet = reinterpret_cast<sensekit_streamset_t*>(&get_rootSet());
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::close_streamset(sensekit_streamset_t*& streamset)
+    sensekit_status_t SenseKitContext::close_streamset(sensekit_streamset_t*& streamSet)
     {
-        streamset = nullptr;
+        streamSet = nullptr;
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -101,6 +101,8 @@ namespace sensekit {
     sensekit_status_t SenseKitContext::create_reader(sensekit_streamset_t* streamSet,
                                                      sensekit_reader_t*& reader)
     {
+        assert(reader != nullptr);
+
         StreamSet* actualSet = reinterpret_cast<StreamSet*>(streamSet);
         reader = reinterpret_cast<sensekit_reader_t*>(new StreamReader(*actualSet));
 
@@ -109,6 +111,9 @@ namespace sensekit {
 
     sensekit_status_t SenseKitContext::destroy_reader(sensekit_reader_t*& reader)
     {
+
+        assert(reader != nullptr);
+
         StreamReader* actualReader = reinterpret_cast<StreamReader*>(reader);
         if (actualReader != nullptr)
         {
@@ -124,8 +129,15 @@ namespace sensekit {
                                                   sensekit_stream_subtype_t subType,
                                                   sensekit_streamconnection_t*& connection)
     {
+        assert(reader != nullptr);
+
         StreamReader* actualReader = reinterpret_cast<StreamReader*>(reader);
-        connection = reinterpret_cast<sensekit_streamconnection_t*>(actualReader->get_stream(type, subType));
+
+        sensekit_stream_desc_t desc;
+        desc.type = type;
+        desc.subType = subType;
+
+        connection = actualReader->get_stream(desc);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -140,50 +152,42 @@ namespace sensekit {
 
     }
 
-    sensekit_status_t SenseKitContext::open_frame(sensekit_streamconnection_t* streamConnection,
+    sensekit_status_t SenseKitContext::open_frame(sensekit_reader_t* reader,
                                                   int timeoutMillis,
-                                                  sensekit_frame_ref_t*& frameRef)
+                                                  sensekit_reader_frame_t*& frame)
     {
+        assert(reader != nullptr);
+
+        StreamReader* actualReader = reinterpret_cast<StreamReader*>(reader);
+
         //we got the actual frame in the temp_update call.
         //for real, we would do some type of double buffer swap on the client side,
         //copy the latest frame (if newer) from the daemon
         //the daemon might reference count this
-
-        StreamConnection* connection = reinterpret_cast<StreamConnection*>(streamConnection);
-
-        StreamBin* bin = connection->get_bin();
-        if (bin)
-        {
-            frameRef = new sensekit_frame_ref_t;
-            frameRef->frame = bin->lock_front_buffer();
-            frameRef->streamConnection = streamConnection;
-        }
-        else
-        {
-            frameRef = nullptr;
-        }
+        frame = actualReader->lock();
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::close_frame(sensekit_frame_ref_t*& frameRef)
+    sensekit_status_t SenseKitContext::close_frame(sensekit_reader_frame_t*& frame)
     {
-        //later, would decrement the reference count
-        //TODO: how does the daemon recover from a client crashing while a frame is open? (reference count does go to 0)
+        assert(frame != nullptr);
+        assert(frame->reader != nullptr);
 
-        StreamConnection* connection = reinterpret_cast<StreamConnection*>(frameRef->streamConnection);
+        StreamReader* actualReader = reinterpret_cast<StreamReader*>(frame->reader);
+        actualReader->unlock(frame);
 
-        StreamBin* bin = connection->get_bin();
-        if (bin != nullptr)
-        {
-            bin->unlock_front_buffer();
-        }
-
-        delete frameRef;
-
-        frameRef = nullptr;
+        frame = nullptr;
 
         return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t SenseKitContext::get_frame(sensekit_reader_frame_t* frame,
+                                sensekit_stream_type_t type,
+                                sensekit_stream_subtype_t subType,
+                                sensekit_frame_ref_t*& frameRef)
+    {
+
     }
 
     sensekit_status_t SenseKitContext::temp_update()
@@ -202,9 +206,15 @@ namespace sensekit {
                                                      size_t byteLength,
                                                      sensekit_parameter_data_t* data)
     {
-        StreamConnection* actualConnection = reinterpret_cast<StreamConnection*>(connection);
+        assert(connection != nullptr);
+        assert(connection->handle != nullptr);
+
+        StreamConnection* actualConnection =
+            reinterpret_cast<StreamConnection*>(connection->handle);
+
         Stream* stream = actualConnection->get_stream();
 
+        //TODO: This could perhaps change bin, thus underlying connection parameters (desc)
         stream->set_parameter(actualConnection, parameterId, byteLength, data);
 
         return SENSEKIT_STATUS_SUCCESS;
@@ -214,7 +224,12 @@ namespace sensekit {
                                                           sensekit_parameter_id parameterId,
                                                           size_t& byteLength)
     {
-        StreamConnection* actualConnection = reinterpret_cast<StreamConnection*>(connection);
+        assert(connection != nullptr);
+        assert(connection->handle != nullptr);
+
+        StreamConnection* actualConnection =
+            reinterpret_cast<StreamConnection*>(connection->handle);
+
         Stream* stream = actualConnection->get_stream();
 
         stream->get_parameter_size(actualConnection, parameterId, byteLength);
@@ -227,7 +242,12 @@ namespace sensekit {
                                                           size_t byteLength,
                                                           sensekit_parameter_data_t* data)
     {
-        StreamConnection* actualConnection = reinterpret_cast<StreamConnection*>(connection);
+        assert(connection != nullptr);
+        assert(connection->handle != nullptr);
+
+        StreamConnection* actualConnection =
+            reinterpret_cast<StreamConnection*>(connection->handle);
+
         Stream* stream = actualConnection->get_stream();
 
         stream->get_parameter_data(actualConnection, parameterId, byteLength, data);
