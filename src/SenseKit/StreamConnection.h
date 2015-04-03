@@ -23,6 +23,8 @@ namespace sensekit {
 
         void set_bin(StreamBin* new_bin);
         StreamBin* get_bin() const { return m_bin; }
+        
+        Stream* get_stream() const { return m_stream; }
 
         sensekit_streamconnection_t* get_handle() { return &m_connection; }
         const sensekit_stream_desc_t& get_description() { return m_connection.desc; }
