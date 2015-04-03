@@ -144,12 +144,12 @@ namespace sensekit {
 
     sensekit_status_t SenseKitContext::start_stream(sensekit_streamconnection_t* connection)
     {
-
+        return SENSEKIT_STATUS_SUCCESS;
     }
 
     sensekit_status_t SenseKitContext::stop_stream(sensekit_streamconnection_t* connection)
     {
-
+        return SENSEKIT_STATUS_SUCCESS;
     }
 
     sensekit_status_t SenseKitContext::open_frame(sensekit_reader_t* reader,
@@ -187,7 +187,7 @@ namespace sensekit {
                                 sensekit_stream_subtype_t subType,
                                 sensekit_frame_ref_t*& frameRef)
     {
-
+        return SENSEKIT_STATUS_SUCCESS;
     }
 
     sensekit_status_t SenseKitContext::temp_update()

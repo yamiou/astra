@@ -53,11 +53,12 @@ SENSEKIT_API sensekit_status_t sensekit_reader_get_stream(sensekit_reader_t* rea
 
 SENSEKIT_API sensekit_status_t sensekit_stream_start(sensekit_streamconnection_t* connection)
 {
-
+    return SENSEKIT_STATUS_SUCCESS;
 }
+
 SENSEKIT_API sensekit_status_t sensekit_stream_stop(sensekit_streamconnection_t* connection)
 {
-
+    return SENSEKIT_STATUS_SUCCESS;
 }
 
 SENSEKIT_API sensekit_status_t sensekit_reader_open_frame(sensekit_reader_t* reader,
@@ -77,7 +78,7 @@ SENSEKIT_API sensekit_status_t sensekit_reader_get_frame(sensekit_reader_frame_t
                                                          sensekit_stream_subtype_t subType,
                                                          sensekit_frame_ref_t** frameRef)
 {
-
+    return SENSEKIT_STATUS_SUCCESS;
 }
 
 SENSEKIT_API sensekit_status_t sensekit_temp_update()
