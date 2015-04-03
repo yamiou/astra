@@ -35,8 +35,8 @@ SENSEKIT_API sensekit_status_t sensekit_reader_destroy(sensekit_reader_t** reade
 	return g_Context.reader_destroy(*reader);
 }
 
-SENSEKIT_API sensekit_status_t sensekit_reader_get_stream(sensekit_reader_t** reader) {
-	return g_Context.reader_get_stream(*reader);
+SENSEKIT_API sensekit_status_t sensekit_reader_get_stream(sensekit_reader_t* reader, sensekit_stream_type_t type, sensekit_stream_subtype_t subType, sensekit_streamconnection_t** connection) {
+	return g_Context.reader_get_stream(reader, type, subType, *connection);
 }
 
 SENSEKIT_END_DECLS
