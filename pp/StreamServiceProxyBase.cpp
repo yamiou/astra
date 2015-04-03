@@ -8,13 +8,21 @@ struct StreamServiceProxyBase
 {
     void* streamService;
 
-    sensekit_status_t (*open_frame)(void*^PARAM-TYPES^);
-	
-    sensekit_status_t (*close_frame)(void*^PARAM-TYPES^);
-	
     sensekit_status_t (*initialize)(void*^PARAM-TYPES^);
 	
-    sensekit_status_t (*terminate)(void*^PARAM-TYPES^);
+    void (*terminate)(void*^PARAM-TYPES^);
+	
+    sensekit_status_t (*streamset_open)(void*^PARAM-TYPES^);
+	
+    sensekit_status_t (*streamset_close)(void*^PARAM-TYPES^);
+	
+    char* (*get_status_string)(void*^PARAM-TYPES^);
+	
+    sensekit_status_t (*reader_create)(void*^PARAM-TYPES^);
+	
+    sensekit_status_t (*reader_destroy)(void*^PARAM-TYPES^);
+	
+    sensekit_status_t (*reader_get_stream)(void*^PARAM-TYPES^);
 	
 };
 

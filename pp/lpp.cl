@@ -68,7 +68,7 @@ is replaced with replacement."
 )
 
 (defstruct lppmacro macro filter)
-
+;TODO add PARAMS-REF for *& transforms
 (setq replacement-macros (list
 	(make-lppmacro :macro "^RETURN^"				:filter (lambda (fd) (funcdef-returntype fd)))
 	(make-lppmacro :macro "^FUNC^"	 				:filter (lambda (fd) (funcdef-funcname fd)))
