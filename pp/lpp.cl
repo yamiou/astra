@@ -1,6 +1,7 @@
 (defpackage :com.orbbec.sdk
   (:use :common-lisp))
-  
+
+(defstruct param type name)
 (defstruct code funcname params returntype)
 
 (defun partial (func &rest args1)
@@ -34,15 +35,45 @@ is replaced with replacement."
 	)
 )
 
+(defun format-paramitem-type (p)
+	(format nil "~A" (param-type p))
+)
+
+(defun format-paramlist-type (params)
+	(format nil "~{~A~^, ~}" (mapcar #'format-paramitem-type params))
+)
+
+(defun format-paramitem-name (p)
+	(format nil "~A" (param-name p))
+)
+
+(defun format-paramlist-name (params)
+	(format nil "~{~A~^, ~}" (mapcar #'format-paramitem-name params))
+)
+
+(defun format-paramitem-full (p)
+	(format nil "~A ~A" (param-type p) (param-name p))
+)
+
+(defun format-paramlist-full (params)
+	(format nil "~{~A~^, ~}" (mapcar #'format-paramitem-full params))
+)
+
 (defun formatmethod (lineformat funcdata) 
 	(replace-all 
 		(replace-all 
-			(replace-all lineformat 
-				"^RETURN^" (code-returntype funcdata)
+			(replace-all 
+				(replace-all 
+					(replace-all lineformat 
+						"^RETURN^" (code-returntype funcdata)
+					)
+					"^FUNC^" (code-funcname funcdata)
+				)
+				"^PARAMS^" (format-paramlist-full (code-params funcdata))
 			)
-			"^FUNC^" (code-funcname funcdata)
+			"^PARAM-NAMES^" (format-paramlist-name (code-params funcdata))
 		)
-		"^PARAMS^" (code-params funcdata)
+		"^PARAM-TYPES^" (format-paramlist-type (code-params funcdata))
 	)
 )
 
@@ -54,23 +85,25 @@ is replaced with replacement."
 
 (setq c1 (make-code :returntype "sk_status"
 					:funcname "open_frame" 
-					:params "sk_stream* stream, sk_frame** frame" 
+					:params (list (make-param :type "sk_stream*" :name "stream")
+								  (make-param :type "sk_frame**" :name "frame")
+							)
 		)
 )
 
 (setq c2 (make-code :returntype "sk_status"
 					:funcname "close_frame" 
-					:params "sk_frame** frame" 
+					:params (list (make-param :type "sk_frame**" :name "frame" ))
 		)
 )
 
 (setq f1 "^RETURN^ ^FUNC^(^PARAMS^);
 ")
 (setq f2 "^RETURN^ sensekit_^FUNC^(^PARAMS^) {
-	return g_Context->^FUNC^(^PARAMS^);
+	return g_Context->^FUNC^(^PARAM-NAMES^);
 }
 ")
-(setq f3 "^RETURN^ (*^FUNC^)(void*, ^PARAMS^);
+(setq f3 "^RETURN^ (*^FUNC^)(void*, ^PARAM-TYPES^);
 ")
 
 (setq funcs (list c1 c2))
