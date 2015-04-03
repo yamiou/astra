@@ -19,8 +19,13 @@ namespace sensekit {
 
         sensekit_streamconnection_t* get_stream(sensekit_stream_desc_t description);
 
+        //TODO: locking currently not threadsafe
+
         sensekit_reader_frame_t* lock()
             {
+                if (m_locked)
+                    return m_currentFrame;
+
                 sensekit_reader_frame_t* frame = new sensekit_reader_frame_t;
                 int count = 0;
 
@@ -34,25 +39,34 @@ namespace sensekit {
 
                 frame->numStreams = count;
 
+                m_currentFrame = frame;
+                m_locked = true;
+
                 return frame;
             }
 
-        void unlock(sensekit_reader_frame_t* frame)
+        void unlock()
             {
-                assert(frame != nullptr);
+                if (!m_locked)
+                    return; // TODO: exception here?
 
-                for(int i = 0; i < frame->numStreams; i++)
+                assert(m_currentFrame != nullptr);
+
+                for(int i = 0; i < m_currentFrame->numStreams; i++)
                 {
                     StreamConnection* underlyingConnection =
                         reinterpret_cast<StreamConnection*>(
-                            frame->streamFrames[i]->streamConnection);
+                            m_currentFrame->streamFrames[i]->streamConnection);
 
                     assert(underlyingConnection != nullptr);
 
-                    underlyingConnection->unlock(frame->streamFrames[i]);
+                    underlyingConnection->unlock(m_currentFrame->streamFrames[i]);
                 }
 
-                delete frame;
+                delete m_currentFrame;
+                m_currentFrame = nullptr;
+
+                m_locked = false;
             }
 
     private:
@@ -63,6 +77,8 @@ namespace sensekit {
 
         using ConnectionSet = std::set<StreamConnection*>;
 
+        bool m_locked{false};
+        sensekit_reader_frame_t* m_currentFrame{nullptr};
         StreamSet& m_streamSet;
         ConnectionSet  m_streamConnections;
     };

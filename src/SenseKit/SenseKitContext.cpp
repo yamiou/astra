@@ -175,7 +175,7 @@ namespace sensekit {
         assert(frame->reader != nullptr);
 
         StreamReader* actualReader = reinterpret_cast<StreamReader*>(frame->reader);
-        actualReader->unlock(frame);
+        actualReader->unlock();
 
         frame = nullptr;
 
