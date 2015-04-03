@@ -28,6 +28,7 @@ namespace sensekit {
         proxy->stop_stream = &StreamServiceDelegate::stop_stream;
         proxy->open_frame = &StreamServiceDelegate::open_frame;
         proxy->close_frame = &StreamServiceDelegate::close_frame;
+        proxy->get_frame =  &StreamServiceDelegate::get_frame;
         proxy->set_parameter = &StreamServiceDelegate::set_parameter;
         proxy->get_parameter_data = &StreamServiceDelegate::get_parameter_data;
         proxy->get_parameter_size = &StreamServiceDelegate::get_parameter_size;
@@ -101,7 +102,7 @@ namespace sensekit {
     sensekit_status_t SenseKitContext::create_reader(sensekit_streamset_t* streamSet,
                                                      sensekit_reader_t*& reader)
     {
-        assert(reader != nullptr);
+        assert(streamSet != nullptr);
 
         StreamSet* actualSet = reinterpret_cast<StreamSet*>(streamSet);
         reader = reinterpret_cast<sensekit_reader_t*>(new StreamReader(*actualSet));
@@ -164,7 +165,8 @@ namespace sensekit {
         //for real, we would do some type of double buffer swap on the client side,
         //copy the latest frame (if newer) from the daemon
         //the daemon might reference count this
-        frame = actualReader->lock();
+        actualReader->lock();
+        frame = reader;
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -172,9 +174,8 @@ namespace sensekit {
     sensekit_status_t SenseKitContext::close_frame(sensekit_reader_frame_t*& frame)
     {
         assert(frame != nullptr);
-        assert(frame->reader != nullptr);
 
-        StreamReader* actualReader = reinterpret_cast<StreamReader*>(frame->reader);
+        StreamReader* actualReader = reinterpret_cast<StreamReader*>(frame);
         actualReader->unlock();
 
         frame = nullptr;
@@ -183,10 +184,20 @@ namespace sensekit {
     }
 
     sensekit_status_t SenseKitContext::get_frame(sensekit_reader_frame_t* frame,
-                                sensekit_stream_type_t type,
-                                sensekit_stream_subtype_t subType,
-                                sensekit_frame_ref_t*& frameRef)
+                                                 sensekit_stream_type_t type,
+                                                 sensekit_stream_subtype_t subType,
+                                                 sensekit_frame_ref_t*& frameRef)
     {
+        assert(frame != nullptr);
+
+        StreamReader* actualReader = reinterpret_cast<StreamReader*>(frame);
+
+        sensekit_stream_desc_t desc;
+        desc.type = type;
+        desc.subType = subType;
+
+        frameRef = actualReader->get_subframe(desc);
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 

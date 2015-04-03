@@ -35,16 +35,19 @@ namespace sensekit {
     class DepthFrame
     {
     public:
-        DepthFrame()
+        DepthFrame(sensekit_reader_frame_t* readerFrame)
             {
-
+                sensekit_depth_frame_get(readerFrame, &m_depthFrame);
             }
 
-        int getResolutionX() { return 0; }
-        int getResolutionY() { return 0; }
-        int getFrameIndex() { return 0; }
+        int getResolutionX() { return m_depthFrame->width; }
+        int getResolutionY() { return m_depthFrame->height; }
+        int getFrameIndex() { return m_depthFrame->frameIndex; }
 
-        uint16_t* data() { return nullptr; }
+        int16_t* data() { return m_depthFrame->data; }
+
+    private:
+        sensekit_depthframe_t* m_depthFrame;
     };
 }
 

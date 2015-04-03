@@ -1,3 +1,4 @@
+#include <sensekit_types.h>
 #include "StreamConnection.h"
 #include "StreamBin.h"
 #include "Stream.h"
@@ -20,21 +21,36 @@ namespace sensekit {
         m_connection->desc.subType = m_stream->get_subtype();
     }
 
-    sensekit_frame_ref_t* StreamConnection::lock()
+    size_t StreamConnection::get_hash() const
     {
-        sensekit_frame_ref_t* frameRef = new sensekit_frame_ref_t;
-        frameRef->frame = m_bin->lock_front_buffer();
-        frameRef->streamConnection = m_connection;
+        assert(m_connection != nullptr);
 
-        return frameRef;
+        std::size_t h1 = std::hash<sensekit_stream_type_t>()(m_connection->desc.type);
+        std::size_t h2 = std::hash<sensekit_stream_subtype_t>()(m_connection->desc.subType);
+
+        return h1 ^ (h2 << 1);
     }
 
-    void StreamConnection::unlock(sensekit_frame_ref_t* frameRef)
+    sensekit_frame_ref_t* StreamConnection::lock()
     {
-        assert(frameRef != nullptr);
-        m_bin->unlock_front_buffer();
+        if (m_locked)
+            return &m_currentFrame;
 
-        delete frameRef;
+        m_currentFrame.frame = m_bin->lock_front_buffer();
+        m_currentFrame.streamConnection = m_connection;
+
+        m_locked = true;
+
+        return &m_currentFrame;
+    }
+
+    void StreamConnection::unlock()
+    {
+        if (!m_locked)
+            return;
+
+        m_bin->unlock_front_buffer();
+        m_locked = true;
     }
 
     void StreamConnection::set_bin(StreamBin* new_bin)

@@ -16,8 +16,7 @@ namespace sensekit {
         ~StreamConnection();
 
         sensekit_frame_ref_t* lock();
-
-        void unlock(sensekit_frame_ref_t* frameRef);
+        void unlock();
 
         void set_bin(StreamBin* new_bin);
 
@@ -28,10 +27,15 @@ namespace sensekit {
         Stream* get_stream() const { return m_stream; }
 
         sensekit_streamconnection_t* get_handle() { return m_connection; }
+        sensekit_stream_desc_t& get_description() const { return m_connection->desc; }
+        size_t get_hash() const;
 
     private:
         sensekit_streamconnection_t* m_connection{nullptr};
-        Stream* m_stream;
+        sensekit_frame_ref_t m_currentFrame;
+
+        bool m_locked{false};
+        Stream* m_stream{nullptr};
         StreamBin* m_bin{nullptr};
         StreamHandle* m_handle{nullptr};
     };

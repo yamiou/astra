@@ -3,6 +3,7 @@
 
 #include <sensekit_core.h>
 #include "SenseKitContext.h"
+#include <iostream>
 
 namespace sensekit {
 
@@ -63,7 +64,7 @@ namespace sensekit {
                 return static_cast<SenseKitContext*>(service)->close_frame(*frame);
             }
 
-        static sensekit_status_t sensekit_reader_get_frame(void* service,
+        static sensekit_status_t get_frame(void* service,
                                                            sensekit_reader_frame_t* frame,
                                                            sensekit_stream_type_t type,
                                                            sensekit_stream_subtype_t subType,

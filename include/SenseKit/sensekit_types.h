@@ -40,12 +40,7 @@ typedef struct _sensekit_frame_ref {
 } sensekit_frame_ref_t;
 
 typedef struct _sensekit_reader sensekit_reader_t;
-
-typedef struct _sensekit_reader_frame_t {
-    uint8_t numStreams;
-    sensekit_reader_t* reader;
-    sensekit_frame_ref_t* streamFrames[SENSEKIT_MAX_READER_STREAMS];
-} sensekit_reader_frame_t;
+typedef sensekit_reader_t sensekit_reader_frame_t;
 
 typedef struct _sensekit_parameter_data sensekit_parameter_data_t;
 typedef int32_t sensekit_parameter_id;
@@ -68,8 +63,6 @@ typedef struct _sensekit_device_desc {
     uint16_t usbVendorId;
     uint16_t usbProductId;
 } sensekit_device_desc_t;
-
-
 
 typedef int32_t bin_id_t;
 typedef bin_id_t StreamBinId;

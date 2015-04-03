@@ -30,20 +30,22 @@ namespace sensekit {
     class FrameRef
     {
     public:
-        FrameRef() { }
+        FrameRef(sensekit_reader_frame_t* readerFrame)
+            : m_frame(readerFrame) { }
 
         template<typename T>
         T get()
             {
-                return T();
+                return T(m_frame);
             }
 
         void release()
             {
-
+                sensekit_reader_close_frame(&m_frame);
             }
 
     private:
+        sensekit_reader_frame_t* m_frame;
     };
 
     class StreamReader
@@ -76,8 +78,9 @@ namespace sensekit {
 
         FrameRef get_latest_frame(int timeoutMillis = -1)
             {
-                sensekit_temp_update();
-                return FrameRef();
+                sensekit_reader_frame_t* frame;
+                sensekit_reader_open_frame(m_reader, timeoutMillis, &frame);
+                return FrameRef(frame);
             }
 
     private:

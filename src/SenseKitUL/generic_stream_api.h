@@ -34,10 +34,10 @@ sensekit_status_t sensekit_generic_frame_get(sensekit_reader_frame_t* readerFram
 }
 
 template<typename TFrameType>
-sensekit_status_t sensekit_generic_frame_open(sensekit_reader_frame_t* readerFrame,
-                                              sensekit_stream_type_t type,
-                                              sensekit_stream_subtype_t subType,
-                                              TFrameType** frame)
+sensekit_status_t sensekit_generic_frame_get(sensekit_reader_frame_t* readerFrame,
+                                             sensekit_stream_type_t type,
+                                             sensekit_stream_subtype_t subType,
+                                             TFrameType** frame)
 {
     sensekit_frame_ref_t* frameRef;
     sensekit_reader_get_frame(readerFrame, type, subType, &frameRef);
