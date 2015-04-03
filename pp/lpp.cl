@@ -1,3 +1,4 @@
+
 (defstruct param type name)
 (defstruct funcdef funcname params returntype)
 
@@ -85,13 +86,26 @@ is replaced with replacement."
 	)
 )
 
-(setq funcs '())
+(defun clear-funcs ()
+	(setq funcs nil)
+	(setq funcs-tail funcs)
+)
+(clear-funcs)
 
 (defun add-func (&rest args)
-	(setq funcs
-		  (cons 
-				(apply #'make-funcdef args)
-			funcs)
+	(let ((func-data (apply #'make-funcdef args)))
+		(if (endp funcs)
+			;then
+			(progn
+				(setq funcs (cons func-data nil))
+				(setq funcs-tail funcs)
+			)
+			;else
+			(progn
+				(setf (cdr funcs-tail) (cons func-data nil))
+				(setq funcs-tail (cdr funcs-tail))
+			)
+		)
 	)
 )
 
@@ -111,22 +125,9 @@ is replaced with replacement."
 )
 
 (defun outputfuncs (f) 
-	(write-string (concat-string-list f))
+	(write-line (concat-string-list f))
 )
 
-(defun _ () (load "lpp.cl" :verbose nil))
-	
-(defun t ()
-	;(write-string (formatmethod f1 c1))
-	;(write-string (formatmethod f2 c1))
-	(outputfuncs (formatmethods f1 funcs))
-	(newline)
-	(outputfuncs (formatmethods f2 funcs))
-	(newline)
-	(outputfuncs (formatmethods f3 funcs))
-	(newline)
-	nil
-)	
 (setq begin-marker "^^^BEGINREPLACE^^^")
 (setq end-marker "^^^ENDREPLACE^^^")
 (setq auto-header-marker "^^^AUTOGENHEADER^^^")
@@ -139,8 +140,18 @@ is replaced with replacement."
 	`(setq ,var (cons ,value ,var))
 )
 
+(defun strip-end-characters (str numChars)
+	(let ((index (- (length str) numChars)))
+		(if (>= index 1)
+			(subseq str 0 index)
+			nil
+		)
+	)
+)
+
 (defun process-file (infilename)
 	(let ((infile (open infilename :if-does-not-exist nil))
+		  (outfile (open (strip-end-characters infilename 4) :direction :output :if-exists :supersede))
 		  (filelines nil)
 		  (templatelines nil)
 		  (template-status 0)
@@ -170,7 +181,6 @@ is replaced with replacement."
 								(lambda (v) (prepend-into filelines v))
 								(formatmethods (concat-string-list (reverse templatelines)) funcs)
 							)
-							;(outputfuncs (formatmethods (concat-string-list (reverse templatelines)) funcs))
 						)
 						;else
 						(prepend-into templatelines line)
@@ -178,14 +188,19 @@ is replaced with replacement."
 				)
 		)
 		(loop for line in (reverse filelines)
-			  do (format t "~A~%" line)
+			  do ;(format t "~A~%" line)
+				(write-line line outfile)
 		)
-		(close infile))
+		(close infile)
+		(close outfile))
 	)
 )
 
-;(t)
+(defun _ () (load "lpp.cl" :verbose nil))
+
 (defun t2 ()
-	(process-file "test2.cpp.lpp")
+	(process-file "SenseKit.cpp.lpp")
+	(process-file "StreamServiceProxyBase.cpp.lpp")
+	"done"
 )
 (t2)
