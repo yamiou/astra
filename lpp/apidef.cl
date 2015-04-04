@@ -1,5 +1,7 @@
 ;definitions 3manually adapted from sensekit_capi.h
 
+(setq voidparam (make-param :type "void*" :name "streamService"))
+
 ;SENSEKIT_API sensekit_status_t sensekit_initialize();
 (add-func 	:returntype "sensekit_status_t"
 			:funcname "initialize" 

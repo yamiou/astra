@@ -1,0 +1,35 @@
+/* ^^^AUTOGENHEADER^^^ */
+#include <SenseKitAPI.h>
+#include <Plugins/StreamServiceProxy.h>
+#include <cassert>
+#include <iostream>
+using std::cout;
+using std::endl;
+
+SENSEKIT_BEGIN_DECLS
+
+SENSEKIT_LOCAL StreamServiceProxyBase* __sensekit_api_proxy_ptr = nullptr;
+
+inline sensekit::StreamServiceProxy* get_api_proxy()
+{
+    return reinterpret_cast<sensekit::StreamServiceProxy*>(__sensekit_api_proxy_ptr);
+}
+
+SENSEKIT_API_PROXY StreamServiceProxyBase* sensekit_api_get_proxy()
+{
+    return __sensekit_api_proxy_ptr;
+}
+
+SENSEKIT_API_PROXY void sensekit_api_set_proxy(StreamServiceProxyBase* proxy)
+{
+    __sensekit_api_proxy_ptr = proxy;
+}
+
+^^^BEGINREPLACE^^^
+SENSEKIT_API ^RETURN^ sensekit_^FUNC^(^PARAMS^)
+{
+    return get_api_proxy()->^FUNC^(^PARAMS:names^);
+}        
+
+^^^ENDREPLACE^^^
+SENSEKIT_END_DECLS

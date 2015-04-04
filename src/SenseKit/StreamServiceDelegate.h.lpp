@@ -1,0 +1,24 @@
+/* ^^^AUTOGENHEADER^^^ */
+#ifndef STREAMSERVICEDELEGATE_H
+#define STREAMSERVICEDELEGATE_H
+
+#include <sensekit_core.h>
+#include "SenseKitContext.h"
+#include <iostream>
+
+namespace sensekit {
+
+    class StreamServiceDelegate
+    {
+    public:
+^^^BEGINREPLACE^^^
+        
+        static ^RETURN^ ^FUNC^(^PARAMS:void^)
+        {
+            return static_cast<SenseKitContext*>(^PARAMS:names,voidonly^)->^FUNC^(^PARAMS:names,deref^);
+        }        
+^^^ENDREPLACE^^^
+    };
+}
+
+#endif /* STREAMSERVICEDELEGATE_H */

@@ -10,6 +10,7 @@ set(SenseKit_SOURCES
   ../../include/SenseKit/Plugins/StreamServiceProxyBase.h
   SenseKitContext.h
   SenseKitContext.cpp
+  CreateStreamProxy.h
   SenseKit.cpp
   Stream.h
   Stream.cpp

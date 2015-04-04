@@ -8,7 +8,7 @@ SENSEKIT_BEGIN_DECLS
 
 SENSEKIT_API sensekit_status_t sensekit_initialize();
 
-SENSEKIT_API void sensekit_terminate();
+SENSEKIT_API sensekit_status_t sensekit_terminate();
 
 SENSEKIT_API sensekit_status_t sensekit_streamset_open(const char* connectionString,
                                                        sensekit_streamset_t** streamSet);

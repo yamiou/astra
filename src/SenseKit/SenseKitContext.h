@@ -1,3 +1,4 @@
+/* THIS FILE AUTO-GENERATED FROM SenseKitContext.h.lpp. DO NOT EDIT. */
 #ifndef SENSEKITCONTEXT_H
 #define SENSEKITCONTEXT_H
 
@@ -37,50 +38,62 @@ namespace sensekit {
         virtual ~SenseKitContext() {}
 
         sensekit_status_t initialize();
+        
         sensekit_status_t terminate();
-
-        sensekit_status_t open_streamset(const char* uri, sensekit_streamset_t*& streamSet);
-        sensekit_status_t close_streamset(sensekit_streamset_t*& streamSet);
-
-        sensekit_status_t create_reader(sensekit_streamset_t* streamSet, sensekit_reader_t*& reader);
-        sensekit_status_t destroy_reader(sensekit_reader_t*& reader);
-
-        sensekit_status_t get_stream(sensekit_reader_t* reader,
-                                     sensekit_stream_type_t type,
-                                     sensekit_stream_subtype_t subType,
-                                     sensekit_streamconnection_t*& connection);
-
-        sensekit_status_t start_stream(sensekit_streamconnection_t* connection);
-        sensekit_status_t stop_stream(sensekit_streamconnection_t* connection);
-
-        sensekit_status_t open_frame(sensekit_reader_t* reader,
-                                     int timeoutMillis,
-                                     sensekit_reader_frame_t*& frame);
-
-        sensekit_status_t close_frame(sensekit_reader_frame_t*& frame);
-
-        sensekit_status_t get_frame(sensekit_reader_frame_t* frame,
-                                    sensekit_stream_type_t type,
-                                    sensekit_stream_subtype_t subType,
-                                    sensekit_frame_ref_t*& frameRef);
-
+        
+        sensekit_status_t streamset_open(const char* connectionString,
+                                         sensekit_streamset_t*& streamSet);
+        
+        sensekit_status_t streamset_close(sensekit_streamset_t*& streamSet);
+        
+        char* get_status_string(sensekit_status_t status);
+        
+        sensekit_status_t reader_create(sensekit_streamset_t* streamSet,
+                                        sensekit_reader_t*& reader);
+        
+        sensekit_status_t reader_destroy(sensekit_reader_t*& reader);
+        
+        sensekit_status_t reader_get_stream(sensekit_reader_t* reader,
+                                            sensekit_stream_type_t type,
+                                            sensekit_stream_subtype_t subType,
+                                            sensekit_streamconnection_t*& connection);
+        
+        sensekit_status_t stream_get_description(sensekit_streamconnection_t* connection,
+                                                 sensekit_stream_desc_t* description);
+        
+        sensekit_status_t stream_start(sensekit_streamconnection_t* connection);
+        
+        sensekit_status_t stream_stop(sensekit_streamconnection_t* connection);
+        
+        sensekit_status_t reader_open_frame(sensekit_reader_t* reader,
+                                            int timeoutMillis,
+                                            sensekit_reader_frame_t*& frame);
+        
+        sensekit_status_t reader_close_frame(sensekit_reader_frame_t*& frame);
+        
+        sensekit_status_t reader_get_frame(sensekit_reader_frame_t* frame,
+                                           sensekit_stream_type_t type,
+                                           sensekit_stream_subtype_t subType,
+                                           sensekit_frame_ref_t*& frameRef);
+        
+        sensekit_status_t stream_set_parameter(sensekit_streamconnection_t* connection,
+                                               sensekit_parameter_id parameterId,
+                                               size_t byteLength,
+                                               sensekit_parameter_data_t* data);
+        
+        sensekit_status_t stream_get_parameter_size(sensekit_streamconnection_t* connection,
+                                                    sensekit_parameter_id parameterId,
+                                                    size_t& byteLength);
+        
+        sensekit_status_t stream_get_parameter_data(sensekit_streamconnection_t* connection,
+                                                    sensekit_parameter_id parameterId,
+                                                    size_t byteLength,
+                                                    sensekit_parameter_data_t* data);
+        
         sensekit_status_t temp_update();
+        
 
         StreamSet& get_rootSet() { return m_rootSet; }
-
-        sensekit_status_t set_parameter(sensekit_streamconnection_t* connection,
-                                        sensekit_parameter_id parameterId,
-                                        size_t byteLength,
-                                        sensekit_parameter_data_t* data);
-
-        sensekit_status_t get_parameter_size(sensekit_streamconnection_t* connection,
-                                             sensekit_parameter_id parameterId,
-                                             size_t& byteLength);
-
-        sensekit_status_t get_parameter_data(sensekit_streamconnection_t* connection,
-                                             sensekit_parameter_id parameterId,
-                                             size_t byteLength,
-                                             sensekit_parameter_data_t* data);
 
         StreamServiceProxyBase* get_streamServiceProxy() { return m_streamServiceProxy; }
 

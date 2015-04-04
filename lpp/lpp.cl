@@ -9,7 +9,6 @@
 (setq token-marker #\^)
 (setq token-arg-marker #\:)
 (setq token-arg-delimiter #\,)
-(setq voidparam (make-param :type "void*" :name "service"))
 
 (defstruct lppmacro macro filter)
 
@@ -23,7 +22,7 @@
 (add-macro :macro "RETURN"	:filter (lambda (fd len args) (funcdef-returntype fd)))
 (add-macro :macro "FUNC"	:filter (lambda (fd len args) (funcdef-funcname fd)))
 (add-macro :macro "PARAMS"	:filter (lambda (fd len args) (format-params (funcdef-params fd) len args)))
-; PARAMS arguments: types, names, deref, ref, void, nowrap
+; PARAMS arguments: types, names, deref, ref, void, voidonly, nowrap
 ;;;;;;;;;
 
 (defun partial (func &rest args1)
@@ -93,17 +92,20 @@ is replaced with replacement."
 )
 
 (defun format-params (params token-start-length args)
-    ;full, types, names, deref, ref, void, nowrap
+    ;full, types, names, deref, ref, void, voidonly, nowrap
     (let*  ((arg-types  (is-arg-set "types" args))
             (arg-names  (is-arg-set "names" args))
             (arg-deref  (is-arg-set "deref" args))
             (arg-ref    (is-arg-set "ref" args))
             (arg-void   (is-arg-set "void" args))
+            (arg-voidonly (is-arg-set "voidonly" args))
+            (arg-wrap   (is-arg-set "wrap" args))
             (arg-nowrap (is-arg-set "nowrap" args))
-            (filtered-params (if arg-void 
-                                 (cons voidparam params) ;then, prepend "void* service"
-                                 params                  ;else, don't
-                              ))
+            (filtered-params (cond  (arg-voidonly (cons voidparam nil)) ;only the voidparam
+                                    (arg-void (cons voidparam params)) ;prepend the voidparam
+                                    (t params) ;default, just use params
+                              )
+                          )
             (types-only (and arg-types (not arg-names)))
             (names-only (and arg-names (not arg-types)))
             (full-decl  (not (xor arg-names arg-types)))
@@ -111,7 +113,7 @@ is replaced with replacement."
                                 (types-only #'format-paramitem-type)
                                 (names-only #'format-paramitem-name)
                           ))
-            (do-wrap    (not (or names-only arg-nowrap)))
+            (do-wrap    (or arg-wrap (not (or names-only arg-nowrap))))
             (format-line (if do-wrap "~{~A~^,~%~}" "~{~A~^, ~}"))
            )
        (when filtered-params
