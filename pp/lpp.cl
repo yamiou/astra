@@ -2,12 +2,39 @@
 (defstruct param type name deref)
 (defstruct funcdef funcname params returntype)
 
+(setq begin-marker "^^^BEGINREPLACE^^^")
+(setq end-marker "^^^ENDREPLACE^^^")
+(setq auto-header-marker "^^^AUTOGENHEADER^^^")
+(setq token-marker #\^)
+(setq token-arg-marker #\:)
+(setq token-arg-delimiter #\,)
+(setq voidparam (make-param :type "void*" :name "service"))
+
+(defstruct lppmacro macro filter)
+
+(setq macro-hash (make-hash-table :test 'equal))
+(defun add-macro (&rest args)
+    (let ((m (apply #'make-lppmacro args)))
+        (setf (gethash (lppmacro-macro m) macro-hash) m)
+    )
+)
+
+(add-macro :macro "RETURN"	:filter (lambda (fd args) (funcdef-returntype fd)))
+(add-macro :macro "FUNC"	:filter (lambda (fd args) (funcdef-funcname fd)))
+(add-macro :macro "PARAMS"	:filter (lambda (fd args) (format-params (funcdef-params fd) args)))
+; PARAMS arguments: types, names, deref, ref, void
+;;;;;;;;;
+
 (defun partial (func &rest args1)
    (lambda (&rest args2) (apply func (append args1 args2)))
 )
 
 (defun newline ()
 	(write-string (format nil "~%"))
+)
+
+(defun concat-string-list (s)
+	(format nil "~{~A~^~%~}" s)
 )
 
 (defun replace-all (string part replacement &key (test #'char=))
@@ -23,31 +50,22 @@ is replaced with replacement."
                              :start old-pos
                              :end (or pos (length string)))
             when pos do (write-string replacement out)
-            while pos)))
-			
-(defun formatmethod2 (lineformat funcdata) 
-	(format nil lineformat 
-		(funcdef-returntype funcdata) 
-		(funcdef-funcname funcdata) 
-		(funcdef-params funcdata)
-	)
+            while pos))
 )
 
-(defun format-paramitem-type (p)
+(defun is-arg-set (target-arg args)
+    (not (null (find target-arg args :test 'equal)))
+)
+
+(defun format-paramitem-type (args p)
 	(format nil "~A" (param-type p))
 )
 
-(defun format-paramlist-type (params)
-	(if params
-		  (concatenate 'string ", " 
-			(format nil "~{~A~^, ~}" (mapcar #'format-paramitem-type params))
-		   )
-		   ""
-    )
-)
-
-(defun format-paramitem-name (deref p)
-	(if (and deref (param-deref p))
+(defun format-paramitem-name (args p)
+    ;in name only format, we can dereference the argument (pointer)
+    ;but only if the macro argument requested it  
+    ;and this parameter can be dereferenced
+	(if (and (is-arg-set "deref" args) (param-deref p))
 		;then
 		(format nil "*~A" (param-name p))
 		;else
@@ -55,40 +73,99 @@ is replaced with replacement."
 	)
 )
 
-(defun format-paramlist-name (deref params)
-	(format nil "~{~A~^, ~}" (mapcar (partial #'format-paramitem-name deref) params))
-)
-
-(defun format-paramitem-full (p)
-	(format nil "~A ~A" (param-type p) (param-name p))
-)
-
-(defun format-paramlist-full (params)
-	(format nil "~{~A~^, ~}" (mapcar #'format-paramitem-full params))
-)
-
-(defstruct lppmacro macro filter)
-;TODO add PARAMS-REF for *& transforms
-(setq replacement-macros (list
-	(make-lppmacro :macro "^RETURN^"				:filter (lambda (fd) (funcdef-returntype fd)))
-	(make-lppmacro :macro "^FUNC^"	 				:filter (lambda (fd) (funcdef-funcname fd)))
-	(make-lppmacro :macro "^PARAMS^"				:filter (lambda (fd) (format-paramlist-full (funcdef-params fd))))
-	(make-lppmacro :macro "^PARAM-TYPES^" 			:filter (lambda (fd) (format-paramlist-type (funcdef-params fd))))
-	(make-lppmacro :macro "^PARAM-NAMES^" 			:filter (lambda (fd) (format-paramlist-name nil (funcdef-params fd))))
-	(make-lppmacro :macro "^PARAM-NAMES-DEREF^" 	:filter (lambda (fd) (format-paramlist-name T (funcdef-params fd))))
-))
-
-(defun formatmethod (lineformat funcdata)
-	(loop for m in replacement-macros
-			do
-				(setq lineformat (replace-all lineformat (lppmacro-macro m) (funcall (lppmacro-filter m) funcdata)))
+(defun format-paramitem-full (args p)
+	(let* ((type-decl (param-type p))
+           (last-index (1- (length type-decl)))
+          )
+        (format nil "~A ~A" 
+                ;if macro requested reference mode, 
+                ; this parameter is dereferencable, 
+                ; and the last char is a *
+                (if (and (is-arg-set "ref" args) (param-deref p) (equal "*" (subseq type-decl last-index)))
+                    ;then, replace the last * with a &
+                    (concatenate 'string (subseq type-decl 0 last-index) "&")
+                    ;else
+                    type-decl
+                )
+                (param-name p))
 	)
-	lineformat
 )
 
-(defun formatmethods (lineformat funclist) 
+(defun format-params (params args)
+    ;full, types, names, deref, ref, void
+    (let*  ((arg-types (is-arg-set "types" args))
+            (arg-names (is-arg-set "names" args))
+            (arg-deref (is-arg-set "deref" args))
+            (arg-ref   (is-arg-set "ref" args))
+            (arg-void  (is-arg-set "void" args))
+            (filtered-params (if arg-void 
+                                 (cons voidparam params) ;then, prepend "void* service"
+                                 params                  ;else, don't
+                              ))
+            (types-only (and arg-types (not arg-names)))
+            (names-only (and arg-names (not arg-types)))
+            (full-decl  (not (xor arg-names arg-types)))
+            (format-func (cond  (full-decl  #'format-paramitem-full)
+                                (types-only #'format-paramitem-type)
+                                (names-only #'format-paramitem-name)
+                          ))
+           )
+        (format nil "~{~A~^, ~}" (mapcar (partial format-func args) filtered-params))
+    )
+)
+
+(defun split-by-delimiter (string delimiter)
+	(loop 	for start = 0 then (1+ finish)
+			for finish = (position delimiter string :start start)
+			if (and (not (eq (length string) start)) (not (eq start finish))) collect (subseq string start finish)
+			until (null finish)
+	)
+)
+
+(defun process-tokens (line funcdata)
+    (let ((token-marker-left (position token-marker line))
+         )
+        (if (null token-marker-left)
+            ;then, no left token marker. return line
+            line
+            ;else, process more
+            (let* ((token-start (1+ token-marker-left))
+                  (token-stop (position token-marker line :start token-start))
+                 )
+                (if (null token-stop)
+                    ;then, no right token marker. return line
+                    line
+                    ;else, process more
+    
+        (let* ((token-full (subseq line token-start token-stop))
+               (seperator-index (position token-arg-marker token-full))
+               (token (subseq token-full 0 seperator-index))
+               (token-args (if (not (null seperator-index))
+                              (split-by-delimiter (subseq token-full (1+ seperator-index) nil) token-arg-delimiter)
+                              '(nil)
+                          ))
+               (line-begin (subseq line 0 token-marker-left))
+               (line-end (subseq line (1+ token-stop) nil))
+               (m (gethash token macro-hash))
+              )
+              ;m (the macro struct) is nil if no macro found for the token
+              (if (null m)
+                    ;then
+                    line
+                    ;else
+                    (concatenate 'string 
+                        line-begin 
+                        (funcall (lppmacro-filter m) funcdata token-args) 
+                        (process-tokens line-end funcdata)
+                    )
+               )
+        )
+    ))))
+)
+
+(defun format-methods (lineformat funcdatalist) 
 	(mapcar 
-		(partial #'formatmethod lineformat) funclist
+		(partial #'process-tokens lineformat) funcdatalist
 	)
 )
 
@@ -117,17 +194,9 @@ is replaced with replacement."
 
 (load "apidef.cl")
 
-(defun concat-string-list (s)
-	(format nil "~{~A~^~%~}" s)
-)
-
 (defun outputfuncs (f) 
 	(write-line (concat-string-list f))
 )
-
-(setq begin-marker "^^^BEGINREPLACE^^^")
-(setq end-marker "^^^ENDREPLACE^^^")
-(setq auto-header-marker "^^^AUTOGENHEADER^^^")
 
 (defun filter-line (line filename)
 	(replace-all line auto-header-marker (format nil "THIS FILE AUTO-GENERATED FROM ~A. DO NOT EDIT." filename))
@@ -173,10 +242,9 @@ is replaced with replacement."
 						(progn 
 							(setq template-status 0)
 							;expand template
-							;(prepend-into filelines (concat-string-list (formatmethods templatelines funcs)))
 							(mapcar 
 								(lambda (v) (prepend-into filelines v))
-								(formatmethods (concat-string-list (reverse templatelines)) funcs)
+								(format-methods (concat-string-list (reverse templatelines)) funcs)
 							)
 						)
 						;else

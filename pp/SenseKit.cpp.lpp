@@ -10,7 +10,7 @@ SENSEKIT_BEGIN_DECLS
 ^^^BEGINREPLACE^^^
 SENSEKIT_API ^RETURN^ sensekit_^FUNC^(^PARAMS^) 
 {
-    return g_Context.^FUNC^(^PARAM-NAMES-DEREF^);
+    return g_Context.^FUNC^(^PARAMS:names,deref^);
 }
 
 ^^^ENDREPLACE^^^

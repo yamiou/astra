@@ -17,7 +17,7 @@
 (add-func 	:returntype "sensekit_status_t"
 			:funcname "streamset_open"
 			:params (list (make-param :type "const char*" :name "connectionString")
-						 (make-param :type "sensekit_streamset_t**" :name "streamSet" :deref T)
+						  (make-param :type "sensekit_streamset_t**" :name "streamSet" :deref T)
 					)
 )
 

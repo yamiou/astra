@@ -9,7 +9,7 @@ struct StreamServiceProxyBase
     void* streamService;
 
 ^^^BEGINREPLACE^^^
-    ^RETURN^ (*^FUNC^)(void*^PARAM-TYPES^);
+    ^RETURN^ (*^FUNC^)(^PARAMS:types,void^);
 	
 ^^^ENDREPLACE^^^
 };
