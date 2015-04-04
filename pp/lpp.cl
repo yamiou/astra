@@ -163,9 +163,19 @@ is replaced with replacement."
     ))))
 )
 
-(defun format-methods (lineformat funcdatalist) 
-	(mapcar 
-		(partial #'process-tokens lineformat) funcdatalist
+(defun expand-template (template-list func-data)
+    (concat-string-list
+        (mapcar 
+            (lambda (template-line) (process-tokens template-line func-data))
+            template-list
+        )
+    )
+)
+
+(defun expand-methods-with-template (template-list func-data-list)
+    (mapcar 
+		(lambda (func-data) (expand-template template-list func-data))
+        func-data-list
 	)
 )
 
@@ -244,7 +254,7 @@ is replaced with replacement."
 							;expand template
 							(mapcar 
 								(lambda (v) (prepend-into filelines v))
-								(format-methods (concat-string-list (reverse templatelines)) funcs)
+								(expand-methods-with-template (reverse templatelines) funcs)
 							)
 						)
 						;else
