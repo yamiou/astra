@@ -2,6 +2,7 @@
 (defstruct param type name deref)
 (defstruct funcdef funcname params returntype)
 
+(setq preprocessor-file-extension "lpp")
 (setq begin-marker "^^^BEGINREPLACE^^^")
 (setq end-marker "^^^ENDREPLACE^^^")
 (setq auto-header-marker "^^^AUTOGENHEADER^^^")
@@ -226,8 +227,6 @@ is replaced with replacement."
 	)
 )
 
-(load "apidef.cl")
-
 (defun outputfuncs (f) 
 	(write-line (concat-string-list f))
 )
@@ -249,9 +248,13 @@ is replaced with replacement."
 	)
 )
 
+(defun in-to-out-filename (fn)
+    (strip-end-characters fn 4)
+)
+
 (defun process-file (infilename)
 	(let ((infile (open infilename :if-does-not-exist nil))
-		  (outfile (open (strip-end-characters infilename 4) :direction :output :if-exists :supersede))
+		  (outfile (open (in-to-out-filename infilename) :direction :output :if-exists :supersede))
 		  (filelines nil)
 		  (templatelines nil)
 		  (template-status 0)
@@ -269,7 +272,7 @@ is replaced with replacement."
 							(setq template-status 1)
 						)
 						;else
-						(prepend-into filelines (filter-line line infilename))
+						(prepend-into filelines (filter-line line (file-namestring infilename)))
 					)
 					(if (equal end-marker line)
 						;then
@@ -294,12 +297,35 @@ is replaced with replacement."
 	)
 )
 
+(load "apidef.cl" :verbose nil)
+(load "cl-fad/load.lisp" :verbose nil)
+
+(defun mapc-directory-tree (fn directory)
+    (dolist (entry (cl-fad:list-directory directory))
+        (when (cl-fad:directory-pathname-p entry)
+            (mapc-directory-tree fn entry))
+        (funcall fn entry)
+    )
+)
+    
 (defun _ () (load "lpp.cl" :verbose nil))
 
-(defun t2 ()
-	(process-file "SenseKit.cpp.lpp")
-	(process-file "StreamServiceProxyBase.h.lpp")
-	(process-file "SenseKitContext.h.lpp")
-	"done"
+(defun process (dir)
+    (let ((target-directory (if (null dir) 
+                                (ext:cd) 
+                                dir
+                                )))
+    (write-line (format nil "Base directory: ~A~%" target-directory))
+    (mapc-directory-tree (lambda (x)
+                            (when (equal (pathname-type x) preprocessor-file-extension)
+                                  (write-line (format nil "~A => ~A"
+                                                    (enough-namestring x target-directory) 
+                                                    (in-to-out-filename (file-namestring x))))
+                                  (process-file (namestring x))
+                             )
+                         )
+                          target-directory
+    )
+    )
 )
-(t2)
+(process (car *args*))
