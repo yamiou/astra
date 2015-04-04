@@ -299,6 +299,7 @@ is replaced with replacement."
 (defun t2 ()
 	(process-file "SenseKit.cpp.lpp")
 	(process-file "StreamServiceProxyBase.h.lpp")
+	(process-file "SenseKitContext.h.lpp")
 	"done"
 )
 (t2)

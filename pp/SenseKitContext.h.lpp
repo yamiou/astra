@@ -1,0 +1,61 @@
+/* ^^^AUTOGENHEADER^^^ */
+#ifndef SENSEKITCONTEXT_H
+#define SENSEKITCONTEXT_H
+
+#include <sensekit_core.h>
+#include <atomic>
+#include "PluginService.h"
+#include "StreamSet.h"
+
+struct StreamServiceProxyBase;
+struct PluginServiceProxyBase;
+
+namespace sensekit {
+
+    using initialize_fn = void(*)(PluginServiceProxyBase*);
+    using terminate_fn = void(*)();
+    using update_fn = void(*)();
+
+    struct PluginFuncs
+    {
+        initialize_fn initialize{nullptr};
+        terminate_fn terminate{nullptr};
+        update_fn update{nullptr};
+
+        bool isValid()
+            {
+                return initialize != nullptr &&
+                    terminate != nullptr &&
+                    update != nullptr;
+            }
+    };
+
+    class SenseKitContext
+    {
+    public:
+        SenseKitContext()
+            : m_pluginService(*this) {}
+        virtual ~SenseKitContext() {}
+
+^^^BEGINREPLACE^^^
+        ^RETURN^ ^FUNC^(^PARAMS:ref^);
+        
+^^^ENDREPLACE^^^
+
+        StreamSet& get_rootSet() { return m_rootSet; }
+
+        StreamServiceProxyBase* get_streamServiceProxy() { return m_streamServiceProxy; }
+
+    private:
+        StreamSet m_rootSet;
+
+        PluginService m_pluginService;
+        PluginServiceProxyBase* m_pluginServiceProxy;
+        StreamServiceProxyBase* m_streamServiceProxy;
+
+        using PluginList = std::vector<PluginFuncs>;
+        PluginList m_pluginList;
+    };
+}
+
+#endif /* SENSEKITCONTEXT_H */
