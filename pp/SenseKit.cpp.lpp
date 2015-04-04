@@ -8,8 +8,9 @@ static sensekit::SenseKitContext g_Context;
 SENSEKIT_BEGIN_DECLS
 
 ^^^BEGINREPLACE^^^
-SENSEKIT_API ^RETURN^ sensekit_^FUNC^(^PARAMS^) {
-	return g_Context.^FUNC^(^PARAM-NAMES-DEREF^);
+SENSEKIT_API ^RETURN^ sensekit_^FUNC^(^PARAMS^) 
+{
+    return g_Context.^FUNC^(^PARAM-NAMES-DEREF^);
 }
 
 ^^^ENDREPLACE^^^

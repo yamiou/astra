@@ -73,7 +73,7 @@ is replaced with replacement."
 	(make-lppmacro :macro "^RETURN^"				:filter (lambda (fd) (funcdef-returntype fd)))
 	(make-lppmacro :macro "^FUNC^"	 				:filter (lambda (fd) (funcdef-funcname fd)))
 	(make-lppmacro :macro "^PARAMS^"				:filter (lambda (fd) (format-paramlist-full (funcdef-params fd))))
-	(make-lppmacro :macro "^PARAMS-TYPES^" 			:filter (lambda (fd) (format-paramlist-type (funcdef-params fd))))
+	(make-lppmacro :macro "^PARAM-TYPES^" 			:filter (lambda (fd) (format-paramlist-type (funcdef-params fd))))
 	(make-lppmacro :macro "^PARAM-NAMES^" 			:filter (lambda (fd) (format-paramlist-name nil (funcdef-params fd))))
 	(make-lppmacro :macro "^PARAM-NAMES-DEREF^" 	:filter (lambda (fd) (format-paramlist-name T (funcdef-params fd))))
 ))
@@ -84,24 +84,6 @@ is replaced with replacement."
 				(setq lineformat (replace-all lineformat (lppmacro-macro m) (funcall (lppmacro-filter m) funcdata)))
 	)
 	lineformat
-)
-
-(defun formatmethod2 (lineformat funcdata) 
-	(replace-all 
-		(replace-all 
-			(replace-all 
-				(replace-all 
-					(replace-all lineformat 
-						"^RETURN^" (funcdef-returntype funcdata)
-					)
-					"^FUNC^" (funcdef-funcname funcdata)
-				)
-				"^PARAMS^" (format-paramlist-full (funcdef-params funcdata))
-			)
-			"^PARAM-NAMES^" (format-paramlist-name (funcdef-params funcdata))
-		)
-		"^PARAM-TYPES^" (format-paramlist-type (funcdef-params funcdata))
-	)
 )
 
 (defun formatmethods (lineformat funclist) 
@@ -214,7 +196,7 @@ is replaced with replacement."
 
 (defun t2 ()
 	(process-file "SenseKit.cpp.lpp")
-	(process-file "StreamServiceProxyBase.cpp.lpp")
+	(process-file "StreamServiceProxyBase.h.lpp")
 	"done"
 )
 (t2)
