@@ -1,4 +1,4 @@
-;definitions 3manually adapted from sensekit_capi.h
+;definitions manually adapted from sensekit_capi.h
 
 (setq voidparam (make-param :type "void*" :name "streamService"))
 
@@ -8,7 +8,7 @@
 			:params '()
 )
 
-;SENSEKIT_API void sensekit_terminate();
+;SENSEKIT_API sensekit_status_t sensekit_terminate();
 (add-func 	:returntype "sensekit_status_t"
 			:funcname "terminate" 
 			:params '()
