@@ -19,10 +19,10 @@
     )
 )
 
-(add-macro :macro "RETURN"	:filter (lambda (fd args) (funcdef-returntype fd)))
-(add-macro :macro "FUNC"	:filter (lambda (fd args) (funcdef-funcname fd)))
-(add-macro :macro "PARAMS"	:filter (lambda (fd args) (format-params (funcdef-params fd) args)))
-; PARAMS arguments: types, names, deref, ref, void
+(add-macro :macro "RETURN"	:filter (lambda (fd len args) (funcdef-returntype fd)))
+(add-macro :macro "FUNC"	:filter (lambda (fd len args) (funcdef-funcname fd)))
+(add-macro :macro "PARAMS"	:filter (lambda (fd len args) (format-params (funcdef-params fd) len args)))
+; PARAMS arguments: types, names, deref, ref, void, nowrap
 ;;;;;;;;;
 
 (defun partial (func &rest args1)
@@ -91,13 +91,14 @@ is replaced with replacement."
 	)
 )
 
-(defun format-params (params args)
-    ;full, types, names, deref, ref, void
-    (let*  ((arg-types (is-arg-set "types" args))
-            (arg-names (is-arg-set "names" args))
-            (arg-deref (is-arg-set "deref" args))
-            (arg-ref   (is-arg-set "ref" args))
-            (arg-void  (is-arg-set "void" args))
+(defun format-params (params token-start-length args)
+    ;full, types, names, deref, ref, void, nowrap
+    (let*  ((arg-types  (is-arg-set "types" args))
+            (arg-names  (is-arg-set "names" args))
+            (arg-deref  (is-arg-set "deref" args))
+            (arg-ref    (is-arg-set "ref" args))
+            (arg-void   (is-arg-set "void" args))
+            (arg-nowrap (is-arg-set "nowrap" args))
             (filtered-params (if arg-void 
                                  (cons voidparam params) ;then, prepend "void* service"
                                  params                  ;else, don't
@@ -105,12 +106,31 @@ is replaced with replacement."
             (types-only (and arg-types (not arg-names)))
             (names-only (and arg-names (not arg-types)))
             (full-decl  (not (xor arg-names arg-types)))
-            (format-func (cond  (full-decl  #'format-paramitem-full)
+            (format-param-func (cond  (full-decl  #'format-paramitem-full)
                                 (types-only #'format-paramitem-type)
                                 (names-only #'format-paramitem-name)
                           ))
+            (do-wrap    (not (or names-only arg-nowrap)))
+            (format-line (if do-wrap "~{~A~^,~%~}" "~{~A~^, ~}"))
            )
-        (format nil "~{~A~^, ~}" (mapcar (partial format-func args) filtered-params))
+       (when filtered-params
+            (format nil format-line 
+                (cons
+                    ;first parameter => no indentation
+                    (apply format-param-func (list args (car filtered-params)))
+                    (mapcar 
+                        (lambda (p) 
+                            (concatenate 'string 
+                                ;second parameter, indent according to wrap policy
+                                (when do-wrap (make-string token-start-length :initial-element #\ ))
+                                (apply format-param-func (list args p))
+                            )
+                        )
+                        (cdr filtered-params)
+                    )
+                )
+            )
+        )
     )
 )
 
@@ -122,7 +142,7 @@ is replaced with replacement."
 	)
 )
 
-(defun process-tokens (line funcdata)
+(defun process-tokens (line funcdata &optional (line-length 0))
     (let ((token-marker-left (position token-marker line))
          )
         (if (null token-marker-left)
@@ -153,10 +173,14 @@ is replaced with replacement."
                     ;then
                     line
                     ;else
-                    (concatenate 'string 
-                        line-begin 
-                        (funcall (lppmacro-filter m) funcdata token-args) 
-                        (process-tokens line-end funcdata)
+                    (let* ((token-start-length (+ line-length token-marker-left))
+                           (expanded-token (funcall (lppmacro-filter m) funcdata token-start-length token-args))
+                          )
+                        (concatenate 'string 
+                            line-begin 
+                            expanded-token
+                            (process-tokens line-end funcdata (+ token-start-length (length expanded-token)))
+                        )
                     )
                )
         )
