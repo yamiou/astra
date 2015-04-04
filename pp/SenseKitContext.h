@@ -39,7 +39,7 @@ namespace sensekit {
 
         sensekit_status_t initialize();
         
-        void terminate();
+        sensekit_status_t terminate();
         
         sensekit_status_t streamset_open(const char* connectionString,
                                          sensekit_streamset_t*& streamSet);

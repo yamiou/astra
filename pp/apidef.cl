@@ -7,7 +7,7 @@
 )
 
 ;SENSEKIT_API void sensekit_terminate();
-(add-func 	:returntype "void"
+(add-func 	:returntype "sensekit_status_t"
 			:funcname "terminate" 
 			:params '()
 )

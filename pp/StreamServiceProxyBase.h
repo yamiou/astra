@@ -10,7 +10,7 @@ struct StreamServiceProxyBase
 
     sensekit_status_t (*initialize)(void*);
 	
-    void (*terminate)(void*);
+    sensekit_status_t (*terminate)(void*);
 	
     sensekit_status_t (*streamset_open)(void*,
                                         const char*,

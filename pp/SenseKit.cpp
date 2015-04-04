@@ -12,7 +12,7 @@ SENSEKIT_API sensekit_status_t sensekit_initialize()
     return g_Context.initialize();
 }
 
-SENSEKIT_API void sensekit_terminate() 
+SENSEKIT_API sensekit_status_t sensekit_terminate() 
 {
     return g_Context.terminate();
 }
