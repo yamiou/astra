@@ -7,6 +7,7 @@
 #include "StreamServiceDelegate.h"
 #include <Plugins/StreamServiceProxyBase.h>
 #include <Plugins/PluginServiceProxyBase.h>
+#include <SenseKitAPI.h>
 
 namespace sensekit {
 
@@ -60,6 +61,8 @@ namespace sensekit {
                 os_free_library(libHandle);
             }
         }
+
+        sensekit_api_set_proxy(get_streamServiceProxy());
 
         return SENSEKIT_STATUS_SUCCESS;
     }

@@ -3,6 +3,11 @@ set(SenseKit_SOURCES
   ../../include/SenseKit/sensekit_core.h
   ../../include/SenseKit/sensekit_types.h
   ../../include/SenseKit/sensekit_capi.h
+  ../../include/SenseKit/Plugins/PluginBase.h
+  ../../include/SenseKit/Plugins/PluginServiceProxy.h
+  ../../include/SenseKit/Plugins/PluginServiceProxyBase.h
+  ../../include/SenseKit/Plugins/StreamServiceProxy.h
+  ../../include/SenseKit/Plugins/StreamServiceProxyBase.h
   SenseKitContext.h
   SenseKitContext.cpp
   SenseKit.cpp
