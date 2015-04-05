@@ -238,11 +238,13 @@ void HandTracker::connection_added(sensekit_streamconnection_t* connection)
     sensekit_frame_t* nextBuffer = nullptr;
     get_pluginService().create_stream_bin(m_handStream, binLength, &m_handBinHandle, &nextBuffer);
     setNextBuffer(nextBuffer);
+    get_pluginService().link_connection_to_bin(connection, m_handBinHandle);
 }
 
 void HandTracker::connection_removed(sensekit_streamconnection_t* connection)
 {
     //TODO need API for get bin client count...don't destroy if other clients assigned to it
+    get_pluginService().link_connection_to_bin(connection, nullptr);
     get_pluginService().destroy_stream_bin(m_handStream, &m_handBinHandle, &m_currentBuffer);
     setNextBuffer(m_currentBuffer);
 }

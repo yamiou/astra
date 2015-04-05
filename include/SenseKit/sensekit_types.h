@@ -62,8 +62,8 @@ typedef struct _sensekit_device_desc {
     char uri[MAX_STRING_FIELD_LENGTH];
     char vendor[MAX_STRING_FIELD_LENGTH];
     char name[MAX_STRING_FIELD_LENGTH];
-    int16_t usbVendorId;
-    int16_t usbProductId;
+    uint16_t usbVendorId;
+    uint16_t usbProductId;
 } sensekit_device_desc_t;
 
 typedef int32_t bin_id_t;
