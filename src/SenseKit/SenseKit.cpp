@@ -1,4 +1,4 @@
-﻿/* THIS FILE AUTO-GENERATED FROM SenseKit.cpp.lpp. DO NOT EDIT. */
+/* THIS FILE AUTO-GENERATED FROM SenseKit.cpp.lpp. DO NOT EDIT. */
 #include "SenseKitContext.h"
 #include <Plugins/StreamServiceProxyBase.h>
 #include <SenseKitAPI.h>

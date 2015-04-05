@@ -39,7 +39,7 @@ namespace sensekit {
 
 ^^^BEGINREPLACE:stream^^^
         ^RETURN^ ^FUNC^(^PARAMS:ref^);
-        
+
 ^^^ENDREPLACE^^^
 
         StreamSet& get_rootSet() { return m_rootSet; }
