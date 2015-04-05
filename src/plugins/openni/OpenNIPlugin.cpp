@@ -104,17 +104,23 @@ namespace sensekit
 
             get_pluginService().create_stream_set(m_streamSetHandle);
 
-            get_pluginService().create_stream(m_streamSetHandle,
-                                              SENSEKIT_STREAM_DEPTH,
-                                              DEPTH_DEFAULT_SUBTYPE,
-                                              pluginCallbacks,
-                                              m_depthHandle);
+            sensekit_stream_desc_t depthDesc;
+            depthDesc.type = SENSEKIT_STREAM_DEPTH;
+            depthDesc.subType = DEPTH_DEFAULT_SUBTYPE;
 
             get_pluginService().create_stream(m_streamSetHandle,
-                                              SENSEKIT_STREAM_COLOR,
-                                              COLOR_DEFAULT_SUBTYPE,
+                                              depthDesc,
                                               pluginCallbacks,
-                                              m_colorHandle);
+                                              &m_depthHandle);
+
+            sensekit_stream_desc_t colorDesc;
+            colorDesc.type = SENSEKIT_STREAM_COLOR;
+            colorDesc.subType = COLOR_DEFAULT_SUBTYPE;
+
+            get_pluginService().create_stream(m_streamSetHandle,
+                                              colorDesc,
+                                              pluginCallbacks,
+                                              &m_colorHandle);
 
             m_depthMode = m_depthStream.getVideoMode();
             m_colorMode = m_colorStream.getVideoMode();
@@ -125,7 +131,7 @@ namespace sensekit
             get_pluginService()
                 .create_stream_bin(m_depthHandle,
                                    sizeof(sensekit_depthframe_t) + m_depthBufferLength,
-                                   &m_depthBinId,
+                                   &m_depthBinHandle,
                                    &nextBuffer);
 
             set_new_depth_buffer(nextBuffer);
@@ -133,7 +139,7 @@ namespace sensekit
             get_pluginService()
                 .create_stream_bin(m_colorHandle,
                                    sizeof(sensekit_colorframe_t) + m_colorBufferLength,
-                                   &m_colorBinId,
+                                   &m_colorBinHandle,
                                    &nextBuffer);
 
             set_new_color_buffer(nextBuffer);
@@ -159,12 +165,32 @@ namespace sensekit
 
         void OpenNIPlugin::connection_added(sensekit_streamconnection_t* connection)
         {
-            cout << "openniplugin: new connection added" << endl;
+            switch (connection->desc.type)
+            {
+            case SENSEKIT_STREAM_DEPTH:
+                get_pluginService().link_connection_to_bin(connection, m_depthBinHandle);
+                cout << "openniplugin: new connection added, linked to global depth" << endl;
+                break;
+            case SENSEKIT_STREAM_COLOR:
+                get_pluginService().link_connection_to_bin(connection, m_colorBinHandle);
+                cout << "openniplugin: new connection added, linked to global color" << endl;
+                break;
+            }
         }
 
         void OpenNIPlugin::connection_removed(sensekit_streamconnection_t* connection)
         {
-            cout << "openniplugin: connection removed" << endl;
+            switch (connection->desc.type)
+            {
+            case SENSEKIT_STREAM_DEPTH:
+                get_pluginService().link_connection_to_bin(connection, nullptr);
+                cout << "openniplugin: connection removed, unlinking from depth" << endl;
+                break;
+            case SENSEKIT_STREAM_COLOR:
+                get_pluginService().link_connection_to_bin(connection, nullptr);
+                cout << "openniplugin: connection removed, unlinking from color" << endl;
+                break;
+            }
         }
 
         sensekit_status_t OpenNIPlugin::close_sensor_streams()
@@ -211,7 +237,7 @@ namespace sensekit
                 == SENSEKIT_STATUS_SUCCESS)
             {
                 sensekit_frame_t* nextBuffer = nullptr;
-                get_pluginService().cycle_bin_buffers(m_depthHandle, m_depthBinId, &nextBuffer);
+                get_pluginService().cycle_bin_buffers(m_depthBinHandle, &nextBuffer);
                 set_new_depth_buffer(nextBuffer);
             }
 
@@ -220,7 +246,7 @@ namespace sensekit
                 == SENSEKIT_STATUS_SUCCESS)
             {
                 sensekit_frame_t* nextBuffer = nullptr;
-                get_pluginService().cycle_bin_buffers(m_colorHandle, m_colorBinId, &nextBuffer);
+                get_pluginService().cycle_bin_buffers(m_colorBinHandle, &nextBuffer);
                 set_new_color_buffer(nextBuffer);
             }
         }

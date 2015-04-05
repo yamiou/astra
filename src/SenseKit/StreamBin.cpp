@@ -1,10 +1,29 @@
 #include "StreamBin.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
-
 namespace sensekit {
+
+    StreamBin::StreamBin(size_t bufferLengthInBytes)
+        : m_frontBufferLocked(ATOMIC_VAR_INIT(false))
+    {
+        allocate_buffers(bufferLengthInBytes);
+    }
+
+    sensekit_frame_t* StreamBin::get_frontBuffer()
+    {
+        return m_buffers[m_frontBufferIndex];
+    }
+
+    size_t StreamBin::inc_index(size_t index)
+    {
+        size_t newIndex = index;
+
+        do
+        {
+            newIndex = newIndex + 1 < BUFFER_COUNT ? newIndex + 1 : 0;
+        } while (newIndex == m_frontBufferIndex);
+
+        return newIndex;
+    }
 
     sensekit_frame_t* allocate_frame(size_t bufferLengthInBytes)
     {
@@ -23,13 +42,6 @@ namespace sensekit {
         delete[] (uint8_t*)frame->data;
         delete frame;
         frame = nullptr;
-    }
-
-    StreamBin::StreamBin(StreamBinId id, size_t bufferLengthInBytes)
-        : m_id(id),
-          m_frontBufferLocked(ATOMIC_VAR_INIT(false))
-    {
-        allocate_buffers(bufferLengthInBytes);
     }
 
     void StreamBin::allocate_buffers(size_t bufferLengthInBytes)

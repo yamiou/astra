@@ -4,23 +4,23 @@
 
 namespace sensekit {
 
-    StreamConnection* StreamSet::open_stream_connection(StreamType type, StreamSubtype subtype)
+    StreamConnection* StreamSet::create_stream_connection(sensekit_stream_desc_t& desc)
     {
-        Stream* sk_stream = find_stream_by_type_subtype_impl(type, subtype);
+        Stream* stream = find_stream_by_type_subtype_impl(desc.type, desc.subType);
 
-        if (sk_stream == nullptr)
+        if (stream == nullptr)
         {
             std::cout << "not found" << std::endl;
             return nullptr;
         }
 
-        return sk_stream->open();
+        return stream->create_connection();
     }
 
-    bool StreamSet::close_stream_connection(StreamConnection* connection)
+    bool StreamSet::destroy_stream_connection(StreamConnection* connection)
     {
         Stream* stream = connection->get_stream();
-        stream->close(connection);
+        stream->destroy_connection(connection);
 
         return true;
     }
@@ -30,30 +30,20 @@ namespace sensekit {
         return find_stream_by_type_subtype(type, subtype) != nullptr;
     }
 
-    void StreamSet::get_stream_type_subtype(StreamHandle* stream, /*out*/StreamType& type, /*out*/StreamSubtype& subtype)
+    Stream* StreamSet::create_stream(sensekit_stream_desc_t desc, stream_callbacks_t pluginCallbacks)
     {
-        Stream* sk_stream = reinterpret_cast<Stream*>(stream);
-
-        type = sk_stream->get_type();
-        subtype = sk_stream->get_subtype();
-    }
-
-    StreamHandle* StreamSet::create_stream(StreamType type, StreamSubtype subtype, stream_callbacks_t pluginCallbacks)
-    {
-        Stream* sk_stream = new Stream(type, subtype, pluginCallbacks);
+        Stream* sk_stream = new Stream(desc, pluginCallbacks);
 
         m_streamCollection.insert(sk_stream);
 
-        StreamHandle* stream = reinterpret_cast<StreamHandle*>(sk_stream);
-        return stream;
+        return sk_stream;
     }
 
-    void StreamSet::destroy_stream(StreamHandle* stream)
+    void StreamSet::destroy_stream(Stream* stream)
     {
         //TODO: check for nullptr
-        Stream* sk_stream = reinterpret_cast<Stream*>(stream);
 
-        m_streamCollection.erase(m_streamCollection.find(sk_stream));
+        m_streamCollection.erase(m_streamCollection.find(stream));
     }
 
     bool StreamSet::is_member(StreamHandle* stream)

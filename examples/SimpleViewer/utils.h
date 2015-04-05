@@ -63,7 +63,7 @@ void Sleep(int millisecs)
 
 void calculateHistogram(float* pHistogram, int histogramSize, sensekit_depthframe_t& frame)
 {
-        short* pDepth = frame.data;
+        int16_t* pDepth = frame.data;
         // Calculate the accumulative histogram (the yellow display...)
         memset(pHistogram, 0, histogramSize*sizeof(float));
         int height = frame.height;

@@ -94,15 +94,12 @@ namespace sensekit {
 
     sensekit_status_t SenseKitContext::reader_destroy(sensekit_reader_t*& reader)
     {
-
         assert(reader != nullptr);
 
         StreamReader* actualReader = reinterpret_cast<StreamReader*>(reader);
-        if (actualReader != nullptr)
-        {
-            delete actualReader;
-            reader = nullptr;
-        }
+
+        delete actualReader;
+        reader = nullptr;
 
         return SENSEKIT_STATUS_SUCCESS;
     }

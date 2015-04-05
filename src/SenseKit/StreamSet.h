@@ -14,17 +14,16 @@ namespace sensekit {
     public:
         using StreamListPtr = std::unique_ptr<std::vector<Stream*> >;
 
-        StreamConnection* open_stream_connection(StreamType type, StreamSubtype subtype);
-        bool close_stream_connection(StreamConnection* connection);
+        StreamConnection* create_stream_connection(sensekit_stream_desc_t& desc);
+
+        bool destroy_stream_connection(StreamConnection* connection);
 
         bool has_stream_of_type_subtype(StreamType type, StreamSubtype subtype);
 
-        void get_stream_type_subtype(StreamHandle* stream, /*out*/StreamType& type, /*out*/StreamSubtype& subtype);
-
         //plugins only below
 
-        StreamHandle* create_stream(StreamType type, StreamSubtype subtype, stream_callbacks_t pluginCallbacks);
-        void destroy_stream(StreamHandle* stream);
+        Stream* create_stream(sensekit_stream_desc_t desc, stream_callbacks_t pluginCallbacks);
+        void destroy_stream(Stream* stream);
 
         bool is_member(StreamHandle* stream);
 

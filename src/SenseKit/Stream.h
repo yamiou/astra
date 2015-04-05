@@ -4,7 +4,6 @@
 #include <atomic>
 #include <memory>
 #include <vector>
-#include <map>
 #include "Signal.h"
 #include "StreamBin.h"
 #include "StreamConnection.h"
@@ -16,26 +15,22 @@ namespace sensekit {
     class Stream
     {
     public:
-        Stream(StreamType type, StreamSubtype subtype, stream_callbacks_t pluginCallbacks) :
-            m_type(type),
-            m_subtype(subtype),
-            m_callbacks(pluginCallbacks)
-        {
-            m_nextBinId = 0;
-        }
+        Stream(sensekit_stream_desc_t description,
+               stream_callbacks_t pluginCallbacks)
+            : m_description(description),
+              m_callbacks(pluginCallbacks)
+            {}
 
         ~Stream();
 
-        StreamConnection* open();
-        void close(StreamConnection* connection);
+        StreamConnection* create_connection();
+        void destroy_connection(StreamConnection* connection);
 
-        StreamType get_type() { return m_type; }
-        StreamSubtype get_subtype() { return m_subtype; }
+        StreamType get_type() { return m_description.type; }
+        StreamSubtype get_subtype() { return m_description.subType; }
 
         StreamBin* create_bin(size_t byteLength);
         void destroy_bin(StreamBin* bin);
-
-        StreamBin* get_bin_by_id(StreamBinId id);
 
         void set_parameter(StreamConnection* connection,
                            sensekit_parameter_id id,
@@ -51,21 +46,20 @@ namespace sensekit {
                                 size_t byteLength,
                                 sensekit_parameter_data_t* data);
 
+        const sensekit_stream_desc_t& get_description() const { return m_description; }
+
     private:
-        using ConnPtr = std::unique_ptr < StreamConnection > ;
-        using ConnectionList = std::vector < ConnPtr > ;
+        using ConnPtr = std::unique_ptr<StreamConnection>;
+        using ConnectionList = std::vector<ConnPtr>;
 
-        using BinPtr = std::unique_ptr < StreamBin > ;
-        using BinMap = std::map < StreamBinId, BinPtr > ;
+        using BinPtr = std::unique_ptr<StreamBin>;
+        using BinList = std::vector<BinPtr>;
 
-        const StreamType m_type{0};
-        const StreamSubtype m_subtype{0};
+        sensekit_stream_desc_t m_description;
 
         ConnectionList m_connections;
-        BinMap m_bins;
+        BinList m_bins;
         stream_callbacks_t m_callbacks;
-
-        std::atomic_int m_nextBinId;
     };
 }
 

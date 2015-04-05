@@ -301,7 +301,7 @@ void SampleViewer::display()
 
     memset(m_pTexMap, 0, m_nTexMapX*m_nTexMapY*sizeof(RGB888Pixel));
 
-    short* pDepthRow = (short*)m_depthFrame->data;
+    int16_t* pDepthRow = (int16_t*)m_depthFrame->data;
     RGB888Pixel* pTexRow = m_pTexMap;
     int rowSize = m_depthFrame->width;
 
@@ -309,12 +309,12 @@ void SampleViewer::display()
 
     for (int y = 0; y < m_depthFrame->height; ++y)
     {
-        short* pDepth = pDepthRow;
+        int16_t* pDepth = pDepthRow;
         RGB888Pixel* pTex = pTexRow;
 
         for (int x = 0; x < m_depthFrame->width; ++x, ++pDepth, ++normMap, ++pTex)
         {
-            short depth = *pDepth;
+            int16_t depth = *pDepth;
             if (depth != 0)
             {
                 /*

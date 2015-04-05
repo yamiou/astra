@@ -29,7 +29,7 @@ private:
 
     void trackPoints(cv::Mat& matDepth, cv::Mat& matForeground);
     void setupStream();
-    
+
     void setNextBuffer(sensekit_frame_t* sensekitFrame);
 
     virtual void set_parameter(sensekit_streamconnection_t* connection,
@@ -49,20 +49,19 @@ private:
     virtual void connection_added(sensekit_streamconnection_t* connection) override;
     virtual void connection_removed(sensekit_streamconnection_t* connection) override;
 
-    //fields    
+    //fields
     sensekit_streamset_t* m_setHandle;
     sensekit_depthstream_t* m_depthStream;
     DepthUtility m_depthUtility;
     CoordinateConverter m_converter;
     PointProcessor m_pointProcessor;
 
-    StreamHandle* m_handStream;
-    StreamBinId m_handBinId{ 0 };
+    sensekit_stream_handle_t m_handStream{nullptr};
+    sensekit_bin_handle_t m_handBinHandle{nullptr};
 
+    int m_width;
+    int m_height;
 
-    int			m_width;
-    int			m_height;
-    
     float m_resizeFactor;
 
     cv::Mat m_matDepth;

@@ -18,19 +18,27 @@ namespace sensekit
         {
         }
 
-        void HandsPlugin::stream_added_handler_thunk(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType type, StreamSubtype subtype)
+        void HandsPlugin::stream_added_handler_thunk(StreamSetHandle* setHandle,
+                                                     sensekit_stream_handle_t streamHandle,
+                                                     sensekit_stream_desc_t desc)
         {
-            g_plugin->stream_added_handler(setHandle, streamHandle, type, subtype);
+            g_plugin->stream_added_handler(setHandle, streamHandle, desc);
         }
 
-        void HandsPlugin::stream_removing_handler_thunk(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType type, StreamSubtype subtype)
+        void HandsPlugin::stream_removing_handler_thunk(StreamSetHandle* setHandle,
+                                                        sensekit_stream_handle_t streamHandle,
+                                                        sensekit_stream_desc_t desc)
+
         {
-            g_plugin->stream_removing_handler(setHandle, streamHandle, type, subtype);
+            g_plugin->stream_removing_handler(setHandle, streamHandle, desc);
         }
 
-        void HandsPlugin::stream_added_handler(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType type, StreamSubtype subtype)
+        void HandsPlugin::stream_added_handler(StreamSetHandle* setHandle,
+                                               sensekit_stream_handle_t streamHandle,
+                                               sensekit_stream_desc_t desc)
         {
-            if (type == SENSEKIT_STREAM_DEPTH && m_streamTrackerMap.find(streamHandle) == m_streamTrackerMap.end())
+            if (desc.type == SENSEKIT_STREAM_DEPTH &&
+                m_streamTrackerMap.find(streamHandle) == m_streamTrackerMap.end())
             {
                 sensekit_depthstream_t* depthStream = reinterpret_cast<sensekit_depthstream_t*>(streamHandle);
 
@@ -39,7 +47,9 @@ namespace sensekit
             }
         }
 
-        void HandsPlugin::stream_removing_handler(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType type, StreamSubtype subtype)
+        void HandsPlugin::stream_removing_handler(StreamSetHandle* setHandle,
+                                                  sensekit_stream_handle_t streamHandle,
+                                                  sensekit_stream_desc_t desc)
         {
             auto it = m_streamTrackerMap.find(streamHandle);
             if (it != m_streamTrackerMap.end())

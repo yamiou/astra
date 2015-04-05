@@ -47,8 +47,12 @@ void HandTracker::setupStream()
 {
     stream_callbacks_t pluginCallbacks = sensekit::create_plugin_callbacks(this);
 
-    get_pluginService().create_stream(m_setHandle, SENSEKIT_STREAM_HANDS, HANDS_DEFAULT_SUBTYPE, pluginCallbacks, m_handStream);
-    
+    sensekit_stream_desc_t desc;
+    desc.type = SENSEKIT_STREAM_HANDS;
+    desc.subType = HANDS_DEFAULT_SUBTYPE;
+
+    get_pluginService().create_stream(m_setHandle, desc, pluginCallbacks, &m_handStream);
+
     //TODO subscribe to m_depthStream's frame ready event
 }
 
@@ -232,13 +236,13 @@ void HandTracker::connection_added(sensekit_streamconnection_t* connection)
     int binLength = sizeof(sensekit_handframe_t) + SENSEKIT_HANDS_MAX_HANDPOINTS * sizeof(sensekit_handpoint_t);
 
     sensekit_frame_t* nextBuffer = nullptr;
-    get_pluginService().create_stream_bin(m_handStream, binLength, &m_handBinId, &nextBuffer);
+    get_pluginService().create_stream_bin(m_handStream, binLength, &m_handBinHandle, &nextBuffer);
     setNextBuffer(nextBuffer);
 }
 
 void HandTracker::connection_removed(sensekit_streamconnection_t* connection)
 {
     //TODO need API for get bin client count...don't destroy if other clients assigned to it
-    get_pluginService().destroy_stream_bin(m_handStream, &m_handBinId, &m_currentBuffer);
+    get_pluginService().destroy_stream_bin(m_handStream, &m_handBinHandle, &m_currentBuffer);
     setNextBuffer(m_currentBuffer);
 }

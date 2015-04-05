@@ -11,7 +11,7 @@ namespace sensekit {
     class StreamBin
     {
     public:
-        StreamBin(StreamBinId id, size_t bufferSizeInBytes);
+        StreamBin(size_t bufferSizeInBytes);
         ~StreamBin();
 
         //exposed to plugins
@@ -34,52 +34,46 @@ namespace sensekit {
                 m_frontBufferLocked = false;
             }
 
-        int get_ref_count() { return m_refCount; }
-
-        void add_ref() { m_refCount++; }
-        void dec_ref()
+        void inc_active() { m_activeCount++; }
+        void dec_active()
             {
-                m_refCount--;
-                if (m_refCount < 0)
+                m_activeCount--;
+                if (m_activeCount < 0)
                 {
                     throw std::exception();
                 }
             }
 
-        StreamBinId get_id() { return m_id; }
+        void inc_connected() { m_connectedCount++; }
+        void dec_connected()
+            {
+                m_connectedCount--;
+                if (m_connectedCount < 0)
+                {
+                    throw std::exception();
+                }
+            }
+
+        bool is_active() { return m_activeCount > 0; }
+        bool has_clients_connected() { return m_connectedCount > 0; }
 
     private:
-        StreamBinId m_id{-1};
-        std::atomic_bool m_frontBufferLocked;
+        void allocate_buffers(size_t bufferLengthInBytes);
+        sensekit_frame_t* get_frontBuffer();
+        size_t inc_index(size_t index);
 
-        const static size_t BUFFER_COUNT = 2;
-        using FrameBufferArray = std::array<sensekit_frame_t*, BUFFER_COUNT>;
+        std::atomic_bool m_frontBufferLocked;
 
         size_t m_frontBufferIndex{0};
         size_t m_backBufferHeadIndex{1};
         size_t m_backBufferTailIndex{1};
 
+        const static size_t BUFFER_COUNT = 2;
+        using FrameBufferArray = std::array<sensekit_frame_t*, BUFFER_COUNT>;
+
         FrameBufferArray m_buffers;
-        int m_refCount{0};
-
-        void allocate_buffers(size_t bufferLengthInBytes);
-
-        sensekit_frame_t* get_frontBuffer()
-            {
-                return m_buffers[m_frontBufferIndex];
-            }
-
-        size_t inc_index(size_t index)
-            {
-                size_t newIndex = index;
-
-                do
-                {
-                    newIndex = newIndex + 1 < BUFFER_COUNT ? newIndex + 1 : 0;
-                } while (newIndex == m_frontBufferIndex);
-
-                return newIndex;
-            }
+        int m_connectedCount{0};
+        int m_activeCount{0};
     };
 }
 

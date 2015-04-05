@@ -23,8 +23,8 @@ namespace sensekit {
         if (connection != nullptr)
             return connection->get_handle();
 
-        connection = m_streamSet.open_stream_connection(desc.type,
-                                                        desc.subType);
+        connection = m_streamSet.create_stream_connection(desc);
+
         if (connection != nullptr)
         {
             m_streamMap.insert(std::make_pair(desc, connection));
@@ -68,22 +68,30 @@ namespace sensekit {
         {
             StreamConnection* connection = pair.second;
             connection->unlock();
-
         }
 
         m_locked = false;
     }
 
-    bool StreamReader::close_stream(StreamConnection* connection)
+    bool StreamReader::destroy_stream_connection(StreamConnection* connection)
     {
         assert(connection != nullptr);
 
         if (m_streamMap.erase(connection->get_description()) > 0)
         {
-            m_streamSet.close_stream_connection(connection);
+            m_streamSet.destroy_stream_connection(connection);
             return true;
         }
 
         return false;
+    }
+
+    StreamReader::~StreamReader()
+    {
+        for(auto pair : m_streamMap)
+        {
+            m_streamSet.destroy_stream_connection(pair.second);
+        }
+        m_streamMap.clear();
     }
 }

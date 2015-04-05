@@ -38,6 +38,8 @@ namespace sensekit {
         explicit StreamReader(StreamSet& streamSet)
             : m_streamSet(streamSet) { }
 
+        ~StreamReader();
+
         StreamSet& get_streamSet() const { return m_streamSet; }
 
         sensekit_streamconnection_t* get_stream(sensekit_stream_desc_t& desc);
@@ -51,7 +53,7 @@ namespace sensekit {
     private:
         StreamConnection* find_stream_of_type(sensekit_stream_desc_t& desc);
 
-        bool close_stream(StreamConnection* connection);
+        bool destroy_stream_connection(StreamConnection* connection);
 
         using ConnectionMap = std::unordered_map<sensekit_stream_desc_t,
                                                  StreamConnection*,

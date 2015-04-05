@@ -6,12 +6,6 @@
 #include "StreamBin.h"
 #include "Core/Signal.h"
 
-//typedef void(*StreamAddedCallback)(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType typeId, StreamSubtype subtype);
-//typedef void(*StreamRemovingCallback)(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType typeId, StreamSubtype subtype);
-//typedef size_t CallbackId;
-
-using StreamAddedCallback = void(*)(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType typeId, StreamSubtype subtype);
-using StreamRemovingCallback = void(*)(StreamSetHandle* setHandle, StreamHandle* streamHandle, StreamType typeId, StreamSubtype subtype);
 using CallbackId = size_t;
 
 struct PluginServiceProxyBase;
@@ -30,8 +24,8 @@ namespace sensekit
 
         PluginServiceProxyBase* create_proxy();
 
-        sensekit_status_t create_stream_set(sensekit_streamset_t*& streamset);
-        sensekit_status_t destroy_stream_set(sensekit_streamset_t*& streamset);
+        sensekit_status_t create_stream_set(sensekit_streamset_t*& streamSet);
+        sensekit_status_t destroy_stream_set(sensekit_streamset_t*& streamSet);
 
         // metadata = int num_stream_types, StreamTypeId[] ids
         //for generators (no requirements, i.e. depth sensor and color sensor)
@@ -43,26 +37,36 @@ namespace sensekit
         sensekit_status_t unregister_stream_removing_callback(CallbackId callbackId);
 
         // Plugin notifying framework of a newly available stream
-        sensekit_status_t create_stream(StreamSetHandle* setHandle, StreamType type, StreamSubtype subtype, stream_callbacks_t pluginCallbacks, /*out*/StreamHandle*& handle);
+        sensekit_status_t create_stream(StreamSetHandle* setHandle,
+                                        sensekit_stream_desc_t desc,
+                                        stream_callbacks_t pluginCallbacks,
+                                        sensekit_stream_handle_t& streamHandle);
 
         // Plugin notifying framework of a stream no longer available
-        sensekit_status_t destroy_stream(StreamHandle*& handle);
+        sensekit_status_t destroy_stream(sensekit_stream_handle_t& handle);
 
-        // TODO: create BinHandle, retire BinId, pass BinHandles to plugins
-        sensekit_status_t create_stream_bin(StreamHandle* handle, size_t lengthInBytes,
-                                            /*out*/ StreamBinId& id, /*out*/ sensekit_frame_t*& binBuffer);
+        sensekit_status_t create_stream_bin(sensekit_stream_handle_t handle,
+                                            size_t lengthInBytes,
+                                            sensekit_bin_handle_t& id,
+                                            sensekit_frame_t*& binBuffer);
 
-        sensekit_status_t destroy_stream_bin(StreamHandle* handle, StreamBinId& id, sensekit_frame_t*& old_buf);
+        sensekit_status_t destroy_stream_bin(sensekit_stream_handle_t streamHandle,
+                                             sensekit_bin_handle_t& binHandle,
+                                             sensekit_frame_t*& binBuffer);
 
-        sensekit_status_t cycle_bin_buffers(StreamHandle* handle, StreamBinId id, sensekit_frame_t*& binBuffer);
+        sensekit_status_t cycle_bin_buffers(sensekit_bin_handle_t binHandle,
+                                            sensekit_frame_t*& binBuffer);
+
+        sensekit_status_t link_connection_to_bin(sensekit_streamconnection_t* connection,
+                                                 sensekit_bin_handle_t binHandle);
 
         //orbbec_error orbbec_stream_assign_connection_to_bin(StreamHandle handle, client_id id, bin_id id);
         //orbbec_error orbbec_stream_register_get_parameter_callback(component_handle handle, client_id client, ...);
 
     private:
         SenseKitContext& m_context;
-        Signal<StreamSetHandle*, StreamHandle*, StreamType, StreamSubtype> m_streamAddedSignal;
-        Signal<StreamSetHandle*, StreamHandle*, StreamType, StreamSubtype> m_streamRemovingSignal;
+        Signal<StreamSetHandle*, sensekit_stream_handle_t, sensekit_stream_desc_t> m_streamAddedSignal;
+        Signal<StreamSetHandle*, sensekit_stream_handle_t, sensekit_stream_desc_t> m_streamRemovingSignal;
 
     };
 }

@@ -2,10 +2,6 @@
 #include "StreamConnection.h"
 #include "StreamBin.h"
 #include "Stream.h"
-#include <iostream>
-
-using std::cout;
-using std::endl;
 
 namespace sensekit {
 
@@ -16,8 +12,13 @@ namespace sensekit {
 
         m_connection.handle =
             reinterpret_cast<sensekit_streamconnection_handle*>(this);
-        m_connection.desc.type = m_stream->get_type();
-        m_connection.desc.subType = m_stream->get_subtype();
+
+        m_connection.desc = stream->get_description();
+    }
+
+    const sensekit_stream_desc_t& StreamConnection::get_description() const
+    {
+        return m_stream->get_description();
     }
 
     sensekit_frame_ref_t* StreamConnection::lock()
@@ -42,19 +43,31 @@ namespace sensekit {
         m_locked = true;
     }
 
-    void StreamConnection::set_bin(StreamBin* new_bin)
+    void StreamConnection::start()
     {
-        if (m_bin)
-        {
-            m_bin->dec_ref();
-        }
+        if (m_started)
+            return;
 
-        m_bin = new_bin;
+        m_started = true;
+    }
 
-        if (m_bin)
-        {
-            m_bin->add_ref();
-        }
+    void StreamConnection::stop()
+    {
+        if (!m_started)
+            return;
+
+        m_started = false;
+    }
+
+    void StreamConnection::set_bin(StreamBin* bin)
+    {
+        if (m_bin != nullptr)
+            m_bin->dec_connected();
+
+        m_bin = bin;
+
+        if (m_bin != nullptr)
+            m_bin->inc_connected();
     }
 
     void StreamConnection::set_parameter(sensekit_parameter_id id,

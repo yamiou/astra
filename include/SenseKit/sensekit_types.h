@@ -7,7 +7,7 @@
 const unsigned MAX_STRING_FIELD_LENGTH = 256;
 const uint8_t SENSEKIT_MAX_READER_STREAMS = 16;
 
-typedef struct _sensekit_stream sensekit_stream_t;
+typedef struct _sensekit_stream_handle* sensekit_stream_handle_t;
 typedef int32_t sensekit_stream_type_t;
 typedef int32_t sensekit_stream_subtype_t;
 
@@ -45,9 +45,11 @@ typedef sensekit_reader_t sensekit_reader_frame_t;
 typedef struct _sensekit_parameter_data sensekit_parameter_data_t;
 typedef int32_t sensekit_parameter_id;
 
-typedef sensekit_stream_t StreamHandle;
+typedef sensekit_stream_handle_t StreamHandle;
 
 typedef sensekit_streamset_t StreamSetHandle;
+
+typedef struct _sensekit_bin_handle* sensekit_bin_handle_t;
 
 typedef enum _sensekit_status {
     SENSEKIT_STATUS_SUCCESS = 0,
@@ -60,8 +62,8 @@ typedef struct _sensekit_device_desc {
     char uri[MAX_STRING_FIELD_LENGTH];
     char vendor[MAX_STRING_FIELD_LENGTH];
     char name[MAX_STRING_FIELD_LENGTH];
-    uint16_t usbVendorId;
-    uint16_t usbProductId;
+    int16_t usbVendorId;
+    int16_t usbProductId;
 } sensekit_device_desc_t;
 
 typedef int32_t bin_id_t;
@@ -81,6 +83,16 @@ typedef void(*get_parameter_data_callback_t)(void*, sensekit_streamconnection_t*
 
 typedef void(*connection_added_callback_t)(void*, sensekit_streamconnection_t*);
 typedef void(*connection_removed_callback_t)(void*, sensekit_streamconnection_t*);
+
+
+typedef void(*StreamAddedCallback)(StreamSetHandle*,
+                                   sensekit_stream_handle_t,
+                                   sensekit_stream_desc_t);
+
+typedef void(*StreamRemovingCallback)(StreamSetHandle*,
+                                      sensekit_stream_handle_t,
+                                      sensekit_stream_desc_t);
+typedef size_t CallbackId;
 
 struct stream_callbacks_t
 {

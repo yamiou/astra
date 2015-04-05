@@ -4,6 +4,7 @@
 #include "PluginServiceDelegate.h"
 #include <Plugins/PluginServiceProxyBase.h>
 #include <iostream>
+#include <sensekit_types.h>
 
 using std::cout;
 using std::endl;
@@ -12,23 +13,24 @@ namespace sensekit
 {
     PluginServiceProxyBase* PluginService::create_proxy()
     {
-        PluginServiceProxyBase* base = new PluginServiceProxyBase;
+        PluginServiceProxyBase* proxy = new PluginServiceProxyBase;
 
-        base->register_stream_added_callback = &PluginServiceDelegate::register_stream_added_callback;
-        base->register_stream_removing_callback = &PluginServiceDelegate::register_stream_removing_callback;
-        base->unregister_stream_added_callback = &PluginServiceDelegate::unregister_stream_added_callback;
-        base->unregister_stream_removing_callback = &PluginServiceDelegate::unregister_stream_removing_callback;
-        base->create_stream_set = &PluginServiceDelegate::create_stream_set;
-        base->destroy_stream_set = &PluginServiceDelegate::destroy_stream_set;
-        base->create_stream = &PluginServiceDelegate::create_stream;
-        base->destroy_stream = &PluginServiceDelegate::destroy_stream;
-        base->create_stream_bin = &PluginServiceDelegate::create_stream_bin;
-        base->destroy_stream_bin = &PluginServiceDelegate::destroy_stream_bin;
-        base->cycle_bin_buffers = &PluginServiceDelegate::cycle_bin_buffers;
+        proxy->register_stream_added_callback = &PluginServiceDelegate::register_stream_added_callback;
+        proxy->register_stream_removing_callback = &PluginServiceDelegate::register_stream_removing_callback;
+        proxy->unregister_stream_added_callback = &PluginServiceDelegate::unregister_stream_added_callback;
+        proxy->unregister_stream_removing_callback = &PluginServiceDelegate::unregister_stream_removing_callback;
+        proxy->create_stream_set = &PluginServiceDelegate::create_stream_set;
+        proxy->destroy_stream_set = &PluginServiceDelegate::destroy_stream_set;
+        proxy->create_stream = &PluginServiceDelegate::create_stream;
+        proxy->destroy_stream = &PluginServiceDelegate::destroy_stream;
+        proxy->create_stream_bin = &PluginServiceDelegate::create_stream_bin;
+        proxy->destroy_stream_bin = &PluginServiceDelegate::destroy_stream_bin;
+        proxy->cycle_bin_buffers = &PluginServiceDelegate::cycle_bin_buffers;
+        proxy->link_connection_to_bin = &PluginServiceDelegate::link_connection_to_bin;
 
-        base->pluginService = this;
+        proxy->pluginService = this;
 
-        return base;
+        return proxy;
     }
 
     sensekit_status_t PluginService::create_stream_set(sensekit_streamset_t*& streamset)
@@ -85,37 +87,38 @@ namespace sensekit
     }
 
     sensekit_status_t PluginService::create_stream(StreamSetHandle* setHandle,
-                                                   StreamType type,
-                                                   StreamSubtype subtype,
+                                                   sensekit_stream_desc_t desc,
                                                    stream_callbacks_t pluginCallbacks,
-                                                   StreamHandle*& handle)
+                                                   sensekit_stream_handle_t& handle)
     {
         // TODO add to specific streamset
-        StreamHandle* stream = m_context.get_rootSet().create_stream(type, subtype, pluginCallbacks);
+        Stream* stream = m_context.get_rootSet().create_stream(desc, pluginCallbacks);
+        handle = reinterpret_cast<sensekit_stream_handle_t>(stream);
 
-        handle = stream;
-
-        m_streamAddedSignal.raise(setHandle, handle, type, subtype);
+        m_streamAddedSignal.raise(setHandle, handle, desc);
 
         cout << "registering stream." << endl;
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::destroy_stream(StreamHandle*& streamHandle)
+    sensekit_status_t PluginService::destroy_stream(sensekit_stream_handle_t& streamHandle)
     {
         if (streamHandle == nullptr)
             return SENSEKIT_STATUS_INVALID_PARAMETER;
 
+        //TODO refactor this mess
+
         StreamSet* set = &m_context.get_rootSet();
 
         StreamSetHandle* setHandle = reinterpret_cast<StreamSetHandle*>(set);
-        StreamType type;
-        StreamSubtype subtype;
-        set->get_stream_type_subtype(streamHandle, type, subtype);
-        m_streamRemovingSignal.raise(setHandle, streamHandle, type, subtype);
 
-        set->destroy_stream(streamHandle);
+        Stream* stream = reinterpret_cast<Stream*>(streamHandle);
+        const sensekit_stream_desc_t& desc = stream->get_description();
+
+        m_streamRemovingSignal.raise(setHandle, streamHandle, desc);
+
+        set->destroy_stream(stream);
 
         streamHandle = nullptr;
 
@@ -124,42 +127,51 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::create_stream_bin(StreamHandle* handle,
+    sensekit_status_t PluginService::create_stream_bin(sensekit_stream_handle_t streamHandle,
                                                        size_t lengthInBytes,
-                                                       StreamBinId& id,
+                                                       sensekit_bin_handle_t& binHandle,
                                                        sensekit_frame_t*& binBuffer)
     {
-        Stream* stream = reinterpret_cast<Stream*>(handle);
+        Stream* stream = reinterpret_cast<Stream*>(streamHandle);
         StreamBin* bin = stream->create_bin(lengthInBytes);
 
-        id = bin->get_id();
+        binHandle = reinterpret_cast<sensekit_bin_handle_t>(bin);
         binBuffer = bin->get_backBuffer();
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::destroy_stream_bin(StreamHandle* handle,
-                                                        StreamBinId& id,
-                                                        sensekit_frame_t*& buffer)
+    sensekit_status_t PluginService::destroy_stream_bin(sensekit_stream_handle_t streamHandle,
+                                                        sensekit_bin_handle_t& binHandle,
+                                                        sensekit_frame_t*& binBuffer)
     {
-        Stream* stream = reinterpret_cast<Stream*>(handle);
-        StreamBin* bin = stream->get_bin_by_id(id);
+        Stream* stream = reinterpret_cast<Stream*>(streamHandle);
+        StreamBin* bin = reinterpret_cast<StreamBin*>(binHandle);
 
         stream->destroy_bin(bin);
 
-        id = -1;
-        buffer = nullptr;
+        binHandle = nullptr;
+        binBuffer = nullptr;
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::cycle_bin_buffers(StreamHandle* handle,
-                                                       StreamBinId id,
+    sensekit_status_t PluginService::cycle_bin_buffers(sensekit_bin_handle_t binHandle,
                                                        sensekit_frame_t*& binBuffer)
     {
-        Stream* stream = reinterpret_cast<Stream*>(handle);
-        StreamBin* bin = stream->get_bin_by_id(id);
+        StreamBin* bin = reinterpret_cast<StreamBin*>(binHandle);
         binBuffer = bin->cycle_buffers();
+
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t PluginService::link_connection_to_bin(sensekit_streamconnection_t* connection,
+                                                            sensekit_bin_handle_t binHandle)
+    {
+        StreamConnection* underlyingConnection = reinterpret_cast<StreamConnection*>(connection->handle);
+        StreamBin* bin = reinterpret_cast<StreamBin*>(binHandle);
+
+        underlyingConnection->set_bin(bin);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
