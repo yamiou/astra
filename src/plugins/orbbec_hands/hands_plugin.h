@@ -34,6 +34,4 @@ namespace sensekit
     }
 }
 
-EXPORT_PLUGIN(sensekit::hands::HandsPlugin);
-
 #endif /* HANDS_PLUGIN_H */

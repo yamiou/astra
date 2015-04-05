@@ -1,5 +1,8 @@
 #include "handtracker.h"
 #include "hands_plugin.h"
+
+EXPORT_PLUGIN(sensekit::hands::HandsPlugin);
+
 namespace sensekit
 {
     namespace hands
