@@ -25,7 +25,7 @@ SENSEKIT_API_PROXY void sensekit_api_set_proxy(StreamServiceProxyBase* proxy)
     __sensekit_api_proxy_ptr = proxy;
 }
 
-^^^BEGINREPLACE^^^
+^^^BEGINREPLACE:stream^^^
 SENSEKIT_API ^RETURN^ sensekit_^FUNC^(^PARAMS^)
 {
     return get_api_proxy()->^FUNC^(^PARAMS:names^);

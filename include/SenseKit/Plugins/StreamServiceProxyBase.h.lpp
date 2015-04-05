@@ -8,9 +8,9 @@ struct StreamServiceProxyBase
 {
     void* streamService;
 
-^^^BEGINREPLACE^^^
+^^^BEGINREPLACE:stream^^^
     ^RETURN^ (*^FUNC^)(^PARAMS:types,void^);
-	
+    
 ^^^ENDREPLACE^^^
 };
 

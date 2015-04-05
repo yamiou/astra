@@ -9,7 +9,7 @@ namespace sensekit {
     {
         StreamServiceProxyBase* proxy = new StreamServiceProxyBase;
 
-^^^BEGINREPLACE^^^
+^^^BEGINREPLACE:stream^^^
         proxy->^FUNC^ = &StreamServiceDelegate::^FUNC^;
 ^^^ENDREPLACE^^^
         proxy->streamService = context;

@@ -37,7 +37,7 @@ namespace sensekit {
             : m_pluginService(*this) {}
         virtual ~SenseKitContext() {}
 
-^^^BEGINREPLACE^^^
+^^^BEGINREPLACE:stream^^^
         ^RETURN^ ^FUNC^(^PARAMS:ref^);
         
 ^^^ENDREPLACE^^^

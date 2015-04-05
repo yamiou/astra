@@ -7,7 +7,7 @@ static sensekit::SenseKitContext g_Context;
 
 SENSEKIT_BEGIN_DECLS
 
-^^^BEGINREPLACE^^^
+^^^BEGINREPLACE:stream^^^
 SENSEKIT_API ^RETURN^ sensekit_^FUNC^(^PARAMS^) 
 {
     return g_Context.^FUNC^(^PARAMS:names,deref^);

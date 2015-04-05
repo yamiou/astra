@@ -1,9 +1,10 @@
 
 (defstruct param type name deref)
-(defstruct funcdef funcname params returntype)
+(defstruct funcdef funcset funcname params returntype)
 
 (setq preprocessor-file-extension "lpp")
-(setq begin-marker "^^^BEGINREPLACE^^^")
+(setq begin-marker-left "^^^BEGINREPLACE:")
+(setq begin-marker-right "^^^")
 (setq end-marker "^^^ENDREPLACE^^^")
 (setq auto-header-marker "^^^AUTOGENHEADER^^^")
 (setq token-marker #\^)
@@ -19,9 +20,9 @@
     )
 )
 
-(add-macro :macro "RETURN"	:filter (lambda (fd len args) (funcdef-returntype fd)))
-(add-macro :macro "FUNC"	:filter (lambda (fd len args) (funcdef-funcname fd)))
-(add-macro :macro "PARAMS"	:filter (lambda (fd len args) (format-params (funcdef-params fd) len args)))
+(add-macro :macro "RETURN"	:filter (lambda (fd len args vp) (funcdef-returntype fd)))
+(add-macro :macro "FUNC"	:filter (lambda (fd len args vp) (funcdef-funcname fd)))
+(add-macro :macro "PARAMS"	:filter (lambda (fd len args vp) (format-params (funcdef-params fd) len args vp)))
 ; PARAMS arguments: types, names, deref, ref, void, voidonly, nowrap
 ;;;;;;;;;
 
@@ -91,18 +92,18 @@ is replaced with replacement."
 	)
 )
 
-(defun format-params (params token-start-length args)
+(defun format-params (params token-start-length args void-param)
     ;full, types, names, deref, ref, void, voidonly, nowrap
-    (let*  ((arg-types  (is-arg-set "types" args))
-            (arg-names  (is-arg-set "names" args))
-            (arg-deref  (is-arg-set "deref" args))
-            (arg-ref    (is-arg-set "ref" args))
-            (arg-void   (is-arg-set "void" args))
-            (arg-voidonly (is-arg-set "voidonly" args))
-            (arg-wrap   (is-arg-set "wrap" args))
-            (arg-nowrap (is-arg-set "nowrap" args))
-            (filtered-params (cond  (arg-voidonly (cons voidparam nil)) ;only the voidparam
-                                    (arg-void (cons voidparam params)) ;prepend the voidparam
+    (let*  ((arg-types      (is-arg-set "types" args))
+            (arg-names      (is-arg-set "names" args))
+            (arg-deref      (is-arg-set "deref" args))
+            (arg-ref        (is-arg-set "ref" args))
+            (arg-void       (is-arg-set "void" args))
+            (arg-voidonly   (is-arg-set "voidonly" args))
+            (arg-wrap       (is-arg-set "wrap" args))
+            (arg-nowrap     (is-arg-set "nowrap" args))
+            (filtered-params (cond  (arg-voidonly (cons void-param nil)) ;only the void-param
+                                    (arg-void (cons void-param params)) ;prepend the void-param
                                     (t params) ;default, just use params
                               )
                           )
@@ -145,7 +146,7 @@ is replaced with replacement."
 	)
 )
 
-(defun process-tokens (line funcdata &optional (line-length 0))
+(defun process-tokens (line funcdata void-param &optional (line-length 0))
     (let ((token-marker-left (position token-marker line))
          )
         (if (null token-marker-left)
@@ -177,12 +178,12 @@ is replaced with replacement."
                     line
                     ;else
                     (let* ((token-start-length (+ line-length token-marker-left))
-                           (expanded-token (funcall (lppmacro-filter m) funcdata token-start-length token-args))
+                           (expanded-token (funcall (lppmacro-filter m) funcdata token-start-length token-args void-param))
                           )
                         (concatenate 'string 
                             line-begin 
                             expanded-token
-                            (process-tokens line-end funcdata (+ token-start-length (length expanded-token)))
+                            (process-tokens line-end funcdata void-param (+ token-start-length (length expanded-token)))
                         )
                     )
                )
@@ -190,18 +191,18 @@ is replaced with replacement."
     ))))
 )
 
-(defun expand-template (template-list func-data)
+(defun expand-template (template-list func-data void-param)
     (concat-string-list
         (mapcar 
-            (lambda (template-line) (process-tokens template-line func-data))
+            (lambda (template-line) (process-tokens template-line func-data void-param))
             template-list
         )
     )
 )
 
-(defun expand-methods-with-template (template-list func-data-list)
+(defun expand-methods-with-template (template-list func-data-list void-param)
     (mapcar 
-		(lambda (func-data) (expand-template template-list func-data))
+		(lambda (func-data) (expand-template template-list func-data void-param))
         func-data-list
 	)
 )
@@ -250,6 +251,38 @@ is replaced with replacement."
 	)
 )
 
+(defun get-funcset-from-begin-marker (line)
+    (let ((start-index (search begin-marker-left line)))
+        (cond ;no begin marker, return nil
+              ((null start-index) nil)
+              
+              ;begin marker must be at start of line
+              ((not (= start-index 0)) nil)
+              
+              ;left side is good
+              (t (let*  ((start-param-index (+ start-index (length begin-marker-left)))
+                         (end-index (search begin-marker-right line :start2 start-param-index)))
+                        (cond ;no right side marker, return nil
+                              ((null end-index) nil)
+                              
+                              ;right marker must be at end of line
+                              ((not (= (length line) (+ end-index (length begin-marker-right)))) nil) 
+                              
+                              ;markers but no funcset parameter, can't process
+                              ((= start-param-index end-index) nil) 
+                              ;we have a begin-marker and funcset parameter!
+                              (t (values (subseq line start-param-index end-index) start-param-index end-index))
+                        )
+                 )
+               )
+        )
+    )
+)
+
+(defun is-end-marker (line)
+    (equal line end-marker)
+)
+
 (defun in-to-out-filename (fn)
     (strip-end-characters fn 4)
 )
@@ -259,36 +292,37 @@ is replaced with replacement."
 		  (outfile (open (in-to-out-filename infilename) :direction :output :if-exists :supersede))
 		  (filelines nil)
 		  (templatelines nil)
-		  (template-status 0)
-		  (doneparts ())
+		  (funcset-name nil)
 		  )
 	  (when infile
 		(loop 
 			for line = (read-line infile nil)
 			while line 
 			do 
-				(if (= template-status 0)
-					(if (equal begin-marker line)
-						;then
-						(progn 
-							(setq template-status 1)
+				(cond   ;outside of a replace block
+                        ((null funcset-name)
+                         ;look for a begin-replace marker (funcset name becomes not nil)
+                         (setq funcset-name (get-funcset-from-begin-marker line))
+                         ;if still no funcset-name
+                         (when (null funcset-name)
+                                ;accumulate filtered lines to filelines
+                               (prepend-into filelines (filter-line line (file-namestring infilename)))
+                         )
+                        )
+                        
+                        ;all below: funcset-name is not nil -- inside of a replace block
+                        ;check for end marker
+                        ((is-end-marker line)
+						 ;since we have a full template, expand template it
+						 (mapcar 
+						 	(lambda (v) (prepend-into filelines v))
+                            ;TODO lookup funcs and void-param from funcset-name
+						 	(expand-methods-with-template (reverse templatelines) funcs stream-void-param) 
+						 )
+                         (setq funcset-name nil) ;clear funcset-name -- return to normal operation above
 						)
-						;else
-						(prepend-into filelines (filter-line line (file-namestring infilename)))
-					)
-					(if (equal end-marker line)
-						;then
-						(progn 
-							(setq template-status 0)
-							;expand template
-							(mapcar 
-								(lambda (v) (prepend-into filelines v))
-								(expand-methods-with-template (reverse templatelines) funcs)
-							)
-						)
-						;else
-						(prepend-into templatelines line)
-					)
+						;inside replace block, accumulate template
+						(t (prepend-into templatelines line))
 				)
 		)
 		(loop for line in (reverse filelines)
@@ -330,4 +364,4 @@ is replaced with replacement."
     )
     )
 )
-(process (car *args*))
+;(process (car *args*))

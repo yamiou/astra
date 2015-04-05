@@ -9,7 +9,7 @@ namespace sensekit {
     class StreamServiceProxy : public StreamServiceProxyBase
     {
     public:
-^^^BEGINREPLACE^^^
+^^^BEGINREPLACE:stream^^^
         
         ^RETURN^ ^FUNC^(^PARAMS^)
         {

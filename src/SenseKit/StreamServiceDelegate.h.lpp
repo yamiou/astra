@@ -11,7 +11,7 @@ namespace sensekit {
     class StreamServiceDelegate
     {
     public:
-^^^BEGINREPLACE^^^
+^^^BEGINREPLACE:stream^^^
         
         static ^RETURN^ ^FUNC^(^PARAMS:void^)
         {
