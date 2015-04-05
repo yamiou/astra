@@ -1,7 +1,5 @@
 ;definitions manually adapted from sensekit_capi.h
 
-(setq stream-void-param (make-param :type "void*" :name "streamService"))
-
 (add-void-param :funcset "stream"
                 :type "void*"
                 :name "streamService"

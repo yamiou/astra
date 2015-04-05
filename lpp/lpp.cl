@@ -19,6 +19,7 @@
         (setf (gethash (lppmacro-macro m) macro-hash) m)
     )
 )
+(defun get-macro (key) (gethash key macro-hash))
 
 (setq void-param-hash (make-hash-table :test 'equal))
 (defun add-void-param (&rest args)
@@ -32,6 +33,7 @@
         )
     )
 )
+(defun get-void-param (funcset-name) (gethash funcset-name void-param-hash))
 
 (add-macro :macro "RETURN"	:filter (lambda (fd len args vp) (funcdef-returntype fd)))
 (add-macro :macro "FUNC"	:filter (lambda (fd len args vp) (funcdef-funcname fd)))
@@ -105,6 +107,8 @@ is replaced with replacement."
 	)
 )
 
+(defun error-if-null (var errmsg) (when (null var) (error errmsg)))
+
 (defun format-params (params token-start-length args void-param)
     ;full, types, names, deref, ref, void, voidonly, nowrap
     (let*  ((arg-types      (is-arg-set "types" args))
@@ -115,8 +119,12 @@ is replaced with replacement."
             (arg-voidonly   (is-arg-set "voidonly" args))
             (arg-wrap       (is-arg-set "wrap" args))
             (arg-nowrap     (is-arg-set "nowrap" args))
-            (filtered-params (cond  (arg-voidonly (cons void-param nil)) ;only the void-param
-                                    (arg-void (cons void-param params)) ;prepend the void-param
+            (filtered-params (cond  (arg-voidonly 
+                                        (error-if-null void-param "Void param must be set to use void argument")
+                                        (cons void-param nil)) ;only the void-param
+                                    (arg-void 
+                                        (error-if-null void-param "Void param must be set to use void argument")
+                                        (cons void-param params)) ;prepend the void-param
                                     (t params) ;default, just use params
                               )
                           )
@@ -183,7 +191,7 @@ is replaced with replacement."
                           ))
                (line-begin (subseq line 0 token-marker-left))
                (line-end (subseq line (1+ token-stop) nil))
-               (m (gethash token macro-hash))
+               (m (get-macro token))
               )
               ;m (the macro struct) is nil if no macro found for the token
               (if (null m)
@@ -213,19 +221,19 @@ is replaced with replacement."
     )
 )
 
-(defun expand-methods-with-template (template-list funcset-name func-data-list void-param)
+(defun expand-methods-with-template (template-list funcset-name)
     (remove nil ;filter out the nil values (from wrong funcsets)
         (mapcar 
             (lambda (func-data) 
                     (cond ;only expand this function if it belongs to the target funcset
                           ((equal funcset-name (funcdef-funcset func-data))
-                           (expand-template template-list func-data void-param)
+                           (expand-template template-list func-data (get-void-param funcset-name))
                           )
                           ;otherwise return nil
                           (t nil)
                     )
             )
-            func-data-list
+            funcs
         )
     )
 )
@@ -339,8 +347,7 @@ is replaced with replacement."
 						 ;since we have a full template, expand template it
 						 (mapcar 
 						 	(lambda (v) (prepend-into filelines v))
-                            ;TODO lookup funcs and void-param from funcset-name
-						 	(expand-methods-with-template (reverse templatelines) funcset-name funcs stream-void-param) 
+						 	(expand-methods-with-template (reverse templatelines) funcset-name) 
 						 )
                          (setq funcset-name nil) ;clear funcset-name -- return to normal operation above
 						)
