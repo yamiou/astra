@@ -13,9 +13,9 @@ namespace sensekit {
                 return PluginServiceProxyBase::register_stream_added_callback(pluginService, callback, callbackId);
             }
 
-        sensekit_status_t register_stream_removed_callback(StreamRemovingCallback callback, CallbackId* callbackId)
+        sensekit_status_t register_stream_removing_callback(StreamRemovingCallback callback, CallbackId* callbackId)
             {
-                return PluginServiceProxyBase::register_stream_removed_callback(pluginService, callback, callbackId);
+                return PluginServiceProxyBase::register_stream_removing_callback(pluginService, callback, callbackId);
             }
 
         sensekit_status_t unregister_stream_added_callback(CallbackId callbackId)
@@ -23,9 +23,9 @@ namespace sensekit {
                 return PluginServiceProxyBase::unregister_stream_added_callback(pluginService, callbackId);
             }
 
-        sensekit_status_t unregister_stream_removed_callback(CallbackId callbackId)
+        sensekit_status_t unregister_stream_removing_callback(CallbackId callbackId)
             {
-                return PluginServiceProxyBase::unregister_stream_removed_callback(pluginService, callbackId);
+                return PluginServiceProxyBase::unregister_stream_removing_callback(pluginService, callbackId);
             }
 
         sensekit_status_t create_stream_set(/*out*/StreamSetHandle*& setHandle)

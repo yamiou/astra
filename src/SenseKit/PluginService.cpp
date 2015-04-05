@@ -15,9 +15,9 @@ namespace sensekit
         PluginServiceProxyBase* base = new PluginServiceProxyBase;
 
         base->register_stream_added_callback = &PluginServiceDelegate::register_stream_added_callback;
-        base->register_stream_removed_callback = &PluginServiceDelegate::register_stream_removed_callback;
+        base->register_stream_removing_callback = &PluginServiceDelegate::register_stream_removing_callback;
         base->unregister_stream_added_callback = &PluginServiceDelegate::unregister_stream_added_callback;
-        base->unregister_stream_removed_callback = &PluginServiceDelegate::unregister_stream_removed_callback;
+        base->unregister_stream_removing_callback = &PluginServiceDelegate::unregister_stream_removing_callback;
         base->create_stream_set = &PluginServiceDelegate::create_stream_set;
         base->destroy_stream_set = &PluginServiceDelegate::destroy_stream_set;
         base->create_stream = &PluginServiceDelegate::create_stream;

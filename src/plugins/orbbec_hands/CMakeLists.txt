@@ -1,6 +1,18 @@
 set(orbbec_hands_SOURCES
   handtracker.cpp
   handtracker.h
+  depthutility.h
+  depthutility.cpp
+  segmentationutility.h
+  segmentationutility.cpp
+  trackedpoint.h
+  vectorx.h
+  vector2.h
+  vector3.h
+  pointprocessor.h
+  pointprocessor.cpp
+  trackingdata.h
+  coordinateconverter.h
   hands_plugin.cpp
   hands_plugin.h
 )

@@ -16,37 +16,12 @@ namespace sensekit {
 
         virtual ~PluginBase() = default;
 
-        void initialize()
-            {
-                if (m_initialized)
-                    return;
-
-                on_initialize();
-
-                m_initialized = true;
-            }
-
-        void cleanup()
-            {
-                if (!m_initialized)
-                    return;
-
-                on_cleanup();
-
-                m_initialized = false;
-            }
-
-        virtual void temp_update() = 0;
-        bool is_initialized() const { return m_initialized; }
+        virtual void temp_update() { };
 
     protected:
         inline PluginServiceProxy& get_pluginService() const  { return *m_pluginService; }
 
-        virtual void on_initialize() {}
-        virtual void on_cleanup() {}
-
     private:
-        bool m_initialized{false};
         PluginServiceProxy* m_pluginService;
 
         static void set_parameter_thunk(void* instance,
@@ -108,7 +83,7 @@ namespace sensekit {
 
     };
 
-    stream_callbacks_t create_plugin_callbacks(PluginBase* context)
+    inline stream_callbacks_t create_plugin_callbacks(PluginBase* context)
     {
         stream_callbacks_t callbacks;
 
@@ -133,7 +108,6 @@ SENSEKIT_EXPORT void sensekit_plugin_initialize(PluginServiceProxyBase* pluginPr
 {                                                                                         \
     g_plugin = new className(                                                             \
         static_cast<sensekit::PluginServiceProxy*>(pluginProxy));                         \
-    g_plugin->initialize();                                                               \
 }                                                                                         \
                                                                                           \
 SENSEKIT_EXPORT void sensekit_plugin_update()                                             \
@@ -143,7 +117,6 @@ SENSEKIT_EXPORT void sensekit_plugin_update()                                   
                                                                                           \
 SENSEKIT_EXPORT void sensekit_plugin_terminate()                                          \
 {                                                                                         \
-    g_plugin->cleanup();                                                                  \
     delete g_plugin;                                                                      \
 }                                                                                         \
                                                                                           \

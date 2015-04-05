@@ -11,21 +11,16 @@ namespace sensekit
 {
     namespace openni
     {
-        class OpenNIPlugin : public sensekit::PluginBase
+        class OpenNIPlugin : public PluginBase
         {
         public:
-            OpenNIPlugin(PluginServiceProxy* pluginService)
-                : sensekit::PluginBase(pluginService) {}
+            OpenNIPlugin(PluginServiceProxy* pluginService);
 
-            virtual ~OpenNIPlugin() = default;
+            virtual ~OpenNIPlugin();
             virtual void temp_update() override;
 
             OpenNIPlugin(const OpenNIPlugin&) = delete;
             OpenNIPlugin& operator=(const OpenNIPlugin&) = delete;
-
-        protected:
-            virtual void on_initialize() override;
-            virtual void on_cleanup() override;
 
         private:
 

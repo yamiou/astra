@@ -1,7 +1,6 @@
 ﻿#include "OpenNIPlugin.h"
 #include <iostream>
 #include <StreamTypes.h>
-#include <streams/color_types.h>
 
 using std::cout;
 using std::endl;
@@ -12,7 +11,9 @@ namespace sensekit
 {
     namespace openni
     {
-        void OpenNIPlugin::on_initialize()
+
+        OpenNIPlugin::OpenNIPlugin(PluginServiceProxy* pluginService)
+            : PluginBase(pluginService)
         {
             ::openni::Status rc = ::openni::STATUS_OK;
 
@@ -34,7 +35,7 @@ namespace sensekit
             open_sensor_streams();
         }
 
-        void OpenNIPlugin::on_cleanup()
+        OpenNIPlugin::~OpenNIPlugin()
         {
             get_pluginService().destroy_stream(m_depthHandle);
             get_pluginService().destroy_stream(m_colorHandle);
@@ -205,9 +206,6 @@ namespace sensekit
 
         void OpenNIPlugin::temp_update()
         {
-            if (!is_initialized())
-                return;
-
             if (nullptr != m_currentDepthFrame &&
                 read_next_depth_frame(m_currentDepthFrame)
                 == SENSEKIT_STATUS_SUCCESS)
