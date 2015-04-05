@@ -29,9 +29,18 @@ set(SenseKit_SOURCES
   Core/shared_library_windows.cpp
   )
 
+set(SenseKit_SOURCES_GEN
+  SenseKitContext.h.lpp
+  StreamServiceDelegate.h.lpp
+  SenseKit.cpp.lpp
+  CreateStreamProxy.h.lpp
+  ../../include/SenseKit/Plugins/StreamServiceProxyBase.h.lpp
+  ../../include/SenseKit/Plugins/StreamServiceProxy.h.lpp
+  )
+
 add_definitions(-DSENSEKIT_BUILD)
 
-add_library(SenseKit SHARED ${SenseKit_SOURCES})
+add_library(SenseKit SHARED ${SenseKit_SOURCES} ${SenseKit_SOURCES_GEN})
 
 # force c++11 (has no effect currently)
 #set_property(TARGET SenseKit PROPERTY CXX_STANDARD 11)
