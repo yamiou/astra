@@ -12,11 +12,11 @@ namespace sensekit {
     {
     public:
 ^^^BEGINREPLACE:stream^^^
-        
+
         static ^RETURN^ ^FUNC^(^PARAMS:void^)
         {
             return static_cast<SenseKitContext*>(^PARAMS:names,voidonly^)->^FUNC^(^PARAMS:names,deref^);
-        }        
+        }
 ^^^ENDREPLACE^^^
     };
 }
