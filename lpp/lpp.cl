@@ -1,5 +1,5 @@
 
-(defstruct param type name deref)
+(defstruct param type name deref funcset)
 (defstruct funcdef funcset funcname params returntype)
 
 (setq preprocessor-file-extension "lpp")
@@ -17,6 +17,19 @@
 (defun add-macro (&rest args)
     (let ((m (apply #'make-lppmacro args)))
         (setf (gethash (lppmacro-macro m) macro-hash) m)
+    )
+)
+
+(setq void-param-hash (make-hash-table :test 'equal))
+(defun add-void-param (&rest args)
+    (let* ((p (apply #'make-param args))
+           (funcset-name (param-funcset p))
+          )
+        (cond ((not (null funcset-name))
+               (setf (gethash funcset-name void-param-hash) p)
+              )
+              (t (error "Must provide :funcset for add-void-param"))
+        )
     )
 )
 
@@ -200,11 +213,21 @@ is replaced with replacement."
     )
 )
 
-(defun expand-methods-with-template (template-list func-data-list void-param)
-    (mapcar 
-		(lambda (func-data) (expand-template template-list func-data void-param))
-        func-data-list
-	)
+(defun expand-methods-with-template (template-list funcset-name func-data-list void-param)
+    (remove nil ;filter out the nil values (from wrong funcsets)
+        (mapcar 
+            (lambda (func-data) 
+                    (cond ;only expand this function if it belongs to the target funcset
+                          ((equal funcset-name (funcdef-funcset func-data))
+                           (expand-template template-list func-data void-param)
+                          )
+                          ;otherwise return nil
+                          (t nil)
+                    )
+            )
+            func-data-list
+        )
+    )
 )
 
 (defun clear-funcs ()
@@ -317,7 +340,7 @@ is replaced with replacement."
 						 (mapcar 
 						 	(lambda (v) (prepend-into filelines v))
                             ;TODO lookup funcs and void-param from funcset-name
-						 	(expand-methods-with-template (reverse templatelines) funcs stream-void-param) 
+						 	(expand-methods-with-template (reverse templatelines) funcset-name funcs stream-void-param) 
 						 )
                          (setq funcset-name nil) ;clear funcset-name -- return to normal operation above
 						)

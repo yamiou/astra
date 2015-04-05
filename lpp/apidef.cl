@@ -2,6 +2,25 @@
 
 (setq stream-void-param (make-param :type "void*" :name "streamService"))
 
+(add-void-param :funcset "stream"
+                :type "void*"
+                :name "streamService"
+)
+
+(add-void-param :funcset "plugin"
+                :type "void*"
+                :name "pluginService"
+)
+
+;sensekit_status_t register_stream_added_callback(StreamAddedCallback callback, CallbackId* callbackId)
+(add-func 	:funcset "plugin"
+            :returntype "sensekit_status_t"
+			:funcname "register_stream_added_callback" 
+			:params (list (make-param :type "StreamAddedCallback" :name "callback")
+						  (make-param :type "CallbackId*" :name "callbackId" :deref T)
+					)
+)
+
 ;SENSEKIT_API sensekit_status_t sensekit_initialize();
 (add-func 	:funcset "stream"
             :returntype "sensekit_status_t"
