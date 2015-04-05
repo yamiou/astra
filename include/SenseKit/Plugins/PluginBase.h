@@ -3,7 +3,6 @@
 
 #include <sensekit_core.h>
 #include "PluginServiceProxy.h"
-#include "StreamServiceProxy.h"
 
 namespace sensekit {
 
