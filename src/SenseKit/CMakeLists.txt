@@ -16,6 +16,7 @@ set(SenseKit_SOURCES
   Stream.cpp
   PluginService.cpp
   PluginService.h
+  StreamServiceDelegate.h
   StreamSet.cpp
   StreamSet.h
   StreamConnection.h

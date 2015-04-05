@@ -1,12 +1,9 @@
 #include "SenseKitContext.h"
-#include <cassert>
 #include "Core/shared_library.h"
 #include "Core/libs.h"
 #include "StreamReader.h"
 #include "StreamConnection.h"
 #include "StreamServiceDelegate.h"
-#include <Plugins/StreamServiceProxyBase.h>
-#include <Plugins/PluginServiceProxyBase.h>
 #include <SenseKitAPI.h>
 #include "CreateStreamProxy.h"
 
