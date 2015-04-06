@@ -38,6 +38,6 @@ typedef struct _sensekit_handframe {
     sensekit_handpoint_t* handpoints;
 } sensekit_handframe_t;
 
-typedef struct _sensekit_handstream sensekit_handstream_t;
+typedef struct _sensekit_handstream * sensekit_handstream_t;
 
 #endif // HAND_TYPES_H

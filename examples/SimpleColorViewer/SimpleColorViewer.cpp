@@ -98,7 +98,7 @@ void SimpleColorViewer::run()      //Does not return
 void SimpleColorViewer::display()
 {
     sensekit_temp_update();
-    sensekit_reader_frame_t* frame;
+    sensekit_reader_frame_t frame;
     sensekit_reader_open_frame(m_reader, 30, &frame);
     sensekit_color_frame_get(frame, &m_colorFrame);
 

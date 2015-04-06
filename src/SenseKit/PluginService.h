@@ -24,8 +24,8 @@ namespace sensekit
 
         PluginServiceProxyBase* create_proxy();
 
-        sensekit_status_t create_stream_set(sensekit_streamset_t*& streamSet);
-        sensekit_status_t destroy_stream_set(sensekit_streamset_t*& streamSet);
+        sensekit_status_t create_stream_set(sensekit_streamset_t& streamSet);
+        sensekit_status_t destroy_stream_set(sensekit_streamset_t& streamSet);
 
         // metadata = int num_stream_types, StreamTypeId[] ids
         //for generators (no requirements, i.e. depth sensor and color sensor)
@@ -37,36 +37,36 @@ namespace sensekit
         sensekit_status_t unregister_stream_removing_callback(CallbackId callbackId);
 
         // Plugin notifying framework of a newly available stream
-        sensekit_status_t create_stream(StreamSetHandle* setHandle,
+        sensekit_status_t create_stream(sensekit_streamset_t setHandle,
                                         sensekit_stream_desc_t desc,
                                         stream_callbacks_t pluginCallbacks,
-                                        sensekit_stream_handle_t& streamHandle);
+                                        sensekit_stream_t& streamHandle);
 
         // Plugin notifying framework of a stream no longer available
-        sensekit_status_t destroy_stream(sensekit_stream_handle_t& handle);
+        sensekit_status_t destroy_stream(sensekit_stream_t& handle);
 
-        sensekit_status_t create_stream_bin(sensekit_stream_handle_t handle,
+        sensekit_status_t create_stream_bin(sensekit_stream_t handle,
                                             size_t lengthInBytes,
-                                            sensekit_bin_handle_t& id,
+                                            sensekit_bin_t& id,
                                             sensekit_frame_t*& binBuffer);
 
-        sensekit_status_t destroy_stream_bin(sensekit_stream_handle_t streamHandle,
-                                             sensekit_bin_handle_t& binHandle,
+        sensekit_status_t destroy_stream_bin(sensekit_stream_t streamHandle,
+                                             sensekit_bin_t& binHandle,
                                              sensekit_frame_t*& binBuffer);
 
-        sensekit_status_t cycle_bin_buffers(sensekit_bin_handle_t binHandle,
+        sensekit_status_t cycle_bin_buffers(sensekit_bin_t binHandle,
                                             sensekit_frame_t*& binBuffer);
 
         sensekit_status_t link_connection_to_bin(sensekit_streamconnection_t* connection,
-                                                 sensekit_bin_handle_t binHandle);
+                                                 sensekit_bin_t binHandle);
 
         //orbbec_error orbbec_stream_assign_connection_to_bin(StreamHandle handle, client_id id, bin_id id);
         //orbbec_error orbbec_stream_register_get_parameter_callback(component_handle handle, client_id client, ...);
 
     private:
         SenseKitContext& m_context;
-        Signal<StreamSetHandle*, sensekit_stream_handle_t, sensekit_stream_desc_t> m_streamAddedSignal;
-        Signal<StreamSetHandle*, sensekit_stream_handle_t, sensekit_stream_desc_t> m_streamRemovingSignal;
+        Signal<sensekit_streamset_t, sensekit_stream_t, sensekit_stream_desc_t> m_streamAddedSignal;
+        Signal<sensekit_streamset_t, sensekit_stream_t, sensekit_stream_desc_t> m_streamRemovingSignal;
 
     };
 }

@@ -26,8 +26,8 @@ namespace sensekit {
         StreamConnection* create_connection();
         void destroy_connection(StreamConnection* connection);
 
-        StreamType get_type() { return m_description.type; }
-        StreamSubtype get_subtype() { return m_description.subType; }
+        sensekit_stream_type_t get_type() { return m_description.type; }
+        sensekit_stream_subtype_t get_subtype() { return m_description.subType; }
 
         StreamBin* create_bin(size_t byteLength);
         void destroy_bin(StreamBin* bin);

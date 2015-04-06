@@ -50,7 +50,7 @@ namespace sensekit {
 
         Stream* m_stream{nullptr};
         StreamBin* m_bin{nullptr};
-        StreamHandle* m_handle{nullptr};
+        sensekit_stream_t m_handle{nullptr};
     };
 }
 

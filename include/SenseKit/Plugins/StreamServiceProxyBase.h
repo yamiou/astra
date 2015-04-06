@@ -14,23 +14,23 @@ struct StreamServiceProxyBase
 
     sensekit_status_t (*streamset_open)(void*,
                                         const char*,
-                                        sensekit_streamset_t**);
+                                        sensekit_streamset_t*);
 
     sensekit_status_t (*streamset_close)(void*,
-                                         sensekit_streamset_t**);
+                                         sensekit_streamset_t*);
 
     char* (*get_status_string)(void*,
                                sensekit_status_t);
 
     sensekit_status_t (*reader_create)(void*,
-                                       sensekit_streamset_t*,
-                                       sensekit_reader_t**);
+                                       sensekit_streamset_t,
+                                       sensekit_reader_t*);
 
     sensekit_status_t (*reader_destroy)(void*,
-                                        sensekit_reader_t**);
+                                        sensekit_reader_t*);
 
     sensekit_status_t (*reader_get_stream)(void*,
-                                           sensekit_reader_t*,
+                                           sensekit_reader_t,
                                            sensekit_stream_type_t,
                                            sensekit_stream_subtype_t,
                                            sensekit_streamconnection_t**);
@@ -46,15 +46,15 @@ struct StreamServiceProxyBase
                                      sensekit_streamconnection_t*);
 
     sensekit_status_t (*reader_open_frame)(void*,
-                                           sensekit_reader_t*,
+                                           sensekit_reader_t,
                                            int,
-                                           sensekit_reader_frame_t**);
+                                           sensekit_reader_frame_t*);
 
     sensekit_status_t (*reader_close_frame)(void*,
-                                            sensekit_reader_frame_t**);
+                                            sensekit_reader_frame_t*);
 
     sensekit_status_t (*reader_get_frame)(void*,
-                                          sensekit_reader_frame_t*,
+                                          sensekit_reader_frame_t,
                                           sensekit_stream_type_t,
                                           sensekit_stream_subtype_t,
                                           sensekit_frame_ref_t**);

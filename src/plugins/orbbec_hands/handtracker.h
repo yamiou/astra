@@ -15,7 +15,10 @@
 class HandTracker : public sensekit::PluginBase
 {
 public:
-    HandTracker(sensekit::PluginServiceProxy* pluginService, sensekit_streamset_t* setHandle, sensekit_depthstream_t* depthStream);
+    HandTracker(sensekit::PluginServiceProxy* pluginService,
+                sensekit_streamset_t setHandle,
+                sensekit_depthstream_t* depthStream);
+
     virtual ~HandTracker();
 private:
 
@@ -50,14 +53,14 @@ private:
     virtual void connection_removed(sensekit_streamconnection_t* connection) override;
 
     //fields
-    sensekit_streamset_t* m_setHandle;
+    sensekit_streamset_t m_setHandle;
     sensekit_depthstream_t* m_depthStream;
     DepthUtility m_depthUtility;
     CoordinateConverter m_converter;
     PointProcessor m_pointProcessor;
 
-    sensekit_stream_handle_t m_handStream{nullptr};
-    sensekit_bin_handle_t m_handBinHandle{nullptr};
+    sensekit_stream_t m_handStream{nullptr};
+    sensekit_bin_t m_handBinHandle{nullptr};
 
     int m_width;
     int m_height;

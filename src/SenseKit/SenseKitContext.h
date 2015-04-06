@@ -42,18 +42,18 @@ namespace sensekit {
         sensekit_status_t terminate();
 
         sensekit_status_t streamset_open(const char* connectionString,
-                                         sensekit_streamset_t*& streamSet);
+                                         sensekit_streamset_t& streamSet);
 
-        sensekit_status_t streamset_close(sensekit_streamset_t*& streamSet);
+        sensekit_status_t streamset_close(sensekit_streamset_t& streamSet);
 
         char* get_status_string(sensekit_status_t status);
 
-        sensekit_status_t reader_create(sensekit_streamset_t* streamSet,
-                                        sensekit_reader_t*& reader);
+        sensekit_status_t reader_create(sensekit_streamset_t streamSet,
+                                        sensekit_reader_t& reader);
 
-        sensekit_status_t reader_destroy(sensekit_reader_t*& reader);
+        sensekit_status_t reader_destroy(sensekit_reader_t& reader);
 
-        sensekit_status_t reader_get_stream(sensekit_reader_t* reader,
+        sensekit_status_t reader_get_stream(sensekit_reader_t reader,
                                             sensekit_stream_type_t type,
                                             sensekit_stream_subtype_t subType,
                                             sensekit_streamconnection_t*& connection);
@@ -65,13 +65,13 @@ namespace sensekit {
 
         sensekit_status_t stream_stop(sensekit_streamconnection_t* connection);
 
-        sensekit_status_t reader_open_frame(sensekit_reader_t* reader,
+        sensekit_status_t reader_open_frame(sensekit_reader_t reader,
                                             int timeoutMillis,
-                                            sensekit_reader_frame_t*& frame);
+                                            sensekit_reader_frame_t& frame);
 
-        sensekit_status_t reader_close_frame(sensekit_reader_frame_t*& frame);
+        sensekit_status_t reader_close_frame(sensekit_reader_frame_t& frame);
 
-        sensekit_status_t reader_get_frame(sensekit_reader_frame_t* frame,
+        sensekit_status_t reader_get_frame(sensekit_reader_frame_t frame,
                                            sensekit_stream_type_t type,
                                            sensekit_stream_subtype_t subType,
                                            sensekit_frame_ref_t*& frameRef);

@@ -11,7 +11,7 @@ namespace sensekit {
         assert (stream != nullptr);
 
         m_connection.handle =
-            reinterpret_cast<sensekit_streamconnection_handle*>(this);
+            reinterpret_cast<sensekit_streamconnection_handle_t>(this);
 
         m_connection.desc = stream->get_description();
     }

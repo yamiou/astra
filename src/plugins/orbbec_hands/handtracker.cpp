@@ -28,13 +28,15 @@ using namespace std;
 #define MIN_NUM_CHUNKS(data_size, chunk_size)   ((((data_size)-1) / (chunk_size) + 1))
 #define MIN_CHUNKS_SIZE(data_size, chunk_size)  (MIN_NUM_CHUNKS(data_size, chunk_size) * (chunk_size))
 
-HandTracker::HandTracker(sensekit::PluginServiceProxy* pluginService, sensekit_streamset_t* setHandle, sensekit_depthstream_t* depthStream) :
-PluginBase(pluginService),
-m_setHandle(setHandle),
-m_depthStream(depthStream),
-m_depthUtility(PROCESSING_SIZE_WIDTH, PROCESSING_SIZE_HEIGHT),
-m_converter(1.0),
-m_pointProcessor(m_converter)
+HandTracker::HandTracker(sensekit::PluginServiceProxy* pluginService,
+                         sensekit_streamset_t setHandle,
+                         sensekit_depthstream_t* depthStream) :
+    PluginBase(pluginService),
+    m_setHandle(setHandle),
+    m_depthStream(depthStream),
+    m_depthUtility(PROCESSING_SIZE_WIDTH, PROCESSING_SIZE_HEIGHT),
+    m_converter(1.0),
+    m_pointProcessor(m_converter)
 {
     setupStream();
 }

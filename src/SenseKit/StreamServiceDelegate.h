@@ -24,13 +24,13 @@ namespace sensekit {
 
         static sensekit_status_t streamset_open(void* streamService,
                                                 const char* connectionString,
-                                                sensekit_streamset_t** streamSet)
+                                                sensekit_streamset_t* streamSet)
         {
             return static_cast<SenseKitContext*>(streamService)->streamset_open(connectionString, *streamSet);
         }
 
         static sensekit_status_t streamset_close(void* streamService,
-                                                 sensekit_streamset_t** streamSet)
+                                                 sensekit_streamset_t* streamSet)
         {
             return static_cast<SenseKitContext*>(streamService)->streamset_close(*streamSet);
         }
@@ -42,20 +42,20 @@ namespace sensekit {
         }
 
         static sensekit_status_t reader_create(void* streamService,
-                                               sensekit_streamset_t* streamSet,
-                                               sensekit_reader_t** reader)
+                                               sensekit_streamset_t streamSet,
+                                               sensekit_reader_t* reader)
         {
             return static_cast<SenseKitContext*>(streamService)->reader_create(streamSet, *reader);
         }
 
         static sensekit_status_t reader_destroy(void* streamService,
-                                                sensekit_reader_t** reader)
+                                                sensekit_reader_t* reader)
         {
             return static_cast<SenseKitContext*>(streamService)->reader_destroy(*reader);
         }
 
         static sensekit_status_t reader_get_stream(void* streamService,
-                                                   sensekit_reader_t* reader,
+                                                   sensekit_reader_t reader,
                                                    sensekit_stream_type_t type,
                                                    sensekit_stream_subtype_t subType,
                                                    sensekit_streamconnection_t** connection)
@@ -83,21 +83,21 @@ namespace sensekit {
         }
 
         static sensekit_status_t reader_open_frame(void* streamService,
-                                                   sensekit_reader_t* reader,
+                                                   sensekit_reader_t reader,
                                                    int timeoutMillis,
-                                                   sensekit_reader_frame_t** frame)
+                                                   sensekit_reader_frame_t* frame)
         {
             return static_cast<SenseKitContext*>(streamService)->reader_open_frame(reader, timeoutMillis, *frame);
         }
 
         static sensekit_status_t reader_close_frame(void* streamService,
-                                                    sensekit_reader_frame_t** frame)
+                                                    sensekit_reader_frame_t* frame)
         {
             return static_cast<SenseKitContext*>(streamService)->reader_close_frame(*frame);
         }
 
         static sensekit_status_t reader_get_frame(void* streamService,
-                                                  sensekit_reader_frame_t* frame,
+                                                  sensekit_reader_frame_t frame,
                                                   sensekit_stream_type_t type,
                                                   sensekit_stream_subtype_t subType,
                                                   sensekit_frame_ref_t** frameRef)

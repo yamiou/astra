@@ -3,7 +3,7 @@
 
 #include <sensekit_core.h>
 
-typedef sensekit_streamconnection_t sensekit_depthstream_t;
+typedef sensekit_streamconnection_t * sensekit_depthstream_t;
 
 typedef struct _sensekit_depthframe {
     sensekit_frame_ref_t* frameRef;

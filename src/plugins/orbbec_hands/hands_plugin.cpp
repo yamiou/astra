@@ -18,23 +18,23 @@ namespace sensekit
         {
         }
 
-        void HandsPlugin::stream_added_handler_thunk(StreamSetHandle* setHandle,
-                                                     sensekit_stream_handle_t streamHandle,
+        void HandsPlugin::stream_added_handler_thunk(sensekit_streamset_t setHandle,
+                                                     sensekit_stream_t streamHandle,
                                                      sensekit_stream_desc_t desc)
         {
             g_plugin->stream_added_handler(setHandle, streamHandle, desc);
         }
 
-        void HandsPlugin::stream_removing_handler_thunk(StreamSetHandle* setHandle,
-                                                        sensekit_stream_handle_t streamHandle,
+        void HandsPlugin::stream_removing_handler_thunk(sensekit_streamset_t setHandle,
+                                                        sensekit_stream_t streamHandle,
                                                         sensekit_stream_desc_t desc)
 
         {
             g_plugin->stream_removing_handler(setHandle, streamHandle, desc);
         }
 
-        void HandsPlugin::stream_added_handler(StreamSetHandle* setHandle,
-                                               sensekit_stream_handle_t streamHandle,
+        void HandsPlugin::stream_added_handler(sensekit_streamset_t setHandle,
+                                               sensekit_stream_t streamHandle,
                                                sensekit_stream_desc_t desc)
         {
             if (desc.type == SENSEKIT_STREAM_DEPTH &&
@@ -47,8 +47,8 @@ namespace sensekit
             }
         }
 
-        void HandsPlugin::stream_removing_handler(StreamSetHandle* setHandle,
-                                                  sensekit_stream_handle_t streamHandle,
+        void HandsPlugin::stream_removing_handler(sensekit_streamset_t setHandle,
+                                                  sensekit_stream_t streamHandle,
                                                   sensekit_stream_desc_t desc)
         {
             auto it = m_streamTrackerMap.find(streamHandle);

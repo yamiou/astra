@@ -36,12 +36,12 @@ SENSEKIT_API sensekit_status_t sensekit_terminate()
 }        
 
 SENSEKIT_API sensekit_status_t sensekit_streamset_open(const char* connectionString,
-                                                       sensekit_streamset_t** streamSet)
+                                                       sensekit_streamset_t* streamSet)
 {
     return get_api_proxy()->streamset_open(connectionString, streamSet);
 }        
 
-SENSEKIT_API sensekit_status_t sensekit_streamset_close(sensekit_streamset_t** streamSet)
+SENSEKIT_API sensekit_status_t sensekit_streamset_close(sensekit_streamset_t* streamSet)
 {
     return get_api_proxy()->streamset_close(streamSet);
 }        
@@ -51,18 +51,18 @@ SENSEKIT_API char* sensekit_get_status_string(sensekit_status_t status)
     return get_api_proxy()->get_status_string(status);
 }        
 
-SENSEKIT_API sensekit_status_t sensekit_reader_create(sensekit_streamset_t* streamSet,
-                                                      sensekit_reader_t** reader)
+SENSEKIT_API sensekit_status_t sensekit_reader_create(sensekit_streamset_t streamSet,
+                                                      sensekit_reader_t* reader)
 {
     return get_api_proxy()->reader_create(streamSet, reader);
 }        
 
-SENSEKIT_API sensekit_status_t sensekit_reader_destroy(sensekit_reader_t** reader)
+SENSEKIT_API sensekit_status_t sensekit_reader_destroy(sensekit_reader_t* reader)
 {
     return get_api_proxy()->reader_destroy(reader);
 }        
 
-SENSEKIT_API sensekit_status_t sensekit_reader_get_stream(sensekit_reader_t* reader,
+SENSEKIT_API sensekit_status_t sensekit_reader_get_stream(sensekit_reader_t reader,
                                                           sensekit_stream_type_t type,
                                                           sensekit_stream_subtype_t subType,
                                                           sensekit_streamconnection_t** connection)
@@ -86,19 +86,19 @@ SENSEKIT_API sensekit_status_t sensekit_stream_stop(sensekit_streamconnection_t*
     return get_api_proxy()->stream_stop(connection);
 }        
 
-SENSEKIT_API sensekit_status_t sensekit_reader_open_frame(sensekit_reader_t* reader,
+SENSEKIT_API sensekit_status_t sensekit_reader_open_frame(sensekit_reader_t reader,
                                                           int timeoutMillis,
-                                                          sensekit_reader_frame_t** frame)
+                                                          sensekit_reader_frame_t* frame)
 {
     return get_api_proxy()->reader_open_frame(reader, timeoutMillis, frame);
 }        
 
-SENSEKIT_API sensekit_status_t sensekit_reader_close_frame(sensekit_reader_frame_t** frame)
+SENSEKIT_API sensekit_status_t sensekit_reader_close_frame(sensekit_reader_frame_t* frame)
 {
     return get_api_proxy()->reader_close_frame(frame);
 }        
 
-SENSEKIT_API sensekit_status_t sensekit_reader_get_frame(sensekit_reader_frame_t* frame,
+SENSEKIT_API sensekit_status_t sensekit_reader_get_frame(sensekit_reader_frame_t frame,
                                                          sensekit_stream_type_t type,
                                                          sensekit_stream_subtype_t subType,
                                                          sensekit_frame_ref_t** frameRef)

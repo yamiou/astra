@@ -65,15 +65,15 @@ namespace sensekit
             sensekit_frame_t* m_currentColorBuffer{nullptr};
             sensekit_frame_t* m_currentDepthBuffer{nullptr};
 
-            sensekit_bin_handle_t m_depthBinHandle{nullptr};
-            sensekit_bin_handle_t m_colorBinHandle{nullptr};
+            sensekit_bin_t m_depthBinHandle{nullptr};
+            sensekit_bin_t m_colorBinHandle{nullptr};
 
             sensekit_depthframe_wrapper_t* m_currentDepthFrame{nullptr};
             sensekit_colorframe_wrapper_t* m_currentColorFrame{nullptr};
 
-            sensekit_stream_handle_t m_depthHandle{nullptr};
-            sensekit_stream_handle_t m_colorHandle{nullptr};
-            StreamSetHandle* m_streamSetHandle{nullptr};
+            sensekit_stream_t m_depthHandle{nullptr};
+            sensekit_stream_t m_colorHandle{nullptr};
+            sensekit_streamset_t m_streamSetHandle{nullptr};
         };
     }
 }

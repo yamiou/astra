@@ -25,7 +25,7 @@ namespace sensekit {
         return true;
     }
 
-    bool StreamSet::has_stream_of_type_subtype(StreamType type, StreamSubtype subtype)
+    bool StreamSet::has_stream_of_type_subtype(sensekit_stream_type_t type, sensekit_stream_subtype_t subtype)
     {
         return find_stream_by_type_subtype(type, subtype) != nullptr;
     }
@@ -46,7 +46,7 @@ namespace sensekit {
         m_streamCollection.erase(m_streamCollection.find(stream));
     }
 
-    bool StreamSet::is_member(StreamHandle* stream)
+    bool StreamSet::is_member(sensekit_stream_t stream)
     {
         //TODO: check for nullptr
         Stream* sk_stream = reinterpret_cast<Stream*>(stream);
@@ -54,15 +54,15 @@ namespace sensekit {
         return m_streamCollection.find(sk_stream) != m_streamCollection.end();
     }
 
-    StreamHandle* StreamSet::find_stream_by_type_subtype(StreamType type, StreamSubtype subtype)
+    sensekit_stream_t StreamSet::find_stream_by_type_subtype(sensekit_stream_type_t type, sensekit_stream_subtype_t subtype)
     {
         Stream* sk_stream = find_stream_by_type_subtype_impl(type, subtype);
 
-        StreamHandle* stream = reinterpret_cast<StreamHandle*>(sk_stream);
+        sensekit_stream_t stream = reinterpret_cast<sensekit_stream_t>(sk_stream);
         return stream;
     }
 
-    Stream* StreamSet::find_stream_by_type_subtype_impl(StreamType type, StreamSubtype subtype)
+    Stream* StreamSet::find_stream_by_type_subtype_impl(sensekit_stream_type_t type, sensekit_stream_subtype_t subtype)
     {
         for (auto it = m_streamCollection.begin(); it != m_streamCollection.end(); ++it)
         {

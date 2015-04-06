@@ -284,7 +284,7 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame)
 void SampleViewer::display()
 {
     sensekit_temp_update();
-    sensekit_reader_frame_t* frame;
+    sensekit_reader_frame_t frame;
     sensekit_reader_open_frame(m_reader, 30, &frame);
     sensekit_depth_frame_get(frame, &m_depthFrame);
 

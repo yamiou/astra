@@ -22,7 +22,7 @@ namespace sensekit {
 
         inline StreamReader create_reader();
     private:
-        sensekit_streamset_t* m_pStreamSet;
+        sensekit_streamset_t m_pStreamSet;
 
         friend class StreamReader;
     };
@@ -30,7 +30,7 @@ namespace sensekit {
     class FrameRef
     {
     public:
-        FrameRef(sensekit_reader_frame_t* readerFrame)
+        FrameRef(sensekit_reader_frame_t readerFrame)
             : m_frame(readerFrame) { }
 
         template<typename T>
@@ -45,7 +45,7 @@ namespace sensekit {
             }
 
     private:
-        sensekit_reader_frame_t* m_frame;
+        sensekit_reader_frame_t m_frame;
     };
 
     class StreamReader
@@ -78,14 +78,14 @@ namespace sensekit {
 
         FrameRef get_latest_frame(int timeoutMillis = -1)
             {
-                sensekit_reader_frame_t* frame;
+                sensekit_reader_frame_t frame;
                 sensekit_reader_open_frame(m_reader, timeoutMillis, &frame);
                 return FrameRef(frame);
             }
 
     private:
         Sensor& m_sensor;
-        sensekit_reader_t* m_reader;
+        sensekit_reader_t m_reader;
     };
 
     StreamReader Sensor::create_reader()

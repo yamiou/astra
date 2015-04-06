@@ -52,9 +52,9 @@ private:
     int                     m_width;
     int                     m_height;
 
-    sensekit_streamset_t* m_sensor;
-    sensekit_reader_t* m_reader;
-    sensekit_colorstream_t* m_colorStream;
+    sensekit_streamset_t m_sensor;
+    sensekit_reader_t m_reader;
+    sensekit_colorstream_t m_colorStream;
     sensekit_colorframe_t* m_colorFrame;
 };
 

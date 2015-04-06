@@ -20,7 +20,7 @@ namespace sensekit {
     class DepthFrame
     {
     public:
-        DepthFrame(sensekit_reader_frame_t* readerFrame)
+        DepthFrame(sensekit_reader_frame_t readerFrame)
             {
                 sensekit_depth_frame_get(readerFrame, &m_depthFrame);
             }

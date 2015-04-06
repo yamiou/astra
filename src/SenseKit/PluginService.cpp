@@ -17,16 +17,16 @@ namespace sensekit
         return create_plugin_proxy(this);
     }
 
-    sensekit_status_t PluginService::create_stream_set(sensekit_streamset_t*& streamset)
+    sensekit_status_t PluginService::create_stream_set(sensekit_streamset_t& streamset)
     {
         //normally would create a new streamset
         StreamSet* skStreamSet = &m_context.get_rootSet();
-        streamset = reinterpret_cast<sensekit_streamset_t*>(skStreamSet);
+        streamset = reinterpret_cast<sensekit_streamset_t>(skStreamSet);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::destroy_stream_set(sensekit_streamset_t*& streamset)
+    sensekit_status_t PluginService::destroy_stream_set(sensekit_streamset_t& streamset)
     {
         StreamSet* skStreamSet = reinterpret_cast<StreamSet*>(streamset);
 
@@ -70,14 +70,14 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::create_stream(StreamSetHandle* setHandle,
+    sensekit_status_t PluginService::create_stream(sensekit_streamset_t setHandle,
                                                    sensekit_stream_desc_t desc,
                                                    stream_callbacks_t pluginCallbacks,
-                                                   sensekit_stream_handle_t& handle)
+                                                   sensekit_stream_t& handle)
     {
         // TODO add to specific streamset
         Stream* stream = m_context.get_rootSet().create_stream(desc, pluginCallbacks);
-        handle = reinterpret_cast<sensekit_stream_handle_t>(stream);
+        handle = reinterpret_cast<sensekit_stream_t>(stream);
 
         m_streamAddedSignal.raise(setHandle, handle, desc);
 
@@ -86,7 +86,7 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::destroy_stream(sensekit_stream_handle_t& streamHandle)
+    sensekit_status_t PluginService::destroy_stream(sensekit_stream_t& streamHandle)
     {
         if (streamHandle == nullptr)
             return SENSEKIT_STATUS_INVALID_PARAMETER;
@@ -95,7 +95,7 @@ namespace sensekit
 
         StreamSet* set = &m_context.get_rootSet();
 
-        StreamSetHandle* setHandle = reinterpret_cast<StreamSetHandle*>(set);
+        sensekit_streamset_t setHandle = reinterpret_cast<sensekit_streamset_t>(set);
 
         Stream* stream = reinterpret_cast<Stream*>(streamHandle);
         const sensekit_stream_desc_t& desc = stream->get_description();
@@ -111,22 +111,22 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::create_stream_bin(sensekit_stream_handle_t streamHandle,
+    sensekit_status_t PluginService::create_stream_bin(sensekit_stream_t streamHandle,
                                                        size_t lengthInBytes,
-                                                       sensekit_bin_handle_t& binHandle,
+                                                       sensekit_bin_t& binHandle,
                                                        sensekit_frame_t*& binBuffer)
     {
         Stream* stream = reinterpret_cast<Stream*>(streamHandle);
         StreamBin* bin = stream->create_bin(lengthInBytes);
 
-        binHandle = reinterpret_cast<sensekit_bin_handle_t>(bin);
+        binHandle = reinterpret_cast<sensekit_bin_t>(bin);
         binBuffer = bin->get_backBuffer();
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::destroy_stream_bin(sensekit_stream_handle_t streamHandle,
-                                                        sensekit_bin_handle_t& binHandle,
+    sensekit_status_t PluginService::destroy_stream_bin(sensekit_stream_t streamHandle,
+                                                        sensekit_bin_t& binHandle,
                                                         sensekit_frame_t*& binBuffer)
     {
         Stream* stream = reinterpret_cast<Stream*>(streamHandle);
@@ -140,7 +140,7 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::cycle_bin_buffers(sensekit_bin_handle_t binHandle,
+    sensekit_status_t PluginService::cycle_bin_buffers(sensekit_bin_t binHandle,
                                                        sensekit_frame_t*& binBuffer)
     {
         StreamBin* bin = reinterpret_cast<StreamBin*>(binHandle);
@@ -150,7 +150,7 @@ namespace sensekit
     }
 
     sensekit_status_t PluginService::link_connection_to_bin(sensekit_streamconnection_t* connection,
-                                                            sensekit_bin_handle_t binHandle)
+                                                            sensekit_bin_t binHandle)
     {
         StreamConnection* underlyingConnection = reinterpret_cast<StreamConnection*>(connection->handle);
         StreamBin* bin = reinterpret_cast<StreamBin*>(binHandle);
