@@ -37,8 +37,8 @@
 (add-macro :macro "RETURN"      :filter (lambda (fd len args vp) (funcdef-returntype fd)))
 (add-macro :macro "FUNC"        :filter (lambda (fd len args vp) (funcdef-funcname fd)))
 (add-macro :macro "PARAMS"      :filter (lambda (fd len args vp) (format-params (funcdef-params fd) len args vp)))
-                                        ; PARAMS arguments: types, names, deref, ref, void, voidonly, nowrap
-;;;;;;;;;
+;; PARAMS arguments: types, names, deref, ref, void, voidonly, nowrap
+;;;;;;;;;;;;;;;;;;
 
 (defun partial (func &rest args1)
   (lambda (&rest args2) (apply func (append args1 args2)))
@@ -77,13 +77,13 @@ is replaced with replacement."
   )
 
 (defun format-paramitem-name (args p)
-                                        ;in name only format, we can dereference the argument (pointer)
-                                        ;but only if the macro argument requested it
-                                        ;and this parameter can be dereferenced
+  ;;in name only format, we can dereference the argument (pointer)
+  ;;but only if the macro argument requested it
+  ;;and this parameter can be dereferenced
   (if (and (is-arg-set "deref" args) (param-deref p))
-                                        ;then
+      ;;then
       (format nil "*~A" (param-name p))
-                                        ;else
+      ;;else
       (format nil "~A" (param-name p))
       )
   )
@@ -93,13 +93,13 @@ is replaced with replacement."
          (last-index (1- (length type-decl)))
          )
     (format nil "~A ~A"
-                                        ;if macro requested reference mode,
-                                        ; this parameter is dereferencable,
-                                        ; and the last char is a *
+            ;;if macro requested reference mode,
+            ;; this parameter is dereferencable,
+            ;; and the last char is a *
             (if (and (is-arg-set "ref" args) (param-deref p) (equal "*" (subseq type-decl last-index)))
-                                        ;then, replace the last * with a &
+                ;;then, replace the last * with a &
                 (concatenate 'string (subseq type-decl 0 last-index) "&")
-                                        ;else
+                ;;else
                 type-decl
                 )
             (param-name p))
@@ -109,7 +109,7 @@ is replaced with replacement."
 (defun error-if-null (var errmsg) (when (null var) (error errmsg)))
 
 (defun format-params (params token-start-length args void-param)
-                                        ;full, types, names, deref, ref, void, voidonly, nowrap
+  ;;full, types, names, deref, ref, void, voidonly, nowrap
   (let*  ((arg-types      (is-arg-set "types" args))
           (arg-names      (is-arg-set "names" args))
           (arg-deref      (is-arg-set "deref" args))
@@ -120,11 +120,11 @@ is replaced with replacement."
           (arg-nowrap     (is-arg-set "nowrap" args))
           (filtered-params (cond  (arg-voidonly
                                    (error-if-null void-param "Void param must be set to use void argument")
-                                   (cons void-param nil)) ;only the void-param
+                                   (cons void-param nil)) ;;only the void-param
                                   (arg-void
                                    (error-if-null void-param "Void param must be set to use void argument")
-                                   (cons void-param params)) ;prepend the void-param
-                                  (t params) ;default, just use params
+                                   (cons void-param params)) ;;prepend the void-param
+                                  (t params) ;;default, just use params
                                   )
             )
           (types-only (and arg-types (not arg-names)))
@@ -140,12 +140,12 @@ is replaced with replacement."
     (when filtered-params
       (format nil format-line
               (cons
-                                        ;first parameter => no indentation
+               ;;first parameter => no indentation
                (apply format-param-func (list args (car filtered-params)))
                (mapcar
                 (lambda (p)
                   (concatenate 'string
-                                        ;second parameter, indent according to wrap policy
+                               ;;second parameter, indent according to wrap policy
                                (when do-wrap (make-string token-start-length :initial-element #\ ))
                                (apply format-param-func (list args p))
                                )
@@ -170,16 +170,16 @@ is replaced with replacement."
   (let ((token-marker-left (position token-marker line))
         )
     (if (null token-marker-left)
-                                        ;then, no left token marker. return line
+        ;;then, no left token marker. return line
         line
-                                        ;else, process more
+        ;;else, process more
         (let* ((token-start (1+ token-marker-left))
                (token-stop (position token-marker line :start token-start))
                )
           (if (null token-stop)
-                                        ;then, no right token marker. return line
+              ;;then, no right token marker. return line
               line
-                                        ;else, process more
+              ;;else, process more
 
               (let* ((token-full (subseq line token-start token-stop))
                      (seperator-index (position token-arg-marker token-full))
@@ -192,11 +192,11 @@ is replaced with replacement."
                      (line-end (subseq line (1+ token-stop) nil))
                      (m (get-macro token))
                      )
-                                        ;m (the macro struct) is nil if no macro found for the token
+                ;;m (the macro struct) is nil if no macro found for the token
                 (if (null m)
-                                        ;then
+                    ;;then
                     line
-                                        ;else
+                    ;;else
                     (let* ((token-start-length (+ line-length token-marker-left))
                            (expanded-token (funcall (lppmacro-filter m) funcdata token-start-length token-args void-param))
                            )
@@ -221,14 +221,14 @@ is replaced with replacement."
   )
 
 (defun expand-methods-with-template (template-list funcset-name)
-  (remove nil ;filter out the nil values (from wrong funcsets)
+  (remove nil ;;filter out the nil values (from wrong funcsets)
           (mapcar
            (lambda (func-data)
-             (cond ;only expand this function if it belongs to the target funcset
+             (cond ;;only expand this function if it belongs to the target funcset
                ((equal funcset-name (funcdef-funcset func-data))
                 (expand-template template-list func-data (get-void-param funcset-name))
                 )
-                                        ;otherwise return nil
+               ;;otherwise return nil
                (t nil)
                )
              )
@@ -246,12 +246,12 @@ is replaced with replacement."
 (defun add-func (&rest args)
   (let ((func-data (apply #'make-funcdef args)))
     (if (endp funcs)
-                                        ;then
+        ;;then
         (progn
           (setq funcs (cons func-data nil))
           (setq funcs-tail funcs)
           )
-                                        ;else
+        ;;else
         (progn
           (setf (cdr funcs-tail) (cons func-data nil))
           (setq funcs-tail (cdr funcs-tail))
@@ -283,24 +283,24 @@ is replaced with replacement."
 
 (defun get-funcset-from-begin-marker (line)
   (let ((start-index (search begin-marker-left line)))
-    (cond ;no begin marker, return nil
+    (cond ;;no begin marker, return nil
       ((null start-index) nil)
 
-                                        ;begin marker must be at start of line
+      ;;begin marker must be at start of line
       ((not (= start-index 0)) nil)
 
-                                        ;left side is good
+      ;;left side is good
       (t (let*  ((start-param-index (+ start-index (length begin-marker-left)))
                  (end-index (search begin-marker-right line :start2 start-param-index)))
-           (cond ;no right side marker, return nil
+           (cond ;;no right side marker, return nil
              ((null end-index) nil)
 
-                                        ;right marker must be at end of line
+             ;;right marker must be at end of line
              ((not (= (length line) (+ end-index (length begin-marker-right)))) nil)
 
-                                        ;markers but no funcset parameter, can't process
+             ;;markers but no funcset parameter, can't process
              ((= start-param-index end-index) nil)
-                                        ;we have a begin-marker and funcset parameter!
+             ;;we have a begin-marker and funcset parameter!
              (t (values (subseq line start-param-index end-index) start-param-index end-index))
              )
            )
@@ -329,28 +329,28 @@ is replaced with replacement."
          for line = (read-line infile nil)
          while line
          do
-           (cond   ;outside of a replace block
+           (cond   ;;outside of a replace block
              ((null funcset-name)
-                                        ;look for a begin-replace marker (funcset name becomes not nil)
+              ;;look for a begin-replace marker (funcset name becomes not nil)
               (setq funcset-name (get-funcset-from-begin-marker line))
-                                        ;if still no funcset-name
+              ;;if still no funcset-name
               (when (null funcset-name)
-                                        ;accumulate filtered lines to filelines
+                ;;accumulate filtered lines to filelines
                 (prepend-into filelines (filter-line line (file-namestring infilename)))
                 )
               )
 
-                                        ;all below: funcset-name is not nil -- inside of a replace block
-                                        ;check for end marker
+             ;;all below: funcset-name is not nil -- inside of a replace block
+             ;;check for end marker
              ((is-end-marker line)
-                                        ;since we have a full template, expand template it
+              ;;since we have a full template, expand template it
               (mapcar
                (lambda (v) (prepend-into filelines v))
                (expand-methods-with-template (reverse templatelines) funcset-name)
                )
-              (setq funcset-name nil) ;clear funcset-name -- return to normal operation above
+              (setq funcset-name nil) ;;clear funcset-name -- return to normal operation above
               )
-                                        ;inside replace block, accumulate template
+             ;;inside replace block, accumulate template
              (t (prepend-into templatelines line))
              )
            )
