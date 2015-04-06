@@ -4,6 +4,8 @@
 #include "StreamReader.h"
 #include "StreamConnection.h"
 #include "StreamServiceDelegate.h"
+#include <Plugins/StreamServiceProxyBase.h>
+#include <Plugins/PluginServiceProxyBase.h>
 #include <SenseKitAPI.h>
 #include "CreateStreamProxy.h"
 
