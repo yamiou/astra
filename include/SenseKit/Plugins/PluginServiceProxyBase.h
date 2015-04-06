@@ -1,3 +1,4 @@
+/* THIS FILE AUTO-GENERATED FROM PluginServiceProxyBase.h.lpp. DO NOT EDIT. */
 #ifndef PLUGINSERVICEPROXYBASE_H
 #define PLUGINSERVICEPROXYBASE_H
 
@@ -6,14 +7,26 @@
 struct PluginServiceProxyBase
 {
     void* pluginService;
-    sensekit_status_t (*register_stream_added_callback)(void*, StreamAddedCallback, CallbackId*);
-    sensekit_status_t (*register_stream_removing_callback)(void*, StreamRemovingCallback, CallbackId*);
 
-    sensekit_status_t (*unregister_stream_added_callback)(void*, CallbackId);
-    sensekit_status_t (*unregister_stream_removing_callback)(void*, CallbackId);
+    sensekit_status_t (*register_stream_added_callback)(void*,
+                                                        StreamAddedCallback,
+                                                        CallbackId*);
 
-    sensekit_status_t (*create_stream_set)(void*, sensekit_streamset_t**);
-    sensekit_status_t (*destroy_stream_set)(void*, sensekit_streamset_t**);
+    sensekit_status_t (*register_stream_removing_callback)(void*,
+                                                           StreamRemovingCallback,
+                                                           CallbackId*);
+
+    sensekit_status_t (*unregister_stream_added_callback)(void*,
+                                                          CallbackId);
+
+    sensekit_status_t (*unregister_stream_removing_callback)(void*,
+                                                             CallbackId);
+
+    sensekit_status_t (*create_stream_set)(void*,
+                                           StreamSetHandle*&);
+
+    sensekit_status_t (*destroy_stream_set)(void*,
+                                            StreamSetHandle*&);
 
     sensekit_status_t (*create_stream)(void*,
                                        StreamSetHandle*,
@@ -21,7 +34,8 @@ struct PluginServiceProxyBase
                                        stream_callbacks_t,
                                        sensekit_stream_handle_t*);
 
-    sensekit_status_t (*destroy_stream)(void*, sensekit_stream_handle_t*);
+    sensekit_status_t (*destroy_stream)(void*,
+                                        sensekit_stream_handle_t&);
 
     sensekit_status_t (*create_stream_bin)(void*,
                                            sensekit_stream_handle_t,

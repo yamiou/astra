@@ -1,0 +1,22 @@
+#ifndef PLUGINSERVICEDELEGATE_H
+#define PLUGINSERVICEDELEGATE_H
+
+#include <sensekit_core.h>
+#include "SenseKitContext.h"
+
+namespace sensekit {
+
+    class PluginServiceDelegate
+    {
+    public:
+^^^BEGINREPLACE:plugin^^^
+
+        static ^RETURN^ ^FUNC^(^PARAMS:void^)
+        {
+            return static_cast<PluginService*>(^PARAMS:names,voidonly^)->^FUNC^(^PARAMS:names,deref^);
+        }
+^^^ENDREPLACE^^^
+    };
+}
+
+#endif /* PLUGINSERVICEDELEGATE_H */

@@ -15,6 +15,93 @@
                 :params (list (make-param :type "StreamAddedCallback" :name "callback")
                               (make-param :type "CallbackId*" :name "callbackId" :deref T)))
 
+;; sensekit_status_t register_stream_removing_callback(StreamRemovingCallback callback, CallbackId* callbackId)
+(add-func       :funcset "plugin"
+                :returntype "sensekit_status_t"
+                :funcname "register_stream_removing_callback"
+                :params (list (make-param :type "StreamRemovingCallback" :name "callback")
+                              (make-param :type "CallbackId*" :name "callbackId" :deref T)))
+
+;; sensekit_status_t unregister_stream_added_callback(CallbackId callbackId)
+(add-func       :funcset "plugin"
+                :returntype "sensekit_status_t"
+                :funcname "unregister_stream_added_callback"
+                :params (list (make-param :type "CallbackId" :name "callback")))
+
+;; sensekit_status_t unregister_stream_removing_callback(CallbackId callbackId)
+(add-func       :funcset "plugin"
+                :returntype "sensekit_status_t"
+                :funcname "unregister_stream_removing_callback"
+                :params (list (make-param :type "CallbackId" :name "callback")))
+
+;; sensekit_status_t create_stream_set(StreamSetHandle*& setHandle)
+(add-func       :funcset "plugin"
+                :returntype "sensekit_status_t"
+                :funcname "create_stream_set"
+                :params (list (make-param :type "StreamSetHandle*&" :name "setHandle")))
+
+;; sensekit_status_t destroy_stream_set(StreamSetHandle*& setHandle)
+(add-func       :funcset "plugin"
+                :returntype "sensekit_status_t"
+                :funcname "destroy_stream_set"
+                :params (list (make-param :type "StreamSetHandle*&" :name "setHandle")))
+
+;; sensekit_status_t create_stream(StreamSetHandle* setHandle,
+;;                                 sensekit_stream_desc_t desc,
+;;                                 stream_callbacks_t pluginCallbacks,
+;;                                 sensekit_stream_handle_t* handle)
+(add-func       :funcset "plugin"
+                :returntype "sensekit_status_t"
+                :funcname "create_stream"
+                :params (list (make-param :type "StreamSetHandle*" :name "setHandle")
+                              (make-param :type "sensekit_stream_desc_t" :name "desc")
+                              (make-param :type "stream_callbacks_t" :name "pluginCallbacks")
+                              (make-param :type "sensekit_stream_handle_t*" :name "handle" :deref T)))
+
+;; sensekit_status_t destroy_stream(sensekit_stream_handle_t& handle)
+(add-func       :funcset "plugin"
+                :returntype "sensekit_status_t"
+                :funcname "destroy_stream"
+                :params (list (make-param :type "sensekit_stream_handle_t&" :name "handle")))
+
+;; sensekit_status_t create_stream_bin(sensekit_stream_handle_t streamHandle,
+;;                                     size_t lengthInBytes,
+;;                                     sensekit_bin_handle_t* binHandle,
+;;                                     sensekit_frame_t** binBuffer)
+(add-func       :funcset "plugin"
+                :returntype "sensekit_status_t"
+                :funcname "create_stream_bin"
+                :params (list (make-param :type "sensekit_stream_handle_t" :name "streamHandle")
+                              (make-param :type "size_t" :name "lengthInBytes")
+                              (make-param :type "sensekit_bin_handle_t*" :name "binHandle" :deref t)
+                              (make-param :type "sensekit_frame_t**" :name "binBuffer" :deref t)))
+
+;; sensekit_status_t destroy_stream_bin(sensekit_stream_handle_t handle,
+;;                                      sensekit_bin_handle_t* binHandle,
+;;                                      sensekit_frame_t** binBuffer)
+(add-func       :funcset "plugin"
+                :returntype "sensekit_status_t"
+                :funcname "destroy_stream_bin"
+                :params (list (make-param :type "sensekit_stream_handle_t" :name "streamHandle")
+                              (make-param :type "sensekit_bin_handle_t*" :name "binHandle" :deref t)
+                              (make-param :type "sensekit_frame_t**" :name "binBuffer" :deref t)))
+
+;; sensekit_status_t cycle_bin_buffers(sensekit_bin_handle_t binHandle,
+;;                                     sensekit_frame_t** binBuffer)
+(add-func       :funcset "plugin"
+                :returntype "sensekit_status_t"
+                :funcname "cycle_bin_buffers"
+                :params (list (make-param :type "sensekit_bin_handle_t" :name "binHandle")
+                              (make-param :type "sensekit_frame_t**" :name "binBuffer" :deref t)))
+
+;; sensekit_status_t link_connection_to_bin(sensekit_streamconnection_t* connection,
+;;                                          sensekit_bin_handle_t binHandle)
+(add-func       :funcset "plugin"
+                :returntype "sensekit_status_t"
+                :funcname "link_connection_to_bin"
+                :params (list (make-param :type "sensekit_streamconnection_t*" :name "connection")
+                              (make-param :type "sensekit_bin_handle_t" :name "binHandle")))
+
 ;; SENSEKIT_API sensekit_status_t sensekit_initialize();
 (add-func       :funcset "stream"
                 :returntype "sensekit_status_t"

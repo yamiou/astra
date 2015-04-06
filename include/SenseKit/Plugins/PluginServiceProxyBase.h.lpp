@@ -1,0 +1,17 @@
+/* ^^^AUTOGENHEADER^^^ */
+#ifndef PLUGINSERVICEPROXYBASE_H
+#define PLUGINSERVICEPROXYBASE_H
+
+#include <sensekit_core.h>
+
+struct PluginServiceProxyBase
+{
+    void* pluginService;
+
+^^^BEGINREPLACE:plugin^^^
+    ^RETURN^ (*^FUNC^)(^PARAMS:types,void^);
+
+^^^ENDREPLACE^^^
+};
+
+#endif /* PLUGINSERVICEPROXYBASE_H */

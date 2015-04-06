@@ -10,11 +10,11 @@ namespace sensekit {
     {
     public:
 ^^^BEGINREPLACE:stream^^^
-        
+
         ^RETURN^ ^FUNC^(^PARAMS^)
         {
             return StreamServiceProxyBase::^FUNC^(^PARAMS:void,names^);
-        }        
+        }
 ^^^ENDREPLACE^^^
     };
 }

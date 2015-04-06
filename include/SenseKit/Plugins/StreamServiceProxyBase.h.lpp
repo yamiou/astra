@@ -10,7 +10,7 @@ struct StreamServiceProxyBase
 
 ^^^BEGINREPLACE:stream^^^
     ^RETURN^ (*^FUNC^)(^PARAMS:types,void^);
-    
+
 ^^^ENDREPLACE^^^
 };
 
