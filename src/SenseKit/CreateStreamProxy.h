@@ -1,4 +1,7 @@
 /* THIS FILE AUTO-GENERATED FROM CreateStreamProxy.h.lpp. DO NOT EDIT. */
+#ifndef CREATESTREAMPROXY_H
+#define CREATESTREAMPROXY_H
+
 #include "SenseKitContext.h"
 #include "StreamServiceDelegate.h"
 #include <Plugins/StreamServiceProxyBase.h>
@@ -32,3 +35,5 @@ namespace sensekit {
         return proxy;
     }
 }
+
+#endif /* CREATESTREAMPROXY_H */
