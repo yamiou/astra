@@ -66,6 +66,8 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get(sensekit_reader_t re
                                                             sensekit_depthstream_t** depthStream)
 
 {
+    refresh_conversion_cache();
+
     return sensekit_generic_stream_get(reader,
                                        SENSEKIT_STREAM_DEPTH,
                                        DEFAULT_SUBTYPE,
