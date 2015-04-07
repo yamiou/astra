@@ -71,6 +71,12 @@ namespace sensekit {
 
         sensekit_status_t reader_close_frame(sensekit_reader_frame_t& frame);
 
+        sensekit_status_t reader_register_frame_ready_callback(sensekit_reader_t reader,
+                                                               FrameReadyCallback callback,
+                                                               sensekit_reader_callback_id_t& callbackId);
+
+        sensekit_status_t reader_unregister_frame_ready_callback(sensekit_reader_callback_id_t& callbackId);
+
         sensekit_status_t reader_get_frame(sensekit_reader_frame_t frame,
                                            sensekit_stream_type_t type,
                                            sensekit_stream_subtype_t subType,

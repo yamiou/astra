@@ -2,4 +2,5 @@
 add_subdirectory(SimpleViewer)
 add_subdirectory(SimpleColorViewer)
 add_subdirectory(DepthReader)
+add_subdirectory(DepthReaderEvent)
 add_subdirectory(cpp/DepthReader)

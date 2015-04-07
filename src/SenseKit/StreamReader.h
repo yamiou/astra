@@ -6,6 +6,7 @@
 #include "StreamConnection.h"
 #include <unordered_map>
 #include <cassert>
+#include "Core/Signal.h"
 
 namespace sensekit {
 
@@ -45,6 +46,10 @@ namespace sensekit {
         sensekit_streamconnection_t* get_stream(sensekit_stream_desc_t& desc);
         sensekit_frame_ref_t* get_subframe(sensekit_stream_desc_t& desc);
 
+        sensekit_status_t register_frame_callback(FrameReadyCallback callback, CallbackId& callbackId);
+
+        sensekit_status_t unregister_frame_callback(CallbackId callbackId);
+
         //TODO: locking currently not threadsafe
 
         void lock();
@@ -68,6 +73,8 @@ namespace sensekit {
         sensekit_reader_frame_t* m_currentFrame{nullptr};
         StreamSet& m_streamSet;
         ConnectionMap m_streamMap;
+        Signal<sensekit_reader_t, sensekit_reader_frame_t> m_frameReadySignal;
+
     };
 }
 

@@ -53,6 +53,14 @@ struct StreamServiceProxyBase
     sensekit_status_t (*reader_close_frame)(void*,
                                             sensekit_reader_frame_t*);
 
+    sensekit_status_t (*reader_register_frame_ready_callback)(void*,
+                                                              sensekit_reader_t,
+                                                              FrameReadyCallback,
+                                                              sensekit_reader_callback_id_t*);
+
+    sensekit_status_t (*reader_unregister_frame_ready_callback)(void*,
+                                                                sensekit_reader_callback_id_t*);
+
     sensekit_status_t (*reader_get_frame)(void*,
                                           sensekit_reader_frame_t,
                                           sensekit_stream_type_t,

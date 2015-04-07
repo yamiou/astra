@@ -36,7 +36,8 @@ set(SenseKit_SOURCES_GEN
   SenseKitContext.h.lpp
   StreamServiceDelegate.h.lpp
   SenseKit.cpp.lpp
-  CreateStreamProxy.h.lpp
+  CreateStreamProxy.h.lpp  
+  ../../include/SenseKit/sensekit_capi.h.lpp
   ../../include/SenseKit/Plugins/StreamServiceProxyBase.h.lpp
   ../../include/SenseKit/Plugins/StreamServiceProxy.h.lpp
   )

@@ -178,6 +178,44 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
+    sensekit_status_t SenseKitContext::reader_register_frame_ready_callback(sensekit_reader_t reader, 
+                                                                      FrameReadyCallback callback, 
+                                                                      sensekit_reader_callback_id_t& callbackId)
+    {
+        assert(reader != nullptr);
+        callbackId = nullptr;
+
+        StreamReader* actualReader = reinterpret_cast<StreamReader*>(reader);
+
+        CallbackId cbId;
+        sensekit_status_t rc = actualReader->register_frame_callback(callback, cbId);
+
+        if (rc == SENSEKIT_STATUS_SUCCESS)
+        {
+            sensekit_reader_callback_id_raw_t* cb = new sensekit_reader_callback_id_raw_t;
+            callbackId = cb;
+
+            cb->reader = reader;
+            cb->callbackId = cbId;
+        }
+
+        return rc;
+    }
+
+    sensekit_status_t SenseKitContext::reader_unregister_frame_ready_callback(sensekit_reader_callback_id_t& callbackId)
+    {
+        sensekit_reader_callback_id_raw_t* cb = callbackId;
+        assert(cb != nullptr);
+        assert(cb->reader != nullptr);
+
+        CallbackId cbId = cb->callbackId;
+        StreamReader* actualReader = reinterpret_cast<StreamReader*>(cb->reader);
+        
+        delete cb;
+        callbackId = nullptr;
+        return actualReader->unregister_frame_callback(cbId);
+    }
+
     sensekit_status_t SenseKitContext::reader_get_frame(sensekit_reader_frame_t frame,
                                                         sensekit_stream_type_t type,
                                                         sensekit_stream_subtype_t subType,

@@ -1,3 +1,4 @@
+/* THIS FILE AUTO-GENERATED FROM sensekit_capi.h.lpp. DO NOT EDIT. */
 #ifndef SENSEKIT_CAPI_H
 #define SENSEKIT_CAPI_H
 
@@ -31,13 +32,20 @@ SENSEKIT_API sensekit_status_t sensekit_stream_get_description(sensekit_streamco
                                                                sensekit_stream_desc_t* description);
 
 SENSEKIT_API sensekit_status_t sensekit_stream_start(sensekit_streamconnection_t* connection);
+
 SENSEKIT_API sensekit_status_t sensekit_stream_stop(sensekit_streamconnection_t* connection);
 
 SENSEKIT_API sensekit_status_t sensekit_reader_open_frame(sensekit_reader_t reader,
                                                           int timeoutMillis,
-                                                          sensekit_reader_frame_t* frame); //0 = return immediately
+                                                          sensekit_reader_frame_t* frame);
 
-SENSEKIT_API sensekit_status_t sensekit_reader_close_frame(sensekit_reader_frame_t* frame); //frame set to null
+SENSEKIT_API sensekit_status_t sensekit_reader_close_frame(sensekit_reader_frame_t* frame);
+
+SENSEKIT_API sensekit_status_t sensekit_reader_register_frame_ready_callback(sensekit_reader_t reader,
+                                                                             FrameReadyCallback callback,
+                                                                             sensekit_reader_callback_id_t* callbackId);
+
+SENSEKIT_API sensekit_status_t sensekit_reader_unregister_frame_ready_callback(sensekit_reader_callback_id_t* callbackId);
 
 SENSEKIT_API sensekit_status_t sensekit_reader_get_frame(sensekit_reader_frame_t frame,
                                                          sensekit_stream_type_t type,

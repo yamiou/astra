@@ -1,0 +1,16 @@
+/* ^^^AUTOGENHEADER^^^ */
+#ifndef SENSEKIT_CAPI_H
+#define SENSEKIT_CAPI_H
+
+#include "sensekit_defines.h"
+#include "sensekit_types.h"
+
+SENSEKIT_BEGIN_DECLS
+
+^^^BEGINREPLACE:stream^^^
+SENSEKIT_API ^RETURN^ sensekit_^FUNC^(^PARAMS^);
+
+^^^ENDREPLACE^^^
+SENSEKIT_END_DECLS
+
+#endif /* SENSEKIT_CAPI_H */

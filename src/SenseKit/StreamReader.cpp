@@ -30,7 +30,7 @@ namespace sensekit {
             m_streamMap.insert(std::make_pair(desc, connection));
         }
 
-        return connection->get_handle();;
+        return connection->get_handle();
     }
 
     sensekit_frame_ref_t* StreamReader::get_subframe(sensekit_stream_desc_t& desc)
@@ -43,6 +43,18 @@ namespace sensekit {
             return nullptr;
 
         return connection->lock();
+    }
+
+    sensekit_status_t StreamReader::register_frame_callback(FrameReadyCallback callback, CallbackId& callbackId)
+    {
+        callbackId = m_frameReadySignal += callback;
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t StreamReader::unregister_frame_callback(CallbackId callbackId)
+    {
+        m_frameReadySignal -= callbackId;
+        return SENSEKIT_STATUS_SUCCESS;
     }
 
     void StreamReader::lock()

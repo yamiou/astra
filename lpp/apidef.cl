@@ -196,6 +196,22 @@
                 :funcname "reader_close_frame"
                 :params (list (make-param :type "sensekit_reader_frame_t*" :name "frame" :deref T)))
 
+;; SENSEKIT_API sensekit_status_t reader_register_frame_ready_callback(sensekit_reader_t reader,
+;;                                                                     FrameReadyCallback callback,
+;;                                                                     sensekit_reader_callback_id_t* callbackId)
+(add-func       :funcset "stream"
+                :returntype "sensekit_status_t"
+                :funcname "reader_register_frame_ready_callback"
+                :params (list (make-param :type "sensekit_reader_t" :name "reader")
+                              (make-param :type "FrameReadyCallback" :name "callback")
+                              (make-param :type "sensekit_reader_callback_id_t*" :name "callbackId" :deref T)))
+
+;; SENSEKIT_API sensekit_status_t reader_unregister_frame_ready_callback(sensekit_reader_callback_id_t* callbackId)
+(add-func       :funcset "stream"
+                :returntype "sensekit_status_t" 
+                :funcname "reader_unregister_frame_ready_callback"
+                :params (list (make-param :type "sensekit_reader_callback_id_t*" :name "callbackId" :deref T)))
+
 ;; SENSEKIT_API sensekit_status_t sensekit_reader_get_frame(sensekit_reader_frame_t frame,
 ;;                                                          sensekit_stream_type_t type,
 ;;                                                          sensekit_stream_subtype_t subType,
