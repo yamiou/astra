@@ -7,6 +7,7 @@
 #include "Signal.h"
 #include "StreamBin.h"
 #include "StreamConnection.h"
+#include "StreamImpl.h"
 
 namespace sensekit {
 
@@ -15,22 +16,13 @@ namespace sensekit {
     class Stream
     {
     public:
-        Stream(sensekit_stream_desc_t description,
-               stream_callbacks_t pluginCallbacks)
-            : m_description(description),
-              m_callbacks(pluginCallbacks)
-            {}
+        Stream(StreamImpl* impl)
+            : m_impl(impl) {}
 
         ~Stream();
 
         StreamConnection* create_connection();
         void destroy_connection(StreamConnection* connection);
-
-        sensekit_stream_type_t get_type() { return m_description.type; }
-        sensekit_stream_subtype_t get_subtype() { return m_description.subType; }
-
-        StreamBin* create_bin(size_t byteLength);
-        void destroy_bin(StreamBin* bin);
 
         void set_parameter(StreamConnection* connection,
                            sensekit_parameter_id id,
@@ -46,20 +38,24 @@ namespace sensekit {
                                 size_t byteLength,
                                 sensekit_parameter_data_t* data);
 
-        const sensekit_stream_desc_t& get_description() const { return m_description; }
+        const sensekit_stream_desc_t& get_description() const { return m_impl->get_description(); }
+
+        static Stream* get_ptr(sensekit_stream_t stream)
+            { return reinterpret_cast<Stream*>(stream); }
+
+        sensekit_stream_t get_handle()
+            { return reinterpret_cast<sensekit_stream_t>(this); }
+
+        StreamImpl* get_impl() { return m_impl.get(); }
 
     private:
+        std::unique_ptr<StreamImpl> m_impl;
+
         using ConnPtr = std::unique_ptr<StreamConnection>;
         using ConnectionList = std::vector<ConnPtr>;
 
-        using BinPtr = std::unique_ptr<StreamBin>;
-        using BinList = std::vector<BinPtr>;
-
-        sensekit_stream_desc_t m_description;
-
         ConnectionList m_connections;
-        BinList m_bins;
-        stream_callbacks_t m_callbacks;
+
     };
 }
 

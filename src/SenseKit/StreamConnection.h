@@ -28,6 +28,9 @@ namespace sensekit {
 
         sensekit_streamconnection_t* get_handle() { return &m_connection; }
 
+        static StreamConnection* get_ptr(sensekit_streamconnection_t* conn)
+            { return reinterpret_cast<StreamConnection*>(conn->handle); }
+
         const sensekit_stream_desc_t& get_description() const;
 
         void set_parameter(sensekit_parameter_id id,

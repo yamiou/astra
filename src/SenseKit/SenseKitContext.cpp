@@ -62,7 +62,7 @@ namespace sensekit {
 
     sensekit_status_t SenseKitContext::streamset_open(const char* uri, sensekit_streamset_t& streamSet)
     {
-        streamSet = reinterpret_cast<sensekit_streamset_t>(&get_rootSet());
+        streamSet = get_rootSet().get_handle();
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -85,8 +85,8 @@ namespace sensekit {
     {
         assert(streamSet != nullptr);
 
-        StreamSet* actualSet = reinterpret_cast<StreamSet*>(streamSet);
-        reader = reinterpret_cast<sensekit_reader_t>(new StreamReader(*actualSet));
+        StreamSet* actualSet = StreamSet::get_ptr(streamSet);
+        reader = (new StreamReader(*actualSet))->get_handle();
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -95,7 +95,7 @@ namespace sensekit {
     {
         assert(reader != nullptr);
 
-        StreamReader* actualReader = reinterpret_cast<StreamReader*>(reader);
+        StreamReader* actualReader = StreamReader::get_ptr(reader);
 
         delete actualReader;
         reader = nullptr;
@@ -110,7 +110,7 @@ namespace sensekit {
     {
         assert(reader != nullptr);
 
-        StreamReader* actualReader = reinterpret_cast<StreamReader*>(reader);
+        StreamReader* actualReader = StreamReader::get_ptr(reader);
 
         sensekit_stream_desc_t desc;
         desc.type = type;
@@ -121,9 +121,10 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::stream_get_description(sensekit_streamconnection_t* connection, sensekit_stream_desc_t* description)
+    sensekit_status_t SenseKitContext::stream_get_description(sensekit_streamconnection_t* connection,
+                                                              sensekit_stream_desc_t* description)
     {
-        //TODO
+        //description = StreamConnection::get_ptr(connection)->get_description();
         return SENSEKIT_STATUS_SUCCESS;
     }
 
@@ -132,8 +133,7 @@ namespace sensekit {
         assert(connection != nullptr);
         assert(connection->handle != nullptr);
 
-        StreamConnection* actualConnection =
-            reinterpret_cast<StreamConnection*>(connection->handle);
+        StreamConnection* actualConnection = StreamConnection::get_ptr(connection);
 
         actualConnection->start();
 
@@ -145,8 +145,7 @@ namespace sensekit {
         assert(connection != nullptr);
         assert(connection->handle != nullptr);
 
-        StreamConnection* actualConnection =
-            reinterpret_cast<StreamConnection*>(connection->handle);
+        StreamConnection* actualConnection = StreamConnection::get_ptr(connection);
 
         actualConnection->stop();
 
@@ -159,9 +158,9 @@ namespace sensekit {
     {
         assert(reader != nullptr);
 
-        StreamReader* actualReader = reinterpret_cast<StreamReader*>(reader);
-
+        StreamReader* actualReader = StreamReader::get_ptr(reader);
         actualReader->lock();
+
         frame = reader;
 
         return SENSEKIT_STATUS_SUCCESS;
@@ -171,7 +170,7 @@ namespace sensekit {
     {
         assert(frame != nullptr);
 
-        StreamReader* actualReader = reinterpret_cast<StreamReader*>(frame);
+        StreamReader* actualReader = StreamReader::from_frame(frame);
         actualReader->unlock();
 
         frame = nullptr;
@@ -186,7 +185,7 @@ namespace sensekit {
     {
         assert(frame != nullptr);
 
-        StreamReader* actualReader = reinterpret_cast<StreamReader*>(frame);
+        StreamReader* actualReader = StreamReader::from_frame(frame);
 
         sensekit_stream_desc_t desc;
         desc.type = type;
@@ -216,9 +215,7 @@ namespace sensekit {
         assert(connection != nullptr);
         assert(connection->handle != nullptr);
 
-        StreamConnection* actualConnection =
-            reinterpret_cast<StreamConnection*>(connection->handle);
-
+        StreamConnection* actualConnection = StreamConnection::get_ptr(connection);
         actualConnection->set_parameter(parameterId, byteLength, data);
 
         return SENSEKIT_STATUS_SUCCESS;
@@ -231,8 +228,7 @@ namespace sensekit {
         assert(connection != nullptr);
         assert(connection->handle != nullptr);
 
-        StreamConnection* actualConnection =
-            reinterpret_cast<StreamConnection*>(connection->handle);
+        StreamConnection* actualConnection = StreamConnection::get_ptr(connection);
 
         actualConnection->get_parameter_size(parameterId, byteLength);
 
@@ -247,9 +243,7 @@ namespace sensekit {
         assert(connection != nullptr);
         assert(connection->handle != nullptr);
 
-        StreamConnection* actualConnection =
-            reinterpret_cast<StreamConnection*>(connection->handle);
-
+        StreamConnection* actualConnection = StreamConnection::get_ptr(connection);
         actualConnection->get_parameter_data(parameterId, byteLength, data);
 
         return SENSEKIT_STATUS_SUCCESS;

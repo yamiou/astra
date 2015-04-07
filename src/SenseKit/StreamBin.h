@@ -57,6 +57,10 @@ namespace sensekit {
         bool is_active() { return m_activeCount > 0; }
         bool has_clients_connected() { return m_connectedCount > 0; }
 
+        sensekit_bin_t get_handle() { return reinterpret_cast<sensekit_bin_t>(this); }
+        static StreamBin* get_ptr(sensekit_bin_t bin)
+            { return reinterpret_cast<StreamBin*>(bin); }
+
     private:
         void allocate_buffers(size_t bufferLengthInBytes);
         sensekit_frame_t* get_frontBuffer();

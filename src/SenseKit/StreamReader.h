@@ -50,6 +50,10 @@ namespace sensekit {
         void lock();
         void unlock();
 
+        sensekit_reader_t get_handle() { return reinterpret_cast<sensekit_reader_t>(this); }
+        static StreamReader* get_ptr(sensekit_reader_t reader) { return reinterpret_cast<StreamReader*>(reader); }
+        static StreamReader* from_frame(sensekit_reader_frame_t frame) { return reinterpret_cast<StreamReader*>(frame); }
+
     private:
         StreamConnection* find_stream_of_type(sensekit_stream_desc_t& desc);
 
