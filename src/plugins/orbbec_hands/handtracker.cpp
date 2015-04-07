@@ -30,7 +30,7 @@ using namespace std;
 
 HandTracker::HandTracker(sensekit::PluginServiceProxy* pluginService,
                          sensekit_streamset_t setHandle,
-                         sensekit_depthstream_t* depthStream) :
+                         sensekit_depthstream_t depthStream) :
     PluginBase(pluginService),
     m_setHandle(setHandle),
     m_depthStream(depthStream),
@@ -64,7 +64,7 @@ void HandTracker::reset()
     m_pointProcessor.reset();
 }
 
-void HandTracker::updateTracking(sensekit_depthframe_t* depthFrame)
+void HandTracker::updateTracking(sensekit_depthframe_t depthFrame)
 {
     sensekit_depthframe_metadata_t metadata;
     sensekit_depthframe_get_metadata(depthFrame, &metadata);

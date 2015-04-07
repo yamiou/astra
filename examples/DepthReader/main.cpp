@@ -6,15 +6,25 @@
 #include <iostream>
 #include "../key_handler.h"
 
-void print_depth(sensekit_depthframe_t* depthFrame)
+void print_depth(sensekit_depthframe_t depthFrame)
 {
     sensekit_depthframe_metadata_t metadata;
+    int16_t* depthData;
+    size_t depthLength;
+
+    sensekit_depthframe_get_data_length(depthFrame, &depthLength);
     sensekit_depthframe_get_metadata(depthFrame, &metadata);
+
+    depthData = (int16_t*)malloc(depthLength);
+    sensekit_depthframe_copy_data(depthFrame, depthData);
+
     int width = metadata.width;
     int height = metadata.height;
 
     size_t index = ((width * (height / 2)) + (width / 2));
-    short middle = depthFrame->data[index];
+    short middle = depthData[index];
+
+    free(depthData);
 
     uint32_t frameIndex;
     sensekit_depthframe_get_frameindex(depthFrame, &frameIndex);
@@ -46,7 +56,7 @@ int main(int argc, char** argv)
         sensekit_reader_frame_t frame;
         sensekit_reader_open_frame(reader, 30, &frame);
 
-        sensekit_depthframe_t* depthFrame;
+        sensekit_depthframe_t depthFrame;
         sensekit_depth_frame_get(frame, &depthFrame);
 
         print_depth(depthFrame);

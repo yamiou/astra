@@ -28,7 +28,7 @@ void DepthUtility::reset()
     m_matDepthVelErode.create(m_processingHeight, m_processingWidth, CV_32FC1);
 }
 
-void DepthUtility::processDepthToForeground(sensekit_depthframe_t* depthFrame, int width, int height, cv::Mat matDepth, cv::Mat matForeground)
+void DepthUtility::processDepthToForeground(sensekit_depthframe_t depthFrame, int width, int height, cv::Mat matDepth, cv::Mat matForeground)
 {
     matDepth.create(m_processingHeight, m_processingWidth, CV_32FC1);
     matForeground = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_8UC1);
@@ -56,12 +56,14 @@ void DepthUtility::processDepthToForeground(sensekit_depthframe_t* depthFrame, i
     thresholdForeground(matForeground, m_matDepthVelErode, m_foregroundThresholdFactor);
 }
 
-void DepthUtility::depthFrameToMat(sensekit_depthframe_t* depthFrameSrc, int width, int height, cv::Mat matTarget)
+void DepthUtility::depthFrameToMat(sensekit_depthframe_t depthFrameSrc, int width, int height, cv::Mat matTarget)
 {
     //ensure initialized
     matTarget.create(height, width, CV_32FC1);
 
-    const int16_t* depthData = depthFrameSrc->data;
+    int16_t* depthData;
+    size_t length;
+    sensekit_depthframe_get_data_ptr(depthFrameSrc, &depthData, &length);
 
     for (int y = 0; y < height; ++y)
     {

@@ -17,7 +17,7 @@ class HandTracker : public sensekit::PluginBase
 public:
     HandTracker(sensekit::PluginServiceProxy* pluginService,
                 sensekit_streamset_t setHandle,
-                sensekit_depthstream_t* depthStream);
+                sensekit_depthstream_t depthStream);
 
     virtual ~HandTracker();
 private:
@@ -27,7 +27,7 @@ private:
     static sensekit_handstatus_t convertHandStatus(TrackingStatus status);
     static void resetHandPoint(sensekit_handpoint_t& point);
 
-    void updateTracking(sensekit_depthframe_t* depthFrame);
+    void updateTracking(sensekit_depthframe_t depthFrame);
     void updateHandFrame(std::vector<TrackedPoint>& internalTrackedPoints, sensekit_handframe_wrapper_t* handframe_wrapper);
 
     void trackPoints(cv::Mat& matDepth, cv::Mat& matForeground);
@@ -54,7 +54,7 @@ private:
 
     //fields
     sensekit_streamset_t m_setHandle;
-    sensekit_depthstream_t* m_depthStream;
+    sensekit_depthstream_t m_depthStream;
     DepthUtility m_depthUtility;
     CoordinateConverter m_converter;
     PointProcessor m_pointProcessor;

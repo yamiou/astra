@@ -1,23 +1,53 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-#include <sensekit_core.h>
-#include "color_types.h"
+#include <SenseKit.h>
+#include <StreamTypes.h>
+#include "color_capi.h"
 
-SENSEKIT_BEGIN_DECLS
+namespace sensekit {
 
-SENSEKIT_API_EX sensekit_status_t sensekit_color_stream_get(sensekit_reader_t reader,
-                                                            sensekit_colorstream_t* colorStream);
+    class ColorStream : public DataStream
+    {
+    public:
+        explicit ColorStream(sensekit_streamconnection_t connection)
+            : DataStream(connection)
+            { }
 
-SENSEKIT_API_EX sensekit_status_t sensekit_color_frame_get(sensekit_reader_frame_t readerFrame,
-                                                           sensekit_colorframe_t** colorFrame);
+        static const sensekit_stream_type_t id = SENSEKIT_STREAM_COLOR;
+    };
 
-SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_metadata(sensekit_colorframe_t* colorFrame,
-                                                                    sensekit_colorframe_metadata_t* metadata);
+    class ColorFrame
+    {
+    public:
+        ColorFrame(sensekit_reader_frame_t readerFrame)
+            {
+                sensekit_color_frame_get(readerFrame, &m_colorFrame);
+                sensekit_colorframe_get_metadata(m_colorFrame, &m_metadata);
+                sensekit_colorframe_get_frameindex(m_colorFrame, &m_frameIndex);
+                sensekit_colorframe_get_data_ptr(m_colorFrame, &m_dataPtr, &m_dataLength);
+            }
 
-SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_frameindex(sensekit_colorframe_t* colorFrame,
-                                                                      uint32_t* index);
+        int get_resolutionX() { return m_metadata.width; }
+        int get_resolutionY() { return m_metadata.height; }
+        int get_frameIndex() { return m_frameIndex; }
+        int get_bytesPerPixel() { return m_metadata.bytesPerPixel; }
 
-SENSEKIT_END_DECLS
+        const uint8_t* data() { return m_dataPtr; }
+        size_t length() { return m_dataLength; }
+
+        void copy_to(uint8_t* buffer)
+            {
+                sensekit_colorframe_copy_data(m_colorFrame, buffer);
+            }
+
+    private:
+        sensekit_colorframe_t m_colorFrame;
+        sensekit_colorframe_metadata_t m_metadata;
+        uint32_t m_frameIndex;
+        uint8_t* m_dataPtr;
+        size_t m_dataLength;
+    };
+}
 
 #endif // COLOR_H

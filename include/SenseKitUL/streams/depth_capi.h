@@ -16,12 +16,23 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get(sensekit_reader_t re
                                                             sensekit_depthstream_t* depthStream);
 
 SENSEKIT_API_EX sensekit_status_t sensekit_depth_frame_get(sensekit_reader_frame_t readerFrame,
-                                                           sensekit_depthframe_t** depthFrame);
+                                                           sensekit_depthframe_t* depthFrame);
 
-SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_metadata(sensekit_depthframe_t* depthFrame,
-                                                                    sensekit_depthframe_metadata_t* metadata );
-SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_frameindex(sensekit_depthframe_t* depthFrame,
-                                                                      uint32_t* index);
+SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_data_length(sensekit_depthframe_t depthFrame,
+                                                                      size_t* length);
+
+SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_data_ptr(sensekit_depthframe_t depthFrame,
+                                                                   int16_t** data,
+                                                                   size_t* length);
+
+SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_copy_data(sensekit_depthframe_t depthFrame,
+                                                                int16_t* data);
+
+SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_metadata(sensekit_depthframe_t depthFrame,
+                                                                   sensekit_depthframe_metadata_t* metadata );
+
+SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_frameindex(sensekit_depthframe_t depthFrame,
+                                                                     uint32_t* index);
 
 SENSEKIT_END_DECLS
 

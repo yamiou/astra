@@ -100,7 +100,13 @@ void SimpleColorViewer::display()
     sensekit_temp_update();
     sensekit_reader_frame_t frame;
     sensekit_reader_open_frame(m_reader, 30, &frame);
+
     sensekit_color_frame_get(frame, &m_colorFrame);
+
+    uint8_t* colorData;
+    size_t colorLength;
+
+    sensekit_colorframe_get_data_ptr(m_colorFrame, &colorData, &colorLength);
 
     sensekit_colorframe_metadata_t metadata;
     sensekit_colorframe_get_metadata(m_colorFrame, &metadata);
@@ -114,7 +120,7 @@ void SimpleColorViewer::display()
 
     memset(m_pTexMap, 0, m_nTexMapX*m_nTexMapY*sizeof(RGB888Pixel));
 
-    RGB888Pixel* pColorRow = (RGB888Pixel*)m_colorFrame->data;
+    RGB888Pixel* pColorRow = (RGB888Pixel*)colorData;
     RGB888Pixel* pTexRow = m_pTexMap;
     int rowSize = metadata.width;
 

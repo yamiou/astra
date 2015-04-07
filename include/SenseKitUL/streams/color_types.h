@@ -11,10 +11,6 @@ struct sensekit_colorframe_metadata_t {
     uint8_t bytesPerPixel;
 };
 
-typedef struct _sensekit_colorframe {
-    sensekit_frame_ref_t* frameRef;
-    sensekit_colorframe_metadata_t metadata;
-    uint8_t* data;
-} sensekit_colorframe_t;
+typedef struct _sensekit_colorframe* sensekit_colorframe_t;
 
 #endif // COLOR_TYPES_H

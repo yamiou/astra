@@ -118,7 +118,7 @@ private:
     sensekit_streamset_t m_sensor;
     sensekit_reader_t m_reader;
     sensekit_depthstream_t m_depthStream;
-    sensekit_depthframe_t* m_depthFrame;
+    sensekit_depthframe_t m_depthFrame;
 };
 
 

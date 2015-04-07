@@ -1,7 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <SenseKit.h>
+#include <sensekit_capi.h>
+#include <SenseKitUL.h>
 
 #include <stdio.h>
 
@@ -9,7 +10,7 @@
 #include <conio.h>
 int wasKeyboardHit()
 {
-        return (int)_kbhit();
+    return (int)_kbhit();
 }
 
 #else // linux
@@ -21,75 +22,78 @@ int wasKeyboardHit()
 
 int wasKeyboardHit()
 {
-        struct termios oldt, newt;
-        int ch;
-        int oldf;
+    struct termios oldt, newt;
+    int ch;
+    int oldf;
 
-        // don't echo and don't wait for ENTER
-        tcgetattr(STDIN_FILENO, &oldt);
-        newt = oldt;
-        newt.c_lflag &= ~(ICANON | ECHO);
-        tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-        oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+    // don't echo and don't wait for ENTER
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
 
-        // make it non-blocking (so we can check without waiting)
-        if (0 != fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK))
-        {
-                return 0;
-        }
-
-        ch = getchar();
-
-        tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-        if (0 != fcntl(STDIN_FILENO, F_SETFL, oldf))
-        {
-                return 0;
-        }
-
-        if(ch != EOF)
-        {
-                ungetc(ch, stdin);
-                return 1;
-        }
-
+    // make it non-blocking (so we can check without waiting)
+    if (0 != fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK))
+    {
         return 0;
+    }
+
+    ch = getchar();
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    if (0 != fcntl(STDIN_FILENO, F_SETFL, oldf))
+    {
+        return 0;
+    }
+
+    if(ch != EOF)
+    {
+        ungetc(ch, stdin);
+        return 1;
+    }
+
+    return 0;
 }
 
 void Sleep(int millisecs)
 {
-        usleep(millisecs * 1000);
+    usleep(millisecs * 1000);
 }
 #endif // WIN32
 
-void calculateHistogram(float* pHistogram, int histogramSize, sensekit_depthframe_t& frame, int width, int height)
+void calculateHistogram(float* pHistogram, int histogramSize, sensekit_depthframe_t frame, int width, int height)
 {
-        int16_t* pDepth = frame.data;
-        // Calculate the accumulative histogram (the yellow display...)
-        memset(pHistogram, 0, histogramSize*sizeof(float));
+    int16_t* pDepth;
+    size_t length;
+    sensekit_depthframe_get_data_ptr(frame, &pDepth, &length);
 
-        unsigned int nNumberOfPoints = 0;
-        for (int y = 0; y < height; ++y)
+    // Calculate the accumulative histogram (the yellow display...)
+    memset(pHistogram, 0, histogramSize*sizeof(float));
+
+    unsigned int nNumberOfPoints = 0;
+    for (int y = 0; y < height; ++y)
+    {
+        for (int x = 0; x < width; ++x, ++pDepth)
         {
-                for (int x = 0; x < width; ++x, ++pDepth)
-                {
-                        if (*pDepth != 0)
-                        {
-                                pHistogram[*pDepth]++;
-                                nNumberOfPoints++;
-                        }
-                }
+            if (*pDepth != 0)
+            {
+                pHistogram[*pDepth]++;
+                nNumberOfPoints++;
+            }
         }
+    }
+    for (int nIndex=1; nIndex<histogramSize; nIndex++)
+    {
+        pHistogram[nIndex] += pHistogram[nIndex-1];
+    }
+    if (nNumberOfPoints)
+    {
         for (int nIndex=1; nIndex<histogramSize; nIndex++)
         {
-                pHistogram[nIndex] += pHistogram[nIndex-1];
+            pHistogram[nIndex] = (256 * (1.0f - (pHistogram[nIndex] / nNumberOfPoints)));
         }
-        if (nNumberOfPoints)
-        {
-                for (int nIndex=1; nIndex<histogramSize; nIndex++)
-                {
-                        pHistogram[nIndex] = (256 * (1.0f - (pHistogram[nIndex] / nNumberOfPoints)));
-                }
-        }
+    }
 }
 
 #endif /* UTILS_H */

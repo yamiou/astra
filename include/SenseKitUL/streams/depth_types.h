@@ -11,10 +11,6 @@ struct sensekit_depthframe_metadata_t {
     uint8_t bytesPerPixel;
 };
 
-typedef struct _sensekit_depthframe {
-    sensekit_frame_ref_t* frameRef;
-    sensekit_depthframe_metadata_t metadata;
-    int16_t* data;
-} sensekit_depthframe_t;
+typedef struct _sensekit_depthframe* sensekit_depthframe_t;
 
 #endif // DEPTH_TYPES_H

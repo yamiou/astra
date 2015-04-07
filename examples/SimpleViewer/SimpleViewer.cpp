@@ -117,7 +117,10 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame, int width, int
         m_normalMapLen = length;
     }
     Vector3* normMap = m_normalMap;
-    int16_t* depthData = frame.data;
+
+    int16_t* depthData;
+    size_t depthLength;
+    sensekit_depthframe_get_data_ptr(frame, &depthData, &depthLength);
 
     //top row
     for (int x = 0; x < width - 1; ++x)
@@ -296,13 +299,17 @@ void SampleViewer::display()
     glLoadIdentity();
     glOrtho(0, GL_WIN_SIZE_X, GL_WIN_SIZE_Y, 0, -1.0, 1.0);
 
-    calculateHistogram(m_pDepthHist, MAX_DEPTH, *m_depthFrame, metadata.width, metadata.height);
+    calculateHistogram(m_pDepthHist, MAX_DEPTH, m_depthFrame, metadata.width, metadata.height);
 
-    calculateNormals(*m_depthFrame, metadata.width, metadata.height);
+    calculateNormals(m_depthFrame, metadata.width, metadata.height);
 
     memset(m_pTexMap, 0, m_nTexMapX*m_nTexMapY*sizeof(RGB888Pixel));
 
-    int16_t* pDepthRow = (int16_t*)m_depthFrame->data;
+    int16_t* depthData;
+    size_t depthLength;
+    sensekit_depthframe_get_data_ptr(m_depthFrame, &depthData, &depthLength);
+
+    int16_t* pDepthRow = depthData;
     RGB888Pixel* pTexRow = m_pTexMap;
     int rowSize = metadata.width;
 

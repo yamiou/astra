@@ -7,11 +7,11 @@ public:
     DepthUtility(int width, int height);
     virtual ~DepthUtility();
 
-    void processDepthToForeground(sensekit_depthframe_t* depthFrame, int width, int height, cv::Mat matDepth, cv::Mat matForeground);
+    void processDepthToForeground(sensekit_depthframe_t depthFrame, int width, int height, cv::Mat matDepth, cv::Mat matForeground);
     void reset();
 
 private:
-    static void depthFrameToMat(sensekit_depthframe_t* depthFrameSrc, int width, int height, cv::Mat matTarget);
+    static void depthFrameToMat(sensekit_depthframe_t depthFrameSrc, int width, int height, cv::Mat matTarget);
 
     static void filterZeroValuesAndJumps(cv::Mat depthCurrent, cv::Mat depthPrev, cv::Mat depthAvg, cv::Mat depthVel, float maxDepthJumpPercent);
     static void thresholdForeground(cv::Mat& matForeground, cv::Mat& matVelocity, float foregroundThresholdFactor);

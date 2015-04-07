@@ -11,13 +11,25 @@
 #pragma warning( push )
 #pragma warning( disable : 4200 )
 
+struct _sensekit_depthframe {
+    sensekit_frame_ref_t* frameRef;
+    sensekit_depthframe_metadata_t metadata;
+    int16_t* data;
+};
+
 typedef struct _sensekit_depthframe_wrapper {
-    sensekit_depthframe_t frame;
+    _sensekit_depthframe frame;
     char frame_data[];
 } sensekit_depthframe_wrapper_t;
 
+struct _sensekit_colorframe {
+    sensekit_frame_ref_t* frameRef;
+    sensekit_colorframe_metadata_t metadata;
+    uint8_t* data;
+};
+
 typedef struct _sensekit_colorframe_wrapper {
-    sensekit_colorframe_t frame;
+    _sensekit_colorframe frame;
     char frame_data[];
 } sensekit_colorframe_wrapper_t;
 

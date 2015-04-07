@@ -40,7 +40,7 @@ namespace sensekit
             if (desc.type == SENSEKIT_STREAM_DEPTH &&
                 m_streamTrackerMap.find(streamHandle) == m_streamTrackerMap.end())
             {
-                sensekit_depthstream_t* depthStream = reinterpret_cast<sensekit_depthstream_t*>(streamHandle);
+                sensekit_depthstream_t depthStream = reinterpret_cast<sensekit_depthstream_t>(streamHandle);
 
                 HandTracker* tracker = new HandTracker(&get_pluginService(), setHandle, depthStream);
                 m_streamTrackerMap[streamHandle] = tracker;
