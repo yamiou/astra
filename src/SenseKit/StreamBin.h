@@ -35,8 +35,8 @@ namespace sensekit {
                 m_frontBufferLocked = false;
             }
 
-        CallbackId register_frame_ready_callback(FrontBufferReadyCallback callback);
-        void unregister_frame_ready_callback(CallbackId callbackId);
+        CallbackId register_front_buffer_ready_callback(FrontBufferReadyCallback callback);
+        void unregister_front_buffer_ready_callback(CallbackId callbackId);
 
         void inc_active() { m_activeCount++; }
         void dec_active()

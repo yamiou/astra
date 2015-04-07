@@ -16,7 +16,7 @@ public:
     typedef std::function<R (Signature...)> callback_type;
 
     CallbackNode(const callback_type& cb)
-        : m_prev(NULL), m_next(NULL), m_callback(cb), m_refCount(1)
+        : m_prev(nullptr), m_next(nullptr), m_callback(cb), m_refCount(1)
         {}
 
     void inc_reference() { m_refCount++; }
@@ -67,7 +67,7 @@ public:
     typedef typename node_type::callback_type callback_type;
 
     CallbackList()
-        : m_count(0), m_head(NULL) { };
+        : m_count(0), m_head(nullptr) { };
 
     ~CallbackList()
     {
@@ -185,8 +185,8 @@ public:
 
 private:
 
-    node_type* m_head;
     unsigned int m_count;
+    node_type* m_head;
 };
 
 template<typename... Args>
