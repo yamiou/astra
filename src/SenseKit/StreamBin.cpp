@@ -1,4 +1,5 @@
 #include "StreamBin.h"
+#include <cassert>
 
 namespace sensekit {
 
@@ -7,7 +8,7 @@ namespace sensekit {
     {
         allocate_buffers(bufferLengthInBytes);
     }
-    
+
     CallbackId StreamBin::register_front_buffer_ready_callback(FrontBufferReadyCallback callback)
     {
         return m_frontBufferReadySignal += callback;

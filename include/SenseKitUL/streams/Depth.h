@@ -10,7 +10,7 @@ namespace sensekit {
     class DepthStream : public DataStream
     {
     public:
-        explicit DepthStream(sensekit_streamconnection_t* connection)
+        explicit DepthStream(sensekit_streamconnection_t connection)
             : DataStream(connection)
             { }
 

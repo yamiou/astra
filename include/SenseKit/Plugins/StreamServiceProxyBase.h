@@ -33,17 +33,17 @@ struct StreamServiceProxyBase
                                            sensekit_reader_t,
                                            sensekit_stream_type_t,
                                            sensekit_stream_subtype_t,
-                                           sensekit_streamconnection_t**);
+                                           sensekit_streamconnection_t*);
 
     sensekit_status_t (*stream_get_description)(void*,
-                                                sensekit_streamconnection_t*,
+                                                sensekit_streamconnection_t,
                                                 sensekit_stream_desc_t*);
 
     sensekit_status_t (*stream_start)(void*,
-                                      sensekit_streamconnection_t*);
+                                      sensekit_streamconnection_t);
 
     sensekit_status_t (*stream_stop)(void*,
-                                     sensekit_streamconnection_t*);
+                                     sensekit_streamconnection_t);
 
     sensekit_status_t (*reader_open_frame)(void*,
                                            sensekit_reader_t,
@@ -68,18 +68,18 @@ struct StreamServiceProxyBase
                                           sensekit_frame_ref_t**);
 
     sensekit_status_t (*stream_set_parameter)(void*,
-                                              sensekit_streamconnection_t*,
+                                              sensekit_streamconnection_t,
                                               sensekit_parameter_id,
                                               size_t,
                                               sensekit_parameter_data_t*);
 
     sensekit_status_t (*stream_get_parameter_size)(void*,
-                                                   sensekit_streamconnection_t*,
+                                                   sensekit_streamconnection_t,
                                                    sensekit_parameter_id,
                                                    size_t*);
 
     sensekit_status_t (*stream_get_parameter_data)(void*,
-                                                   sensekit_streamconnection_t*,
+                                                   sensekit_streamconnection_t,
                                                    sensekit_parameter_id,
                                                    size_t,
                                                    sensekit_parameter_data_t*);

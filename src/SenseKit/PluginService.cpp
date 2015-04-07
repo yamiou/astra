@@ -153,7 +153,7 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::link_connection_to_bin(sensekit_streamconnection_t* connection,
+    sensekit_status_t PluginService::link_connection_to_bin(sensekit_streamconnection_t connection,
                                                             sensekit_bin_t binHandle)
     {
         StreamConnection* underlyingConnection = StreamConnection::get_ptr(connection);

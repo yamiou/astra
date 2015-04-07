@@ -24,7 +24,7 @@ namespace sensekit {
         PluginServiceProxy* m_pluginService;
 
         static void set_parameter_thunk(void* instance,
-                                        sensekit_streamconnection_t* connection,
+                                        sensekit_streamconnection_t connection,
                                         sensekit_parameter_id id,
                                         size_t byteLength,
                                         sensekit_parameter_data_t* data)
@@ -33,7 +33,7 @@ namespace sensekit {
             }
 
         static void get_parameter_size_thunk(void* instance,
-                                             sensekit_streamconnection_t* connection,
+                                             sensekit_streamconnection_t connection,
                                              sensekit_parameter_id id,
                                              size_t* byteLength)
             {
@@ -41,7 +41,7 @@ namespace sensekit {
             }
 
         static void get_parameter_data_thunk(void* instance,
-                                             sensekit_streamconnection_t* connection,
+                                             sensekit_streamconnection_t connection,
                                              sensekit_parameter_id id,
                                              size_t byteLength,
                                              sensekit_parameter_data_t* data)
@@ -50,36 +50,35 @@ namespace sensekit {
             }
 
         static void connection_added_thunk(void* instance,
-                                           sensekit_streamconnection_t* connection)
+                                           sensekit_streamconnection_t connection)
             {
                 static_cast<PluginBase*>(instance)->connection_added(connection);
             }
 
         static void connection_removed_thunk(void* instance,
-                                             sensekit_streamconnection_t* connection)
+                                             sensekit_streamconnection_t connection)
             {
                 static_cast<PluginBase*>(instance)->connection_removed(connection);
             }
 
-        virtual void set_parameter(sensekit_streamconnection_t* connection,
+        virtual void set_parameter(sensekit_streamconnection_t connection,
                                    sensekit_parameter_id id,
                                    size_t byteLength,
                                    sensekit_parameter_data_t* data) {}
 
-        virtual void get_parameter_size(sensekit_streamconnection_t* connection,
+        virtual void get_parameter_size(sensekit_streamconnection_t connection,
                                         sensekit_parameter_id id,
                                         size_t& byteLength) {}
 
-        virtual void get_parameter_data(sensekit_streamconnection_t* connection,
+        virtual void get_parameter_data(sensekit_streamconnection_t connection,
                                         sensekit_parameter_id id,
                                         size_t byteLength,
                                         sensekit_parameter_data_t* data) {}
 
-        virtual void connection_added(sensekit_streamconnection_t* connection) {}
-        virtual void connection_removed(sensekit_streamconnection_t* connection) {}
+        virtual void connection_added(sensekit_streamconnection_t connection) {}
+        virtual void connection_removed(sensekit_streamconnection_t connection) {}
 
         friend stream_callbacks_t create_plugin_callbacks(PluginBase* context);
-
     };
 
     inline stream_callbacks_t create_plugin_callbacks(PluginBase* context)

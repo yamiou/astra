@@ -89,7 +89,7 @@ namespace sensekit {
         }
 
         static sensekit_status_t link_connection_to_bin(void* pluginService,
-                                                        sensekit_streamconnection_t* connection,
+                                                        sensekit_streamconnection_t connection,
                                                         sensekit_bin_t binHandle)
         {
             return static_cast<PluginService*>(pluginService)->link_connection_to_bin(connection, binHandle);

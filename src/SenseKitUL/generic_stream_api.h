@@ -9,7 +9,7 @@ sensekit_status_t sensekit_generic_stream_get(sensekit_reader_t reader,
                                               sensekit_stream_subtype_t subType,
                                               TStreamType* stream)
 {
-    sensekit_streamconnection_t* connection;
+    sensekit_streamconnection_t connection;
     sensekit_reader_get_stream(reader, type, subType, &connection);
 
     *stream = reinterpret_cast<TStreamType>(connection);

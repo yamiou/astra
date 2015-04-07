@@ -56,14 +56,14 @@ namespace sensekit {
         sensekit_status_t reader_get_stream(sensekit_reader_t reader,
                                             sensekit_stream_type_t type,
                                             sensekit_stream_subtype_t subType,
-                                            sensekit_streamconnection_t*& connection);
+                                            sensekit_streamconnection_t& connection);
 
-        sensekit_status_t stream_get_description(sensekit_streamconnection_t* connection,
+        sensekit_status_t stream_get_description(sensekit_streamconnection_t connection,
                                                  sensekit_stream_desc_t* description);
 
-        sensekit_status_t stream_start(sensekit_streamconnection_t* connection);
+        sensekit_status_t stream_start(sensekit_streamconnection_t connection);
 
-        sensekit_status_t stream_stop(sensekit_streamconnection_t* connection);
+        sensekit_status_t stream_stop(sensekit_streamconnection_t connection);
 
         sensekit_status_t reader_open_frame(sensekit_reader_t reader,
                                             int timeoutMillis,
@@ -82,16 +82,16 @@ namespace sensekit {
                                            sensekit_stream_subtype_t subType,
                                            sensekit_frame_ref_t*& frameRef);
 
-        sensekit_status_t stream_set_parameter(sensekit_streamconnection_t* connection,
+        sensekit_status_t stream_set_parameter(sensekit_streamconnection_t connection,
                                                sensekit_parameter_id parameterId,
                                                size_t byteLength,
                                                sensekit_parameter_data_t* data);
 
-        sensekit_status_t stream_get_parameter_size(sensekit_streamconnection_t* connection,
+        sensekit_status_t stream_get_parameter_size(sensekit_streamconnection_t connection,
                                                     sensekit_parameter_id parameterId,
                                                     size_t& byteLength);
 
-        sensekit_status_t stream_get_parameter_data(sensekit_streamconnection_t* connection,
+        sensekit_status_t stream_get_parameter_data(sensekit_streamconnection_t connection,
                                                     sensekit_parameter_id parameterId,
                                                     size_t byteLength,
                                                     sensekit_parameter_data_t* data);

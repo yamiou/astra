@@ -66,7 +66,7 @@ namespace sensekit {
         template<typename T>
         T stream(sensekit_stream_subtype_t subType)
             {
-                sensekit_streamconnection_t* connection;
+                sensekit_streamconnection_t connection;
 
                 sensekit_reader_get_stream(m_reader,
                                            T::id,
@@ -96,7 +96,7 @@ namespace sensekit {
     class DataStream
     {
     public:
-        DataStream(sensekit_streamconnection_t* connection)
+        DataStream(sensekit_streamconnection_t connection)
             : m_connection(connection) {}
 
         void start()
@@ -109,7 +109,7 @@ namespace sensekit {
             }
 
     private:
-        sensekit_streamconnection_t* m_connection;
+        sensekit_streamconnection_t m_connection;
     };
 }
 

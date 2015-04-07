@@ -50,23 +50,23 @@ namespace sensekit {
         sensekit_status_t reader_get_stream(sensekit_reader_t reader,
                                             sensekit_stream_type_t type,
                                             sensekit_stream_subtype_t subType,
-                                            sensekit_streamconnection_t** connection)
+                                            sensekit_streamconnection_t* connection)
         {
             return StreamServiceProxyBase::reader_get_stream(streamService, reader, type, subType, connection);
         }
 
-        sensekit_status_t stream_get_description(sensekit_streamconnection_t* connection,
+        sensekit_status_t stream_get_description(sensekit_streamconnection_t connection,
                                                  sensekit_stream_desc_t* description)
         {
             return StreamServiceProxyBase::stream_get_description(streamService, connection, description);
         }
 
-        sensekit_status_t stream_start(sensekit_streamconnection_t* connection)
+        sensekit_status_t stream_start(sensekit_streamconnection_t connection)
         {
             return StreamServiceProxyBase::stream_start(streamService, connection);
         }
 
-        sensekit_status_t stream_stop(sensekit_streamconnection_t* connection)
+        sensekit_status_t stream_stop(sensekit_streamconnection_t connection)
         {
             return StreamServiceProxyBase::stream_stop(streamService, connection);
         }
@@ -103,7 +103,7 @@ namespace sensekit {
             return StreamServiceProxyBase::reader_get_frame(streamService, frame, type, subType, frameRef);
         }
 
-        sensekit_status_t stream_set_parameter(sensekit_streamconnection_t* connection,
+        sensekit_status_t stream_set_parameter(sensekit_streamconnection_t connection,
                                                sensekit_parameter_id parameterId,
                                                size_t byteLength,
                                                sensekit_parameter_data_t* data)
@@ -111,14 +111,14 @@ namespace sensekit {
             return StreamServiceProxyBase::stream_set_parameter(streamService, connection, parameterId, byteLength, data);
         }
 
-        sensekit_status_t stream_get_parameter_size(sensekit_streamconnection_t* connection,
+        sensekit_status_t stream_get_parameter_size(sensekit_streamconnection_t connection,
                                                     sensekit_parameter_id parameterId,
                                                     size_t* byteLength)
         {
             return StreamServiceProxyBase::stream_get_parameter_size(streamService, connection, parameterId, byteLength);
         }
 
-        sensekit_status_t stream_get_parameter_data(sensekit_streamconnection_t* connection,
+        sensekit_status_t stream_get_parameter_data(sensekit_streamconnection_t connection,
                                                     sensekit_parameter_id parameterId,
                                                     size_t byteLength,
                                                     sensekit_parameter_data_t* data)

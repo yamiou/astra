@@ -1,8 +1,9 @@
 #ifndef STREAMCONNECTION_H
 #define STREAMCONNECTION_H
 
-#include "sensekit_types.h"
+#include <sensekit_types.h>
 #include <cassert>
+#include "sensekit_internal.h"
 #include "StreamBin.h"
 
 namespace sensekit {
@@ -29,9 +30,9 @@ namespace sensekit {
 
         Stream* get_stream() const { return m_stream; }
 
-        sensekit_streamconnection_t* get_handle() { return &m_connection; }
+        sensekit_streamconnection_t get_handle() { return &m_connection; }
 
-        static StreamConnection* get_ptr(sensekit_streamconnection_t* conn)
+        static StreamConnection* get_ptr(sensekit_streamconnection_t conn)
             { return reinterpret_cast<StreamConnection*>(conn->handle); }
 
         const sensekit_stream_desc_t& get_description() const;
@@ -53,7 +54,7 @@ namespace sensekit {
     private:
         void on_bin_front_buffer_ready(StreamBin* bin);
 
-        sensekit_streamconnection_t m_connection;
+        _sensekit_streamconnection m_connection;
         sensekit_frame_ref_t m_currentFrame;
 
         bool m_locked{false};

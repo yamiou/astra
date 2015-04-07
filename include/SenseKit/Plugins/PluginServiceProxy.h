@@ -76,7 +76,7 @@ namespace sensekit {
         return PluginServiceProxyBase::cycle_bin_buffers(pluginService, binHandle, binBuffer);
     }
 
-    sensekit_status_t link_connection_to_bin(sensekit_streamconnection_t* connection,
+    sensekit_status_t link_connection_to_bin(sensekit_streamconnection_t connection,
                                              sensekit_bin_t binHandle)
     {
         return PluginServiceProxyBase::link_connection_to_bin(pluginService, connection, binHandle);

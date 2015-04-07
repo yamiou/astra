@@ -215,16 +215,24 @@ void HandTracker::setNextBuffer(sensekit_frame_t* nextBuffer)
     }
 }
 
-void HandTracker::set_parameter(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t byteLength, sensekit_parameter_data_t* data)
+void HandTracker::set_parameter(sensekit_streamconnection_t streamConnection,
+                                sensekit_parameter_id id,
+                                size_t byteLength,
+                                sensekit_parameter_data_t* data)
 {
 }
 
-void HandTracker::get_parameter_size(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, /*out*/size_t& byteLength)
+void HandTracker::get_parameter_size(sensekit_streamconnection_t streamConnection,
+                                     sensekit_parameter_id id,
+                                     size_t& byteLength)
 {
     byteLength = 20;
 }
 
-void HandTracker::get_parameter_data(sensekit_streamconnection_t* streamConnection, sensekit_parameter_id id, size_t byteLength, sensekit_parameter_data_t* data)
+void HandTracker::get_parameter_data(sensekit_streamconnection_t streamConnection,
+                                     sensekit_parameter_id id,
+                                     size_t byteLength,
+                                     sensekit_parameter_data_t* data)
 {
     char* charData = (char*)data;
     for (int i = 0; i < byteLength; i++)
@@ -233,7 +241,7 @@ void HandTracker::get_parameter_data(sensekit_streamconnection_t* streamConnecti
     }
 }
 
-void HandTracker::connection_added(sensekit_streamconnection_t* connection)
+void HandTracker::connection_added(sensekit_streamconnection_t connection)
 {
     int binLength = sizeof(sensekit_handframe_t) + SENSEKIT_HANDS_MAX_HANDPOINTS * sizeof(sensekit_handpoint_t);
 
@@ -243,7 +251,7 @@ void HandTracker::connection_added(sensekit_streamconnection_t* connection)
     get_pluginService().link_connection_to_bin(connection, m_handBinHandle);
 }
 
-void HandTracker::connection_removed(sensekit_streamconnection_t* connection)
+void HandTracker::connection_removed(sensekit_streamconnection_t connection)
 {
     //TODO need API for get bin client count...don't destroy if other clients assigned to it
     get_pluginService().link_connection_to_bin(connection, nullptr);

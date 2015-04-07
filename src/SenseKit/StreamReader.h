@@ -28,7 +28,7 @@ namespace sensekit {
         std::size_t operator()(const sensekit_stream_desc_t& lhs,
                                const sensekit_stream_desc_t& rhs) const
             {
-                return lhs.type == rhs.type && 
+                return lhs.type == rhs.type &&
                                     (lhs.subType == ANY_SUBTYPE ||
                                      rhs.subType == ANY_SUBTYPE ||
                                      lhs.subType == rhs.subType);
@@ -51,7 +51,7 @@ namespace sensekit {
 
         StreamSet& get_streamSet() const { return m_streamSet; }
 
-        sensekit_streamconnection_t* get_stream(sensekit_stream_desc_t& desc);
+        StreamConnection* get_stream(sensekit_stream_desc_t& desc);
         void on_connection_frame_ready(StreamConnection* connection);
         sensekit_frame_ref_t* get_subframe(sensekit_stream_desc_t& desc);
 

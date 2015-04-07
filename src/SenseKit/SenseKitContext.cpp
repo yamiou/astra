@@ -8,6 +8,7 @@
 #include <Plugins/PluginServiceProxyBase.h>
 #include <SenseKitAPI.h>
 #include "CreateStreamProxy.h"
+#include "sensekit_internal.h"
 
 namespace sensekit {
 
@@ -106,7 +107,7 @@ namespace sensekit {
     sensekit_status_t SenseKitContext::reader_get_stream(sensekit_reader_t reader,
                                                          sensekit_stream_type_t type,
                                                          sensekit_stream_subtype_t subType,
-                                                         sensekit_streamconnection_t*& connection)
+                                                         sensekit_streamconnection_t& connection)
     {
         assert(reader != nullptr);
 
@@ -116,19 +117,20 @@ namespace sensekit {
         desc.type = type;
         desc.subType = subType;
 
-        connection = actualReader->get_stream(desc);
+        connection = actualReader->get_stream(desc)->get_handle();
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::stream_get_description(sensekit_streamconnection_t* connection,
+    sensekit_status_t SenseKitContext::stream_get_description(sensekit_streamconnection_t connection,
                                                               sensekit_stream_desc_t* description)
     {
-        //description = StreamConnection::get_ptr(connection)->get_description();
+        *description = StreamConnection::get_ptr(connection)->get_description();
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::stream_start(sensekit_streamconnection_t* connection)
+    sensekit_status_t SenseKitContext::stream_start(sensekit_streamconnection_t connection)
     {
         assert(connection != nullptr);
         assert(connection->handle != nullptr);
@@ -140,7 +142,7 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::stream_stop(sensekit_streamconnection_t* connection)
+    sensekit_status_t SenseKitContext::stream_stop(sensekit_streamconnection_t connection)
     {
         assert(connection != nullptr);
         assert(connection->handle != nullptr);
@@ -178,9 +180,9 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::reader_register_frame_ready_callback(sensekit_reader_t reader, 
-                                                                      FrameReadyCallback callback, 
-                                                                      sensekit_reader_callback_id_t& callbackId)
+    sensekit_status_t SenseKitContext::reader_register_frame_ready_callback(sensekit_reader_t reader,
+                                                                            FrameReadyCallback callback,
+                                                                            sensekit_reader_callback_id_t& callbackId)
     {
         assert(reader != nullptr);
         callbackId = nullptr;
@@ -194,7 +196,7 @@ namespace sensekit {
 
         cb->reader = reader;
         cb->callbackId = cbId;
-    
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 
@@ -206,7 +208,7 @@ namespace sensekit {
 
         CallbackId cbId = cb->callbackId;
         StreamReader* actualReader = StreamReader::get_ptr(cb->reader);
-        
+
         delete cb;
         callbackId = nullptr;
         actualReader->unregister_frame_ready_callback(cbId);
@@ -243,7 +245,7 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::stream_set_parameter(sensekit_streamconnection_t* connection,
+    sensekit_status_t SenseKitContext::stream_set_parameter(sensekit_streamconnection_t connection,
                                                             sensekit_parameter_id parameterId,
                                                             size_t byteLength,
                                                             sensekit_parameter_data_t* data)
@@ -257,7 +259,7 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::stream_get_parameter_size(sensekit_streamconnection_t* connection,
+    sensekit_status_t SenseKitContext::stream_get_parameter_size(sensekit_streamconnection_t connection,
                                                                  sensekit_parameter_id parameterId,
                                                                  size_t& byteLength)
     {
@@ -271,7 +273,7 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::stream_get_parameter_data(sensekit_streamconnection_t* connection,
+    sensekit_status_t SenseKitContext::stream_get_parameter_data(sensekit_streamconnection_t connection,
                                                                  sensekit_parameter_id parameterId,
                                                                  size_t byteLength,
                                                                  sensekit_parameter_data_t* data)

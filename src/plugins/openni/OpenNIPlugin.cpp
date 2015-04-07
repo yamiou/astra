@@ -147,25 +147,28 @@ namespace sensekit
             return SENSEKIT_STATUS_SUCCESS;
         }
 
-        void OpenNIPlugin::set_parameter(sensekit_streamconnection_t* streamConnection,
+        void OpenNIPlugin::set_parameter(sensekit_streamconnection_t streamConnection,
                                          sensekit_parameter_id id, size_t byteLength,
                                          sensekit_parameter_data_t* data)
         {}
 
-        void OpenNIPlugin::get_parameter_size(sensekit_streamconnection_t* streamConnection,
+        void OpenNIPlugin::get_parameter_size(sensekit_streamconnection_t streamConnection,
                                               sensekit_parameter_id id,
                                               size_t& byteLength)
         {}
 
-        void OpenNIPlugin::get_parameter_data(sensekit_streamconnection_t* streamConnection,
+        void OpenNIPlugin::get_parameter_data(sensekit_streamconnection_t streamConnection,
                                               sensekit_parameter_id id,
                                               size_t byteLength,
                                               sensekit_parameter_data_t* data)
         {}
 
-        void OpenNIPlugin::connection_added(sensekit_streamconnection_t* connection)
+        void OpenNIPlugin::connection_added(sensekit_streamconnection_t connection)
         {
-            switch (connection->desc.type)
+            sensekit_stream_desc_t desc;
+            sensekit_stream_get_description(connection, &desc);
+
+            switch (desc.type)
             {
             case SENSEKIT_STREAM_DEPTH:
                 get_pluginService().link_connection_to_bin(connection, m_depthBinHandle);
@@ -178,9 +181,12 @@ namespace sensekit
             }
         }
 
-        void OpenNIPlugin::connection_removed(sensekit_streamconnection_t* connection)
+        void OpenNIPlugin::connection_removed(sensekit_streamconnection_t connection)
         {
-            switch (connection->desc.type)
+            sensekit_stream_desc_t desc;
+            sensekit_stream_get_description(connection, &desc);
+
+            switch (desc.type)
             {
             case SENSEKIT_STREAM_DEPTH:
                 get_pluginService().link_connection_to_bin(connection, nullptr);

@@ -94,12 +94,12 @@
                 :params (list (make-param :type "sensekit_bin_t" :name "binHandle")
                               (make-param :type "sensekit_frame_t**" :name "binBuffer" :deref t)))
 
-;; sensekit_status_t link_connection_to_bin(sensekit_streamconnection_t* connection,
+;; sensekit_status_t link_connection_to_bin(sensekit_streamconnection_t connection,
 ;;                                          sensekit_bin_t binHandle)
 (add-func       :funcset "plugin"
                 :returntype "sensekit_status_t"
                 :funcname "link_connection_to_bin"
-                :params (list (make-param :type "sensekit_streamconnection_t*" :name "connection")
+                :params (list (make-param :type "sensekit_streamconnection_t" :name "connection")
                               (make-param :type "sensekit_bin_t" :name "binHandle")))
 
 ;; SENSEKIT_API sensekit_status_t sensekit_initialize();
@@ -151,34 +151,34 @@
 ;; SENSEKIT_API sensekit_status_t sensekit_reader_get_stream(sensekit_reader_t reader,
 ;;                                                           sensekit_stream_type_t type,
 ;;                                                           sensekit_stream_subtype_t subType,
-;;                                                           sensekit_streamconnection_t** connection);
+;;                                                           sensekit_streamconnection_t* connection);
 (add-func       :funcset "stream"
                 :returntype "sensekit_status_t"
                 :funcname "reader_get_stream"
                 :params (list (make-param :type "sensekit_reader_t" :name "reader")
                               (make-param :type "sensekit_stream_type_t" :name "type")
                               (make-param :type "sensekit_stream_subtype_t" :name "subType")
-                              (make-param :type "sensekit_streamconnection_t**" :name "connection" :deref T)))
+                              (make-param :type "sensekit_streamconnection_t*" :name "connection" :deref T)))
 
-;; SENSEKIT_API sensekit_status_t sensekit_stream_get_description(sensekit_streamconnection_t* connection,
+;; SENSEKIT_API sensekit_status_t sensekit_stream_get_description(sensekit_streamconnection_t connection,
 ;;                                                                sensekit_stream_desc_t* description);
 (add-func       :funcset "stream"
                 :returntype "sensekit_status_t"
                 :funcname "stream_get_description"
-                :params (list (make-param :type "sensekit_streamconnection_t*" :name "connection")
+                :params (list (make-param :type "sensekit_streamconnection_t" :name "connection")
                               (make-param :type "sensekit_stream_desc_t*" :name "description")))
 
-;; SENSEKIT_API sensekit_status_t sensekit_stream_start(sensekit_streamconnection_t* connection);
+;; SENSEKIT_API sensekit_status_t sensekit_stream_start(sensekit_streamconnection_t connection);
 (add-func       :funcset "stream"
                 :returntype "sensekit_status_t"
                 :funcname "stream_start"
-                :params (list (make-param :type "sensekit_streamconnection_t*" :name "connection")))
+                :params (list (make-param :type "sensekit_streamconnection_t" :name "connection")))
 
-;; SENSEKIT_API sensekit_status_t sensekit_stream_stop(sensekit_streamconnection_t* connection);
+;; SENSEKIT_API sensekit_status_t sensekit_stream_stop(sensekit_streamconnection_t connection);
 (add-func       :funcset "stream"
                 :returntype "sensekit_status_t"
                 :funcname "stream_stop"
-                :params (list (make-param :type "sensekit_streamconnection_t*" :name "connection")))
+                :params (list (make-param :type "sensekit_streamconnection_t" :name "connection")))
 
 ;; SENSEKIT_API sensekit_status_t sensekit_reader_open_frame(sensekit_reader_t reader,
 ;;                                                           int timeoutMillis,
@@ -208,7 +208,7 @@
 
 ;; SENSEKIT_API sensekit_status_t reader_unregister_frame_ready_callback(sensekit_reader_callback_id_t* callbackId)
 (add-func       :funcset "stream"
-                :returntype "sensekit_status_t" 
+                :returntype "sensekit_status_t"
                 :funcname "reader_unregister_frame_ready_callback"
                 :params (list (make-param :type "sensekit_reader_callback_id_t*" :name "callbackId" :deref T)))
 
@@ -224,36 +224,36 @@
                               (make-param :type "sensekit_stream_subtype_t" :name "subType")
                               (make-param :type "sensekit_frame_ref_t**" :name "frameRef" :deref T)))
 
-;; SENSEKIT_API sensekit_status_t sensekit_stream_set_parameter(sensekit_streamconnection_t* connection,
+;; SENSEKIT_API sensekit_status_t sensekit_stream_set_parameter(sensekit_streamconnection_t connection,
 ;;                                                              sensekit_parameter_id parameterId,
 ;;                                                              size_t byteLength,
 ;;                                                              sensekit_parameter_data_t* data);
 (add-func       :funcset "stream"
                 :returntype "sensekit_status_t"
                 :funcname "stream_set_parameter"
-                :params (list (make-param :type "sensekit_streamconnection_t*" :name "connection")
+                :params (list (make-param :type "sensekit_streamconnection_t" :name "connection")
                               (make-param :type "sensekit_parameter_id" :name "parameterId")
                               (make-param :type "size_t" :name "byteLength")
                               (make-param :type "sensekit_parameter_data_t*" :name "data")))
 
-;; SENSEKIT_API sensekit_status_t sensekit_stream_get_parameter_size(sensekit_streamconnection_t* connection,
+;; SENSEKIT_API sensekit_status_t sensekit_stream_get_parameter_size(sensekit_streamconnection_t connection,
 ;;                                                                   sensekit_parameter_id parameterId,
 ;;                                                                   size_t* byteLength);
 (add-func       :funcset "stream"
                 :returntype "sensekit_status_t"
                 :funcname "stream_get_parameter_size"
-                :params (list (make-param :type "sensekit_streamconnection_t*" :name "connection")
+                :params (list (make-param :type "sensekit_streamconnection_t" :name "connection")
                               (make-param :type "sensekit_parameter_id" :name "parameterId")
                               (make-param :type "size_t*" :name "byteLength" :deref T)))
 
-;; SENSEKIT_API sensekit_status_t sensekit_stream_get_parameter_data(sensekit_streamconnection_t* connection,
+;; SENSEKIT_API sensekit_status_t sensekit_stream_get_parameter_data(sensekit_streamconnection_t connection,
 ;;                                                                   sensekit_parameter_id parameterId,
 ;;                                                                   size_t byteLength,
 ;;                                                                   sensekit_parameter_data_t* data);
 (add-func       :funcset "stream"
                 :returntype "sensekit_status_t"
                 :funcname "stream_get_parameter_data"
-                :params (list (make-param :type "sensekit_streamconnection_t*" :name "connection")
+                :params (list (make-param :type "sensekit_streamconnection_t" :name "connection")
                               (make-param :type "sensekit_parameter_id" :name "parameterId")
                               (make-param :type "size_t" :name "byteLength")
                               (make-param :type "sensekit_parameter_data_t*" :name "data")))

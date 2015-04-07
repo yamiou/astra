@@ -35,22 +35,22 @@ private:
 
     void setNextBuffer(sensekit_frame_t* sensekitFrame);
 
-    virtual void set_parameter(sensekit_streamconnection_t* connection,
+    virtual void set_parameter(sensekit_streamconnection_t connection,
                                sensekit_parameter_id id,
                                size_t byteLength,
                                sensekit_parameter_data_t* data) override;
 
-    virtual void get_parameter_size(sensekit_streamconnection_t* connection,
+    virtual void get_parameter_size(sensekit_streamconnection_t connection,
                                     sensekit_parameter_id id,
                                     size_t& byteLength) override;
 
-    virtual void get_parameter_data(sensekit_streamconnection_t* connection,
+    virtual void get_parameter_data(sensekit_streamconnection_t connection,
                                     sensekit_parameter_id id,
                                     size_t byteLength,
                                     sensekit_parameter_data_t* data) override;
 
-    virtual void connection_added(sensekit_streamconnection_t* connection) override;
-    virtual void connection_removed(sensekit_streamconnection_t* connection) override;
+    virtual void connection_added(sensekit_streamconnection_t connection) override;
+    virtual void connection_removed(sensekit_streamconnection_t connection) override;
 
     //fields
     sensekit_streamset_t m_setHandle;

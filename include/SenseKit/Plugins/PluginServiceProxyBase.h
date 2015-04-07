@@ -53,7 +53,7 @@ struct PluginServiceProxyBase
                                            sensekit_frame_t**);
 
     sensekit_status_t (*link_connection_to_bin)(void*,
-                                                sensekit_streamconnection_t*,
+                                                sensekit_streamconnection_t,
                                                 sensekit_bin_t);
 
 };

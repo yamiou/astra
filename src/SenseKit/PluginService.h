@@ -57,7 +57,7 @@ namespace sensekit
         sensekit_status_t cycle_bin_buffers(sensekit_bin_t binHandle,
                                             sensekit_frame_t*& binBuffer);
 
-        sensekit_status_t link_connection_to_bin(sensekit_streamconnection_t* connection,
+        sensekit_status_t link_connection_to_bin(sensekit_streamconnection_t connection,
                                                  sensekit_bin_t binHandle);
 
         //orbbec_error orbbec_stream_assign_connection_to_bin(StreamHandle handle, client_id id, bin_id id);

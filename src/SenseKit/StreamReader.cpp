@@ -44,15 +44,15 @@ namespace sensekit {
         return m_scFrameReadyCallback;
     }
 
-    sensekit_streamconnection_t* StreamReader::get_stream(sensekit_stream_desc_t& desc)
+    StreamConnection* StreamReader::get_stream(sensekit_stream_desc_t& desc)
     {
         StreamConnection* connection = find_stream_of_type(desc);
 
         if (connection != nullptr)
-            return connection->get_handle();
+            return connection;
 
         connection = m_streamSet.create_stream_connection(desc);
-        
+
         if (connection != nullptr)
         {
             CallbackId cbId = connection->register_frame_ready_callback(get_sc_frame_ready_callback());
@@ -64,7 +64,7 @@ namespace sensekit {
 
             m_streamMap.insert(std::make_pair(desc, data));
 
-            return connection->get_handle();
+            return connection;
         }
         else
         {
@@ -75,7 +75,7 @@ namespace sensekit {
     void StreamReader::on_connection_frame_ready(StreamConnection* connection)
     {
         auto& desc = connection->get_description();
-        
+
         auto pair = m_streamMap.find(desc);
 
         if (pair != m_streamMap.end())
@@ -161,7 +161,7 @@ namespace sensekit {
             ReaderConnectionData* data = pair.second;
             if (!data->isNewFrameReady)
             {
-                //TODO the new frames may not be synced. 
+                //TODO the new frames may not be synced.
                 //We need matching frame indices in the future
                 allReady = false;
             }

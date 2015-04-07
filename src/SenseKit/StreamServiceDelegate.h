@@ -58,26 +58,26 @@ namespace sensekit {
                                                    sensekit_reader_t reader,
                                                    sensekit_stream_type_t type,
                                                    sensekit_stream_subtype_t subType,
-                                                   sensekit_streamconnection_t** connection)
+                                                   sensekit_streamconnection_t* connection)
         {
             return static_cast<SenseKitContext*>(streamService)->reader_get_stream(reader, type, subType, *connection);
         }
 
         static sensekit_status_t stream_get_description(void* streamService,
-                                                        sensekit_streamconnection_t* connection,
+                                                        sensekit_streamconnection_t connection,
                                                         sensekit_stream_desc_t* description)
         {
             return static_cast<SenseKitContext*>(streamService)->stream_get_description(connection, description);
         }
 
         static sensekit_status_t stream_start(void* streamService,
-                                              sensekit_streamconnection_t* connection)
+                                              sensekit_streamconnection_t connection)
         {
             return static_cast<SenseKitContext*>(streamService)->stream_start(connection);
         }
 
         static sensekit_status_t stream_stop(void* streamService,
-                                             sensekit_streamconnection_t* connection)
+                                             sensekit_streamconnection_t connection)
         {
             return static_cast<SenseKitContext*>(streamService)->stream_stop(connection);
         }
@@ -120,7 +120,7 @@ namespace sensekit {
         }
 
         static sensekit_status_t stream_set_parameter(void* streamService,
-                                                      sensekit_streamconnection_t* connection,
+                                                      sensekit_streamconnection_t connection,
                                                       sensekit_parameter_id parameterId,
                                                       size_t byteLength,
                                                       sensekit_parameter_data_t* data)
@@ -129,7 +129,7 @@ namespace sensekit {
         }
 
         static sensekit_status_t stream_get_parameter_size(void* streamService,
-                                                           sensekit_streamconnection_t* connection,
+                                                           sensekit_streamconnection_t connection,
                                                            sensekit_parameter_id parameterId,
                                                            size_t* byteLength)
         {
@@ -137,7 +137,7 @@ namespace sensekit {
         }
 
         static sensekit_status_t stream_get_parameter_data(void* streamService,
-                                                           sensekit_streamconnection_t* connection,
+                                                           sensekit_streamconnection_t connection,
                                                            sensekit_parameter_id parameterId,
                                                            size_t byteLength,
                                                            sensekit_parameter_data_t* data)

@@ -24,22 +24,22 @@ namespace sensekit
 
         private:
 
-            virtual void set_parameter(sensekit_streamconnection_t* connection,
+            virtual void set_parameter(sensekit_streamconnection_t connection,
                                sensekit_parameter_id id,
                                size_t byteLength,
                                sensekit_parameter_data_t* data) override;
 
-            virtual void get_parameter_size(sensekit_streamconnection_t* connection,
+            virtual void get_parameter_size(sensekit_streamconnection_t connection,
                                     sensekit_parameter_id id,
                                     size_t& byteLength) override;
 
-            virtual void get_parameter_data(sensekit_streamconnection_t* connection,
+            virtual void get_parameter_data(sensekit_streamconnection_t connection,
                                     sensekit_parameter_id id,
                                     size_t byteLength,
                                     sensekit_parameter_data_t* data) override;
 
-            virtual void connection_added(sensekit_streamconnection_t* connection) override;
-            virtual void connection_removed(sensekit_streamconnection_t* connection) override;
+            virtual void connection_added(sensekit_streamconnection_t connection) override;
+            virtual void connection_removed(sensekit_streamconnection_t connection) override;
 
             sensekit_status_t open_sensor_streams();
             sensekit_status_t close_sensor_streams();

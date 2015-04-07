@@ -8,6 +8,7 @@ set(SenseKit_SOURCES
   ../../include/SenseKit/Plugins/PluginServiceProxyBase.h
   ../../include/SenseKit/Plugins/StreamServiceProxy.h
   ../../include/SenseKit/Plugins/StreamServiceProxyBase.h
+  sensekit_internal.h
   SenseKitContext.h
   SenseKitContext.cpp
   CreateStreamProxy.h
@@ -39,14 +40,16 @@ set(SenseKit_SOURCES_GEN
   StreamServiceDelegate.h.lpp
   SenseKit.cpp.lpp
   PluginServiceDelegate.h.lpp
-  CreateStreamProxy.h.lpp  
-  CreatePluginProxy.h.lpp  
+  CreateStreamProxy.h.lpp
+  CreatePluginProxy.h.lpp
   ../../include/SenseKit/sensekit_capi.h.lpp
   ../../include/SenseKit/Plugins/StreamServiceProxyBase.h.lpp
   ../../include/SenseKit/Plugins/StreamServiceProxy.h.lpp
   ../../include/SenseKit/Plugins/PluginServiceProxyBase.h.lpp
   ../../include/SenseKit/Plugins/PluginServiceProxy.h.lpp
   )
+
+source_group(templates, ${SenseKit_SOURCE_GEN})
 
 add_definitions(-DSENSEKIT_BUILD)
 
@@ -63,4 +66,3 @@ add_subdirectory(Core/tests)
 add_executable(OpenNITest "openni/test.cpp")
 
 target_link_libraries(OpenNITest ${OpenNI2_LIBRARY})
-

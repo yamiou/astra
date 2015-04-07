@@ -29,8 +29,7 @@ namespace sensekit {
     {
         if (m_callbacks.connectionAddedCallback)
             m_callbacks.connectionAddedCallback(m_callbacks.context,
-                                                reinterpret_cast<sensekit_streamconnection_t*>(
-                                                    connection->get_handle()));
+                                                connection->get_handle());
 
     }
 
@@ -38,8 +37,7 @@ namespace sensekit {
     {
         if (m_callbacks.connectionRemovedCallback)
             m_callbacks.connectionRemovedCallback(m_callbacks.context,
-                                                  reinterpret_cast<sensekit_streamconnection_t*>(
-                                                      connection->get_handle()));
+                                                  connection->get_handle());
     }
 
     void StreamImpl::on_set_parameter(StreamConnection* connection,
@@ -47,12 +45,14 @@ namespace sensekit {
                                       size_t byteLength,
                                       sensekit_parameter_data_t* data)
     {
-        sensekit_streamconnection_t* streamConnection =
-            reinterpret_cast<sensekit_streamconnection_t*>(connection->get_handle());
 
         if (m_callbacks.setParameterCallback != nullptr)
         {
-            m_callbacks.setParameterCallback(m_callbacks.context, streamConnection, id, byteLength, data);
+            m_callbacks.setParameterCallback(m_callbacks.context,
+                                             connection->get_handle(),
+                                             id,
+                                             byteLength,
+                                             data);
         }
     }
 
@@ -60,12 +60,12 @@ namespace sensekit {
                                            sensekit_parameter_id id,
                                            size_t& byteLength)
     {
-        sensekit_streamconnection_t* streamConnection =
-            reinterpret_cast<sensekit_streamconnection_t*>(connection->get_handle());
-
         if (m_callbacks.getParameterSizeCallback != nullptr)
         {
-            m_callbacks.getParameterSizeCallback(m_callbacks.context, streamConnection, id, &byteLength);
+            m_callbacks.getParameterSizeCallback(m_callbacks.context,
+                                                 connection->get_handle(),
+                                                 id,
+                                                 &byteLength);
         }
     }
 
@@ -79,7 +79,11 @@ namespace sensekit {
 
         if (m_callbacks.getParameterDataCallback != nullptr)
         {
-            m_callbacks.getParameterDataCallback(m_callbacks.context, streamConnection, parameterId, byteLength, data);
+            m_callbacks.getParameterDataCallback(m_callbacks.context,
+                                                 connection->get_handle(),
+                                                 parameterId,
+                                                 byteLength,
+                                                 data);
         }
     }
 
