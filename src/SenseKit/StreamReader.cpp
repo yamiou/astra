@@ -40,7 +40,7 @@ namespace sensekit {
     {
         if (m_scFrameReadyCallback == nullptr)
         {
-            m_scFrameReadyCallback = [this](StreamConnection* sc, sensekit_frame_index_t frameIndex) 
+            m_scFrameReadyCallback = [this](StreamConnection* sc, sensekit_frame_index_t frameIndex)
                 { this->on_connection_frame_ready(sc, frameIndex); };
         }
         return m_scFrameReadyCallback;
@@ -128,7 +128,7 @@ namespace sensekit {
         long long milliseconds = 0;
         if (timeoutMillis != SENSEKIT_TIMEOUT_RETURN_IMMEDIATELY)
         {
-            std::chrono::time_point<std::chrono::system_clock> start, end;
+            std::chrono::time_point<std::chrono::steady_clock> start, end;
             start = std::chrono::steady_clock::now();
             bool forever = timeoutMillis == SENSEKIT_TIMEOUT_FOREVER;
             do
@@ -144,7 +144,7 @@ namespace sensekit {
                 milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_seconds).count();
             } while (forever || milliseconds < timeoutMillis);
         }
-  
+
         return m_isFrameReady ? blockresult::BLOCKRESULT_FRAMEREADY : blockresult::BLOCKRESULT_TIMEOUT;
     }
 
@@ -239,7 +239,7 @@ namespace sensekit {
         sensekit_reader_t reader = get_handle();
         sensekit_reader_frame_t frame = get_handle();
         m_frameReadySignal.raise(reader, frame);
-        
+
         if (!wasLocked && m_locked)
         {
             unlock();
