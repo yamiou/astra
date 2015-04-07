@@ -77,12 +77,9 @@ class SampleViewer
 public:
     SampleViewer(const char* strSampleName);
     virtual ~SampleViewer();
-
     virtual void init(int argc, char **argv);
     virtual void run();   //Does not return
-
 protected:
-    void calculateNormals(sensekit_depthframe_t& frame, int width, int height);
     virtual void display();
     virtual void displayPostDraw(){};       // Overload to draw over the screen image
 
@@ -96,6 +93,10 @@ private:
     SampleViewer& operator=(SampleViewer&);
 
     static SampleViewer* ms_self;
+    void initTextMap(int width, int height);
+    void calculateNormals(sensekit_depthframe_t& frame, sensekit_depthframe_metadata_t metadata);
+    void showTex(int depthWidth, int depthHeight);
+    void updateTex(sensekit_depthframe_t depthFrame, sensekit_depthframe_metadata_t metadata);
     static void glutIdle();
     static void glutDisplay();
     static void glutKeyboard(unsigned char key, int x, int y);
@@ -105,9 +106,7 @@ private:
     unsigned int            m_nTexMapX;
     unsigned int            m_nTexMapY;
     RGB888Pixel*            m_pTexMap;
-    int                     m_width;
-    int                     m_height;
-
+    
     Vector3*                m_normalMap{ nullptr };
     Vector3*                m_blurNormalMap{ nullptr };
     size_t                  m_normalMapLen{ 0 };
@@ -118,7 +117,6 @@ private:
     sensekit_streamset_t m_sensor;
     sensekit_reader_t m_reader;
     sensekit_depthstream_t m_depthStream;
-    sensekit_depthframe_t m_depthFrame;
 };
 
 

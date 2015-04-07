@@ -62,7 +62,7 @@ void Sleep(int millisecs)
 }
 #endif // WIN32
 
-void calculateHistogram(float* pHistogram, int histogramSize, sensekit_depthframe_t frame, int width, int height)
+inline void calculateHistogram(float* pHistogram, int histogramSize, sensekit_depthframe_t frame, sensekit_depthframe_metadata_t metadata)
 {
     int16_t* pDepth;
     size_t length;
@@ -71,10 +71,13 @@ void calculateHistogram(float* pHistogram, int histogramSize, sensekit_depthfram
     // Calculate the accumulative histogram (the yellow display...)
     memset(pHistogram, 0, histogramSize*sizeof(float));
 
+    int depthWidth = metadata.width;
+    int depthHeight = metadata.height;
+
     unsigned int nNumberOfPoints = 0;
-    for (int y = 0; y < height; ++y)
+    for (int y = 0; y < depthHeight; ++y)
     {
-        for (int x = 0; x < width; ++x, ++pDepth)
+        for (int x = 0; x < depthWidth; ++x, ++pDepth)
         {
             if (*pDepth != 0)
             {

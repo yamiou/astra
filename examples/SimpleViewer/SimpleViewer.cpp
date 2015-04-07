@@ -28,7 +28,7 @@
 
 #define GL_WIN_SIZE_X   1280
 #define GL_WIN_SIZE_Y   1024
-#define TEXTURE_SIZE    512
+#define TEXTURE_SIZE    1024
 
 #define DEFAULT_DISPLAY_MODE    DISPLAY_MODE_DEPTH
 
@@ -36,7 +36,7 @@
 #define MIN_CHUNKS_SIZE(data_size, chunk_size)  (MIN_NUM_CHUNKS(data_size, chunk_size) * (chunk_size))
 #include <algorithm>
 
-SampleViewer* SampleViewer::ms_self = NULL;
+SampleViewer* SampleViewer::ms_self = nullptr;
 
 void SampleViewer::glutIdle()
 {
@@ -52,7 +52,7 @@ void SampleViewer::glutKeyboard(unsigned char key, int x, int y)
 }
 
 SampleViewer::SampleViewer(const char* strSampleName) :
-m_pTexMap(NULL)
+m_pTexMap(nullptr)
 {
     ms_self = this;
     strncpy(m_strSampleName, strSampleName, 255);
@@ -69,6 +69,22 @@ SampleViewer::~SampleViewer()
     ms_self = NULL;
 }
 
+void SampleViewer::initTextMap(int width, int height)
+{
+    int desiredW = MIN_CHUNKS_SIZE(width, TEXTURE_SIZE);
+    int desiredH = MIN_CHUNKS_SIZE(height, TEXTURE_SIZE);
+    if (m_pTexMap == nullptr || desiredW != m_nTexMapX || desiredH != m_nTexMapY)
+    {
+        m_nTexMapX = desiredW;
+        m_nTexMapY = desiredH;
+        if (m_pTexMap != nullptr)
+        {
+            delete m_pTexMap;
+        }
+        m_pTexMap = new RGB888Pixel[m_nTexMapX * m_nTexMapY];
+    }
+}
+
 void SampleViewer::init(int argc, char **argv)
 {
     sensekit_initialize();
@@ -77,16 +93,6 @@ void SampleViewer::init(int argc, char **argv)
     sensekit_reader_create(m_sensor, &m_reader);
 
     sensekit_depth_stream_get(m_reader, &m_depthStream);
-
-    int depthWidth = 320;
-    int depthHeight = 240;
-    m_width = depthWidth;
-    m_height = depthHeight;
-
-    // Texture map init
-    m_nTexMapX = MIN_CHUNKS_SIZE(m_width, TEXTURE_SIZE);
-    m_nTexMapY = MIN_CHUNKS_SIZE(m_height, TEXTURE_SIZE);
-    m_pTexMap = new RGB888Pixel[m_nTexMapX * m_nTexMapY];
 
     m_lightVector = Vector3::Normalize(Vector3(.5, -0.2, 1));
     //m_lightVector = Vector3::Normalize(Vector3(0, 0, 1));
@@ -106,41 +112,44 @@ void SampleViewer::run()      //Does not return
     glutMainLoop();
 }
 
-void SampleViewer::calculateNormals(sensekit_depthframe_t& frame, int width, int height)
+void SampleViewer::calculateNormals(sensekit_depthframe_t& frame, sensekit_depthframe_metadata_t metadata)
 {
-    int length = width * height;
-    if (m_normalMap == nullptr || m_normalMapLen != length)
-    {
-        m_normalMap = new Vector3[length];
-        m_blurNormalMap = new Vector3[length];
-        memset(m_blurNormalMap, 0, sizeof(Vector3)*length);
-        m_normalMapLen = length;
-    }
-    Vector3* normMap = m_normalMap;
-
     int16_t* depthData;
     size_t depthLength;
     sensekit_depthframe_get_data_ptr(frame, &depthData, &depthLength);
 
+    int depthWidth = metadata.width;
+    int depthHeight = metadata.height;
+
+    int numPixels = depthWidth * depthHeight;
+    if (m_normalMap == nullptr || m_normalMapLen != numPixels)
+    {
+        m_normalMap = new Vector3[numPixels];
+        m_blurNormalMap = new Vector3[numPixels];
+        memset(m_blurNormalMap, 0, sizeof(Vector3)*numPixels);
+        m_normalMapLen = numPixels;
+    }
+    Vector3* normMap = m_normalMap;
+
     //top row
-    for (int x = 0; x < width - 1; ++x)
+    for (int x = 0; x < depthWidth; ++x)
     {
         *normMap = Vector3();
         ++normMap;
     }
-    for (int y = 1; y < height - 1; ++y)
+    for (int y = 1; y < depthHeight - 1; ++y)
     {
         //first pixel at start of row
         *normMap = Vector3();
         ++normMap;
 
-        for (int x = 1; x < width - 1; ++x)
+        for (int x = 1; x < depthWidth - 1; ++x)
         {
-            int index = x + y * width;
+            int index = x + y * depthWidth;
             int rightIndex = index + 1;
             int leftIndex = index - 1;
-            int upIndex = index - width;
-            int downIndex = index + width;
+            int upIndex = index - depthWidth;
+            int downIndex = index + depthWidth;
 
             int16_t depth = *(depthData + index);
             int16_t depthLeft = *(depthData + leftIndex);
@@ -250,7 +259,7 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame, int width, int
         ++normMap;
     }
     //bottom row
-    for (int x = 0; x < width - 1; ++x)
+    for (int x = 0; x < depthWidth; ++x)
     {
         *normMap = Vector3();
         ++normMap;
@@ -258,9 +267,9 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame, int width, int
 
     const int blurRadius = 1;
     //box blur
-    for (int y = blurRadius; y < height - blurRadius; y++)
+    for (int y = blurRadius; y < depthHeight - blurRadius; y++)
     {
-        for (int x = blurRadius; x < width - blurRadius; x++)
+        for (int x = blurRadius; x < depthWidth - blurRadius; x++)
         {
             Vector3 normAvg;
 
@@ -268,7 +277,7 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame, int width, int
             {
                 for (int dx = -blurRadius; dx <= blurRadius; dx++)
                 {
-                    int index = x + dx + (y + dy) * width;
+                    int index = x + dx + (y + dy) * depthWidth;
                     Vector3 norm = *(m_normalMap + index);
 
                     normAvg.x += norm.x;
@@ -276,70 +285,101 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame, int width, int
                     normAvg.z += norm.z;
                 }
             }
-            int centerIndex = x + y*width;
+            int centerIndex = x + y*depthWidth;
             *(m_blurNormalMap + centerIndex) = Vector3::Normalize(normAvg);
         }
     }
 }
 
-void SampleViewer::display()
+void SampleViewer::showTex(int depthWidth, int depthHeight)
 {
-    sensekit_temp_update();
-    sensekit_reader_frame_t frame;
-    sensekit_reader_open_frame(m_reader, 30, &frame);
-    sensekit_depth_frame_get(frame, &m_depthFrame);
-
-    sensekit_depthframe_metadata_t metadata;
-    sensekit_depthframe_get_metadata(m_depthFrame, &metadata);
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
     glOrtho(0, GL_WIN_SIZE_X, GL_WIN_SIZE_Y, 0, -1.0, 1.0);
 
-    calculateHistogram(m_pDepthHist, MAX_DEPTH, m_depthFrame, metadata.width, metadata.height);
+    glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nTexMapX, m_nTexMapY, 0, GL_RGB, GL_UNSIGNED_BYTE, m_pTexMap);
 
-    calculateNormals(m_depthFrame, metadata.width, metadata.height);
+    // Display the OpenGL texture map
 
+    glColor4f(1, 1, 1, 1);
+
+    glBegin(GL_QUADS);
+
+    int nXRes = depthWidth;
+    int nYRes = depthHeight;
+
+    // upper left
+
+    glTexCoord2f(0, 0);
+    glVertex2f(0, 0);
+    // upper right
+
+    glTexCoord2f((float)nXRes / (float)m_nTexMapX, 0);
+    glVertex2f(GL_WIN_SIZE_X, 0);
+    // bottom right
+
+    glTexCoord2f((float)nXRes / (float)m_nTexMapX, (float)nYRes / (float)m_nTexMapY);
+    glVertex2f(GL_WIN_SIZE_X, GL_WIN_SIZE_Y);
+    // bottom left
+
+    glTexCoord2f(0, (float)nYRes / (float)m_nTexMapY);
+    glVertex2f(0, GL_WIN_SIZE_Y);
+
+    glEnd();
+}
+
+void SampleViewer::updateTex(sensekit_depthframe_t depthFrame, sensekit_depthframe_metadata_t metadata)
+{
+    int depthWidth = metadata.width;
+    int depthHeight = metadata.height;
+
+    initTextMap(depthWidth, depthHeight);
     memset(m_pTexMap, 0, m_nTexMapX*m_nTexMapY*sizeof(RGB888Pixel));
 
-    int16_t* depthData;
+    int16_t* pDepthRow;
     size_t depthLength;
-    sensekit_depthframe_get_data_ptr(m_depthFrame, &depthData, &depthLength);
+    sensekit_depthframe_get_data_ptr(depthFrame, &pDepthRow, &depthLength);
 
-    int16_t* pDepthRow = depthData;
     RGB888Pixel* pTexRow = m_pTexMap;
-    int rowSize = metadata.width;
+    int rowSize = depthWidth;
 
     Vector3* normMap = m_blurNormalMap;
 
-    for (int y = 0; y < metadata.height; ++y)
+    for (int y = 0; y < depthHeight; ++y)
     {
         int16_t* pDepth = pDepthRow;
         RGB888Pixel* pTex = pTexRow;
 
-        for (int x = 0; x < metadata.width; ++x, ++pDepth, ++normMap, ++pTex)
+        for (int x = 0; x < depthWidth; ++x, ++pDepth, ++normMap, ++pTex)
         {
+            if (x > 320 || y > 240)
+            {
+                continue;
+            }
             int16_t depth = *pDepth;
             if (depth != 0)
             {
-                /*
-                int nHistValue = m_pDepthHist[*pDepth];
-                pTex->r = nHistValue;
-                pTex->g = nHistValue;
-                pTex->b = 0;
-                */
+                
+                //int nHistValue = m_pDepthHist[*pDepth];
+                //pTex->r = nHistValue;
+                //pTex->g = nHistValue;
+                //pTex->b = 0;
+                
             }
 
             Vector3 norm = *normMap;
             if (!norm.isEmpty())
             {
-                /*    pTex->r = (norm.x * 0.5 + 1) * 255;
-                    pTex->g = (norm.y * 0.5 + 1) * 255;
-                    pTex->b = (norm.z * 0.5 + 1) * 255;
-                    */
+                //pTex->r = (norm.x * 0.5 + 1) * 255;
+                //pTex->g = (norm.y * 0.5 + 1) * 255;
+                //pTex->b = (norm.z * 0.5 + 1) * 255;
+                    
 
                 float fadeFactor = 1 - 0.6*std::max(0.0f, std::min(1.0f, ((depth - 400) / 3200.0f)));
                 float diffuseFactor = Vector3::DotProduct(norm, m_lightVector);
@@ -368,36 +408,36 @@ void SampleViewer::display()
         pDepthRow += rowSize;
         pTexRow += m_nTexMapX;
     }
+}
+
+void SampleViewer::display()
+{
+    sensekit_temp_update();
+    sensekit_reader_frame_t frame;
+    sensekit_reader_open_frame(m_reader, 30, &frame);
+
+    sensekit_depthframe_t depthFrame;
+    sensekit_depth_frame_get(frame, &depthFrame);
+
+    sensekit_depthframe_metadata_t metadata;
+    sensekit_depthframe_get_metadata(depthFrame, &metadata);
+
+    int depthWidth = metadata.width;
+    int depthHeight = metadata.height;
+
+    int16_t* depthData;
+    size_t depthLength;
+    sensekit_depthframe_get_data_ptr(depthFrame, &depthData, &depthLength);
+
+    calculateHistogram(m_pDepthHist, MAX_DEPTH, depthFrame, metadata);
+
+    calculateNormals(depthFrame, metadata);
+
+    updateTex(depthFrame, metadata);
 
     sensekit_reader_close_frame(&frame);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_nTexMapX, m_nTexMapY, 0, GL_RGB, GL_UNSIGNED_BYTE, m_pTexMap);
-
-    // Display the OpenGL texture map
-    glColor4f(1, 1, 1, 1);
-
-    glBegin(GL_QUADS);
-
-    int nXRes = m_width;
-    int nYRes = m_height;
-
-    // upper left
-    glTexCoord2f(0, 0);
-    glVertex2f(0, 0);
-    // upper right
-    glTexCoord2f((float)nXRes / (float)m_nTexMapX, 0);
-    glVertex2f(GL_WIN_SIZE_X, 0);
-    // bottom right
-    glTexCoord2f((float)nXRes / (float)m_nTexMapX, (float)nYRes / (float)m_nTexMapY);
-    glVertex2f(GL_WIN_SIZE_X, GL_WIN_SIZE_Y);
-    // bottom left
-    glTexCoord2f(0, (float)nYRes / (float)m_nTexMapY);
-    glVertex2f(0, GL_WIN_SIZE_Y);
-
-    glEnd();
+    showTex(depthWidth, depthHeight);
 
     // Swap the OpenGL display buffers
     glutSwapBuffers();
