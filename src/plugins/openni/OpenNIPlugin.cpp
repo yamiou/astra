@@ -220,10 +220,14 @@ namespace sensekit
             m_currentDepthBuffer->frameIndex = m_frameIndex;
             m_currentDepthFrame = static_cast<sensekit_depthframe_wrapper_t*>(m_currentDepthBuffer->data);
             m_currentDepthFrame->frame.data = (int16_t *)&(m_currentDepthFrame->frame_data);
-            m_currentDepthFrame->frame.frameIndex = m_frameIndex;
-            m_currentDepthFrame->frame.width = m_depthMode.getResolutionX();
-            m_currentDepthFrame->frame.height = m_depthMode.getResolutionY();
-            m_currentDepthFrame->frame.bpp = 2;
+
+            sensekit_depthframe_metadata_t metadata;
+
+            metadata.width = m_depthMode.getResolutionX();
+            metadata.height = m_depthMode.getResolutionY();
+            metadata.bytesPerPixel = 2;
+
+            m_currentDepthFrame->frame.metadata = metadata;
         }
 
         void OpenNIPlugin::set_new_color_buffer(sensekit_frame_t* nextBuffer)
@@ -232,10 +236,14 @@ namespace sensekit
             m_currentColorBuffer->frameIndex = m_frameIndex;
             m_currentColorFrame = static_cast<sensekit_colorframe_wrapper_t*>(m_currentColorBuffer->data);
             m_currentColorFrame->frame.data = (uint8_t *)&(m_currentColorFrame->frame_data);
-            m_currentColorFrame->frame.frameIndex = m_frameIndex;
-            m_currentColorFrame->frame.width = m_colorMode.getResolutionX();
-            m_currentColorFrame->frame.height = m_colorMode.getResolutionY();
-            m_currentColorFrame->frame.bpp = 3;
+
+            sensekit_colorframe_metadata_t metadata;
+
+            metadata.width = m_colorMode.getResolutionX();
+            metadata.height = m_colorMode.getResolutionY();
+            metadata.bytesPerPixel = 3;
+
+            m_currentColorFrame->frame.metadata = metadata;
         }
 
         void OpenNIPlugin::temp_update()
@@ -280,7 +288,6 @@ namespace sensekit
 
             memcpy(frameData, datData, sizeof(int16_t)*bufferLength);
 
-            frame->frame.frameIndex = m_frameIndex;
             ++m_frameIndex;
 
             ref.release();
@@ -309,7 +316,6 @@ namespace sensekit
 
             memcpy(frameData, datData, bufferLength);
 
-            frame->frame.frameIndex = m_frameIndex;
             ++m_frameIndex;
 
             ref.release();

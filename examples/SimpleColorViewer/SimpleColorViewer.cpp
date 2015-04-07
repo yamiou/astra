@@ -102,6 +102,9 @@ void SimpleColorViewer::display()
     sensekit_reader_open_frame(m_reader, 30, &frame);
     sensekit_color_frame_get(frame, &m_colorFrame);
 
+    sensekit_colorframe_metadata_t metadata;
+    sensekit_colorframe_get_metadata(m_colorFrame, &metadata);
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glMatrixMode(GL_PROJECTION);
@@ -113,14 +116,14 @@ void SimpleColorViewer::display()
 
     RGB888Pixel* pColorRow = (RGB888Pixel*)m_colorFrame->data;
     RGB888Pixel* pTexRow = m_pTexMap;
-    int rowSize = m_colorFrame->width;
+    int rowSize = metadata.width;
 
-    for (int y = 0; y < m_colorFrame->height; ++y)
+    for (int y = 0; y < metadata.height; ++y)
     {
         RGB888Pixel* pColor = pColorRow;
         RGB888Pixel* pTex = pTexRow;
 
-        for (int x = 0; x < m_colorFrame->width; ++x, ++pColor, ++pTex)
+        for (int x = 0; x < metadata.width; ++x, ++pColor, ++pTex)
         {
             RGB888Pixel color = *pColor;
             pTex->r = color.r;

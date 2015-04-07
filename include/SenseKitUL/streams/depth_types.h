@@ -5,12 +5,15 @@
 
 typedef sensekit_streamconnection_t sensekit_depthstream_t;
 
-typedef struct _sensekit_depthframe {
-    sensekit_frame_ref_t* frameRef;
-    uint32_t frameIndex;
+struct sensekit_depthframe_metadata_t {
     uint32_t width;
     uint32_t height;
-    uint8_t bpp;
+    uint8_t bytesPerPixel;
+};
+
+typedef struct _sensekit_depthframe {
+    sensekit_frame_ref_t* frameRef;
+    sensekit_depthframe_metadata_t metadata;
     int16_t* data;
 } sensekit_depthframe_t;
 

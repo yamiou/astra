@@ -66,12 +66,15 @@ void HandTracker::reset()
 
 void HandTracker::updateTracking(sensekit_depthframe_t* depthFrame)
 {
-    int width = depthFrame->width;
-    int height = depthFrame->height;
+    sensekit_depthframe_metadata_t metadata;
+    sensekit_depthframe_get_metadata(depthFrame, &metadata);
+
+    int width = metadata.width;
+    int height = metadata.height;
 
     m_resizeFactor = width / static_cast<float>(PROCESSING_SIZE_WIDTH);
 
-    m_depthUtility.processDepthToForeground(depthFrame, m_matDepth, m_matForeground);
+    m_depthUtility.processDepthToForeground(depthFrame, width, height, m_matDepth, m_matForeground);
 
     float minArea = 10000;
     float maxArea = 20000;

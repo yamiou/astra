@@ -28,12 +28,12 @@ void DepthUtility::reset()
     m_matDepthVelErode.create(m_processingHeight, m_processingWidth, CV_32FC1);
 }
 
-void DepthUtility::processDepthToForeground(sensekit_depthframe_t* depthFrame, cv::Mat matDepth, cv::Mat matForeground)
+void DepthUtility::processDepthToForeground(sensekit_depthframe_t* depthFrame, int width, int height, cv::Mat matDepth, cv::Mat matForeground)
 {
     matDepth.create(m_processingHeight, m_processingWidth, CV_32FC1);
     matForeground = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_8UC1);
 
-    depthFrameToMat(depthFrame, m_matDepthOriginal);
+    depthFrameToMat(depthFrame, width, height, m_matDepthOriginal);
 
     //convert to the target processing size with nearest neighbor
 
@@ -56,11 +56,8 @@ void DepthUtility::processDepthToForeground(sensekit_depthframe_t* depthFrame, c
     thresholdForeground(matForeground, m_matDepthVelErode, m_foregroundThresholdFactor);
 }
 
-void DepthUtility::depthFrameToMat(sensekit_depthframe_t* depthFrameSrc, cv::Mat matTarget)
+void DepthUtility::depthFrameToMat(sensekit_depthframe_t* depthFrameSrc, int width, int height, cv::Mat matTarget)
 {
-    int width = depthFrameSrc->width;
-    int height = depthFrameSrc->height;
-
     //ensure initialized
     matTarget.create(height, width, CV_32FC1);
 

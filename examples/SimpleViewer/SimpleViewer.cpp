@@ -106,10 +106,8 @@ void SampleViewer::run()      //Does not return
     glutMainLoop();
 }
 
-void SampleViewer::calculateNormals(sensekit_depthframe_t& frame)
+void SampleViewer::calculateNormals(sensekit_depthframe_t& frame, int width, int height)
 {
-    int width = frame.width;
-    int height = frame.height;
     int length = width * height;
     if (m_normalMap == nullptr || m_normalMapLen != length)
     {
@@ -288,31 +286,34 @@ void SampleViewer::display()
     sensekit_reader_open_frame(m_reader, 30, &frame);
     sensekit_depth_frame_get(frame, &m_depthFrame);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    sensekit_depthframe_metadata_t metadata;
+    sensekit_depthframe_get_metadata(m_depthFrame, &metadata);
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
     glOrtho(0, GL_WIN_SIZE_X, GL_WIN_SIZE_Y, 0, -1.0, 1.0);
 
-    calculateHistogram(m_pDepthHist, MAX_DEPTH, *m_depthFrame);
+    calculateHistogram(m_pDepthHist, MAX_DEPTH, *m_depthFrame, metadata.width, metadata.height);
 
-    calculateNormals(*m_depthFrame);
+    calculateNormals(*m_depthFrame, metadata.width, metadata.height);
 
     memset(m_pTexMap, 0, m_nTexMapX*m_nTexMapY*sizeof(RGB888Pixel));
 
     int16_t* pDepthRow = (int16_t*)m_depthFrame->data;
     RGB888Pixel* pTexRow = m_pTexMap;
-    int rowSize = m_depthFrame->width;
+    int rowSize = metadata.width;
 
     Vector3* normMap = m_blurNormalMap;
 
-    for (int y = 0; y < m_depthFrame->height; ++y)
+    for (int y = 0; y < metadata.height; ++y)
     {
         int16_t* pDepth = pDepthRow;
         RGB888Pixel* pTex = pTexRow;
 
-        for (int x = 0; x < m_depthFrame->width; ++x, ++pDepth, ++normMap, ++pTex)
+        for (int x = 0; x < metadata.width; ++x, ++pDepth, ++normMap, ++pTex)
         {
             int16_t depth = *pDepth;
             if (depth != 0)

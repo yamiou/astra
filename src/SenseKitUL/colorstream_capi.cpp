@@ -25,4 +25,17 @@ SENSEKIT_API_EX sensekit_status_t sensekit_color_frame_get(sensekit_reader_frame
                                                                      ANY_SUBTYPE,
                                                                      colorFrame);
 }
+
+SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_frameindex(sensekit_colorframe_t* colorFrame,
+                                                                      uint32_t* index)
+{
+    return sensekit_generic_frame_get_frameindex(colorFrame, index);
+}
+
+SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_metadata(sensekit_colorframe_t* colorFrame,
+                                                                    sensekit_colorframe_metadata_t* metadata ){
+    *metadata = colorFrame->metadata;
+    return SENSEKIT_STATUS_SUCCESS;
+}
+
 SENSEKIT_END_DECLS

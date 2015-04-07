@@ -18,6 +18,11 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get(sensekit_reader_t re
 SENSEKIT_API_EX sensekit_status_t sensekit_depth_frame_get(sensekit_reader_frame_t readerFrame,
                                                            sensekit_depthframe_t** depthFrame);
 
+SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_metadata(sensekit_depthframe_t* depthFrame,
+                                                                    sensekit_depthframe_metadata_t* metadata );
+SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_frameindex(sensekit_depthframe_t* depthFrame,
+                                                                      uint32_t* index);
+
 SENSEKIT_END_DECLS
 
 #endif // DEPTH_CAPI_H

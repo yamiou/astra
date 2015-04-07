@@ -82,7 +82,7 @@ public:
     virtual void run();   //Does not return
 
 protected:
-    void calculateNormals(sensekit_depthframe_t& frame);
+    void calculateNormals(sensekit_depthframe_t& frame, int width, int height);
     virtual void display();
     virtual void displayPostDraw(){};       // Overload to draw over the screen image
 

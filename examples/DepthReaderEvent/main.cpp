@@ -8,12 +8,17 @@
 
 void print_depth(sensekit_depthframe_t* depthFrame)
 {
-    int width = depthFrame->width;
-    int height = depthFrame->height;
+    sensekit_depthframe_metadata_t metadata;
+    sensekit_depthframe_get_metadata(depthFrame, &metadata);
+    int width = metadata.width;
+    int height = metadata.height;
 
     size_t index = ((width * (height / 2)) + (width / 2));
     short middle = depthFrame->data[index];
-    std::cout << "index: " << depthFrame->frameIndex << " value: " << middle << std::endl;
+
+    uint32_t frameIndex;
+    sensekit_depthframe_get_frameindex(depthFrame, &frameIndex);
+    std::cout << "index: " << frameIndex << " value: " << middle << std::endl;
 }
 
 void frame_ready(sensekit_reader_t reader, sensekit_reader_frame_t frame)
