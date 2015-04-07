@@ -11,6 +11,7 @@ set(SenseKit_SOURCES
   SenseKitContext.h
   SenseKitContext.cpp
   CreateStreamProxy.h
+  CreatePluginProxy.h
   SenseKit.cpp
   Stream.h
   Stream.cpp
@@ -18,6 +19,7 @@ set(SenseKit_SOURCES
   StreamImpl.cpp
   PluginService.cpp
   PluginService.h
+  PluginServiceDelegate.h
   StreamServiceDelegate.h
   StreamSet.cpp
   StreamSet.h
@@ -36,10 +38,14 @@ set(SenseKit_SOURCES_GEN
   SenseKitContext.h.lpp
   StreamServiceDelegate.h.lpp
   SenseKit.cpp.lpp
+  PluginServiceDelegate.h.lpp
   CreateStreamProxy.h.lpp  
+  CreatePluginProxy.h.lpp  
   ../../include/SenseKit/sensekit_capi.h.lpp
   ../../include/SenseKit/Plugins/StreamServiceProxyBase.h.lpp
   ../../include/SenseKit/Plugins/StreamServiceProxy.h.lpp
+  ../../include/SenseKit/Plugins/PluginServiceProxyBase.h.lpp
+  ../../include/SenseKit/Plugins/PluginServiceProxy.h.lpp
   )
 
 add_definitions(-DSENSEKIT_BUILD)
