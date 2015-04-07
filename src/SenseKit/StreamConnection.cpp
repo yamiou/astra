@@ -75,7 +75,7 @@ namespace sensekit {
         {
             m_bin->inc_connected();
             
-            m_binFrontBufferReadyCallback = std::bind(&StreamConnection::on_bin_front_buffer_ready, this, _1);
+            m_binFrontBufferReadyCallback = [this](StreamBin* b) { this->on_bin_front_buffer_ready(b); };
             m_binFrontBufferReadyCallbackId = m_bin->register_front_buffer_ready_callback(m_binFrontBufferReadyCallback);
         }
     }
@@ -85,7 +85,7 @@ namespace sensekit {
         m_frameReadySignal.raise(this);
     }
 
-    CallbackId StreamConnection::register_frame_ready_callback(SCFrameReadyCallback callback)
+    CallbackId StreamConnection::register_frame_ready_callback(FrameReadyCallback callback)
     {
         return m_frameReadySignal += callback;
     }

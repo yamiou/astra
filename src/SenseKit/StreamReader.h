@@ -72,7 +72,7 @@ namespace sensekit {
         void raise_frame_ready();
 
         StreamConnection* find_stream_of_type(sensekit_stream_desc_t& desc);
-        SCFrameReadyCallback get_sc_frame_ready_callback();
+        StreamConnection::FrameReadyCallback get_sc_frame_ready_callback();
 
         bool destroy_stream_connection(StreamConnection* connection);
 
@@ -87,7 +87,7 @@ namespace sensekit {
         ConnectionMap m_streamMap;
         Signal<sensekit_reader_t, sensekit_reader_frame_t> m_frameReadySignal;
 
-        SCFrameReadyCallback m_scFrameReadyCallback;
+        StreamConnection::FrameReadyCallback m_scFrameReadyCallback;
     };
 }
 

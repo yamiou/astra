@@ -10,11 +10,11 @@ namespace sensekit {
     class StreamBin;
     class Stream;
     class StreamConnection;
-    using SCFrameReadyCallback = std::function<void(StreamConnection*)>;
-
+    
     class StreamConnection
     {
     public:
+        using FrameReadyCallback = std::function<void(StreamConnection*)>;
         StreamConnection(Stream* stream);
         ~StreamConnection();
 
@@ -36,7 +36,7 @@ namespace sensekit {
 
         const sensekit_stream_desc_t& get_description() const;
 
-        CallbackId register_frame_ready_callback(SCFrameReadyCallback callback);
+        CallbackId register_frame_ready_callback(FrameReadyCallback callback);
         void unregister_frame_ready_callback(CallbackId& callbackId);
 
         void set_parameter(sensekit_parameter_id id,

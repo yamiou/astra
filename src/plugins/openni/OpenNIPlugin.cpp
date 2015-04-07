@@ -211,6 +211,7 @@ namespace sensekit
         void OpenNIPlugin::set_new_depth_buffer(sensekit_frame_t* nextBuffer)
         {
             m_currentDepthBuffer = nextBuffer;
+            m_currentDepthBuffer->frameIndex = m_frameIndex;
             m_currentDepthFrame = static_cast<sensekit_depthframe_wrapper_t*>(m_currentDepthBuffer->data);
             m_currentDepthFrame->frame.data = (int16_t *)&(m_currentDepthFrame->frame_data);
             m_currentDepthFrame->frame.frameIndex = m_frameIndex;
@@ -222,6 +223,7 @@ namespace sensekit
         void OpenNIPlugin::set_new_color_buffer(sensekit_frame_t* nextBuffer)
         {
             m_currentColorBuffer = nextBuffer;
+            m_currentColorBuffer->frameIndex = m_frameIndex;
             m_currentColorFrame = static_cast<sensekit_colorframe_wrapper_t*>(m_currentColorBuffer->data);
             m_currentColorFrame->frame.data = (uint8_t *)&(m_currentColorFrame->frame_data);
             m_currentColorFrame->frame.frameIndex = m_frameIndex;

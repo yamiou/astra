@@ -79,7 +79,7 @@ namespace sensekit {
         size_t m_backBufferHeadIndex{1};
         size_t m_backBufferTailIndex{1};
 
-        const static size_t BUFFER_COUNT = 2;
+        const static size_t BUFFER_COUNT = 3;
         using FrameBufferArray = std::array<sensekit_frame_t*, BUFFER_COUNT>;
 
         FrameBufferArray m_buffers;

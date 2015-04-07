@@ -35,11 +35,11 @@ namespace sensekit {
         return nullptr;
     }
 
-    SCFrameReadyCallback StreamReader::get_sc_frame_ready_callback()
+    StreamConnection::FrameReadyCallback StreamReader::get_sc_frame_ready_callback()
     {
         if (m_scFrameReadyCallback == nullptr)
         {
-            m_scFrameReadyCallback = std::bind(&StreamReader::on_connection_frame_ready, this, _1);
+            m_scFrameReadyCallback = [this](StreamConnection* sc) { this->on_connection_frame_ready(sc); };
         }
         return m_scFrameReadyCallback;
     }
@@ -180,8 +180,9 @@ namespace sensekit {
         {
             lock();
         }
-
-        m_frameReadySignal.raise(get_handle(), get_handle());
+        sensekit_reader_t reader = get_handle();
+        sensekit_reader_frame_t frame = get_handle();
+        m_frameReadySignal.raise(reader, frame);
 
         if (!wasLocked && m_locked)
         {

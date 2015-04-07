@@ -29,6 +29,7 @@ typedef struct _sensekit_streamconnection {
 
 typedef struct _sensekit_frame {
     size_t byteLength;
+    uint32_t frameIndex;
     void* data;
 } sensekit_frame_t;
 
