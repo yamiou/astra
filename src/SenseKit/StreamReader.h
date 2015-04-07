@@ -40,6 +40,7 @@ namespace sensekit {
         StreamConnection* connection;
         CallbackId scFrameReadyCallbackId;
         bool isNewFrameReady;
+        sensekit_frame_index_t currentFrameIndex;
     };
 
     class StreamReader
@@ -52,7 +53,6 @@ namespace sensekit {
         StreamSet& get_streamSet() const { return m_streamSet; }
 
         StreamConnection* get_stream(sensekit_stream_desc_t& desc);
-        void on_connection_frame_ready(StreamConnection* connection);
         sensekit_frame_ref_t* get_subframe(sensekit_stream_desc_t& desc);
 
         CallbackId register_frame_ready_callback(FrameReadyCallback callback);
@@ -60,7 +60,7 @@ namespace sensekit {
 
         //TODO: locking currently not threadsafe
 
-        void lock();
+        sensekit_status_t lock(int timeoutMillis);
         void unlock();
 
         sensekit_reader_t get_handle() { return reinterpret_cast<sensekit_reader_t>(this); }
@@ -68,11 +68,19 @@ namespace sensekit {
         static StreamReader* from_frame(sensekit_reader_frame_t frame) { return reinterpret_cast<StreamReader*>(frame); }
 
     private:
+        enum class blockresult
+        {
+            BLOCKRESULT_TIMEOUT = 0,
+            BLOCKRESULT_FRAMEREADY = 1
+        };
+
+        blockresult block_until_frame_ready_or_timeout(int timeoutMillis);
         void check_for_all_frames_ready();
         void raise_frame_ready();
 
         StreamConnection* find_stream_of_type(sensekit_stream_desc_t& desc);
         StreamConnection::FrameReadyCallback get_sc_frame_ready_callback();
+        void on_connection_frame_ready(StreamConnection* connection, sensekit_frame_index_t frameIndex);
 
         bool destroy_stream_connection(StreamConnection* connection);
 
@@ -82,6 +90,8 @@ namespace sensekit {
                                                  StreamDescEqualTo>;
 
         bool m_locked{false};
+        bool m_isFrameReady{ false };
+        sensekit_frame_index_t m_lastFrameIndex{ -1 };
         sensekit_reader_frame_t* m_currentFrame{nullptr};
         StreamSet& m_streamSet;
         ConnectionMap m_streamMap;

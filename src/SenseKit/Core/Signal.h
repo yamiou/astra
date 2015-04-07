@@ -200,7 +200,10 @@ public:
 
     Signal()
         : m_callbackList() { }
-
+    unsigned int& slot_count()
+        {
+            return m_callbackList.count();
+        }
     size_t operator+=(const callback_type& cb)
         {
             return m_callbackList.add(cb);
@@ -229,7 +232,10 @@ public:
 
     Signal()
         : m_callbackList() { }
-
+    unsigned int& slot_count()
+        {
+            return m_callbackList.count();
+        }
     size_t operator+=(const callback_type& cb)
     {
         return m_callbackList.add([cb] (bool b) { cb(); });

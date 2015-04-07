@@ -15,13 +15,12 @@ namespace sensekit {
     class StreamConnection
     {
     public:
-        using FrameReadyCallback = std::function<void(StreamConnection*)>;
+        using FrameReadyCallback = std::function<void(StreamConnection*,sensekit_frame_index_t)>;
         StreamConnection(Stream* stream);
         ~StreamConnection();
 
         void start();
         void stop();
-
         sensekit_frame_ref_t* lock();
         void unlock();
 
@@ -52,7 +51,8 @@ namespace sensekit {
                                 sensekit_parameter_data_t* data);
 
     private:
-        void on_bin_front_buffer_ready(StreamBin* bin);
+        void on_bin_front_buffer_ready(StreamBin* bin, sensekit_frame_index_t frameIndex);
+        FrontBufferReadyCallback getFrontBufferReadyCallback();
 
         _sensekit_streamconnection m_connection;
         sensekit_frame_ref_t m_currentFrame;
@@ -67,7 +67,7 @@ namespace sensekit {
         FrontBufferReadyCallback m_binFrontBufferReadyCallback;
         CallbackId m_binFrontBufferReadyCallbackId;
 
-        Signal<StreamConnection*> m_frameReadySignal;
+        Signal<StreamConnection*, sensekit_frame_index_t> m_frameReadySignal;
     };
 }
 

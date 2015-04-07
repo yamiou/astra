@@ -41,7 +41,7 @@ namespace sensekit {
             return;
 
         m_bin->unlock_front_buffer();
-        m_locked = true;
+        m_locked = false;
     }
 
     void StreamConnection::start()
@@ -60,12 +60,21 @@ namespace sensekit {
         m_started = false;
     }
 
+    FrontBufferReadyCallback StreamConnection::getFrontBufferReadyCallback()
+    {
+        if (m_binFrontBufferReadyCallback == nullptr)
+        {
+            m_binFrontBufferReadyCallback = [this](StreamBin* b, sensekit_frame_index_t frameIndex)
+               { this->on_bin_front_buffer_ready(b, frameIndex); };
+        }
+        return m_binFrontBufferReadyCallback;
+    }
+
     void StreamConnection::set_bin(StreamBin* bin)
     {
         if (m_bin != nullptr)
         {
             m_bin->unregister_front_buffer_ready_callback(m_binFrontBufferReadyCallbackId);
-            m_binFrontBufferReadyCallback = nullptr;
             m_bin->dec_connected();
         }
 
@@ -74,15 +83,16 @@ namespace sensekit {
         if (m_bin != nullptr)
         {
             m_bin->inc_connected();
-            
-            m_binFrontBufferReadyCallback = [this](StreamBin* b) { this->on_bin_front_buffer_ready(b); };
-            m_binFrontBufferReadyCallbackId = m_bin->register_front_buffer_ready_callback(m_binFrontBufferReadyCallback);
+
+            m_binFrontBufferReadyCallbackId = m_bin->register_front_buffer_ready_callback(getFrontBufferReadyCallback());
         }
     }
 
-    void StreamConnection::on_bin_front_buffer_ready(StreamBin* bin)
+    void StreamConnection::on_bin_front_buffer_ready(StreamBin* bin, sensekit_frame_index_t frameIndex)
     {
-        m_frameReadySignal.raise(this);
+        assert(m_bin != nullptr);
+        assert(m_bin == bin);
+        m_frameReadySignal.raise(this, frameIndex);
     }
 
     CallbackId StreamConnection::register_frame_ready_callback(FrameReadyCallback callback)

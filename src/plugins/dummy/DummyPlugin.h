@@ -15,11 +15,7 @@ namespace sensekit {
     public:
         DummyPlugin(PluginServiceProxy* pluginService)
             : PluginBase(pluginService) { }
-
-        virtual void temp_update() override { cout << "dumb." << endl; }
     };
 }
-
-EXPORT_PLUGIN(sensekit::DummyPlugin);
 
 #endif /* DUMMYPLUGIN_H */

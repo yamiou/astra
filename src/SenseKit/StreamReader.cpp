@@ -1,6 +1,7 @@
 #include "StreamReader.h"
 #include <algorithm>
 #include <cassert>
+#include <chrono>
 
 namespace sensekit {
     using namespace std::placeholders;
@@ -39,7 +40,8 @@ namespace sensekit {
     {
         if (m_scFrameReadyCallback == nullptr)
         {
-            m_scFrameReadyCallback = [this](StreamConnection* sc) { this->on_connection_frame_ready(sc); };
+            m_scFrameReadyCallback = [this](StreamConnection* sc, sensekit_frame_index_t frameIndex) 
+                { this->on_connection_frame_ready(sc, frameIndex); };
         }
         return m_scFrameReadyCallback;
     }
@@ -61,6 +63,7 @@ namespace sensekit {
             data->connection = connection;
             data->scFrameReadyCallbackId = cbId;
             data->isNewFrameReady = false;
+            data->currentFrameIndex = -1;
 
             m_streamMap.insert(std::make_pair(desc, data));
 
@@ -72,20 +75,24 @@ namespace sensekit {
         }
     }
 
-    void StreamReader::on_connection_frame_ready(StreamConnection* connection)
+    void StreamReader::on_connection_frame_ready(StreamConnection* connection, sensekit_frame_index_t frameIndex)
     {
-        auto& desc = connection->get_description();
-
-        auto pair = m_streamMap.find(desc);
-
-        if (pair != m_streamMap.end())
+        if (frameIndex > m_lastFrameIndex)
         {
-            //TODO optimization/special case -- if m_streamMap.size() == 1, call raise_frame_ready() directly
-            ReaderConnectionData* data = pair->second;
-            data->isNewFrameReady = true;
-        }
+            auto& desc = connection->get_description();
 
-        check_for_all_frames_ready();
+            auto pair = m_streamMap.find(desc);
+
+            if (pair != m_streamMap.end())
+            {
+                //TODO optimization/special case -- if m_streamMap.size() == 1, call raise_frame_ready() directly
+                ReaderConnectionData* data = pair->second;
+                data->isNewFrameReady = true;
+                data->currentFrameIndex = frameIndex;
+            }
+
+            check_for_all_frames_ready();
+        }
     }
 
     sensekit_frame_ref_t* StreamReader::get_subframe(sensekit_stream_desc_t& desc)
@@ -111,10 +118,47 @@ namespace sensekit {
         callbackId = 0;
     }
 
-    void StreamReader::lock()
+    StreamReader::blockresult StreamReader::block_until_frame_ready_or_timeout(int timeoutMillis)
+    {
+        if (m_isFrameReady)
+        {
+            return blockresult::BLOCKRESULT_FRAMEREADY;
+        }
+
+        long long milliseconds = 0;
+        if (timeoutMillis != SENSEKIT_TIMEOUT_RETURN_IMMEDIATELY)
+        {
+            std::chrono::time_point<std::chrono::system_clock> start, end;
+            start = std::chrono::steady_clock::now();
+            bool forever = timeoutMillis == SENSEKIT_TIMEOUT_FOREVER;
+            do
+            {
+                sensekit_temp_update();
+                if (m_isFrameReady)
+                {
+                    return blockresult::BLOCKRESULT_FRAMEREADY;
+                }
+
+                end = std::chrono::steady_clock::now();
+                std::chrono::duration<double> elapsed_seconds = end - start;
+                milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_seconds).count();
+            } while (forever || milliseconds < timeoutMillis);
+        }
+  
+        return m_isFrameReady ? blockresult::BLOCKRESULT_FRAMEREADY : blockresult::BLOCKRESULT_TIMEOUT;
+    }
+
+    sensekit_status_t StreamReader::lock(int timeoutMillis)
     {
         if (m_locked)
-            return;
+            return SENSEKIT_STATUS_SUCCESS;
+
+        StreamReader::blockresult result = block_until_frame_ready_or_timeout(timeoutMillis);
+
+        if (result == blockresult::BLOCKRESULT_TIMEOUT)
+        {
+            return SENSEKIT_STATUS_TIMEOUT;
+        }
 
         for(auto pair : m_streamMap)
         {
@@ -123,6 +167,7 @@ namespace sensekit {
         }
 
         m_locked = true;
+        return SENSEKIT_STATUS_SUCCESS;
     }
 
     void StreamReader::unlock()
@@ -135,8 +180,13 @@ namespace sensekit {
             ReaderConnectionData* data = pair.second;
             data->connection->unlock();
             data->isNewFrameReady = false;
+            if (data->currentFrameIndex > m_lastFrameIndex)
+            {
+                m_lastFrameIndex = data->currentFrameIndex;
+            }
         }
 
+        m_isFrameReady = false;
         m_locked = false;
     }
 
@@ -169,21 +219,27 @@ namespace sensekit {
 
         if (allReady)
         {
+            m_isFrameReady = true;
             raise_frame_ready();
         }
     }
 
     void StreamReader::raise_frame_ready()
     {
+        if (m_frameReadySignal.slot_count() == 0)
+        {
+            //no clients to serve, don't bother locking and unlocking
+            return;
+        }
         bool wasLocked = m_locked;
         if (!wasLocked)
         {
-            lock();
+            lock(SENSEKIT_TIMEOUT_RETURN_IMMEDIATELY);
         }
         sensekit_reader_t reader = get_handle();
         sensekit_reader_frame_t frame = get_handle();
         m_frameReadySignal.raise(reader, frame);
-
+        
         if (!wasLocked && m_locked)
         {
             unlock();

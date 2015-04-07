@@ -33,7 +33,7 @@ typedef struct _sensekit_handpoint {
 
 typedef struct _sensekit_handframe {
     sensekit_frame_ref_t* frameRef;
-    uint32_t frameIndex;
+    sensekit_frame_index_t frameIndex;
     uint32_t numHands;
     sensekit_handpoint_t* handpoints;
 } sensekit_handframe_t;

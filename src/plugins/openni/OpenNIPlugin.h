@@ -60,7 +60,7 @@ namespace sensekit
             unsigned m_colorBufferLength{0};
             unsigned m_depthBufferLength{0};
 
-            int m_frameIndex{ 0 };
+            sensekit_frame_index_t m_frameIndex{ 0 };
 
             sensekit_frame_t* m_currentColorBuffer{nullptr};
             sensekit_frame_t* m_currentDepthBuffer{nullptr};

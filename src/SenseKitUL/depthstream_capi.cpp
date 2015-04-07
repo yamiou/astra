@@ -85,7 +85,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depth_frame_get(sensekit_reader_frame
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_frameindex(sensekit_depthframe_t depthFrame,
-                                                                     uint32_t* index)
+                                                                     sensekit_frame_index_t* index)
 {
     return sensekit_generic_frame_get_frameindex(depthFrame, index);
 }

@@ -32,7 +32,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_metadata(sensekit_dept
                                                                    sensekit_depthframe_metadata_t* metadata );
 
 SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_frameindex(sensekit_depthframe_t depthFrame,
-                                                                     uint32_t* index);
+                                                                     sensekit_frame_index_t* index);
 
 SENSEKIT_END_DECLS
 

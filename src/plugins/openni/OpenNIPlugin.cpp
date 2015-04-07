@@ -270,7 +270,7 @@ namespace sensekit
         sensekit_status_t OpenNIPlugin::read_next_depth_frame(sensekit_depthframe_wrapper_t* frame)
         {
             int dummy;
-            int timeout = 30;
+            int timeout = 0;
             ::openni::VideoStream* pStream = &m_depthStream;
             if (::openni::OpenNI::waitForAnyStream(&pStream, 1, &dummy, timeout)
                 == ::openni::STATUS_TIME_OUT)
@@ -298,7 +298,7 @@ namespace sensekit
         sensekit_status_t OpenNIPlugin::read_next_color_frame(sensekit_colorframe_wrapper_t* frame)
         {
             int dummy;
-            int timeout = 30;
+            int timeout = 0;
             ::openni::VideoStream* pStream = &m_colorStream;
             if (::openni::OpenNI::waitForAnyStream(&pStream, 1, &dummy, timeout)
                 == ::openni::STATUS_TIME_OUT)

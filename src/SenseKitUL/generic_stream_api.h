@@ -50,7 +50,7 @@ sensekit_status_t sensekit_generic_frame_get(sensekit_reader_frame_t readerFrame
 
 template<typename TFrameType>
 sensekit_status_t sensekit_generic_frame_get_frameindex(TFrameType* frame,
-                                                        uint32_t* index)
+                                                        sensekit_frame_index_t* index)
 {
     *index = frame->frameRef->frame->frameIndex;
 

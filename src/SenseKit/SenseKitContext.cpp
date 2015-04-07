@@ -161,11 +161,17 @@ namespace sensekit {
         assert(reader != nullptr);
 
         StreamReader* actualReader = StreamReader::get_ptr(reader);
-        actualReader->lock();
+        sensekit_status_t rc = actualReader->lock(timeoutMillis);
 
-        frame = reader;
-
-        return SENSEKIT_STATUS_SUCCESS;
+        if (rc == SENSEKIT_STATUS_SUCCESS)
+        {
+            frame = reader;
+        }
+        else
+        {
+            frame = nullptr;
+        }
+        return rc;
     }
 
     sensekit_status_t SenseKitContext::reader_close_frame(sensekit_reader_frame_t& frame)

@@ -28,7 +28,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_color_frame_get(sensekit_reader_frame
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_frameindex(sensekit_colorframe_t colorFrame,
-                                                                     uint32_t* index)
+                                                                     sensekit_frame_index_t* index)
 {
     return sensekit_generic_frame_get_frameindex(colorFrame, index);
 }

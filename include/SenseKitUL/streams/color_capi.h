@@ -26,7 +26,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_metadata(sensekit_colo
                                                                    sensekit_colorframe_metadata_t* metadata);
 
 SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_frameindex(sensekit_colorframe_t colorFrame,
-                                                                     uint32_t* index);
+                                                                     sensekit_frame_index_t* index);
 SENSEKIT_END_DECLS
 
 #endif /* COLOR_CAPI_H */

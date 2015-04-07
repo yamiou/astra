@@ -30,7 +30,7 @@ namespace sensekit {
 
         int get_resolutionX() { return m_metadata.width; }
         int get_resolutionY() { return m_metadata.height; }
-        int get_frameIndex() { return m_frameIndex; }
+        sensekit_frame_index_t get_frameIndex() { return m_frameIndex; }
         int get_bytesPerPixel() { return m_metadata.bytesPerPixel; }
 
         const uint8_t* data() { return m_dataPtr; }
@@ -44,7 +44,7 @@ namespace sensekit {
     private:
         sensekit_colorframe_t m_colorFrame;
         sensekit_colorframe_metadata_t m_metadata;
-        uint32_t m_frameIndex;
+        sensekit_frame_index_t m_frameIndex;
         uint8_t* m_dataPtr;
         size_t m_dataLength;
     };

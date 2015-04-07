@@ -42,7 +42,8 @@ namespace sensekit {
         sensekit_frame_t* frame = new sensekit_frame_t;
         frame->byteLength = bufferLengthInBytes;
         frame->data = new uint8_t[bufferLengthInBytes];
-
+        memset(frame->data, 0, bufferLengthInBytes);
+        frame->frameIndex = -1;
         return frame;
     }
 
@@ -75,12 +76,18 @@ namespace sensekit {
         }
         else
         {
+            sensekit_frame_index_t oldFrameIndex = get_frontBuffer()->frameIndex;
             size_t oldFBI = m_frontBufferIndex;
             m_frontBufferIndex = m_backBufferHeadIndex;
             m_backBufferTailIndex = oldFBI;
             m_backBufferHeadIndex = inc_index(m_backBufferHeadIndex);
 
-            m_frontBufferReadySignal.raise(this);
+            sensekit_frame_index_t frameIndex = get_frontBuffer()->frameIndex;
+            if (frameIndex != -1)
+            {
+                assert(frameIndex > oldFrameIndex);
+                m_frontBufferReadySignal.raise(this, frameIndex);
+            }
         }
 
         // cout << "f: " << m_frontBufferIndex << " b-head: " << m_backBufferHeadIndex

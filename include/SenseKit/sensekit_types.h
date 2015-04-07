@@ -7,10 +7,14 @@
 const unsigned MAX_STRING_FIELD_LENGTH = 256;
 const uint8_t SENSEKIT_MAX_READER_STREAMS = 16;
 
+const int SENSEKIT_TIMEOUT_FOREVER = -1;
+const int SENSEKIT_TIMEOUT_RETURN_IMMEDIATELY = 0;
+
 typedef struct _sensekit_stream* sensekit_stream_t;
 
 typedef int32_t sensekit_stream_type_t;
 typedef int32_t sensekit_stream_subtype_t;
+typedef int32_t sensekit_frame_index_t;
 
 const sensekit_stream_subtype_t ANY_SUBTYPE = -1;
 
@@ -26,7 +30,7 @@ typedef struct _sensekit_streamconnection* sensekit_streamconnection_t;
 
 typedef struct _sensekit_frame {
     size_t byteLength;
-    uint32_t frameIndex;
+    sensekit_frame_index_t frameIndex;
     void* data;
 } sensekit_frame_t;
 

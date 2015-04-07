@@ -21,7 +21,7 @@ void print_depth(sensekit_depthframe_t depthFrame)
     size_t index = ((width * (height / 2)) + (width / 2));
     short middle = depthData[index];
 
-    uint32_t frameIndex;
+    sensekit_frame_index_t frameIndex;
     sensekit_depthframe_get_frameindex(depthFrame, &frameIndex);
     std::cout << "index: " << frameIndex << " value: " << middle << std::endl;
 }

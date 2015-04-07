@@ -26,7 +26,7 @@ void print_depth(sensekit_depthframe_t depthFrame)
 
     free(depthData);
 
-    uint32_t frameIndex;
+    sensekit_frame_index_t frameIndex;
     sensekit_depthframe_get_frameindex(depthFrame, &frameIndex);
     std::cout << "index: " << frameIndex << " value: " << middle << std::endl;
 }
@@ -49,19 +49,29 @@ int main(int argc, char** argv)
 
     sensekit_stream_start(depthStream);
 
+    sensekit_frame_index_t lastFrameIndex = -1;
     do
     {
-        sensekit_temp_update();
-
         sensekit_reader_frame_t frame;
-        sensekit_reader_open_frame(reader, 30, &frame);
+        sensekit_status_t rc = sensekit_reader_open_frame(reader, 1, &frame);
+        if (rc == SENSEKIT_STATUS_SUCCESS)
+        {
+            sensekit_depthframe_t depthFrame;
+            sensekit_depth_frame_get(frame, &depthFrame);
 
-        sensekit_depthframe_t depthFrame;
-        sensekit_depth_frame_get(frame, &depthFrame);
+            sensekit_frame_index_t newFrameIndex;
+            sensekit_depthframe_get_frameindex(depthFrame, &newFrameIndex);
 
-        print_depth(depthFrame);
+            if (lastFrameIndex == newFrameIndex)
+            {
+                printf("duplicate frame index: %d\n", lastFrameIndex);
+            }
+            lastFrameIndex = newFrameIndex;
 
-        sensekit_reader_close_frame(&frame);
+            print_depth(depthFrame);
+
+            sensekit_reader_close_frame(&frame);
+        }
 
     } while (shouldContinue);
 
