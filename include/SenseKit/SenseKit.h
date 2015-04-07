@@ -60,7 +60,7 @@ namespace sensekit {
         template<typename T>
         T stream()
             {
-                return stream<T>(DEFAULT_SUBTYPE);
+                return stream<T>(ANY_SUBTYPE);
             }
 
         template<typename T>

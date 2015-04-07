@@ -3,17 +3,45 @@
 #include <cassert>
 
 namespace sensekit {
-    
+    using namespace std::placeholders;
+
+    StreamReader::StreamReader(StreamSet& streamSet) :
+        m_streamSet(streamSet),
+        m_scFrameReadyCallback(nullptr)
+    {
+    }
+
+    StreamReader::~StreamReader()
+    {
+        for (auto pair : m_streamMap)
+        {
+            ReaderConnectionData* data = pair.second;
+            data->connection->unregister_frame_ready_callback(data->scFrameReadyCallbackId);
+            m_streamSet.destroy_stream_connection(data->connection);
+            delete data;
+        }
+        m_streamMap.clear();
+    }
+
     StreamConnection* StreamReader::find_stream_of_type(sensekit_stream_desc_t& desc)
     {
         auto it = m_streamMap.find(desc);
 
         if (it != m_streamMap.end())
         {
-            return it->second;
+            return it->second->connection;
         }
 
         return nullptr;
+    }
+
+    SCFrameReadyCallback StreamReader::get_sc_frame_ready_callback()
+    {
+        if (m_scFrameReadyCallback == nullptr)
+        {
+            m_scFrameReadyCallback = std::bind(&StreamReader::on_connection_frame_ready, this, _1);
+        }
+        return m_scFrameReadyCallback;
     }
 
     sensekit_streamconnection_t* StreamReader::get_stream(sensekit_stream_desc_t& desc)
@@ -24,13 +52,40 @@ namespace sensekit {
             return connection->get_handle();
 
         connection = m_streamSet.create_stream_connection(desc);
-
+        
         if (connection != nullptr)
         {
-            m_streamMap.insert(std::make_pair(desc, connection));
+            CallbackId cbId = connection->register_frame_ready_callback(get_sc_frame_ready_callback());
+
+            ReaderConnectionData* data = new ReaderConnectionData;
+            data->connection = connection;
+            data->scFrameReadyCallbackId = cbId;
+            data->isNewFrameReady = false;
+
+            m_streamMap.insert(std::make_pair(desc, data));
+
+            return connection->get_handle();
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    void StreamReader::on_connection_frame_ready(StreamConnection* connection)
+    {
+        auto& desc = connection->get_description();
+        
+        auto pair = m_streamMap.find(desc);
+
+        if (pair != m_streamMap.end())
+        {
+            //TODO optimization/special case -- if m_streamMap.size() == 1, call raise_frame_ready() directly
+            ReaderConnectionData* data = pair->second;
+            data->isNewFrameReady = true;
         }
 
-        return connection->get_handle();
+        check_for_all_frames_ready();
     }
 
     sensekit_frame_ref_t* StreamReader::get_subframe(sensekit_stream_desc_t& desc)
@@ -63,8 +118,8 @@ namespace sensekit {
 
         for(auto pair : m_streamMap)
         {
-            StreamConnection* connection = pair.second;
-            connection->lock();
+            ReaderConnectionData* data = pair.second;
+            data->connection->lock();
         }
 
         m_locked = true;
@@ -77,8 +132,9 @@ namespace sensekit {
 
         for(auto pair : m_streamMap)
         {
-            StreamConnection* connection = pair.second;
-            connection->unlock();
+            ReaderConnectionData* data = pair.second;
+            data->connection->unlock();
+            data->isNewFrameReady = false;
         }
 
         m_locked = false;
@@ -97,13 +153,24 @@ namespace sensekit {
         return false;
     }
 
-    StreamReader::~StreamReader()
+    void StreamReader::check_for_all_frames_ready()
     {
-        for(auto pair : m_streamMap)
+        bool allReady = true;
+        for (auto pair : m_streamMap)
         {
-            m_streamSet.destroy_stream_connection(pair.second);
+            ReaderConnectionData* data = pair.second;
+            if (!data->isNewFrameReady)
+            {
+                //TODO the new frames may not be synced. 
+                //We need matching frame indices in the future
+                allReady = false;
+            }
         }
-        m_streamMap.clear();
+
+        if (allReady)
+        {
+            raise_frame_ready();
+        }
     }
 
     void StreamReader::raise_frame_ready()
@@ -113,7 +180,7 @@ namespace sensekit {
         {
             lock();
         }
-        
+
         m_frameReadySignal.raise(get_handle(), get_handle());
 
         if (!wasLocked && m_locked)

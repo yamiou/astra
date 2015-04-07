@@ -67,7 +67,7 @@ namespace sensekit {
             const sensekit_stream_desc_t& desc = stream->get_description();
 
             if (desc.type == type &&
-                (subType == DEFAULT_SUBTYPE || desc.subType == subType))
+                (subType == ANY_SUBTYPE || desc.subType == subType))
             {
                 return stream;
             }

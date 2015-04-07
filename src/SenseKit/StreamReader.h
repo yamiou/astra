@@ -28,22 +28,31 @@ namespace sensekit {
         std::size_t operator()(const sensekit_stream_desc_t& lhs,
                                const sensekit_stream_desc_t& rhs) const
             {
-                return lhs.type == rhs.type && lhs.subType == rhs.subType;
+                return lhs.type == rhs.type && 
+                                    (lhs.subType == ANY_SUBTYPE ||
+                                     rhs.subType == ANY_SUBTYPE ||
+                                     lhs.subType == rhs.subType);
             }
     };
 
+    struct ReaderConnectionData
+    {
+        StreamConnection* connection;
+        CallbackId scFrameReadyCallbackId;
+        bool isNewFrameReady;
+    };
 
     class StreamReader
     {
     public:
-        explicit StreamReader(StreamSet& streamSet)
-            : m_streamSet(streamSet) { }
+        explicit StreamReader(StreamSet& streamSet);
 
         ~StreamReader();
 
         StreamSet& get_streamSet() const { return m_streamSet; }
 
         sensekit_streamconnection_t* get_stream(sensekit_stream_desc_t& desc);
+        void on_connection_frame_ready(StreamConnection* connection);
         sensekit_frame_ref_t* get_subframe(sensekit_stream_desc_t& desc);
 
         CallbackId register_frame_ready_callback(FrameReadyCallback callback);
@@ -59,13 +68,16 @@ namespace sensekit {
         static StreamReader* from_frame(sensekit_reader_frame_t frame) { return reinterpret_cast<StreamReader*>(frame); }
 
     private:
+        void check_for_all_frames_ready();
         void raise_frame_ready();
+
         StreamConnection* find_stream_of_type(sensekit_stream_desc_t& desc);
+        SCFrameReadyCallback get_sc_frame_ready_callback();
 
         bool destroy_stream_connection(StreamConnection* connection);
 
         using ConnectionMap = std::unordered_map<sensekit_stream_desc_t,
-                                                 StreamConnection*,
+                                                 ReaderConnectionData*,
                                                  StreamDescHash,
                                                  StreamDescEqualTo>;
 
@@ -75,6 +87,7 @@ namespace sensekit {
         ConnectionMap m_streamMap;
         Signal<sensekit_reader_t, sensekit_reader_frame_t> m_frameReadySignal;
 
+        SCFrameReadyCallback m_scFrameReadyCallback;
     };
 }
 
