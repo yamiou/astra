@@ -42,10 +42,10 @@ namespace sensekit {
                                                       connection->get_handle()));
     }
 
-        void StreamImpl::on_set_parameter(StreamConnection* connection,
-                                          sensekit_parameter_id id,
-                                          size_t byteLength,
-                                          sensekit_parameter_data_t* data)
+    void StreamImpl::on_set_parameter(StreamConnection* connection,
+                                      sensekit_parameter_id id,
+                                      size_t byteLength,
+                                      sensekit_parameter_data_t* data)
     {
         sensekit_streamconnection_t* streamConnection =
             reinterpret_cast<sensekit_streamconnection_t*>(connection->get_handle());

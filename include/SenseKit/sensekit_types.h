@@ -71,6 +71,9 @@ typedef struct _sensekit_reader_callback_id {
 typedef void(*FrameReadyCallback)(sensekit_reader_t reader,
     sensekit_reader_frame_t frame);
 
+//Internal to SenseKit
+typedef void(*FrontBufferReadyCallback)();
+
 // Plugin service callback types
 
 typedef void(*set_parameter_callback_t)(void*, sensekit_streamconnection_t*,

@@ -45,6 +45,9 @@ namespace sensekit {
                                 sensekit_parameter_data_t* data);
 
     private:
+
+        static void on_bin_front_buffer_ready();
+
         sensekit_streamconnection_t m_connection;
         sensekit_frame_ref_t m_currentFrame;
 

@@ -19,7 +19,7 @@ namespace sensekit {
         Stream(StreamImpl* impl)
             : m_impl(impl) {}
 
-        ~Stream();
+        ~Stream() { }
 
         StreamConnection* create_connection();
         void destroy_connection(StreamConnection* connection);

@@ -185,21 +185,17 @@ namespace sensekit {
         assert(reader != nullptr);
         callbackId = nullptr;
 
-        StreamReader* actualReader = reinterpret_cast<StreamReader*>(reader);
+        StreamReader* actualReader = StreamReader::get_ptr(reader);
 
-        CallbackId cbId;
-        sensekit_status_t rc = actualReader->register_frame_callback(callback, cbId);
+        CallbackId cbId = actualReader->register_frame_ready_callback(callback);
 
-        if (rc == SENSEKIT_STATUS_SUCCESS)
-        {
-            sensekit_reader_callback_id_raw_t* cb = new sensekit_reader_callback_id_raw_t;
-            callbackId = cb;
+        sensekit_reader_callback_id_raw_t* cb = new sensekit_reader_callback_id_raw_t;
+        callbackId = cb;
 
-            cb->reader = reader;
-            cb->callbackId = cbId;
-        }
-
-        return rc;
+        cb->reader = reader;
+        cb->callbackId = cbId;
+    
+        return SENSEKIT_STATUS_SUCCESS;
     }
 
     sensekit_status_t SenseKitContext::reader_unregister_frame_ready_callback(sensekit_reader_callback_id_t& callbackId)
@@ -209,11 +205,13 @@ namespace sensekit {
         assert(cb->reader != nullptr);
 
         CallbackId cbId = cb->callbackId;
-        StreamReader* actualReader = reinterpret_cast<StreamReader*>(cb->reader);
+        StreamReader* actualReader = StreamReader::get_ptr(cb->reader);
         
         delete cb;
         callbackId = nullptr;
-        return actualReader->unregister_frame_callback(cbId);
+        actualReader->unregister_frame_ready_callback(cbId);
+
+        return SENSEKIT_STATUS_SUCCESS;
     }
 
     sensekit_status_t SenseKitContext::reader_get_frame(sensekit_reader_frame_t frame,

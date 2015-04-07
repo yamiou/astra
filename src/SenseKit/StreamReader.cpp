@@ -3,7 +3,7 @@
 #include <cassert>
 
 namespace sensekit {
-
+    
     StreamConnection* StreamReader::find_stream_of_type(sensekit_stream_desc_t& desc)
     {
         auto it = m_streamMap.find(desc);
@@ -45,16 +45,14 @@ namespace sensekit {
         return connection->lock();
     }
 
-    sensekit_status_t StreamReader::register_frame_callback(FrameReadyCallback callback, CallbackId& callbackId)
+    CallbackId StreamReader::register_frame_ready_callback(FrameReadyCallback callback)
     {
-        callbackId = m_frameReadySignal += callback;
-        return SENSEKIT_STATUS_SUCCESS;
+        return m_frameReadySignal += callback;
     }
 
-    sensekit_status_t StreamReader::unregister_frame_callback(CallbackId callbackId)
+    void StreamReader::unregister_frame_ready_callback(CallbackId callbackId)
     {
         m_frameReadySignal -= callbackId;
-        return SENSEKIT_STATUS_SUCCESS;
     }
 
     void StreamReader::lock()
@@ -105,5 +103,21 @@ namespace sensekit {
             m_streamSet.destroy_stream_connection(pair.second);
         }
         m_streamMap.clear();
+    }
+
+    void StreamReader::raise_frame_ready()
+    {
+        bool wasLocked = m_locked;
+        if (!wasLocked)
+        {
+            lock();
+        }
+        
+        m_frameReadySignal.raise(get_handle(), get_handle());
+
+        if (!wasLocked && m_locked)
+        {
+            unlock();
+        }
     }
 }

@@ -5,6 +5,7 @@
 #include <array>
 #include <atomic>
 #include <sensekit_types.h>
+#include "Core/Signal.h"
 
 namespace sensekit {
 
@@ -33,6 +34,9 @@ namespace sensekit {
             {
                 m_frontBufferLocked = false;
             }
+
+        CallbackId register_frame_ready_callback(FrontBufferReadyCallback callback);
+        void unregister_frame_ready_callback(CallbackId callbackId);
 
         void inc_active() { m_activeCount++; }
         void dec_active()
@@ -78,6 +82,8 @@ namespace sensekit {
         FrameBufferArray m_buffers;
         int m_connectedCount{0};
         int m_activeCount{0};
+
+        Signal<void> m_frontBufferReadySignal;
     };
 }
 

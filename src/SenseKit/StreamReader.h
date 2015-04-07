@@ -46,9 +46,8 @@ namespace sensekit {
         sensekit_streamconnection_t* get_stream(sensekit_stream_desc_t& desc);
         sensekit_frame_ref_t* get_subframe(sensekit_stream_desc_t& desc);
 
-        sensekit_status_t register_frame_callback(FrameReadyCallback callback, CallbackId& callbackId);
-
-        sensekit_status_t unregister_frame_callback(CallbackId callbackId);
+        CallbackId register_frame_ready_callback(FrameReadyCallback callback);
+        void unregister_frame_ready_callback(CallbackId callbackId);
 
         //TODO: locking currently not threadsafe
 
@@ -60,6 +59,7 @@ namespace sensekit {
         static StreamReader* from_frame(sensekit_reader_frame_t frame) { return reinterpret_cast<StreamReader*>(frame); }
 
     private:
+        void raise_frame_ready();
         StreamConnection* find_stream_of_type(sensekit_stream_desc_t& desc);
 
         bool destroy_stream_connection(StreamConnection* connection);

@@ -68,6 +68,8 @@ namespace sensekit {
 
         if (m_bin != nullptr)
             m_bin->inc_connected();
+
+        m_bin->register_front_buffer_ready_callback()
     }
 
     void StreamConnection::set_parameter(sensekit_parameter_id id,
@@ -88,6 +90,11 @@ namespace sensekit {
                                               sensekit_parameter_data_t* data)
     {
         m_stream->get_parameter_data(this, id, byteLength, data);
+    }
+
+    void StreamConnection::on_bin_front_buffer_ready()
+    {
+
     }
 
     StreamConnection::~StreamConnection()

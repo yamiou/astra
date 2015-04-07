@@ -7,6 +7,16 @@ namespace sensekit {
     {
         allocate_buffers(bufferLengthInBytes);
     }
+    
+    CallbackId StreamBin::register_front_buffer_ready_callback(FrontBufferReadyCallback callback)
+    {
+        return m_frontBufferReadySignal += callback;
+    }
+
+    void StreamBin::unregister_front_buffer_ready_callback(CallbackId callbackId)
+    {
+        m_frontBufferReadySignal -= callbackId;
+    }
 
     sensekit_frame_t* StreamBin::get_frontBuffer()
     {
@@ -67,6 +77,8 @@ namespace sensekit {
             m_frontBufferIndex = m_backBufferHeadIndex;
             m_backBufferTailIndex = oldFBI;
             m_backBufferHeadIndex = inc_index(m_backBufferHeadIndex);
+
+            m_frontBufferReadySignal.raise();
         }
 
         // cout << "f: " << m_frontBufferIndex << " b-head: " << m_backBufferHeadIndex
@@ -78,6 +90,7 @@ namespace sensekit {
 
     StreamBin::~StreamBin()
     {
+        assert(!has_clients_connected());
         for(auto& frame : m_buffers)
         {
             deallocate_frame(frame);
