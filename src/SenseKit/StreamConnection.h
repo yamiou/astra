@@ -3,11 +3,14 @@
 
 #include "sensekit_types.h"
 #include <cassert>
+#include "StreamBin.h"
 
 namespace sensekit {
 
     class StreamBin;
     class Stream;
+    class StreamConnection;
+    using SCFrameReadyCallback = std::function<void(StreamConnection*)>;
 
     class StreamConnection
     {
@@ -33,6 +36,9 @@ namespace sensekit {
 
         const sensekit_stream_desc_t& get_description() const;
 
+        CallbackId register_frame_ready_callback(SCFrameReadyCallback callback);
+        void unregister_frame_ready_callback(CallbackId& callbackId);
+
         void set_parameter(sensekit_parameter_id id,
                            size_t byteLength,
                            sensekit_parameter_data_t* data);
@@ -45,9 +51,7 @@ namespace sensekit {
                                 sensekit_parameter_data_t* data);
 
     private:
-
-        static void on_bin_front_buffer_ready_thunk();
-        void on_bin_front_buffer_ready();
+        void on_bin_front_buffer_ready(StreamBin* bin);
 
         sensekit_streamconnection_t m_connection;
         sensekit_frame_ref_t m_currentFrame;
@@ -58,6 +62,11 @@ namespace sensekit {
         Stream* m_stream{nullptr};
         StreamBin* m_bin{nullptr};
         sensekit_stream_t m_handle{nullptr};
+
+        FrontBufferReadyCallback m_binFrontBufferReadyCallback;
+        CallbackId m_binFrontBufferReadyCallbackId;
+
+        Signal<StreamConnection*> m_frameReadySignal;
     };
 }
 

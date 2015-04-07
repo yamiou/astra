@@ -4,6 +4,7 @@
 #include "Stream.h"
 
 namespace sensekit {
+    using namespace std::placeholders;
 
     StreamConnection::StreamConnection(Stream* stream)
         : m_stream(stream)
@@ -62,23 +63,37 @@ namespace sensekit {
     void StreamConnection::set_bin(StreamBin* bin)
     {
         if (m_bin != nullptr)
+        {
+            m_bin->unregister_front_buffer_ready_callback(m_binFrontBufferReadyCallbackId);
+            m_binFrontBufferReadyCallback = nullptr;
             m_bin->dec_connected();
+        }
 
         m_bin = bin;
 
         if (m_bin != nullptr)
+        {
             m_bin->inc_connected();
-
-        m_bin->register_front_buffer_ready_callback(&StreamConnection::on_bin_front_buffer_ready_thunk);
+            
+            m_binFrontBufferReadyCallback = std::bind(&StreamConnection::on_bin_front_buffer_ready, this, _1);
+            m_binFrontBufferReadyCallbackId = m_bin->register_front_buffer_ready_callback(m_binFrontBufferReadyCallback);
+        }
     }
 
-    void StreamConnection::on_bin_front_buffer_ready_thunk()
+    void StreamConnection::on_bin_front_buffer_ready(StreamBin* bin)
     {
+        m_frameReadySignal.raise(this);
     }
 
-    void StreamConnection::on_bin_front_buffer_ready()
+    CallbackId StreamConnection::register_frame_ready_callback(SCFrameReadyCallback callback)
     {
+        return m_frameReadySignal += callback;
+    }
 
+    void StreamConnection::unregister_frame_ready_callback(CallbackId& callbackId)
+    {
+        m_frameReadySignal -= callbackId;
+        callbackId = 0;
     }
 
     void StreamConnection::set_parameter(sensekit_parameter_id id,

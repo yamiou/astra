@@ -50,9 +50,10 @@ namespace sensekit {
         return m_frameReadySignal += callback;
     }
 
-    void StreamReader::unregister_frame_ready_callback(CallbackId callbackId)
+    void StreamReader::unregister_frame_ready_callback(CallbackId& callbackId)
     {
         m_frameReadySignal -= callbackId;
+        callbackId = 0;
     }
 
     void StreamReader::lock()

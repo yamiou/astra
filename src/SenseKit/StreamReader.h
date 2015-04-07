@@ -47,7 +47,7 @@ namespace sensekit {
         sensekit_frame_ref_t* get_subframe(sensekit_stream_desc_t& desc);
 
         CallbackId register_frame_ready_callback(FrameReadyCallback callback);
-        void unregister_frame_ready_callback(CallbackId callbackId);
+        void unregister_frame_ready_callback(CallbackId& callbackId);
 
         //TODO: locking currently not threadsafe
 
