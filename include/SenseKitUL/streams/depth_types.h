@@ -3,6 +3,18 @@
 
 #include <sensekit_core.h>
 
+struct conversion_cache_t
+{
+    float xzFactor;
+    float yzFactor;
+    float coeffX;
+    float coeffY;
+    int resolutionX;
+    int resolutionY;
+    int halfResX;
+    int halfResY;
+};
+
 typedef sensekit_streamconnection_t sensekit_depthstream_t;
 
 struct sensekit_depthframe_metadata_t {

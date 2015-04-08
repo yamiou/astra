@@ -6,44 +6,7 @@
 #include <StreamTypes.h>
 #include "SenseKitUL_internal.h"
 
-struct coonversion_cache_t
-{
-    float xzFactor;
-    float yzFactor;
-    float coeffX;
-    float coeffY;
-    int resolutionX;
-    int resolutionY;
-    int halfResX;
-    int halfResY;
-};
-
-static coonversion_cache_t g_conversionCache;
-
-SENSEKIT_BEGIN_DECLS
-
-SENSEKIT_API_EX sensekit_status_t convert_depth_to_world(float depthX, float depthY, float depthZ,
-                                                         float* pWorldX, float* pWorldY, float* pWorldZ)
-{
-    float normalizedX = depthX / g_conversionCache.resolutionX - .5f;
-    float normalizedY = .5f - depthY / g_conversionCache.resolutionY;
-
-    *pWorldX = normalizedX * depthZ * g_conversionCache.xzFactor;
-    *pWorldY = normalizedY * depthZ * g_conversionCache.yzFactor;
-    *pWorldZ = depthZ;
-
-    return SENSEKIT_STATUS_SUCCESS;
-}
-
-SENSEKIT_API_EX sensekit_status_t convert_world_to_depth(float worldX, float worldY, float worldZ,
-                                                         float* pDepthX, float* pDepthY, float* pDepthZ)
-{
-    *pDepthX = g_conversionCache.coeffX * worldX / worldZ + g_conversionCache.halfResX;
-    *pDepthY = g_conversionCache.halfResY - g_conversionCache.coeffY * worldY / worldZ;
-    *pDepthZ = worldZ;
-
-    return SENSEKIT_STATUS_SUCCESS;
-}
+static conversion_cache_t g_conversionCache;
 
 static void refresh_conversion_cache()
 {
@@ -63,12 +26,40 @@ static void refresh_conversion_cache()
     g_conversionCache.coeffY = g_conversionCache.resolutionY / g_conversionCache.yzFactor;
 }
 
+SENSEKIT_BEGIN_DECLS
+
+SENSEKIT_API_EX sensekit_status_t convert_depth_to_world(float depthX, float depthY, float depthZ,
+                                                         float* pWorldX, float* pWorldY, float* pWorldZ)
+{
+    refresh_conversion_cache();
+
+    float normalizedX = depthX / g_conversionCache.resolutionX - .5f;
+    float normalizedY = .5f - depthY / g_conversionCache.resolutionY;
+
+    *pWorldX = normalizedX * depthZ * g_conversionCache.xzFactor;
+    *pWorldY = normalizedY * depthZ * g_conversionCache.yzFactor;
+    *pWorldZ = depthZ;
+
+    return SENSEKIT_STATUS_SUCCESS;
+}
+
+SENSEKIT_API_EX sensekit_status_t convert_world_to_depth(float worldX, float worldY, float worldZ,
+                                                         float* pDepthX, float* pDepthY, float* pDepthZ)
+{
+    refresh_conversion_cache();
+
+    *pDepthX = g_conversionCache.coeffX * worldX / worldZ + g_conversionCache.halfResX;
+    *pDepthY = g_conversionCache.halfResY - g_conversionCache.coeffY * worldY / worldZ;
+    *pDepthZ = worldZ;
+
+    return SENSEKIT_STATUS_SUCCESS;
+}
+
+
 SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get(sensekit_reader_t reader,
                                                             sensekit_depthstream_t* depthStream)
 
 {
-    refresh_conversion_cache();
-
     return sensekit_generic_stream_get(reader,
                                        SENSEKIT_STREAM_DEPTH,
                                        ANY_SUBTYPE,
