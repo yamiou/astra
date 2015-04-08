@@ -11,7 +11,7 @@ namespace sensekit {
     class StreamBin;
     class Stream;
     class StreamConnection;
-    
+
     class StreamConnection
     {
     public:
@@ -36,8 +36,8 @@ namespace sensekit {
 
         const sensekit_stream_desc_t& get_description() const;
 
-        CallbackId register_frame_ready_callback(FrameReadyCallback callback);
-        void unregister_frame_ready_callback(CallbackId& callbackId);
+        sensekit_callback_id_t register_frame_ready_callback(FrameReadyCallback callback);
+        void unregister_frame_ready_callback(sensekit_callback_id_t& callbackId);
 
         void set_parameter(sensekit_parameter_id id,
                            size_t byteLength,
@@ -65,7 +65,7 @@ namespace sensekit {
         sensekit_stream_t m_handle{nullptr};
 
         FrontBufferReadyCallback m_binFrontBufferReadyCallback;
-        CallbackId m_binFrontBufferReadyCallbackId;
+        sensekit_callback_id_t m_binFrontBufferReadyCallbackId;
 
         Signal<StreamConnection*, sensekit_frame_index_t> m_frameReadySignal;
     };

@@ -10,24 +10,24 @@ namespace sensekit {
     {
     public:
 
-    sensekit_status_t register_stream_added_callback(StreamAddedCallback callback,
-                                                     CallbackId* callbackId)
+    sensekit_status_t register_stream_added_callback(stream_added_callback_t callback,
+                                                     sensekit_callback_id_t* callbackId)
     {
         return PluginServiceProxyBase::register_stream_added_callback(pluginService, callback, callbackId);
     }
 
-    sensekit_status_t register_stream_removing_callback(StreamRemovingCallback callback,
-                                                        CallbackId* callbackId)
+    sensekit_status_t register_stream_removing_callback(stream_removing_callback_t callback,
+                                                        sensekit_callback_id_t* callbackId)
     {
         return PluginServiceProxyBase::register_stream_removing_callback(pluginService, callback, callbackId);
     }
 
-    sensekit_status_t unregister_stream_added_callback(CallbackId callback)
+    sensekit_status_t unregister_stream_added_callback(sensekit_callback_id_t callback)
     {
         return PluginServiceProxyBase::unregister_stream_added_callback(pluginService, callback);
     }
 
-    sensekit_status_t unregister_stream_removing_callback(CallbackId callback)
+    sensekit_status_t unregister_stream_removing_callback(sensekit_callback_id_t callback)
     {
         return PluginServiceProxyBase::unregister_stream_removing_callback(pluginService, callback);
     }

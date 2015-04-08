@@ -12,27 +12,27 @@ namespace sensekit {
     public:
 
         static sensekit_status_t register_stream_added_callback(void* pluginService,
-                                                                StreamAddedCallback callback,
-                                                                CallbackId* callbackId)
+                                                                stream_added_callback_t callback,
+                                                                sensekit_callback_id_t* callbackId)
         {
             return static_cast<PluginService*>(pluginService)->register_stream_added_callback(callback, *callbackId);
         }
 
         static sensekit_status_t register_stream_removing_callback(void* pluginService,
-                                                                   StreamRemovingCallback callback,
-                                                                   CallbackId* callbackId)
+                                                                   stream_removing_callback_t callback,
+                                                                   sensekit_callback_id_t* callbackId)
         {
             return static_cast<PluginService*>(pluginService)->register_stream_removing_callback(callback, *callbackId);
         }
 
         static sensekit_status_t unregister_stream_added_callback(void* pluginService,
-                                                                  CallbackId callback)
+                                                                  sensekit_callback_id_t callback)
         {
             return static_cast<PluginService*>(pluginService)->unregister_stream_added_callback(callback);
         }
 
         static sensekit_status_t unregister_stream_removing_callback(void* pluginService,
-                                                                     CallbackId callback)
+                                                                     sensekit_callback_id_t callback)
         {
             return static_cast<PluginService*>(pluginService)->unregister_stream_removing_callback(callback);
         }

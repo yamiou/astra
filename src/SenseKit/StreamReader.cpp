@@ -57,7 +57,7 @@ namespace sensekit {
 
         if (connection != nullptr)
         {
-            CallbackId cbId = connection->register_frame_ready_callback(get_sc_frame_ready_callback());
+            sensekit_callback_id_t cbId = connection->register_frame_ready_callback(get_sc_frame_ready_callback());
 
             ReaderConnectionData* data = new ReaderConnectionData;
             data->connection = connection;
@@ -107,12 +107,12 @@ namespace sensekit {
         return connection->lock();
     }
 
-    CallbackId StreamReader::register_frame_ready_callback(FrameReadyCallback callback)
+    sensekit_callback_id_t StreamReader::register_frame_ready_callback(sensekit_frame_ready_callback_t callback)
     {
         return m_frameReadySignal += callback;
     }
 
-    void StreamReader::unregister_frame_ready_callback(CallbackId& callbackId)
+    void StreamReader::unregister_frame_ready_callback(sensekit_callback_id_t& callbackId)
     {
         m_frameReadySignal -= callbackId;
         callbackId = 0;

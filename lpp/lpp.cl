@@ -183,7 +183,8 @@ is replaced with replacement."
 (defun expand-template (template-list func-data void-param)
   (concat-string-list
    (mapcar
-    (lambda (template-line) (process-tokens template-line func-data void-param)) template-list)))
+    (lambda (template-line) (process-tokens template-line func-data void-param))
+    template-list)))
 
 (defun expand-methods-with-template (template-list funcset-name)
   (remove nil ;;filter out the nil values (from wrong funcsets)

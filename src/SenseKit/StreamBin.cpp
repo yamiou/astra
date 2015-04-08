@@ -9,12 +9,12 @@ namespace sensekit {
         allocate_buffers(bufferLengthInBytes);
     }
 
-    CallbackId StreamBin::register_front_buffer_ready_callback(FrontBufferReadyCallback callback)
+    sensekit_callback_id_t StreamBin::register_front_buffer_ready_callback(FrontBufferReadyCallback callback)
     {
         return m_frontBufferReadySignal += callback;
     }
 
-    void StreamBin::unregister_front_buffer_ready_callback(CallbackId& callbackId)
+    void StreamBin::unregister_front_buffer_ready_callback(sensekit_callback_id_t& callbackId)
     {
         m_frontBufferReadySignal -= callbackId;
         callbackId = 0;

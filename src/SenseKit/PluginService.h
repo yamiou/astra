@@ -31,8 +31,8 @@ namespace sensekit
         //for generators (no requirements, i.e. depth sensor and color sensor)
         //plugin would directly create and register the streams, without using stream_factory
 
-        sensekit_status_t register_stream_added_callback(StreamAddedCallback callback, CallbackId& callbackId);
-        sensekit_status_t register_stream_removing_callback(StreamRemovingCallback callback, CallbackId& callbackId);
+        sensekit_status_t register_stream_added_callback(stream_added_callback_t callback, CallbackId& callbackId);
+        sensekit_status_t register_stream_removing_callback(stream_removing_callback_t callback, CallbackId& callbackId);
         sensekit_status_t unregister_stream_added_callback(CallbackId callbackId);
         sensekit_status_t unregister_stream_removing_callback(CallbackId callbackId);
 
@@ -59,9 +59,6 @@ namespace sensekit
 
         sensekit_status_t link_connection_to_bin(sensekit_streamconnection_t connection,
                                                  sensekit_bin_t binHandle);
-
-        //orbbec_error orbbec_stream_assign_connection_to_bin(StreamHandle handle, client_id id, bin_id id);
-        //orbbec_error orbbec_stream_register_get_parameter_callback(component_handle handle, client_id client, ...);
 
     private:
         SenseKitContext& m_context;

@@ -62,16 +62,12 @@ typedef struct _sensekit_device_desc {
     uint16_t usbProductId;
 } sensekit_device_desc_t;
 
-typedef size_t CallbackId;
+typedef size_t sensekit_callback_id_t;
 
-// Stream service callback types
-typedef struct _sensekit_reader_callback_id {
-    sensekit_reader_t reader;
-    CallbackId callbackId;
-} sensekit_reader_callback_id_raw_t, *sensekit_reader_callback_id_t;
+typedef struct _sensekit_reader_callback_id* sensekit_reader_callback_id_t;
 
-typedef void(*FrameReadyCallback)(sensekit_reader_t reader,
-    sensekit_reader_frame_t frame);
+typedef void(*sensekit_frame_ready_callback_t)(sensekit_reader_t reader,
+                                               sensekit_reader_frame_t frame);
 
 // Plugin service callback types
 
@@ -94,13 +90,13 @@ typedef void(*connection_added_callback_t)(void*, sensekit_streamconnection_t);
 typedef void(*connection_removed_callback_t)(void*, sensekit_streamconnection_t);
 
 
-typedef void(*StreamAddedCallback)(sensekit_streamset_t,
-                                   sensekit_stream_t,
-                                   sensekit_stream_desc_t);
+typedef void(*stream_added_callback_t)(sensekit_streamset_t,
+                                       sensekit_stream_t,
+                                       sensekit_stream_desc_t);
 
-typedef void(*StreamRemovingCallback)(sensekit_streamset_t,
-                                      sensekit_stream_t,
-                                      sensekit_stream_desc_t);
+typedef void(*stream_removing_callback_t)(sensekit_streamset_t,
+                                          sensekit_stream_t,
+                                          sensekit_stream_desc_t);
 
 struct stream_callbacks_t
 {

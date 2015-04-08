@@ -41,7 +41,7 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::register_stream_added_callback(StreamAddedCallback callback,
+    sensekit_status_t PluginService::register_stream_added_callback(stream_added_callback_t callback,
                                                                     CallbackId& callbackId)
     {
         callbackId = m_streamAddedSignal += callback;
@@ -49,7 +49,7 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::register_stream_removing_callback(StreamRemovingCallback callback,
+    sensekit_status_t PluginService::register_stream_removing_callback(stream_removing_callback_t callback,
                                                                        CallbackId& callbackId)
     {
         callbackId = m_streamRemovingSignal += callback;

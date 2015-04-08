@@ -36,11 +36,7 @@ namespace sensekit {
     public:
         SenseKitContext()
             : m_pluginService(*this) {}
-
-        ~SenseKitContext()
-            {
-                terminate();
-            }
+        virtual ~SenseKitContext() {}
 
         sensekit_status_t initialize();
 
@@ -77,7 +73,7 @@ namespace sensekit {
         sensekit_status_t reader_close_frame(sensekit_reader_frame_t& frame);
 
         sensekit_status_t reader_register_frame_ready_callback(sensekit_reader_t reader,
-                                                               FrameReadyCallback callback,
+                                                               sensekit_frame_ready_callback_t callback,
                                                                sensekit_reader_callback_id_t& callbackId);
 
         sensekit_status_t reader_unregister_frame_ready_callback(sensekit_reader_callback_id_t& callbackId);

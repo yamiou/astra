@@ -8,31 +8,31 @@
                 :type "void*"
                 :name "pluginService")
 
-;; sensekit_status_t register_stream_added_callback(StreamAddedCallback callback, CallbackId* callbackId)
+;; sensekit_status_t register_stream_added_callback(stream_added_callback_t callback, sensekit_callback_id_t* callbackId)
 (add-func       :funcset "plugin"
                 :returntype "sensekit_status_t"
                 :funcname "register_stream_added_callback"
-                :params (list (make-param :type "StreamAddedCallback" :name "callback")
-                              (make-param :type "CallbackId*" :name "callbackId" :deref T)))
+                :params (list (make-param :type "stream_added_callback_t" :name "callback")
+                              (make-param :type "sensekit_callback_id_t*" :name "callbackId" :deref T)))
 
-;; sensekit_status_t register_stream_removing_callback(StreamRemovingCallback callback, CallbackId* callbackId)
+;; sensekit_status_t register_stream_removing_callback(stream_removing_callback_t callback, sensekit_callback_id_t* callbackId)
 (add-func       :funcset "plugin"
                 :returntype "sensekit_status_t"
                 :funcname "register_stream_removing_callback"
-                :params (list (make-param :type "StreamRemovingCallback" :name "callback")
-                              (make-param :type "CallbackId*" :name "callbackId" :deref T)))
+                :params (list (make-param :type "stream_removing_callback_t" :name "callback")
+                              (make-param :type "sensekit_callback_id_t*" :name "callbackId" :deref T)))
 
-;; sensekit_status_t unregister_stream_added_callback(CallbackId callbackId)
+;; sensekit_status_t unregister_stream_added_callback(sensekit_callback_id_t callbackId)
 (add-func       :funcset "plugin"
                 :returntype "sensekit_status_t"
                 :funcname "unregister_stream_added_callback"
-                :params (list (make-param :type "CallbackId" :name "callback")))
+                :params (list (make-param :type "sensekit_callback_id_t" :name "callback")))
 
-;; sensekit_status_t unregister_stream_removing_callback(CallbackId callbackId)
+;; sensekit_status_t unregister_stream_removing_callback(sensekit_callback_id_t callbackId)
 (add-func       :funcset "plugin"
                 :returntype "sensekit_status_t"
                 :funcname "unregister_stream_removing_callback"
-                :params (list (make-param :type "CallbackId" :name "callback")))
+                :params (list (make-param :type "sensekit_callback_id_t" :name "callback")))
 
 ;; sensekit_status_t create_stream_set(sensekit_streamset_t& setHandle)
 (add-func       :funcset "plugin"
@@ -197,13 +197,13 @@
                 :params (list (make-param :type "sensekit_reader_frame_t*" :name "frame" :deref T)))
 
 ;; SENSEKIT_API sensekit_status_t reader_register_frame_ready_callback(sensekit_reader_t reader,
-;;                                                                     FrameReadyCallback callback,
+;;                                                                     sensekit_frame_ready_callback_t callback,
 ;;                                                                     sensekit_reader_callback_id_t* callbackId)
 (add-func       :funcset "stream"
                 :returntype "sensekit_status_t"
                 :funcname "reader_register_frame_ready_callback"
                 :params (list (make-param :type "sensekit_reader_t" :name "reader")
-                              (make-param :type "FrameReadyCallback" :name "callback")
+                              (make-param :type "sensekit_frame_ready_callback_t" :name "callback")
                               (make-param :type "sensekit_reader_callback_id_t*" :name "callbackId" :deref T)))
 
 ;; SENSEKIT_API sensekit_status_t reader_unregister_frame_ready_callback(sensekit_reader_callback_id_t* callbackId)

@@ -95,12 +95,12 @@ namespace sensekit {
         m_frameReadySignal.raise(this, frameIndex);
     }
 
-    CallbackId StreamConnection::register_frame_ready_callback(FrameReadyCallback callback)
+    sensekit_callback_id_t StreamConnection::register_frame_ready_callback(FrameReadyCallback callback)
     {
         return m_frameReadySignal += callback;
     }
 
-    void StreamConnection::unregister_frame_ready_callback(CallbackId& callbackId)
+    void StreamConnection::unregister_frame_ready_callback(sensekit_callback_id_t& callbackId)
     {
         m_frameReadySignal -= callbackId;
         callbackId = 0;

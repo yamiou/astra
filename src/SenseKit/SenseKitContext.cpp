@@ -215,7 +215,7 @@ namespace sensekit {
     }
 
     sensekit_status_t SenseKitContext::reader_register_frame_ready_callback(sensekit_reader_t reader,
-                                                                            FrameReadyCallback callback,
+                                                                            sensekit_frame_ready_callback_t callback,
                                                                             sensekit_reader_callback_id_t& callbackId)
     {
         assert(reader != nullptr);
@@ -225,7 +225,7 @@ namespace sensekit {
 
         CallbackId cbId = actualReader->register_frame_ready_callback(callback);
 
-        sensekit_reader_callback_id_raw_t* cb = new sensekit_reader_callback_id_raw_t;
+        sensekit_reader_callback_id_t cb = new _sensekit_reader_callback_id;
         callbackId = cb;
 
         cb->reader = reader;
@@ -236,7 +236,7 @@ namespace sensekit {
 
     sensekit_status_t SenseKitContext::reader_unregister_frame_ready_callback(sensekit_reader_callback_id_t& callbackId)
     {
-        sensekit_reader_callback_id_raw_t* cb = callbackId;
+        sensekit_reader_callback_id_t cb = callbackId;
         assert(cb != nullptr);
         assert(cb->reader != nullptr);
 

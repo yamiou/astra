@@ -34,8 +34,8 @@ namespace sensekit
                                          sensekit_stream_t streamHandle,
                                          sensekit_stream_desc_t desc);
 
-            CallbackId m_streamAddedCallbackId;
-            CallbackId m_streamRemovingCallbackId;
+            sensekit_callback_id_t m_streamAddedCallbackId;
+            sensekit_callback_id_t m_streamRemovingCallbackId;
 
             typedef std::unordered_map<sensekit_stream_t, HandTracker*> StreamTrackerMap;
             StreamTrackerMap m_streamTrackerMap;

@@ -8,4 +8,9 @@ struct _sensekit_streamconnection {
     sensekit_stream_desc_t desc;
 };
 
+typedef struct _sensekit_reader_callback_id {
+    sensekit_reader_t reader;
+    sensekit_callback_id_t callbackId;
+} *sensekit_reader_callback_id_t;
+
 #endif /* SENSEKIT_INTERNAL_H */

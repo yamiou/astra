@@ -38,7 +38,7 @@ namespace sensekit {
     struct ReaderConnectionData
     {
         StreamConnection* connection;
-        CallbackId scFrameReadyCallbackId;
+        sensekit_callback_id_t scFrameReadyCallbackId;
         bool isNewFrameReady;
         sensekit_frame_index_t currentFrameIndex;
     };
@@ -55,8 +55,8 @@ namespace sensekit {
         StreamConnection* get_stream(sensekit_stream_desc_t& desc);
         sensekit_frame_ref_t* get_subframe(sensekit_stream_desc_t& desc);
 
-        CallbackId register_frame_ready_callback(FrameReadyCallback callback);
-        void unregister_frame_ready_callback(CallbackId& callbackId);
+        sensekit_callback_id_t register_frame_ready_callback(sensekit_frame_ready_callback_t callback);
+        void unregister_frame_ready_callback(sensekit_callback_id_t& callbackId);
 
         //TODO: locking currently not threadsafe
 
