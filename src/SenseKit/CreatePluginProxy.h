@@ -21,6 +21,7 @@ PluginServiceProxyBase* create_plugin_proxy(PluginService* service)
         proxy->destroy_stream = &PluginServiceDelegate::destroy_stream;
         proxy->create_stream_bin = &PluginServiceDelegate::create_stream_bin;
         proxy->destroy_stream_bin = &PluginServiceDelegate::destroy_stream_bin;
+        proxy->bin_has_connections = &PluginServiceDelegate::bin_has_connections;
         proxy->cycle_bin_buffers = &PluginServiceDelegate::cycle_bin_buffers;
         proxy->link_connection_to_bin = &PluginServiceDelegate::link_connection_to_bin;
         proxy->pluginService = service;

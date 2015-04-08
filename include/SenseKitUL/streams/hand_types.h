@@ -31,13 +31,8 @@ typedef struct _sensekit_handpoint {
     sensekit_vector3f_t worldDeltaPosition;
 } sensekit_handpoint_t;
 
-typedef struct _sensekit_handframe {
-    sensekit_frame_ref_t* frameRef;
-    sensekit_frame_index_t frameIndex;
-    uint32_t numHands;
-    sensekit_handpoint_t* handpoints;
-} sensekit_handframe_t;
+typedef struct _sensekit_handframe* sensekit_handframe_t;
 
-typedef struct _sensekit_handstream * sensekit_handstream_t;
+typedef struct _sensekit_handstream* sensekit_handstream_t;
 
 #endif // HAND_TYPES_H

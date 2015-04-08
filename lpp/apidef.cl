@@ -86,6 +86,14 @@
                               (make-param :type "sensekit_bin_t*" :name "binHandle" :deref t)
                               (make-param :type "sensekit_frame_t**" :name "binBuffer" :deref t)))
 
+;; sensekit_status_t bin_has_connections(sensekit_bin_t binHandle,
+;;                                             bool* hasConnections)
+(add-func       :funcset "plugin"
+                :returntype "sensekit_status_t"
+                :funcname "bin_has_connections"
+                :params (list (make-param :type "sensekit_bin_t" :name "binHandle")
+                              (make-param :type "bool*" :name "hasConnections" :deref t)))
+
 ;; sensekit_status_t cycle_bin_buffers(sensekit_bin_t binHandle,
 ;;                                     sensekit_frame_t** binBuffer)
 (add-func       :funcset "plugin"

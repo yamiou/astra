@@ -1,0 +1,40 @@
+/* ^^^AUTOGENHEADER^^^ */
+#ifndef PLUGINSERVICE_H
+#define PLUGINSERVICE_H
+
+#include <sensekit_core.h>
+#include "Stream.h"
+#include "StreamBin.h"
+#include "Core/Signal.h"
+
+using CallbackId = size_t;
+
+struct PluginServiceProxyBase;
+
+namespace sensekit
+{
+    class SenseKitContext;
+    class StreamSet;
+
+    class PluginService
+    {
+    public:
+        PluginService(SenseKitContext& context)
+            : m_context(context)
+            {}
+
+        PluginServiceProxyBase* create_proxy();
+
+^^^BEGINREPLACE:plugin^^^
+        ^RETURN^ ^FUNC^(^PARAMS:ref^);
+^^^ENDREPLACE^^^
+
+    private:
+        SenseKitContext& m_context;
+        Signal<sensekit_streamset_t, sensekit_stream_t, sensekit_stream_desc_t> m_streamAddedSignal;
+        Signal<sensekit_streamset_t, sensekit_stream_t, sensekit_stream_desc_t> m_streamRemovingSignal;
+
+    };
+}
+
+#endif /* PLUGINSERVICE_H */

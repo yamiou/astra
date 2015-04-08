@@ -83,6 +83,18 @@ void HandTracker::reader_frame_ready(sensekit_reader_t reader, sensekit_reader_f
     updateTracking(depthFrame);
 }
 
+void HandTracker::setNextBuffer(sensekit_frame_t* nextBuffer)
+{
+    m_currentHandBuffer = nextBuffer;
+    m_currentHandBuffer->frameIndex = m_frameIndex;
+    m_currentHandFrame = static_cast<sensekit_handframe_wrapper_t*>(m_currentHandBuffer->data);
+    if (m_currentHandFrame != nullptr)
+    {
+        m_currentHandFrame->frame.handpoints = reinterpret_cast<sensekit_handpoint_t*>(&(m_currentHandFrame->frame_data));
+        m_currentHandFrame->frame.numHands = SENSEKIT_HANDS_MAX_HANDPOINTS;
+    }
+}
+
 void HandTracker::reset()
 {
     m_depthUtility.reset();
@@ -160,8 +172,7 @@ void HandTracker::trackPoints(cv::Mat& matDepth, cv::Mat& matForeground)
 
 void HandTracker::updateHandFrame(vector<TrackedPoint>& internalTrackedPoints, sensekit_handframe_wrapper_t* wrapper)
 {
-    sensekit_handframe_t& frame = wrapper->frame;
-    frame.frameIndex++;
+    _sensekit_handframe& frame = wrapper->frame;
 
     int handIndex = 0;
     int maxNumHands = frame.numHands;
@@ -193,8 +204,6 @@ void HandTracker::updateHandFrame(vector<TrackedPoint>& internalTrackedPoints, s
         sensekit_handpoint_t& point = frame.handpoints[i];
         resetHandPoint(point);
     }
-
-    frame.numHands = handIndex;
 }
 
 void HandTracker::copyPosition(cv::Point3f& source, sensekit_vector3f_t& target)
@@ -231,18 +240,6 @@ void HandTracker::resetHandPoint(sensekit_handpoint_t& point)
     point.worldDeltaPosition = sensekit_vector3f_t();
 }
 
-void HandTracker::setNextBuffer(sensekit_frame_t* nextBuffer)
-{
-    m_currentBuffer = nextBuffer;
-    m_currentHandFrame = static_cast<sensekit_handframe_wrapper_t*>(m_currentBuffer->data);
-    if (m_currentHandFrame != nullptr)
-    {
-        m_currentHandFrame->frame.handpoints = reinterpret_cast<sensekit_handpoint_t*>(&(m_currentHandFrame->frame_data));
-        m_currentHandFrame->frame.frameIndex = m_frameIndex;
-        m_currentHandFrame->frame.numHands = SENSEKIT_HANDS_MAX_HANDPOINTS;
-    }
-}
-
 void HandTracker::set_parameter(sensekit_streamconnection_t streamConnection,
                                 sensekit_parameter_id id,
                                 size_t byteLength,
@@ -254,7 +251,6 @@ void HandTracker::get_parameter_size(sensekit_streamconnection_t streamConnectio
                                      sensekit_parameter_id id,
                                      size_t& byteLength)
 {
-    byteLength = 20;
 }
 
 void HandTracker::get_parameter_data(sensekit_streamconnection_t streamConnection,
@@ -262,16 +258,11 @@ void HandTracker::get_parameter_data(sensekit_streamconnection_t streamConnectio
                                      size_t byteLength,
                                      sensekit_parameter_data_t* data)
 {
-    char* charData = (char*)data;
-    for (int i = 0; i < byteLength; i++)
-    {
-        charData[i] = i;
-    }
 }
 
 void HandTracker::connection_added(sensekit_streamconnection_t connection)
 {
-    int binLength = sizeof(sensekit_handframe_t) + SENSEKIT_HANDS_MAX_HANDPOINTS * sizeof(sensekit_handpoint_t);
+    int binLength = sizeof(_sensekit_handframe) + SENSEKIT_HANDS_MAX_HANDPOINTS * sizeof(sensekit_handpoint_t);
 
     sensekit_frame_t* nextBuffer = nullptr;
     get_pluginService().create_stream_bin(m_handStream, binLength, &m_handBinHandle, &nextBuffer);
@@ -281,8 +272,13 @@ void HandTracker::connection_added(sensekit_streamconnection_t connection)
 
 void HandTracker::connection_removed(sensekit_streamconnection_t connection)
 {
-    //TODO need API for get bin client count...don't destroy if other clients assigned to it
     get_pluginService().link_connection_to_bin(connection, nullptr);
-    get_pluginService().destroy_stream_bin(m_handStream, &m_handBinHandle, &m_currentBuffer);
-    setNextBuffer(m_currentBuffer);
+    //TODO need API for get bin client count...don't destroy if other clients assigned to it
+    bool hasConnections;
+    get_pluginService().bin_has_connections(m_handBinHandle, &hasConnections);
+    if (!hasConnections)
+    {
+        get_pluginService().destroy_stream_bin(m_handStream, &m_handBinHandle, &m_currentHandBuffer);
+    }
+    setNextBuffer(m_currentHandBuffer);
 }

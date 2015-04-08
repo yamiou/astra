@@ -81,6 +81,13 @@ namespace sensekit {
             return static_cast<PluginService*>(pluginService)->destroy_stream_bin(streamHandle, *binHandle, *binBuffer);
         }
 
+        static sensekit_status_t bin_has_connections(void* pluginService,
+                                                     sensekit_bin_t binHandle,
+                                                     bool* hasConnections)
+        {
+            return static_cast<PluginService*>(pluginService)->bin_has_connections(binHandle, *hasConnections);
+        }
+
         static sensekit_status_t cycle_bin_buffers(void* pluginService,
                                                    sensekit_bin_t binHandle,
                                                    sensekit_frame_t** binBuffer)

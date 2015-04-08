@@ -31,7 +31,6 @@ private:
     
     static void reader_frame_ready_thunk(sensekit_reader_t reader, sensekit_reader_frame_t frame, void* clientTag);
     void reader_frame_ready(sensekit_reader_t reader, sensekit_reader_frame_t frame);
-
     void setNextBuffer(sensekit_frame_t* sensekitFrame);
 
     virtual void set_parameter(sensekit_streamconnection_t connection,
@@ -72,7 +71,7 @@ private:
     cv::Mat m_matDepth;
     cv::Mat m_matForeground;
     int m_frameIndex{ 0 };
-    sensekit_frame_t* m_currentBuffer{ nullptr };
+    sensekit_frame_t* m_currentHandBuffer{ nullptr };
     sensekit_handframe_wrapper_t* m_currentHandFrame { nullptr };
 };
 

@@ -144,6 +144,14 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
+    sensekit_status_t PluginService::bin_has_connections(sensekit_bin_t binHandle, bool& hasConnections)
+    {
+        StreamBin* bin = StreamBin::get_ptr(binHandle);
+        hasConnections = bin->has_clients_connected();
+
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
     sensekit_status_t PluginService::cycle_bin_buffers(sensekit_bin_t binHandle,
                                                        sensekit_frame_t*& binBuffer)
     {

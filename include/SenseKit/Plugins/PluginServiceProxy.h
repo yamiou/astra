@@ -70,6 +70,12 @@ namespace sensekit {
         return PluginServiceProxyBase::destroy_stream_bin(pluginService, streamHandle, binHandle, binBuffer);
     }
 
+    sensekit_status_t bin_has_connections(sensekit_bin_t binHandle,
+                                          bool* hasConnections)
+    {
+        return PluginServiceProxyBase::bin_has_connections(pluginService, binHandle, hasConnections);
+    }
+
     sensekit_status_t cycle_bin_buffers(sensekit_bin_t binHandle,
                                         sensekit_frame_t** binBuffer)
     {

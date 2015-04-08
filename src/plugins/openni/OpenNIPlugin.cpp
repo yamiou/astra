@@ -220,7 +220,7 @@ namespace sensekit
             m_currentDepthBuffer = nextBuffer;
             m_currentDepthBuffer->frameIndex = m_frameIndex;
             m_currentDepthFrame = static_cast<sensekit_depthframe_wrapper_t*>(m_currentDepthBuffer->data);
-            m_currentDepthFrame->frame.data = (int16_t *)&(m_currentDepthFrame->frame_data);
+            m_currentDepthFrame->frame.data = reinterpret_cast<int16_t *>(&(m_currentDepthFrame->frame_data));
 
             sensekit_depthframe_metadata_t metadata;
 
@@ -236,7 +236,7 @@ namespace sensekit
             m_currentColorBuffer = nextBuffer;
             m_currentColorBuffer->frameIndex = m_frameIndex;
             m_currentColorFrame = static_cast<sensekit_colorframe_wrapper_t*>(m_currentColorBuffer->data);
-            m_currentColorFrame->frame.data = (uint8_t *)&(m_currentColorFrame->frame_data);
+            m_currentColorFrame->frame.data = reinterpret_cast<uint8_t *>(&(m_currentColorFrame->frame_data));
 
             sensekit_colorframe_metadata_t metadata;
 

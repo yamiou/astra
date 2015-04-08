@@ -48,6 +48,10 @@ struct PluginServiceProxyBase
                                             sensekit_bin_t*,
                                             sensekit_frame_t**);
 
+    sensekit_status_t (*bin_has_connections)(void*,
+                                             sensekit_bin_t,
+                                             bool*);
+
     sensekit_status_t (*cycle_bin_buffers)(void*,
                                            sensekit_bin_t,
                                            sensekit_frame_t**);

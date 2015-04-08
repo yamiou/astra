@@ -33,11 +33,16 @@ typedef struct _sensekit_colorframe_wrapper {
     char frame_data[];
 } sensekit_colorframe_wrapper_t;
 
-#pragma warning( pop )
+struct _sensekit_handframe {
+    sensekit_frame_ref_t* frameRef;
+    uint32_t numHands;
+    sensekit_handpoint_t* handpoints;
+};
 
 typedef struct _sensekit_handframe_wrapper {
-    sensekit_handframe_t frame;
+    _sensekit_handframe frame;
     char frame_data[];
 } sensekit_handframe_wrapper_t;
 
+#pragma warning( pop )
 #endif /* SENSEKITUL_INTERNAL_H */
