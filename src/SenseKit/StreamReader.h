@@ -55,7 +55,7 @@ namespace sensekit {
         StreamConnection* get_stream(sensekit_stream_desc_t& desc);
         sensekit_frame_ref_t* get_subframe(sensekit_stream_desc_t& desc);
 
-        sensekit_callback_id_t register_frame_ready_callback(sensekit_frame_ready_callback_t callback);
+        sensekit_callback_id_t register_frame_ready_callback(sensekit_frame_ready_callback_t callback, void* clientTag);
         void unregister_frame_ready_callback(sensekit_callback_id_t& callbackId);
 
         //TODO: locking currently not threadsafe

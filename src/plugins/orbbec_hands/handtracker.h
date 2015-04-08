@@ -14,13 +14,11 @@
 class HandTracker : public sensekit::PluginBase
 {
 public:
-    HandTracker(sensekit::PluginServiceProxy* pluginService,
-                sensekit_streamset_t setHandle,
-                sensekit_depthstream_t depthStream);
-
+    HandTracker(sensekit::PluginServiceProxy* pluginService);
     virtual ~HandTracker();
-private:
 
+    void setupStream(sensekit_streamset_t setHandle, sensekit_stream_desc_t depthStreamDesc);
+private:
     void reset();
     static void copyPosition(cv::Point3f& source, sensekit_vector3f_t& target);
     static sensekit_handstatus_t convertHandStatus(TrackingStatus status);
@@ -30,7 +28,9 @@ private:
     void updateHandFrame(std::vector<TrackedPoint>& internalTrackedPoints, sensekit_handframe_wrapper_t* handframe_wrapper);
 
     void trackPoints(cv::Mat& matDepth, cv::Mat& matForeground);
-    void setupStream();
+    
+    static void reader_frame_ready_thunk(sensekit_reader_t reader, sensekit_reader_frame_t frame, void* clientTag);
+    void reader_frame_ready(sensekit_reader_t reader, sensekit_reader_frame_t frame);
 
     void setNextBuffer(sensekit_frame_t* sensekitFrame);
 
@@ -52,8 +52,11 @@ private:
     virtual void connection_removed(sensekit_streamconnection_t connection) override;
 
     //fields
-    sensekit_streamset_t m_setHandle;
-    sensekit_depthstream_t m_depthStream;
+    sensekit_streamset_t m_streamSet { nullptr };
+    sensekit_reader_t m_reader { nullptr };
+    sensekit_frame_ready_callback_t m_readerFrameReadyCallback { nullptr };
+    sensekit_reader_callback_id_t m_readerCallbackId;
+
     DepthUtility m_depthUtility;
     CoordinateConverter m_converter;
     PointProcessor m_pointProcessor;

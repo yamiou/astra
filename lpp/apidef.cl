@@ -198,12 +198,14 @@
 
 ;; SENSEKIT_API sensekit_status_t reader_register_frame_ready_callback(sensekit_reader_t reader,
 ;;                                                                     sensekit_frame_ready_callback_t callback,
+;;                                                                     void* clientTag,
 ;;                                                                     sensekit_reader_callback_id_t* callbackId)
 (add-func       :funcset "stream"
                 :returntype "sensekit_status_t"
                 :funcname "reader_register_frame_ready_callback"
                 :params (list (make-param :type "sensekit_reader_t" :name "reader")
                               (make-param :type "sensekit_frame_ready_callback_t" :name "callback")
+                              (make-param :type "void*" :name "clientTag")
                               (make-param :type "sensekit_reader_callback_id_t*" :name "callbackId" :deref T)))
 
 ;; SENSEKIT_API sensekit_status_t reader_unregister_frame_ready_callback(sensekit_reader_callback_id_t* callbackId)

@@ -107,9 +107,11 @@ namespace sensekit {
         return connection->lock();
     }
 
-    sensekit_callback_id_t StreamReader::register_frame_ready_callback(sensekit_frame_ready_callback_t callback)
+    sensekit_callback_id_t StreamReader::register_frame_ready_callback(sensekit_frame_ready_callback_t callback, void* clientTag)
     {
-        return m_frameReadySignal += callback;
+        auto blah = [clientTag, callback](sensekit_reader_t reader, sensekit_reader_frame_t frame)
+            { callback(reader, frame, clientTag); };
+        return m_frameReadySignal += blah;
     }
 
     void StreamReader::unregister_frame_ready_callback(sensekit_callback_id_t& callbackId)

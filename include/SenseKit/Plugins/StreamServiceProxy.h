@@ -85,9 +85,10 @@ namespace sensekit {
 
         sensekit_status_t reader_register_frame_ready_callback(sensekit_reader_t reader,
                                                                sensekit_frame_ready_callback_t callback,
+                                                               void* clientTag,
                                                                sensekit_reader_callback_id_t* callbackId)
         {
-            return StreamServiceProxyBase::reader_register_frame_ready_callback(streamService, reader, callback, callbackId);
+            return StreamServiceProxyBase::reader_register_frame_ready_callback(streamService, reader, callback, clientTag, callbackId);
         }
 
         sensekit_status_t reader_unregister_frame_ready_callback(sensekit_reader_callback_id_t* callbackId)

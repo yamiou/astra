@@ -35,14 +35,13 @@ namespace sensekit
 
         void HandsPlugin::stream_added_handler(sensekit_streamset_t setHandle,
                                                sensekit_stream_t streamHandle,
-                                               sensekit_stream_desc_t desc)
+                                               sensekit_stream_desc_t streamDesc)
         {
-            if (desc.type == SENSEKIT_STREAM_DEPTH &&
+            if (streamDesc.type == SENSEKIT_STREAM_DEPTH &&
                 m_streamTrackerMap.find(streamHandle) == m_streamTrackerMap.end())
             {
-                sensekit_depthstream_t depthStream = reinterpret_cast<sensekit_depthstream_t>(streamHandle);
-
-                HandTracker* tracker = new HandTracker(&get_pluginService(), setHandle, depthStream);
+                HandTracker* tracker = new HandTracker(&get_pluginService());
+                tracker->setupStream(setHandle, streamDesc);
                 m_streamTrackerMap[streamHandle] = tracker;
             }
         }

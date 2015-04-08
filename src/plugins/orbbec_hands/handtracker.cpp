@@ -29,34 +29,58 @@ using namespace std;
 #define MIN_NUM_CHUNKS(data_size, chunk_size)   ((((data_size)-1) / (chunk_size) + 1))
 #define MIN_CHUNKS_SIZE(data_size, chunk_size)  (MIN_NUM_CHUNKS(data_size, chunk_size) * (chunk_size))
 
-HandTracker::HandTracker(sensekit::PluginServiceProxy* pluginService,
-                         sensekit_streamset_t setHandle,
-                         sensekit_depthstream_t depthStream) :
+HandTracker::HandTracker(sensekit::PluginServiceProxy* pluginService) :
     PluginBase(pluginService),
-    m_setHandle(setHandle),
-    m_depthStream(depthStream),
     m_depthUtility(PROCESSING_SIZE_WIDTH, PROCESSING_SIZE_HEIGHT),
     m_converter(1.0),
     m_pointProcessor(m_converter)
 {
-    setupStream();
 }
 
 HandTracker::~HandTracker()
 {
 }
 
-void HandTracker::setupStream()
+void HandTracker::setupStream(sensekit_streamset_t setHandle, sensekit_stream_desc_t depthStreamDesc)
 {
+    m_streamSet = setHandle;
+
     stream_callbacks_t pluginCallbacks = sensekit::create_plugin_callbacks(this);
 
     sensekit_stream_desc_t desc;
     desc.type = SENSEKIT_STREAM_HANDS;
     desc.subType = HANDS_DEFAULT_SUBTYPE;
 
-    get_pluginService().create_stream(m_setHandle, desc, pluginCallbacks, &m_handStream);
+    get_pluginService().create_stream(m_streamSet, desc, pluginCallbacks, &m_handStream);
 
-    //TODO subscribe to m_depthStream's frame ready event
+    //subscribe to m_depthStream's frame ready event
+    sensekit_reader_t m_reader;
+    sensekit_reader_create(m_streamSet, &m_reader);
+
+    sensekit_streamconnection_t depthConnection;
+    sensekit_status_t rc = sensekit_reader_get_stream(m_reader, depthStreamDesc.type, depthStreamDesc.subType, &depthConnection);
+    if (rc != SENSEKIT_STATUS_SUCCESS)
+    {
+        sensekit_reader_destroy(&m_reader);
+        throw std::logic_error("Could not add a stream with desired description");
+    }
+
+    sensekit_stream_start(depthConnection);
+
+    sensekit_reader_register_frame_ready_callback(m_reader, &HandTracker::reader_frame_ready_thunk, this, &m_readerCallbackId);
+}
+
+void HandTracker::reader_frame_ready_thunk(sensekit_reader_t reader, sensekit_reader_frame_t frame, void* clientTag)
+{
+    HandTracker* tracker = static_cast<HandTracker*>(clientTag);
+    tracker->reader_frame_ready(reader, frame);
+}
+
+void HandTracker::reader_frame_ready(sensekit_reader_t reader, sensekit_reader_frame_t frame)
+{
+    sensekit_depthframe_t depthFrame;
+    sensekit_depth_frame_get(frame, &depthFrame);
+    updateTracking(depthFrame);
 }
 
 void HandTracker::reset()
