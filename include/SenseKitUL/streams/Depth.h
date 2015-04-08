@@ -18,7 +18,7 @@ namespace sensekit {
             }
 
         void convert_depth_to_world(float depthX, float depthY, float depthZ,
-                                    float* worldX, float* worldY, float* worldZ)
+                                    float* worldX, float* worldY, float* worldZ) const
             {
                 float normalizedX = depthX / m_conversionCache.resolutionX - .5f;
                 float normalizedY = .5f - depthY / m_conversionCache.resolutionY;
@@ -29,7 +29,7 @@ namespace sensekit {
             }
 
         void convert_world_to_depth(float worldX, float worldY, float worldZ,
-                                    float* depthX, float* depthY, float* depthZ)
+                                    float* depthX, float* depthY, float* depthZ) const
             {
                 *depthX = m_conversionCache.coeffX * worldX / worldZ + m_conversionCache.halfResX;
                 *depthY = m_conversionCache.halfResY - m_conversionCache.coeffY * worldY / worldZ;
@@ -65,7 +65,7 @@ namespace sensekit {
 
         static const sensekit_stream_type_t id = SENSEKIT_STREAM_DEPTH;
 
-        CoordinateMapper& get_coordinateMapper();
+        const CoordinateMapper& get_coordinateMapper() const { return m_coordinateMapper; };
     private:
         CoordinateMapper m_coordinateMapper;
     };

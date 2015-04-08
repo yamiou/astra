@@ -7,7 +7,8 @@
 
 #include "../../key_handler.h"
 
-void print_depth(sensekit::DepthFrame& depthFrame)
+void print_depth(sensekit::DepthFrame& depthFrame,
+                 const sensekit::CoordinateMapper& mapper)
 {
     if (depthFrame.is_valid())
     {
@@ -18,9 +19,23 @@ void print_depth(sensekit::DepthFrame& depthFrame)
         int16_t* buffer = new int16_t[depthFrame.length()];
         depthFrame.copy_to(buffer);
 
-        size_t index = ((width * (height / 2)) + (width / 2));
+        size_t index = ((width * (height / 2.0f)) + (width / 2.0f));
         short middle = buffer[index];
-        std::cout << "index: " << frameIndex << " value: " << middle << std::endl;
+
+        float worldX, worldY, worldZ;
+        float depthX, depthY, depthZ;
+        mapper.convert_depth_to_world(width / 2.0f, height / 2.0f, middle, &worldX, &worldY, &worldZ);
+        mapper.convert_world_to_depth(worldX, worldY, worldZ, &depthX, &depthY, &depthZ);
+
+        std::cout << "index: " << frameIndex
+                  << " value: " << middle
+                  << " wX: " << worldX
+                  << " wY: " << worldY
+                  << " wZ: " << worldZ
+                  << " dX: " << depthX
+                  << " dY: " << depthY
+                  << " dZ: " << depthZ
+                  << std::endl;
 
         delete[] buffer;
     }
@@ -68,7 +83,8 @@ int main(int argc, char** argv)
 
         sensekit::Frame frame = reader.get_latest_frame(30);
         sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
-        print_depth(depthFrame);
+        print_depth(depthFrame,
+                    reader.stream<sensekit::DepthStream>().get_coordinateMapper());
 
         sensekit::ColorFrame colorFrame = frame.get<sensekit::ColorFrame>();
         print_color(colorFrame);
