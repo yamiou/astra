@@ -22,7 +22,7 @@ $(LOCAL_PATH)/../../../include/SenseKit \
 $(LOCAL_PATH)/../../../include/SenseKitUL \
 
 # Output
-LOCAL_SHARED_LIBRARIES := libOpenNI2
+LOCAL_SHARED_LIBRARIES := libOpenNI2 libSenseKitAPI
 LOCAL_MODULE := libOpenNIPlugin
 
 include $(BUILD_SHARED_LIBRARY)
