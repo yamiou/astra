@@ -2,7 +2,7 @@
 #define SENSEKIT_H
 
 #include "sensekit_core.h"
-#include <exception>
+#include <stdexcept>
 #include <memory>
 
 namespace sensekit {
@@ -38,7 +38,7 @@ namespace sensekit {
 
         ~FrameRef()
         {
-            
+
         }
         FrameRef(const FrameRef& other)
         {
@@ -136,7 +136,7 @@ namespace sensekit {
             {
                 if (m_connection == nullptr)
                 {
-                    throw std::exception("Cannot start a stream that is not available");
+                    throw std::logic_error("Cannot start a stream that is not available");
                 }
                 sensekit_stream_start(m_connection);
             }
@@ -144,7 +144,7 @@ namespace sensekit {
             {
                 if (m_connection == nullptr)
                 {
-                    throw std::exception("Cannot stop a stream that is not available");
+                    throw std::logic_error("Cannot stop a stream that is not available");
                 }
                 sensekit_stream_stop(m_connection);
             }

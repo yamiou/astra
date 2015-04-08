@@ -2,6 +2,7 @@
 #define COLOR_H
 
 #include <SenseKit.h>
+#include <stdexcept>
 #include <StreamTypes.h>
 #include "color_capi.h"
 
@@ -51,7 +52,7 @@ namespace sensekit {
         {
             if (m_colorFrame == nullptr)
             {
-                throw std::exception("Cannot operate on an invalid frame");
+                throw std::logic_error("Cannot operate on an invalid frame");
             }
         }
 

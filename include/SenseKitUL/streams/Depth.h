@@ -2,6 +2,7 @@
 #define DEPTH_H
 
 #include <SenseKit.h>
+#include <stdexcept>
 #include <StreamTypes.h>
 #include "depth_capi.h"
 
@@ -51,7 +52,7 @@ namespace sensekit {
         {
             if (m_depthFrame == nullptr)
             {
-                throw std::exception("Cannot operate on an invalid frame");
+                throw std::logic_error("Cannot operate on an invalid frame");
             }
         }
         sensekit_depthframe_t m_depthFrame { nullptr };

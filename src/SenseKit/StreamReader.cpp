@@ -128,7 +128,7 @@ namespace sensekit {
         long long milliseconds = 0;
         if (timeoutMillis != SENSEKIT_TIMEOUT_RETURN_IMMEDIATELY)
         {
-            std::chrono::time_point<std::chrono::steady_clock> start, end;
+            std::chrono::steady_clock::time_point start, end;
             start = std::chrono::steady_clock::now();
             bool forever = timeoutMillis == SENSEKIT_TIMEOUT_FOREVER;
             do
