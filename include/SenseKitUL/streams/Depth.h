@@ -55,7 +55,7 @@ namespace sensekit {
                 throw std::logic_error("Cannot operate on an invalid frame");
             }
         }
-        sensekit_depthframe_t m_depthFrame { nullptr };
+        sensekit_depthframe_t m_depthFrame{nullptr};
         sensekit_depthframe_metadata_t m_metadata;
         sensekit_frame_index_t m_frameIndex;
         int16_t* m_dataPtr;

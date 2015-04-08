@@ -14,6 +14,9 @@ namespace sensekit {
 
     sensekit_status_t SenseKitContext::initialize()
     {
+        if (m_initialized)
+            return SENSEKIT_STATUS_SUCCESS;
+
         m_pluginServiceProxy = m_pluginService.create_proxy();
         m_streamServiceProxy = create_stream_proxy(this);
 
@@ -42,11 +45,18 @@ namespace sensekit {
 
         sensekit_api_set_proxy(get_streamServiceProxy());
 
+        m_initialized = true;
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 
     sensekit_status_t SenseKitContext::terminate()
     {
+        if (!m_initialized)
+            return SENSEKIT_STATUS_SUCCESS;
+
+        m_readers.clear();
+
         for(auto pluginFuncs : m_pluginList)
         {
             pluginFuncs.terminate();
@@ -57,6 +67,8 @@ namespace sensekit {
 
         if (m_streamServiceProxy)
             delete m_streamServiceProxy;
+
+        m_initialized = false;
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -87,7 +99,11 @@ namespace sensekit {
         assert(streamSet != nullptr);
 
         StreamSet* actualSet = StreamSet::get_ptr(streamSet);
-        reader = (new StreamReader(*actualSet))->get_handle();
+        std::unique_ptr<StreamReader> actualReader(new StreamReader(*actualSet));
+
+        reader = actualReader->get_handle();
+
+        m_readers.push_back(std::move(actualReader));
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -98,7 +114,19 @@ namespace sensekit {
 
         StreamReader* actualReader = StreamReader::get_ptr(reader);
 
-        delete actualReader;
+        auto it = std::find_if(m_readers.begin(),
+                               m_readers.end(),
+                               [&actualReader] (ReaderPtr& element)
+                               -> bool
+                               {
+                                   return actualReader == element.get();
+                               });
+
+        if (it != m_readers.end())
+        {
+            m_readers.erase(it);
+        }
+
         reader = nullptr;
 
         return SENSEKIT_STATUS_SUCCESS;

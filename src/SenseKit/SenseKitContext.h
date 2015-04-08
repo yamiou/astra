@@ -6,6 +6,7 @@
 #include <atomic>
 #include "PluginService.h"
 #include "StreamSet.h"
+#include "StreamReader.h"
 
 struct StreamServiceProxyBase;
 struct PluginServiceProxyBase;
@@ -35,7 +36,11 @@ namespace sensekit {
     public:
         SenseKitContext()
             : m_pluginService(*this) {}
-        virtual ~SenseKitContext() {}
+
+        ~SenseKitContext()
+            {
+                terminate();
+            }
 
         sensekit_status_t initialize();
 
@@ -104,6 +109,8 @@ namespace sensekit {
         StreamServiceProxyBase* get_streamServiceProxy() { return m_streamServiceProxy; }
 
     private:
+        bool m_initialized{false};
+
         StreamSet m_rootSet;
 
         PluginService m_pluginService;
@@ -112,6 +119,11 @@ namespace sensekit {
 
         using PluginList = std::vector<PluginFuncs>;
         PluginList m_pluginList;
+
+        using ReaderPtr = std::unique_ptr<StreamReader>;
+        using ReaderList = std::vector<ReaderPtr>;
+
+        ReaderList m_readers;
     };
 }
 

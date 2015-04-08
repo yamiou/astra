@@ -4,6 +4,8 @@
 #include "sensekit_core.h"
 #include <stdexcept>
 #include <memory>
+#include <string>
+#include <vector>
 
 namespace sensekit {
 
@@ -12,82 +14,74 @@ namespace sensekit {
     class Sensor
     {
     public:
-        Sensor()
+        Sensor(const std::string uri)
             {
-                sensekit_streamset_open("", &m_pStreamSet);
+                sensekit_initialize(); //idempotent
+                sensekit_streamset_open(uri.c_str(), &m_streamSet);
             }
+
+        Sensor()
+            : Sensor("") { }
 
         ~Sensor()
             {
-                sensekit_streamset_close(&m_pStreamSet);
+                sensekit_streamset_close(&m_streamSet);
             }
 
         inline StreamReader create_reader();
+
     private:
-        sensekit_streamset_t m_pStreamSet;
+        sensekit_streamset_t get_handle() { return m_streamSet; }
+
+        sensekit_streamset_t m_streamSet;
+        std::string m_uri;
 
         friend class StreamReader;
     };
 
-    class FrameRef
+    class Frame
     {
     public:
-        FrameRef(sensekit_reader_frame_t readerFrame)
-            : m_data(new Data(readerFrame))
-        { }
-
-        ~FrameRef()
-        {
-
-        }
-        FrameRef(const FrameRef& other)
-        {
-            m_data = other.m_data;
-        }
-
-        FrameRef& operator=(const FrameRef& other)
-        {
-            m_data = other.m_data;
-            return *this;
-        }
+        Frame(sensekit_reader_frame_t readerFrame)
+            : m_frame(std::make_shared<FrameRef>(readerFrame))
+            { }
 
         template<typename T>
         T get()
             {
-                return T(m_data->get_data());
+                return T(m_frame->get());
             }
 
     private:
-        class Data
+        class FrameRef
         {
         public:
-            Data(sensekit_reader_frame_t readerFrame) :
-                m_frame(readerFrame)
-            { }
-            ~Data()
-            {
-                if (m_frame != nullptr)
+            FrameRef(sensekit_reader_frame_t readerFrame)
+                :  m_frame(readerFrame) { }
+
+            ~FrameRef()
                 {
-                    sensekit_reader_close_frame(&m_frame);
+                    if (m_frame != nullptr)
+                    {
+                        sensekit_reader_close_frame(&m_frame);
+                    }
                 }
-            }
-            sensekit_reader_frame_t get_data() { return m_frame; }
+
+            sensekit_reader_frame_t get() { return m_frame; }
 
         private:
             sensekit_reader_frame_t m_frame;
         };
 
-        std::shared_ptr<Data> m_data;
+        std::shared_ptr<FrameRef> m_frame;
     };
 
     class StreamReader
     {
     public:
-        explicit StreamReader(Sensor& sensor)
-            : m_sensor(sensor)
-            {
-                sensekit_reader_create(sensor.m_pStreamSet, &m_reader);
-            }
+        StreamReader(sensekit_reader_t reader)
+            : m_reader(std::make_shared<ReaderRef>(reader))
+            { }
 
         template<typename T>
         T stream()
@@ -100,7 +94,7 @@ namespace sensekit {
             {
                 sensekit_streamconnection_t connection;
 
-                sensekit_reader_get_stream(m_reader,
+                sensekit_reader_get_stream(m_reader->get(),
                                            T::id,
                                            subType,
                                            &connection);
@@ -108,21 +102,43 @@ namespace sensekit {
                 return T(connection);
             }
 
-        FrameRef get_latest_frame(int timeoutMillis = SENSEKIT_TIMEOUT_FOREVER)
+        Frame get_latest_frame(int timeoutMillis = SENSEKIT_TIMEOUT_FOREVER)
             {
                 sensekit_reader_frame_t frame;
-                sensekit_reader_open_frame(m_reader, timeoutMillis, &frame);
-                return FrameRef(frame);
+                sensekit_reader_open_frame(m_reader->get(), timeoutMillis, &frame);
+                return Frame(frame);
             }
 
     private:
-        Sensor& m_sensor;
-        sensekit_reader_t m_reader;
+        class ReaderRef
+        {
+        public:
+            ReaderRef(sensekit_reader_t reader)
+                :  m_reader(reader) { }
+
+            ~ReaderRef()
+                {
+                    if (m_reader != nullptr)
+                    {
+                        sensekit_reader_destroy(&m_reader);
+                    }
+                }
+
+            sensekit_reader_t get() { return m_reader; }
+
+        private:
+            sensekit_reader_t m_reader;
+        };
+
+        std::shared_ptr<ReaderRef> m_reader;
     };
 
     StreamReader Sensor::create_reader()
     {
-        return StreamReader(*this);
+        sensekit_reader_t reader;
+        sensekit_reader_create(get_handle(), &reader);
+
+        return StreamReader(reader);
     }
 
     class DataStream
