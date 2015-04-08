@@ -3,6 +3,14 @@
 #include <StreamTypes.h>
 #include "../../SenseKit/sensekit_internal.h"
 
+#ifndef MIN
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#endif
+
+#ifndef MAX
+#define MAX(a,b) (((a)>(b))?(a):(b))
+#endif
+
 using std::cout;
 using std::endl;
 
@@ -131,7 +139,7 @@ namespace sensekit
 
             get_pluginService()
                 .create_stream_bin(m_depthHandle,
-                                   sizeof(sensekit_depthframe_t) + m_depthBufferLength,
+                                   sizeof(sensekit_depthframe_wrapper_t) + m_depthBufferLength,
                                    &m_depthBinHandle,
                                    &nextBuffer);
 
@@ -139,7 +147,7 @@ namespace sensekit
 
             get_pluginService()
                 .create_stream_bin(m_colorHandle,
-                                   sizeof(sensekit_colorframe_t) + m_colorBufferLength,
+                                   sizeof(sensekit_colorframe_wrapper_t) + m_colorBufferLength,
                                    &m_colorBinHandle,
                                    &nextBuffer);
 
@@ -222,6 +230,7 @@ namespace sensekit
             m_currentDepthFrame = static_cast<sensekit_depthframe_wrapper_t*>(m_currentDepthBuffer->data);
             m_currentDepthFrame->frame.data = reinterpret_cast<int16_t *>(&(m_currentDepthFrame->frame_data));
 
+
             sensekit_depthframe_metadata_t metadata;
 
             metadata.width = m_depthMode.getResolutionX();
@@ -249,6 +258,8 @@ namespace sensekit
 
         void OpenNIPlugin::temp_update()
         {
+
+            //std::cout << "openni temp update: " << m_currentDepthFrame << std::endl;
             if (nullptr != m_currentDepthFrame &&
                 read_next_depth_frame(m_currentDepthFrame)
                 == SENSEKIT_STATUS_SUCCESS)
@@ -280,18 +291,23 @@ namespace sensekit
             }
 
             ::openni::VideoFrameRef ref;
-            m_depthStream.readFrame(&ref);
+            if (m_depthStream.readFrame(&ref) == ::openni::STATUS_OK)
+            {
+                const int16_t* datData = static_cast<const int16_t*>(ref.getData());
 
-            const short* datData = static_cast<const short*>(ref.getData());
+                int16_t* frameData = m_currentDepthFrame->frame.data;
+                int dataSize = MIN(ref.getDataSize(), m_depthBufferLength);
 
-            int16_t* frameData = m_currentDepthFrame->frame.data;
-            size_t bufferLength = m_depthMode.getResolutionX() * m_depthMode.getResolutionY();
+                memcpy(frameData, datData, dataSize);
 
-            memcpy(frameData, datData, sizeof(int16_t)*bufferLength);
+                ++m_frameIndex;
 
-            ++m_frameIndex;
-
-            ref.release();
+                ref.release();
+            }
+            else
+            {
+                return SENSEKIT_STATUS_DEVICE_ERROR;
+            }
 
             return SENSEKIT_STATUS_SUCCESS;
         }
@@ -308,18 +324,24 @@ namespace sensekit
             }
 
             ::openni::VideoFrameRef ref;
-            m_colorStream.readFrame(&ref);
+            if (m_colorStream.readFrame(&ref) == ::openni::STATUS_OK)
+            {
+                const uint8_t* datData = static_cast<const uint8_t*>(ref.getData());
 
-            const uint8_t* datData = static_cast<const uint8_t*>(ref.getData());
+                uint8_t* frameData = m_currentColorFrame->frame.data;
 
-            uint8_t* frameData = m_currentColorFrame->frame.data;
-            size_t bufferLength = m_colorMode.getResolutionX() * m_depthMode.getResolutionY() * 3;
+                int dataSize = MIN(ref.getDataSize(), m_depthBufferLength);
+                memcpy(frameData, datData, dataSize);
 
-            memcpy(frameData, datData, bufferLength);
+                ++m_frameIndex;
 
-            ++m_frameIndex;
+                ref.release();
 
-            ref.release();
+            }
+            else
+            {
+                return SENSEKIT_STATUS_DEVICE_ERROR;
+            }
 
             return SENSEKIT_STATUS_SUCCESS;
         }
