@@ -10,7 +10,13 @@ static conversion_cache_t g_conversionCache;
 
 static void refresh_conversion_cache()
 {
-    // the hardest of codings
+    // the hardest of codings PART DEUX
+
+    static bool is_cached = false;
+
+    if (is_cached)
+        return;
+
     float horizontalFov = 58.0f;
     float verticalFov = 45.0f;
     int resolutionX = 320;
@@ -24,6 +30,8 @@ static void refresh_conversion_cache()
     g_conversionCache.halfResY = g_conversionCache.resolutionY / 2;
     g_conversionCache.coeffX = g_conversionCache.resolutionX / g_conversionCache.xzFactor;
     g_conversionCache.coeffY = g_conversionCache.resolutionY / g_conversionCache.yzFactor;
+
+    is_cached = true;
 }
 
 SENSEKIT_BEGIN_DECLS
