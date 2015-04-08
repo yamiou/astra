@@ -2,6 +2,8 @@
 #define SENSEKIT_H
 
 #include "sensekit_core.h"
+#include <exception>
+#include <memory>
 
 namespace sensekit {
 
@@ -31,21 +33,51 @@ namespace sensekit {
     {
     public:
         FrameRef(sensekit_reader_frame_t readerFrame)
-            : m_frame(readerFrame) { }
+            : m_data(new Data(readerFrame))
+        { }
+
+        ~FrameRef()
+        {
+            
+        }
+        FrameRef(const FrameRef& other)
+        {
+            m_data = other.m_data;
+        }
+
+        FrameRef& operator=(const FrameRef& other)
+        {
+            m_data = other.m_data;
+            return *this;
+        }
 
         template<typename T>
         T get()
             {
-                return T(m_frame);
-            }
-
-        void release()
-            {
-                sensekit_reader_close_frame(&m_frame);
+                return T(m_data->get_data());
             }
 
     private:
-        sensekit_reader_frame_t m_frame;
+        class Data
+        {
+        public:
+            Data(sensekit_reader_frame_t readerFrame) :
+                m_frame(readerFrame)
+            { }
+            ~Data()
+            {
+                if (m_frame != nullptr)
+                {
+                    sensekit_reader_close_frame(&m_frame);
+                }
+            }
+            sensekit_reader_frame_t get_data() { return m_frame; }
+
+        private:
+            sensekit_reader_frame_t m_frame;
+        };
+
+        std::shared_ptr<Data> m_data;
     };
 
     class StreamReader
@@ -76,7 +108,7 @@ namespace sensekit {
                 return T(connection);
             }
 
-        FrameRef get_latest_frame(int timeoutMillis = -1)
+        FrameRef get_latest_frame(int timeoutMillis = SENSEKIT_TIMEOUT_FOREVER)
             {
                 sensekit_reader_frame_t frame;
                 sensekit_reader_open_frame(m_reader, timeoutMillis, &frame);
@@ -99,12 +131,21 @@ namespace sensekit {
         DataStream(sensekit_streamconnection_t connection)
             : m_connection(connection) {}
 
+        bool is_available() { return m_connection != nullptr; }
         void start()
             {
+                if (m_connection == nullptr)
+                {
+                    throw new std::exception("Cannot start a stream that is not available");
+                }
                 sensekit_stream_start(m_connection);
             }
         void stop()
             {
+                if (m_connection == nullptr)
+                {
+                    throw new std::exception("Cannot stop a stream that is not available");
+                }
                 sensekit_stream_stop(m_connection);
             }
 

@@ -9,41 +9,47 @@
 
 void print_depth(sensekit::DepthFrame& depthFrame)
 {
-    int width = depthFrame.get_resolutionX();
-    int height = depthFrame.get_resolutionY();
-    int frameIndex = depthFrame.get_frameIndex();
+    if (depthFrame.is_valid())
+    {
+        int width = depthFrame.get_resolutionX();
+        int height = depthFrame.get_resolutionY();
+        int frameIndex = depthFrame.get_frameIndex();
 
-    int16_t* buffer = new int16_t[depthFrame.length()];
-    depthFrame.copy_to(buffer);
+        int16_t* buffer = new int16_t[depthFrame.length()];
+        depthFrame.copy_to(buffer);
 
-    size_t index = ((width * (height / 2)) + (width / 2));
-    short middle = buffer[index];
-    std::cout << "index: " << frameIndex << " value: " << middle << std::endl;
+        size_t index = ((width * (height / 2)) + (width / 2));
+        short middle = buffer[index];
+        std::cout << "index: " << frameIndex << " value: " << middle << std::endl;
 
-    delete[] buffer;
+        delete[] buffer;
+    }
 }
 
 void print_color(sensekit::ColorFrame& colorFrame)
 {
-    int width = colorFrame.get_resolutionX();
-    int height = colorFrame.get_resolutionY();
-    int frameIndex = colorFrame.get_frameIndex();
+    if (colorFrame.is_valid())
+    {
+        int width = colorFrame.get_resolutionX();
+        int height = colorFrame.get_resolutionY();
+        int frameIndex = colorFrame.get_frameIndex();
 
-    uint8_t* buffer = new uint8_t[colorFrame.length()];
-    colorFrame.copy_to(buffer);
+        uint8_t* buffer = new uint8_t[colorFrame.length()];
+        colorFrame.copy_to(buffer);
 
-    size_t index = ((width * (height / 2)) + (width / 2)) * colorFrame.get_bytesPerPixel();
-    uint8_t r = buffer[index];
-    uint8_t g = buffer[index+1];
-    uint8_t b = buffer[index+2];
+        size_t index = ((width * (height / 2)) + (width / 2)) * colorFrame.get_bytesPerPixel();
+        uint8_t r = buffer[index];
+        uint8_t g = buffer[index + 1];
+        uint8_t b = buffer[index + 2];
 
-    std::cout << "index: " << frameIndex
-              << " r: " << +r
-              << " g: " << +g
-              << " b: " << +b
-              << std::endl;
+        std::cout << "index: " << frameIndex
+            << " r: " << +r
+            << " g: " << +g
+            << " b: " << +b
+            << std::endl;
 
-    delete[] buffer;
+        delete[] buffer;
+    }
 }
 
 int main(int argc, char** argv)
@@ -56,21 +62,21 @@ int main(int argc, char** argv)
     sensekit::StreamReader reader = sensor.create_reader();
 
     reader.stream<sensekit::DepthStream>().start();
-    reader.stream<sensekit::ColorStream>().start();
+    //reader.stream<sensekit::ColorStream>().start();
 
     do
     {
         sensekit_temp_update();
 
         sensekit::FrameRef frameRef = reader.get_latest_frame(30);
-
-        sensekit::DepthFrame depthFrame = frameRef.get<sensekit::DepthFrame>();
+        sensekit::FrameRef& frameRef2 = frameRef;
+        sensekit::FrameRef& frameRef3 = frameRef2;
+        sensekit::DepthFrame depthFrame = frameRef3.get<sensekit::DepthFrame>();
         print_depth(depthFrame);
 
-        sensekit::ColorFrame colorFrame = frameRef.get<sensekit::ColorFrame>();
-        print_color(colorFrame);
+        //sensekit::ColorFrame colorFrame = frameRef.get<sensekit::ColorFrame>();
+        //print_color(colorFrame);
 
-        frameRef.release();
 
      } while (shouldContinue);
 
