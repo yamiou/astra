@@ -136,7 +136,7 @@ namespace sensekit {
             {
                 if (m_connection == nullptr)
                 {
-                    throw new std::exception("Cannot start a stream that is not available");
+                    throw std::exception("Cannot start a stream that is not available");
                 }
                 sensekit_stream_start(m_connection);
             }
@@ -144,7 +144,7 @@ namespace sensekit {
             {
                 if (m_connection == nullptr)
                 {
-                    throw new std::exception("Cannot stop a stream that is not available");
+                    throw std::exception("Cannot stop a stream that is not available");
                 }
                 sensekit_stream_stop(m_connection);
             }

@@ -51,7 +51,7 @@ namespace sensekit {
         {
             if (m_depthFrame == nullptr)
             {
-                throw new std::exception("Cannot operate on an invalid frame");
+                throw std::exception("Cannot operate on an invalid frame");
             }
         }
         sensekit_depthframe_t m_depthFrame { nullptr };
