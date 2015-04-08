@@ -350,7 +350,7 @@ void SampleViewer::updateTex(sensekit_depthframe_t depthFrame, sensekit_depthfra
     int rowSize = depthWidth;
 
     Vector3* normMap = m_blurNormalMap;
-
+    bool showNormMap = normMap != nullptr;
     for (int y = 0; y < depthHeight; ++y)
     {
         int16_t* pDepth = pDepthRow;
@@ -358,28 +358,26 @@ void SampleViewer::updateTex(sensekit_depthframe_t depthFrame, sensekit_depthfra
 
         for (int x = 0; x < depthWidth; ++x, ++pDepth, ++normMap, ++pTex)
         {
-            if (x > 320 || y > 240)
-            {
-                continue;
-            }
             int16_t depth = *pDepth;
             if (depth != 0)
             {
-                
                 //int nHistValue = m_pDepthHist[*pDepth];
                 //pTex->r = nHistValue;
                 //pTex->g = nHistValue;
                 //pTex->b = 0;
-                
             }
 
-            Vector3 norm = *normMap;
+            Vector3 norm(1,0,0);
+            if (showNormMap)
+            {
+                norm = *normMap;
+            }
             if (!norm.isEmpty())
             {
                 //pTex->r = (norm.x * 0.5 + 1) * 255;
                 //pTex->g = (norm.y * 0.5 + 1) * 255;
                 //pTex->b = (norm.z * 0.5 + 1) * 255;
-                    
+
 
                 float fadeFactor = 1 - 0.6*std::max(0.0f, std::min(1.0f, ((depth - 400) / 3200.0f)));
                 float diffuseFactor = Vector3::DotProduct(norm, m_lightVector);
@@ -414,10 +412,19 @@ void SampleViewer::display()
 {
     sensekit_temp_update();
     sensekit_reader_frame_t frame;
-    sensekit_reader_open_frame(m_reader, 30, &frame);
+    sensekit_status_t rc = sensekit_reader_open_frame(m_reader, 30, &frame);
+    if (rc != SENSEKIT_STATUS_SUCCESS)
+    {
+        return;
+    }
 
     sensekit_depthframe_t depthFrame;
-    sensekit_depth_frame_get(frame, &depthFrame);
+    rc = sensekit_depth_frame_get(frame, &depthFrame);
+
+    if (rc != SENSEKIT_STATUS_SUCCESS)
+    {
+        return;
+    }
 
     sensekit_depthframe_metadata_t metadata;
     sensekit_depthframe_get_metadata(depthFrame, &metadata);
@@ -441,7 +448,6 @@ void SampleViewer::display()
 
     // Swap the OpenGL display buffers
     glutSwapBuffers();
-
 }
 
 void SampleViewer::onKey(unsigned char key, int /*x*/, int /*y*/)
