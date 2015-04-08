@@ -199,6 +199,7 @@ namespace sensekit {
         {
             frame = nullptr;
         }
+
         return rc;
     }
 

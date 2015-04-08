@@ -155,6 +155,8 @@ namespace sensekit
     sensekit_status_t PluginService::cycle_bin_buffers(sensekit_bin_t binHandle,
                                                        sensekit_frame_t*& binBuffer)
     {
+        assert(binHandle != nullptr);
+
         StreamBin* bin = StreamBin::get_ptr(binHandle);
         binBuffer = bin->cycle_buffers();
 

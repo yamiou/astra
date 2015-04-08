@@ -1,6 +1,7 @@
 #include "StreamBin.h"
 #include <cassert>
 #include "sensekit_internal.h"
+#include <iostream>
 
 namespace sensekit {
 
@@ -84,6 +85,7 @@ namespace sensekit {
             m_backBufferHeadIndex = inc_index(m_backBufferHeadIndex);
 
             sensekit_frame_index_t frameIndex = get_frontBuffer()->frameIndex;
+
             if (frameIndex != -1)
             {
                 assert(frameIndex > oldFrameIndex);

@@ -13,7 +13,6 @@ struct _sensekit_reader_callback_id {
     sensekit_callback_id_t callbackId;
 };
 
-
 struct _sensekit_frame {
     size_t byteLength;
     sensekit_frame_index_t frameIndex;

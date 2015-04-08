@@ -52,8 +52,11 @@ int main(int argc, char** argv)
     sensekit_frame_index_t lastFrameIndex = -1;
     do
     {
+        sensekit_temp_update();
+
         sensekit_reader_frame_t frame;
-        sensekit_status_t rc = sensekit_reader_open_frame(reader, 1, &frame);
+        sensekit_status_t rc = sensekit_reader_open_frame(reader, 0, &frame);
+
         if (rc == SENSEKIT_STATUS_SUCCESS)
         {
             sensekit_depthframe_t depthFrame;
