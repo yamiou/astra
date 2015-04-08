@@ -1,5 +1,6 @@
 #include "StreamBin.h"
 #include <cassert>
+#include "sensekit_internal.h"
 
 namespace sensekit {
 

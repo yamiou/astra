@@ -9,8 +9,7 @@
 #include "pointprocessor.h"
 #include "../../SenseKitUL/SenseKitUL_internal.h"
 #include "coordinateconverter.h"
-#include <SenseKit/Plugins/PluginServiceProxy.h>
-#include <SenseKit/Plugins/PluginBase.h>
+#include <SenseKit/Plugins/plugin_api.h>
 
 class HandTracker : public sensekit::PluginBase
 {

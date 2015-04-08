@@ -1,7 +1,7 @@
 #ifndef DUMMYPLUGIN_H
 #define DUMMYPLUGIN_H
 
-#include <Plugins/PluginBase.h>
+#include <Plugins/plugin_api.h>
 #include <SenseKitUL.h>
 
 #include <iostream>

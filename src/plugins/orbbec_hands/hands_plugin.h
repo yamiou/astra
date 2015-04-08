@@ -1,7 +1,7 @@
 #ifndef HANDS_PLUGIN_H
 #define HANDS_PLUGIN_H
 
-#include <Plugins/PluginBase.h>
+#include <Plugins/plugin_api.h>
 #include <unordered_map>
 #include <SenseKitUL.h>
 #include "handtracker.h"

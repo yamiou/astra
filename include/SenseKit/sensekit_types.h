@@ -28,16 +28,8 @@ typedef struct _sensekit_streamconnection_handle* sensekit_streamconnection_hand
 
 typedef struct _sensekit_streamconnection* sensekit_streamconnection_t;
 
-typedef struct _sensekit_frame {
-    size_t byteLength;
-    sensekit_frame_index_t frameIndex;
-    void* data;
-} sensekit_frame_t;
-
-typedef struct _sensekit_frame_ref {
-    sensekit_streamconnection_t streamConnection;
-    sensekit_frame_t* frame;
-} sensekit_frame_ref_t;
+typedef struct _sensekit_frame_ref sensekit_frame_ref_t;
+typedef struct _sensekit_frame sensekit_frame_t;
 
 typedef struct _sensekit_reader* sensekit_reader_t;
 typedef sensekit_reader_t sensekit_reader_frame_t;
@@ -69,42 +61,4 @@ typedef struct _sensekit_reader_callback_id* sensekit_reader_callback_id_t;
 typedef void(*sensekit_frame_ready_callback_t)(sensekit_reader_t reader,
                                                sensekit_reader_frame_t frame);
 
-// Plugin service callback types
-
-typedef void(*set_parameter_callback_t)(void*, sensekit_streamconnection_t,
-                                        sensekit_parameter_id,
-                                        size_t,
-                                        sensekit_parameter_data_t*);
-
-typedef void(*get_parameter_size_callback_t)(void*,
-                                             sensekit_streamconnection_t,
-                                             sensekit_parameter_id,
-                                             size_t*);
-
-typedef void(*get_parameter_data_callback_t)(void*,
-                                             sensekit_streamconnection_t,
-                                             sensekit_parameter_id, size_t,
-                                             sensekit_parameter_data_t*);
-
-typedef void(*connection_added_callback_t)(void*, sensekit_streamconnection_t);
-typedef void(*connection_removed_callback_t)(void*, sensekit_streamconnection_t);
-
-
-typedef void(*stream_added_callback_t)(sensekit_streamset_t,
-                                       sensekit_stream_t,
-                                       sensekit_stream_desc_t);
-
-typedef void(*stream_removing_callback_t)(sensekit_streamset_t,
-                                          sensekit_stream_t,
-                                          sensekit_stream_desc_t);
-
-struct stream_callbacks_t
-{
-    void* context;
-    set_parameter_callback_t setParameterCallback;
-    get_parameter_size_callback_t getParameterSizeCallback;
-    get_parameter_data_callback_t getParameterDataCallback;
-    connection_added_callback_t connectionAddedCallback;
-    connection_removed_callback_t connectionRemovedCallback;
-};
 #endif /* SENSEKIT_TYPES_H */

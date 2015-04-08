@@ -1,7 +1,7 @@
 ﻿#ifndef OPENNIPLUGIN_H
 #define OPENNIPLUGIN_H
 
-#include <Plugins/PluginBase.h>
+#include <Plugins/plugin_api.h>
 #include <OpenNI.h>
 #include <streams/depth_types.h>
 #include <streams/color_types.h>

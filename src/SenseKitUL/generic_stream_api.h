@@ -2,6 +2,7 @@
 #define GENERIC_STREAM_API_H
 
 #include "sensekit_core.h"
+#include "../SenseKit/sensekit_internal.h"
 
 template<typename TStreamType>
 sensekit_status_t sensekit_generic_stream_get(sensekit_reader_t reader,

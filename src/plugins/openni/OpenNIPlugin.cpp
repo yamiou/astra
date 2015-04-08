@@ -1,6 +1,7 @@
 ﻿#include "OpenNIPlugin.h"
 #include <iostream>
 #include <StreamTypes.h>
+#include "../../SenseKit/sensekit_internal.h"
 
 using std::cout;
 using std::endl;
