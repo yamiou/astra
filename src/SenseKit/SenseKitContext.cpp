@@ -99,7 +99,7 @@ namespace sensekit {
         assert(streamSet != nullptr);
 
         StreamSet* actualSet = StreamSet::get_ptr(streamSet);
-        std::unique_ptr<StreamReader> actualReader(new StreamReader(*actualSet));
+        ReaderPtr actualReader(new StreamReader(*actualSet));
 
         reader = actualReader->get_handle();
 
