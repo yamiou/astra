@@ -70,7 +70,6 @@ private:
 
     cv::Mat m_matDepth;
     cv::Mat m_matForeground;
-    int m_frameIndex{ 0 };
     sensekit_frame_t* m_currentHandBuffer{ nullptr };
     sensekit_handframe_wrapper_t* m_currentHandFrame { nullptr };
 };

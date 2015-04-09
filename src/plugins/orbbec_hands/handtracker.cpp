@@ -86,12 +86,15 @@ void HandTracker::reader_frame_ready(sensekit_reader_t reader, sensekit_reader_f
 void HandTracker::setNextBuffer(sensekit_frame_t* nextBuffer)
 {
     m_currentHandBuffer = nextBuffer;
-    m_currentHandBuffer->frameIndex = m_frameIndex;
-    m_currentHandFrame = static_cast<sensekit_handframe_wrapper_t*>(m_currentHandBuffer->data);
-    if (m_currentHandFrame != nullptr)
+    m_currentHandFrame = nullptr;
+    if (m_currentHandBuffer != nullptr)
     {
-        m_currentHandFrame->frame.handpoints = reinterpret_cast<sensekit_handpoint_t*>(&(m_currentHandFrame->frame_data));
-        m_currentHandFrame->frame.numHands = SENSEKIT_HANDS_MAX_HANDPOINTS;
+        m_currentHandFrame = static_cast<sensekit_handframe_wrapper_t*>(m_currentHandBuffer->data);
+        if (m_currentHandFrame != nullptr)
+        {
+            m_currentHandFrame->frame.handpoints = reinterpret_cast<sensekit_handpoint_t*>(&(m_currentHandFrame->frame_data));
+            m_currentHandFrame->frame.numHands = SENSEKIT_HANDS_MAX_HANDPOINTS;
+        }
     }
 }
 
@@ -120,10 +123,16 @@ void HandTracker::updateTracking(sensekit_depthframe_t depthFrame)
     if (m_currentHandFrame != nullptr)
     {
         updateHandFrame(m_pointProcessor.get_trackedPoints(), m_currentHandFrame);
-        sensekit_frame_t* nextBuffer = nullptr;
-        get_pluginService().cycle_bin_buffers(m_handBinHandle, &nextBuffer);
-        setNextBuffer(nextBuffer);
+
+        //use same frameIndex as source depth frame
+        sensekit_frame_index_t frameIndex;
+        sensekit_depthframe_get_frameindex(depthFrame, &frameIndex);
+        m_currentHandBuffer->frameIndex = frameIndex;
     }
+
+    sensekit_frame_t* nextBuffer = nullptr;
+    get_pluginService().cycle_bin_buffers(m_handBinHandle, &nextBuffer);
+    setNextBuffer(nextBuffer);
 }
 
 void HandTracker::trackPoints(cv::Mat& matDepth, cv::Mat& matForeground)
@@ -176,7 +185,7 @@ void HandTracker::trackPoints(cv::Mat& matDepth, cv::Mat& matForeground)
 void HandTracker::updateHandFrame(vector<TrackedPoint>& internalTrackedPoints, sensekit_handframe_wrapper_t* wrapper)
 {
     _sensekit_handframe& frame = wrapper->frame;
-
+    
     int handIndex = 0;
     int maxNumHands = frame.numHands;
 

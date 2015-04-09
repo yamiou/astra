@@ -21,6 +21,6 @@ find_package( OpenCV REQUIRED )
 
 add_library(orbbec_hands SHARED ${orbbec_hands_SOURCES})
 
-target_link_libraries(orbbec_hands SenseKitUL ${OpenCV_LIBS})
+target_link_libraries(orbbec_hands SenseKitAPI SenseKitUL ${OpenCV_LIBS})
 
 include_directories(orbbec_hands ${OpenCV_INCLUDE_DIRS})

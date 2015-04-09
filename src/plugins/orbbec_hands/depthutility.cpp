@@ -28,7 +28,7 @@ void DepthUtility::reset()
     m_matDepthVelErode.create(m_processingHeight, m_processingWidth, CV_32FC1);
 }
 
-void DepthUtility::processDepthToForeground(sensekit_depthframe_t depthFrame, int width, int height, cv::Mat matDepth, cv::Mat matForeground)
+void DepthUtility::processDepthToForeground(sensekit_depthframe_t depthFrame, int width, int height, cv::Mat& matDepth, cv::Mat& matForeground)
 {
     matDepth.create(m_processingHeight, m_processingWidth, CV_32FC1);
     matForeground = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_8UC1);
@@ -56,7 +56,7 @@ void DepthUtility::processDepthToForeground(sensekit_depthframe_t depthFrame, in
     thresholdForeground(matForeground, m_matDepthVelErode, m_foregroundThresholdFactor);
 }
 
-void DepthUtility::depthFrameToMat(sensekit_depthframe_t depthFrameSrc, int width, int height, cv::Mat matTarget)
+void DepthUtility::depthFrameToMat(sensekit_depthframe_t depthFrameSrc, int width, int height, cv::Mat& matTarget)
 {
     //ensure initialized
     matTarget.create(height, width, CV_32FC1);
@@ -76,7 +76,7 @@ void DepthUtility::depthFrameToMat(sensekit_depthframe_t depthFrameSrc, int widt
     }
 }
 
-void DepthUtility::filterZeroValuesAndJumps(cv::Mat matDepth, cv::Mat matDepthPrevious, cv::Mat matDepthAvg, cv::Mat matDepthVel, float maxDepthJumpPercent)
+void DepthUtility::filterZeroValuesAndJumps(cv::Mat& matDepth, cv::Mat& matDepthPrevious, cv::Mat& matDepthAvg, cv::Mat& matDepthVel, float maxDepthJumpPercent)
 {
     int width = matDepth.cols;
     int height = matDepth.rows;

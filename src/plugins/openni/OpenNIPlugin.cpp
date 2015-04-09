@@ -225,50 +225,62 @@ namespace sensekit
         void OpenNIPlugin::set_new_depth_buffer(sensekit_frame_t* nextBuffer)
         {
             m_currentDepthBuffer = nextBuffer;
-            m_currentDepthBuffer->frameIndex = m_frameIndex;
-            m_currentDepthFrame = static_cast<sensekit_depthframe_wrapper_t*>(m_currentDepthBuffer->data);
-            m_currentDepthFrame->frame.data = reinterpret_cast<int16_t *>(&(m_currentDepthFrame->frame_data));
+            m_currentDepthFrame = nullptr;
+            if (m_currentDepthBuffer != nullptr)
+            {
+                m_currentDepthBuffer->frameIndex = m_frameIndex;
+                m_currentDepthFrame = static_cast<sensekit_depthframe_wrapper_t*>(m_currentDepthBuffer->data);
+                if (m_currentDepthFrame != nullptr)
+                {
+                    m_currentDepthFrame->frame.data = reinterpret_cast<int16_t *>(&(m_currentDepthFrame->frame_data));
 
 
-            sensekit_depthframe_metadata_t metadata;
+                    sensekit_depthframe_metadata_t metadata;
 
-            metadata.width = m_depthMode.getResolutionX();
-            metadata.height = m_depthMode.getResolutionY();
-            metadata.bytesPerPixel = 2;
+                    metadata.width = m_depthMode.getResolutionX();
+                    metadata.height = m_depthMode.getResolutionY();
+                    metadata.bytesPerPixel = 2;
 
-            m_currentDepthFrame->frame.metadata = metadata;
+                    m_currentDepthFrame->frame.metadata = metadata;
+                }
+            }
         }
 
         void OpenNIPlugin::set_new_color_buffer(sensekit_frame_t* nextBuffer)
         {
             m_currentColorBuffer = nextBuffer;
-            m_currentColorBuffer->frameIndex = m_frameIndex;
-            m_currentColorFrame = static_cast<sensekit_colorframe_wrapper_t*>(m_currentColorBuffer->data);
-            m_currentColorFrame->frame.data = reinterpret_cast<uint8_t *>(&(m_currentColorFrame->frame_data));
+            m_currentColorFrame = nullptr;
+            if (m_currentColorBuffer != nullptr)
+            {
+                m_currentColorBuffer->frameIndex = m_frameIndex;
+                m_currentColorFrame = static_cast<sensekit_colorframe_wrapper_t*>(m_currentColorBuffer->data);
+                if (m_currentColorFrame != nullptr)
+                {
+                    m_currentColorFrame->frame.data = reinterpret_cast<uint8_t *>(&(m_currentColorFrame->frame_data));
 
-            sensekit_colorframe_metadata_t metadata;
+                    sensekit_colorframe_metadata_t metadata;
 
-            metadata.width = m_colorMode.getResolutionX();
-            metadata.height = m_colorMode.getResolutionY();
-            metadata.bytesPerPixel = 3;
+                    metadata.width = m_colorMode.getResolutionX();
+                    metadata.height = m_colorMode.getResolutionY();
+                    metadata.bytesPerPixel = 3;
 
-            m_currentColorFrame->frame.metadata = metadata;
+                    m_currentColorFrame->frame.metadata = metadata;
+                }
+            }
         }
 
         void OpenNIPlugin::temp_update()
         {
-            if (nullptr != m_currentDepthFrame &&
-                read_next_depth_frame(m_currentDepthFrame)
-                == SENSEKIT_STATUS_SUCCESS)
+            if (m_currentDepthFrame == nullptr ||
+                read_next_depth_frame(m_currentDepthFrame) == SENSEKIT_STATUS_SUCCESS)
             {
                 sensekit_frame_t* nextBuffer = nullptr;
                 get_pluginService().cycle_bin_buffers(m_depthBinHandle, &nextBuffer);
                 set_new_depth_buffer(nextBuffer);
             }
 
-            if (nullptr != m_currentColorFrame &&
-                read_next_color_frame(m_currentColorFrame)
-                == SENSEKIT_STATUS_SUCCESS)
+            if (m_currentColorFrame == nullptr ||
+                read_next_color_frame(m_currentColorFrame) == SENSEKIT_STATUS_SUCCESS)
             {
                 sensekit_frame_t* nextBuffer = nullptr;
                 get_pluginService().cycle_bin_buffers(m_colorBinHandle, &nextBuffer);
@@ -278,6 +290,11 @@ namespace sensekit
 
         sensekit_status_t OpenNIPlugin::read_next_depth_frame(sensekit_depthframe_wrapper_t* frame)
         {
+            if (frame == nullptr)
+            {
+                return SENSEKIT_STATUS_INVALID_PARAMETER;
+            }
+
             int dummy;
             int timeout = 0;
             ::openni::VideoStream* pStream = &m_depthStream;
@@ -311,6 +328,11 @@ namespace sensekit
 
         sensekit_status_t OpenNIPlugin::read_next_color_frame(sensekit_colorframe_wrapper_t* frame)
         {
+            if (frame == nullptr)
+            {
+                return SENSEKIT_STATUS_INVALID_PARAMETER;
+            }
+
             int dummy;
             int timeout = 0;
             ::openni::VideoStream* pStream = &m_colorStream;
