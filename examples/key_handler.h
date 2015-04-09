@@ -25,7 +25,7 @@ void signal_stop_processing(){
 
 #ifdef _WIN32
 
-BOOL CtrlHandler(DWORD fdwCtrlType)
+bool CtrlHandler(DWORD fdwCtrlType)
 {
     switch (fdwCtrlType)
     {
