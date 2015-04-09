@@ -1,8 +1,6 @@
 #ifndef HAND_TYPES_H
 #define HAND_TYPES_H
 
-#include <SenseKit.h>
-
 #define SENSEKIT_HANDS_MAX_HANDPOINTS 20
 
 typedef enum _sensekit_handstatus

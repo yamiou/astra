@@ -1,6 +1,7 @@
 set(SenseKitUL_SOURCES
   ../../include/SenseKitUL/SenseKitUL.h
   ../../include/SenseKitUL/skul_capi.h
+  ../../include/SenseKitUL/StreamTypes.h
   ../../include/SenseKitUL/streams/depth.h
   ../../include/SenseKitUL/streams/depth_capi.h
   ../../include/SenseKitUL/streams/depth_types.h
@@ -8,8 +9,10 @@ set(SenseKitUL_SOURCES
   ../../include/SenseKitUL/streams/color_capi.h
   ../../include/SenseKitUL/streams/color_types.h
   ../../include/SenseKitUL/streams/hand_types.h
+  ../../include/SenseKitUL/streams/hand_capi.h
   depthstream_capi.cpp
   colorstream_capi.cpp
+  hand_capi.cpp
   SenseKitUL.cpp
   generic_stream_api.h
   SenseKitUL_internal.h

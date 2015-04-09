@@ -22,7 +22,7 @@ struct _sensekit_colorframe {
 
 struct _sensekit_handframe {
     sensekit_frame_ref_t* frameRef;
-    uint32_t numHands;
+    size_t numHands;
     sensekit_handpoint_t* handpoints;
 };
 

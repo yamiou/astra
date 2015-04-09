@@ -48,8 +48,8 @@ void HandTracker::setupStream(sensekit_streamset_t setHandle, sensekit_stream_de
     stream_callbacks_t pluginCallbacks = sensekit::create_plugin_callbacks(this);
 
     sensekit_stream_desc_t desc;
-    desc.type = SENSEKIT_STREAM_HANDS;
-    desc.subType = HANDS_DEFAULT_SUBTYPE;
+    desc.type = SENSEKIT_STREAM_HAND;
+    desc.subType = HAND_DEFAULT_SUBTYPE;
 
     get_pluginService().create_stream(m_streamSet, desc, pluginCallbacks, &m_handStream);
 

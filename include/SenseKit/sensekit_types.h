@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-const unsigned MAX_STRING_FIELD_LENGTH = 256;
+#define MAX_STRING_FIELD_LENGTH 256
 const uint8_t SENSEKIT_MAX_READER_STREAMS = 16;
 
 const int SENSEKIT_TIMEOUT_FOREVER = -1;

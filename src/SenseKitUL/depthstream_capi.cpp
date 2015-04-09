@@ -5,6 +5,7 @@
 #include <memory.h>
 #include <StreamTypes.h>
 #include "SenseKitUL_internal.h"
+#include <streams/depth_capi.h>
 
 static conversion_cache_t g_conversionCache;
 
