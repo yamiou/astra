@@ -48,6 +48,15 @@ namespace sensekit {
         friend class StreamReader;
     };
 
+    class StreamDescription : private sensekit_stream_desc_t
+    {
+    public:
+        sensekit_stream_type_t get_Type() { return type; }
+        sensekit_stream_subtype_t get_subType() { return subType; }
+
+        friend class DataStream;
+    };
+
     class Frame
     {
     public:
@@ -265,7 +274,10 @@ namespace sensekit {
     {
     public:
         DataStream(sensekit_streamconnection_t connection)
-            : m_connection(connection) {}
+            : m_connection(connection)
+            {
+                sensekit_stream_get_description(connection, &m_description);
+        }
 
         bool is_available() { return m_connection != nullptr; }
         void start()
@@ -284,9 +296,14 @@ namespace sensekit {
                 }
                 sensekit_stream_stop(m_connection);
             }
+        const StreamDescription& get_description()
+            {
+                return static_cast<const StreamDescription&>(m_description);
+            }
 
     private:
         sensekit_streamconnection_t m_connection;
+        sensekit_stream_desc_t m_description;
     };
 }
 
