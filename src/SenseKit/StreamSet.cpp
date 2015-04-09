@@ -59,6 +59,14 @@ namespace sensekit {
         return streamHandle;
     }
 
+    void StreamSet::visit_streams(std::function<void(Stream*)> visitorMethod)
+    {
+        for (auto* stream : m_streamCollection)
+        {
+            visitorMethod(stream);
+        }
+    }
+
     Stream* StreamSet::find_stream_by_type_subtype_impl(sensekit_stream_type_t type,
                                                         sensekit_stream_subtype_t subType) const
     {

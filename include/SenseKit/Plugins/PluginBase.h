@@ -15,11 +15,13 @@ namespace sensekit {
 
         virtual ~PluginBase() = default;
 
+        void initialize() { on_initialize(); };
+
         virtual void temp_update() { };
 
     protected:
         inline PluginServiceProxy& get_pluginService() const  { return *m_pluginService; }
-
+        virtual void on_initialize() { };
     private:
         PluginServiceProxy* m_pluginService;
 
@@ -106,6 +108,7 @@ SENSEKIT_EXPORT void sensekit_plugin_initialize(PluginServiceProxyBase* pluginPr
 {                                                                                         \
     g_plugin = new className(                                                             \
         static_cast<sensekit::PluginServiceProxy*>(pluginProxy));                         \
+    g_plugin->initialize();                                                               \
 }                                                                                         \
                                                                                           \
 SENSEKIT_EXPORT void sensekit_plugin_update()                                             \

@@ -281,6 +281,20 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
+    void SenseKitContext::raise_existing_streams_added(stream_added_callback_t callback, void* clientTag)
+    {
+        //TODO loop for all created rootsets
+        StreamSet set = get_rootSet();
+        auto setHandle = set.get_handle();
+
+        std::function<void(Stream*)> visitor = [setHandle, callback, clientTag](Stream* stream)
+        {
+            callback(clientTag, setHandle, stream->get_handle(), stream->get_description());
+        };
+
+        set.visit_streams(visitor);
+    }
+
     sensekit_status_t SenseKitContext::stream_set_parameter(sensekit_streamconnection_t connection,
                                                             sensekit_parameter_id parameterId,
                                                             size_t byteLength,

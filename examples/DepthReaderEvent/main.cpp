@@ -26,7 +26,7 @@ void print_depth(sensekit_depthframe_t depthFrame)
     std::cout << "index: " << frameIndex << " value: " << middle << std::endl;
 }
 
-void frame_ready(sensekit_reader_t reader, sensekit_reader_frame_t frame, void* clientTag)
+void frame_ready(void* clientTag, sensekit_reader_t reader, sensekit_reader_frame_t frame)
 {
     sensekit_depthframe_t depthFrame;
     sensekit_depth_frame_get(frame, &depthFrame);

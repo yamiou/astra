@@ -43,13 +43,17 @@ typedef void(*connection_added_callback_t)(void*, sensekit_streamconnection_t);
 typedef void(*connection_removed_callback_t)(void*, sensekit_streamconnection_t);
 
 
-typedef void(*stream_added_callback_t)(sensekit_streamset_t,
+typedef void(*stream_added_callback_t)(void*,
+                                       sensekit_streamset_t,
                                        sensekit_stream_t,
-                                       sensekit_stream_desc_t);
+                                       sensekit_stream_desc_t
+                                       );
 
-typedef void(*stream_removing_callback_t)(sensekit_streamset_t,
+typedef void(*stream_removing_callback_t)(void*,
+                                          sensekit_streamset_t,
                                           sensekit_stream_t,
-                                          sensekit_stream_desc_t);
+                                          sensekit_stream_desc_t
+                                          );
 
 struct stream_callbacks_t
 {

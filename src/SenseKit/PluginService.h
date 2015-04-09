@@ -26,8 +26,10 @@ namespace sensekit
         PluginServiceProxyBase* create_proxy();
 
         sensekit_status_t register_stream_added_callback(stream_added_callback_t callback,
+                                                         void* clientTag,
                                                          sensekit_callback_id_t& callbackId);
         sensekit_status_t register_stream_removing_callback(stream_removing_callback_t callback,
+                                                            void* clientTag,
                                                             sensekit_callback_id_t& callbackId);
         sensekit_status_t unregister_stream_added_callback(sensekit_callback_id_t callback);
         sensekit_status_t unregister_stream_removing_callback(sensekit_callback_id_t callback);

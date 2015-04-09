@@ -70,7 +70,7 @@ void HandTracker::setupStream(sensekit_streamset_t setHandle, sensekit_stream_de
     sensekit_reader_register_frame_ready_callback(m_reader, &HandTracker::reader_frame_ready_thunk, this, &m_readerCallbackId);
 }
 
-void HandTracker::reader_frame_ready_thunk(sensekit_reader_t reader, sensekit_reader_frame_t frame, void* clientTag)
+void HandTracker::reader_frame_ready_thunk(void* clientTag, sensekit_reader_t reader, sensekit_reader_frame_t frame)
 {
     HandTracker* tracker = static_cast<HandTracker*>(clientTag);
     tracker->reader_frame_ready(reader, frame);

@@ -9,28 +9,35 @@ namespace sensekit
     {
         HandsPlugin::HandsPlugin(PluginServiceProxy* pluginProxy)
             : PluginBase(pluginProxy)
-        {
-            get_pluginService().register_stream_added_callback(&HandsPlugin::stream_added_handler_thunk, &m_streamAddedCallbackId);
-            get_pluginService().register_stream_removing_callback(&HandsPlugin::stream_removing_handler_thunk, &m_streamRemovingCallbackId);
-        }
+        { }
 
         HandsPlugin::~HandsPlugin()
         {
         }
 
-        void HandsPlugin::stream_added_handler_thunk(sensekit_streamset_t setHandle,
+        void HandsPlugin::on_initialize()
+        {
+            get_pluginService().register_stream_added_callback(&HandsPlugin::stream_added_handler_thunk, this, &m_streamAddedCallbackId);
+            get_pluginService().register_stream_removing_callback(&HandsPlugin::stream_removing_handler_thunk, this, &m_streamRemovingCallbackId);
+        }
+
+        void HandsPlugin::stream_added_handler_thunk(void* clientTag,
+                                                     sensekit_streamset_t setHandle,
                                                      sensekit_stream_t streamHandle,
                                                      sensekit_stream_desc_t desc)
         {
-            g_plugin->stream_added_handler(setHandle, streamHandle, desc);
+            HandsPlugin* plugin = static_cast<HandsPlugin*>(clientTag);
+            plugin->stream_added_handler(setHandle, streamHandle, desc);
         }
 
-        void HandsPlugin::stream_removing_handler_thunk(sensekit_streamset_t setHandle,
+        void HandsPlugin::stream_removing_handler_thunk(void* clientTag,
+                                                        sensekit_streamset_t setHandle,
                                                         sensekit_stream_t streamHandle,
                                                         sensekit_stream_desc_t desc)
 
         {
-            g_plugin->stream_removing_handler(setHandle, streamHandle, desc);
+            HandsPlugin* plugin = static_cast<HandsPlugin*>(clientTag);
+            plugin->stream_removing_handler(setHandle, streamHandle, desc);
         }
 
         void HandsPlugin::stream_added_handler(sensekit_streamset_t setHandle,

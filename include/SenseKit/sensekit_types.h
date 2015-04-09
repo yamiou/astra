@@ -58,8 +58,8 @@ typedef size_t sensekit_callback_id_t;
 
 typedef struct _sensekit_reader_callback_id* sensekit_reader_callback_id_t;
 
-typedef void(*sensekit_frame_ready_callback_t)(sensekit_reader_t reader,
-                                               sensekit_reader_frame_t frame,
-                                               void* clientTag);
+typedef void(*sensekit_frame_ready_callback_t)(void* clientTag,
+                                               sensekit_reader_t reader,
+                                               sensekit_reader_frame_t frame);
 
 #endif /* SENSEKIT_TYPES_H */

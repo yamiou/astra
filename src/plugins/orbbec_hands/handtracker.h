@@ -29,7 +29,7 @@ private:
 
     void trackPoints(cv::Mat& matDepth, cv::Mat& matForeground);
     
-    static void reader_frame_ready_thunk(sensekit_reader_t reader, sensekit_reader_frame_t frame, void* clientTag);
+    static void reader_frame_ready_thunk(void* clientTag, sensekit_reader_t reader, sensekit_reader_frame_t frame);
     void reader_frame_ready(sensekit_reader_t reader, sensekit_reader_frame_t frame);
     void setNextBuffer(sensekit_frame_t* sensekitFrame);
 

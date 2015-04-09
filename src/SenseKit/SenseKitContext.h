@@ -101,6 +101,8 @@ namespace sensekit {
         sensekit_status_t temp_update();
 
 
+        void raise_existing_streams_added(stream_added_callback_t callback, void* clientTag);
+
         StreamSet& get_rootSet() { return m_rootSet; }
 
         StreamServiceProxyBase* get_streamServiceProxy() { return m_streamServiceProxy; }

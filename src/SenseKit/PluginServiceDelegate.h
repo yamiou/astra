@@ -13,16 +13,18 @@ namespace sensekit {
 
         static sensekit_status_t register_stream_added_callback(void* pluginService,
                                                                 stream_added_callback_t callback,
+                                                                void* clientTag,
                                                                 sensekit_callback_id_t* callbackId)
         {
-            return static_cast<PluginService*>(pluginService)->register_stream_added_callback(callback, *callbackId);
+            return static_cast<PluginService*>(pluginService)->register_stream_added_callback(callback, clientTag, *callbackId);
         }
 
         static sensekit_status_t register_stream_removing_callback(void* pluginService,
                                                                    stream_removing_callback_t callback,
+                                                                   void* clientTag,
                                                                    sensekit_callback_id_t* callbackId)
         {
-            return static_cast<PluginService*>(pluginService)->register_stream_removing_callback(callback, *callbackId);
+            return static_cast<PluginService*>(pluginService)->register_stream_removing_callback(callback, clientTag, *callbackId);
         }
 
         static sensekit_status_t unregister_stream_added_callback(void* pluginService,

@@ -20,7 +20,7 @@ namespace sensekit
 
     sensekit_status_t PluginService::create_stream_set(sensekit_streamset_t& streamSet)
     {
-        //normally would create a new streamset
+        //TODO: normally would create a new streamset
         StreamSet* actualStreamSet = &m_context.get_rootSet();
         streamSet = actualStreamSet->get_handle();
 
@@ -31,7 +31,7 @@ namespace sensekit
     {
         StreamSet* actualStreamSet = StreamSet::get_ptr(streamSet);
 
-        //if we were not hard coding the rootset in create_stream_set...
+        //TODO: if we were not hard coding the rootset in create_stream_set...
         //if streamset has direct child streams, return error
         //if streamset has child streamsets, reparent them to this streamset's parent (or null parent)
         //then delete the streamset
@@ -42,17 +42,31 @@ namespace sensekit
     }
 
     sensekit_status_t PluginService::register_stream_added_callback(stream_added_callback_t callback,
+                                                                    void* clientTag,
                                                                     CallbackId& callbackId)
     {
-        callbackId = m_streamAddedSignal += callback;
+        auto thunk = [clientTag, callback](sensekit_streamset_t ss, 
+                                           sensekit_stream_t s,
+                                           sensekit_stream_desc_t d)
+            { callback(clientTag, ss, s, d); };
 
+        callbackId = m_streamAddedSignal += thunk;
+
+        m_context.raise_existing_streams_added(callback, clientTag);
+        
         return SENSEKIT_STATUS_SUCCESS;
     }
 
     sensekit_status_t PluginService::register_stream_removing_callback(stream_removing_callback_t callback,
+                                                                       void* clientTag,
                                                                        CallbackId& callbackId)
     {
-        callbackId = m_streamRemovingSignal += callback;
+        auto thunk = [clientTag, callback](sensekit_streamset_t ss,
+            sensekit_stream_t s,
+            sensekit_stream_desc_t d)
+            { callback(clientTag, ss, s, d); };
+
+        callbackId = m_streamRemovingSignal += thunk;
 
         return SENSEKIT_STATUS_SUCCESS;
     }

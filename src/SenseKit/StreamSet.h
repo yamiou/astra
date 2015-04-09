@@ -30,6 +30,8 @@ namespace sensekit {
         sensekit_streamset_t get_handle()
             { return reinterpret_cast<sensekit_streamset_t>(this); }
 
+        void visit_streams(std::function<void(Stream*)> visitorMethod);
+
         static StreamSet* get_ptr(sensekit_streamset_t handle)
             { return reinterpret_cast<StreamSet*>(handle); }
 
