@@ -258,8 +258,6 @@ namespace sensekit
 
         void OpenNIPlugin::temp_update()
         {
-
-            //std::cout << "openni temp update: " << m_currentDepthFrame << std::endl;
             if (nullptr != m_currentDepthFrame &&
                 read_next_depth_frame(m_currentDepthFrame)
                 == SENSEKIT_STATUS_SUCCESS)
