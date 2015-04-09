@@ -8,6 +8,7 @@
 void print_depth(sensekit_depthframe_t depthFrame)
 {
     sensekit_depthframe_metadata_t metadata;
+
     int16_t* depthData;
     size_t depthLength;
 
@@ -49,6 +50,7 @@ int main(int argc, char** argv)
     sensekit_stream_start(depthStream);
 
     sensekit_frame_index_t lastFrameIndex = -1;
+
     do
     {
         sensekit_temp_update();

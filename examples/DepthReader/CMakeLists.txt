@@ -1,5 +1,5 @@
 set (DepthReader_SOURCES
-  main.cpp
+  main.c
   )
 
 add_executable(DepthReader ${DepthReader_SOURCES})

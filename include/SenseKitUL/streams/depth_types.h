@@ -3,7 +3,7 @@
 
 #include <sensekit_core.h>
 
-struct conversion_cache_t
+typedef struct
 {
     float xzFactor;
     float yzFactor;
@@ -13,15 +13,15 @@ struct conversion_cache_t
     int resolutionY;
     int halfResX;
     int halfResY;
-};
+} conversion_cache_t;
 
 typedef sensekit_streamconnection_t sensekit_depthstream_t;
 
-struct sensekit_depthframe_metadata_t {
+typedef struct {
     uint32_t width;
     uint32_t height;
     uint8_t bytesPerPixel;
-};
+} sensekit_depthframe_metadata_t;
 
 typedef struct _sensekit_depthframe* sensekit_depthframe_t;
 

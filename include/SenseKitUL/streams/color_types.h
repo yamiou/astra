@@ -5,11 +5,11 @@
 
 typedef sensekit_streamconnection_t sensekit_colorstream_t;
 
-struct sensekit_colorframe_metadata_t {
+typedef struct {
     uint32_t width;
     uint32_t height;
     uint8_t bytesPerPixel;
-};
+} sensekit_colorframe_metadata_t;
 
 typedef struct _sensekit_colorframe* sensekit_colorframe_t;
 

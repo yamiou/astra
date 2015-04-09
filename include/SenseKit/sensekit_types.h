@@ -18,10 +18,10 @@ typedef int32_t sensekit_frame_index_t;
 
 const sensekit_stream_subtype_t ANY_SUBTYPE = -1;
 
-struct sensekit_stream_desc_t {
+typedef struct {
     sensekit_stream_type_t type;
     sensekit_stream_subtype_t subType;
-};
+} sensekit_stream_desc_t;
 
 typedef struct _sensekit_streamset* sensekit_streamset_t;
 typedef struct _sensekit_streamconnection_handle* sensekit_streamconnection_handle_t;
@@ -39,14 +39,14 @@ typedef int32_t sensekit_parameter_id;
 
 typedef struct _sensekit_bin* sensekit_bin_t;
 
-typedef enum _sensekit_status {
+typedef enum {
     SENSEKIT_STATUS_SUCCESS = 0,
     SENSEKIT_STATUS_INVALID_PARAMETER = 1,
     SENSEKIT_STATUS_DEVICE_ERROR = 2,
     SENSEKIT_STATUS_TIMEOUT = 3
 } sensekit_status_t;
 
-typedef struct _sensekit_device_desc {
+typedef struct {
     char uri[MAX_STRING_FIELD_LENGTH];
     char vendor[MAX_STRING_FIELD_LENGTH];
     char name[MAX_STRING_FIELD_LENGTH];
@@ -59,7 +59,7 @@ typedef size_t sensekit_callback_id_t;
 typedef struct _sensekit_reader_callback_id* sensekit_reader_callback_id_t;
 
 typedef void(*sensekit_frame_ready_callback_t)(sensekit_reader_t reader,
-                                               sensekit_reader_frame_t frame, 
+                                               sensekit_reader_frame_t frame,
                                                void* clientTag);
 
 #endif /* SENSEKIT_TYPES_H */

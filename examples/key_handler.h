@@ -2,6 +2,7 @@
 #define KEY_HANDLER_H
 
 #include <stdio.h>
+#include <stdbool.h>
 
 #ifdef _WIN32
 
