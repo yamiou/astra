@@ -271,38 +271,21 @@ namespace sensekit
 
         void OpenNIPlugin::temp_update()
         {
-            if (m_currentDepthFrame == nullptr ||
-                read_next_depth_frame(m_currentDepthFrame) == SENSEKIT_STATUS_SUCCESS)
-            {
-                sensekit_frame_t* nextBuffer = nullptr;
-                get_pluginService().cycle_bin_buffers(m_depthBinHandle, &nextBuffer);
-                set_new_depth_buffer(nextBuffer);
-            }
-
-            if (m_currentColorFrame == nullptr ||
-                read_next_color_frame(m_currentColorFrame) == SENSEKIT_STATUS_SUCCESS)
-            {
-                sensekit_frame_t* nextBuffer = nullptr;
-                get_pluginService().cycle_bin_buffers(m_colorBinHandle, &nextBuffer);
-                set_new_color_buffer(nextBuffer);
-            }
+            read_streams();
         }
 
-        sensekit_status_t OpenNIPlugin::read_next_depth_frame(sensekit_depthframe_wrapper_t* frame)
+        sensekit_status_t OpenNIPlugin::read_streams()
         {
-            if (frame == nullptr)
-            {
-                return SENSEKIT_STATUS_INVALID_PARAMETER;
-            }
-
             int dummy;
             int timeout = 0;
-            ::openni::VideoStream* pStream = &m_depthStream;
-            if (::openni::OpenNI::waitForAnyStream(&pStream, 1, &dummy, timeout)
+            ::openni::VideoStream* pStreams[2] =  { &m_depthStream, &m_colorStream };
+            if (::openni::OpenNI::waitForAnyStream(pStreams, 2, &dummy, timeout)
                 == ::openni::STATUS_TIME_OUT)
             {
                 return SENSEKIT_STATUS_TIMEOUT;
             }
+
+            sensekit_frame_t* nextBuffer = nullptr;
 
             ::openni::VideoFrameRef ref;
             if (m_depthStream.readFrame(&ref) == ::openni::STATUS_OK)
@@ -317,32 +300,11 @@ namespace sensekit
                 ++m_frameIndex;
 
                 ref.release();
-            }
-            else
-            {
-                return SENSEKIT_STATUS_DEVICE_ERROR;
-            }
 
-            return SENSEKIT_STATUS_SUCCESS;
-        }
-
-        sensekit_status_t OpenNIPlugin::read_next_color_frame(sensekit_colorframe_wrapper_t* frame)
-        {
-            if (frame == nullptr)
-            {
-                return SENSEKIT_STATUS_INVALID_PARAMETER;
+                get_pluginService().cycle_bin_buffers(m_depthBinHandle, &nextBuffer);
+                set_new_depth_buffer(nextBuffer);
             }
 
-            int dummy;
-            int timeout = 0;
-            ::openni::VideoStream* pStream = &m_colorStream;
-            if (::openni::OpenNI::waitForAnyStream(&pStream, 1, &dummy, timeout)
-                == ::openni::STATUS_TIME_OUT)
-            {
-                return SENSEKIT_STATUS_TIMEOUT;
-            }
-
-            ::openni::VideoFrameRef ref;
             if (m_colorStream.readFrame(&ref) == ::openni::STATUS_OK)
             {
                 const uint8_t* datData = static_cast<const uint8_t*>(ref.getData());
@@ -356,10 +318,9 @@ namespace sensekit
 
                 ref.release();
 
-            }
-            else
-            {
-                return SENSEKIT_STATUS_DEVICE_ERROR;
+                get_pluginService().cycle_bin_buffers(m_colorBinHandle, &nextBuffer);
+                set_new_color_buffer(nextBuffer);
+
             }
 
             return SENSEKIT_STATUS_SUCCESS;

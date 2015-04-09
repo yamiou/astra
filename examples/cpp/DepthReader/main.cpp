@@ -27,7 +27,7 @@ void print_depth(sensekit::DepthFrame& depthFrame,
         mapper.convert_depth_to_world(width / 2.0f, height / 2.0f, middle, &worldX, &worldY, &worldZ);
         mapper.convert_world_to_depth(worldX, worldY, worldZ, &depthX, &depthY, &depthZ);
 
-        std::cout << "index: " << frameIndex
+        std::cout << "depth index: " << frameIndex
                   << " value: " << middle
                   << " wX: " << worldX
                   << " wY: " << worldY
@@ -57,7 +57,7 @@ void print_color(sensekit::ColorFrame& colorFrame)
         uint8_t g = buffer[index + 1];
         uint8_t b = buffer[index + 2];
 
-        std::cout << "index: " << frameIndex
+        std::cout << "color index: " << frameIndex
             << " r: " << +r
             << " g: " << +g
             << " b: " << +b
@@ -67,6 +67,37 @@ void print_color(sensekit::ColorFrame& colorFrame)
     }
 }
 
+class SampleFrameListener : public sensekit::FrameReadyListener
+{
+    virtual void on_frame_ready(sensekit::StreamReader& reader,
+                                 sensekit::Frame& frame) override
+        {
+            sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
+            print_depth(depthFrame,
+                        reader.stream<sensekit::DepthStream>().get_coordinateMapper());
+
+            sensekit::ColorFrame colorFrame = frame.get<sensekit::ColorFrame>();
+            print_color(colorFrame);
+
+            if (depthFrame.is_valid() && colorFrame.is_valid())
+            {
+                ++count;
+            }
+            else
+            {
+                std::cout << "invalid frame(s)" << std::endl;
+            }
+
+            if (count == 10)
+            {
+                reader.removeListener(*this);
+            }
+        }
+
+private:
+    int count{0};
+};
+
 int main(int argc, char** argv)
 {
     set_key_handler();
@@ -74,20 +105,15 @@ int main(int argc, char** argv)
     sensekit::Sensor sensor;
     sensekit::StreamReader reader = sensor.create_reader();
 
+    SampleFrameListener listener;
+
     reader.stream<sensekit::DepthStream>().start();
     reader.stream<sensekit::ColorStream>().start();
 
+    reader.addListener(listener);
+    int count = 0;
     do
     {
         sensekit_temp_update();
-
-        sensekit::Frame frame = reader.get_latest_frame(30);
-        sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
-        print_depth(depthFrame,
-                    reader.stream<sensekit::DepthStream>().get_coordinateMapper());
-
-        sensekit::ColorFrame colorFrame = frame.get<sensekit::ColorFrame>();
-        print_color(colorFrame);
-
-     } while (shouldContinue);
+    } while (shouldContinue);
 }

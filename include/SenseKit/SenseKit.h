@@ -5,7 +5,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-
+#include <functional>
 #include "sensekit_capi.h"
 
 namespace sensekit {
@@ -77,12 +77,34 @@ namespace sensekit {
         std::shared_ptr<FrameRef> m_frame;
     };
 
+    class FrameReadyListener
+    {
+    public:
+        virtual void on_frame_ready(StreamReader& reader, Frame& frame) = 0;
+    };
+
+    inline bool operator==(const FrameReadyListener& l, const FrameReadyListener& r)
+    {
+        return &l == &r;
+    }
+
     class StreamReader
     {
     public:
         StreamReader(sensekit_reader_t reader)
             : m_reader(std::make_shared<ReaderRef>(reader))
-            { }
+            {
+                sensekit_reader_register_frame_ready_callback(m_reader->get(),
+                                                              &StreamReader::frame_ready_thunk,
+                                                              this,
+                                                              &m_callbackId);
+            }
+
+        ~StreamReader()
+            {
+                m_listeners.clear();
+                sensekit_reader_unregister_frame_ready_callback(&m_callbackId);
+            }
 
         template<typename T>
         T stream()
@@ -103,14 +125,93 @@ namespace sensekit {
                 return T(connection);
             }
 
+        void addListener(FrameReadyListener& listener)
+            {
+                auto it = std::find(m_listeners.begin(),
+                                    m_listeners.end(),
+                                    listener);
+
+                if (it != m_listeners.end())
+                    return;
+
+                if (m_isNotifying)
+                {
+                    m_addedListeners.push_back(listener);
+                }
+                else
+                {
+                    m_listeners.push_back(listener);
+                }
+            }
+
+        void removeListener(FrameReadyListener& listener)
+            {
+                auto it = std::find(m_listeners.begin(),
+                                    m_listeners.end(),
+                                    listener);
+
+                if (it == m_listeners.end())
+                    return;
+
+                if (m_isNotifying)
+                {
+                    m_removedListeners.push_back(listener);
+                }
+                else
+                {
+                    m_listeners.erase(it);
+                }
+            }
+
         Frame get_latest_frame(int timeoutMillis = SENSEKIT_TIMEOUT_FOREVER)
             {
                 sensekit_reader_frame_t frame;
                 sensekit_reader_open_frame(m_reader->get(), timeoutMillis, &frame);
+
                 return Frame(frame);
             }
 
     private:
+        static void frame_ready_thunk(void* clientTag,
+                                      sensekit_reader_t reader,
+                                      sensekit_reader_frame_t frame)
+            {
+                StreamReader* self = static_cast<StreamReader*>(clientTag);
+                self->notify_listeners(frame);
+            }
+
+        void notify_listeners(sensekit_reader_frame_t readerFrame)
+            {
+                if (m_removedListeners.size() > 0)
+                {
+                    for(FrameReadyListener& listener : m_removedListeners)
+                    {
+                        auto it = std::find(m_listeners.begin(),
+                                            m_listeners.end(),
+                                            listener);
+
+                        m_listeners.erase(it);
+                    }
+                    m_removedListeners.clear();
+                }
+
+                std::move(m_addedListeners.begin(),
+                          m_addedListeners.end(),
+                          std::back_inserter(m_listeners));
+
+                if (m_listeners.size() == 0)
+                    return;
+
+                Frame frameWrapper(readerFrame);
+
+                m_isNotifying = true;
+                for(FrameReadyListener& listener : m_listeners)
+                {
+                    listener.on_frame_ready(*this, frameWrapper);
+                }
+                m_isNotifying = false;
+            }
+
         class ReaderRef
         {
         public:
@@ -131,7 +232,16 @@ namespace sensekit {
             sensekit_reader_t m_reader;
         };
 
+        bool m_isNotifying{false};
+
+        using ListenerList = std::vector<std::reference_wrapper<FrameReadyListener> >;
+
+        ListenerList m_listeners;
+        ListenerList m_addedListeners;
+        ListenerList m_removedListeners;
+
         std::shared_ptr<ReaderRef> m_reader;
+        sensekit_reader_callback_id_t m_callbackId;
     };
 
     StreamReader Sensor::create_reader()

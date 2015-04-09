@@ -34,9 +34,8 @@ namespace sensekit {
     class SenseKitContext
     {
     public:
-        SenseKitContext()
-            : m_pluginService(*this) {}
-        virtual ~SenseKitContext() {}
+        SenseKitContext();
+        ~SenseKitContext();
 
         sensekit_status_t initialize();
 

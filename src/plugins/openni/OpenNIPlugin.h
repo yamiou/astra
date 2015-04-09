@@ -49,8 +49,7 @@ namespace sensekit
             void set_new_depth_buffer(sensekit_frame_t* nextBuffer);
             void set_new_color_buffer(sensekit_frame_t* nextBuffer);
 
-            sensekit_status_t read_next_depth_frame(sensekit_depthframe_wrapper_t* frame);
-            sensekit_status_t read_next_color_frame(sensekit_colorframe_wrapper_t* frame);
+            sensekit_status_t read_streams();
 
             ::openni::Device m_device;
             ::openni::VideoStream m_depthStream;

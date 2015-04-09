@@ -8,9 +8,18 @@
 #include <Plugins/PluginServiceProxyBase.h>
 #include <SenseKitAPI.h>
 #include "CreateStreamProxy.h"
+#include "sensekit_capi.h"
 #include "sensekit_internal.h"
 
 namespace sensekit {
+
+    SenseKitContext::SenseKitContext()
+        : m_pluginService(*this) {}
+
+    SenseKitContext::~SenseKitContext()
+    {
+        sensekit_terminate();
+    }
 
     sensekit_status_t SenseKitContext::initialize()
     {
@@ -288,9 +297,9 @@ namespace sensekit {
         auto setHandle = set.get_handle();
 
         std::function<void(Stream*)> visitor = [setHandle, callback, clientTag](Stream* stream)
-        {
-            callback(clientTag, setHandle, stream->get_handle(), stream->get_description());
-        };
+            {
+                callback(clientTag, setHandle, stream->get_handle(), stream->get_description());
+            };
 
         set.visit_streams(visitor);
     }
