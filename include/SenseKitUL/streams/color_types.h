@@ -1,7 +1,7 @@
 #ifndef COLOR_TYPES_H
 #define COLOR_TYPES_H
 
-#include <sensekit_core.h>
+#include <sensekit_types.h>
 
 typedef sensekit_streamconnection_t sensekit_colorstream_t;
 

@@ -2,6 +2,7 @@
 #define OPENNIPLUGIN_H
 
 #include <Plugins/plugin_api.h>
+#include <sensekit_capi.h>
 #include <OpenNI.h>
 #include <streams/depth_types.h>
 #include <streams/color_types.h>

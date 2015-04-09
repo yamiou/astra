@@ -1,7 +1,7 @@
 #ifndef COLOR_CAPI_H
 #define COLOR_CAPI_H
 
-#include <sensekit_core.h>
+#include <sensekit_types.h>
 #include "color_types.h"
 
 SENSEKIT_BEGIN_DECLS

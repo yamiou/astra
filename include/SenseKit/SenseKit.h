@@ -1,11 +1,12 @@
 #ifndef SENSEKIT_H
 #define SENSEKIT_H
 
-#include "sensekit_core.h"
 #include <stdexcept>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "sensekit_capi.h"
 
 namespace sensekit {
 
@@ -14,7 +15,7 @@ namespace sensekit {
     class Sensor
     {
     public:
-        Sensor(const std::string uri)
+        Sensor(std::string uri)
             {
                 sensekit_initialize(); //idempotent
                 sensekit_streamset_open(uri.c_str(), &m_streamSet);

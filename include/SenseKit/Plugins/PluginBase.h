@@ -1,7 +1,7 @@
 ﻿#ifndef PLUGINBASE_H
 #define PLUGINBASE_H
 
-#include <sensekit_core.h>
+#include <sensekit_types.h>
 #include "PluginServiceProxy.h"
 
 namespace sensekit {

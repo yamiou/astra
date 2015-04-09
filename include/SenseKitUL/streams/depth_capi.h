@@ -1,7 +1,7 @@
 #ifndef DEPTH_CAPI_H
 #define DEPTH_CAPI_H
 
-#include <sensekit_core.h>
+#include <sensekit_types.h>
 #include "depth_types.h"
 
 SENSEKIT_BEGIN_DECLS

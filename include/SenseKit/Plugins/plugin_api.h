@@ -1,6 +1,7 @@
 #ifndef PLUGIN_API_H
 #define PLUGIN_API_H
 
+#include "../sensekit_defines.h"
 #include "../sensekit_types.h"
 
 struct _sensekit_streamconnection {
@@ -46,14 +47,12 @@ typedef void(*connection_removed_callback_t)(void*, sensekit_streamconnection_t)
 typedef void(*stream_added_callback_t)(void*,
                                        sensekit_streamset_t,
                                        sensekit_stream_t,
-                                       sensekit_stream_desc_t
-                                       );
+                                       sensekit_stream_desc_t);
 
 typedef void(*stream_removing_callback_t)(void*,
                                           sensekit_streamset_t,
                                           sensekit_stream_t,
-                                          sensekit_stream_desc_t
-                                          );
+                                          sensekit_stream_desc_t);
 
 struct stream_callbacks_t
 {

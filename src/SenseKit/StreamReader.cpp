@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cassert>
 #include <chrono>
+#include <sensekit_capi.h>
 
 namespace sensekit {
     using namespace std::placeholders;

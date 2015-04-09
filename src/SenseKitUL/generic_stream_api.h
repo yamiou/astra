@@ -1,7 +1,7 @@
 #ifndef GENERIC_STREAM_API_H
 #define GENERIC_STREAM_API_H
 
-#include "sensekit_core.h"
+#include "sensekit_capi.h"
 #include "../SenseKit/sensekit_internal.h"
 
 template<typename TStreamType>

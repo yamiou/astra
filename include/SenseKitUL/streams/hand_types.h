@@ -1,6 +1,8 @@
 #ifndef HAND_TYPES_H
 #define HAND_TYPES_H
 
+#include <sensekit_types.h>
+
 #define SENSEKIT_HANDS_MAX_HANDPOINTS 20
 
 typedef enum _sensekit_handstatus
@@ -30,7 +32,6 @@ typedef struct _sensekit_handpoint {
 } sensekit_handpoint_t;
 
 typedef struct _sensekit_handframe* sensekit_handframe_t;
-
-typedef struct _sensekit_handstream* sensekit_handstream_t;
+typedef sensekit_streamconnection_t sensekit_handstream_t;
 
 #endif // HAND_TYPES_H

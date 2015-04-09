@@ -1,4 +1,4 @@
-#include <sensekit_core.h>
+#include <sensekit_types.h>
 #include "generic_stream_api.h"
 #include <streams/color_types.h>
 #include "SenseKitUL_internal.h"

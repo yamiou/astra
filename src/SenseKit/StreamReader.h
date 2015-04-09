@@ -1,7 +1,7 @@
 #ifndef STREAMREADER_H
 #define STREAMREADER_H
 
-#include <sensekit_core.h>
+#include <sensekit_types.h>
 #include "StreamSet.h"
 #include "StreamConnection.h"
 #include <unordered_map>

@@ -1,4 +1,3 @@
-#include <sensekit_core.h>
 #include <SenseKitUL.h>
 #include <Plugins/StreamServiceProxyBase.h>
 

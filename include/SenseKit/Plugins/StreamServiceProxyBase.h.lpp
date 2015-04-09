@@ -2,7 +2,7 @@
 #ifndef STREAMSERVICEPROXYBASE_H
 #define STREAMSERVICEPROXYBASE_H
 
-#include <sensekit_core.h>
+#include <sensekit_types.h>
 
 struct StreamServiceProxyBase
 {
