@@ -46,6 +46,9 @@ if (WIN32)
                                 "$<TARGET_FILE_DIR:OpenNIPlugin>/OpenNIPlugin.dll"
                                 "$<TARGET_FILE_DIR:SimpleViewer>/Plugins"
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                "$<TARGET_FILE_DIR:orbbec_hands>/orbbec_hands.dll"
+                                "$<TARGET_FILE_DIR:HandReader>/Plugins"
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 "$<TARGET_FILE_DIR:DummyPlugin>/DummyPlugin.dll"
                                 "$<TARGET_FILE_DIR:SimpleViewer>/Plugins"
           #DepthReaderCPP
@@ -63,6 +66,12 @@ if (WIN32)
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 "$<TARGET_FILE_DIR:OpenNIPlugin>/OpenNIPlugin.dll"
                                 "$<TARGET_FILE_DIR:DepthReaderCPP>/Plugins"
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                "$<TARGET_FILE_DIR:orbbec_hands>/orbbec_hands.dll"
+                                "$<TARGET_FILE_DIR:HandReader>/Plugins"
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                "$<TARGET_FILE_DIR:orbbec_hands>/orbbec_hands.dll"
+                                "$<TARGET_FILE_DIR:HandReader>/Plugins"
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 "$<TARGET_FILE_DIR:DummyPlugin>/DummyPlugin.dll"
                                 "$<TARGET_FILE_DIR:DepthReaderCPP>/Plugins"
@@ -82,6 +91,9 @@ if (WIN32)
                                 "$<TARGET_FILE_DIR:OpenNIPlugin>/OpenNIPlugin.dll"
                                 "$<TARGET_FILE_DIR:DepthReader>/Plugins"
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                "$<TARGET_FILE_DIR:orbbec_hands>/orbbec_hands.dll"
+                                "$<TARGET_FILE_DIR:HandReader>/Plugins"
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 "$<TARGET_FILE_DIR:DummyPlugin>/DummyPlugin.dll"
                                 "$<TARGET_FILE_DIR:DepthReader>/Plugins"
           #SimpleColorViewer
@@ -99,6 +111,9 @@ if (WIN32)
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 "$<TARGET_FILE_DIR:OpenNIPlugin>/OpenNIPlugin.dll"
                                 "$<TARGET_FILE_DIR:SimpleColorViewer>/Plugins"
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                "$<TARGET_FILE_DIR:orbbec_hands>/orbbec_hands.dll"
+                                "$<TARGET_FILE_DIR:HandReader>/Plugins"
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 "$<TARGET_FILE_DIR:DummyPlugin>/DummyPlugin.dll"
                                 "$<TARGET_FILE_DIR:SimpleColorViewer>/Plugins"
@@ -118,6 +133,9 @@ if (WIN32)
                                 "$<TARGET_FILE_DIR:OpenNIPlugin>/OpenNIPlugin.dll"
                                 "$<TARGET_FILE_DIR:DepthReaderEvent>/Plugins"
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                "$<TARGET_FILE_DIR:orbbec_hands>/orbbec_hands.dll"
+                                "$<TARGET_FILE_DIR:HandReader>/Plugins"
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 "$<TARGET_FILE_DIR:DummyPlugin>/DummyPlugin.dll"
                                 "$<TARGET_FILE_DIR:DepthReaderEvent>/Plugins"
           #HandReader
@@ -134,6 +152,9 @@ if (WIN32)
                                 $<TARGET_FILE_DIR:HandReader>
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 "$<TARGET_FILE_DIR:OpenNIPlugin>/OpenNIPlugin.dll"
+                                "$<TARGET_FILE_DIR:HandReader>/Plugins"
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                "$<TARGET_FILE_DIR:orbbec_hands>/orbbec_hands.dll"
                                 "$<TARGET_FILE_DIR:HandReader>/Plugins"
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 "$<TARGET_FILE_DIR:DummyPlugin>/DummyPlugin.dll"
