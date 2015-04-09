@@ -6,12 +6,13 @@
 #include <streams/depth_types.h>
 #include <streams/color_types.h>
 #include "../../SenseKitUL/SenseKitUL_internal.h"
+#include <SenseKit/Plugins/StreamCallbackListener.h>
 
 namespace sensekit
 {
     namespace openni
     {
-        class OpenNIPlugin : public PluginBase
+        class OpenNIPlugin : public PluginBase, StreamCallbackListener
         {
         public:
             OpenNIPlugin(PluginServiceProxy* pluginService);

@@ -47,7 +47,7 @@ namespace sensekit
             if (streamDesc.type == SENSEKIT_STREAM_DEPTH &&
                 m_streamTrackerMap.find(streamHandle) == m_streamTrackerMap.end())
             {
-                HandTracker* tracker = new HandTracker(&get_pluginService());
+                HandTracker* tracker = new HandTracker(get_pluginService());
                 tracker->setupStream(setHandle, streamDesc);
                 m_streamTrackerMap[streamHandle] = tracker;
             }

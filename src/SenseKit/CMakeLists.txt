@@ -5,6 +5,7 @@ set(SenseKit_SOURCES
   ../../include/SenseKit/sensekit_capi.h
   ../../include/SenseKit/Plugins/plugin_api.h
   ../../include/SenseKit/Plugins/PluginBase.h
+  ../../include/SenseKit/Plugins/StreamCallbackListener.h
   ../../include/SenseKit/Plugins/PluginServiceProxy.h
   ../../include/SenseKit/Plugins/PluginServiceProxyBase.h
   ../../include/SenseKit/Plugins/StreamServiceProxy.h
