@@ -120,6 +120,9 @@ void HandTracker::updateTracking(sensekit_depthframe_t depthFrame)
     if (m_currentHandFrame != nullptr)
     {
         updateHandFrame(m_pointProcessor.get_trackedPoints(), m_currentHandFrame);
+        sensekit_frame_t* nextBuffer = nullptr;
+        get_pluginService().cycle_bin_buffers(m_handBinHandle, &nextBuffer);
+        setNextBuffer(nextBuffer);
     }
 }
 
@@ -262,23 +265,26 @@ void HandTracker::get_parameter_data(sensekit_streamconnection_t streamConnectio
 
 void HandTracker::connection_added(sensekit_streamconnection_t connection)
 {
-    int binLength = sizeof(_sensekit_handframe) + SENSEKIT_HANDS_MAX_HANDPOINTS * sizeof(sensekit_handpoint_t);
+    if (m_handBinHandle == nullptr)
+    {
+        int binLength = sizeof(sensekit_handframe_wrapper_t) + SENSEKIT_HANDS_MAX_HANDPOINTS * sizeof(sensekit_handpoint_t);
 
-    sensekit_frame_t* nextBuffer = nullptr;
-    get_pluginService().create_stream_bin(m_handStream, binLength, &m_handBinHandle, &nextBuffer);
-    setNextBuffer(nextBuffer);
-    get_pluginService().link_connection_to_bin(connection, m_handBinHandle);
+        sensekit_frame_t* nextBuffer = nullptr;
+        get_pluginService().create_stream_bin(m_handStream, binLength, &m_handBinHandle, &nextBuffer);
+        setNextBuffer(nextBuffer);
+        get_pluginService().link_connection_to_bin(connection, m_handBinHandle);
+    }
 }
 
 void HandTracker::connection_removed(sensekit_streamconnection_t connection)
 {
     get_pluginService().link_connection_to_bin(connection, nullptr);
-    //TODO need API for get bin client count...don't destroy if other clients assigned to it
+    //don't destroy bin if other connections are linked assigned to it
     bool hasConnections;
     get_pluginService().bin_has_connections(m_handBinHandle, &hasConnections);
     if (!hasConnections)
     {
         get_pluginService().destroy_stream_bin(m_handStream, &m_handBinHandle, &m_currentHandBuffer);
+        setNextBuffer(m_currentHandBuffer);
     }
-    setNextBuffer(m_currentHandBuffer);
 }
