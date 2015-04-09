@@ -230,10 +230,10 @@ sensekit_handstatus_t HandTracker::convertHandStatus(TrackingStatus status)
     switch (status)
     {
     case TrackingStatus::Tracking:
-        return sensekit_handstatus_t::HAND_STATUS_NOTTRACKING;
+        return sensekit_handstatus_t::HAND_STATUS_TRACKING;
         break;
     case TrackingStatus::Lost:
-        return sensekit_handstatus_t::HAND_STATUS_NOTTRACKING;
+        return sensekit_handstatus_t::HAND_STATUS_LOST;
         break;
     case TrackingStatus::Dead:
     case TrackingStatus::NotTracking:
