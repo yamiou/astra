@@ -330,7 +330,7 @@ namespace sensekit
 
                 uint8_t* frameData = m_currentColorFrame->frame.data;
 
-                int dataSize = MIN(ref.getDataSize(), m_depthBufferLength);
+                int dataSize = MIN(ref.getDataSize(), m_colorBufferLength);
                 memcpy(frameData, datData, dataSize);
 
                 ++m_frameIndex;
