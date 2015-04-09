@@ -20,6 +20,8 @@ namespace sensekit {
         m_pluginServiceProxy = m_pluginService.create_proxy();
         m_streamServiceProxy = create_stream_proxy(this);
 
+        sensekit_api_set_proxy(get_streamServiceProxy());
+
         //TODO: OMG ERROR HANDLING
         LibHandle libHandle = nullptr;
 
@@ -42,8 +44,6 @@ namespace sensekit {
                 os_free_library(libHandle);
             }
         }
-
-        sensekit_api_set_proxy(get_streamServiceProxy());
 
         m_initialized = true;
 
