@@ -20,7 +20,6 @@ namespace sensekit
 {
     namespace openni
     {
-
         OpenNIPlugin::OpenNIPlugin(PluginServiceProxy* pluginService)
             : PluginBase(pluginService)
         {
