@@ -1,5 +1,6 @@
 set(SenseKitUL_SOURCES
   ../../include/SenseKitUL/SenseKitUL.h
+  ../../include/SenseKitUL/skul_capi.h
   ../../include/SenseKitUL/streams/depth.h
   ../../include/SenseKitUL/streams/depth_capi.h
   ../../include/SenseKitUL/streams/depth_types.h

@@ -1,9 +1,8 @@
 ﻿// Orbbec (c) 2015
 
-#include <SenseKit.h>
-#include <SenseKitUL.h>
-#include <cstdio>
-#include <iostream>
+#include <sensekit_capi.h>
+#include <skul_capi.h>
+#include <stdio.h>
 #include "../key_handler.h"
 
 void print_depth(sensekit_depthframe_t depthFrame)
@@ -28,7 +27,7 @@ void print_depth(sensekit_depthframe_t depthFrame)
 
     sensekit_frame_index_t frameIndex;
     sensekit_depthframe_get_frameindex(depthFrame, &frameIndex);
-    std::cout << "index: " << frameIndex << " value: " << middle << std::endl;
+    printf("index %d value %d\n", frameIndex, middle);
 }
 
 int main(int argc, char** argv)
