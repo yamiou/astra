@@ -16,7 +16,11 @@ namespace sensekit
         class OpenNIPlugin : public PluginBase, StreamCallbackListener
         {
         public:
-            OpenNIPlugin(PluginServiceProxy* pluginService);
+            OpenNIPlugin(PluginServiceProxy* pluginService)
+                : PluginBase(pluginService)
+            {
+                init_openni();
+            }
 
             virtual ~OpenNIPlugin();
             virtual void temp_update() override;
@@ -25,6 +29,7 @@ namespace sensekit
             OpenNIPlugin& operator=(const OpenNIPlugin&) = delete;
 
         private:
+            void init_openni();
 
             virtual void set_parameter(sensekit_streamconnection_t connection,
                                sensekit_parameter_id id,

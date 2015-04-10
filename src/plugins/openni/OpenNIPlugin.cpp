@@ -20,8 +20,7 @@ namespace sensekit
 {
     namespace openni
     {
-        OpenNIPlugin::OpenNIPlugin(PluginServiceProxy* pluginService)
-            : PluginBase(pluginService)
+        void OpenNIPlugin::init_openni()
         {
             ::openni::Status rc = ::openni::STATUS_OK;
 
@@ -29,6 +28,7 @@ namespace sensekit
 
             cout << "Initializing openni" << endl;
             rc = ::openni::OpenNI::initialize();
+            
             cout << "Opening device" << endl;
             rc = m_device.open(deviceURI);
 
