@@ -64,12 +64,12 @@ namespace sensekit {
         if (!m_initialized)
             return SENSEKIT_STATUS_SUCCESS;
 
-        m_readers.clear();
-
         for(auto pluginFuncs : m_pluginList)
         {
             pluginFuncs.terminate();
         }
+
+        m_readers.clear();
 
         if (m_pluginServiceProxy)
             delete m_pluginServiceProxy;
