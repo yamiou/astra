@@ -271,56 +271,69 @@ namespace sensekit
 
         void OpenNIPlugin::temp_update()
         {
-            read_streams();
+            if (m_currentColorBuffer != nullptr
+                && m_currentDepthBuffer != nullptr)
+            {
+                read_streams();
+            }
+            else
+            {
+                std::cout << "buffers not available" << std::endl;
+            }
         }
 
         sensekit_status_t OpenNIPlugin::read_streams()
         {
-            int dummy;
-            int timeout = 0;
-            ::openni::VideoStream* pStreams[2] =  { &m_depthStream, &m_colorStream };
-            if (::openni::OpenNI::waitForAnyStream(pStreams, 2, &dummy, timeout)
+            int streamIndex = -1;
+            int timeout = ::openni::TIMEOUT_NONE;
+
+            ::openni::VideoStream* pStreams[] =  { &m_depthStream, &m_colorStream };
+            if (::openni::OpenNI::waitForAnyStream(pStreams, 2, &streamIndex, timeout)
                 == ::openni::STATUS_TIME_OUT)
             {
                 return SENSEKIT_STATUS_TIMEOUT;
             }
 
+            if (streamIndex == -1)
+                return SENSEKIT_STATUS_TIMEOUT;
+
             sensekit_frame_t* nextBuffer = nullptr;
 
-            ::openni::VideoFrameRef ref;
-            if (m_depthStream.readFrame(&ref) == ::openni::STATUS_OK)
+            if (streamIndex == 0)
             {
-                const int16_t* datData = static_cast<const int16_t*>(ref.getData());
+                ::openni::VideoFrameRef ref;
+                if (m_depthStream.readFrame(&ref) == ::openni::STATUS_OK)
+                {
+                    const int16_t* datData = static_cast<const int16_t*>(ref.getData());
 
-                int16_t* frameData = m_currentDepthFrame->frame.data;
-                int dataSize = MIN(ref.getDataSize(), m_depthBufferLength);
+                    int16_t* frameData = m_currentDepthFrame->frame.data;
+                    int dataSize = MIN(ref.getDataSize(), m_depthBufferLength);
 
-                memcpy(frameData, datData, dataSize);
+                    memcpy(frameData, datData, dataSize);
 
-                ++m_frameIndex;
+                    ++m_frameIndex;
 
-                ref.release();
-
-                get_pluginService().cycle_bin_buffers(m_depthBinHandle, &nextBuffer);
-                set_new_depth_buffer(nextBuffer);
+                    get_pluginService().cycle_bin_buffers(m_depthBinHandle, &nextBuffer);
+                    set_new_depth_buffer(nextBuffer);
+                }
             }
-
-            if (m_colorStream.readFrame(&ref) == ::openni::STATUS_OK)
+            else if (streamIndex == 1)
             {
-                const uint8_t* datData = static_cast<const uint8_t*>(ref.getData());
+                ::openni::VideoFrameRef ref;
+                if (m_colorStream.readFrame(&ref) == ::openni::STATUS_OK)
+                {
+                    const uint8_t* datData = static_cast<const uint8_t*>(ref.getData());
 
-                uint8_t* frameData = m_currentColorFrame->frame.data;
+                    uint8_t* frameData = m_currentColorFrame->frame.data;
 
-                int dataSize = MIN(ref.getDataSize(), m_colorBufferLength);
-                memcpy(frameData, datData, dataSize);
+                    int dataSize = MIN(ref.getDataSize(), m_colorBufferLength);
+                    memcpy(frameData, datData, dataSize);
 
-                ++m_frameIndex;
+                    ++m_frameIndex;
 
-                ref.release();
-
-                get_pluginService().cycle_bin_buffers(m_colorBinHandle, &nextBuffer);
-                set_new_color_buffer(nextBuffer);
-
+                    get_pluginService().cycle_bin_buffers(m_colorBinHandle, &nextBuffer);
+                    set_new_color_buffer(nextBuffer);
+                }
             }
 
             return SENSEKIT_STATUS_SUCCESS;
