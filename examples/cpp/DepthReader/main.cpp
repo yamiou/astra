@@ -90,6 +90,7 @@ class SampleFrameListener : public sensekit::FrameReadyListener
 
             if (count == 10)
             {
+                std::cout << "removing listener" << std::endl;
                 reader.removeListener(*this);
             }
         }
