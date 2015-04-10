@@ -27,9 +27,9 @@ namespace sensekit {
                 return desc;
             }
 
-            static StreamDescription* fromDesc(sensekit_stream_desc_t& desc)
+            static StreamDescription fromDesc(sensekit_stream_desc_t& desc)
             {
-                return new StreamDescription(desc.type, desc.subType);
+                return StreamDescription(desc.type, desc.subType);
             }
         };
 

@@ -49,8 +49,11 @@ namespace sensekit
                 if (streamDesc.type == SENSEKIT_STREAM_DEPTH &&
                     m_streamTrackerMap.find(streamHandle) == m_streamTrackerMap.end())
                 {
-                    HandTracker* tracker = new HandTracker(get_pluginService(), setHandle, streamDesc);
+                    Sensor sensor(setHandle);
+                    StreamDescription depthDescription = StreamDescription::fromDesc(streamDesc);
+                    HandTracker* tracker = new HandTracker(get_pluginService(), sensor, depthDescription);
                     m_streamTrackerMap[streamHandle] = tracker;
+                    
                 }
             }
 

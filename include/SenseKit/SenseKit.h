@@ -11,7 +11,7 @@
 namespace sensekit {
 
     class StreamReader;
-
+    
     class Sensor
     {
     public:
@@ -20,6 +20,14 @@ namespace sensekit {
                 sensekit_initialize(); //idempotent
                 sensekit_streamset_open(uri.c_str(), &m_streamSet);
             }
+
+        Sensor(const sensekit_streamset_t& streamSetHandle) : m_streamSet(streamSetHandle)
+        {
+            if (streamSetHandle == nullptr)
+            {
+                throw std::invalid_argument("streamSetHandle must not be null");
+            }
+        }
 
         Sensor()
             : Sensor("") { }
@@ -30,10 +38,10 @@ namespace sensekit {
             }
 
         inline StreamReader create_reader();
+        sensekit_streamset_t get_handle() const { return m_streamSet; }
 
     private:
-        sensekit_streamset_t get_handle() { return m_streamSet; }
-
+        
         sensekit_streamset_t m_streamSet;
         std::string m_uri;
 
@@ -80,6 +88,7 @@ namespace sensekit {
     class FrameReadyListener
     {
     public:
+        virtual ~FrameReadyListener() = default;
         virtual void on_frame_ready(StreamReader& reader, Frame& frame) = 0;
     };
 

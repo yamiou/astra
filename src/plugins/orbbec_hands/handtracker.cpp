@@ -36,64 +36,42 @@ namespace sensekit
 #define MIN_CHUNKS_SIZE(data_size, chunk_size)  (MIN_NUM_CHUNKS(data_size, chunk_size) * (chunk_size))
 
             HandTracker::HandTracker(PluginServiceProxy& pluginService, 
-                                     sensekit_streamset_t setHandle, 
-                                     sensekit_stream_desc_t depthStreamDesc) :
+                                     Sensor& streamset,
+                                     StreamDescription& depthDescription) :
                 m_pluginService(pluginService),
                 m_depthUtility(PROCESSING_SIZE_WIDTH, PROCESSING_SIZE_HEIGHT),
                 m_converter(1.0),
-                m_pointProcessor(m_converter)
+                m_pointProcessor(m_converter),
+                m_reader(streamset.create_reader())
             {
-                create_streams(pluginService, setHandle);
+                create_hand_streams(pluginService, streamset);
 
-                subscribeToDepthStream(setHandle, depthStreamDesc);
+                subscribe_to_depth_stream(streamset, depthDescription);
             }
 
             HandTracker::~HandTracker()
             {
-                delete m_handStream;
-
-                sensekit_reader_unregister_frame_ready_callback(&m_readerCallbackId);
-                sensekit_reader_destroy(&m_reader);
             }
 
-            void HandTracker::create_streams(PluginServiceProxy& pluginService, sensekit_streamset_t setHandle)
+            void HandTracker::on_frame_ready(StreamReader& reader, Frame& frame)
+            {
+                DepthFrame depthFrame = frame.get<DepthFrame>();
+
+                update_tracking(depthFrame);
+            }
+
+            void HandTracker::create_hand_streams(PluginServiceProxy& pluginService, Sensor streamset)
             {
                 size_t binByteLength = sizeof(sensekit_depthframe_wrapper_t) + SENSEKIT_HANDS_MAX_HANDPOINTS * sizeof(sensekit_handpoint_t);
 
                 StreamDescription description(SENSEKIT_STREAM_HAND, HAND_DEFAULT_SUBTYPE);
-                m_handStream = new PluginStream<sensekit_handframe_wrapper_t>(pluginService, setHandle, description, binByteLength);
+                m_handStream = make_unique<HandStream>(pluginService, streamset, description, binByteLength);
             }
 
-            void HandTracker::subscribeToDepthStream(sensekit_streamset_t setHandle,
-                                                     sensekit_stream_desc_t depthStreamDesc)
+            void HandTracker::subscribe_to_depth_stream(Sensor& streamset, StreamDescription& depthDescription)
             {
-                //subscribe to m_depthStream's frame ready event
-                sensekit_reader_create(setHandle, &m_reader);
-
-                sensekit_streamconnection_t depthConnection;
-                sensekit_status_t rc = sensekit_reader_get_stream(m_reader, depthStreamDesc.type, depthStreamDesc.subType, &depthConnection);
-                if (rc != SENSEKIT_STATUS_SUCCESS)
-                {
-                    sensekit_reader_destroy(&m_reader);
-                    //TODO: throw logic_error("Could not add a stream with desired description");
-                }
-
-                sensekit_stream_start(depthConnection);
-
-                sensekit_reader_register_frame_ready_callback(m_reader, &HandTracker::reader_frame_ready_thunk, this, &m_readerCallbackId);
-            }
-
-            void HandTracker::reader_frame_ready_thunk(void* clientTag, sensekit_reader_t reader, sensekit_reader_frame_t frame)
-            {
-                HandTracker* tracker = static_cast<HandTracker*>(clientTag);
-                tracker->reader_frame_ready(reader, frame);
-            }
-
-            void HandTracker::reader_frame_ready(sensekit_reader_t reader, sensekit_reader_frame_t frame)
-            {
-                sensekit_depthframe_t depthFrame;
-                sensekit_depth_frame_get(frame, &depthFrame);
-                updateTracking(depthFrame);
+                m_reader.stream<DepthStream>(depthDescription.subtype).start();
+                m_reader.addListener(*this);
             }
 
             void HandTracker::reset()
@@ -102,25 +80,20 @@ namespace sensekit
                 m_pointProcessor.reset();
             }
 
-            void HandTracker::updateTracking(sensekit_depthframe_t depthFrame)
+            void HandTracker::update_tracking(DepthFrame& depthFrame)
             {
-                sensekit_depthframe_metadata_t metadata;
-                sensekit_depthframe_get_metadata(depthFrame, &metadata);
-
-                int width = metadata.width;
-                int height = metadata.height;
+                int width = depthFrame.get_resolutionX();
 
                 m_resizeFactor = width / static_cast<float>(PROCESSING_SIZE_WIDTH);
 
-                m_depthUtility.processDepthToForeground(depthFrame, width, height, m_matDepth, m_matForeground);
+                m_depthUtility.processDepthToForeground(depthFrame, m_matDepth, m_matForeground);
 
                 float minArea = 10000;
                 float maxArea = 20000;
-                trackPoints(m_matDepth, m_matForeground);
+                track_points(m_matDepth, m_matForeground);
 
                 //use same frameIndex as source depth frame
-                sensekit_frame_index_t frameIndex;
-                sensekit_depthframe_get_frameindex(depthFrame, &frameIndex);
+                sensekit_frame_index_t frameIndex = depthFrame.get_frameIndex();
 
                 sensekit_handframe_wrapper_t* handFrame = m_handStream->try_lock_frame(frameIndex);
                 if (handFrame != nullptr)
@@ -128,13 +101,13 @@ namespace sensekit
                     handFrame->frame.handpoints = reinterpret_cast<sensekit_handpoint_t*>(&(handFrame->frame_data));
                     handFrame->frame.numHands = SENSEKIT_HANDS_MAX_HANDPOINTS;
 
-                    updateHandFrame(m_pointProcessor.get_trackedPoints(), handFrame->frame);
+                    update_hand_frame(m_pointProcessor.get_trackedPoints(), handFrame->frame);
 
                     m_handStream->unlock_frame(handFrame);
                 }
             }
 
-            void HandTracker::trackPoints(cv::Mat& matDepth, cv::Mat& matForeground)
+            void HandTracker::track_points(cv::Mat& matDepth, cv::Mat& matForeground)
             {
                 //TODO-done try tracking without edge distance
                 //TODO-done calculate global score once
@@ -181,7 +154,7 @@ namespace sensekit
                 m_pointProcessor.removeOldOrDeadPoints();
             }
 
-            void HandTracker::updateHandFrame(vector<TrackedPoint>& internalTrackedPoints, _sensekit_handframe& frame)
+            void HandTracker::update_hand_frame(vector<TrackedPoint>& internalTrackedPoints, _sensekit_handframe& frame)
             {
                 int handIndex = 0;
                 int maxNumHands = frame.numHands;
@@ -203,27 +176,27 @@ namespace sensekit
                         point.depthPosition.x = internalPoint.m_position.x * m_resizeFactor;
                         point.depthPosition.y = internalPoint.m_position.y * m_resizeFactor;
 
-                        copyPosition(internalPoint.m_worldPosition, point.worldPosition);
-                        copyPosition(internalPoint.m_worldDeltaPosition, point.worldDeltaPosition);
+                        copy_position(internalPoint.m_worldPosition, point.worldPosition);
+                        copy_position(internalPoint.m_worldDeltaPosition, point.worldDeltaPosition);
 
-                        point.status = convertHandStatus(status);
+                        point.status = convert_hand_status(status);
                     }
                 }
                 for (int i = handIndex; i < maxNumHands; ++i)
                 {
                     sensekit_handpoint_t& point = frame.handpoints[i];
-                    resetHandPoint(point);
+                    reset_hand_point(point);
                 }
             }
 
-            void HandTracker::copyPosition(cv::Point3f& source, sensekit_vector3f_t& target)
+            void HandTracker::copy_position(cv::Point3f& source, sensekit_vector3f_t& target)
             {
                 target.x = source.x;
                 target.y = source.y;
                 target.z = source.z;
             }
 
-            sensekit_handstatus_t HandTracker::convertHandStatus(TrackingStatus status)
+            sensekit_handstatus_t HandTracker::convert_hand_status(TrackingStatus status)
             {
                 switch (status)
                 {
@@ -241,7 +214,7 @@ namespace sensekit
                 }
             }
 
-            void HandTracker::resetHandPoint(sensekit_handpoint_t& point)
+            void HandTracker::reset_hand_point(sensekit_handpoint_t& point)
             {
                 point.trackingId = -1;
                 point.status = HAND_STATUS_NOTTRACKING;

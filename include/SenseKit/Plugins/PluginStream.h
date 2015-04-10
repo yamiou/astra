@@ -14,19 +14,14 @@ namespace sensekit {
         {
         public:
             PluginStream(PluginServiceProxy& pluginService, 
-                         sensekit_streamset_t setHandle, 
+                         Sensor& streamset, 
                          StreamDescription description,
                          size_t binByteLength) :
                 m_pluginService(pluginService),
-                m_setHandle(setHandle),
+                m_streamset(streamset),
                 m_description(description),
                 m_binByteLength(binByteLength)
             {
-                if (setHandle == nullptr)
-                {
-                    throw std::invalid_argument("setHandle must not be null");
-                }
-
                 create_stream(description);
             }
 
@@ -77,11 +72,11 @@ namespace sensekit {
                 stream_callbacks_t pluginCallbacks = create_plugin_callbacks(this);
 
                 sensekit_stream_desc_t desc = description.toDesc();
-                m_pluginService.create_stream(m_setHandle, desc, pluginCallbacks, &m_streamHandle);
+                m_pluginService.create_stream(m_streamset.get_handle(), desc, pluginCallbacks, &m_streamHandle);
             }
 
             PluginServiceProxy& m_pluginService;
-            sensekit_streamset_t m_setHandle;
+            Sensor& m_streamset;
             StreamDescription m_description;
             sensekit_stream_t m_streamHandle{ nullptr };
             sensekit_bin_t m_binHandle{ nullptr };
