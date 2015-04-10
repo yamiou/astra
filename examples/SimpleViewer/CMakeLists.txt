@@ -51,6 +51,27 @@ if (WIN32)
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 "$<TARGET_FILE_DIR:DummyPlugin>/DummyPlugin.dll"
                                 "$<TARGET_FILE_DIR:SimpleViewer>/Plugins"
+          #DepthViewer
+                        COMMAND ${CMAKE_COMMAND} -E make_directory
+                                "$<TARGET_FILE_DIR:DepthViewer>/Plugins"
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                "$<TARGET_FILE_DIR:SenseKit>/SenseKit.dll"
+                                $<TARGET_FILE_DIR:DepthViewer>
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                "$<TARGET_FILE_DIR:SenseKitAPI>/SenseKitAPI.dll"
+                                $<TARGET_FILE_DIR:DepthViewer>
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                "$<TARGET_FILE_DIR:SenseKitUL>/SenseKitUL.dll"
+                                $<TARGET_FILE_DIR:DepthViewer>
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                "$<TARGET_FILE_DIR:OpenNIPlugin>/OpenNIPlugin.dll"
+                                "$<TARGET_FILE_DIR:DepthViewer>/Plugins"
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                "$<TARGET_FILE_DIR:orbbec_hands>/orbbec_hands.dll"
+                                "$<TARGET_FILE_DIR:DepthViewer>/Plugins"
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                "$<TARGET_FILE_DIR:DummyPlugin>/DummyPlugin.dll"
+                                "$<TARGET_FILE_DIR:DepthViewer>/Plugins"
           #DepthReaderCPP
                         COMMAND ${CMAKE_COMMAND} -E make_directory
                                 "$<TARGET_FILE_DIR:DepthReaderCPP>/Plugins"
