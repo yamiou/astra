@@ -257,9 +257,12 @@ namespace sensekit
                 point.worldDeltaPosition = sensekit_vector3f_t();
             }
 
-            void HandTracker::update_debug_image_frame(_sensekit_colorframe& sensekitColorframe)
+            void HandTracker::update_debug_image_frame(_sensekit_colorframe& colorFrame)
             {
-
+                m_debugVisualizer.showDepthMat(m_matDepth, 
+                                               m_matForeground, 
+                                               m_pointProcessor.get_trackedPoints(), 
+                                               colorFrame);
             }
         }
     }

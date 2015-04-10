@@ -11,6 +11,7 @@
 #include "coordinateconverter.h"
 #include <SenseKit/Plugins/plugin_api.h>
 #include <SenseKit/Plugins/PluginStream.h>
+#include "debugvisualizer.h"
 
 namespace sensekit
 {
@@ -67,6 +68,8 @@ namespace sensekit
                 cv::Mat m_matDepth;
                 cv::Mat m_matForeground;
 
+
+                DebugVisualizer m_debugVisualizer;
             };
         }
     }

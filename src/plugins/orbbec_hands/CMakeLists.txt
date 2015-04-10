@@ -1,6 +1,7 @@
 set(orbbec_hands_SOURCES
   handtracker.cpp
   handtracker.h
+  debugvisualizer.h
   depthutility.h
   depthutility.cpp
   segmentationutility.h
