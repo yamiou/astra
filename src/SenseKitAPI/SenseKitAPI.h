@@ -1,5 +1,5 @@
-#ifndef STREAMKITAPI_H
-#define STREAMKITAPI_H
+#ifndef SENSEKITAPI_H
+#define SENSEKITAPI_H
 
 #include <sensekit_defines.h>
 #include <Plugins/StreamServiceProxyBase.h>
@@ -20,4 +20,4 @@ SENSEKIT_API_PROXY void sensekit_api_set_proxy(StreamServiceProxyBase* proxy);
 
 SENSEKIT_END_DECLS
 
-#endif /* STREAMKITAPI_H */
+#endif /* SENSEKITAPI_H */

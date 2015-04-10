@@ -52,6 +52,8 @@ set(SenseKit_SOURCES_GEN
   ../../include/SenseKit/Plugins/PluginServiceProxy.h.lpp
   )
 
+include_directories(${PROJECT_SOURCE_DIR}/src/SenseKitAPI)
+
 source_group(templates, ${SenseKit_SOURCE_GEN})
 
 add_definitions(-DSENSEKIT_BUILD)

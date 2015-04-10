@@ -16,7 +16,6 @@ set(include_PATHS
   ${PROJECT_SOURCE_DIR}/include
   ${PROJECT_SOURCE_DIR}/include/SenseKit
   ${PROJECT_SOURCE_DIR}/include/SenseKitUL
-  ${PROJECT_SOURCE_DIR}/include/SenseKitAPI
   $ENV{OPENNI2_INCLUDE}
   )
 include_directories ("${include_PATHS}")

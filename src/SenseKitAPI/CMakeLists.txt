@@ -1,5 +1,5 @@
 set(SenseKitAPI_SOURCES
-  ../../include/SenseKitAPI/SenseKitAPI.h
+  SenseKitAPI.h
   SenseKitAPI.cpp
   )
 
