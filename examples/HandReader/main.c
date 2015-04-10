@@ -37,7 +37,6 @@ void print_hands(sensekit_handframe_t handFrame)
 
 void runHandStream(sensekit_reader_t reader)
 {
-    sensekit_frame_index_t lastFrameIndex = -1;
     do
     {
         sensekit_temp_update();
@@ -50,16 +49,13 @@ void runHandStream(sensekit_reader_t reader)
             sensekit_handframe_t handFrame;
             sensekit_hand_get_frame(frame, &handFrame);
 
-            sensekit_frame_index_t newFrameIndex;
-            sensekit_handframe_get_frameindex(handFrame, &newFrameIndex);
-
-            if (lastFrameIndex == newFrameIndex)
-            {
-                printf("duplicate frame index: %d\n", lastFrameIndex);
-            }
-            lastFrameIndex = newFrameIndex;
-
             print_hands(handFrame);
+
+            sensekit_colorframe_t handDebugImageFrame;
+            sensekit_hand_debug_image_get_frame(frame, &handDebugImageFrame);
+
+            sensekit_colorframe_metadata_t metadata;
+            sensekit_colorframe_get_metadata(handDebugImageFrame, &metadata);
 
             sensekit_reader_close_frame(&frame);
         }
@@ -81,16 +77,14 @@ int main(int argc, char** argv)
     sensekit_reader_create(sensor, &reader);
 
     sensekit_handstream_t handStream;
-    sensekit_status_t rc = sensekit_hand_get_stream(reader, &handStream);
-    if (rc != SENSEKIT_STATUS_SUCCESS)
-    {
-        printf("cannot find hand stream");
-    }
-    else
-    {
-        sensekit_stream_start(handStream);
-        runHandStream(reader);
-    }
+    sensekit_hand_get_stream(reader, &handStream);
+    sensekit_stream_start(handStream);
+
+    sensekit_colorstream_t handDebugImageStream;
+    sensekit_hand_debug_image_get_stream(reader, &handDebugImageStream);
+    sensekit_stream_start(handDebugImageStream);
+
+    runHandStream(reader);
 
     sensekit_reader_destroy(&reader);
     sensekit_streamset_close(&sensor);

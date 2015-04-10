@@ -18,6 +18,18 @@ SENSEKIT_API_EX sensekit_status_t sensekit_color_stream_get(sensekit_reader_t re
                                        colorStream);
 }
 
+SENSEKIT_API_EX sensekit_status_t sensekit_color_stream_get_by_type(sensekit_reader_t reader,
+                                                                    sensekit_stream_type_t type,
+                                                                    sensekit_stream_subtype_t subtype,
+                                                                    sensekit_colorstream_t* colorStream)
+
+{
+    return sensekit_generic_stream_get(reader,
+                                       type,
+                                       subtype,
+                                       colorStream);
+}
+
 SENSEKIT_API_EX sensekit_status_t sensekit_color_frame_get(sensekit_reader_frame_t readerFrame,
                                                            sensekit_colorframe_t* colorFrame)
 {

@@ -18,6 +18,16 @@ SENSEKIT_API_EX sensekit_status_t sensekit_hand_get_stream(sensekit_reader_t rea
                                        handStream);
 }
 
+SENSEKIT_API_EX sensekit_status_t sensekit_hand_debug_image_get_stream(sensekit_reader_t reader,
+                                                                       sensekit_colorstream_t* handDebugImageStream)
+
+{
+    return sensekit_generic_stream_get(reader,
+                                       SENSEKIT_STREAM_HAND_DEBUG_IMAGE,
+                                       HAND_DEFAULT_SUBTYPE,
+                                       handDebugImageStream);
+}
+
 SENSEKIT_API_EX sensekit_status_t sensekit_hand_get_frame(sensekit_reader_frame_t readerFrame,
                                                           sensekit_handframe_t* handFrame)
 {
@@ -25,6 +35,15 @@ SENSEKIT_API_EX sensekit_status_t sensekit_hand_get_frame(sensekit_reader_frame_
                                                                     SENSEKIT_STREAM_HAND,
                                                                     ANY_SUBTYPE,
                                                                     handFrame);
+}
+
+SENSEKIT_API_EX sensekit_status_t sensekit_hand_debug_image_get_frame(sensekit_reader_frame_t readerFrame,
+                                                                      sensekit_colorframe_t* handDebugImageFrame)
+{
+    return sensekit_generic_frame_get<sensekit_handframe_wrapper_t>(readerFrame,
+                                                                    SENSEKIT_STREAM_HAND_DEBUG_IMAGE,
+                                                                    HAND_DEFAULT_SUBTYPE,
+                                                                    handDebugImageFrame);
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_handframe_get_frameindex(sensekit_handframe_t handFrame,
