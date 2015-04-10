@@ -211,11 +211,10 @@ namespace sensekit
         {
             cout << "stopping depth stream" << endl;
             m_depthStream.stop();
-            cout << "destroying depth stream" << endl;
-            m_depthStream.destroy();
-
             cout << "stopping color stream" << endl;
             m_colorStream.stop();
+            cout << "destroying depth stream" << endl;
+            m_depthStream.destroy();
             cout << "destroying color stream" << endl;
             m_colorStream.destroy();
 

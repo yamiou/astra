@@ -57,11 +57,11 @@ namespace sensekit
             sensekit_status_t read_streams();
 
             ::openni::Device m_device;
+            ::openni::DeviceInfo m_deviceInfo;
             ::openni::VideoStream m_depthStream;
             ::openni::VideoStream m_colorStream;
             ::openni::VideoMode m_colorMode;
             ::openni::VideoMode m_depthMode;
-            ::openni::DeviceInfo m_deviceInfo;
 
             unsigned m_colorBufferLength{0};
             unsigned m_depthBufferLength{0};
