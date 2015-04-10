@@ -15,6 +15,11 @@ public:
     float get_resizeFactor() const { return m_resizeFactor; }
     void set_resizeFactor(float resizeFactor) { m_resizeFactor = resizeFactor; }
 
+    inline cv::Point3f convertDepthToRealWorld(int localX, int localY, float localZ) const
+    {
+        return convertDepthToRealWorld(static_cast<float>(localX), static_cast<float>(localY), localZ);
+    }
+
     inline cv::Point3f convertDepthToRealWorld(float localX, float localY, float localZ) const
     {
         float worldX, worldY, worldZ;
@@ -46,7 +51,7 @@ public:
 
     inline cv::Point offsetPixelLocationByMM(cv::Point& position, float offsetX, float offsetY, float depth) const
     {
-        cv::Point3f world = convertDepthToRealWorld(position.x, position.y, depth);
+        cv::Point3f world = convertDepthToRealWorld(static_cast<float>(position.x), static_cast<float>(position.y), depth);
 
         world.x += offsetX;
         world.y += offsetY;

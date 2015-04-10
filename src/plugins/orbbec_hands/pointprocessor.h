@@ -4,7 +4,7 @@
 #include "trackingdata.h"
 #include "coordinateconverter.h"
 
-class TrackedPoint;
+struct TrackedPoint;
 
 class PointProcessor
 {

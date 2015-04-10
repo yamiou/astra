@@ -15,8 +15,6 @@ set(orbbec_hands_SOURCES
   coordinateconverter.h
   hands_plugin.cpp
   hands_plugin.h
-  streamhelper.h
-  streamhelper.cpp
 )
 
 find_package( OpenCV REQUIRED )

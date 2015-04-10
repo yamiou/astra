@@ -278,10 +278,6 @@ void SegmentationUtility::calculateSegmentArea(cv::Mat& matDepth, cv::Mat& matAr
 
 float SegmentationUtility::getDepthArea(cv::Point3f& p1, cv::Point3f& p2, cv::Point3f& p3, const CoordinateConverter& converter)
 {
-    float worldX1, worldY1, worldZ1;
-    float worldX2, worldY2, worldZ2;
-    float worldX3, worldY3, worldZ3;
-
     cv::Point3f world1 = converter.convertDepthToRealWorld(p1);
     cv::Point3f world2 = converter.convertDepthToRealWorld(p2);
     cv::Point3f world3 = converter.convertDepthToRealWorld(p3);
@@ -289,7 +285,7 @@ float SegmentationUtility::getDepthArea(cv::Point3f& p1, cv::Point3f& p2, cv::Po
     cv::Point3f v1 = world2 - world1;
     cv::Point3f v2 = world3 - world1;
 
-    float area = 0.5 * cv::norm(v1.cross(v2));
+    float area = static_cast<float>(0.5 * cv::norm(v1.cross(v2)));
     return area;
 }
 
