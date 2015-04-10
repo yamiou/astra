@@ -67,9 +67,6 @@ if (WIN32)
                                 "$<TARGET_FILE_DIR:OpenNIPlugin>/OpenNIPlugin.dll"
                                 "$<TARGET_FILE_DIR:DepthViewer>/Plugins"
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                                "$<TARGET_FILE_DIR:orbbec_hands>/orbbec_hands.dll"
-                                "$<TARGET_FILE_DIR:DepthViewer>/Plugins"
-                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 "$<TARGET_FILE_DIR:DummyPlugin>/DummyPlugin.dll"
                                 "$<TARGET_FILE_DIR:DepthViewer>/Plugins"
           #DepthReaderCPP

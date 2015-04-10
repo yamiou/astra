@@ -21,7 +21,23 @@ public:
 
             m_texture.create(m_width, m_height);
             m_sprite.setTexture(m_texture);
+            m_sprite.setPosition(0, 0);
+            m_sprite.setScale(2, 2);
         }
+    }
+
+    void check_fps()
+    {
+        double fpsFactor = 0.02;
+
+        std::clock_t newTimepoint= std::clock();
+        long double frameDuration = (newTimepoint - m_lastTimepoint) / static_cast<long double>(CLOCKS_PER_SEC);
+        
+        m_frameDuration = frameDuration * fpsFactor + m_frameDuration * (1 - fpsFactor);
+        m_lastTimepoint = newTimepoint;
+        double fps = 1.0 / m_frameDuration;
+
+        printf("FPS: %3.1f (%3.4f ms)\n", fps, m_frameDuration * 1000);
     }
 
     virtual void on_frame_ready(sensekit::StreamReader& reader,
@@ -49,6 +65,7 @@ public:
                 }
             }
             m_texture.update(buffer);
+            check_fps();
         }
 
     void drawTo(sf::RenderWindow& window)
@@ -57,6 +74,8 @@ public:
         }
 
 private:
+    long double m_frameDuration{ 0 };
+    std::clock_t m_lastTimepoint { 0 };
     sf::Texture m_texture;
     sf::Sprite m_sprite;
     uint8_t* buffer { nullptr };
@@ -68,7 +87,7 @@ private:
 int main(int argc, char** argv)
 {
     // create the window
-    sf::RenderWindow window(sf::VideoMode(640, 480), "My window");
+    sf::RenderWindow window(sf::VideoMode(1280, 960), "My window");
 
     sensekit::Sensor sensor;
     sensekit::StreamReader reader = sensor.create_reader();
@@ -76,8 +95,7 @@ int main(int argc, char** argv)
     SampleFrameListener listener;
 
     reader.stream<sensekit::DepthStream>().start();
-    reader.stream<sensekit::ColorStream>().start();
-
+    
     reader.addListener(listener);
 
     // run the program as long as the window is open
