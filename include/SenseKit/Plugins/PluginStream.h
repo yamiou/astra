@@ -4,7 +4,6 @@
 #include <Plugins/plugin_api.h>
 #include <system_error>
 #include "StreamCallbackListener.h"
-#include "StreamDescription.h"
 
 namespace sensekit {
     namespace plugins {
@@ -71,7 +70,7 @@ namespace sensekit {
             {
                 stream_callbacks_t pluginCallbacks = create_plugin_callbacks(this);
 
-                sensekit_stream_desc_t desc = description.toDesc();
+                sensekit_stream_desc_t desc = description.get_desc_t();
                 m_pluginService.create_stream(m_streamset.get_handle(), desc, pluginCallbacks, &m_streamHandle);
             }
 

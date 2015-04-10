@@ -77,7 +77,7 @@ namespace sensekit
 
             void HandTracker::subscribe_to_depth_stream(Sensor& streamset, StreamDescription& depthDescription)
             {
-                m_reader.stream<DepthStream>(depthDescription.subtype).start();
+                m_reader.stream<DepthStream>(depthDescription.get_subType()).start();
                 m_reader.addListener(*this);
             }
 
