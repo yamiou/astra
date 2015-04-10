@@ -1,7 +1,8 @@
 set(SenseKit_SOURCES
   ../../include/SenseKit/SenseKit.h
-  ../../include/SenseKit/sensekit_types.h
   ../../include/SenseKit/sensekit_capi.h
+  ../../include/SenseKit/sensekit_defines.h
+  ../../include/SenseKit/sensekit_types.h
   ../../include/SenseKit/Plugins/plugin_api.h
   ../../include/SenseKit/Plugins/PluginBase.h
   ../../include/SenseKit/Plugins/PluginStream.h
