@@ -25,8 +25,8 @@ namespace sensekit
 #define GL_WIN_SIZE_X   640
 #define GL_WIN_SIZE_Y   480
 
-#define PROCESSING_SIZE_WIDTH 80
-#define PROCESSING_SIZE_HEIGHT 60
+            const int PROCESSING_SIZE_WIDTH = 80;
+            const int PROCESSING_SIZE_HEIGHT = 60;
 
 #define TEXTURE_SIZE    512
 
@@ -44,7 +44,7 @@ namespace sensekit
                 m_pointProcessor(m_converter),
                 m_reader(streamset.create_reader())
             {
-                create_hand_streams(pluginService, streamset);
+                create_streams(pluginService, streamset);
 
                 subscribe_to_depth_stream(streamset, depthDescription);
             }
@@ -60,7 +60,7 @@ namespace sensekit
                 update_tracking(depthFrame);
             }
 
-            void HandTracker::create_hand_streams(PluginServiceProxy& pluginService, Sensor streamset)
+            void HandTracker::create_streams(PluginServiceProxy& pluginService, Sensor streamset)
             {
                 size_t handByteLength = sizeof(sensekit_depthframe_wrapper_t) + 
                                             SENSEKIT_HANDS_MAX_HANDPOINTS * sizeof(sensekit_handpoint_t);
@@ -72,7 +72,7 @@ namespace sensekit
                                                   PROCESSING_SIZE_WIDTH * PROCESSING_SIZE_HEIGHT * 3;
 
                 StreamDescription debugImageDescription(SENSEKIT_STREAM_HAND_DEBUG_IMAGE, HAND_DEFAULT_SUBTYPE);
-                m_handDebugImageStream = make_unique<ColorStream>(pluginService, streamset, debugImageDescription, debugImageByteLength);
+                m_debugImageStream = make_unique<ColorStream>(pluginService, streamset, debugImageDescription, debugImageByteLength);
             }
 
             void HandTracker::subscribe_to_depth_stream(Sensor& streamset, StreamDescription& depthDescription)
@@ -102,6 +102,13 @@ namespace sensekit
                 //use same frameIndex as source depth frame
                 sensekit_frame_index_t frameIndex = depthFrame.get_frameIndex();
 
+                generate_hand_frame(frameIndex);
+
+                generate_hand_debug_image_frame(frameIndex);
+            }
+
+            void HandTracker::generate_hand_frame(sensekit_frame_index_t frameIndex)
+            {
                 sensekit_handframe_wrapper_t* handFrame = m_handStream->try_lock_frame(frameIndex);
                 if (handFrame != nullptr)
                 {
@@ -111,6 +118,26 @@ namespace sensekit
                     update_hand_frame(m_pointProcessor.get_trackedPoints(), handFrame->frame);
 
                     m_handStream->unlock_frame(handFrame);
+                }
+            }
+
+            void HandTracker::generate_hand_debug_image_frame(sensekit_frame_index_t frameIndex)
+            {
+                sensekit_colorframe_wrapper_t* debugImageFrame = m_debugImageStream->try_lock_frame(frameIndex);
+                if (debugImageFrame != nullptr)
+                {
+                    debugImageFrame->frame.data = reinterpret_cast<uint8_t *>(&(debugImageFrame->frame_data));
+
+                    sensekit_colorframe_metadata_t metadata;
+
+                    metadata.width = PROCESSING_SIZE_WIDTH;
+                    metadata.height = PROCESSING_SIZE_HEIGHT;
+                    metadata.bytesPerPixel = 3;
+
+                    debugImageFrame->frame.metadata = metadata;
+                    update_debug_image_frame(debugImageFrame->frame);
+
+                    m_debugImageStream->unlock_frame(debugImageFrame);
                 }
             }
 
@@ -230,6 +257,10 @@ namespace sensekit
                 point.worldDeltaPosition = sensekit_vector3f_t();
             }
 
+            void HandTracker::update_debug_image_frame(_sensekit_colorframe& sensekitColorframe)
+            {
+
+            }
         }
     }
 }

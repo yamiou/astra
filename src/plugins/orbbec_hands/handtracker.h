@@ -27,13 +27,16 @@ namespace sensekit
                 virtual ~HandTracker();
                 virtual void on_frame_ready(StreamReader& reader, Frame& frame) override;
             private:
-                void create_hand_streams(PluginServiceProxy& pluginService, Sensor streamset);
+                void create_streams(PluginServiceProxy& pluginService, Sensor streamset);
                 void subscribe_to_depth_stream(Sensor& streamset, StreamDescription& depthDescription);
                 void reset();
+                void generate_hand_frame(sensekit_frame_index_t frameIndex);
                 static void copy_position(cv::Point3f& source, sensekit_vector3f_t& target);
                 static sensekit_handstatus_t convert_hand_status(TrackingStatus status);
                 static void reset_hand_point(sensekit_handpoint_t& point);
 
+                void update_debug_image_frame(_sensekit_colorframe& sensekitColorframe);
+                void generate_hand_debug_image_frame(sensekit_frame_index_t frameIndex);
                 void update_tracking(DepthFrame& depthFrame);
                 void update_hand_frame(std::vector<TrackedPoint>& internalTrackedPoints, _sensekit_handframe& frame);
 
@@ -44,7 +47,7 @@ namespace sensekit
                 
                 using ColorStream = PluginStream < sensekit_colorframe_wrapper_t > ;
                 using ColorStreamPtr = std::unique_ptr < ColorStream > ;
-                ColorStreamPtr m_handDebugImageStream;
+                ColorStreamPtr m_debugImageStream;
                 
                 using HandStream = PluginStream<sensekit_handframe_wrapper_t>;
                 using HandStreamPtr = std::unique_ptr<HandStream>;
