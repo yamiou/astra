@@ -18,8 +18,8 @@ set(SenseKit_SOURCES
   SenseKit.cpp
   Stream.h
   Stream.cpp
-  StreamImpl.h
-  StreamImpl.cpp
+  StreamBackend.h
+  StreamBackend.cpp
   PluginService.cpp
   PluginService.h
   PluginServiceDelegate.h

@@ -28,9 +28,10 @@ namespace sensekit {
         return true;
     }
 
-    Stream* StreamSet::create_stream(StreamImpl* streamImpl)
+    Stream* StreamSet::create_stream(sensekit_stream_desc_t desc,
+                                     stream_callbacks_t callbacks)
     {
-        Stream* stream = new Stream(streamImpl);
+        Stream* stream = new Stream(desc, callbacks);
         m_streamCollection.insert(stream);
 
         return stream;

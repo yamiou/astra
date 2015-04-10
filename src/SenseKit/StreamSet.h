@@ -18,7 +18,7 @@ namespace sensekit {
 
         //plugins only below
 
-        Stream* create_stream(StreamImpl* streamImpl);
+        Stream* create_stream(sensekit_stream_desc_t desc, stream_callbacks_t callbacks);
 
         void destroy_stream(Stream* stream);
 

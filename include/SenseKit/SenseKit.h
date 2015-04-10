@@ -10,6 +10,20 @@
 
 namespace sensekit {
 
+    class SenseKit
+    {
+    public:
+        static sensekit_status_t initialize()
+            {
+                return sensekit_initialize();
+            }
+
+        static sensekit_status_t terminate()
+            {
+                return sensekit_terminate();
+            }
+    };
+
     class StreamReader;
 
     class Sensor

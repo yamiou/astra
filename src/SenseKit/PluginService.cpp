@@ -1,7 +1,6 @@
 ﻿#include "PluginService.h"
 #include "Stream.h"
 #include "SenseKitContext.h"
-#include "StreamImpl.h"
 #include "PluginServiceDelegate.h"
 #include <Plugins/PluginServiceProxyBase.h>
 #include <iostream>
@@ -45,7 +44,7 @@ namespace sensekit
                                                                     void* clientTag,
                                                                     CallbackId& callbackId)
     {
-        auto thunk = [clientTag, callback](sensekit_streamset_t ss, 
+        auto thunk = [clientTag, callback](sensekit_streamset_t ss,
                                            sensekit_stream_t s,
                                            sensekit_stream_desc_t d)
             { callback(clientTag, ss, s, d); };
@@ -53,7 +52,7 @@ namespace sensekit
         callbackId = m_streamAddedSignal += thunk;
 
         m_context.raise_existing_streams_added(callback, clientTag);
-        
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 
@@ -91,9 +90,7 @@ namespace sensekit
                                                    sensekit_stream_t& handle)
     {
         // TODO add to specific stream set
-
-        StreamImpl* impl = new StreamImpl(desc, pluginCallbacks);
-        Stream* stream = m_context.get_rootSet().create_stream(impl);
+        Stream* stream = m_context.get_rootSet().create_stream(desc, pluginCallbacks);
         handle = stream->get_handle();
 
         m_streamAddedSignal.raise(setHandle, handle, desc);
@@ -133,8 +130,7 @@ namespace sensekit
                                                        sensekit_frame_t*& binBuffer)
     {
         Stream* actualStream = Stream::get_ptr(streamHandle);
-        StreamImpl* streamImpl = actualStream->get_impl();
-        StreamBin* bin = streamImpl->create_bin(lengthInBytes);
+        StreamBin* bin = actualStream->create_bin(lengthInBytes);
 
         binHandle = bin->get_handle();
         binBuffer = bin->get_backBuffer();
@@ -147,10 +143,8 @@ namespace sensekit
                                                         sensekit_frame_t*& binBuffer)
     {
         Stream* actualStream = Stream::get_ptr(streamHandle);
-        StreamImpl* streamImpl = actualStream->get_impl();
-
         StreamBin* bin = StreamBin::get_ptr(binHandle);
-        streamImpl->destroy_bin(bin);
+        actualStream->destroy_bin(bin);
 
         binHandle = nullptr;
         binBuffer = nullptr;

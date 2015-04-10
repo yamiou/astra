@@ -7,6 +7,7 @@
 #include "PluginService.h"
 #include "StreamSet.h"
 #include "StreamReader.h"
+#include "Core/shared_library.h"
 
 struct StreamServiceProxyBase;
 struct PluginServiceProxyBase;
@@ -22,6 +23,7 @@ namespace sensekit {
         initialize_fn initialize{nullptr};
         terminate_fn terminate{nullptr};
         update_fn update{nullptr};
+        LibHandle libHandle{nullptr};
 
         bool isValid()
             {

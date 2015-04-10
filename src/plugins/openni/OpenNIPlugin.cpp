@@ -28,7 +28,7 @@ namespace sensekit
 
             cout << "Initializing openni" << endl;
             rc = ::openni::OpenNI::initialize();
-            
+
             cout << "Opening device" << endl;
             rc = m_device.open(deviceURI);
 
@@ -303,12 +303,12 @@ namespace sensekit
                 ::openni::VideoFrameRef ref;
                 if (m_depthStream.readFrame(&ref) == ::openni::STATUS_OK)
                 {
-                    const int16_t* datData = static_cast<const int16_t*>(ref.getData());
+                    const int16_t* oniFrameData = static_cast<const int16_t*>(ref.getData());
 
                     int16_t* frameData = m_currentDepthFrame->frame.data;
                     int dataSize = MIN(ref.getDataSize(), m_depthBufferLength);
 
-                    memcpy(frameData, datData, dataSize);
+                    memcpy(frameData, oniFrameData, dataSize);
 
                     ++m_frameIndex;
 
@@ -321,12 +321,12 @@ namespace sensekit
                 ::openni::VideoFrameRef ref;
                 if (m_colorStream.readFrame(&ref) == ::openni::STATUS_OK)
                 {
-                    const uint8_t* datData = static_cast<const uint8_t*>(ref.getData());
+                    const uint8_t* oniFrameData = static_cast<const uint8_t*>(ref.getData());
 
                     uint8_t* frameData = m_currentColorFrame->frame.data;
 
                     int dataSize = MIN(ref.getDataSize(), m_colorBufferLength);
-                    memcpy(frameData, datData, dataSize);
+                    memcpy(frameData, oniFrameData, dataSize);
 
                     ++m_frameIndex;
 

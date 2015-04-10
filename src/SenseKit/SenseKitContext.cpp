@@ -18,7 +18,6 @@ namespace sensekit {
 
     SenseKitContext::~SenseKitContext()
     {
-        sensekit_terminate();
     }
 
     sensekit_status_t SenseKitContext::initialize()
@@ -42,6 +41,7 @@ namespace sensekit {
             os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_initialize), (FarProc&)pluginFuncs.initialize);
             os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_terminate), (FarProc&)pluginFuncs.terminate);
             os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_update), (FarProc&)pluginFuncs.update);
+            pluginFuncs.libHandle = libHandle;
 
             if (pluginFuncs.isValid())
             {
@@ -67,6 +67,7 @@ namespace sensekit {
         for(auto pluginFuncs : m_pluginList)
         {
             pluginFuncs.terminate();
+            os_free_library(pluginFuncs.libHandle);
         }
 
         m_readers.clear();

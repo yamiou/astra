@@ -15,7 +15,7 @@ namespace sensekit {
         StreamConnection* rawPtr = conn.get();
 
         m_connections.push_back(std::move(conn));
-        m_impl->on_connection_created(rawPtr);
+        on_connection_created(rawPtr);
 
         return rawPtr;
     }
@@ -32,7 +32,7 @@ namespace sensekit {
 
         if (it != m_connections.cend())
         {
-            m_impl->on_connection_destroyed(it->get());
+            on_connection_destroyed(it->get());
             m_connections.erase(it);
         }
     }
@@ -42,14 +42,14 @@ namespace sensekit {
                                size_t byteLength,
                                sensekit_parameter_data_t* data)
     {
-        m_impl->on_set_parameter(connection, id, byteLength, data);
+        on_set_parameter(connection, id, byteLength, data);
     }
 
     void Stream::get_parameter_size(StreamConnection* connection,
                                     sensekit_parameter_id id,
                                     size_t& byteLength)
     {
-        m_impl->on_get_parameter_size(connection, id, byteLength);
+        on_get_parameter_size(connection, id, byteLength);
     }
 
     void Stream::get_parameter_data(StreamConnection* connection,
@@ -57,7 +57,6 @@ namespace sensekit {
                                     size_t byteLength,
                                     sensekit_parameter_data_t* data)
     {
-        m_impl->on_get_parameter_data(connection, parameterId, byteLength, data);
+        on_get_parameter_data(connection, parameterId, byteLength, data);
     }
-
 }

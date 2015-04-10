@@ -1,8 +1,9 @@
-#include "StreamImpl.h"
+#include "StreamBackend.h"
+#include "StreamBin.h"
 
 namespace sensekit {
 
-    StreamBin* StreamImpl::create_bin(size_t bufferLengthInBytes)
+    StreamBin* StreamBackend::create_bin(size_t bufferLengthInBytes)
     {
         BinPtr bin(new StreamBin(bufferLengthInBytes));
         StreamBin* rawPtr = bin.get();
@@ -12,7 +13,7 @@ namespace sensekit {
         return rawPtr;
     }
 
-    void StreamImpl::destroy_bin(StreamBin* bin)
+    void StreamBackend::destroy_bin(StreamBin* bin)
     {
         auto it = std::find_if(m_bins.cbegin(),
                                m_bins.cend(),
@@ -25,7 +26,7 @@ namespace sensekit {
             m_bins.erase(it);
     }
 
-    void StreamImpl::on_connection_created(StreamConnection* connection)
+    void StreamBackend::on_connection_created(StreamConnection* connection)
     {
         if (m_callbacks.connectionAddedCallback)
             m_callbacks.connectionAddedCallback(m_callbacks.context,
@@ -33,17 +34,17 @@ namespace sensekit {
 
     }
 
-    void StreamImpl::on_connection_destroyed(StreamConnection* connection)
+    void StreamBackend::on_connection_destroyed(StreamConnection* connection)
     {
         if (m_callbacks.connectionRemovedCallback)
             m_callbacks.connectionRemovedCallback(m_callbacks.context,
                                                   connection->get_handle());
     }
 
-    void StreamImpl::on_set_parameter(StreamConnection* connection,
-                                      sensekit_parameter_id id,
-                                      size_t byteLength,
-                                      sensekit_parameter_data_t* data)
+    void StreamBackend::on_set_parameter(StreamConnection* connection,
+                                         sensekit_parameter_id id,
+                                         size_t byteLength,
+                                         sensekit_parameter_data_t* data)
     {
 
         if (m_callbacks.setParameterCallback != nullptr)
@@ -56,9 +57,9 @@ namespace sensekit {
         }
     }
 
-    void StreamImpl::on_get_parameter_size(StreamConnection* connection,
-                                           sensekit_parameter_id id,
-                                           size_t& byteLength)
+    void StreamBackend::on_get_parameter_size(StreamConnection* connection,
+                                              sensekit_parameter_id id,
+                                              size_t& byteLength)
     {
         if (m_callbacks.getParameterSizeCallback != nullptr)
         {
@@ -69,10 +70,10 @@ namespace sensekit {
         }
     }
 
-    void StreamImpl::on_get_parameter_data(StreamConnection* connection,
-                                           sensekit_parameter_id parameterId,
-                                           size_t byteLength,
-                                           sensekit_parameter_data_t* data)
+    void StreamBackend::on_get_parameter_data(StreamConnection* connection,
+                                              sensekit_parameter_id parameterId,
+                                              size_t byteLength,
+                                              sensekit_parameter_data_t* data)
     {
         sensekit_streamconnection_t* streamConnection =
             reinterpret_cast<sensekit_streamconnection_t*>(connection->get_handle());
@@ -86,11 +87,4 @@ namespace sensekit {
                                                  data);
         }
     }
-
-    StreamImpl::~StreamImpl()
-    {
-        m_bins.clear();
-    }
-
-
 }
