@@ -62,10 +62,17 @@ namespace sensekit
 
             void HandTracker::create_hand_streams(PluginServiceProxy& pluginService, Sensor streamset)
             {
-                size_t binByteLength = sizeof(sensekit_depthframe_wrapper_t) + SENSEKIT_HANDS_MAX_HANDPOINTS * sizeof(sensekit_handpoint_t);
+                size_t handByteLength = sizeof(sensekit_depthframe_wrapper_t) + 
+                                            SENSEKIT_HANDS_MAX_HANDPOINTS * sizeof(sensekit_handpoint_t);
 
-                StreamDescription description(SENSEKIT_STREAM_HAND, HAND_DEFAULT_SUBTYPE);
-                m_handStream = make_unique<HandStream>(pluginService, streamset, description, binByteLength);
+                StreamDescription handDescription(SENSEKIT_STREAM_HAND, HAND_DEFAULT_SUBTYPE);
+                m_handStream = make_unique<HandStream>(pluginService, streamset, handDescription, handByteLength);
+
+                size_t debugImageByteLength = sizeof(sensekit_colorframe_wrapper_t) + 
+                                                  PROCESSING_SIZE_WIDTH * PROCESSING_SIZE_HEIGHT * 3;
+
+                StreamDescription debugImageDescription(SENSEKIT_STREAM_HAND_DEBUG_IMAGE, HAND_DEFAULT_SUBTYPE);
+                m_handDebugImageStream = make_unique<ColorStream>(pluginService, streamset, debugImageDescription, debugImageByteLength);
             }
 
             void HandTracker::subscribe_to_depth_stream(Sensor& streamset, StreamDescription& depthDescription)

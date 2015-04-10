@@ -16,9 +16,6 @@ namespace sensekit {
             sensekit_stream_type_t type;
             sensekit_stream_subtype_t subtype;
 
-            friend bool operator==(const StreamDescription& lhs, const StreamDescription& rhs);
-            friend bool operator!=(const StreamDescription& lhs, const StreamDescription& rhs);
-
             inline sensekit_stream_desc_t toDesc()
             {
                 sensekit_stream_desc_t desc;
@@ -31,6 +28,8 @@ namespace sensekit {
             {
                 return StreamDescription(desc.type, desc.subType);
             }
+
+            friend bool operator==(const StreamDescription& lhs, const StreamDescription& rhs);
         };
 
 

@@ -42,6 +42,9 @@ namespace sensekit
                 //fields
                 PluginServiceProxy& m_pluginService;
                 
+                using ColorStream = PluginStream < sensekit_colorframe_wrapper_t > ;
+                using ColorStreamPtr = std::unique_ptr < ColorStream > ;
+                ColorStreamPtr m_handDebugImageStream;
                 
                 using HandStream = PluginStream<sensekit_handframe_wrapper_t>;
                 using HandStreamPtr = std::unique_ptr<HandStream>;
