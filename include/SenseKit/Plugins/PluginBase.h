@@ -49,6 +49,7 @@ SENSEKIT_EXPORT void sensekit_plugin_update()                                   
 SENSEKIT_EXPORT void sensekit_plugin_terminate()                                          \
 {                                                                                         \
     delete g_plugin;                                                                      \
+    g_plugin = nullptr;                                                                   \
 }                                                                                         \
                                                                                           \
 SENSEKIT_END_DECLS                                                                        \

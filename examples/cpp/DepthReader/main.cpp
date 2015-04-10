@@ -72,6 +72,8 @@ private:
 
 int main(int argc, char** argv)
 {
+    sensekit_initialize();
+ 
     set_key_handler();
 
     sensekit::Sensor sensor;
@@ -80,11 +82,15 @@ int main(int argc, char** argv)
     SampleFrameListener listener;
 
     reader.stream<sensekit::DepthStream>().start();
-    
+
     reader.addListener(listener);
-    int count = 0;
+
     do
     {
         sensekit_temp_update();
     } while (shouldContinue);
+
+    reader.removeListener(listener);
+    
+    sensekit_terminate();
 }

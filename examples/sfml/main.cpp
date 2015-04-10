@@ -86,6 +86,8 @@ private:
 
 int main(int argc, char** argv)
 {
+    sensekit_initialize();
+
     // create the window
     sf::RenderWindow window(sf::VideoMode(1280, 960), "My window");
 
@@ -121,6 +123,8 @@ int main(int argc, char** argv)
         listener.drawTo(window);
         window.display();
     }
+
+    sensekit_terminate();
 
     return 0;
 }

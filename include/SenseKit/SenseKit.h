@@ -17,7 +17,6 @@ namespace sensekit {
     public:
         Sensor(std::string uri)
             {
-                sensekit_initialize(); //idempotent
                 sensekit_streamset_open(uri.c_str(), &m_streamSet);
             }
 
