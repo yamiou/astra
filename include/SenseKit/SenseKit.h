@@ -11,37 +11,37 @@
 namespace sensekit {
 
     class StreamReader;
-    
+
     class Sensor
     {
     public:
         Sensor(std::string uri)
-        {
-            sensekit_initialize(); //idempotent
-            sensekit_streamset_open(uri.c_str(), &m_streamSet);
-        }
+            {
+                sensekit_initialize(); //idempotent
+                sensekit_streamset_open(uri.c_str(), &m_streamSet);
+            }
 
         Sensor(const sensekit_streamset_t& streamSetHandle) : m_streamSet(streamSetHandle)
-        {
-            if (streamSetHandle == nullptr)
             {
-                throw std::invalid_argument("streamSetHandle must not be null");
+                if (streamSetHandle == nullptr)
+                {
+                    throw std::invalid_argument("streamSetHandle must not be null");
+                }
             }
-        }
 
         Sensor()
             : Sensor("") { }
 
         ~Sensor()
-        {
-            sensekit_streamset_close(&m_streamSet);
-        }
+            {
+                sensekit_streamset_close(&m_streamSet);
+            }
 
         inline StreamReader create_reader();
         sensekit_streamset_t get_handle() const { return m_streamSet; }
 
     private:
-        
+
         sensekit_streamset_t m_streamSet;
         std::string m_uri;
 
@@ -51,24 +51,44 @@ namespace sensekit {
     class StreamDescription : private sensekit_stream_desc_t
     {
     public:
-        sensekit_stream_type_t get_Type() { return type; }
+        StreamDescription(sensekit_stream_type_t type,
+                          sensekit_stream_subtype_t subType)
+            {
+                this->type = type;
+                this->subType = subType;
+            }
+
+        sensekit_stream_type_t get_type() { return type; }
         sensekit_stream_subtype_t get_subType() { return subType; }
 
         friend class DataStream;
+        friend bool operator==(const StreamDescription& lhs, const StreamDescription& rhs);
+        friend bool operator!=(const StreamDescription& lhs, const StreamDescription& rhs);
     };
+
+    inline bool operator==(const StreamDescription& lhs, const StreamDescription& rhs)
+    {
+        return lhs.type == rhs.type && lhs.subType == rhs.subType;
+    }
+
+    inline bool operator!=(const StreamDescription& lhs, const StreamDescription& rhs)
+    {
+        return !(lhs == rhs);
+    }
+
 
     class Frame
     {
     public:
         Frame(sensekit_reader_frame_t readerFrame)
             : m_frame(std::make_shared<FrameRef>(readerFrame))
-        { }
+            { }
 
         template<typename T>
         T get()
-        {
-            return T(m_frame->get());
-        }
+            {
+                return T(m_frame->get());
+            }
 
     private:
         class FrameRef
@@ -78,12 +98,12 @@ namespace sensekit {
                 :  m_frame(readerFrame) { }
 
             ~FrameRef()
-            {
-                if (m_frame != nullptr)
                 {
-                    sensekit_reader_close_frame(&m_frame);
+                    if (m_frame != nullptr)
+                    {
+                        sensekit_reader_close_frame(&m_frame);
+                    }
                 }
-            }
 
             sensekit_reader_frame_t get() { return m_frame; }
 
@@ -111,44 +131,44 @@ namespace sensekit {
     public:
         StreamReader(sensekit_reader_t reader)
             : m_readerRef(std::make_shared<ReaderRef>(reader))
-        {}
+            {}
 
         template<typename T>
         T stream()
-        {
-            return stream<T>(ANY_SUBTYPE);
-        }
+            {
+                return stream<T>(ANY_SUBTYPE);
+            }
 
         template<typename T>
         T stream(sensekit_stream_subtype_t subType)
-        {
-            sensekit_streamconnection_t connection;
+            {
+                sensekit_streamconnection_t connection;
 
-            sensekit_reader_get_stream(m_readerRef->get(),
-                                       T::id,
-                                       subType,
-                                       &connection);
+                sensekit_reader_get_stream(m_readerRef->get(),
+                                           T::id,
+                                           subType,
+                                           &connection);
 
-            return T(connection);
-        }
+                return T(connection);
+            }
 
         void addListener(FrameReadyListener& listener)
-        {
-            m_readerRef.get()->addListener(listener);
-        }
+            {
+                m_readerRef.get()->addListener(listener);
+            }
 
         void removeListener(FrameReadyListener& listener)
-        {
-            m_readerRef.get()->removeListener(listener);
-        }
+            {
+                m_readerRef.get()->removeListener(listener);
+            }
 
         Frame get_latest_frame(int timeoutMillis = SENSEKIT_TIMEOUT_FOREVER)
-        {
-            sensekit_reader_frame_t frame;
-            sensekit_reader_open_frame(m_readerRef->get(), timeoutMillis, &frame);
+            {
+                sensekit_reader_frame_t frame;
+                sensekit_reader_open_frame(m_readerRef->get(), timeoutMillis, &frame);
 
-            return Frame(frame);
-        }
+                return Frame(frame);
+            }
 
     private:
         class ReaderRef;
@@ -156,7 +176,7 @@ namespace sensekit {
 
         StreamReader(ReaderRefPtr readerRef)
             : m_readerRef(readerRef)
-        { }
+            { }
 
         class ReaderRef :
             public std::enable_shared_from_this<ReaderRef>
@@ -164,99 +184,99 @@ namespace sensekit {
         public:
             ReaderRef(sensekit_reader_t reader)
                 :  m_reader(reader)
-            {
+                {
 
-                sensekit_reader_register_frame_ready_callback(m_reader,
-                                                              &ReaderRef::frame_ready_thunk,
-                                                              this,
-                                                              &m_callbackId);
-            }
+                    sensekit_reader_register_frame_ready_callback(m_reader,
+                                                                  &ReaderRef::frame_ready_thunk,
+                                                                  this,
+                                                                  &m_callbackId);
+                }
 
             ~ReaderRef()
-            {
-                m_listeners.clear();
-                sensekit_reader_unregister_frame_ready_callback(&m_callbackId);
-                sensekit_reader_destroy(&m_reader);
-            }
+                {
+                    m_listeners.clear();
+                    sensekit_reader_unregister_frame_ready_callback(&m_callbackId);
+                    sensekit_reader_destroy(&m_reader);
+                }
 
             static void frame_ready_thunk(void* clientTag,
                                           sensekit_reader_t reader,
                                           sensekit_reader_frame_t frame)
-            {
-                ReaderRef* self = static_cast<ReaderRef*>(clientTag);
-                self->notify_listeners(frame);
-            }
+                {
+                    ReaderRef* self = static_cast<ReaderRef*>(clientTag);
+                    self->notify_listeners(frame);
+                }
 
             void addListener(FrameReadyListener& listener)
-            {
-                auto it = std::find(m_listeners.begin(),
-                                    m_listeners.end(),
-                                    listener);
-
-                if (it != m_listeners.end())
-                    return;
-
-                if (m_isNotifying)
                 {
-                    m_addedListeners.push_back(listener);
+                    auto it = std::find(m_listeners.begin(),
+                                        m_listeners.end(),
+                                        listener);
+
+                    if (it != m_listeners.end())
+                        return;
+
+                    if (m_isNotifying)
+                    {
+                        m_addedListeners.push_back(listener);
+                    }
+                    else
+                    {
+                        m_listeners.push_back(listener);
+                    }
                 }
-                else
-                {
-                    m_listeners.push_back(listener);
-                }
-            }
 
             void removeListener(FrameReadyListener& listener)
-            {
-                auto it = std::find(m_listeners.begin(),
-                                    m_listeners.end(),
-                                    listener);
-
-                if (it == m_listeners.end())
-                    return;
-
-                if (m_isNotifying)
                 {
-                    m_removedListeners.push_back(listener);
-                }
-                else
-                {
-                    m_listeners.erase(it);
-                }
-            }
+                    auto it = std::find(m_listeners.begin(),
+                                        m_listeners.end(),
+                                        listener);
 
-            void notify_listeners(sensekit_reader_frame_t readerFrame)
-            {
-                if (m_removedListeners.size() > 0)
-                {
-                    for(FrameReadyListener& listener : m_removedListeners)
+                    if (it == m_listeners.end())
+                        return;
+
+                    if (m_isNotifying)
                     {
-                        auto it = std::find(m_listeners.begin(),
-                                            m_listeners.end(),
-                                            listener);
-
+                        m_removedListeners.push_back(listener);
+                    }
+                    else
+                    {
                         m_listeners.erase(it);
                     }
-                    m_removedListeners.clear();
                 }
 
-                std::move(m_addedListeners.begin(),
-                          m_addedListeners.end(),
-                          std::back_inserter(m_listeners));
-
-                if (m_listeners.size() == 0)
-                    return;
-
-                Frame frameWrapper(readerFrame);
-
-                m_isNotifying = true;
-                StreamReader reader(shared_from_this());
-                for(FrameReadyListener& listener : m_listeners)
+            void notify_listeners(sensekit_reader_frame_t readerFrame)
                 {
-                    listener.on_frame_ready(reader, frameWrapper);
+                    if (m_removedListeners.size() > 0)
+                    {
+                        for(FrameReadyListener& listener : m_removedListeners)
+                        {
+                            auto it = std::find(m_listeners.begin(),
+                                                m_listeners.end(),
+                                                listener);
+
+                            m_listeners.erase(it);
+                        }
+                        m_removedListeners.clear();
+                    }
+
+                    std::move(m_addedListeners.begin(),
+                              m_addedListeners.end(),
+                              std::back_inserter(m_listeners));
+
+                    if (m_listeners.size() == 0)
+                        return;
+
+                    Frame frameWrapper(readerFrame);
+
+                    m_isNotifying = true;
+                    StreamReader reader(shared_from_this());
+                    for(FrameReadyListener& listener : m_listeners)
+                    {
+                        listener.on_frame_ready(reader, frameWrapper);
+                    }
+                    m_isNotifying = false;
                 }
-                m_isNotifying = false;
-            }
 
             sensekit_reader_t get() { return m_reader; }
 
@@ -302,31 +322,31 @@ namespace sensekit {
     public:
         DataStream(sensekit_streamconnection_t connection)
             : m_connection(connection)
-        {
-            sensekit_stream_get_description(connection, &m_description);
-        }
+            {
+                sensekit_stream_get_description(connection, &m_description);
+            }
 
         bool is_available() { return m_connection != nullptr; }
         void start()
-        {
-            if (m_connection == nullptr)
             {
-                throw std::logic_error("Cannot start a stream that is not available");
+                if (m_connection == nullptr)
+                {
+                    throw std::logic_error("Cannot start a stream that is not available");
+                }
+                sensekit_stream_start(m_connection);
             }
-            sensekit_stream_start(m_connection);
-        }
         void stop()
-        {
-            if (m_connection == nullptr)
             {
-                throw std::logic_error("Cannot stop a stream that is not available");
+                if (m_connection == nullptr)
+                {
+                    throw std::logic_error("Cannot stop a stream that is not available");
+                }
+                sensekit_stream_stop(m_connection);
             }
-            sensekit_stream_stop(m_connection);
-        }
         const StreamDescription& get_description()
-        {
-            return static_cast<const StreamDescription&>(m_description);
-        }
+            {
+                return static_cast<const StreamDescription&>(m_description);
+            }
 
     private:
         sensekit_streamconnection_t m_connection;
