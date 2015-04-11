@@ -70,8 +70,6 @@ namespace sensekit {
             os_free_library(pluginFuncs.libHandle);
         }
 
-        m_readers.clear();
-
         if (m_pluginServiceProxy)
             delete m_pluginServiceProxy;
 

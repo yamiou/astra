@@ -24,6 +24,13 @@ namespace sensekit {
         Stream* stream = connection->get_stream();
         stream->destroy_connection(connection);
 
+        if (!stream->has_connections()
+            && !stream->is_available())
+        {
+            m_streamCollection.erase(stream);
+            delete stream;
+        }
+
         return true;
     }
 

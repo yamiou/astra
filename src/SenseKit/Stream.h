@@ -47,6 +47,7 @@ namespace sensekit {
 
         virtual void on_availability_changed() override;
 
+        bool has_connections() { return m_connections.size() > 0; }
     private:
 
         using ConnPtr = std::unique_ptr<StreamConnection>;
