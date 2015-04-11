@@ -26,6 +26,17 @@ elseif (APPLE)
   find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.dylib" HINTS "$ENV{OPENNI2_REDIST}" PATH_SUFFIXES lib)
 endif()
 
+#Override FindSenseKit equivalents
+set(SENSEKIT_SDK_BUILD TRUE)
+set(SENSEKIT_LIBRARIES
+        SenseKit
+        SenseKitAPI
+        SenseKitUL
+        )
+set(SENSEKIT_INCLUDE_DIR
+    ${PROJECT_SOURCE_DIR}/include
+    )
+        
 add_subdirectory(src)
 add_subdirectory(examples)
 

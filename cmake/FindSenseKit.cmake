@@ -32,71 +32,75 @@ set(FIND_SENSEKIT_PATHS
     /opt/csw
     /opt)
 
-# find the SenseKit include directory
-find_path(SENSEKIT_INCLUDE_DIR SenseKit/SenseKit.h
-          PATH_SUFFIXES include
-          PATHS ${FIND_SENSEKIT_PATHS})
 
-# find the requested modules
+# find the required libraries
 set(SENSEKIT_FOUND TRUE) # will be set to false if one of the required modules is not found
-set(SENSEKIT_FIND_COMPONENTS
-    SenseKit
-    SenseKitAPI
-    SenseKitUL
-    )
 
-foreach(FIND_SENSEKIT_COMPONENT ${SENSEKIT_FIND_COMPONENTS})
-    string(TOUPPER ${FIND_SENSEKIT_COMPONENT} FIND_SENSEKIT_COMPONENT_UPPER)
-    
-    # dynamic release library
-    find_library(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_RELEASE
-                 NAMES ${FIND_SENSEKIT_COMPONENT}
-                 PATH_SUFFIXES lib64 lib
-                 PATHS ${FIND_SENSEKIT_PATHS})
+if (NOT SENSEKIT_SDK_BUILD)
+    # find the SenseKit include directory
+    find_path(SENSEKIT_INCLUDE_DIR SenseKit/SenseKit.h
+              PATH_SUFFIXES include
+              PATHS ${FIND_SENSEKIT_PATHS})
 
-    # dynamic debug library
-    find_library(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_DEBUG
-                 NAMES ${FIND_SENSEKIT_COMPONENT}-d
-                 PATH_SUFFIXES lib64 lib
-                 PATHS ${FIND_SENSEKIT_PATHS})
+    set(SENSEKIT_FIND_COMPONENTS
+        SenseKit
+        SenseKitAPI
+        SenseKitUL
+        )
 
-    if (SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_DEBUG OR SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_RELEASE)
-        # library found
-        set(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_FOUND TRUE)
+    foreach(FIND_SENSEKIT_COMPONENT ${SENSEKIT_FIND_COMPONENTS})
+        string(TOUPPER ${FIND_SENSEKIT_COMPONENT} FIND_SENSEKIT_COMPONENT_UPPER)
         
-        # if both are found, set SENSEKIT_XXX_LIBRARY to contain both
-        if (SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_DEBUG AND SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_RELEASE)
-            set(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY debug     ${SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_DEBUG}
-                                                          optimized ${SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_RELEASE})
+        # dynamic release library
+        find_library(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_RELEASE
+                     NAMES ${FIND_SENSEKIT_COMPONENT}
+                     PATH_SUFFIXES lib64 lib
+                     PATHS ${FIND_SENSEKIT_PATHS})
+
+        # dynamic debug library
+        find_library(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_DEBUG
+                     NAMES ${FIND_SENSEKIT_COMPONENT}-d
+                     PATH_SUFFIXES lib64 lib
+                     PATHS ${FIND_SENSEKIT_PATHS})
+
+        if (SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_DEBUG OR SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_RELEASE)
+            # library found
+            set(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_FOUND TRUE)
+            
+            # if both are found, set SENSEKIT_XXX_LIBRARY to contain both
+            if (SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_DEBUG AND SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_RELEASE)
+                set(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY debug     ${SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_DEBUG}
+                                                              optimized ${SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_RELEASE})
+            endif()
+
+            # if only one debug/release variant is found, set the other to be equal to the found one
+            if (SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_DEBUG AND NOT SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_RELEASE)
+                # debug and not release
+                set(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_RELEASE ${SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_DEBUG})
+                set(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY         ${SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_DEBUG})
+            endif()
+            if (SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_RELEASE AND NOT SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_DEBUG)
+                # release and not debug
+                set(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_DEBUG ${SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_RELEASE})
+                set(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY       ${SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_RELEASE})
+            endif()
+        else()
+            # library not found
+            set(SENSEKIT_FOUND FALSE)
+            set(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_FOUND FALSE)
+            set(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY "")
+            set(FIND_SENSEKIT_MISSING "${FIND_SENSEKIT_MISSING} SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY")
         endif()
 
-        # if only one debug/release variant is found, set the other to be equal to the found one
-        if (SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_DEBUG AND NOT SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_RELEASE)
-            # debug and not release
-            set(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_RELEASE ${SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_DEBUG})
-            set(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY         ${SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_DEBUG})
-        endif()
-        if (SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_RELEASE AND NOT SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_DEBUG)
-            # release and not debug
-            set(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_DEBUG ${SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_RELEASE})
-            set(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY       ${SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_RELEASE})
-        endif()
-    else()
-        # library not found
-        set(SENSEKIT_FOUND FALSE)
-        set(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_FOUND FALSE)
-        set(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY "")
-        set(FIND_SENSEKIT_MISSING "${FIND_SENSEKIT_MISSING} SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY")
-    endif()
+        # mark as advanced
+        MARK_AS_ADVANCED(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY
+                         SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_RELEASE
+                         SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_DEBUG)
 
-    # mark as advanced
-    MARK_AS_ADVANCED(SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY
-                     SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_RELEASE
-                     SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY_DEBUG)
-
-    # add to the global list of libraries
-    set(SENSEKIT_LIBRARIES ${SENSEKIT_LIBRARIES} "${SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY}")
-endforeach()
+        # add to the global list of libraries
+        set(SENSEKIT_LIBRARIES ${SENSEKIT_LIBRARIES} "${SENSEKIT_${FIND_SENSEKIT_COMPONENT_UPPER}_LIBRARY}")
+    endforeach()
+endif()
 
 # handle errors
 if(NOT SENSEKIT_FOUND)
