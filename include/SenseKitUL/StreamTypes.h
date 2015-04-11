@@ -1,8 +1,6 @@
 #ifndef STREAMTYPES_H
 #define STREAMTYPES_H
 
-#include <sensekit_types.h>
-
 enum sensekit_core_stream_types {
     SENSEKIT_STREAM_DEPTH = 1,
     SENSEKIT_STREAM_COLOR = 2,

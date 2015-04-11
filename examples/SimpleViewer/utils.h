@@ -1,9 +1,6 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <sensekit_capi.h>
-#include <SenseKitUL.h>
-
 #include <stdio.h>
 
 #ifdef _WIN32
@@ -61,42 +58,5 @@ void Sleep(int millisecs)
     usleep(millisecs * 1000);
 }
 #endif // WIN32
-
-inline void calculateHistogram(float* pHistogram, int histogramSize, sensekit_depthframe_t frame, sensekit_depthframe_metadata_t metadata)
-{
-    int16_t* pDepth;
-    size_t length;
-    sensekit_depthframe_get_data_ptr(frame, &pDepth, &length);
-
-    // Calculate the accumulative histogram (the yellow display...)
-    memset(pHistogram, 0, histogramSize*sizeof(float));
-
-    int depthWidth = metadata.width;
-    int depthHeight = metadata.height;
-
-    unsigned int nNumberOfPoints = 0;
-    for (int y = 0; y < depthHeight; ++y)
-    {
-        for (int x = 0; x < depthWidth; ++x, ++pDepth)
-        {
-            if (*pDepth != 0)
-            {
-                pHistogram[*pDepth]++;
-                nNumberOfPoints++;
-            }
-        }
-    }
-    for (int nIndex=1; nIndex<histogramSize; nIndex++)
-    {
-        pHistogram[nIndex] += pHistogram[nIndex-1];
-    }
-    if (nNumberOfPoints)
-    {
-        for (int nIndex=1; nIndex<histogramSize; nIndex++)
-        {
-            pHistogram[nIndex] = (256 * (1.0f - (pHistogram[nIndex] / nNumberOfPoints)));
-        }
-    }
-}
 
 #endif /* UTILS_H */

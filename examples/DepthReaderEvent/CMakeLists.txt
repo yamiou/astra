@@ -4,4 +4,6 @@ set (DepthReaderEvent_SOURCES
 
 add_executable(DepthReaderEvent ${DepthReaderEvent_SOURCES})
 
-target_link_libraries(DepthReaderEvent SenseKit SenseKitUL)
+include_directories(DepthReaderEvent ${SENSEKIT_INCLUDE_DIR})
+
+target_link_libraries(DepthReaderEvent ${SENSEKIT_LIBRARIES})

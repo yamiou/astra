@@ -1,7 +1,7 @@
 #ifndef SENSEKITUL_H
 #define SENSEKITUL_H
 
-#include <sensekit_types.h>
+#include <SenseKit/sensekit_types.h>
 #include "streams/depth.h"
 #include "streams/color.h"
 

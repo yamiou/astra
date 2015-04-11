@@ -3,8 +3,8 @@
 
 #define MAX_DEPTH 10000
 
-#include <SenseKit.h>
-#include <SenseKitUL.h>
+#include <SenseKit/SenseKit.h>
+#include <SenseKitUL/SenseKitUL.h>
 #include <stddef.h>
 #include <math.h>
 
@@ -97,6 +97,7 @@ private:
     void calculateNormals(sensekit_depthframe_t& frame, sensekit_depthframe_metadata_t metadata);
     void showTex(int depthWidth, int depthHeight);
     void updateTex(sensekit_depthframe_t depthFrame, sensekit_depthframe_metadata_t metadata);
+    void CalculateHistogram(float* pHistogram, int histogramSize, sensekit_depthframe_t frame, sensekit_depthframe_metadata_t metadata);
     static void glutIdle();
     static void glutDisplay();
     static void glutKeyboard(unsigned char key, int x, int y);

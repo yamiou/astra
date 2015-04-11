@@ -10,9 +10,9 @@ set (SimpleColorViewer_SOURCES
 
 add_executable(SimpleColorViewer ${SimpleColorViewer_SOURCES})
 
-include_directories(SimpleColorViewer ${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIR})
+include_directories(SimpleColorViewer ${SENSEKIT_INCLUDE_DIR} ${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIR})
 
-target_link_libraries(SimpleColorViewer SenseKit SenseKitUL ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
+target_link_libraries(SimpleColorViewer ${SENSEKIT_LIBRARIES} ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
 
 if (WIN32)
   SET (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")

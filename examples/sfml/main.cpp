@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
-#include <SenseKit.h>
-#include <SenseKitUL.h>
+#include <Sensekit/SenseKit.h>
+#include <SensekitUL/SenseKitUL.h>
 
 class SampleFrameListener : public sensekit::FrameReadyListener
 {

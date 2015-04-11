@@ -4,4 +4,6 @@ set (DepthReader_SOURCES
 
 add_executable(DepthReader ${DepthReader_SOURCES})
 
-target_link_libraries(DepthReader SenseKit SenseKitUL)
+include_directories(DepthReader ${SENSEKIT_INCLUDE_DIR})
+
+target_link_libraries(DepthReader ${SENSEKIT_LIBRARIES})

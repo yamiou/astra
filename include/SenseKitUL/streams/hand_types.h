@@ -1,7 +1,7 @@
 #ifndef HAND_TYPES_H
 #define HAND_TYPES_H
 
-#include <sensekit_types.h>
+#include <SenseKit/sensekit_types.h>
 
 #define SENSEKIT_HANDS_MAX_HANDPOINTS 20
 

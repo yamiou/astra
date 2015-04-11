@@ -1,8 +1,6 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <SenseKit.h>
-
 #include <stdio.h>
 
 #ifdef _WIN32

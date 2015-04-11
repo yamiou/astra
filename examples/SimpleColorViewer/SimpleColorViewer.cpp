@@ -3,8 +3,6 @@
 #define _CRT_SECURE_NO_DEPRECATE 1
 #endif
 
-#include <SenseKit.h>
-#include <SenseKitUL.h>
 #include "SimpleColorViewer.h"
 #include <memory.h>
 

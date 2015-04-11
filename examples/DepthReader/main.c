@@ -1,7 +1,7 @@
 ﻿// Orbbec (c) 2015
 
-#include <sensekit_capi.h>
-#include <skul_capi.h>
+#include <SenseKit/sensekit_capi.h>
+#include <SenseKitUL/skul_capi.h>
 #include <stdio.h>
 #include "../key_handler.h"
 

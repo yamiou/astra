@@ -1,7 +1,7 @@
 #ifndef DEPTH_TYPES_H
 #define DEPTH_TYPES_H
 
-#include <sensekit_types.h>
+#include <SenseKit/sensekit_types.h>
 
 typedef struct
 {

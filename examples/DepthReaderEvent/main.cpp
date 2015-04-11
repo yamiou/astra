@@ -1,7 +1,7 @@
 ﻿// Orbbec (c) 2015
 
-#include <SenseKit.h>
-#include <SenseKitUL.h>
+#include <SenseKit/SenseKit.h>
+#include <SenseKitUL/SenseKitUL.h>
 #include <cstdio>
 #include <iostream>
 #include "../key_handler.h"

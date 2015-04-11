@@ -3,8 +3,6 @@
 #define _CRT_SECURE_NO_DEPRECATE 1
 #endif
 
-#include <SenseKit.h>
-#include <SenseKitUL.h>
 #include "SimpleViewer.h"
 #include <memory.h>
 
@@ -408,6 +406,44 @@ void SampleViewer::updateTex(sensekit_depthframe_t depthFrame, sensekit_depthfra
     }
 }
 
+
+void SampleViewer::CalculateHistogram(float* pHistogram, int histogramSize, sensekit_depthframe_t frame, sensekit_depthframe_metadata_t metadata)
+{
+    int16_t* pDepth;
+    size_t length;
+    sensekit_depthframe_get_data_ptr(frame, &pDepth, &length);
+
+    // Calculate the accumulative histogram (the yellow display...)
+    memset(pHistogram, 0, histogramSize*sizeof(float));
+
+    int depthWidth = metadata.width;
+    int depthHeight = metadata.height;
+
+    unsigned int nNumberOfPoints = 0;
+    for (int y = 0; y < depthHeight; ++y)
+    {
+        for (int x = 0; x < depthWidth; ++x, ++pDepth)
+        {
+            if (*pDepth != 0)
+            {
+                pHistogram[*pDepth]++;
+                nNumberOfPoints++;
+            }
+        }
+    }
+    for (int nIndex = 1; nIndex<histogramSize; nIndex++)
+    {
+        pHistogram[nIndex] += pHistogram[nIndex - 1];
+    }
+    if (nNumberOfPoints)
+    {
+        for (int nIndex = 1; nIndex<histogramSize; nIndex++)
+        {
+            pHistogram[nIndex] = (256 * (1.0f - (pHistogram[nIndex] / nNumberOfPoints)));
+        }
+    }
+}
+
 void SampleViewer::display()
 {
     sensekit_temp_update();
@@ -436,7 +472,7 @@ void SampleViewer::display()
     size_t depthLength;
     sensekit_depthframe_get_data_ptr(depthFrame, &depthData, &depthLength);
 
-    calculateHistogram(m_pDepthHist, MAX_DEPTH, depthFrame, metadata);
+    CalculateHistogram(m_pDepthHist, MAX_DEPTH, depthFrame, metadata);
 
     calculateNormals(depthFrame, metadata);
 

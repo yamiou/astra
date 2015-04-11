@@ -4,4 +4,6 @@ set (HandReader_SOURCES
 
 add_executable(HandReader ${HandReader_SOURCES})
 
-target_link_libraries(HandReader SenseKit SenseKitUL)
+include_directories(HandReader ${SENSEKIT_INCLUDE_DIR})
+
+target_link_libraries(HandReader ${SENSEKIT_LIBRARIES})

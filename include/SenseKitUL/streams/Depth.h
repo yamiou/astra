@@ -1,9 +1,9 @@
 #ifndef DEPTH_H
 #define DEPTH_H
 
-#include <SenseKit.h>
+#include <SenseKit/SenseKit.h>
 #include <stdexcept>
-#include <StreamTypes.h>
+#include <SenseKitUL/StreamTypes.h>
 #include "depth_capi.h"
 #include <cmath>
 

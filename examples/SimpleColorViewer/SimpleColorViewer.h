@@ -3,8 +3,8 @@
 
 #define MAX_DEPTH 10000
 
-#include <SenseKit.h>
-#include <SenseKitUL.h>
+#include <SenseKit/SenseKit.h>
+#include <SenseKitUL/SenseKitUL.h>
 #include <stddef.h>
 #include <math.h>
 

@@ -1,9 +1,9 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-#include <SenseKit.h>
+#include <SenseKit/SenseKit.h>
 #include <stdexcept>
-#include <StreamTypes.h>
+#include <SenseKitUL/StreamTypes.h>
 #include "color_capi.h"
 
 namespace sensekit {
