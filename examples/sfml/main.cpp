@@ -5,10 +5,6 @@
 class SampleFrameListener : public sensekit::FrameReadyListener
 {
 public:
-    SampleFrameListener()
-        {
-        }
-
     void init_texture(int width, int height)
     {
         if (buffer == nullptr || width != m_width || height != m_height)
@@ -32,7 +28,7 @@ public:
 
         std::clock_t newTimepoint= std::clock();
         long double frameDuration = (newTimepoint - m_lastTimepoint) / static_cast<long double>(CLOCKS_PER_SEC);
-        
+
         m_frameDuration = frameDuration * fpsFactor + m_frameDuration * (1 - fpsFactor);
         m_lastTimepoint = newTimepoint;
         double fps = 1.0 / m_frameDuration;
@@ -64,6 +60,7 @@ public:
                     buffer[index * 4 + 3] = 255;
                 }
             }
+
             m_texture.update(buffer);
             check_fps();
         }
@@ -81,15 +78,13 @@ private:
     uint8_t* buffer { nullptr };
     int m_width { 0 };
     int m_height { 0 };
-
 };
 
 int main(int argc, char** argv)
 {
-    sensekit_initialize();
+    sensekit::SenseKit::initialize();
 
-    // create the window
-    sf::RenderWindow window(sf::VideoMode(1280, 960), "My window");
+    sf::RenderWindow window(sf::VideoMode(1280, 960), "Depth Viewer");
 
     sensekit::Sensor sensor;
     sensekit::StreamReader reader = sensor.create_reader();
@@ -97,19 +92,16 @@ int main(int argc, char** argv)
     SampleFrameListener listener;
 
     reader.stream<sensekit::DepthStream>().start();
-    
+
     reader.addListener(listener);
 
-    // run the program as long as the window is open
     while (window.isOpen())
     {
         sensekit_temp_update();
 
-        // check all the window's events that were triggered since the last iteration of the loop
         sf::Event event;
         while (window.pollEvent(event))
         {
-            // "close requested" event: we close the window
             if (event.type == sf::Event::Closed)
                 window.close();
         }
@@ -117,14 +109,11 @@ int main(int argc, char** argv)
         // clear the window with black color
         window.clear(sf::Color::Black);
 
-        // draw everything here...
-        // window.draw(...);
-
         listener.drawTo(window);
         window.display();
     }
 
-    sensekit_terminate();
+    sensekit::SenseKit::terminate();
 
     return 0;
 }
