@@ -12,6 +12,12 @@ public:
             m_width = width;
             m_height = height;
             int byteLength = m_width * m_height * 4;
+
+            if (buffer != nullptr)
+            {
+                delete[] buffer;
+            }
+
             buffer = new uint8_t[byteLength];
             memset(buffer, 0, byteLength);
 
