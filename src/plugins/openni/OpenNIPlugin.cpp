@@ -35,7 +35,7 @@ namespace sensekit
         {
             ::openni::Status rc = ::openni::STATUS_OK;
 
-            cout << "Opening device" << endl;
+            cout << "device connected, opening device" << endl;
             rc = m_device.open(info->getUri());
 
             if (rc != ::openni::STATUS_OK)
@@ -51,6 +51,7 @@ namespace sensekit
 
         void OpenNIPlugin::onDeviceDisconnected(const ::openni::DeviceInfo* info)
         {
+            cout << "device disconnected" << endl;
             get_pluginService().destroy_stream(m_depthHandle);
             get_pluginService().destroy_stream(m_colorHandle);
             get_pluginService().destroy_stream_set(m_streamSetHandle);
