@@ -66,7 +66,7 @@ namespace sensekit {
     {
     public:
         StreamDescription(sensekit_stream_type_t type,
-                          sensekit_stream_subtype_t subType)
+                          sensekit_stream_subtype_t subType = DEFAULT_SUBTYPE)
             {
                 m_desc.type = type;
                 m_desc.subType = subType;
@@ -160,21 +160,21 @@ namespace sensekit {
         template<typename T>
         T stream()
             {
-                return stream<T>(ANY_SUBTYPE);
+                return stream<T>(DEFAULT_SUBTYPE);
             }
 
         template<typename T>
         T stream(sensekit_stream_subtype_t subType)
-            {
-                sensekit_streamconnection_t connection;
+        {
+            sensekit_streamconnection_t connection;
 
-                sensekit_reader_get_stream(m_readerRef->get(),
-                                           T::id,
-                                           subType,
-                                           &connection);
+            sensekit_reader_get_stream(m_readerRef->get(),
+                T::id,
+                subType,
+                &connection);
 
-                return T(connection);
-            }
+            return T(connection);
+        }
 
         void addListener(FrameReadyListener& listener)
             {
@@ -195,6 +195,7 @@ namespace sensekit {
             }
 
     private:
+
         class ReaderRef;
         using ReaderRefPtr = std::shared_ptr<ReaderRef>;
 

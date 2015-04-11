@@ -49,8 +49,11 @@ namespace sensekit
                                     size_t byteLength,
                                     sensekit_parameter_data_t* data) override;
 
-            virtual void connection_added(sensekit_streamconnection_t connection) override;
-            virtual void connection_removed(sensekit_streamconnection_t connection) override;
+            virtual void connection_added(sensekit_stream_t stream, 
+                                          sensekit_streamconnection_t connection) override;
+            virtual void connection_removed(sensekit_stream_t stream, 
+                                            sensekit_bin_t bin, 
+                                            sensekit_streamconnection_t connection) override;
 
             sensekit_status_t open_sensor_streams();
             sensekit_status_t close_sensor_streams();
@@ -60,6 +63,7 @@ namespace sensekit
 
             sensekit_status_t read_streams();
 
+            bool m_isDeviceOpen{ false };
             ::openni::Device m_device;
             ::openni::DeviceInfo m_deviceInfo;
             ::openni::VideoStream m_depthStream;

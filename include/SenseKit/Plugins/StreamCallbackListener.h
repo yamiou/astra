@@ -39,15 +39,18 @@ namespace sensekit {
             }
 
         static void connection_added_thunk(void* instance,
+                                           sensekit_stream_t stream,
                                            sensekit_streamconnection_t connection)
             {
-                static_cast<StreamCallbackListener*>(instance)->connection_added(connection);
+                static_cast<StreamCallbackListener*>(instance)->connection_added(stream, connection);
             }
 
         static void connection_removed_thunk(void* instance,
+                                             sensekit_stream_t stream,
+                                             sensekit_bin_t bin,
                                              sensekit_streamconnection_t connection)
             {
-                static_cast<StreamCallbackListener*>(instance)->connection_removed(connection);
+                static_cast<StreamCallbackListener*>(instance)->connection_removed(stream, bin, connection);
             }
 
         virtual void set_parameter(sensekit_streamconnection_t connection,
@@ -64,8 +67,8 @@ namespace sensekit {
                                         size_t byteLength,
                                         sensekit_parameter_data_t* data) {}
 
-        virtual void connection_added(sensekit_streamconnection_t connection) {}
-        virtual void connection_removed(sensekit_streamconnection_t connection) {}
+        virtual void connection_added(sensekit_stream_t stream, sensekit_streamconnection_t connection) {}
+        virtual void connection_removed(sensekit_stream_t stream, sensekit_bin_t bin, sensekit_streamconnection_t connection) {}
 
         friend stream_callbacks_t create_plugin_callbacks(StreamCallbackListener* context);
     };

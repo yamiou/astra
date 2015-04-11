@@ -17,6 +17,18 @@ namespace sensekit {
         m_connection.desc = stream->get_description();
     }
 
+    sensekit_bin_t StreamConnection::get_bin_handle()
+    {
+        if (m_bin != nullptr)
+        {
+            return m_bin->get_handle();
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
     const sensekit_stream_desc_t& StreamConnection::get_description() const
     {
         return m_stream->get_description();

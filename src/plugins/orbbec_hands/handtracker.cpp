@@ -65,13 +65,13 @@ namespace sensekit
                 size_t handByteLength = sizeof(sensekit_depthframe_wrapper_t) + 
                                             SENSEKIT_HANDS_MAX_HANDPOINTS * sizeof(sensekit_handpoint_t);
 
-                StreamDescription handDescription(SENSEKIT_STREAM_HAND, HAND_DEFAULT_SUBTYPE);
+                StreamDescription handDescription(SENSEKIT_STREAM_HAND);
                 m_handStream = make_unique<HandStream>(pluginService, streamset, handDescription, handByteLength);
 
                 size_t debugImageByteLength = sizeof(sensekit_colorframe_wrapper_t) + 
                                                   PROCESSING_SIZE_WIDTH * PROCESSING_SIZE_HEIGHT * 3;
 
-                StreamDescription debugImageDescription(SENSEKIT_STREAM_HAND_DEBUG_IMAGE, HAND_DEFAULT_SUBTYPE);
+                StreamDescription debugImageDescription(SENSEKIT_STREAM_HAND_DEBUG_IMAGE);
                 m_debugImageStream = make_unique<ColorStream>(pluginService, streamset, debugImageDescription, debugImageByteLength);
             }
 

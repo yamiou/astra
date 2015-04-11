@@ -40,8 +40,8 @@ typedef void(*get_parameter_data_callback_t)(void*,
                                              sensekit_parameter_id, size_t,
                                              sensekit_parameter_data_t*);
 
-typedef void(*connection_added_callback_t)(void*, sensekit_streamconnection_t);
-typedef void(*connection_removed_callback_t)(void*, sensekit_streamconnection_t);
+typedef void(*connection_added_callback_t)(void*, sensekit_stream_t, sensekit_streamconnection_t);
+typedef void(*connection_removed_callback_t)(void*, sensekit_stream_t, sensekit_bin_t, sensekit_streamconnection_t);
 
 
 typedef void(*stream_added_callback_t)(void*,

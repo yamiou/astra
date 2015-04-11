@@ -188,19 +188,6 @@ namespace sensekit {
         m_locked = false;
     }
 
-    bool StreamReader::destroy_stream_connection(StreamConnection* connection)
-    {
-        assert(connection != nullptr);
-
-        if (m_streamMap.erase(connection->get_description()) > 0)
-        {
-            m_streamSet.destroy_stream_connection(connection);
-            return true;
-        }
-
-        return false;
-    }
-
     void StreamReader::check_for_all_frames_ready()
     {
         bool allReady = true;

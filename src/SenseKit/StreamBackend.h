@@ -31,8 +31,7 @@ namespace sensekit {
 
         void set_callbacks(const stream_callbacks_t& callbacks)
             {
-                m_callbacks =
-                    std::unique_ptr<stream_callbacks_t>(new stream_callbacks_t(callbacks));
+                m_callbacks = std::make_unique<stream_callbacks_t>(callbacks);
                 on_availability_changed();
             }
 
@@ -43,8 +42,8 @@ namespace sensekit {
             }
 
     protected:
-        void on_connection_created(StreamConnection* connection);
-        void on_connection_destroyed(StreamConnection* connection);
+        void on_connection_created(StreamConnection* connection, sensekit_stream_t stream);
+        void on_connection_destroyed(StreamConnection* connection, sensekit_stream_t stream);
 
         void on_set_parameter(StreamConnection* connection,
                               sensekit_parameter_id id,

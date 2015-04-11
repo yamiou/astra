@@ -16,7 +16,7 @@ typedef int32_t sensekit_stream_type_t;
 typedef int32_t sensekit_stream_subtype_t;
 typedef int32_t sensekit_frame_index_t;
 
-const sensekit_stream_subtype_t ANY_SUBTYPE = -1;
+const sensekit_stream_subtype_t DEFAULT_SUBTYPE = 0;
 
 typedef struct {
     sensekit_stream_type_t type;

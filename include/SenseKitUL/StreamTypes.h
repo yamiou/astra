@@ -10,9 +10,4 @@ enum sensekit_core_stream_types {
     SENSEKIT_STREAM_HAND_DEBUG_IMAGE = 3001,
 };
 
-const sensekit_stream_subtype_t DEPTH_DEFAULT_SUBTYPE = 0;
-const sensekit_stream_subtype_t COLOR_DEFAULT_SUBTYPE = 0;
-const sensekit_stream_subtype_t HAND_DEFAULT_SUBTYPE = 0;
-
-
 #endif /* STREAMTYPES_H */

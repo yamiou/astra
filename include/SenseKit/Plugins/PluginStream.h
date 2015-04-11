@@ -63,8 +63,11 @@ namespace sensekit {
                 size_t byteLength,
                 sensekit_parameter_data_t* data) override;
 
-            virtual void connection_added(sensekit_streamconnection_t connection) override;
-            virtual void connection_removed(sensekit_streamconnection_t connection) override;
+            virtual void connection_added(sensekit_stream_t stream, 
+                                          sensekit_streamconnection_t connection) override;
+            virtual void connection_removed(sensekit_stream_t stream, 
+                                            sensekit_bin_t bin, 
+                                            sensekit_streamconnection_t connection) override;
 
             void create_stream(StreamDescription& description)
             {
@@ -107,8 +110,11 @@ namespace sensekit {
         }
 
         template < typename TFrameWrapper >
-        inline void PluginStream<TFrameWrapper>::connection_added(sensekit_streamconnection_t connection)
+        inline void PluginStream<TFrameWrapper>::connection_added(sensekit_stream_t stream, 
+                                                                  sensekit_streamconnection_t connection)
         {
+            assert(stream == m_streamHandle);
+
             if (m_binHandle == nullptr)
             {
                 
@@ -118,8 +124,13 @@ namespace sensekit {
         }
 
         template < typename TFrameWrapper >
-        inline void PluginStream<TFrameWrapper>::connection_removed(sensekit_streamconnection_t connection)
+        inline void PluginStream<TFrameWrapper>::connection_removed(sensekit_stream_t stream, 
+                                                                    sensekit_bin_t bin, 
+                                                                    sensekit_streamconnection_t connection)
         {
+            assert(stream == m_streamHandle);
+            assert(bin == m_binHandle);
+
             m_pluginService.link_connection_to_bin(connection, nullptr);
             //don't destroy bin if other connections are linked assigned to it
             bool hasConnections;

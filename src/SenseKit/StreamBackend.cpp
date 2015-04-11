@@ -26,21 +26,28 @@ namespace sensekit {
             m_bins.erase(it);
     }
 
-    void StreamBackend::on_connection_created(StreamConnection* connection)
+    void StreamBackend::on_connection_created(StreamConnection* connection, sensekit_stream_t stream)
     {
         if (m_callbacks &&
             m_callbacks->connectionAddedCallback)
             m_callbacks->connectionAddedCallback(m_callbacks->context,
-                                                connection->get_handle());
+                                                 stream,
+                                                 connection->get_handle());
 
     }
 
-    void StreamBackend::on_connection_destroyed(StreamConnection* connection)
+    void StreamBackend::on_connection_destroyed(StreamConnection* connection, sensekit_stream_t stream)
     {
         if (m_callbacks &&
             m_callbacks->connectionRemovedCallback)
+        {
+            sensekit_bin_t binHandle = connection->get_bin_handle();
+
             m_callbacks->connectionRemovedCallback(m_callbacks->context,
-                                                  connection->get_handle());
+                                                   stream,
+                                                   binHandle,
+                                                   connection->get_handle());
+        }
     }
 
     void StreamBackend::on_set_parameter(StreamConnection* connection,

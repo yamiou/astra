@@ -28,10 +28,7 @@ namespace sensekit {
         std::size_t operator()(const sensekit_stream_desc_t& lhs,
                                const sensekit_stream_desc_t& rhs) const
             {
-                return lhs.type == rhs.type &&
-                                    (lhs.subType == ANY_SUBTYPE ||
-                                     rhs.subType == ANY_SUBTYPE ||
-                                     lhs.subType == rhs.subType);
+                return lhs.type == rhs.type && lhs.subType == rhs.subType;
             }
     };
 
@@ -81,8 +78,6 @@ namespace sensekit {
         StreamConnection* find_stream_of_type(sensekit_stream_desc_t& desc);
         StreamConnection::FrameReadyCallback get_sc_frame_ready_callback();
         void on_connection_frame_ready(StreamConnection* connection, sensekit_frame_index_t frameIndex);
-
-        bool destroy_stream_connection(StreamConnection* connection);
 
         using ConnectionMap = std::unordered_map<sensekit_stream_desc_t,
                                                  ReaderConnectionData*,

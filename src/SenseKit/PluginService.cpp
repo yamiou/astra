@@ -89,13 +89,13 @@ namespace sensekit
                                                    stream_callbacks_t pluginCallbacks,
                                                    sensekit_stream_t& handle)
     {
+        cout << "registering stream." << endl;
+
         // TODO add to specific stream set
         Stream* stream = m_context.get_rootSet().create_stream(desc, pluginCallbacks);
         handle = stream->get_handle();
 
         m_streamAddedSignal.raise(setHandle, handle, desc);
-
-        cout << "registering stream." << endl;
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -104,6 +104,8 @@ namespace sensekit
     {
         if (streamHandle == nullptr)
             return SENSEKIT_STATUS_INVALID_PARAMETER;
+
+        cout << "unregistered stream." << endl;
 
         //TODO refactor this mess
 
@@ -118,8 +120,6 @@ namespace sensekit
         set->destroy_stream(stream);
 
         streamHandle = nullptr;
-
-        cout << "unregistered stream." << endl;
 
         return SENSEKIT_STATUS_SUCCESS;
     }

@@ -18,7 +18,7 @@ namespace sensekit {
 
         if (is_available())
         {
-            on_connection_created(rawPtr);
+            on_connection_created(rawPtr, get_handle());
         }
 
         return rawPtr;
@@ -38,7 +38,7 @@ namespace sensekit {
         {
             if (is_available())
             {
-              on_connection_destroyed(it->get());
+                on_connection_destroyed(it->get(), get_handle());
             }
             m_connections.erase(it);
         }
@@ -50,7 +50,7 @@ namespace sensekit {
         {
             for(auto& connection : m_connections)
             {
-                on_connection_created(connection.get());
+                on_connection_created(connection.get(), get_handle());
             }
         }
         else

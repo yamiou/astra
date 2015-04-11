@@ -71,7 +71,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get(sensekit_reader_t re
 {
     return sensekit_generic_stream_get(reader,
                                        SENSEKIT_STREAM_DEPTH,
-                                       ANY_SUBTYPE,
+                                       DEFAULT_SUBTYPE,
                                        depthStream);
 }
 
@@ -80,7 +80,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depth_frame_get(sensekit_reader_frame
 {
     return sensekit_generic_frame_get<sensekit_depthframe_wrapper_t>(readerFrame,
                                                                      SENSEKIT_STREAM_DEPTH,
-                                                                     ANY_SUBTYPE,
+                                                                     DEFAULT_SUBTYPE,
                                                                      depthFrame);
 }
 

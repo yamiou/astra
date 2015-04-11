@@ -37,7 +37,7 @@ namespace sensekit
 
             cout << "device connected, opening device" << endl;
             rc = m_device.open(info->getUri());
-
+            
             if (rc != ::openni::STATUS_OK)
             {
                 cout << "Failed to open" << endl;
@@ -45,6 +45,7 @@ namespace sensekit
             }
 
             m_deviceInfo = m_device.getDeviceInfo();
+            m_isDeviceOpen = true;
 
             open_sensor_streams();
         }
@@ -52,6 +53,7 @@ namespace sensekit
         void OpenNIPlugin::onDeviceDisconnected(const ::openni::DeviceInfo* info)
         {
             cout << "device disconnected" << endl;
+            m_isDeviceOpen = false;
             get_pluginService().destroy_stream(m_depthHandle);
             get_pluginService().destroy_stream(m_colorHandle);
             get_pluginService().destroy_stream_set(m_streamSetHandle);
@@ -81,6 +83,10 @@ namespace sensekit
             {
                 cout << "starting depth stream." << endl;
                 rc = m_depthStream.start();
+
+                m_depthMode = m_depthStream.getVideoMode();
+                m_depthBufferLength = m_depthMode.getResolutionX() * m_depthMode.getResolutionY() * 2;
+
                 if (rc != ::openni::STATUS_OK)
                 {
                     cout << "failed to start depth stream" << endl;
@@ -104,6 +110,10 @@ namespace sensekit
             {
                 cout << "starting color stream." << endl;
                 rc = m_colorStream.start();
+
+                m_colorMode = m_colorStream.getVideoMode();
+                m_colorBufferLength = m_colorMode.getResolutionX() * m_colorMode.getResolutionY() * 3;
+
                 if (rc != ::openni::STATUS_OK)
                 {
                     cout << "failed to start color stream" << endl;
@@ -121,15 +131,13 @@ namespace sensekit
                 ::openni::OpenNI::shutdown();
             }
 
-            sensekit_frame_t* nextBuffer = nullptr;
-
             stream_callbacks_t pluginCallbacks = create_plugin_callbacks(this);
 
             get_pluginService().create_stream_set(m_streamSetHandle);
 
             sensekit_stream_desc_t depthDesc;
             depthDesc.type = SENSEKIT_STREAM_DEPTH;
-            depthDesc.subType = DEPTH_DEFAULT_SUBTYPE;
+            depthDesc.subType = DEFAULT_SUBTYPE;
 
             get_pluginService().create_stream(m_streamSetHandle,
                                               depthDesc,
@@ -138,34 +146,12 @@ namespace sensekit
 
             sensekit_stream_desc_t colorDesc;
             colorDesc.type = SENSEKIT_STREAM_COLOR;
-            colorDesc.subType = COLOR_DEFAULT_SUBTYPE;
+            colorDesc.subType = DEFAULT_SUBTYPE;
 
             get_pluginService().create_stream(m_streamSetHandle,
                                               colorDesc,
                                               pluginCallbacks,
                                               &m_colorHandle);
-
-            m_depthMode = m_depthStream.getVideoMode();
-            m_colorMode = m_colorStream.getVideoMode();
-
-            m_depthBufferLength  = m_depthMode.getResolutionX() * m_depthMode.getResolutionY() * 2;
-            m_colorBufferLength = m_colorMode.getResolutionX() * m_colorMode.getResolutionY() * 3;
-
-            get_pluginService()
-                .create_stream_bin(m_depthHandle,
-                                   sizeof(sensekit_depthframe_wrapper_t) + m_depthBufferLength,
-                                   &m_depthBinHandle,
-                                   &nextBuffer);
-
-            set_new_depth_buffer(nextBuffer);
-
-            get_pluginService()
-                .create_stream_bin(m_colorHandle,
-                                   sizeof(sensekit_colorframe_wrapper_t) + m_colorBufferLength,
-                                   &m_colorBinHandle,
-                                   &nextBuffer);
-
-            set_new_color_buffer(nextBuffer);
 
             return SENSEKIT_STATUS_SUCCESS;
         }
@@ -186,7 +172,8 @@ namespace sensekit
                                               sensekit_parameter_data_t* data)
         {}
 
-        void OpenNIPlugin::connection_added(sensekit_streamconnection_t connection)
+        void OpenNIPlugin::connection_added(sensekit_stream_t stream, 
+                                            sensekit_streamconnection_t connection)
         {
             sensekit_stream_desc_t desc;
             sensekit_stream_get_description(connection, &desc);
@@ -194,17 +181,42 @@ namespace sensekit
             switch (desc.type)
             {
             case SENSEKIT_STREAM_DEPTH:
+                if (m_depthBinHandle == nullptr)
+                {
+                    sensekit_frame_t* nextBuffer = nullptr;
+                    get_pluginService()
+                        .create_stream_bin(stream,
+                        sizeof(sensekit_depthframe_wrapper_t) + m_depthBufferLength,
+                        &m_depthBinHandle,
+                        &nextBuffer);
+
+                    set_new_depth_buffer(nextBuffer);
+                }
+
                 get_pluginService().link_connection_to_bin(connection, m_depthBinHandle);
                 cout << "openniplugin: new connection added, linked to global depth" << endl;
                 break;
             case SENSEKIT_STREAM_COLOR:
+                if (m_colorBinHandle == nullptr)
+                {
+                    sensekit_frame_t* nextBuffer = nullptr;
+                    get_pluginService()
+                        .create_stream_bin(stream,
+                        sizeof(sensekit_colorframe_wrapper_t) + m_colorBufferLength,
+                        &m_colorBinHandle,
+                        &nextBuffer);
+
+                    set_new_color_buffer(nextBuffer);
+                }
                 get_pluginService().link_connection_to_bin(connection, m_colorBinHandle);
                 cout << "openniplugin: new connection added, linked to global color" << endl;
                 break;
             }
         }
 
-        void OpenNIPlugin::connection_removed(sensekit_streamconnection_t connection)
+        void OpenNIPlugin::connection_removed(sensekit_stream_t stream, 
+                                              sensekit_bin_t bin, 
+                                              sensekit_streamconnection_t connection)
         {
             sensekit_stream_desc_t desc;
             sensekit_stream_get_description(connection, &desc);
@@ -285,8 +297,7 @@ namespace sensekit
 
         void OpenNIPlugin::temp_update()
         {
-            if (m_currentColorBuffer != nullptr
-                && m_currentDepthBuffer != nullptr)
+            if (m_isDeviceOpen)
             {
                 read_streams();
             }
@@ -309,7 +320,7 @@ namespace sensekit
 
             sensekit_frame_t* nextBuffer = nullptr;
 
-            if (streamIndex == 0)
+            if (streamIndex == 0 && m_currentDepthBuffer != nullptr)
             {
                 ::openni::VideoFrameRef ref;
                 if (m_depthStream.readFrame(&ref) == ::openni::STATUS_OK)
@@ -327,7 +338,7 @@ namespace sensekit
                     set_new_depth_buffer(nextBuffer);
                 }
             }
-            else if (streamIndex == 1)
+            else if (streamIndex == 1 && m_currentColorBuffer != nullptr)
             {
                 ::openni::VideoFrameRef ref;
                 if (m_colorStream.readFrame(&ref) == ::openni::STATUS_OK)
