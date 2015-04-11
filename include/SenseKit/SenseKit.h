@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <iostream>
 #include "sensekit_capi.h"
 
 namespace sensekit {
@@ -209,6 +210,7 @@ namespace sensekit {
                 :  m_reader(reader)
                 {
 
+                    std::cout << "ReaderRef allocated" << this << std::endl;
                     sensekit_reader_register_frame_ready_callback(m_reader,
                                                                   &ReaderRef::frame_ready_thunk,
                                                                   this,
@@ -217,6 +219,7 @@ namespace sensekit {
 
             ~ReaderRef()
                 {
+                    std::cout << "ReaderRef deallocated" << this << std::endl;
                     m_listeners.clear();
                     sensekit_reader_unregister_frame_ready_callback(&m_callbackId);
                     sensekit_reader_destroy(&m_reader);

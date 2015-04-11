@@ -28,16 +28,18 @@ namespace sensekit {
 
     void StreamBackend::on_connection_created(StreamConnection* connection)
     {
-        if (m_callbacks.connectionAddedCallback)
-            m_callbacks.connectionAddedCallback(m_callbacks.context,
+        if (m_callbacks &&
+            m_callbacks->connectionAddedCallback)
+            m_callbacks->connectionAddedCallback(m_callbacks->context,
                                                 connection->get_handle());
 
     }
 
     void StreamBackend::on_connection_destroyed(StreamConnection* connection)
     {
-        if (m_callbacks.connectionRemovedCallback)
-            m_callbacks.connectionRemovedCallback(m_callbacks.context,
+        if (m_callbacks &&
+            m_callbacks->connectionRemovedCallback)
+            m_callbacks->connectionRemovedCallback(m_callbacks->context,
                                                   connection->get_handle());
     }
 
@@ -47,9 +49,10 @@ namespace sensekit {
                                          sensekit_parameter_data_t* data)
     {
 
-        if (m_callbacks.setParameterCallback != nullptr)
+        if (m_callbacks &&
+            m_callbacks->setParameterCallback != nullptr)
         {
-            m_callbacks.setParameterCallback(m_callbacks.context,
+            m_callbacks->setParameterCallback(m_callbacks->context,
                                              connection->get_handle(),
                                              id,
                                              byteLength,
@@ -61,9 +64,10 @@ namespace sensekit {
                                               sensekit_parameter_id id,
                                               size_t& byteLength)
     {
-        if (m_callbacks.getParameterSizeCallback != nullptr)
+        if (m_callbacks &&
+            m_callbacks->getParameterSizeCallback != nullptr)
         {
-            m_callbacks.getParameterSizeCallback(m_callbacks.context,
+            m_callbacks->getParameterSizeCallback(m_callbacks->context,
                                                  connection->get_handle(),
                                                  id,
                                                  &byteLength);
@@ -78,9 +82,10 @@ namespace sensekit {
         sensekit_streamconnection_t* streamConnection =
             reinterpret_cast<sensekit_streamconnection_t*>(connection->get_handle());
 
-        if (m_callbacks.getParameterDataCallback != nullptr)
+        if (m_callbacks &&
+            m_callbacks->getParameterDataCallback != nullptr)
         {
-            m_callbacks.getParameterDataCallback(m_callbacks.context,
+            m_callbacks->getParameterDataCallback(m_callbacks->context,
                                                  connection->get_handle(),
                                                  parameterId,
                                                  byteLength,

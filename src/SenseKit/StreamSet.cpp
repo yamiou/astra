@@ -11,8 +11,7 @@ namespace sensekit {
 
         if (stream == nullptr)
         {
-            std::cout << "not found" << std::endl;
-            return nullptr;
+            stream = create_stream_placeholder(desc);
         }
 
         return stream->create_connection();
@@ -31,7 +30,22 @@ namespace sensekit {
     Stream* StreamSet::create_stream(sensekit_stream_desc_t desc,
                                      stream_callbacks_t callbacks)
     {
-        Stream* stream = new Stream(desc, callbacks);
+        Stream* stream = find_stream_by_type_subtype_impl(desc.type, desc.subType);
+
+        if (stream == nullptr)
+        {
+            stream = new Stream(desc);
+            m_streamCollection.insert(stream);
+        }
+
+        stream->set_callbacks(callbacks);
+
+        return stream;
+    }
+
+    Stream* StreamSet::create_stream_placeholder(sensekit_stream_desc_t desc)
+    {
+        Stream* stream = new Stream(desc);
         m_streamCollection.insert(stream);
 
         return stream;
@@ -40,7 +54,12 @@ namespace sensekit {
     void StreamSet::destroy_stream(Stream* stream)
     {
         assert(stream != nullptr);
-        m_streamCollection.erase(m_streamCollection.find(stream));
+
+        auto it = m_streamCollection.find(stream);
+        if (it != m_streamCollection.end())
+        {
+            (*it)->clear_callbacks();
+        }
     }
 
     bool StreamSet::is_member(sensekit_stream_t streamHandle) const

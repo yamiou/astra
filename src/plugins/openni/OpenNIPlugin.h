@@ -13,7 +13,9 @@ namespace sensekit
 {
     namespace openni
     {
-        class OpenNIPlugin : public PluginBase, StreamCallbackListener
+        class OpenNIPlugin : public PluginBase, StreamCallbackListener,
+                             ::openni::OpenNI::DeviceConnectedListener,
+                             ::openni::OpenNI::DeviceDisconnectedListener
         {
         public:
             OpenNIPlugin(PluginServiceProxy* pluginService)
@@ -31,6 +33,8 @@ namespace sensekit
         private:
             void init_openni();
 
+            virtual void onDeviceConnected(const ::openni::DeviceInfo* info);
+            virtual void onDeviceDisconnected(const ::openni::DeviceInfo* info);
             virtual void set_parameter(sensekit_streamconnection_t connection,
                                sensekit_parameter_id id,
                                size_t byteLength,

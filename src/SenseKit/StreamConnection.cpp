@@ -27,7 +27,15 @@ namespace sensekit {
         if (m_locked)
             return &m_currentFrame;
 
-        m_currentFrame.frame = m_bin->lock_front_buffer();
+        if (m_bin != nullptr)
+        {
+            m_currentFrame.frame = m_bin->lock_front_buffer();
+        }
+        else
+        {
+            m_currentFrame.frame = nullptr;
+        }
+
         m_currentFrame.streamConnection = &m_connection;
 
         m_locked = true;
@@ -40,7 +48,9 @@ namespace sensekit {
         if (!m_locked)
             return;
 
-        m_bin->unlock_front_buffer();
+        if (m_bin != nullptr)
+            m_bin->unlock_front_buffer();
+
         m_locked = false;
     }
 

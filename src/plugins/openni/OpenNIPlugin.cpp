@@ -24,13 +24,19 @@ namespace sensekit
         {
             ::openni::Status rc = ::openni::STATUS_OK;
 
-            const char* deviceURI = ::openni::ANY_DEVICE;
+            ::openni::OpenNI::addDeviceConnectedListener(this);
+            ::openni::OpenNI::addDeviceDisconnectedListener(this);
 
             cout << "Initializing openni" << endl;
             rc = ::openni::OpenNI::initialize();
+        }
+
+        void OpenNIPlugin::onDeviceConnected(const ::openni::DeviceInfo* info)
+        {
+            ::openni::Status rc = ::openni::STATUS_OK;
 
             cout << "Opening device" << endl;
-            rc = m_device.open(deviceURI);
+            rc = m_device.open(info->getUri());
 
             if (rc != ::openni::STATUS_OK)
             {
@@ -41,6 +47,14 @@ namespace sensekit
             m_deviceInfo = m_device.getDeviceInfo();
 
             open_sensor_streams();
+        }
+
+        void OpenNIPlugin::onDeviceDisconnected(const ::openni::DeviceInfo* info)
+        {
+            get_pluginService().destroy_stream(m_depthHandle);
+            get_pluginService().destroy_stream(m_colorHandle);
+            get_pluginService().destroy_stream_set(m_streamSetHandle);
+            close_sensor_streams();
         }
 
         OpenNIPlugin::~OpenNIPlugin()
@@ -274,10 +288,6 @@ namespace sensekit
                 && m_currentDepthBuffer != nullptr)
             {
                 read_streams();
-            }
-            else
-            {
-                std::cout << "buffers not available" << std::endl;
             }
         }
 

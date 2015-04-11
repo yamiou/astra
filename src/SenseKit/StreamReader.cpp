@@ -56,24 +56,19 @@ namespace sensekit {
 
         connection = m_streamSet.create_stream_connection(desc);
 
-        if (connection != nullptr)
-        {
-            sensekit_callback_id_t cbId = connection->register_frame_ready_callback(get_sc_frame_ready_callback());
+        assert(connection != nullptr);
 
-            ReaderConnectionData* data = new ReaderConnectionData;
-            data->connection = connection;
-            data->scFrameReadyCallbackId = cbId;
-            data->isNewFrameReady = false;
-            data->currentFrameIndex = -1;
+        sensekit_callback_id_t cbId = connection->register_frame_ready_callback(get_sc_frame_ready_callback());
 
-            m_streamMap.insert(std::make_pair(desc, data));
+        ReaderConnectionData* data = new ReaderConnectionData;
+        data->connection = connection;
+        data->scFrameReadyCallbackId = cbId;
+        data->isNewFrameReady = false;
+        data->currentFrameIndex = -1;
 
-            return connection;
-        }
-        else
-        {
-            return nullptr;
-        }
+        m_streamMap.insert(std::make_pair(desc, data));
+
+        return connection;
     }
 
     void StreamReader::on_connection_frame_ready(StreamConnection* connection, sensekit_frame_index_t frameIndex)

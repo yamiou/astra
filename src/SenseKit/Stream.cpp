@@ -15,7 +15,11 @@ namespace sensekit {
         StreamConnection* rawPtr = conn.get();
 
         m_connections.push_back(std::move(conn));
-        on_connection_created(rawPtr);
+
+        if (is_available())
+        {
+            on_connection_created(rawPtr);
+        }
 
         return rawPtr;
     }
@@ -32,8 +36,29 @@ namespace sensekit {
 
         if (it != m_connections.cend())
         {
-            on_connection_destroyed(it->get());
+            if (is_available())
+            {
+              on_connection_destroyed(it->get());
+            }
             m_connections.erase(it);
+        }
+    }
+
+    void Stream::on_availability_changed()
+    {
+        if (is_available())
+        {
+            for(auto& connection : m_connections)
+            {
+                on_connection_created(connection.get());
+            }
+        }
+        else
+        {
+            for(auto& connection : m_connections)
+            {
+                connection->set_bin(nullptr);
+            }
         }
     }
 
@@ -42,14 +67,16 @@ namespace sensekit {
                                size_t byteLength,
                                sensekit_parameter_data_t* data)
     {
-        on_set_parameter(connection, id, byteLength, data);
+        if (is_available())
+            on_set_parameter(connection, id, byteLength, data);
     }
 
     void Stream::get_parameter_size(StreamConnection* connection,
                                     sensekit_parameter_id id,
                                     size_t& byteLength)
     {
-        on_get_parameter_size(connection, id, byteLength);
+        if (is_available())
+            on_get_parameter_size(connection, id, byteLength);
     }
 
     void Stream::get_parameter_data(StreamConnection* connection,
@@ -57,6 +84,7 @@ namespace sensekit {
                                     size_t byteLength,
                                     sensekit_parameter_data_t* data)
     {
-        on_get_parameter_data(connection, parameterId, byteLength, data);
+        if (is_available())
+            on_get_parameter_data(connection, parameterId, byteLength, data);
     }
 }

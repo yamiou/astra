@@ -14,9 +14,8 @@ namespace sensekit {
     {
     public:
 
-        Stream(sensekit_stream_desc_t description,
-               stream_callbacks_t callbacks)
-            : StreamBackend(description, callbacks) {}
+        Stream(sensekit_stream_desc_t description)
+            : StreamBackend(description) {}
 
         virtual ~Stream()
             {
@@ -46,7 +45,10 @@ namespace sensekit {
         static Stream* get_ptr(sensekit_stream_t stream)
             { return reinterpret_cast<Stream*>(stream); }
 
+        virtual void on_availability_changed() override;
+
     private:
+
         using ConnPtr = std::unique_ptr<StreamConnection>;
         using ConnectionList = std::vector<ConnPtr>;
 
