@@ -72,3 +72,9 @@ add_subdirectory(Core/tests)
 add_executable(OpenNITest "openni/test.cpp")
 
 target_link_libraries(OpenNITest ${OpenNI2_LIBRARY})
+
+install(TARGETS SenseKit
+        RUNTIME DESTINATION ${PROJECT_BINARY_DIR}/sdk/bin/
+        LIBRARY DESTINATION ${PROJECT_BINARY_DIR}/sdk/bin/
+        ARCHIVE DESTINATION ${PROJECT_BINARY_DIR}/sdk/lib/
+        )

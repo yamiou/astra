@@ -27,3 +27,9 @@ add_definitions(-DSENSEKIT_BUILD_EX)
 #set_property(TARGET SenseKit PROPERTY CXX_STANDARD_REQUIRED ON)
 
 target_link_libraries(SenseKitUL SenseKitAPI)
+
+install(TARGETS SenseKitUL
+        RUNTIME DESTINATION ${PROJECT_BINARY_DIR}/sdk/bin/
+        LIBRARY DESTINATION ${PROJECT_BINARY_DIR}/sdk/bin/
+        ARCHIVE DESTINATION ${PROJECT_BINARY_DIR}/sdk/lib/
+        )

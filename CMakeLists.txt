@@ -28,3 +28,9 @@ endif()
 
 add_subdirectory(src)
 add_subdirectory(examples)
+
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include
+        DESTINATION ${PROJECT_BINARY_DIR}/sdk
+        FILES_MATCHING PATTERN "*.h"
+        PATTERN "include/SenseKit/Plugins" EXCLUDE
+        )
