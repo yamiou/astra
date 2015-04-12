@@ -23,6 +23,7 @@
 set(FIND_SENSEKIT_PATHS
     ${SENSEKIT_ROOT}
     $ENV{SENSEKIT_ROOT}
+    ..
     ~/Library/Frameworks
     /Library/Frameworks
     /usr/local
