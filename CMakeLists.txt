@@ -12,20 +12,6 @@ if (NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 endif()
 
-set(include_PATHS
-  ${PROJECT_SOURCE_DIR}/include
-  ${PROJECT_SOURCE_DIR}/include/SenseKit
-  ${PROJECT_SOURCE_DIR}/include/SenseKitUL
-  $ENV{OPENNI2_INCLUDE}
-  )
-include_directories ("${include_PATHS}")
-
-if (WIN32)
-  find_library(OpenNI2_LIBRARY NAMES "OpenNI2.lib" HINTS "$ENV{OPENNI2_LIB}" PATH_SUFFIXES lib)
-elseif (APPLE)
-  find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.dylib" HINTS "$ENV{OPENNI2_REDIST}" PATH_SUFFIXES lib)
-endif()
-
 #Override FindSenseKit equivalents
 set(SENSEKIT_SDK_BUILD TRUE)
 set(SENSEKIT_LIBRARIES
@@ -36,6 +22,10 @@ set(SENSEKIT_LIBRARIES
 set(SENSEKIT_INCLUDE_DIR
     ${PROJECT_SOURCE_DIR}/include
     )
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 add_subdirectory(src)
 add_subdirectory(examples)
