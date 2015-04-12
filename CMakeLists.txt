@@ -45,6 +45,12 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/examples
         PATTERN ".gitignore" EXCLUDE
         )
 
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
+        DESTINATION examples
+        PATTERN "build" EXCLUDE
+        PATTERN ".gitignore" EXCLUDE
+        )
+
 set(CPACK_PACKAGE_NAME "SenseKitSDK")
 set(CPACK_PACKAGE_VENDOR "Orbbec")
 set(CPACK_PACKAGE_DIRECTORY "${PROJECT_BINARY_DIR}/sdk_package")
