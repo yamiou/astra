@@ -36,7 +36,7 @@ set(SENSEKIT_LIBRARIES
 set(SENSEKIT_INCLUDE_DIR
     ${PROJECT_SOURCE_DIR}/include
     )
-        
+
 add_subdirectory(src)
 add_subdirectory(examples)
 
@@ -44,4 +44,10 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/include
         DESTINATION ${PROJECT_BINARY_DIR}/sdk
         FILES_MATCHING PATTERN "*.h"
         PATTERN "include/SenseKit/Plugins" EXCLUDE
+        )
+
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/examples
+        DESTINATION ${PROJECT_BINARY_DIR}/sdk
+        PATTERN "build" EXCLUDE
+        PATTERN ".gitignore" EXCLUDE
         )

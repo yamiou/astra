@@ -12,3 +12,8 @@ add_library(DummyPlugin SHARED ${DummyPlugin_SOURCES})
 #set_property(TARGET SenseKit PROPERTY CXX_STANDARD_REQUIRED ON)
 
 target_link_libraries(DummyPlugin SenseKitUL)
+
+install(TARGETS DummyPlugin
+        RUNTIME DESTINATION ${PROJECT_BINARY_DIR}/sdk/bin/Plugins/
+        LIBRARY DESTINATION ${PROJECT_BINARY_DIR}/sdk/bin/Plugins/
+        )
