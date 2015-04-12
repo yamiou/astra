@@ -70,7 +70,7 @@ target_link_libraries(SenseKit SenseKitAPI)
 add_subdirectory(Core/tests)
 
 install(TARGETS SenseKit
-        RUNTIME DESTINATION ${PROJECT_BINARY_DIR}/sdk/bin/
-        LIBRARY DESTINATION ${PROJECT_BINARY_DIR}/sdk/bin/
-        ARCHIVE DESTINATION ${PROJECT_BINARY_DIR}/sdk/lib/
+        RUNTIME DESTINATION bin/
+        LIBRARY DESTINATION bin/
+        ARCHIVE DESTINATION lib/
         )

@@ -14,6 +14,6 @@ add_library(DummyPlugin SHARED ${DummyPlugin_SOURCES})
 target_link_libraries(DummyPlugin SenseKitUL)
 
 install(TARGETS DummyPlugin
-        RUNTIME DESTINATION ${PROJECT_BINARY_DIR}/sdk/bin/Plugins/
-        LIBRARY DESTINATION ${PROJECT_BINARY_DIR}/sdk/bin/Plugins/
+        RUNTIME DESTINATION bin/Plugins/
+        LIBRARY DESTINATION bin/Plugins/
         )

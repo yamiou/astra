@@ -29,7 +29,7 @@ add_definitions(-DSENSEKIT_BUILD_EX)
 target_link_libraries(SenseKitUL SenseKitAPI)
 
 install(TARGETS SenseKitUL
-        RUNTIME DESTINATION ${PROJECT_BINARY_DIR}/sdk/bin/
-        LIBRARY DESTINATION ${PROJECT_BINARY_DIR}/sdk/bin/
-        ARCHIVE DESTINATION ${PROJECT_BINARY_DIR}/sdk/lib/
+        RUNTIME DESTINATION bin/
+        LIBRARY DESTINATION bin/
+        ARCHIVE DESTINATION lib/
         )

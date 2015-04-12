@@ -22,6 +22,6 @@ add_library(OpenNIPlugin SHARED ${OpenNIPlugin_SOURCES})
 target_link_libraries(OpenNIPlugin SenseKitAPI ${OpenNI2_LIBRARY})
 
 install(TARGETS OpenNIPlugin
-        RUNTIME DESTINATION ${PROJECT_BINARY_DIR}/sdk/bin/Plugins/
-        LIBRARY DESTINATION ${PROJECT_BINARY_DIR}/sdk/bin/Plugins/
+        RUNTIME DESTINATION bin/Plugins/
+        LIBRARY DESTINATION bin/Plugins/
         )
