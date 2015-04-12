@@ -33,7 +33,12 @@ namespace sensekit {
         //TODO: OMG ERROR HANDLING
         LibHandle libHandle = nullptr;
 
-        for(auto lib : get_libs())
+        std::vector<std::string> libs = get_libs();
+        if (libs.size() == 0)
+        {
+            std::cout << "Warning: Sensekit found no plugins. Is there a Plugins folder? Is the working directory correct?" << std::endl;
+        }
+        for(auto lib : libs)
         {
             os_load_library((PLUGIN_DIRECTORY + lib).c_str(), libHandle);
 

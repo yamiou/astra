@@ -9,7 +9,7 @@ namespace sensekit {
 
     const char PLUGIN_DIRECTORY[] = "./Plugins/";
 
-    std::vector<std::string> get_libs()
+    static inline std::vector<std::string> get_libs()
     {
 #ifdef _WIN32
         std::vector<std::string> extensions = { "dll" };
