@@ -1,5 +1,11 @@
 #
+# For MSVC, Creates a .vcxproj.user file with the debug working directory set.
+# NOTE: Visual Studio only reads the .user when it opens the solution and will
+# write it when the solution or IDE is closed. If you need to regen this file,
+# close Visual Studio first and use CMake or CMake-gui.
 #
+# Usage:
+#   set_debug_working_dir(YOURTARGET "$(TargetDir)")
 #
 
 get_filename_component(_configuserfile_dir

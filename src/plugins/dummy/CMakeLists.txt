@@ -17,3 +17,5 @@ install(TARGETS DummyPlugin
         RUNTIME DESTINATION bin/Plugins/
         LIBRARY DESTINATION bin/Plugins/
         )
+
+install_pdb(DummyPlugin bin/Plugins/)

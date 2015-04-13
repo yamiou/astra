@@ -21,3 +21,5 @@ install(TARGETS SenseKitAPI
         LIBRARY DESTINATION bin/
         ARCHIVE DESTINATION lib/
         )
+
+install_pdb(SenseKitAPI bin/)

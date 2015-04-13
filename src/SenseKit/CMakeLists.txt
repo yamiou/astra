@@ -74,3 +74,5 @@ install(TARGETS SenseKit
         LIBRARY DESTINATION bin/
         ARCHIVE DESTINATION lib/
         )
+
+install_pdb(SenseKit bin/)

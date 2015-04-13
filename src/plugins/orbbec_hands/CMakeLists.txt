@@ -30,3 +30,5 @@ install(TARGETS orbbec_hands
         RUNTIME DESTINATION bin/Plugins/
         LIBRARY DESTINATION bin/Plugins/
         )
+
+install_pdb(orbbec_hands bin/Plugins/)

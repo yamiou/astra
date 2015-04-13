@@ -33,3 +33,5 @@ install(TARGETS SenseKitUL
         LIBRARY DESTINATION bin/
         ARCHIVE DESTINATION lib/
         )
+
+install_pdb(SenseKitUL bin/)

@@ -12,6 +12,8 @@ if (NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 endif()
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+
 #Override FindSenseKit equivalents
 set(SENSEKIT_SDK_BUILD TRUE)
 set(SENSEKIT_LIBRARIES

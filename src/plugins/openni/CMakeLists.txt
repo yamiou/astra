@@ -25,3 +25,5 @@ install(TARGETS OpenNIPlugin
         RUNTIME DESTINATION bin/Plugins/
         LIBRARY DESTINATION bin/Plugins/
         )
+
+install_pdb(OpenNIPlugin bin/Plugins/)
