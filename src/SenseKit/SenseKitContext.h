@@ -2,7 +2,7 @@
 #ifndef SENSEKITCONTEXT_H
 #define SENSEKITCONTEXT_H
 
-#include <sensekit_types.h>
+#include <SenseKit/sensekit_types.h>
 #include <atomic>
 #include "PluginService.h"
 #include "StreamSet.h"

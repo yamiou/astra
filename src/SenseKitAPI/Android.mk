@@ -14,8 +14,7 @@ LOCAL_CFLAGS += $(SENSEKIT_CFLAGS) -DSENSEKIT_BUILD_API_PROXY
 
 # Includes
 LOCAL_C_INCLUDES := \
-$(LOCAL_PATH)/../../include/SenseKit \
-$(LOCAL_PATH)/../../include/SenseKitAPI \
+$(LOCAL_PATH)/../../include/ \
 
 # Dependencies
 

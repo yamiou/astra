@@ -2,9 +2,8 @@
 
 set(include_PATHS
   ${PROJECT_SOURCE_DIR}/include
-  ${PROJECT_SOURCE_DIR}/include/SenseKit
-  ${PROJECT_SOURCE_DIR}/include/SenseKitUL
   )
+
 include_directories ("${include_PATHS}")
 
 set(CMAKE_DEBUG_POSTFIX "-d")

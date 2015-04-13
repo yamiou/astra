@@ -31,7 +31,7 @@ void print_depth(sensekit_depthframe_t depthFrame)
     printf("index %d value %d\n", frameIndex, middle);
 }
 
-int main(int argc, char** argv)
+int main(int argc, char* argv[])
 {
     set_key_handler();
 

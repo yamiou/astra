@@ -1,4 +1,4 @@
-#include <sensekit_types.h>
+#include <SenseKit/sensekit_types.h>
 #include "StreamConnection.h"
 #include "StreamBin.h"
 #include "Stream.h"
@@ -15,6 +15,12 @@ namespace sensekit {
             reinterpret_cast<sensekit_streamconnection_handle_t>(this);
 
         m_connection.desc = stream->get_description();
+
+        m_binFrontBufferReadyCallback =
+            [this](StreamBin* b, sensekit_frame_index_t frameIndex)
+            {
+                this->on_bin_front_buffer_ready(b, frameIndex);
+            };
     }
 
     sensekit_bin_t StreamConnection::get_bin_handle()
@@ -82,16 +88,6 @@ namespace sensekit {
         m_started = false;
     }
 
-    FrontBufferReadyCallback StreamConnection::getFrontBufferReadyCallback()
-    {
-        if (m_binFrontBufferReadyCallback == nullptr)
-        {
-            m_binFrontBufferReadyCallback = [this](StreamBin* b, sensekit_frame_index_t frameIndex)
-               { this->on_bin_front_buffer_ready(b, frameIndex); };
-        }
-        return m_binFrontBufferReadyCallback;
-    }
-
     void StreamConnection::set_bin(StreamBin* bin)
     {
         if (m_bin != nullptr)
@@ -106,7 +102,8 @@ namespace sensekit {
         {
             m_bin->inc_connected();
 
-            m_binFrontBufferReadyCallbackId = m_bin->register_front_buffer_ready_callback(getFrontBufferReadyCallback());
+            m_binFrontBufferReadyCallbackId =
+                m_bin->register_front_buffer_ready_callback(m_binFrontBufferReadyCallback);
         }
     }
 

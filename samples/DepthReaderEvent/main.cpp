@@ -34,7 +34,7 @@ void frame_ready(void* clientTag, sensekit_reader_t reader, sensekit_reader_fram
     print_depth(depthFrame);
 }
 
-int main(int argc, char** argv)
+int main(int argc, char* argv[])
 {
     set_key_handler();
 

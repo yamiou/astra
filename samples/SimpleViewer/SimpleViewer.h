@@ -107,7 +107,7 @@ private:
     unsigned int            m_nTexMapX;
     unsigned int            m_nTexMapY;
     RGB888Pixel*            m_pTexMap;
-    
+
     Vector3*                m_normalMap{ nullptr };
     Vector3*                m_blurNormalMap{ nullptr };
     size_t                  m_normalMapLen{ 0 };

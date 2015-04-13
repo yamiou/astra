@@ -1,7 +1,7 @@
 #ifndef STREAMCONNECTION_H
 #define STREAMCONNECTION_H
 
-#include <sensekit_types.h>
+#include <SenseKit/sensekit_types.h>
 #include <cassert>
 #include "sensekit_internal.h"
 #include "StreamBin.h"
@@ -54,7 +54,6 @@ namespace sensekit {
 
     private:
         void on_bin_front_buffer_ready(StreamBin* bin, sensekit_frame_index_t frameIndex);
-        FrontBufferReadyCallback getFrontBufferReadyCallback();
 
         _sensekit_streamconnection m_connection;
         sensekit_frame_ref_t m_currentFrame;

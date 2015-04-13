@@ -35,7 +35,7 @@ namespace sensekit
 #define MIN_NUM_CHUNKS(data_size, chunk_size)   ((((data_size)-1) / (chunk_size) + 1))
 #define MIN_CHUNKS_SIZE(data_size, chunk_size)  (MIN_NUM_CHUNKS(data_size, chunk_size) * (chunk_size))
 
-            HandTracker::HandTracker(PluginServiceProxy& pluginService, 
+            HandTracker::HandTracker(PluginServiceProxy& pluginService,
                                      Sensor& streamset,
                                      StreamDescription& depthDescription) :
                 m_pluginService(pluginService),
@@ -66,13 +66,13 @@ namespace sensekit
 
             void HandTracker::create_streams(PluginServiceProxy& pluginService, Sensor streamset)
             {
-                size_t handByteLength = sizeof(sensekit_depthframe_wrapper_t) + 
+                size_t handByteLength = sizeof(sensekit_depthframe_wrapper_t) +
                                             SENSEKIT_HANDS_MAX_HANDPOINTS * sizeof(sensekit_handpoint_t);
 
                 StreamDescription handDescription(SENSEKIT_STREAM_HAND);
                 m_handStream = make_unique<HandStream>(pluginService, streamset, handDescription, handByteLength);
 
-                size_t debugImageByteLength = sizeof(sensekit_colorframe_wrapper_t) + 
+                size_t debugImageByteLength = sizeof(sensekit_colorframe_wrapper_t) +
                                                   PROCESSING_SIZE_WIDTH * PROCESSING_SIZE_HEIGHT * 3;
 
                 StreamDescription debugImageDescription(SENSEKIT_STREAM_HAND_DEBUG_IMAGE);
@@ -208,7 +208,7 @@ namespace sensekit
                     TrackedPoint internalPoint = *it;
 
                     TrackingStatus status = internalPoint.m_status;
-                    if (//internalPoint.m_type == TrackedPointType::ActivePoint && 
+                    if (//internalPoint.m_type == TrackedPointType::ActivePoint &&
                         status != Dead && handIndex < maxNumHands)
                     {
                         sensekit_handpoint_t& point = frame.handpoints[handIndex];
@@ -269,9 +269,9 @@ namespace sensekit
 
             void HandTracker::update_debug_image_frame(_sensekit_colorframe& colorFrame)
             {
-                m_debugVisualizer.showDepthMat(m_matDepth, 
-                                               m_matForeground, 
-                                               m_pointProcessor.get_trackedPoints(), 
+                m_debugVisualizer.showDepthMat(m_matDepth,
+                                               m_matForeground,
+                                               m_pointProcessor.get_trackedPoints(),
                                                colorFrame);
             }
         }

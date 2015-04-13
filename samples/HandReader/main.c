@@ -11,7 +11,7 @@ void print_hands(sensekit_handframe_t handFrame)
     size_t numHands;
 
     sensekit_handframe_get_num_hands(handFrame, &numHands);
-    
+
     handPoints = (sensekit_handpoint_t*)malloc(numHands * sizeof(sensekit_handpoint_t));
     sensekit_handframe_copy_hands(handFrame, handPoints);
 
@@ -63,7 +63,7 @@ void runHandStream(sensekit_reader_t reader)
     } while (shouldContinue);
 }
 
-int main(int argc, char** argv)
+int main(int argc, char* argv[])
 {
     set_key_handler();
 

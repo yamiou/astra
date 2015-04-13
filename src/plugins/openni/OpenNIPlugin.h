@@ -1,11 +1,11 @@
 ﻿#ifndef OPENNIPLUGIN_H
 #define OPENNIPLUGIN_H
 
-#include <Plugins/plugin_api.h>
-#include <sensekit_capi.h>
+#include <SenseKit/Plugins/plugin_api.h>
+#include <SenseKit/sensekit_capi.h>
 #include <OpenNI.h>
-#include <streams/depth_types.h>
-#include <streams/color_types.h>
+#include <SenseKitUL/streams/depth_types.h>
+#include <SenseKitUL/streams/color_types.h>
 #include "../../SenseKitUL/SenseKitUL_internal.h"
 #include <SenseKit/Plugins/StreamCallbackListener.h>
 
@@ -49,10 +49,10 @@ namespace sensekit
                                     size_t byteLength,
                                     sensekit_parameter_data_t* data) override;
 
-            virtual void connection_added(sensekit_stream_t stream, 
+            virtual void connection_added(sensekit_stream_t stream,
                                           sensekit_streamconnection_t connection) override;
-            virtual void connection_removed(sensekit_stream_t stream, 
-                                            sensekit_bin_t bin, 
+            virtual void connection_removed(sensekit_stream_t stream,
+                                            sensekit_bin_t bin,
                                             sensekit_streamconnection_t connection) override;
 
             sensekit_status_t open_sensor_streams();

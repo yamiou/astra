@@ -4,7 +4,7 @@
 
 #include "SenseKitContext.h"
 #include "StreamServiceDelegate.h"
-#include <Plugins/StreamServiceProxyBase.h>
+#include <SenseKit/Plugins/StreamServiceProxyBase.h>
 
 namespace sensekit {
 

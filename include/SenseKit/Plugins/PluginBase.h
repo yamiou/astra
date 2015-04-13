@@ -1,7 +1,7 @@
 ﻿#ifndef PLUGINBASE_H
 #define PLUGINBASE_H
 
-#include <sensekit_types.h>
+#include <SenseKit/sensekit_types.h>
 #include "PluginServiceProxy.h"
 #include <cassert>
 

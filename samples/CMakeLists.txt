@@ -11,6 +11,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 include(ConfigUserFile)
 
+include_directories(${SENSEKIT_INCLUDE_DIR})
+
 add_subdirectory(SimpleViewer)
 add_subdirectory(SimpleColorViewer)
 add_subdirectory(DepthReader)

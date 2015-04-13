@@ -1,7 +1,7 @@
 /* THIS FILE AUTO-GENERATED FROM SenseKitAPI.cpp.lpp. DO NOT EDIT. */
 #include "SenseKitAPI.h"
 #include "../SenseKit/sensekit_internal.h"
-#include <Plugins/StreamServiceProxy.h>
+#include <SenseKit/Plugins/StreamServiceProxy.h>
 #include <cassert>
 #include <iostream>
 using std::cout;

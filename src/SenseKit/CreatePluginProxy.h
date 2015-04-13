@@ -4,7 +4,7 @@
 
 #include "PluginService.h"
 #include "PluginServiceDelegate.h"
-#include <Plugins/PluginServiceProxyBase.h>
+#include <SenseKit/Plugins/PluginServiceProxyBase.h>
 
 namespace sensekit {
 PluginServiceProxyBase* create_plugin_proxy(PluginService* service)

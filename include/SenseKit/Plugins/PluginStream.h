@@ -1,7 +1,7 @@
 ﻿#ifndef PLUGINSTREAM_H
 #define PLUGINSTREAM_H
-#include <sensekit_types.h>
-#include <Plugins/plugin_api.h>
+#include <SenseKit/sensekit_types.h>
+#include <SenseKit/Plugins/plugin_api.h>
 #include <system_error>
 #include "StreamCallbackListener.h"
 
@@ -12,8 +12,8 @@ namespace sensekit {
         class PluginStream : StreamCallbackListener
         {
         public:
-            PluginStream(PluginServiceProxy& pluginService, 
-                         Sensor& streamset, 
+            PluginStream(PluginServiceProxy& pluginService,
+                         Sensor& streamset,
                          StreamDescription description,
                          size_t binByteLength) :
                 m_pluginService(pluginService),
@@ -75,10 +75,10 @@ namespace sensekit {
                 size_t byteLength,
                 sensekit_parameter_data_t* data) override;
 
-            virtual void connection_added(sensekit_stream_t stream, 
+            virtual void connection_added(sensekit_stream_t stream,
                                           sensekit_streamconnection_t connection) override;
-            virtual void connection_removed(sensekit_stream_t stream, 
-                                            sensekit_bin_t bin, 
+            virtual void connection_removed(sensekit_stream_t stream,
+                                            sensekit_bin_t bin,
                                             sensekit_streamconnection_t connection) override;
 
             void create_stream(StreamDescription& description)
@@ -122,22 +122,22 @@ namespace sensekit {
         }
 
         template < typename TFrameWrapper >
-        inline void PluginStream<TFrameWrapper>::connection_added(sensekit_stream_t stream, 
+        inline void PluginStream<TFrameWrapper>::connection_added(sensekit_stream_t stream,
                                                                   sensekit_streamconnection_t connection)
         {
             assert(stream == m_streamHandle);
 
             if (m_binHandle == nullptr)
             {
-                
+
                 m_pluginService.create_stream_bin(m_streamHandle, m_binByteLength, &m_binHandle, &m_currentFrame);
             }
             m_pluginService.link_connection_to_bin(connection, m_binHandle);
         }
 
         template < typename TFrameWrapper >
-        inline void PluginStream<TFrameWrapper>::connection_removed(sensekit_stream_t stream, 
-                                                                    sensekit_bin_t bin, 
+        inline void PluginStream<TFrameWrapper>::connection_removed(sensekit_stream_t stream,
+                                                                    sensekit_bin_t bin,
                                                                     sensekit_streamconnection_t connection)
         {
             assert(stream == m_streamHandle);

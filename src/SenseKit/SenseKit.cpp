@@ -1,6 +1,6 @@
 /* THIS FILE AUTO-GENERATED FROM SenseKit.cpp.lpp. DO NOT EDIT. */
 #include "SenseKitContext.h"
-#include <Plugins/StreamServiceProxyBase.h>
+#include <SenseKit/Plugins/StreamServiceProxyBase.h>
 #include <SenseKitAPI.h>
 
 static sensekit::SenseKitContext g_Context;

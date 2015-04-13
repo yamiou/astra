@@ -4,11 +4,11 @@
 #include "StreamReader.h"
 #include "StreamConnection.h"
 #include "StreamServiceDelegate.h"
-#include <Plugins/StreamServiceProxyBase.h>
-#include <Plugins/PluginServiceProxyBase.h>
+#include <SenseKit/Plugins/StreamServiceProxyBase.h>
+#include <SenseKit/Plugins/PluginServiceProxyBase.h>
 #include <SenseKitAPI.h>
 #include "CreateStreamProxy.h"
-#include "sensekit_capi.h"
+#include "SenseKit/sensekit_capi.h"
 #include "sensekit_internal.h"
 
 namespace sensekit {

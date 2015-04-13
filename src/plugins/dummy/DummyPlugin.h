@@ -1,8 +1,8 @@
 #ifndef DUMMYPLUGIN_H
 #define DUMMYPLUGIN_H
 
-#include <Plugins/plugin_api.h>
-#include <SenseKitUL.h>
+#include <SenseKit/Plugins/plugin_api.h>
+#include <SenseKitUL/SenseKitUL.h>
 
 #include <iostream>
 using std::cout;

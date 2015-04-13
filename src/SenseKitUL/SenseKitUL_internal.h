@@ -1,9 +1,9 @@
 #ifndef SENSEKITUL_INTERNAL_H
 #define SENSEKITUL_INTERNAL_H
 
-#include <streams/depth_types.h>
-#include <streams/color_types.h>
-#include <streams/hand_types.h>
+#include <SenseKitUL/streams/depth_types.h>
+#include <SenseKitUL/streams/color_types.h>
+#include <SenseKitUL/streams/hand_types.h>
 
 // https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
 // http://stackoverflow.com/questions/3350852/how-to-correctly-fix-zero-sized-array-in-struct-union-warning-c4200-without

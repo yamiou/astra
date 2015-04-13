@@ -1,5 +1,5 @@
 #include <opencv2/opencv.hpp>
-#include <SenseKitUL.h>
+#include <SenseKitUL/SenseKitUL.h>
 #include "depthutility.h"
 #include "trackingdata.h"
 namespace sensekit

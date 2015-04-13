@@ -1,11 +1,11 @@
-#include <sensekit_types.h>
+#include <SenseKit/sensekit_types.h>
 #include "generic_stream_api.h"
-#include <streams/depth_types.h>
+#include <SenseKitUL/streams/depth_types.h>
 #include <math.h>
 #include <memory.h>
-#include <StreamTypes.h>
+#include <SenseKitUL/StreamTypes.h>
 #include "SenseKitUL_internal.h"
-#include <streams/depth_capi.h>
+#include <string.h>
 
 static conversion_cache_t g_conversionCache;
 

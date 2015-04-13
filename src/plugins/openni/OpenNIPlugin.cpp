@@ -1,6 +1,6 @@
 ﻿#include "OpenNIPlugin.h"
 #include <iostream>
-#include <StreamTypes.h>
+#include <SenseKitUL/StreamTypes.h>
 #include "../../SenseKit/sensekit_internal.h"
 
 #ifndef MIN
@@ -37,7 +37,7 @@ namespace sensekit
 
             cout << "device connected, opening device" << endl;
             rc = m_device.open(info->getUri());
-            
+
             if (rc != ::openni::STATUS_OK)
             {
                 cout << "Failed to open" << endl;
@@ -172,7 +172,7 @@ namespace sensekit
                                               sensekit_parameter_data_t* data)
         {}
 
-        void OpenNIPlugin::connection_added(sensekit_stream_t stream, 
+        void OpenNIPlugin::connection_added(sensekit_stream_t stream,
                                             sensekit_streamconnection_t connection)
         {
             sensekit_stream_desc_t desc;
@@ -214,8 +214,8 @@ namespace sensekit
             }
         }
 
-        void OpenNIPlugin::connection_removed(sensekit_stream_t stream, 
-                                              sensekit_bin_t bin, 
+        void OpenNIPlugin::connection_removed(sensekit_stream_t stream,
+                                              sensekit_bin_t bin,
                                               sensekit_streamconnection_t connection)
         {
             sensekit_stream_desc_t desc;

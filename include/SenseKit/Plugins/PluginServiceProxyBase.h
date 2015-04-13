@@ -2,7 +2,7 @@
 #ifndef PLUGINSERVICEPROXYBASE_H
 #define PLUGINSERVICEPROXYBASE_H
 
-#include <sensekit_types.h>
+#include <SenseKit/sensekit_types.h>
 
 struct PluginServiceProxyBase
 {

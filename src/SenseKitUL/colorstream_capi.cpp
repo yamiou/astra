@@ -1,10 +1,10 @@
-#include <sensekit_types.h>
+#include <SenseKit/sensekit_types.h>
 #include "generic_stream_api.h"
-#include <streams/color_types.h>
+#include <SenseKitUL/streams/color_types.h>
 #include "SenseKitUL_internal.h"
 #include <math.h>
-#include <memory.h>
-#include <StreamTypes.h>
+#include <string.h>
+#include <SenseKitUL/StreamTypes.h>
 
 SENSEKIT_BEGIN_DECLS
 

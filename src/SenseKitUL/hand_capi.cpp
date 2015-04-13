@@ -1,10 +1,11 @@
-#include <sensekit_types.h>
+#include <SenseKit/sensekit_types.h>
 #include "generic_stream_api.h"
 #include <math.h>
 #include <memory.h>
-#include <StreamTypes.h>
+#include <SenseKitUL/StreamTypes.h>
 #include "SenseKitUL_internal.h"
-#include <streams/hand_capi.h>
+#include <SenseKitUL/streams/hand_capi.h>
+#include <string.h>
 
 SENSEKIT_BEGIN_DECLS
 

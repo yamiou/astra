@@ -2,8 +2,8 @@
 #ifndef SENSEKIT_CAPI_H
 #define SENSEKIT_CAPI_H
 
-#include "sensekit_defines.h"
-#include "sensekit_types.h"
+#include "SenseKit/sensekit_defines.h"
+#include "SenseKit/sensekit_types.h"
 
 SENSEKIT_BEGIN_DECLS
 

@@ -2,9 +2,9 @@
 #include "Stream.h"
 #include "SenseKitContext.h"
 #include "PluginServiceDelegate.h"
-#include <Plugins/PluginServiceProxyBase.h>
+#include <SenseKit/Plugins/PluginServiceProxyBase.h>
 #include <iostream>
-#include <sensekit_types.h>
+#include <SenseKit/sensekit_types.h>
 #include "CreatePluginProxy.h"
 
 using std::cout;

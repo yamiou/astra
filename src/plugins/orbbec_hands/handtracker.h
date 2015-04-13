@@ -2,7 +2,7 @@
 #define HANDTRACKER_H
 
 #include <opencv2/imgproc/imgproc.hpp>
-#include <SenseKitUL.h>
+#include <SenseKitUL/SenseKitUL.h>
 
 #include "depthutility.h"
 #include "trackedpoint.h"
@@ -45,11 +45,11 @@ namespace sensekit
 
                 //fields
                 PluginServiceProxy& m_pluginService;
-                
+
                 using ColorStream = PluginStream < sensekit_colorframe_wrapper_t > ;
                 using ColorStreamPtr = std::unique_ptr < ColorStream > ;
                 ColorStreamPtr m_debugImageStream;
-                
+
                 using HandStream = PluginStream<sensekit_handframe_wrapper_t>;
                 using HandStreamPtr = std::unique_ptr<HandStream>;
                 HandStreamPtr m_handStream;

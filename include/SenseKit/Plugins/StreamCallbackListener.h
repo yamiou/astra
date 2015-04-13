@@ -1,8 +1,8 @@
 ﻿#ifndef STREAMCALLBACKTARGET_H
 #define STREAMCALLBACKTARGET_H
 
-#include <sensekit_types.h>
-#include "plugin_api.h"
+#include <SenseKit/sensekit_types.h>
+#include <SenseKit/Plugins/plugin_api.h>
 
 namespace sensekit {
 

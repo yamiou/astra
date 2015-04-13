@@ -10,8 +10,7 @@ LOCAL_CFLAGS += $(SENSEKIT_CFLAGS) -DSENSEKIT_BUILD
 
 # Includes
 LOCAL_C_INCLUDES := \
-$(LOCAL_PATH)/../../../include/SenseKit \
-$(LOCAL_PATH)/../../../include/SenseKitUL \
+$(LOCAL_PATH)/../../../include/
 
 # Output
 LOCAL_MODULE := libDummyPlugin

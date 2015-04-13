@@ -4,15 +4,14 @@ include $(CLEAR_VARS)
 
 # Sources
 MY_SRC_FILES := \
-$(LOCAL_PATH)/*.cpp
+$(LOCAL_PATH)/*.c
 
 MY_SRC_FILE_EXPANDED := $(wildcard $(MY_SRC_FILES))
 LOCAL_SRC_FILES := $(MY_SRC_FILE_EXPANDED:$(LOCAL_PATH)/%=%)
 
 # Includes
 LOCAL_C_INCLUDES := \
-$(LOCAL_PATH)/../../include/SenseKit \
-$(LOCAL_PATH)/../../include/SenseKitUL \
+$(LOCAL_PATH)/../../include/
 
 # Dependencies
 LOCAL_SHARED_LIBRARIES := libSenseKit libSenseKitUL

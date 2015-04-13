@@ -7,7 +7,7 @@ MY_SRC_FILES := \
 SenseKitContext.cpp \
 SenseKit.cpp \
 Stream.cpp \
-StreamImpl.cpp \
+StreamBackend.cpp \
 PluginService.cpp \
 StreamSet.cpp \
 StreamConnection.cpp \
@@ -22,10 +22,8 @@ LOCAL_CFLAGS += $(SENSEKIT_CFLAGS) -DSENSEKIT_BUILD
 
 # Includes
 LOCAL_C_INCLUDES := \
-$(LOCAL_PATH)/../../include/SenseKit \
-$(LOCAL_PATH)/../../include/SenseKit/Plugins \
-$(LOCAL_PATH)/../../include/SenseKitAPI \
-$(LOCAL_PATH)/../../include/SenseKitUL \
+$(LOCAL_PATH)/../../include \
+$(LOCAL_PATH)/../SenseKitAPI
 
 # Output
 LOCAL_SHARED_LIBRARIES := libSenseKitAPI

@@ -11,8 +11,7 @@ LOCAL_SRC_FILES := $(MY_SRC_FILE_EXPANDED:$(LOCAL_PATH)/%=%)
 
 # Includes
 LOCAL_C_INCLUDES := \
-$(LOCAL_PATH)/../../include/SenseKit \
-$(LOCAL_PATH)/../../include/SenseKitUL \
+$(LOCAL_PATH)/../../include/
 
 # Dependencies
 LOCAL_SHARED_LIBRARIES := libSenseKit libSenseKitUL

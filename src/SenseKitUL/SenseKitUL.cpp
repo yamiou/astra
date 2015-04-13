@@ -1,5 +1,5 @@
-#include <SenseKitUL.h>
-#include <Plugins/StreamServiceProxyBase.h>
+#include <SenseKit/sensekit_defines.h>
+#include <SenseKit/Plugins/StreamServiceProxyBase.h>
 
 SENSEKIT_BEGIN_DECLS
 
