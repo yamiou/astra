@@ -1,4 +1,3 @@
-#!/usr/local/bin/clisp
 (defstruct param type name deref funcset)
 (defstruct funcdef funcset funcname params returntype)
 
