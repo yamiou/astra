@@ -1,6 +1,9 @@
 set(OpenNIPlugin_SOURCES
   OpenNIPlugin.cpp
   OpenNIPlugin.h
+  OniDeviceStream.h
+  OniDeviceStream.cpp
+  OniDepthStream.h
   )
 
 add_definitions(-DSENSEKIT_BUILD)

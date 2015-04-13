@@ -66,17 +66,15 @@ namespace sensekit
 
             void HandTracker::create_streams(PluginServiceProxy& pluginService, Sensor streamset)
             {
-                size_t handByteLength = sizeof(sensekit_depthframe_wrapper_t) +
-                                            SENSEKIT_HANDS_MAX_HANDPOINTS * sizeof(sensekit_handpoint_t);
+                m_handStream = make_unique<HandStream>(pluginService, streamset, SENSEKIT_HANDS_MAX_HANDPOINTS);
 
-                StreamDescription handDescription(SENSEKIT_STREAM_HAND);
-                m_handStream = make_unique<HandStream>(pluginService, streamset, handDescription, handByteLength);
-
-                size_t debugImageByteLength = sizeof(sensekit_colorframe_wrapper_t) +
-                                                  PROCESSING_SIZE_WIDTH * PROCESSING_SIZE_HEIGHT * 3;
-
+                size_t debugImageByteLength = PROCESSING_SIZE_WIDTH * PROCESSING_SIZE_HEIGHT * 3;
                 StreamDescription debugImageDescription(SENSEKIT_STREAM_HAND_DEBUG_IMAGE);
-                m_debugImageStream = make_unique<ColorStream>(pluginService, streamset, debugImageDescription, debugImageByteLength);
+
+                m_debugImageStream = make_unique<ColorStream>(pluginService,
+                                                              streamset,
+                                                              debugImageDescription,
+                                                              debugImageByteLength);
             }
 
             void HandTracker::subscribe_to_depth_stream(Sensor& streamset, StreamDescription& depthDescription)
@@ -119,7 +117,8 @@ namespace sensekit
 
             void HandTracker::generate_hand_frame(sensekit_frame_index_t frameIndex)
             {
-                sensekit_handframe_wrapper_t* handFrame = m_handStream->try_lock_frame(frameIndex);
+                sensekit_handframe_wrapper_t* handFrame = m_handStream->begin_write();
+
                 if (handFrame != nullptr)
                 {
                     handFrame->frame.handpoints = reinterpret_cast<sensekit_handpoint_t*>(&(handFrame->frame_data));
@@ -127,13 +126,14 @@ namespace sensekit
 
                     update_hand_frame(m_pointProcessor.get_trackedPoints(), handFrame->frame);
 
-                    m_handStream->unlock_frame(handFrame);
+                    m_handStream->end_write();
                 }
             }
 
             void HandTracker::generate_hand_debug_image_frame(sensekit_frame_index_t frameIndex)
             {
-                sensekit_colorframe_wrapper_t* debugImageFrame = m_debugImageStream->try_lock_frame(frameIndex);
+                sensekit_colorframe_wrapper_t* debugImageFrame = m_debugImageStream->begin_write();
+
                 if (debugImageFrame != nullptr)
                 {
                     debugImageFrame->frame.data = reinterpret_cast<uint8_t *>(&(debugImageFrame->frame_data));
@@ -147,7 +147,7 @@ namespace sensekit
                     debugImageFrame->frame.metadata = metadata;
                     update_debug_image_frame(debugImageFrame->frame);
 
-                    m_debugImageStream->unlock_frame(debugImageFrame);
+                    m_debugImageStream->end_write();
                 }
             }
 

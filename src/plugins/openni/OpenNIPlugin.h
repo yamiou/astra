@@ -2,7 +2,10 @@
 #define OPENNIPLUGIN_H
 
 #include <SenseKit/Plugins/plugin_api.h>
-#include <SenseKit/sensekit_capi.h>
+#include "OniDeviceStream.h"
+#include <SenseKit/SenseKit.h>
+#include <memory>
+#include <vector>
 #include <OpenNI.h>
 #include <SenseKitUL/streams/depth_types.h>
 #include <SenseKitUL/streams/color_types.h>
@@ -11,18 +14,18 @@
 
 namespace sensekit
 {
-    namespace openni
+    namespace plugins
     {
-        class OpenNIPlugin : public PluginBase, StreamCallbackListener,
+        class OpenNIPlugin : public PluginBase,
                              ::openni::OpenNI::DeviceConnectedListener,
                              ::openni::OpenNI::DeviceDisconnectedListener
         {
         public:
             OpenNIPlugin(PluginServiceProxy* pluginService)
                 : PluginBase(pluginService)
-            {
-                init_openni();
-            }
+                {
+                    init_openni();
+                }
 
             virtual ~OpenNIPlugin();
             virtual void temp_update() override;
@@ -35,59 +38,23 @@ namespace sensekit
 
             virtual void onDeviceConnected(const ::openni::DeviceInfo* info);
             virtual void onDeviceDisconnected(const ::openni::DeviceInfo* info);
-            virtual void set_parameter(sensekit_streamconnection_t connection,
-                               sensekit_parameter_id id,
-                               size_t byteLength,
-                               sensekit_parameter_data_t* data) override;
-
-            virtual void get_parameter_size(sensekit_streamconnection_t connection,
-                                    sensekit_parameter_id id,
-                                    size_t& byteLength) override;
-
-            virtual void get_parameter_data(sensekit_streamconnection_t connection,
-                                    sensekit_parameter_id id,
-                                    size_t byteLength,
-                                    sensekit_parameter_data_t* data) override;
-
-            virtual void connection_added(sensekit_stream_t stream,
-                                          sensekit_streamconnection_t connection) override;
-            virtual void connection_removed(sensekit_stream_t stream,
-                                            sensekit_bin_t bin,
-                                            sensekit_streamconnection_t connection) override;
 
             sensekit_status_t open_sensor_streams();
             sensekit_status_t close_sensor_streams();
-
-            void set_new_depth_buffer(sensekit_frame_t* nextBuffer);
-            void set_new_color_buffer(sensekit_frame_t* nextBuffer);
 
             sensekit_status_t read_streams();
 
             bool m_isDeviceOpen{ false };
             ::openni::Device m_device;
             ::openni::DeviceInfo m_deviceInfo;
-            ::openni::VideoStream m_depthStream;
-            ::openni::VideoStream m_colorStream;
-            ::openni::VideoMode m_colorMode;
-            ::openni::VideoMode m_depthMode;
 
-            unsigned m_colorBufferLength{0};
-            unsigned m_depthBufferLength{0};
-
-            sensekit_frame_index_t m_frameIndex{ 0 };
-
-            sensekit_frame_t* m_currentColorBuffer{nullptr};
-            sensekit_frame_t* m_currentDepthBuffer{nullptr};
-
-            sensekit_bin_t m_depthBinHandle{nullptr};
-            sensekit_bin_t m_colorBinHandle{nullptr};
-
-            sensekit_depthframe_wrapper_t* m_currentDepthFrame{nullptr};
-            sensekit_colorframe_wrapper_t* m_currentColorFrame{nullptr};
-
-            sensekit_stream_t m_depthHandle{nullptr};
-            sensekit_stream_t m_colorHandle{nullptr};
             sensekit_streamset_t m_streamSetHandle{nullptr};
+            Sensor* m_sensor;
+
+            using StreamPtr = std::unique_ptr<OniDeviceStreamBase>;
+            using StreamList = std::vector<StreamPtr>;
+
+            StreamList m_streams;
         };
     }
 }
