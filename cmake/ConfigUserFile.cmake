@@ -45,11 +45,11 @@ function(set_debug_working_dir _targetname _workingDir)
                          _userconfiggroup
                          @ONLY ESCAPE_QUOTES)
         if (USERFILE_CONFIGSECTIONS)
-        set(USERFILE_CONFIGSECTIONS
-            "${USERFILE_CONFIGSECTIONS}\n${_userconfiggroup}")
+            set(USERFILE_CONFIGSECTIONS
+                "${USERFILE_CONFIGSECTIONS}\n${_userconfiggroup}")
         else()
-        set(USERFILE_CONFIGSECTIONS
-            "${_userconfiggroup}")
+            set(USERFILE_CONFIGSECTIONS
+                "${_userconfiggroup}")
         endif()
     endforeach( USERFILE_CONFIGNAME CMAKE_CONFIGURATION_TYPES )
 

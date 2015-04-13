@@ -55,7 +55,7 @@ set(SenseKit_SOURCES_GEN
 
 include_directories(${PROJECT_SOURCE_DIR}/src/SenseKitAPI)
 
-source_group(templates, ${SenseKit_SOURCE_GEN})
+source_group(templates FILES ${SenseKit_SOURCES_GEN})
 
 add_definitions(-DSENSEKIT_BUILD)
 
