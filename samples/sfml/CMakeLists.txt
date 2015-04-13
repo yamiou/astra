@@ -6,7 +6,7 @@ find_package(SFML COMPONENTS graphics window system audio)
 
 add_executable(DepthViewer ${DepthViewer_SOURCES})
 
-include_directories(DepthViewer ${SENSEKIT_INCLUDE_DIR} ${SFML_INCLUDE_DIR})
+include_directories(${SFML_INCLUDE_DIR})
 
 target_link_libraries(DepthViewer ${SENSEKIT_LIBRARIES} ${SFML_LIBRARIES})
 

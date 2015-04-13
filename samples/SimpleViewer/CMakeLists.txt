@@ -10,7 +10,7 @@ set (SimpleViewer_SOURCES
 
 add_executable(SimpleViewer ${SimpleViewer_SOURCES})
 
-include_directories(SimpleViewer ${SENSEKIT_INCLUDE_DIR} ${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIR})
+include_directories(${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIR})
 
 target_link_libraries(SimpleViewer ${SENSEKIT_LIBRARIES} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY})
 
