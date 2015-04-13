@@ -48,6 +48,18 @@ namespace sensekit {
 
             inline StreamDescription get_description() { return m_description; }
 
+            inline bool has_connections()
+            {
+                if (m_binHandle == nullptr)
+                {
+                    return false;
+                }
+
+                bool hasConnections;
+                m_pluginService.bin_has_connections(m_binHandle, &hasConnections);
+                return hasConnections;
+            }
+
         private:
             virtual void set_parameter(sensekit_streamconnection_t connection,
                 sensekit_parameter_id id,

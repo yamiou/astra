@@ -55,9 +55,13 @@ namespace sensekit
 
             void HandTracker::on_frame_ready(StreamReader& reader, Frame& frame)
             {
-                DepthFrame depthFrame = frame.get<DepthFrame>();
+                if (m_handStream->has_connections() ||
+                    m_debugImageStream->has_connections())
+                {
+                    DepthFrame depthFrame = frame.get<DepthFrame>();
 
-                update_tracking(depthFrame);
+                    update_tracking(depthFrame);
+                }
             }
 
             void HandTracker::create_streams(PluginServiceProxy& pluginService, Sensor streamset)
@@ -102,9 +106,15 @@ namespace sensekit
                 //use same frameIndex as source depth frame
                 sensekit_frame_index_t frameIndex = depthFrame.get_frameIndex();
 
-                generate_hand_frame(frameIndex);
+                if (m_handStream->has_connections())
+                {
+                    generate_hand_frame(frameIndex);
+                }
 
-                generate_hand_debug_image_frame(frameIndex);
+                if (m_debugImageStream->has_connections())
+                {
+                    generate_hand_debug_image_frame(frameIndex);
+                }
             }
 
             void HandTracker::generate_hand_frame(sensekit_frame_index_t frameIndex)
