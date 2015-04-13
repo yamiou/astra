@@ -30,7 +30,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 add_subdirectory(src)
-add_subdirectory(examples)
+add_subdirectory(samples)
 
 set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/sdk")
 MESSAGE("CMAKE_INSTALL_PREFIX : ${CMAKE_INSTALL_PREFIX}")
@@ -41,14 +41,14 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/include
         PATTERN "include/SenseKit/Plugins" EXCLUDE
         )
 
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/examples
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples
         DESTINATION .
         PATTERN "build" EXCLUDE
         PATTERN ".gitignore" EXCLUDE
         )
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
-        DESTINATION examples
+        DESTINATION samples
         PATTERN "build" EXCLUDE
         PATTERN ".gitignore" EXCLUDE
         )
