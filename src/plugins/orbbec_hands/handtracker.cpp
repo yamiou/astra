@@ -117,7 +117,7 @@ namespace sensekit
 
             void HandTracker::generate_hand_frame(sensekit_frame_index_t frameIndex)
             {
-                sensekit_handframe_wrapper_t* handFrame = m_handStream->begin_write();
+                sensekit_handframe_wrapper_t* handFrame = m_handStream->begin_write(frameIndex);
 
                 if (handFrame != nullptr)
                 {
@@ -132,7 +132,7 @@ namespace sensekit
 
             void HandTracker::generate_hand_debug_image_frame(sensekit_frame_index_t frameIndex)
             {
-                sensekit_colorframe_wrapper_t* debugImageFrame = m_debugImageStream->begin_write();
+                sensekit_colorframe_wrapper_t* debugImageFrame = m_debugImageStream->begin_write(frameIndex);
 
                 if (debugImageFrame != nullptr)
                 {

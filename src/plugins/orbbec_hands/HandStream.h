@@ -4,6 +4,7 @@
 #include <SenseKit/Plugins/PluginStream.h>
 #include <SenseKitUL/streams/hand_types.h>
 #include <SenseKitUL/StreamTypes.h>
+
 namespace sensekit {
     namespace plugins {
         namespace hands {

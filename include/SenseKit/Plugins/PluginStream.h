@@ -192,12 +192,13 @@ namespace sensekit { namespace plugins {
                     return bin_has_connections(m_binHandle);
                 }
 
-            frame_type* begin_write()
+            frame_type* begin_write(size_t frameIndex)
                 {
                     if (m_locked)
                         return reinterpret_cast<TFrameType*>(m_frame->data);
 
                     m_locked = true;
+                    m_frame->frameIndex = frameIndex;
                     return reinterpret_cast<TFrameType*>(m_frame->data);
                 }
 
@@ -210,11 +211,21 @@ namespace sensekit { namespace plugins {
                     m_locked = false;
                 }
 
+            virtual void on_connection_added(sensekit_streamconnection_t connection) override
+                {
+                    link_connection_to_bin(connection, m_binHandle);
+                }
+
+            virtual void on_connection_removed(sensekit_bin_t bin,
+                                               sensekit_streamconnection_t connection) override
+                {
+                    link_connection_to_bin(connection, nullptr);
+                }
+
         private:
             bool m_locked{false};
             sensekit_bin_t m_binHandle{nullptr};
             sensekit_frame_t* m_frame{nullptr};
-
         };
     }}
 
