@@ -149,7 +149,7 @@ CMAKE_USE_RELATIVE_PATHS:BOOL=ON
 CMAKE_VERBOSE_MAKEFILE:BOOL=OFF
 
 //Path to a file.
-GLUT_INCLUDE_DIR:PATH=/$$(SolutionDir)/thirdparty/glut_windows/
+GLUT_INCLUDE_DIR:PATH=@SAMPLES_BUILD_TEMP_DIR@thirdparty/glut_windows/
 
 //Path to a library.
 GLUT_glut_LIBRARY:FILEPATH=$(SolutionDir)/thirdparty/glut_windows/glut32.lib
@@ -161,7 +161,7 @@ OPENGL_gl_LIBRARY:STRING=opengl32
 OPENGL_glu_LIBRARY:STRING=glu32
 
 //Path to a file.
-SENSEKIT_INCLUDE_DIR:PATH=/$$(SolutionDir)/../../include/
+SENSEKIT_INCLUDE_DIR:PATH=@SAMPLES_BUILD_TEMP_DIR@../../include/
 
 //Path to a library.
 SENSEKIT_SENSEKITAPI_LIBRARY_DEBUG:FILEPATH=
@@ -206,7 +206,7 @@ SFML_GRAPHICS_LIBRARY_STATIC_DEBUG:FILEPATH=SFML_GRAPHICS_LIBRARY_STATIC_DEBUG-N
 SFML_GRAPHICS_LIBRARY_STATIC_RELEASE:FILEPATH=SFML_GRAPHICS_LIBRARY_STATIC_RELEASE-NOTFOUND
 
 //Path to a file.
-SFML_INCLUDE_DIR:PATH=/$$(SolutionDir)/thirdparty/SFML-2.2-min/include/
+SFML_INCLUDE_DIR:PATH=@SAMPLES_BUILD_TEMP_DIR@thirdparty/SFML-2.2-min/include/
 
 //Path to a library.
 SFML_SYSTEM_LIBRARY_DYNAMIC_DEBUG:FILEPATH=SFML_SYSTEM_LIBRARY_DYNAMIC_DEBUG-NOTFOUND
@@ -367,7 +367,7 @@ DepthReader_GUID_CMAKE:INTERNAL=EC88231E-E623-4C7F-B7A7-6BF0AF3C2E86
 //Stored GUID
 DepthViewer_GUID_CMAKE:INTERNAL=AA522F45-9D83-4F71-AB1F-319EBC0F4C49
 //Details about finding GLUT
-FIND_PACKAGE_MESSAGE_DETAILS_GLUT:INTERNAL=[/$$(SolutionDir)/thirdparty/glut_windows/glut32.lib][/$$(SolutionDir)/thirdparty/glut_windows/][v()]
+FIND_PACKAGE_MESSAGE_DETAILS_GLUT:INTERNAL=[$(SolutionDir)/thirdparty/glut_windows/glut32.lib][$(SolutionDir)/thirdparty/glut_windows/][v()]
 //Details about finding OpenGL
 FIND_PACKAGE_MESSAGE_DETAILS_OpenGL:INTERNAL=[opengl32][v()]
 //ADVANCED property for variable: GLUT_INCLUDE_DIR

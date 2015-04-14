@@ -74,6 +74,8 @@ if (MSVC)
         PATTERN "build" EXCLUDE
         PATTERN ".gitignore" EXCLUDE
         )
+
+    install(CODE "file(REMOVE_RECURSE ${SAMPLES_BUILD_TEMP_DIR})")
 endif()
 
 set(CPACK_PACKAGE_NAME "SenseKitSDK")

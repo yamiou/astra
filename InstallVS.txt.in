@@ -42,7 +42,7 @@ file(REMOVE_RECURSE ${FOUND_DIRS_TO_DELETE})
 
 MESSAGE("Removing CMake from VS2013 projects...")
 
-execute_process(COMMAND clisp.exe "parse-replace.cl" "${SAMPLES_BUILD_TEMP_DIR}"
+execute_process(COMMAND clisp.exe "parse-replace.cl" "${SAMPLES_BUILD_TEMP_DIR}" "${SAMPLES_SOURCE_DIR}"
                 WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/lpp/")
 
 MESSAGE("Done configuring sdk sample VS2013 projects.")
