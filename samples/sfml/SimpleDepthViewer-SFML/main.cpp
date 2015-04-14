@@ -13,13 +13,8 @@ public:
             m_height = height;
             int byteLength = m_width * m_height * 4;
 
-            if (m_depthVizBuffer != nullptr)
-            {
-                delete[] m_depthVizBuffer;
-            }
-
-            m_depthVizBuffer = new uint8_t[byteLength];
-            memset(m_depthVizBuffer, 0, byteLength);
+            m_depthVizBuffer = DepthPtr( new uint8_t[byteLength] );
+            memset(m_depthVizBuffer.get(), 0, byteLength);
 
             m_texture.create(m_width, m_height);
             m_sprite.setTexture(m_texture);
@@ -67,7 +62,7 @@ public:
                 }
             }
 
-            m_texture.update(m_depthVizBuffer);
+            m_texture.update(m_depthVizBuffer.get());
             check_fps();
         }
 
@@ -81,7 +76,9 @@ private:
     std::clock_t m_lastTimepoint { 0 };
     sf::Texture m_texture;
     sf::Sprite m_sprite;
-    uint8_t* m_depthVizBuffer { nullptr };
+    
+    using DepthPtr = std::unique_ptr < uint8_t[] > ;
+    DepthPtr m_depthVizBuffer { nullptr };
     int m_width { 0 };
     int m_height { 0 };
 };
