@@ -72,7 +72,7 @@
             (callback (rdata-replacement-callback template))
             (include-markers (rdata-include-markers template))
             )
-           (write-line (format nil "Replacing: ~A to ~A" sm em))
+           ;(write-line (format nil "Replacing: ~A to ~A" sm em))
            (loop  with index = 0
                   do (setq next-index (get-next-substr-index str :start-marker sm
                                :end-marker em
@@ -81,15 +81,14 @@
                                :next-index index
                                :include-markers include-markers))
                   if (null next-index)
-                    collect (progn (write-line (format nil "~A -> ~A" index (length str)))
+                    collect (progn ;(write-line (format nil "~A -> ~A" index (length str)))
                               (subseq str index)
                              )
                   while next-index
-                  ;collect (subseq str index next-index)
                   collect (subseq str index si)
                   collect (funcall callback (subseq str si ei))
                   collect (subseq str ei next-index)
-                  do (progn (write-line (format nil "~A -> [~A ~A] -> ~A" index si ei next-index))
+                  do (progn ;(write-line (format nil "~A -> [~A ~A] -> ~A" index si ei next-index))
                         (setq index next-index)
                       )
            )
@@ -140,7 +139,7 @@ is replaced with replacement."
                      :end-marker "</data>"
                      :replacement-callback (lambda (str) "_123_")
                      :include-markers T))
-(setq build-dir "C:[\\/]projects[\\/]orbbec[\\/]SenseKitSDK-0.1.0-win32[\\/]samples[\\/]build")
+(setq build-dir "[Cc]:[\\/]projects[\\/]orbbec[\\/]SenseKitSDK-0.1.0-win32[\\/]samples[\\/]build")
 (setq lambda-path-to-sln-dir (lambda (str) (regexp-replace str build-dir "$(SolutionDir)")))
 (setq lambda-remove (lambda (str) ""))
 
@@ -164,10 +163,6 @@ is replaced with replacement."
            :end-marker "</ProjectReference>[^<]*</ItemGroup>"
            :replacement-callback lambda-remove
            :include-markers T)
-
-(setq f1 "abc <data>123</data> fdsa <data-type>9090</data> lala")
-(setq fni "DepthReader.vcxproj")
-(setq fno "DepthReader.vcxproj.out")
 
 (defun mapc-directory-tree (fn directory)
   (dolist (entry (cl-fad:list-directory directory))
@@ -201,17 +196,8 @@ is replaced with replacement."
 
 (defun _ () (load "parse-replace.cl" :verbose nil))
 
-(defun t1 ()
-  (write-line (parse-replace f1 tp1))
+(when (>= (length *args*) 1)
+  (let ((path (car *args*)))
+    (process path)
+  )
 )
-(defun t2 ()
-  (apply-parse-file fni fno rdata-list)
-)
-
-(when (>= (length *args*) 2)
-  (setq path (car *args*))
-  (setq template-file (cdr *args*))
-  (parse-replace (file-string path) template-file)
-)
-
-(process "files")
