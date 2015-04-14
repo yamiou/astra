@@ -2,7 +2,7 @@
 #define DEBUGVISUALIZER_H
 #include <vector>
 #include "trackedpoint.h"
-#include "../../SenseKitUL/SenseKitUL_internal.h"
+#include <SenseKitUL/Plugins/stream_types.h>
 
 namespace sensekit
 {

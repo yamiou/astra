@@ -7,7 +7,7 @@
 #include "depthutility.h"
 #include "trackedpoint.h"
 #include "pointprocessor.h"
-#include "../../SenseKitUL/SenseKitUL_internal.h"
+#include <SenseKitUL/Plugins/stream_types.h>
 #include "coordinateconverter.h"
 #include <SenseKit/Plugins/plugin_api.h>
 #include <SenseKit/Plugins/SingleBinStream.h>

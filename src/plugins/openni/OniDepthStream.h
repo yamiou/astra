@@ -3,7 +3,7 @@
 
 #include "OniDeviceStream.h"
 #include <SenseKit/Plugins/plugin_api.h>
-#include "../../SensekitUL/SenseKitUL_internal.h"
+#include <SenseKitUL/Plugins/stream_types.h>
 #include <SenseKitUL/StreamTypes.h>
 
 namespace sensekit { namespace plugins {

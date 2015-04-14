@@ -1,7 +1,7 @@
 #include <SenseKit/sensekit_types.h>
 #include "generic_stream_api.h"
 #include <SenseKitUL/streams/color_types.h>
-#include "SenseKitUL_internal.h"
+#include <SenseKitUL/Plugins/stream_types.h>
 #include <math.h>
 #include <string.h>
 #include <SenseKitUL/StreamTypes.h>

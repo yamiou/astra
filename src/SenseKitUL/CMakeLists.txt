@@ -15,7 +15,7 @@ set(SenseKitUL_SOURCES
   hand_capi.cpp
   SenseKitUL.cpp
   generic_stream_api.h
-  SenseKitUL_internal.h
+  ../../include/SenseKitUL/Plugins/stream_types.h
   )
 
 add_library(SenseKitUL SHARED ${SenseKitUL_SOURCES})

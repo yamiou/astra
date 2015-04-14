@@ -4,7 +4,7 @@
 #include <math.h>
 #include <memory.h>
 #include <SenseKitUL/StreamTypes.h>
-#include "SenseKitUL_internal.h"
+#include <SenseKitUL/Plugins/stream_types.h>
 #include <string.h>
 
 static conversion_cache_t g_conversionCache;

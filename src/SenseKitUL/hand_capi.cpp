@@ -3,7 +3,7 @@
 #include <math.h>
 #include <memory.h>
 #include <SenseKitUL/StreamTypes.h>
-#include "SenseKitUL_internal.h"
+#include <SenseKitUL/Plugins/stream_types.h>
 #include <SenseKitUL/streams/hand_capi.h>
 #include <string.h>
 
