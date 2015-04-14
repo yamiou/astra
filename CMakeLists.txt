@@ -15,16 +15,18 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+find_package(CLISP REQUIRED)
+
 #Override FindSenseKit equivalents
 set(SENSEKIT_SDK_BUILD TRUE)
 set(SENSEKIT_LIBRARIES
-        SenseKit
-        SenseKitAPI
-        SenseKitUL
-        )
+  SenseKit
+  SenseKitAPI
+  SenseKitUL
+  )
 set(SENSEKIT_INCLUDE_DIR
-    ${PROJECT_SOURCE_DIR}/include
-    )
+  ${PROJECT_SOURCE_DIR}/include
+  )
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -39,24 +41,25 @@ set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/sdk")
 MESSAGE("CMAKE_INSTALL_PREFIX : ${CMAKE_INSTALL_PREFIX}")
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include
-        DESTINATION .
-        FILES_MATCHING PATTERN "*.h"
-        PATTERN "include/SenseKit/Plugins" EXCLUDE
-        )
+  DESTINATION .
+  FILES_MATCHING PATTERN "*.h"
+  PATTERN "include/SenseKit/Plugins" EXCLUDE
+  )
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples
-        DESTINATION .
-        PATTERN "build" EXCLUDE
-        PATTERN ".gitignore" EXCLUDE
-        )
+  DESTINATION .
+  PATTERN "build" EXCLUDE
+  PATTERN ".gitignore" EXCLUDE
+  )
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
-        DESTINATION samples
-        PATTERN "build" EXCLUDE
-        PATTERN ".gitignore" EXCLUDE
-        )
+  DESTINATION samples
+  PATTERN "build" EXCLUDE
+  PATTERN ".gitignore" EXCLUDE
+  )
 
 if (MSVC)
+  
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013
         DESTINATION samples
         PATTERN "build" EXCLUDE
@@ -78,6 +81,7 @@ if (MSVC)
         )
 
     install(CODE "file(REMOVE_RECURSE ${SAMPLES_BUILD_TEMP_DIR})")
+
 endif()
 
 set(CPACK_PACKAGE_NAME "SenseKitSDK")
@@ -90,8 +94,8 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Orbbec Sensekit SDK")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "Orbbec/SenseKit")
 
 if (WIN32)
-    set(CPACK_GENERATOR "ZIP")
+  set(CPACK_GENERATOR "ZIP")
 else()
-    set(CPACK_GENERATOR "ZIP;TGZ")
+  set(CPACK_GENERATOR "ZIP;TGZ")
 endif()
 INCLUDE(CPack)

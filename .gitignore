@@ -3,4 +3,5 @@ compile_commands.json
 bin/
 lib/
 build*/
+.pp-modification-cache.cl
 InstallVS.txt

@@ -305,17 +305,33 @@ is replaced with replacement."
 
 (defun _ () (load "lpp.cl" :verbose nil))
 
+(defparameter *pp-cache* '())
+
 (defun process (dir)
-  (let ((target-directory (if (null dir)
-                              (ext:cd)
-                              dir)))
+  (let* ((target-directory (if (null dir)
+                               (ext:cd)
+                               dir))
+         (cache-file-path (cl-fad:merge-pathnames-as-file
+                           (cl-fad:pathname-as-directory target-directory)
+                           ".pp-modification-cache.cl"))
+         (_ (load cache-file-path :if-does-not-exist nil))
+         (cache-file (open cache-file-path :direction :output :if-does-not-exist :create :if-exists :overwrite)))
     (write-line (format nil "Base directory: ~A~%" target-directory))
+    (write-line "(defparameter *pp-cache* '(" cache-file)
+
     (mapc-directory-tree (lambda (x)
                            (when (equal (pathname-type x) preprocessor-file-extension)
-                             (write-line (format nil "~A => ~A"
-                                                 (enough-namestring x target-directory)
-                                                 (in-to-out-filename (file-namestring x))))
-                             (process-file (namestring x))))
-                         target-directory)))
+                             (let* ((cache-modify (cdr (assoc (format nil "~A" x) *pp-cache* :test #'string=)))
+                                    (cache-modify (if (null cache-modify) 0 cache-modify))
+                                    (last-modify (posix:file-stat-mtime (posix:file-stat x))))
+                               (write-line (format nil "(\"~A\" . ~A)" x last-modify) cache-file)
+                               (when (> last-modify cache-modify)
+                                 (write-line (format nil "~A => ~A"
+                                                     (enough-namestring x target-directory)
+                                                     (in-to-out-filename (file-namestring x))))
+                                 (process-file (namestring x))))))
+                         target-directory)
+    (write-line "))" cache-file)
+    (close cache-file)))
 
 (process (car *args*))
