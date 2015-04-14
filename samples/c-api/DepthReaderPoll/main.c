@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
     sensekit_depth_stream_get_hfov(depthStream, &hFov);
     sensekit_depth_stream_get_vfov(depthStream, &vFov);
 
-    printf("depth sensor -- hFov: %f radians vFov: %f radians", hFov, vFov);
+    printf("depth sensor -- hFov: %f radians vFov: %f radians\n", hFov, vFov);
 
     sensekit_stream_start(depthStream);
 
