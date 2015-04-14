@@ -6,6 +6,7 @@
 
 (setq project-file-extension "vcxproj")
 (setq solution-file-extension "sln")
+(setq filters-file-extension "filters")
 
 (defun regexp-replace (string pat repl)
   (reduce #'(lambda (x y) (string-concat x repl y))
@@ -128,19 +129,20 @@ is replaced with replacement."
        when pos do (write-string replacement out)
        while pos)))
 
-(setq proj-data-list nil)
-(defun add-projdata (&rest args)
-  (let ((rd (apply #'make-rdata args)))
-    (setq proj-data-list (cons rd proj-data-list))
+(defmacro create-rdata-list (listname addname)
+  `(progn
+    (setq ,listname nil)
+    (defun ,addname (&rest args)
+      (let ((rd (apply #'make-rdata args)))
+        (setq ,listname (cons rd ,listname))
+      )
+    )
   )
 )
 
-(setq sln-data-list nil)
-(defun add-slndata (&rest args)
-  (let ((rd (apply #'make-rdata args)))
-    (setq sln-data-list (cons rd sln-data-list))
-  )
-)
+(create-rdata-list proj-data-list add-projdata)
+(create-rdata-list sln-data-list add-slndata)
+(create-rdata-list filter-data-list add-filterdata)
 
 (setq tp1 (make-rdata :start-marker "<data[^>]*>" 
                      :end-marker "</data>"
@@ -169,15 +171,20 @@ is replaced with replacement."
               :end-marker "</ProgramDataBaseFile>"
               :replacement-callback lambda-path-to-sln-dir)
 (add-projdata :start-marker "[^<>]*<ItemGroup[^>]*>[^<]*<CustomBuild[^>]*CMakeLists[.]txt[^>]*>"
-              :end-marker "</CustomBuild>[^<]*</ItemGroup>"
+              :end-marker "</ItemGroup>"
               :replacement-callback lambda-remove
               :include-markers T)
 (add-projdata :start-marker "[^<>]*<ItemGroup[^>]*>[^<]*<ProjectReference[^>]*ZERO_CHECK[.]vcxproj[^>]*>"
-              :end-marker "</ProjectReference>[^<]*</ItemGroup>"
+              :end-marker "</ItemGroup>"
               :replacement-callback lambda-remove
               :include-markers T)
 (add-projdata :start-marker "CMAKE_INTDIR="
               :end-marker ";"
+              :replacement-callback lambda-remove
+              :include-markers T)
+
+(add-filterdata :start-marker "[^<>]*<ItemGroup[^>]*>[^<]*<CustomBuild[^>]*CMakeLists[.]txt[^>]*>"
+              :end-marker "</ItemGroup>"
               :replacement-callback lambda-remove
               :include-markers T)
               
@@ -203,6 +210,7 @@ is replaced with replacement."
 (defun process-file (filename-in file-extension)
   (let ((filename-out (get-temp-filename filename-in))
         (data-list (cond ((equal file-extension solution-file-extension) sln-data-list)
+                         ((equal file-extension filters-file-extension) filter-data-list)
                          (t proj-data-list)))
        )
     (apply-parse-file filename-in filename-out data-list)
@@ -220,6 +228,7 @@ is replaced with replacement."
     (mapc-directory-tree (lambda (x)
                            (let ((file-extension (pathname-type x)))
                              (when (or (equal file-extension project-file-extension)
+                                       (equal file-extension filters-file-extension)
                                        (equal file-extension solution-file-extension))
                                (write-line (format nil "~A"
                                                    (enough-namestring x target-directory)
