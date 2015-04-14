@@ -3,7 +3,7 @@
 
 #include <SenseKit/SenseKit.h>
 #include <SenseKit/Plugins/plugin_api.h>
-#include <SenseKit/Plugins/PluginStream.h>
+#include <SenseKit/Plugins/Stream.h>
 #include <OpenNI.h>
 #include <iostream>
 

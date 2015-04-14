@@ -1,7 +1,7 @@
 #ifndef HANDSTREAM_H
 #define HANDSTREAM_H
 
-#include <SenseKit/Plugins/PluginStream.h>
+#include <SenseKit/Plugins/SingleBinStream.h>
 #include <SenseKitUL/streams/hand_types.h>
 #include <SenseKitUL/StreamTypes.h>
 

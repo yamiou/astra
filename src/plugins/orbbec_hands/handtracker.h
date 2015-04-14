@@ -10,7 +10,7 @@
 #include "../../SenseKitUL/SenseKitUL_internal.h"
 #include "coordinateconverter.h"
 #include <SenseKit/Plugins/plugin_api.h>
-#include <SenseKit/Plugins/PluginStream.h>
+#include <SenseKit/Plugins/SingleBinStream.h>
 #include "HandStream.h"
 #include "debugvisualizer.h"
 
