@@ -5,6 +5,7 @@
 (defstruct rdata start-marker end-marker replacement-callback include-markers)
 
 (setq project-file-extension "vcxproj")
+(setq solution-file-extension "sln")
 
 (defun regexp-replace (string pat repl)
   (reduce #'(lambda (x y) (string-concat x repl y))
@@ -127,13 +128,19 @@ is replaced with replacement."
        when pos do (write-string replacement out)
        while pos)))
 
-(setq rdata-list nil)
-(defun add-rdata (&rest args)
+(setq proj-data-list nil)
+(defun add-projdata (&rest args)
   (let ((rd (apply #'make-rdata args)))
-    (setq rdata-list (cons rd rdata-list))
+    (setq proj-data-list (cons rd proj-data-list))
   )
 )
-(defun get-macro (key) (gethash key macro-hash))
+
+(setq sln-data-list nil)
+(defun add-slndata (&rest args)
+  (let ((rd (apply #'make-rdata args)))
+    (setq sln-data-list (cons rd sln-data-list))
+  )
+)
 
 (setq tp1 (make-rdata :start-marker "<data[^>]*>" 
                      :end-marker "</data>"
@@ -149,27 +156,37 @@ is replaced with replacement."
                                                            "$(SolutionDir)")))
 (setq lambda-remove (lambda (str) ""))
 
-(add-rdata :start-marker "<AdditionalIncludeDirectories>" 
-           :end-marker "</AdditionalIncludeDirectories>"
-           :replacement-callback (lambda (str) (replace-all str "\\$$(SolutionDir)" "$(SolutionDir)")))
-(add-rdata :start-marker "<OutDir[^>]*>" 
-           :end-marker "</OutDir>"
-           :replacement-callback lambda-path-to-sln-dir)
-(add-rdata :start-marker "<ImportLibrary[^>]*>" 
-           :end-marker "</ImportLibrary>"
-           :replacement-callback lambda-path-to-sln-dir)
-(add-rdata :start-marker "<ProgramDataBaseFile[^>]*>" 
-           :end-marker "</ProgramDataBaseFile>"
-           :replacement-callback lambda-path-to-sln-dir)
-(add-rdata :start-marker "[^<>]*<ItemGroup[^>]*>[^<]*<CustomBuild[^>]*CMakeLists[.]txt[^>]*>"
-           :end-marker "</CustomBuild>[^<]*</ItemGroup>"
-           :replacement-callback lambda-remove
-           :include-markers T)
-(add-rdata :start-marker "[^<>]*<ItemGroup[^>]*>[^<]*<ProjectReference[^>]*ZERO_CHECK[.]vcxproj[^>]*>"
-           :end-marker "</ProjectReference>[^<]*</ItemGroup>"
-           :replacement-callback lambda-remove
-           :include-markers T)
+(add-projdata :start-marker "<AdditionalIncludeDirectories>" 
+              :end-marker "</AdditionalIncludeDirectories>"
+              :replacement-callback (lambda (str) (replace-all str "\\$$(SolutionDir)" "$(SolutionDir)")))
+(add-projdata :start-marker "<OutDir[^>]*>" 
+              :end-marker "</OutDir>"
+              :replacement-callback lambda-path-to-sln-dir)
+(add-projdata :start-marker "<ImportLibrary[^>]*>" 
+              :end-marker "</ImportLibrary>"
+              :replacement-callback lambda-path-to-sln-dir)
+(add-projdata :start-marker "<ProgramDataBaseFile[^>]*>" 
+              :end-marker "</ProgramDataBaseFile>"
+              :replacement-callback lambda-path-to-sln-dir)
+(add-projdata :start-marker "[^<>]*<ItemGroup[^>]*>[^<]*<CustomBuild[^>]*CMakeLists[.]txt[^>]*>"
+              :end-marker "</CustomBuild>[^<]*</ItemGroup>"
+              :replacement-callback lambda-remove
+              :include-markers T)
+(add-projdata :start-marker "[^<>]*<ItemGroup[^>]*>[^<]*<ProjectReference[^>]*ZERO_CHECK[.]vcxproj[^>]*>"
+              :end-marker "</ProjectReference>[^<]*</ItemGroup>"
+              :replacement-callback lambda-remove
+              :include-markers T)
+              
+(add-slndata  :start-marker "Project([^,]*ALL_BUILD"
+              :end-marker "EndProject"
+              :replacement-callback lambda-remove
+              :include-markers T)
+(add-slndata  :start-marker "Project([^,]*ZERO_CHECK"
+              :end-marker "EndProject"
+              :replacement-callback lambda-remove
+              :include-markers T)
 
+              
 (defun mapc-directory-tree (fn directory)
   (dolist (entry (cl-fad:list-directory directory))
     (when (cl-fad:directory-pathname-p entry)
@@ -179,9 +196,12 @@ is replaced with replacement."
 (defun get-temp-filename (fn)
   (format nil "~A.tmp" fn))
   
-(defun process-file (filename-in)
-  (let ((filename-out (get-temp-filename filename-in)))
-    (apply-parse-file filename-in filename-out rdata-list)
+(defun process-file (filename-in file-extension)
+  (let ((filename-out (get-temp-filename filename-in))
+        (data-list (cond ((equal file-extension solution-file-extension) sln-data-list)
+                         (t proj-data-list)))
+       )
+    (apply-parse-file filename-in filename-out data-list)
     (delete-file filename-in)
     (rename-file filename-out filename-in)
   )
@@ -194,11 +214,15 @@ is replaced with replacement."
                               dir)))
     (write-line (format nil "Base directory: ~A~%" target-directory))
     (mapc-directory-tree (lambda (x)
-                           (when (equal (pathname-type x) project-file-extension)
-                             (write-line (format nil "~A"
-                                                 (enough-namestring x target-directory)
-                                                 ))
-                             (process-file (namestring x))))
+                           (let ((file-extension (pathname-type x)))
+                             (when (or (equal file-extension project-file-extension)
+                                       (equal file-extension solution-file-extension))
+                               (write-line (format nil "~A"
+                                                   (enough-namestring x target-directory)
+                                                   ))
+                               (process-file (namestring x) file-extension))
+                           )
+                         )
                          target-directory)))
 
 (defun _ () (load "parse-replace.cl" :verbose nil))

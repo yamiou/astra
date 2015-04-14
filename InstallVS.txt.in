@@ -16,6 +16,17 @@ execute_process(COMMAND cmake.exe "${SAMPLES_BUILD_TEMP_DIR}"
 
 MESSAGE("Removing CMake from VS2013 projects...")
 
+set(CMAKE_GEN_FILES_TO_DELETE
+    "${SAMPLES_BUILD_TEMP_DIR}/ALL_BUILD.vcxproj"
+    "${SAMPLES_BUILD_TEMP_DIR}/ALL_BUILD.vcxproj.filters"
+    "${SAMPLES_BUILD_TEMP_DIR}/cmake_install.cmake"
+    "${SAMPLES_BUILD_TEMP_DIR}/CMakeCache.txt"
+    "${SAMPLES_BUILD_TEMP_DIR}/ZERO_CHECK.vcxproj"
+    "${SAMPLES_BUILD_TEMP_DIR}/ZERO_CHECK.vcxproj.filters"
+    )
+
+file(REMOVE ${CMAKE_GEN_FILES_TO_DELETE})
+
 execute_process(COMMAND clisp.exe "parse-replace.cl" "${SAMPLES_BUILD_TEMP_DIR}"
                 WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/lpp/")
 
