@@ -1,5 +1,6 @@
 ﻿#include "OpenNIPlugin.h"
 #include "OniDepthStream.h"
+#include "OniColorStream.h"
 #include <iostream>
 #include <SenseKit/SenseKit.h>
 #include <SenseKitUL/StreamTypes.h>

@@ -1,5 +1,5 @@
-#ifndef ONIDEPTHSTREAM_H
-#define ONIDEPTHSTREAM_H
+#ifndef ONICOLORSTREAM_H
+#define ONICOLORSTREAM_H
 
 #include "OniDeviceStream.h"
 #include <SenseKit/Plugins/plugin_api.h>
@@ -7,46 +7,47 @@
 
 namespace sensekit { namespace plugins {
 
-        class OniDepthStream : public OniDeviceStream<sensekit_depthframe_wrapper_t,
-                                                      int16_t>
+        class OniColorStream : public OniDeviceStream<sensekit_colorframe_wrapper_t,
+                                                      uint8_t>
         {
         public:
-            OniDepthStream(PluginServiceProxy& pluginService,
+            OniColorStream(PluginServiceProxy& pluginService,
                            Sensor& streamSet,
                            ::openni::Device& oniDevice)
                 : OniDeviceStream(pluginService,
                                   streamSet,
                                   StreamDescription(
-                                      SENSEKIT_STREAM_DEPTH,
+                                      SENSEKIT_STREAM_COLOR,
                                       DEFAULT_SUBTYPE),
                                   oniDevice)
                 {
-                    m_oniStream.create(m_oniDevice, ::openni::SENSOR_DEPTH);
+                    m_oniStream.create(m_oniDevice, ::openni::SENSOR_COLOR);
                     m_oniVideoMode = m_oniStream.getVideoMode();
                     m_bufferLength = m_oniVideoMode.getResolutionX() *
                         m_oniVideoMode.getResolutionX() *
-                        2;
+                        3;
                 }
 
         private:
-            virtual void on_new_buffer(sensekit_frame_t* newBuffer,
-                                       wrapper_type* wrapper) override;
+            void on_new_buffer(sensekit_frame_t* newBuffer,
+                               wrapper_type* wrapper) override;
         };
 
-        void OniDepthStream::on_new_buffer(sensekit_frame_t* newBuffer,
+        void OniColorStream::on_new_buffer(sensekit_frame_t* newBuffer,
                                            wrapper_type* wrapper)
         {
             if (wrapper == nullptr)
                 return;
 
-            sensekit_depthframe_metadata_t metadata;
+            sensekit_colorframe_metadata_t metadata;
 
             metadata.width = m_oniVideoMode.getResolutionX();
             metadata.height = m_oniVideoMode.getResolutionY();
-            metadata.bytesPerPixel = 2;
+            metadata.bytesPerPixel = 3;
 
             wrapper->frame.metadata = metadata;
         }
+
     }}
 
-#endif /* ONIDEPTHSTREAM_H */
+#endif /* ONICOLORSTREAM_H */
