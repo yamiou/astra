@@ -98,7 +98,7 @@ namespace sensekit { namespace plugins {
             sensekit_bin_t m_binHandle{nullptr};
             sensekit_frame_t* m_currentBuffer{nullptr};
             wrapper_type* m_currentFrame{nullptr};
-            sensekit_frame_index_t m_frameIndex;
+            sensekit_frame_index_t m_frameIndex {0};
 
         };
 
