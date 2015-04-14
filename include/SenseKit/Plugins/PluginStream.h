@@ -12,13 +12,13 @@ using std::endl;
 
 namespace sensekit { namespace plugins {
 
-        class StreamBase : public StreamCallbackListener
+        class Stream : public StreamCallbackListener
         {
         public:
 
-            StreamBase(PluginServiceProxy& pluginService,
-                       Sensor& streamSet,
-                       StreamDescription description) :
+            Stream(PluginServiceProxy& pluginService,
+                   Sensor& streamSet,
+                   StreamDescription description) :
                 m_pluginService(pluginService),
                 m_streamSet(streamSet),
                 m_description(description)
@@ -26,7 +26,7 @@ namespace sensekit { namespace plugins {
                     create_stream(description);
                 }
 
-            virtual ~StreamBase()
+            virtual ~Stream()
                 {
                     cout << "destroying sensekit stream of type " << m_description.get_type() << endl;
                     m_pluginService.destroy_stream(m_streamHandle);
@@ -132,33 +132,33 @@ namespace sensekit { namespace plugins {
                 }
         };
 
-        inline void StreamBase::set_parameter(sensekit_streamconnection_t streamConnection,
-                                              sensekit_parameter_id id,
-                                              size_t byteLength,
-                                              sensekit_parameter_data_t* data)
+        inline void Stream::set_parameter(sensekit_streamconnection_t streamConnection,
+                                          sensekit_parameter_id id,
+                                          size_t byteLength,
+                                          sensekit_parameter_data_t* data)
         { }
 
-        inline void StreamBase::get_parameter_size(sensekit_streamconnection_t streamConnection,
-                                                   sensekit_parameter_id id,
-                                                   size_t& byteLength)
+        inline void Stream::get_parameter_size(sensekit_streamconnection_t streamConnection,
+                                               sensekit_parameter_id id,
+                                               size_t& byteLength)
         { }
 
-        inline void StreamBase::get_parameter_data(sensekit_streamconnection_t streamConnection,
-                                                   sensekit_parameter_id id,
-                                                   size_t byteLength,
-                                                   sensekit_parameter_data_t* data)
+        inline void Stream::get_parameter_data(sensekit_streamconnection_t streamConnection,
+                                               sensekit_parameter_id id,
+                                               size_t byteLength,
+                                               sensekit_parameter_data_t* data)
         { }
 
-        inline void StreamBase::connection_added(sensekit_stream_t stream,
-                                                 sensekit_streamconnection_t connection)
+        inline void Stream::connection_added(sensekit_stream_t stream,
+                                             sensekit_streamconnection_t connection)
         {
             assert(stream == m_streamHandle);
             on_connection_added(connection);
         }
 
-        inline void StreamBase::connection_removed(sensekit_stream_t stream,
-                                                   sensekit_bin_t bin,
-                                                   sensekit_streamconnection_t connection)
+        inline void Stream::connection_removed(sensekit_stream_t stream,
+                                               sensekit_bin_t bin,
+                                               sensekit_streamconnection_t connection)
         {
             assert(stream == m_streamHandle);
             on_connection_removed(bin, connection);
@@ -166,7 +166,7 @@ namespace sensekit { namespace plugins {
 
 
         template<typename TFrameType, typename TBlockType>
-        class SingleBinStream : public StreamBase
+        class SingleBinStream : public Stream
         {
         public:
 
@@ -174,9 +174,9 @@ namespace sensekit { namespace plugins {
                             Sensor& streamSet,
                             StreamDescription description,
                             size_t bufferSize)
-                : StreamBase(pluginService,
-                             streamSet,
-                             description)
+                : Stream(pluginService,
+                         streamSet,
+                         description)
                 {
                     create_bin(sizeof(TFrameType) + bufferSize, m_binHandle, m_frame);
                 }

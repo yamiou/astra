@@ -21,15 +21,15 @@ using std::endl;
 
 namespace sensekit { namespace plugins {
 
-        class OniDeviceStreamBase : public StreamBase
+        class OniDeviceStreamBase : public Stream
         {
         public:
             OniDeviceStreamBase(PluginServiceProxy& pluginService,
                                 Sensor& streamSet,
                                 StreamDescription desc)
-                : StreamBase(pluginService,
-                             streamSet,
-                             desc) { }
+                : Stream(pluginService,
+                         streamSet,
+                         desc) { }
 
             virtual void read_frame() = 0;
             virtual ::openni::VideoStream* get_oni_stream() = 0;
