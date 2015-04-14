@@ -35,6 +35,7 @@ add_subdirectory(samples)
 set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/sdk")
 MESSAGE("CMAKE_INSTALL_PREFIX : ${CMAKE_INSTALL_PREFIX}")
 
+
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include
         DESTINATION .
         FILES_MATCHING PATTERN "*.h"
@@ -52,6 +53,28 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
         PATTERN "build" EXCLUDE
         PATTERN ".gitignore" EXCLUDE
         )
+
+if (MSVC)
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013
+        DESTINATION samples
+        PATTERN "build" EXCLUDE
+        PATTERN ".gitignore" EXCLUDE
+        )
+
+    set(SAMPLES_SOURCE_DIR "${PROJECT_BINARY_DIR}/sdk/samples")
+    set(SAMPLES_BUILD_TEMP_DIR "${PROJECT_BINARY_DIR}/temp/vs2013/")
+
+    configure_file("${PROJECT_SOURCE_DIR}/InstallVS.txt.in"
+                   "${PROJECT_SOURCE_DIR}/InstallVS.txt"
+                   @ONLY)
+    install(SCRIPT "InstallVS.txt")
+    
+    install(DIRECTORY ${SAMPLES_BUILD_TEMP_DIR}
+        DESTINATION samples/vs2013
+        PATTERN "build" EXCLUDE
+        PATTERN ".gitignore" EXCLUDE
+        )
+endif()
 
 set(CPACK_PACKAGE_NAME "SenseKitSDK")
 set(CPACK_PACKAGE_VENDOR "Orbbec")

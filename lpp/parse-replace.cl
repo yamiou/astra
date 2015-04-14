@@ -32,7 +32,7 @@
       :direction :output
       :if-exists :supersede
       :if-does-not-exist :create)
-  (format outfile content)))
+  (format outfile "~A" content)))
     
 (defmacro get-next-substr-index (str &key start-marker end-marker start-index end-index include-markers (next-index 0))
   `(progn
@@ -139,8 +139,14 @@ is replaced with replacement."
                      :end-marker "</data>"
                      :replacement-callback (lambda (str) "_123_")
                      :include-markers T))
-(setq build-dir "[Cc]:[\\/]projects[\\/]orbbec[\\/]SenseKitSDK-0.1.0-win32[\\/]samples[\\/]build")
-(setq lambda-path-to-sln-dir (lambda (str) (regexp-replace str build-dir "$(SolutionDir)")))
+
+(defun back-to-forward-slashes (str)
+  (replace-all str "\\" "/")
+)
+
+(setq lambda-path-to-sln-dir (lambda (str) (regexp-replace (back-to-forward-slashes str) 
+                                                           (back-to-forward-slashes build-dir)
+                                                           "$(SolutionDir)")))
 (setq lambda-remove (lambda (str) ""))
 
 (add-rdata :start-marker "<AdditionalIncludeDirectories>" 
@@ -182,6 +188,7 @@ is replaced with replacement."
 )
 
 (defun process (dir)
+  (setq build-dir dir)
   (let ((target-directory (if (null dir)
                               (ext:cd)
                               dir)))
