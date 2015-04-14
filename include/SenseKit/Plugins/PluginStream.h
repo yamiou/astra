@@ -6,6 +6,10 @@
 #include <system_error>
 #include "StreamCallbackListener.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace sensekit { namespace plugins {
 
         class StreamBase : public StreamCallbackListener
@@ -24,6 +28,7 @@ namespace sensekit { namespace plugins {
 
             virtual ~StreamBase()
                 {
+                    cout << "destroying sensekit stream of type " << m_description.get_type() << endl;
                     m_pluginService.destroy_stream(m_streamHandle);
                 }
 
@@ -62,6 +67,7 @@ namespace sensekit { namespace plugins {
                 {
                     assert(m_streamHandle == nullptr);
 
+                    cout << "creating stream of type: " << m_description.get_type() << endl;
                     stream_callbacks_t pluginCallbacks = create_plugin_callbacks(this);
 
                     sensekit_stream_desc_t desc = description.get_desc_t();
@@ -69,7 +75,7 @@ namespace sensekit { namespace plugins {
                     m_pluginService.create_stream(m_streamSet.get_handle(),
                                                   desc,
                                                   pluginCallbacks,
-                                                  & m_streamHandle);
+                                                  &m_streamHandle);
                 }
 
             PluginServiceProxy& m_pluginService;
@@ -80,6 +86,11 @@ namespace sensekit { namespace plugins {
         protected:
             void create_bin(size_t binSize, sensekit_bin_t& binHandle, sensekit_frame_t*& buffer)
                 {
+                    cout << "creating bin -- "
+                         << " handle: " << m_streamHandle
+                         << " type: " << m_description.get_type()
+                         << " size: " << binSize << endl;
+
                     m_pluginService.create_stream_bin(m_streamHandle,
                                                       binSize,
                                                       &binHandle,
@@ -93,11 +104,22 @@ namespace sensekit { namespace plugins {
 
             void link_connection_to_bin(sensekit_streamconnection_t connection, sensekit_bin_t bin)
                 {
+                    cout << "link connection to bin -- "
+                         << " handle: " << m_streamHandle
+                         << " type: " << m_description.get_type()
+                         << " conn: " << connection
+                         << " bin: " << bin << endl;
+
                     m_pluginService.link_connection_to_bin(connection, bin);
                 }
 
             void destroy_bin(sensekit_bin_t& binHandle, sensekit_frame_t*& buffer)
                 {
+                    cout << "destroying bin -- "
+                         << " handle: " << m_streamHandle
+                         << " type: " << m_description.get_type()
+                         << " bin: " << binHandle << endl;
+
                     m_pluginService.destroy_stream_bin(m_streamHandle, &binHandle, &buffer);
                 }
 

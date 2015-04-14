@@ -23,6 +23,9 @@ namespace sensekit { namespace plugins {
                 {
                     m_oniStream.create(m_oniDevice, ::openni::SENSOR_DEPTH);
                     m_oniVideoMode = m_oniStream.getVideoMode();
+                    m_bufferLength = m_oniVideoMode.getResolutionX() *
+                        m_oniVideoMode.getResolutionX() *
+                        2;
                 }
 
         private:
@@ -52,7 +55,8 @@ namespace sensekit { namespace plugins {
             OniColorStream(PluginServiceProxy& pluginService,
                            Sensor& streamSet,
                            ::openni::Device& oniDevice)
-                : OniDeviceStream(pluginService, streamSet,
+                : OniDeviceStream(pluginService,
+                                  streamSet,
                                   StreamDescription(
                                       SENSEKIT_STREAM_COLOR,
                                       DEFAULT_SUBTYPE),
@@ -60,6 +64,9 @@ namespace sensekit { namespace plugins {
                 {
                     m_oniStream.create(m_oniDevice, ::openni::SENSOR_COLOR);
                     m_oniVideoMode = m_oniStream.getVideoMode();
+                    m_bufferLength = m_oniVideoMode.getResolutionX() *
+                        m_oniVideoMode.getResolutionX() *
+                        3;
                 }
 
         private:

@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
             sensekit_reader_close_frame(&frame);
         }
 
-    } while (shouldContinue);
+    } while (false);
 
     sensekit_reader_destroy(&reader);
     sensekit_streamset_close(&sensor);

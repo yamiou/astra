@@ -22,11 +22,12 @@ namespace sensekit
             ::openni::OpenNI::addDeviceConnectedListener(this);
             ::openni::OpenNI::addDeviceDisconnectedListener(this);
 
+            get_pluginService().create_stream_set(m_streamSetHandle);
+
+            m_sensor = new Sensor(m_streamSetHandle);
+
             cout << "Initializing openni" << endl;
             rc = ::openni::OpenNI::initialize();
-
-            get_pluginService().create_stream_set(m_streamSetHandle);
-            m_sensor = new Sensor(m_streamSetHandle);
         }
 
         void OpenNIPlugin::onDeviceConnected(const ::openni::DeviceInfo* info)
@@ -58,6 +59,7 @@ namespace sensekit
 
         OpenNIPlugin::~OpenNIPlugin()
         {
+            close_sensor_streams();
             cout << "closing device" << endl;
             m_device.close();
             cout << "shutting down openni" << endl;
@@ -70,27 +72,14 @@ namespace sensekit
             ::openni::Status rc = ::openni::STATUS_OK;
 
             cout << "opening depth stream" << endl;
-            ::openni::VideoStream depthStream;
-            rc = depthStream.create(m_device, ::openni::SENSOR_DEPTH);
-
             if (rc == ::openni::STATUS_OK)
             {
                 OniDepthStream* stream = new OniDepthStream(get_pluginService(),
                                                             *m_sensor,
                                                             m_device);
-
-                cout << "starting depth stream" << endl;
                 stream->start();
+                m_streams.push_back(StreamPtr(stream));
 
-                if (rc != ::openni::STATUS_OK)
-                {
-                    cout << "failed to start depth stream" << endl;
-                    delete stream;
-                }
-                else
-                {
-                    m_streams.push_back(StreamPtr(stream));
-                }
             }
             else
             {
@@ -104,19 +93,8 @@ namespace sensekit
                 OniColorStream* stream = new OniColorStream(get_pluginService(),
                                                             *m_sensor,
                                                             m_device);
-
-                cout << "starting color stream" << endl;
                 stream->start();
-
-                if (rc != ::openni::STATUS_OK)
-                {
-                    cout << "failed to start color stream" << endl;
-                    delete stream;
-                }
-                else
-                {
-                    m_streams.push_back(StreamPtr(stream));
-                }
+                m_streams.push_back(StreamPtr(stream));
             }
             else
             {

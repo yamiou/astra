@@ -5,6 +5,10 @@
 #include <SenseKit/Plugins/plugin_api.h>
 #include <SenseKit/Plugins/PluginStream.h>
 #include <OpenNI.h>
+#include <iostream>
+
+using std::cout;
+using std::endl;
 
 
 #ifndef MIN
@@ -24,8 +28,8 @@ namespace sensekit { namespace plugins {
                                 Sensor& streamSet,
                                 StreamDescription desc)
                 : StreamBase(pluginService,
-                         streamSet,
-                         desc) { }
+                             streamSet,
+                             desc) { }
 
             virtual void read_frame() = 0;
             virtual ::openni::VideoStream* get_oni_stream() = 0;
@@ -47,24 +51,24 @@ namespace sensekit { namespace plugins {
                 : OniDeviceStreamBase(pluginService,
                                       streamSet,
                                       desc),
-                  m_oniDevice(oniDevice)
-                {
-
-                }
+                  m_oniDevice(oniDevice) { }
 
             virtual ~OniDeviceStream()
                 {
-                    m_oniStream.stop();
+                    stop();
+                    cout << "destroying oni stream of type: " << get_description().get_type() << endl;
                     m_oniStream.destroy();
                 }
 
             virtual void start() override
                 {
                     m_oniStream.start();
+                    cout << "starting stream of type: " << get_description().get_type() << endl;
                 }
 
             virtual void stop() override
                 {
+                    cout << "stop stream of type: " << get_description().get_type() << endl;
                     m_oniStream.stop();
                 }
 
@@ -87,16 +91,13 @@ namespace sensekit { namespace plugins {
             ::openni::Device& m_oniDevice;
             ::openni::VideoStream m_oniStream;
             ::openni::VideoMode m_oniVideoMode;
+            size_t m_bufferLength{0};
 
         private:
-
             sensekit_stream_t m_streamHandle{nullptr};
-            size_t m_bufferLength{0};
             sensekit_bin_t m_binHandle{nullptr};
             sensekit_frame_t* m_currentBuffer{nullptr};
-
             wrapper_type* m_currentFrame{nullptr};
-
             sensekit_frame_index_t m_frameIndex;
 
         };
@@ -110,7 +111,6 @@ namespace sensekit { namespace plugins {
             {
                 size_t binSize = sizeof(wrapper_type) + m_bufferLength;
                 create_bin(binSize, m_binHandle, m_currentBuffer);
-
                 set_new_buffer(m_currentBuffer);
             }
 
@@ -158,6 +158,9 @@ namespace sensekit { namespace plugins {
         template<typename TFrameWrapper, typename TBufferBlockType>
         void OniDeviceStream<TFrameWrapper, TBufferBlockType>::read_frame()
         {
+            if (m_binHandle == nullptr)
+                return;
+
             openni::VideoFrameRef ref;
             if (m_oniStream.readFrame(&ref) == ::openni::STATUS_OK)
             {
