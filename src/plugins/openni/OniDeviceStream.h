@@ -102,7 +102,6 @@ namespace sensekit { namespace plugins {
 
         };
 
-
         template<typename TFrameWrapper, typename TBufferBlockType>
         void OniDeviceStream<TFrameWrapper,
                              TBufferBlockType>::on_connection_added(sensekit_streamconnection_t connection)

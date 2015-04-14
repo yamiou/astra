@@ -3,6 +3,7 @@
 
 #include <SenseKit/Plugins/plugin_api.h>
 #include "OniDeviceStream.h"
+#include "OniDeviceStreamSet.h"
 #include <SenseKit/SenseKit.h>
 #include <memory>
 #include <vector>
@@ -39,22 +40,12 @@ namespace sensekit
             virtual void onDeviceConnected(const ::openni::DeviceInfo* info);
             virtual void onDeviceDisconnected(const ::openni::DeviceInfo* info);
 
-            sensekit_status_t open_sensor_streams();
-            sensekit_status_t close_sensor_streams();
-
             sensekit_status_t read_streams();
 
-            bool m_isDeviceOpen{ false };
-            ::openni::Device m_device;
-            ::openni::DeviceInfo m_deviceInfo;
+            using SetPtr = std::unique_ptr<OniDeviceStreamSet>;
+            using SetList = std::vector<SetPtr>;
 
-            sensekit_streamset_t m_streamSetHandle{nullptr};
-            Sensor* m_sensor;
-
-            using StreamPtr = std::unique_ptr<OniDeviceStreamBase>;
-            using StreamList = std::vector<StreamPtr>;
-
-            StreamList m_streams;
+            SetList m_sets;
         };
     }
 }

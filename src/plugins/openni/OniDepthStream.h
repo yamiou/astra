@@ -3,6 +3,7 @@
 
 #include "OniDeviceStream.h"
 #include <SenseKit/Plugins/plugin_api.h>
+#include "../../SensekitUL/SenseKitUL_internal.h"
 #include <SenseKitUL/StreamTypes.h>
 
 namespace sensekit { namespace plugins {
@@ -32,21 +33,6 @@ namespace sensekit { namespace plugins {
             virtual void on_new_buffer(sensekit_frame_t* newBuffer,
                                        wrapper_type* wrapper) override;
         };
-
-        void OniDepthStream::on_new_buffer(sensekit_frame_t* newBuffer,
-                                           wrapper_type* wrapper)
-        {
-            if (wrapper == nullptr)
-                return;
-
-            sensekit_depthframe_metadata_t metadata;
-
-            metadata.width = m_oniVideoMode.getResolutionX();
-            metadata.height = m_oniVideoMode.getResolutionY();
-            metadata.bytesPerPixel = 2;
-
-            wrapper->frame.metadata = metadata;
-        }
     }}
 
 #endif /* ONIDEPTHSTREAM_H */

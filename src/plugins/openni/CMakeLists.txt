@@ -4,7 +4,12 @@ set(OpenNIPlugin_SOURCES
   OniDeviceStream.h
   OniDeviceStream.cpp
   OniDepthStream.h
+  OniDepthStream.cpp
   OniColorStream.h
+  OniColorStream.cpp
+  OniDeviceStreamSet.h
+  OniDeviceStreamSet.cpp
+
   )
 
 add_definitions(-DSENSEKIT_BUILD)

@@ -104,11 +104,21 @@ namespace sensekit { namespace plugins {
 
             void link_connection_to_bin(sensekit_streamconnection_t connection, sensekit_bin_t bin)
                 {
-                    cout << "link connection to bin -- "
+                    if (bin != nullptr)
+                    {
+                    cout << "linking connection to bin -- "
                          << " handle: " << m_streamHandle
                          << " type: " << m_description.get_type()
                          << " conn: " << connection
                          << " bin: " << bin << endl;
+                    }
+                    else
+                    {
+                        cout << "unlinking connection -- "
+                             << " handle: " << m_streamHandle
+                             << " type: " << m_description.get_type()
+                             << " conn: " << connection << endl;
+                    }
 
                     m_pluginService.link_connection_to_bin(connection, bin);
                 }
