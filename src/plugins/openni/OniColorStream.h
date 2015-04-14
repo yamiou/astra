@@ -24,8 +24,9 @@ namespace sensekit { namespace plugins {
                 {
                     m_oniStream.create(m_oniDevice, ::openni::SENSOR_COLOR);
                     m_oniVideoMode = m_oniStream.getVideoMode();
-                    m_bufferLength = m_oniVideoMode.getResolutionX() *
+                    m_bufferLength =
                         m_oniVideoMode.getResolutionX() *
+                        m_oniVideoMode.getResolutionY() *
                         3;
                 }
 
