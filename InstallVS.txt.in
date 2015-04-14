@@ -14,18 +14,33 @@ configure_file("${PROJECT_SOURCE_DIR}/samples-aux/CMakeCache.txt.in"
 execute_process(COMMAND cmake.exe "${SAMPLES_BUILD_TEMP_DIR}"
                 WORKING_DIRECTORY ${SAMPLES_SOURCE_DIR})
 
-MESSAGE("Removing CMake from VS2013 projects...")
+MESSAGE("Deleting CMake generated directories and files...")
 
 set(CMAKE_GEN_FILES_TO_DELETE
     "${SAMPLES_BUILD_TEMP_DIR}/ALL_BUILD.vcxproj"
     "${SAMPLES_BUILD_TEMP_DIR}/ALL_BUILD.vcxproj.filters"
-    "${SAMPLES_BUILD_TEMP_DIR}/cmake_install.cmake"
     "${SAMPLES_BUILD_TEMP_DIR}/CMakeCache.txt"
     "${SAMPLES_BUILD_TEMP_DIR}/ZERO_CHECK.vcxproj"
     "${SAMPLES_BUILD_TEMP_DIR}/ZERO_CHECK.vcxproj.filters"
     )
 
+file(GLOB_RECURSE FOUND_FILES_TO_DELETE "${SAMPLES_BUILD_TEMP_DIR}/cmake_install.cmake")
+
+FILE(GLOB_RECURSE cmake_stamp_list "${SAMPLES_BUILD_TEMP_DIR}/generate.stamp")
+SET(FOUND_DIRS_TO_DELETE "")
+FOREACH(file_path ${cmake_stamp_list})
+    GET_FILENAME_COMPONENT(dir_path ${file_path} DIRECTORY)
+    LIST(APPEND FOUND_DIRS_TO_DELETE "${dir_path}")
+ENDFOREACH()
+LIST(REMOVE_DUPLICATES FOUND_DIRS_TO_DELETE)
+
+MESSAGE("Removing directories: ${FOUND_DIRS_TO_DELETE}")
+
 file(REMOVE ${CMAKE_GEN_FILES_TO_DELETE})
+file(REMOVE ${FOUND_FILES_TO_DELETE})
+file(REMOVE_RECURSE ${FOUND_DIRS_TO_DELETE})
+
+MESSAGE("Removing CMake from VS2013 projects...")
 
 execute_process(COMMAND clisp.exe "parse-replace.cl" "${SAMPLES_BUILD_TEMP_DIR}"
                 WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/lpp/")

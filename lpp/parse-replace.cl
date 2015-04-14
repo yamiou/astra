@@ -176,6 +176,10 @@ is replaced with replacement."
               :end-marker "</ProjectReference>[^<]*</ItemGroup>"
               :replacement-callback lambda-remove
               :include-markers T)
+(add-projdata :start-marker "CMAKE_INTDIR="
+              :end-marker ";"
+              :replacement-callback lambda-remove
+              :include-markers T)
               
 (add-slndata  :start-marker "Project([^,]*ALL_BUILD"
               :end-marker "EndProject"
