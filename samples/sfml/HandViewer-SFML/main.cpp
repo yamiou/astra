@@ -42,32 +42,44 @@ public:
         printf("FPS: %3.1f (%3.4f ms)\n", fps, m_frameDuration * 1000);
     }
 
+    void processDepth(sensekit::Frame& frame)
+    {
+        sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
+
+        int width = depthFrame.get_resolutionX();
+        int height = depthFrame.get_resolutionY();
+
+        init_texture(width, height);
+
+        const int16_t* depthPtr = depthFrame.data();
+        for(int y = 0; y < height; y++)
+        {
+            for(int x = 0; x < width; x++)
+            {
+                int index = (x + y * width);
+                int16_t depth = depthPtr[index];
+                uint8_t value = depth % 255;
+                m_depthVizBuffer[index * 4] = value;
+                m_depthVizBuffer[index * 4 + 1] = value;
+                m_depthVizBuffer[index * 4 + 2] = value;
+                m_depthVizBuffer[index * 4 + 3] = 255;
+            }
+        }
+
+        m_texture.update(m_depthVizBuffer);
+    }
+
+    void processHands(sensekit::Frame& frame)
+    {
+        sensekit::HandFrame handFrame = frame.get<sensekit::HandFrame>();
+
+    }
+
     virtual void on_frame_ready(sensekit::StreamReader& reader,
                                 sensekit::Frame& frame) override
         {
-            sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
-
-            int width = depthFrame.get_resolutionX();
-            int height = depthFrame.get_resolutionY();
-
-            init_texture(width, height);
-
-            const int16_t* depthPtr = depthFrame.data();
-            for(int y = 0; y < height; y++)
-            {
-                for(int x = 0; x < width; x++)
-                {
-                    int index = (x + y * width);
-                    int16_t depth = depthPtr[index];
-                    uint8_t value = depth % 255;
-                    m_depthVizBuffer[index * 4] = value;
-                    m_depthVizBuffer[index * 4 + 1] = value;
-                    m_depthVizBuffer[index * 4 + 2] = value;
-                    m_depthVizBuffer[index * 4 + 3] = 255;
-                }
-            }
-
-            m_texture.update(m_depthVizBuffer);
+            processDepth(frame);
+            processHands(frame);
             check_fps();
         }
 
@@ -82,6 +94,7 @@ private:
     sf::Texture m_texture;
     sf::Sprite m_sprite;
     uint8_t* m_depthVizBuffer { nullptr };
+    
     int m_width { 0 };
     int m_height { 0 };
 };
