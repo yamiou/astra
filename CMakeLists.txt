@@ -5,7 +5,7 @@ project (SenseKit)
 # Version
 set (SenseKit_VERSION_MAJOR 0)
 set (SenseKit_VERSION_MINOR 1)
-set (SenseKit_VERSION_PATCH 0)
+set (SenseKit_VERSION_PATCH 1)
 set (SenseKit_VERSION_BUILD 1)
 
 if (NOT WIN32)
