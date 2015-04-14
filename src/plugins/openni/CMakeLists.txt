@@ -24,6 +24,8 @@ include_directories ("$ENV{OPENNI2_INCLUDE}")
 
 add_library(OpenNIPlugin SHARED ${OpenNIPlugin_SOURCES})
 
+set_target_properties(OpenNIPlugin PROPERTIES FOLDER "plugins")
+
 # force c++11 (has no effect currently)
 #set_property(TARGET SenseKit PROPERTY CXX_STANDARD 11)
 #set_property(TARGET SenseKit PROPERTY CXX_STANDARD_REQUIRED ON)

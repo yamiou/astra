@@ -4,7 +4,7 @@
 #include <SenseKitUL/SenseKitUL.h>
 #include <cstdio>
 #include <iostream>
-#include "../key_handler.h"
+#include <key_handler.h>
 
 void print_depth(sensekit_depthframe_t depthFrame)
 {

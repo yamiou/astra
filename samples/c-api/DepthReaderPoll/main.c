@@ -3,7 +3,7 @@
 #include <SenseKit/sensekit_capi.h>
 #include <SenseKitUL/skul_capi.h>
 #include <stdio.h>
-#include "../key_handler.h"
+#include <key_handler.h>
 
 void print_depth(sensekit_depthframe_t depthFrame)
 {

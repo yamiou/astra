@@ -8,15 +8,17 @@ find_package(SenseKit REQUIRED)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 include(ConfigUserFile)
 
 include_directories(${SENSEKIT_INCLUDE_DIR})
 
-add_subdirectory(SimpleViewer)
-add_subdirectory(SimpleColorViewer)
-add_subdirectory(DepthReader)
-add_subdirectory(DepthReaderEvent)
-add_subdirectory(HandReader)
-add_subdirectory(cpp/DepthReader)
+get_filename_component(SAMPLE_COMMON_DIR "./common" ABSOLUTE)
+
+include_directories(${SAMPLE_COMMON_DIR})
+
+add_subdirectory(c-api)
+add_subdirectory(cpp-api)
+add_subdirectory(gl)
 add_subdirectory(sfml)

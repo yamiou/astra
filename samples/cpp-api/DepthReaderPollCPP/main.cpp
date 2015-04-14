@@ -5,7 +5,7 @@
 #include <cstdio>
 #include <iostream>
 
-#include "../../key_handler.h"
+#include <key_handler.h>
 
 void print_depth(sensekit::DepthFrame& depthFrame,
                  const sensekit::CoordinateMapper& mapper)
