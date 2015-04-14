@@ -13,6 +13,7 @@
 #include <SenseKit/Plugins/SingleBinStream.h>
 #include "HandStream.h"
 #include "debugvisualizer.h"
+#include <memory>
 
 namespace sensekit
 {
@@ -45,6 +46,8 @@ namespace sensekit
                 void track_points(cv::Mat& matDepth, cv::Mat& matForeground);
 
                 //fields
+
+                DepthStream m_depthStream;
                 PluginServiceProxy& m_pluginService;
 
                 using ColorStream = SingleBinStream<sensekit_colorframe_wrapper_t, uint8_t>;
@@ -57,8 +60,8 @@ namespace sensekit
                 StreamReader m_reader;
 
                 DepthUtility m_depthUtility;
-                CoordinateConverter m_converter;
-                PointProcessor m_pointProcessor;
+                std::unique_ptr<CoordinateConverter> m_converter;
+                std::unique_ptr<PointProcessor> m_pointProcessor;
 
                 int m_width;
                 int m_height;

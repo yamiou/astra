@@ -47,6 +47,12 @@ int main(int argc, char* argv[])
     sensekit_depthstream_t depthStream;
     sensekit_depth_stream_get(reader, &depthStream);
 
+    float hFov, vFov;
+    sensekit_depth_stream_get_hfov(depthStream, &hFov);
+    sensekit_depth_stream_get_vfov(depthStream, &vFov);
+
+    printf("depth sensor -- hFov: %f radians vFov: %f radians", hFov, vFov);
+
     sensekit_stream_start(depthStream);
 
     sensekit_frame_index_t lastFrameIndex = -1;

@@ -165,16 +165,16 @@ namespace sensekit {
 
         template<typename T>
         T stream(sensekit_stream_subtype_t subType)
-        {
-            sensekit_streamconnection_t connection;
+            {
+                sensekit_streamconnection_t connection;
 
-            sensekit_reader_get_stream(m_readerRef->get(),
-                T::id,
-                subType,
-                &connection);
+                sensekit_reader_get_stream(m_readerRef->get(),
+                                           T::id,
+                                           subType,
+                                           &connection);
 
-            return T(connection);
-        }
+                return T(connection);
+            }
 
         void addListener(FrameReadyListener& listener)
             {
@@ -347,7 +347,10 @@ namespace sensekit {
         DataStream(sensekit_streamconnection_t connection)
             : m_connection(connection)
             {
-                sensekit_stream_get_description(connection, &m_description);
+                if (m_connection != nullptr)
+                {
+                    sensekit_stream_get_description(connection, &m_description);
+                }
             }
 
         bool is_available() { return m_connection != nullptr; }
@@ -367,6 +370,12 @@ namespace sensekit {
                 }
                 sensekit_stream_stop(m_connection);
             }
+
+        bool isValid()
+            {
+                return m_connection != nullptr;
+            }
+
         const StreamDescription& get_description()
             {
                 return static_cast<const StreamDescription&>(m_description);

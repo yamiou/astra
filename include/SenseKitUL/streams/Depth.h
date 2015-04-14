@@ -12,47 +12,25 @@ namespace sensekit {
     class CoordinateMapper
     {
     public:
-        CoordinateMapper(float horizontalFov, float verticalFov, int resolutionX, int resolutionY)
-            {
-                refresh_conversion_cache(horizontalFov, verticalFov, resolutionX, resolutionY);
-            }
-
+        CoordinateMapper(sensekit_depthstream_t depthStream)
+            : m_depthStream(depthStream) {}
         void convert_depth_to_world(float depthX, float depthY, float depthZ,
                                     float* worldX, float* worldY, float* worldZ) const
             {
-                float normalizedX = depthX / m_conversionCache.resolutionX - .5f;
-                float normalizedY = .5f - depthY / m_conversionCache.resolutionY;
-
-                *worldX = normalizedX * depthZ * m_conversionCache.xzFactor;
-                *worldY = normalizedY * depthZ * m_conversionCache.yzFactor;
-                *worldZ = depthZ;
+                sensekit_convert_depth_to_world(m_depthStream, depthX, depthY, depthZ,
+                                                worldX, worldY, worldZ);
             }
 
         void convert_world_to_depth(float worldX, float worldY, float worldZ,
                                     float* depthX, float* depthY, float* depthZ) const
             {
-                *depthX = m_conversionCache.coeffX * worldX / worldZ + m_conversionCache.halfResX;
-                *depthY = m_conversionCache.halfResY - m_conversionCache.coeffY * worldY / worldZ;
-                *depthZ = worldZ;
+                sensekit_convert_world_to_depth(m_depthStream,
+                                                worldX, worldY, worldZ,
+                                                depthX, depthY, depthZ);
             }
 
     private:
-        void refresh_conversion_cache(float horizontalFov,
-                                      float verticalFov,
-                                      int resolutionX,
-                                      int resolutionY)
-            {
-                m_conversionCache.xzFactor = tan(horizontalFov / 2) * 2;
-                m_conversionCache.yzFactor = tan(verticalFov / 2) * 2;
-                m_conversionCache.resolutionX = resolutionX;
-                m_conversionCache.resolutionY = resolutionY;
-                m_conversionCache.halfResX = m_conversionCache.resolutionX / 2;
-                m_conversionCache.halfResY = m_conversionCache.resolutionY / 2;
-                m_conversionCache.coeffX = m_conversionCache.resolutionX / m_conversionCache.xzFactor;
-                m_conversionCache.coeffY = m_conversionCache.resolutionY / m_conversionCache.yzFactor;
-            }
-
-        conversion_cache_t m_conversionCache;
+        sensekit_depthstream_t m_depthStream;
     };
 
     class DepthStream : public DataStream
@@ -60,14 +38,32 @@ namespace sensekit {
     public:
         explicit DepthStream(sensekit_streamconnection_t connection)
             : DataStream(connection),
-              m_coordinateMapper(58.0f, 45.0f, 320, 200) // still the hardest of codings
+              m_depthStream(reinterpret_cast<sensekit_depthstream_t>(connection)),
+              m_coordinateMapper(reinterpret_cast<sensekit_depthstream_t>(connection))
             { }
 
         static const sensekit_stream_type_t id = SENSEKIT_STREAM_DEPTH;
 
         const CoordinateMapper& get_coordinateMapper() const { return m_coordinateMapper; };
+
+        float get_horizontalFieldOfView()
+            {
+                float hFov;
+                sensekit_depth_stream_get_hfov(m_depthStream, &hFov);
+
+                return hFov;
+            }
+
+        float get_verticalFieldOfView()
+            {
+                float vFov;
+                sensekit_depth_stream_get_vfov(m_depthStream, &vFov);
+
+                return vFov;
+            }
     private:
         CoordinateMapper m_coordinateMapper;
+        sensekit_depthstream_t m_depthStream;
     };
 
     class DepthFrame

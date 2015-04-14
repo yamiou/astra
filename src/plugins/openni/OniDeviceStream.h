@@ -4,6 +4,7 @@
 #include <SenseKit/SenseKit.h>
 #include <SenseKit/Plugins/plugin_api.h>
 #include <SenseKit/Plugins/Stream.h>
+#include <SenseKitUL/streams/video_parameters.h>
 #include <OpenNI.h>
 #include <iostream>
 
@@ -78,6 +79,51 @@ namespace sensekit { namespace plugins {
 
             virtual void on_connection_removed(sensekit_bin_t bin,
                                                sensekit_streamconnection_t connection) override;
+
+            virtual void set_parameter(sensekit_streamconnection_t connection,
+                                       sensekit_parameter_id id,
+                                       size_t byteLength,
+                                       sensekit_parameter_data_t* data) override
+                {
+
+                }
+
+            virtual void get_parameter_size(sensekit_streamconnection_t connection,
+                                            sensekit_parameter_id id,
+                                            size_t& byteLength) override
+                {
+                    switch (id)
+                    {
+                    case STREAM_PARAMETER_HFOV:
+                    case STREAM_PARAMETER_VFOV:
+                        byteLength = sizeof(float);
+                        break;
+                    }
+                }
+
+            virtual void get_parameter_data(sensekit_streamconnection_t connection,
+                                            sensekit_parameter_id id,
+                                            size_t byteLength,
+                                            sensekit_parameter_data_t* data) override
+                {
+                    switch (id)
+                    {
+                    case STREAM_PARAMETER_HFOV:
+                    {
+                        assert(byteLength >= sizeof(float));
+                        float* hFov = reinterpret_cast<float*>(data);
+                        *hFov = m_oniStream.getHorizontalFieldOfView();
+                        break;
+                    }
+                    case STREAM_PARAMETER_VFOV:
+                    {
+                        assert(byteLength >= sizeof(float));
+                        float* vFov = reinterpret_cast<float*>(data);
+                        *vFov = m_oniStream.getVerticalFieldOfView();
+                        break;
+                    }
+                    }
+                }
 
             virtual void on_new_buffer(sensekit_frame_t* newBuffer,
                                        wrapper_type* wrapper) { }

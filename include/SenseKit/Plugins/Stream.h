@@ -35,20 +35,6 @@ namespace sensekit { namespace plugins {
             inline const StreamDescription& get_description() { return m_description; }
 
         private:
-            virtual void set_parameter(sensekit_streamconnection_t connection,
-                                       sensekit_parameter_id id,
-                                       size_t byteLength,
-                                       sensekit_parameter_data_t* data) final;
-
-            virtual void get_parameter_size(sensekit_streamconnection_t connection,
-                                            sensekit_parameter_id id,
-                                            size_t& byteLength) override;
-
-            virtual void get_parameter_data(sensekit_streamconnection_t connection,
-                                            sensekit_parameter_id id,
-                                            size_t byteLength,
-                                            sensekit_parameter_data_t* data) final;
-
             virtual void connection_added(sensekit_stream_t stream,
                                           sensekit_streamconnection_t connection) final;
 
@@ -141,23 +127,6 @@ namespace sensekit { namespace plugins {
                     return hasConnections;
                 }
         };
-
-        inline void Stream::set_parameter(sensekit_streamconnection_t streamConnection,
-                                          sensekit_parameter_id id,
-                                          size_t byteLength,
-                                          sensekit_parameter_data_t* data)
-        { }
-
-        inline void Stream::get_parameter_size(sensekit_streamconnection_t streamConnection,
-                                               sensekit_parameter_id id,
-                                               size_t& byteLength)
-        { }
-
-        inline void Stream::get_parameter_data(sensekit_streamconnection_t streamConnection,
-                                               sensekit_parameter_id id,
-                                               size_t byteLength,
-                                               sensekit_parameter_data_t* data)
-        { }
 
         inline void Stream::connection_added(sensekit_stream_t stream,
                                              sensekit_streamconnection_t connection)

@@ -11,7 +11,7 @@ class SegmentationUtility
 public:
     static cv::Point convergeTrackPointFromSeed(TrackingData data);
 
-    static void calculateSegmentArea(cv::Mat& matDepth, cv::Mat& matArea, const float resizeFactor);
+    static void calculateSegmentArea(cv::Mat& matDepth, cv::Mat& matArea, const CoordinateConverter& converter);
     static void calculateEdgeDistance(cv::Mat& matSegmentation, cv::Mat& matArea, cv::Mat& matEdgeDistance);
 
     static void calculateBasicScore(cv::Mat& matDepth, cv::Mat& matScore, const float heightFactor, const float depthFactor, const CoordinateConverter& converter);

@@ -238,7 +238,7 @@ void SegmentationUtility::calculateEdgeDistance(cv::Mat& matSegmentation, cv::Ma
     } while (!done && nonZeroCount < imageLength && ++iterations < maxIterations);
 }
 
-void SegmentationUtility::calculateSegmentArea(cv::Mat& matDepth, cv::Mat& matArea, const float resizeFactor)
+void SegmentationUtility::calculateSegmentArea(cv::Mat& matDepth, cv::Mat& matArea, const CoordinateConverter& converter)
 {
     int width = matDepth.cols;
     int height = matDepth.rows;
@@ -263,8 +263,8 @@ void SegmentationUtility::calculateSegmentArea(cv::Mat& matDepth, cv::Mat& matAr
                 cv::Point3f p3(x, y + 1, depth1);
                 cv::Point3f p4(x + 1, y + 1, depth1);
 
-                area += getDepthArea(p1, p2, p3, resizeFactor);
-                area += getDepthArea(p2, p3, p4, resizeFactor);
+                area += getDepthArea(p1, p2, p3, converter);
+                area += getDepthArea(p2, p3, p4, converter);
             }
 
             *areaRow = area;

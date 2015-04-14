@@ -110,7 +110,8 @@ void SampleViewer::run()      //Does not return
     glutMainLoop();
 }
 
-void SampleViewer::calculateNormals(sensekit_depthframe_t& frame, sensekit_depthframe_metadata_t metadata)
+void SampleViewer::calculateNormals(sensekit_depthframe_t& frame,
+                                    sensekit_depthframe_metadata_t metadata)
 {
     int16_t* depthData;
     size_t depthLength;
@@ -162,9 +163,9 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame, sensekit_depth
                 float worldX1, worldY1, worldZ1;
                 float worldX2, worldY2, worldZ2;
                 float worldX3, worldY3, worldZ3;
-                convert_depth_to_world(x, y, depth, &worldX1, &worldY1, &worldZ1);
-                convert_depth_to_world(x + 1, y, depthRight, &worldX2, &worldY2, &worldZ2);
-                convert_depth_to_world(x, y + 1, depthDown, &worldX3, &worldY3, &worldZ3);
+                sensekit_convert_depth_to_world(m_depthStream, x, y, depth, &worldX1, &worldY1, &worldZ1);
+                sensekit_convert_depth_to_world(m_depthStream, x + 1, y, depthRight, &worldX2, &worldY2, &worldZ2);
+                sensekit_convert_depth_to_world(m_depthStream, x, y + 1, depthDown, &worldX3, &worldY3, &worldZ3);
 
                 Vector3 v1 = Vector3(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
                 Vector3 v2 = Vector3(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
@@ -180,9 +181,9 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame, sensekit_depth
                 float worldX1, worldY1, worldZ1;
                 float worldX2, worldY2, worldZ2;
                 float worldX3, worldY3, worldZ3;
-                convert_depth_to_world(x, y, depth, &worldX1, &worldY1, &worldZ1);
-                convert_depth_to_world(x, y - 1, depthUp, &worldX2, &worldY2, &worldZ2);
-                convert_depth_to_world(x + 1, y, depthRight, &worldX3, &worldY3, &worldZ3);
+                sensekit_convert_depth_to_world(m_depthStream, x, y, depth, &worldX1, &worldY1, &worldZ1);
+                sensekit_convert_depth_to_world(m_depthStream, x, y - 1, depthUp, &worldX2, &worldY2, &worldZ2);
+                sensekit_convert_depth_to_world(m_depthStream, x + 1, y, depthRight, &worldX3, &worldY3, &worldZ3);
 
                 Vector3 v1 = Vector3(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
                 Vector3 v2 = Vector3(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
@@ -200,9 +201,9 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame, sensekit_depth
                 float worldX1, worldY1, worldZ1;
                 float worldX2, worldY2, worldZ2;
                 float worldX3, worldY3, worldZ3;
-                convert_depth_to_world(x, y, depth, &worldX1, &worldY1, &worldZ1);
-                convert_depth_to_world(x - 1, y, depthLeft, &worldX2, &worldY2, &worldZ2);
-                convert_depth_to_world(x, y - 1, depthUp, &worldX3, &worldY3, &worldZ3);
+                sensekit_convert_depth_to_world(m_depthStream, x, y, depth, &worldX1, &worldY1, &worldZ1);
+                sensekit_convert_depth_to_world(m_depthStream, x - 1, y, depthLeft, &worldX2, &worldY2, &worldZ2);
+                sensekit_convert_depth_to_world(m_depthStream, x, y - 1, depthUp, &worldX3, &worldY3, &worldZ3);
 
                 Vector3 v1 = Vector3(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
                 Vector3 v2 = Vector3(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
@@ -219,9 +220,9 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame, sensekit_depth
                 float worldX1, worldY1, worldZ1;
                 float worldX2, worldY2, worldZ2;
                 float worldX3, worldY3, worldZ3;
-                convert_depth_to_world(x, y, depth, &worldX1, &worldY1, &worldZ1);
-                convert_depth_to_world(x, y + 1, depthDown, &worldX2, &worldY2, &worldZ2);
-                convert_depth_to_world(x - 1, y, depthLeft, &worldX3, &worldY3, &worldZ3);
+                sensekit_convert_depth_to_world(m_depthStream, x, y, depth, &worldX1, &worldY1, &worldZ1);
+                sensekit_convert_depth_to_world(m_depthStream, x, y + 1, depthDown, &worldX2, &worldY2, &worldZ2);
+                sensekit_convert_depth_to_world(m_depthStream, x - 1, y, depthLeft, &worldX3, &worldY3, &worldZ3);
 
                 Vector3 v1 = Vector3(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
                 Vector3 v2 = Vector3(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);

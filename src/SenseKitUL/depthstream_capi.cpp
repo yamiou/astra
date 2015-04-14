@@ -1,64 +1,47 @@
 #include <SenseKit/sensekit_types.h>
 #include "generic_stream_api.h"
 #include <SenseKitUL/streams/depth_types.h>
-#include <math.h>
 #include <memory.h>
 #include <SenseKitUL/StreamTypes.h>
 #include <SenseKitUL/Plugins/stream_types.h>
+#include <SenseKitUL/streams/video_parameters.h>
+#include <SenseKitUL/streams/depth_parameters.h>
 #include <string.h>
-
-static conversion_cache_t g_conversionCache;
-
-static void refresh_conversion_cache()
-{
-    // the hardest of codings PART DEUX
-
-    static bool is_cached = false;
-
-    if (is_cached)
-        return;
-
-    float horizontalFov = 58.0f;
-    float verticalFov = 45.0f;
-    int resolutionX = 320;
-    int resolutionY = 240;
-
-    g_conversionCache.xzFactor = tan(horizontalFov / 2) * 2;
-    g_conversionCache.yzFactor = tan(verticalFov / 2) * 2;
-    g_conversionCache.resolutionX = resolutionX;
-    g_conversionCache.resolutionY = resolutionY;
-    g_conversionCache.halfResX = g_conversionCache.resolutionX / 2;
-    g_conversionCache.halfResY = g_conversionCache.resolutionY / 2;
-    g_conversionCache.coeffX = g_conversionCache.resolutionX / g_conversionCache.xzFactor;
-    g_conversionCache.coeffY = g_conversionCache.resolutionY / g_conversionCache.yzFactor;
-
-    is_cached = true;
-}
 
 SENSEKIT_BEGIN_DECLS
 
-SENSEKIT_API_EX sensekit_status_t convert_depth_to_world(float depthX, float depthY, float depthZ,
-                                                         float* pWorldX, float* pWorldY, float* pWorldZ)
+SENSEKIT_API_EX sensekit_status_t sensekit_convert_depth_to_world(sensekit_depthstream_t depthStream,
+                                                                  float depthX, float depthY, float depthZ,
+                                                                  float* pWorldX, float* pWorldY, float* pWorldZ)
 {
-    refresh_conversion_cache();
+    conversion_cache_t conversionCache;
+    sensekit_stream_get_parameter_data(depthStream,
+                                       DEPTH_PARAMETER_CONVERSION_CACHE,
+                                       sizeof(conversion_cache_t),
+                                       reinterpret_cast<sensekit_parameter_data_t*>(&conversionCache));
 
-    float normalizedX = depthX / g_conversionCache.resolutionX - .5f;
-    float normalizedY = .5f - depthY / g_conversionCache.resolutionY;
+    float normalizedX = depthX / conversionCache.resolutionX - .5f;
+    float normalizedY = .5f - depthY / conversionCache.resolutionY;
 
-    *pWorldX = normalizedX * depthZ * g_conversionCache.xzFactor;
-    *pWorldY = normalizedY * depthZ * g_conversionCache.yzFactor;
+    *pWorldX = normalizedX * depthZ * conversionCache.xzFactor;
+    *pWorldY = normalizedY * depthZ * conversionCache.yzFactor;
     *pWorldZ = depthZ;
 
     return SENSEKIT_STATUS_SUCCESS;
 }
 
-SENSEKIT_API_EX sensekit_status_t convert_world_to_depth(float worldX, float worldY, float worldZ,
-                                                         float* pDepthX, float* pDepthY, float* pDepthZ)
+SENSEKIT_API_EX sensekit_status_t sensekit_convert_world_to_depth(sensekit_depthstream_t depthStream,
+                                                                  float worldX, float worldY, float worldZ,
+                                                                  float* pDepthX, float* pDepthY, float* pDepthZ)
 {
-    refresh_conversion_cache();
+    conversion_cache_t conversionCache;
+    sensekit_stream_get_parameter_data(depthStream,
+                                       DEPTH_PARAMETER_CONVERSION_CACHE,
+                                       sizeof(conversion_cache_t),
+                                       reinterpret_cast<sensekit_parameter_data_t*>(&conversionCache));
 
-    *pDepthX = g_conversionCache.coeffX * worldX / worldZ + g_conversionCache.halfResX;
-    *pDepthY = g_conversionCache.halfResY - g_conversionCache.coeffY * worldY / worldZ;
+    *pDepthX = conversionCache.coeffX * worldX / worldZ + conversionCache.halfResX;
+    *pDepthY = conversionCache.halfResY - conversionCache.coeffY * worldY / worldZ;
     *pDepthZ = worldZ;
 
     return SENSEKIT_STATUS_SUCCESS;
@@ -73,6 +56,24 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get(sensekit_reader_t re
                                        SENSEKIT_STREAM_DEPTH,
                                        DEFAULT_SUBTYPE,
                                        depthStream);
+}
+
+SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get_hfov(sensekit_depthstream_t depthStream,
+                                                                 float* hFov)
+{
+    return sensekit_stream_get_parameter_data(depthStream,
+                                              STREAM_PARAMETER_HFOV,
+                                              sizeof(float),
+                                              reinterpret_cast<sensekit_parameter_data_t*>(hFov));
+}
+
+SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get_vfov(sensekit_depthstream_t depthStream,
+                                                                 float* vFov)
+{
+    return sensekit_stream_get_parameter_data(depthStream,
+                                              STREAM_PARAMETER_VFOV,
+                                              sizeof(float),
+                                              reinterpret_cast<sensekit_parameter_data_t*>(vFov));
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_depth_frame_get(sensekit_reader_frame_t readerFrame,

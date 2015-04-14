@@ -40,9 +40,8 @@ namespace sensekit
                                      StreamDescription& depthDescription) :
                 m_pluginService(pluginService),
                 m_depthUtility(PROCESSING_SIZE_WIDTH, PROCESSING_SIZE_HEIGHT),
-                m_converter(1.0),
-                m_pointProcessor(m_converter),
-                m_reader(streamset.create_reader())
+                m_reader(streamset.create_reader()),
+                m_depthStream(nullptr)
             {
                 create_streams(pluginService, streamset);
 
@@ -79,7 +78,11 @@ namespace sensekit
 
             void HandTracker::subscribe_to_depth_stream(Sensor& streamset, StreamDescription& depthDescription)
             {
-                m_reader.stream<DepthStream>(depthDescription.get_subType()).start();
+                m_depthStream = m_reader.stream<DepthStream>(depthDescription.get_subType());
+                m_depthStream.start();
+                m_converter = std::make_unique<CoordinateConverter>(m_depthStream, 1.0f);
+                m_pointProcessor = std::make_unique<PointProcessor>(*(m_converter.get()));
+
                 m_reader.addListener(*this);
             }
 
@@ -124,7 +127,7 @@ namespace sensekit
                     handFrame->frame.handpoints = reinterpret_cast<sensekit_handpoint_t*>(&(handFrame->frame_data));
                     handFrame->frame.numHands = SENSEKIT_HANDS_MAX_HANDPOINTS;
 
-                    update_hand_frame(m_pointProcessor.get_trackedPoints(), handFrame->frame);
+                    update_hand_frame(m_pointProcessor->get_trackedPoints(), handFrame->frame);
 
                     m_handStream->end_write();
                 }
@@ -176,26 +179,26 @@ namespace sensekit
                 float heightFactor = 1;
                 float depthFactor = 1.5;
 
-                SegmentationUtility::calculateBasicScore(matDepth, matScore, heightFactor, depthFactor, m_resizeFactor);
-                SegmentationUtility::calculateSegmentArea(matDepth, matArea, m_resizeFactor);
+                SegmentationUtility::calculateBasicScore(matDepth, matScore, heightFactor, depthFactor, *(m_converter.get()));
+                SegmentationUtility::calculateSegmentArea(matDepth, matArea, *(m_converter.get()));
 
                 cv::Mat foregroundCopy = matForeground.clone();
 
                 TrackingMatrices matrices(matDepth, matArea, matScore, matForeground, layerSegmentation);
 
-                m_pointProcessor.updateTrackedPoints(matrices);
+                m_pointProcessor->updateTrackedPoints(matrices);
 
-                m_pointProcessor.removeDuplicatePoints();
+                m_pointProcessor->removeDuplicatePoints();
 
                 cv::Point seedPosition;
                 //add new points (unless already tracking)
                 while (SegmentationUtility::findForegroundPixel(foregroundCopy, seedPosition))
                 {
-                    m_pointProcessor.updateTrackedPointOrCreateNewPointFromSeedPosition(matrices, seedPosition);
+                    m_pointProcessor->updateTrackedPointOrCreateNewPointFromSeedPosition(matrices, seedPosition);
                 }
 
                 //remove old points
-                m_pointProcessor.removeOldOrDeadPoints();
+                m_pointProcessor->removeOldOrDeadPoints();
             }
 
             void HandTracker::update_hand_frame(vector<TrackedPoint>& internalTrackedPoints, _sensekit_handframe& frame)
@@ -271,7 +274,7 @@ namespace sensekit
             {
                 m_debugVisualizer.showDepthMat(m_matDepth,
                                                m_matForeground,
-                                               m_pointProcessor.get_trackedPoints(),
+                                               m_pointProcessor->get_trackedPoints(),
                                                colorFrame);
             }
         }

@@ -1,0 +1,10 @@
+#ifndef VIDEO_PARAMETERS_H
+#define VIDEO_PARAMETERS_H
+
+enum
+{
+    STREAM_PARAMETER_HFOV = 0,
+    STREAM_PARAMETER_VFOV = 1
+};
+
+#endif /* VIDEO_PARAMETERS_H */

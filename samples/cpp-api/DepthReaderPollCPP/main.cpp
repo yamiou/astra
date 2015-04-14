@@ -73,7 +73,7 @@ private:
 int main(int argc, char** argv)
 {
     sensekit_initialize();
- 
+
     set_key_handler();
 
     sensekit::Sensor sensor;
@@ -83,6 +83,13 @@ int main(int argc, char** argv)
 
     reader.stream<sensekit::DepthStream>().start();
 
+    std::cout << "depthStream -- hFov: "
+              << reader.stream<sensekit::DepthStream>().get_horizontalFieldOfView()
+              << " vFov: "
+              << reader.stream<sensekit::DepthStream>().get_verticalFieldOfView()
+              << std::endl;
+
+
     reader.addListener(listener);
 
     do
@@ -91,6 +98,6 @@ int main(int argc, char** argv)
     } while (shouldContinue);
 
     reader.removeListener(listener);
-    
+
     sensekit_terminate();
 }
