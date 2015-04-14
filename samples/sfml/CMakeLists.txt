@@ -2,7 +2,7 @@ set (DepthViewer_SOURCES
   main.cpp
   )
 
-find_package(SFML COMPONENTS graphics window system audio)
+find_package(SFML COMPONENTS graphics window system)
 
 add_executable(DepthViewer ${DepthViewer_SOURCES})
 
