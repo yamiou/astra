@@ -90,15 +90,15 @@ int main(int argc, char** argv)
 {
     sensekit::SenseKit::initialize();
 
-    sf::RenderWindow window(sf::VideoMode(1280, 960), "Depth Viewer");
+    sf::RenderWindow window(sf::VideoMode(1280, 960), "Hand Viewer");
 
     sensekit::Sensor sensor;
     sensekit::StreamReader reader = sensor.create_reader();
 
     SampleFrameListener listener;
-
+    
     reader.stream<sensekit::DepthStream>().start();
-
+    reader.stream<sensekit::HandStream>().start();
     reader.addListener(listener);
 
     while (window.isOpen())

@@ -4,14 +4,15 @@ set(${_projname}_SOURCES
   ../../include/SenseKitUL/SenseKitUL.h
   ../../include/SenseKitUL/skul_capi.h
   ../../include/SenseKitUL/StreamTypes.h
-  ../../include/SenseKitUL/streams/depth.h
+  ../../include/SenseKitUL/streams/Depth.h
   ../../include/SenseKitUL/streams/depth_capi.h
   ../../include/SenseKitUL/streams/depth_types.h
-  ../../include/SenseKitUL/streams/color.h
+  ../../include/SenseKitUL/streams/Color.h
   ../../include/SenseKitUL/streams/color_capi.h
   ../../include/SenseKitUL/streams/color_types.h
-  ../../include/SenseKitUL/streams/hand_types.h
+  ../../include/SenseKitUL/streams/Hand.h
   ../../include/SenseKitUL/streams/hand_capi.h
+  ../../include/SenseKitUL/streams/hand_types.h
   depthstream_capi.cpp
   colorstream_capi.cpp
   hand_capi.cpp
