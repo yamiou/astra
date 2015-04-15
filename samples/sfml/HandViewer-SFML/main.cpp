@@ -2,24 +2,23 @@
 #include <Sensekit/SenseKit.h>
 #include <SensekitUL/SenseKitUL.h>
 
-class SampleFrameListener : public sensekit::FrameReadyListener
+class HandFrameListener : public sensekit::FrameReadyListener
 {
 public:
     void init_texture(int width, int height)
     {
-        if (m_depthVizBuffer == nullptr || width != m_width || height != m_height)
+        if (m_depthVizBuffer == nullptr || width != m_depthWidth || height != m_depthHeight)
         {
-            m_width = width;
-            m_height = height;
-            int byteLength = m_width * m_height * 4;
+            m_depthWidth = width;
+            m_depthHeight = height;
+            int byteLength = m_depthWidth * m_depthHeight * 4;
 
             m_depthVizBuffer = DepthPtr(new uint8_t[byteLength]);
             memset(m_depthVizBuffer.get(), 0, byteLength);
 
-            m_texture.create(m_width, m_height);
+            m_texture.create(m_depthWidth, m_depthHeight);
             m_sprite.setTexture(m_texture);
             m_sprite.setPosition(0, 0);
-            m_sprite.setScale(2, 2);
         }
     }
 
@@ -70,13 +69,16 @@ public:
         size_t numHands = handFrame.get_numHands();
         const sensekit_handpoint_t* hands = handFrame.hands();
 
+        m_handPositions.clear();
+
         for (int i = 0; i < numHands; i++)
         {
             auto& hand = *hands;
 
             if (hand.status == HAND_STATUS_TRACKING)
             {
-                
+                auto position = new sensekit::Vector2f(hand.depthPosition.x, hand.depthPosition.y);
+                m_handPositions.push_back(Vector2fPtr(position));
             }
 
             ++hands;
@@ -88,6 +90,14 @@ public:
         {
             processDepth(frame);
             processHands(frame);
+
+            /*m_handPositions.clear();
+
+            m_handPositions.push_back(Vector2fPtr(new sensekit::Vector2f(0, 0)));
+            m_handPositions.push_back(Vector2fPtr(new sensekit::Vector2f(320, 0)));
+            m_handPositions.push_back(Vector2fPtr(new sensekit::Vector2f(320, 240)));
+            m_handPositions.push_back(Vector2fPtr(new sensekit::Vector2f(160, 120)));
+            */
             check_fps();
         }
 
@@ -102,16 +112,30 @@ public:
         window.draw(shape);
     }
 
+    void drawHands(sf::RenderWindow& window)
+    {
+        float radius = 25;
+        auto size = window.getSize();
+        sf::Color color(100, 250, 50);
+        
+        for (auto p : m_handPositions)
+        {
+            drawCircle(window, radius, p->x * m_scale, p->y * m_scale, color);
+        }
+    }
     void drawTo(sf::RenderWindow& window)
         {
+            m_scale = window.getSize().x / m_depthWidth;
+
+            m_sprite.setScale(m_scale, m_scale);
+
             window.draw(m_sprite);
-            float radius = 50;
-            auto size = window.getSize();
-            sf::Color color(100, 250, 50);
-            drawCircle(window, radius, size.x/2, size.y/2, color);
+
+            drawHands(window);
         }
 
 private:
+    float m_scale{ 2 };
     long double m_frameDuration{ 0 };
     std::clock_t m_lastTimepoint { 0 };
     sf::Texture m_texture;
@@ -119,9 +143,14 @@ private:
 
     using DepthPtr = std::unique_ptr < uint8_t[] >;
     DepthPtr m_depthVizBuffer{ nullptr };
+
+    using Vector2fPtr = std::shared_ptr < sensekit::Vector2f > ;
+    using Vector2fList = std::vector < Vector2fPtr > ;
+
+    Vector2fList m_handPositions;
     
-    int m_width { 0 };
-    int m_height { 0 };
+    int m_depthWidth { 0 };
+    int m_depthHeight { 0 };
 };
 
 int main(int argc, char** argv)
@@ -133,7 +162,7 @@ int main(int argc, char** argv)
     sensekit::Sensor sensor;
     sensekit::StreamReader reader = sensor.create_reader();
 
-    SampleFrameListener listener;
+    HandFrameListener listener;
     
     reader.stream<sensekit::DepthStream>().start();
     reader.stream<sensekit::HandStream>().start();
