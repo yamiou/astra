@@ -4,6 +4,9 @@ set(${_projname}_SOURCES
   ../../include/SenseKitUL/SenseKitUL.h
   ../../include/SenseKitUL/skul_capi.h
   ../../include/SenseKitUL/StreamTypes.h
+  ../../include/SenseKitUL/vectorx.h
+  ../../include/SenseKitUL/vector2.h
+  ../../include/SenseKitUL/vector3.h
   ../../include/SenseKitUL/streams/Depth.h
   ../../include/SenseKitUL/streams/depth_capi.h
   ../../include/SenseKitUL/streams/depth_types.h
