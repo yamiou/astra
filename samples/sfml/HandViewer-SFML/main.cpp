@@ -13,13 +13,8 @@ public:
             m_height = height;
             int byteLength = m_width * m_height * 4;
 
-            if (m_depthVizBuffer != nullptr)
-            {
-                delete[] m_depthVizBuffer;
-            }
-
-            m_depthVizBuffer = new uint8_t[byteLength];
-            memset(m_depthVizBuffer, 0, byteLength);
+            m_depthVizBuffer = DepthPtr(new uint8_t[byteLength]);
+            memset(m_depthVizBuffer.get(), 0, byteLength);
 
             m_texture.create(m_width, m_height);
             m_sprite.setTexture(m_texture);
@@ -66,7 +61,7 @@ public:
             }
         }
 
-        m_texture.update(m_depthVizBuffer);
+        m_texture.update(m_depthVizBuffer.get());
     }
 
     void processHands(sensekit::Frame& frame)
@@ -93,7 +88,9 @@ private:
     std::clock_t m_lastTimepoint { 0 };
     sf::Texture m_texture;
     sf::Sprite m_sprite;
-    uint8_t* m_depthVizBuffer { nullptr };
+
+    using DepthPtr = std::unique_ptr < uint8_t[] >;
+    DepthPtr m_depthVizBuffer{ nullptr };
     
     int m_width { 0 };
     int m_height { 0 };
@@ -122,6 +119,8 @@ int main(int argc, char** argv)
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
+                window.close();
+            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
                 window.close();
         }
 

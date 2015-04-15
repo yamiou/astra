@@ -107,6 +107,8 @@ int main(int argc, char** argv)
         {
             if (event.type == sf::Event::Closed)
                 window.close();
+            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
+                window.close();
         }
 
         // clear the window with black color
