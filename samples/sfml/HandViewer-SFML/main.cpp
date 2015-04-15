@@ -67,7 +67,20 @@ public:
     void processHands(sensekit::Frame& frame)
     {
         sensekit::HandFrame handFrame = frame.get<sensekit::HandFrame>();
+        size_t numHands = handFrame.get_numHands();
+        const sensekit_handpoint_t* hands = handFrame.hands();
 
+        for (int i = 0; i < numHands; i++)
+        {
+            auto& hand = *hands;
+
+            if (hand.status == HAND_STATUS_TRACKING)
+            {
+                
+            }
+
+            ++hands;
+        }
     }
 
     virtual void on_frame_ready(sensekit::StreamReader& reader,
@@ -78,9 +91,24 @@ public:
             check_fps();
         }
 
+    void drawCircle(sf::RenderWindow& window, float radius, float x, float y, sf::Color color)
+    {
+        sf::CircleShape shape(radius);
+
+        shape.setFillColor(color);
+
+        shape.setOrigin(radius, radius);
+        shape.setPosition(x, y);
+        window.draw(shape);
+    }
+
     void drawTo(sf::RenderWindow& window)
         {
             window.draw(m_sprite);
+            float radius = 50;
+            auto size = window.getSize();
+            sf::Color color(100, 250, 50);
+            drawCircle(window, radius, size.x/2, size.y/2, color);
         }
 
 private:
