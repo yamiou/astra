@@ -7,16 +7,16 @@ class SampleFrameListener : public sensekit::FrameReadyListener
 public:
     void init_texture(int width, int height)
     {
-        if (m_depthVizBuffer == nullptr || width != m_width || height != m_height)
+        if (m_depthVizBuffer == nullptr || width != m_depthWidth || height != m_depthHeight)
         {
-            m_width = width;
-            m_height = height;
-            int byteLength = m_width * m_height * 4;
+            m_depthWidth = width;
+            m_depthHeight = height;
+            int byteLength = m_depthWidth * m_depthHeight * 4;
 
             m_depthVizBuffer = DepthPtr( new uint8_t[byteLength] );
             memset(m_depthVizBuffer.get(), 0, byteLength);
 
-            m_texture.create(m_width, m_height);
+            m_texture.create(m_depthWidth, m_depthHeight);
             m_sprite.setTexture(m_texture);
             m_sprite.setPosition(0, 0);
             m_sprite.setScale(2, 2);
@@ -79,8 +79,8 @@ private:
     
     using DepthPtr = std::unique_ptr < uint8_t[] > ;
     DepthPtr m_depthVizBuffer { nullptr };
-    int m_width { 0 };
-    int m_height { 0 };
+    int m_depthWidth { 0 };
+    int m_depthHeight { 0 };
 };
 
 int main(int argc, char** argv)
