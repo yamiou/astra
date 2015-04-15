@@ -59,6 +59,10 @@ is replaced with replacement."
        when pos do (write-string replacement out)
        while pos)))
 
+(defun back-to-forward-slashes (str)
+  (replace-all str "\\" "/")
+)
+
 (defun is-arg-set (target-arg args)
   (not (null (find target-arg args :test 'equal))))
 
@@ -305,8 +309,6 @@ is replaced with replacement."
 
 (defun _ () (load "lpp.cl" :verbose nil))
 
-(defparameter *pp-cache* '())
-
 (defun process (dir)
   (let* ((target-directory (if (null dir)
                                (ext:cd)
@@ -314,24 +316,40 @@ is replaced with replacement."
          (cache-file-path (cl-fad:merge-pathnames-as-file
                            (cl-fad:pathname-as-directory target-directory)
                            ".pp-modification-cache.cl"))
-         (_ (load cache-file-path :if-does-not-exist nil))
-         (cache-file (open cache-file-path :direction :output :if-does-not-exist :create :if-exists :overwrite)))
+         (pp-cache (with-open-file (fsi cache-file-path :if-does-not-exist nil)
+                      (cond ((null fsi) (make-hash-table :test 'equal) )
+                            (t (let ((data (read fsi nil)))
+                                  (if (hash-table-p data)
+                                      data
+                                      (make-hash-table :test 'equal)
+                                   )
+                               ))
+                      )
+                   ))
+        )
     (write-line (format nil "Base directory: ~A~%" target-directory))
-    (write-line "(defparameter *pp-cache* '(" cache-file)
-
     (mapc-directory-tree (lambda (x)
                            (when (equal (pathname-type x) preprocessor-file-extension)
-                             (let* ((cache-modify (cdr (assoc (format nil "~A" x) *pp-cache* :test #'string=)))
-                                    (cache-modify (if (null cache-modify) 0 cache-modify))
+                             (let* ((fwd-path (back-to-forward-slashes (namestring x)))
+                                    (cache-modify (gethash fwd-path pp-cache 0))
                                     (last-modify (posix:file-stat-mtime (posix:file-stat x))))
-                               (write-line (format nil "(\"~A\" . ~A)" x last-modify) cache-file)
                                (when (> last-modify cache-modify)
                                  (write-line (format nil "~A => ~A"
                                                      (enough-namestring x target-directory)
-                                                     (in-to-out-filename (file-namestring x))))
-                                 (process-file (namestring x))))))
+                                                     (in-to-out-filename (file-namestring x))
+                                             ))
+                                  
+                                 (process-file (namestring x))
+                                 (setf (gethash fwd-path pp-cache) last-modify)
+                               )
+                             )
+                           )
+                         )
                          target-directory)
-    (write-line "))" cache-file)
-    (close cache-file)))
+    (with-open-file (fso cache-file-path :direction :output :if-does-not-exist :create :if-exists :supersede)
+      (write pp-cache :stream fso)
+    )
+  )
+)
 
 (process (car *args*))
