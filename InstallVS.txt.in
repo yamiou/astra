@@ -7,6 +7,8 @@ set(SAMPLES_BUILD_TEMP_DIR "@SAMPLES_BUILD_TEMP_DIR@")
 MESSAGE("Configuring sdk sample VS2013 projects...")
 MESSAGE("SAMPLES_SOURCE_DIR: ${SAMPLES_SOURCE_DIR}")
 
+file(REMOVE_RECURSE ${SAMPLES_BUILD_TEMP_DIR})
+
 configure_file("${PROJECT_SOURCE_DIR}/samples-aux/CMakeCache.txt.in"
                "${SAMPLES_BUILD_TEMP_DIR}/CMakeCache.txt"
                @ONLY)
