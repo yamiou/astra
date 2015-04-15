@@ -8,6 +8,10 @@
 
 namespace sensekit {
 
+    class HandPoint
+    {
+        
+    };
     class HandStream : public DataStream
     {
     public:
