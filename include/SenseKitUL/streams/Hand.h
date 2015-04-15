@@ -10,7 +10,12 @@ namespace sensekit {
 
     class HandPoint
     {
-        
+    public:
+        explicit HandPoint(sensekit_handpoint_t handPoint)
+            : m_handPoint(handPoint) { }
+
+    private:
+        sensekit_handpoint_t m_handPoint;
     };
     class HandStream : public DataStream
     {
