@@ -1,4 +1,4 @@
-set (_projname "DepthReaderPollCPP")
+set (_projname "DepthReaderEventCPP")
 
 set (${_projname}_SOURCES
   main.cpp

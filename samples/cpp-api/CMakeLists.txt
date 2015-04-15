@@ -1,1 +1,1 @@
-add_subdirectory(DepthReaderPollCPP)
+add_subdirectory(DepthReaderEventCPP)
