@@ -17,7 +17,7 @@ set(${_projname}_SOURCES
   hands_plugin.h
 )
 
-find_package( OpenCV REQUIRED )
+find_package( OpenCV REQUIRED core imgproc)
 
 add_library(${_projname} SHARED ${${_projname}_SOURCES})
 
