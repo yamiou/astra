@@ -1,4 +1,6 @@
-set(SenseKit_SOURCES
+set (_projname "SenseKit")
+
+set(${_projname}_SOURCES
   ../../include/SenseKit/SenseKit.h
   ../../include/SenseKit/sensekit_capi.h
   ../../include/SenseKit/sensekit_defines.h
@@ -38,7 +40,7 @@ set(SenseKit_SOURCES
   Core/shared_library_windows.cpp
   )
 
-set(SenseKit_SOURCES_GEN
+set(${_projname}_SOURCES_GEN
   SenseKitContext.h.lpp
   StreamServiceDelegate.h.lpp
   SenseKit.cpp.lpp
@@ -55,24 +57,20 @@ set(SenseKit_SOURCES_GEN
 
 include_directories(${PROJECT_SOURCE_DIR}/src/SenseKitAPI)
 
-source_group(templates FILES ${SenseKit_SOURCES_GEN})
+source_group(templates FILES ${${_projname}_SOURCES_GEN})
 
 add_definitions(-DSENSEKIT_BUILD)
 
-add_library(SenseKit SHARED ${SenseKit_SOURCES} ${SenseKit_SOURCES_GEN})
+add_library(${_projname} SHARED ${${_projname}_SOURCES} ${${_projname}_SOURCES_GEN})
 
-# force c++11 (has no effect currently)
-#set_property(TARGET SenseKit PROPERTY CXX_STANDARD 11)
-#set_property(TARGET SenseKit PROPERTY CXX_STANDARD_REQUIRED ON)
-
-target_link_libraries(SenseKit SenseKitAPI)
+target_link_libraries(${_projname} SenseKitAPI)
 
 add_subdirectory(Core/tests)
 
-install(TARGETS SenseKit
+install(TARGETS ${_projname}
         RUNTIME DESTINATION bin/
         LIBRARY DESTINATION bin/
         ARCHIVE DESTINATION lib/
         )
 
-install_pdb(SenseKit bin/)
+install_pdb(${_projname} bin/)

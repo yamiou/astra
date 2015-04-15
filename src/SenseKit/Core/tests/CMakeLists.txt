@@ -1,8 +1,10 @@
-set(SenseKit_TESTS
+set (_projname "SenseKitTests")
+
+set(${_projname}_TESTS
   signal_tests.cpp)
 
-add_executable(SenseKitTests ${SenseKit_TESTS})
+add_executable(${_projname} ${${_projname}_TESTS})
 
-set_target_properties(SenseKitTests PROPERTIES FOLDER "tests")
+set_target_properties(${_projname} PROPERTIES FOLDER "tests")
 
-target_link_libraries(SenseKitTests SenseKit)
+target_link_libraries(${_projname} SenseKit)

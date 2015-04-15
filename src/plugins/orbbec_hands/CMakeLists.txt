@@ -1,4 +1,6 @@
-set(orbbec_hands_SOURCES
+set (_projname "orbbec_hands")
+
+set(${_projname}_SOURCES
   handtracker.cpp
   handtracker.h
   debugvisualizer.h
@@ -20,17 +22,17 @@ set(orbbec_hands_SOURCES
 
 find_package( OpenCV REQUIRED )
 
-add_library(orbbec_hands SHARED ${orbbec_hands_SOURCES})
+add_library(${_projname} SHARED ${${_projname}_SOURCES})
 
-set_target_properties(orbbec_hands PROPERTIES FOLDER "plugins")
+set_target_properties(${_projname} PROPERTIES FOLDER "plugins")
 
-target_link_libraries(orbbec_hands SenseKitAPI SenseKitUL ${OpenCV_LIBS})
+target_link_libraries(${_projname} SenseKitAPI SenseKitUL ${OpenCV_LIBS})
 
-include_directories(orbbec_hands ${OpenCV_INCLUDE_DIRS})
+include_directories(${_projname} ${OpenCV_INCLUDE_DIRS})
 
-install(TARGETS orbbec_hands
+install(TARGETS ${_projname}
         RUNTIME DESTINATION bin/Plugins/
         LIBRARY DESTINATION bin/Plugins/
         )
 
-install_pdb(orbbec_hands bin/Plugins/)
+install_pdb(${_projname} bin/Plugins/)

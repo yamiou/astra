@@ -1,25 +1,25 @@
-set(SenseKitAPI_SOURCES
+set (_projname "SenseKitAPI")
+
+set(${_projname}_SOURCES
   SenseKitAPI.h
   SenseKitAPI.cpp
   )
 
-set(SenseKitAPI_SOURCES_GEN
+set(${_projname}_SOURCES_GEN
   SenseKitAPI.cpp.lpp
   )
 
 add_definitions(-DSENSEKIT_BUILD_API_PROXY)
 add_definitions(-DSENSEKIT_BUILD)
 
-add_library(SenseKitAPI SHARED ${SenseKitAPI_SOURCES} ${SenseKitAPI_SOURCES_GEN})
+source_group(templates FILES ${${_projname}_SOURCES_GEN})
 
-# force c++11 (has no effect currently)
-#set_property(TARGET SenseKit PROPERTY CXX_STANDARD 11)
-#set_property(TARGET SenseKit PROPERTY CXX_STANDARD_REQUIRED ON)
+add_library(${_projname} SHARED ${${_projname}_SOURCES} ${${_projname}_SOURCES_GEN})
 
-install(TARGETS SenseKitAPI
+install(TARGETS ${_projname}
         RUNTIME DESTINATION bin/
         LIBRARY DESTINATION bin/
         ARCHIVE DESTINATION lib/
         )
 
-install_pdb(SenseKitAPI bin/)
+install_pdb(${_projname} bin/)
