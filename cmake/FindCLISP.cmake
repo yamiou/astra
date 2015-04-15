@@ -1,4 +1,6 @@
 set(CLISP_PATHS
+  "c:/Program Files (x86)/clisp-2.49/"
+  "c:/Program Files/clisp-2.49/"
   /usr/local/bin)
 
 find_program(CLISP_EXECUTABLE
