@@ -1,4 +1,4 @@
-SenseKit SDK v0.1.1 for Windows
+SenseKit SDK v0.1.2 for Windows
 Copyright (c) 2015 Orbbec
 
 ALPHA - NOT FOR PUBLIC DISTRIBUTION
@@ -8,7 +8,10 @@ josh@orbbec3d.com
 What's New
 ==========
 
+v0.1.2 2015/04/15 Fixed absolute paths in VS2013 projects. Moved sample folders around. Fixed hand tracker so it gets data, but hand tracking plugin still is not working. Improved SFML samples. Added HandViewer-SFML, but it again hand plugin is not working yet. Various internal improvements to SDK and plugins. The pre-compiled sample binaries will be Release mode, so hopefully won't require VS2013 to be installed.
+
 v0.1.1 2015/04/14 Fixed SimpleColorViewer. Added VS2013 projects (auto-generated via SDK CMake install process). Samples now includes dependencies and have a much better out-of-the-box experience. Fixed minor bugs. HandReader very broken. 
+
 v0.1.0 2015/04/12 Initial internal release
 
 Sample pre-requisites
@@ -24,7 +27,7 @@ See sdk/samples/vs2013/thirdparty/
 1) GLUT 3.7 
 2) SFML 2.2 - From http://www.sfml-dev.org/download/sfml/2.2/ Windows | Visual C++ 12 (2013) - 32-bit
 
-If you want to run the samples and don't have VS2013 installed, 
+If you want to run the pre-compiled samples and don't have VS2013 installed, 
 you must install the Visual C++ Redistributable Packages for Visual Studio 2013 from
 http://www.microsoft.com/en-us/download/details.aspx?id=40784
 (Not required if VS2013 is installed.)
@@ -76,6 +79,3 @@ off and then on first. (This is primarily an OpenNI driver issue.)
 
 5) The DepthReaderCPP sample will automatically remove its event listener after 100 callbacks. This is
 not a bug, but is testing part of the API.
-
-6) The orbbec_hands plugin uses the debug version of opencv temporarily, so for now you need to have
-VS2013 installed to run samples (which provides the debug runtime.)
