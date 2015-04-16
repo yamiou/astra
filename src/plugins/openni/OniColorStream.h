@@ -2,7 +2,7 @@
 #define ONICOLORSTREAM_H
 
 #include "OniDeviceStream.h"
-#include <SenseKit/Plugins/plugin_api.h>
+#include <SenseKit/Plugins/plugin_capi.h>
 #include <SenseKitUL/StreamTypes.h>
 #include <SenseKitUL/Plugins/stream_types.h>
 

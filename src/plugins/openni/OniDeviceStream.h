@@ -2,7 +2,7 @@
 #define ONIDEVICESTREAM_H
 
 #include <SenseKit/SenseKit.h>
-#include <SenseKit/Plugins/plugin_api.h>
+#include <SenseKit/Plugins/plugin_capi.h>
 #include <SenseKit/Plugins/Stream.h>
 #include <SenseKitUL/streams/video_parameters.h>
 #include <OpenNI.h>

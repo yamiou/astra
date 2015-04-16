@@ -1,14 +1,14 @@
 #ifndef ONIDEVICESTREAMSET_H
 #define ONIDEVICESTREAMSET_H
 
-#include <SenseKit/Plugins/plugin_api.h>
-#include "OniDepthStream.h"
-#include "OniColorStream.h"
+#include <SenseKit/Plugins/plugin_capi.h>
 #include <OpenNI.h>
 #include <memory>
 #include <vector>
 #include <string>
 #include <array>
+#include "OniDepthStream.h"
+#include "OniColorStream.h"
 
 #include <iostream>
 

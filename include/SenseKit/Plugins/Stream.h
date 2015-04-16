@@ -1,10 +1,11 @@
 ﻿#ifndef PLUGINSTREAM_H
 #define PLUGINSTREAM_H
 
-#include <SenseKit/Plugins/plugin_api.h>
 #include <SenseKit/SenseKit.h>
+#include <SenseKit/Plugins/PluginServiceProxy.h>
+#include <SenseKit/Plugins/StreamCallbackListener.h>
 #include <system_error>
-#include "StreamCallbackListener.h"
+#include <cassert>
 
 #include <iostream>
 using std::cout;

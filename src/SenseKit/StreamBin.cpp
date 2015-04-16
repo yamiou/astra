@@ -1,6 +1,6 @@
 #include "StreamBin.h"
 #include <cassert>
-#include "sensekit_internal.h"
+#include <SenseKit/Plugins/plugin_capi.h>
 #include <iostream>
 
 namespace sensekit {

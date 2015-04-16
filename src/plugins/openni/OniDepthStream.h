@@ -2,7 +2,7 @@
 #define ONIDEPTHSTREAM_H
 
 #include "OniDeviceStream.h"
-#include <SenseKit/Plugins/plugin_api.h>
+#include <SenseKit/Plugins/plugin_capi.h>
 #include <SenseKitUL/Plugins/stream_types.h>
 #include <SenseKitUL/StreamTypes.h>
 #include <cmath>

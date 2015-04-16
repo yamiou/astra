@@ -2,8 +2,8 @@
 #define STREAMCONNECTION_H
 
 #include <SenseKit/sensekit_types.h>
+#include <SenseKit/Plugins/plugin_capi.h>
 #include <cassert>
-#include "sensekit_internal.h"
 #include "StreamBin.h"
 
 namespace sensekit {

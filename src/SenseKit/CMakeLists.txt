@@ -11,15 +11,17 @@ set(${_projname}_SOURCES
   ../../include/SenseKit/sensekit_capi.h
   ../../include/SenseKit/sensekit_defines.h
   ../../include/SenseKit/sensekit_types.h
-  ../../include/SenseKit/Plugins/plugin_api.h
+  ../../include/SenseKit/Plugins/PluginKit.h
+  ../../include/SenseKit/Plugins/plugin_capi.h
+  ../../include/SenseKit/Plugins/plugin_callbacks.h
   ../../include/SenseKit/Plugins/PluginBase.h
   ../../include/SenseKit/Plugins/Stream.h
   ../../include/SenseKit/Plugins/StreamCallbackListener.h
+  ../../include/SenseKit/Plugins/SingleBinStream.h
   ../../include/SenseKit/Plugins/PluginServiceProxy.h
   ../../include/SenseKit/Plugins/PluginServiceProxyBase.h
   ../../include/SenseKit/Plugins/StreamServiceProxy.h
   ../../include/SenseKit/Plugins/StreamServiceProxyBase.h
-  sensekit_internal.h
   SenseKitContext.h
   SenseKitContext.cpp
   CreateStreamProxy.h

@@ -1,12 +1,8 @@
 #ifndef DUMMYPLUGIN_H
 #define DUMMYPLUGIN_H
 
-#include <SenseKit/Plugins/plugin_api.h>
+#include <SenseKit/Plugins/PluginKit.h>
 #include <SenseKitUL/SenseKitUL.h>
-
-#include <iostream>
-using std::cout;
-using std::endl;
 
 namespace sensekit {
 

@@ -16,12 +16,12 @@ set(${_projname}_SOURCES
   ../../include/SenseKitUL/streams/Hand.h
   ../../include/SenseKitUL/streams/hand_capi.h
   ../../include/SenseKitUL/streams/hand_types.h
+  ../../include/SenseKitUL/Plugins/stream_types.h
   depthstream_capi.cpp
   colorstream_capi.cpp
   hand_capi.cpp
   SenseKitUL.cpp
   generic_stream_api.h
-  ../../include/SenseKitUL/Plugins/stream_types.h
   )
 
 add_library(${_projname} SHARED ${${_projname}_SOURCES})

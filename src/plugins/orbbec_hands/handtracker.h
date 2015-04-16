@@ -9,8 +9,7 @@
 #include "pointprocessor.h"
 #include <SenseKitUL/Plugins/stream_types.h>
 #include "coordinateconverter.h"
-#include <SenseKit/Plugins/plugin_api.h>
-#include <SenseKit/Plugins/SingleBinStream.h>
+#include <SenseKit/Plugins/PluginKit.h>
 #include "HandStream.h"
 #include "debugvisualizer.h"
 #include <memory>

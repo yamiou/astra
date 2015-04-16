@@ -1,17 +1,16 @@
 ﻿#ifndef OPENNIPLUGIN_H
 #define OPENNIPLUGIN_H
 
-#include <SenseKit/Plugins/plugin_api.h>
+#include <SenseKit/SenseKit.h>
+#include <SenseKit/Plugins/PluginKit.h>
 #include "OniDeviceStream.h"
 #include "OniDeviceStreamSet.h"
-#include <SenseKit/SenseKit.h>
 #include <memory>
 #include <vector>
 #include <OpenNI.h>
 #include <SenseKitUL/streams/depth_types.h>
 #include <SenseKitUL/streams/color_types.h>
 #include <SenseKitUL/Plugins/stream_types.h>
-#include <SenseKit/Plugins/StreamCallbackListener.h>
 
 namespace sensekit
 {

@@ -1,15 +1,13 @@
 #include "SenseKitContext.h"
+#include <SenseKit/sensekit_capi.h>
+#include <SenseKit/Plugins/plugin_capi.h>
+#include <SenseKitAPI.h>
 #include "Core/shared_library.h"
 #include "Core/libs.h"
 #include "StreamReader.h"
 #include "StreamConnection.h"
 #include "StreamServiceDelegate.h"
-#include <SenseKit/Plugins/StreamServiceProxyBase.h>
-#include <SenseKit/Plugins/PluginServiceProxyBase.h>
-#include <SenseKitAPI.h>
 #include "CreateStreamProxy.h"
-#include "SenseKit/sensekit_capi.h"
-#include "sensekit_internal.h"
 
 namespace sensekit {
 

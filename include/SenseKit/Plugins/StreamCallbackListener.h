@@ -2,7 +2,7 @@
 #define STREAMCALLBACKTARGET_H
 
 #include <SenseKit/sensekit_types.h>
-#include <SenseKit/Plugins/plugin_api.h>
+#include <SenseKit/Plugins/plugin_callbacks.h>
 
 namespace sensekit {
 

@@ -2,7 +2,7 @@
 #define STREAMBACKEND_H
 
 #include <SenseKit/sensekit_types.h>
-#include "sensekit_internal.h"
+#include <SenseKit/Plugins/plugin_capi.h>
 #include "StreamConnection.h"
 #include <vector>
 #include <memory>

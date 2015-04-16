@@ -1,11 +1,7 @@
 /* THIS FILE AUTO-GENERATED FROM SenseKitAPI.cpp.lpp. DO NOT EDIT. */
 #include "SenseKitAPI.h"
-#include "../SenseKit/sensekit_internal.h"
-#include <SenseKit/Plugins/StreamServiceProxy.h>
+#include <SenseKit/Plugins/PluginKit.h>
 #include <cassert>
-#include <iostream>
-using std::cout;
-using std::endl;
 
 SENSEKIT_BEGIN_DECLS
 

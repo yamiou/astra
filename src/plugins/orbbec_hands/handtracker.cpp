@@ -11,8 +11,7 @@
 #include "pointprocessor.h"
 #include <SenseKitUL/streams/hand_types.h>
 #include <SenseKitUL/StreamTypes.h>
-#include "../../SenseKit/sensekit_internal.h"
-#include <SenseKit/Plugins/plugin_api.h>
+#include <SenseKit/Plugins/PluginKit.h>
 
 namespace sensekit
 {

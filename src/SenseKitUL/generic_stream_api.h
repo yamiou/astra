@@ -2,7 +2,7 @@
 #define GENERIC_STREAM_API_H
 
 #include <SenseKit/sensekit_capi.h>
-#include "../SenseKit/sensekit_internal.h"
+#include <SenseKit/Plugins/plugin_capi.h>
 
 template<typename TStreamType>
 sensekit_status_t sensekit_generic_stream_get(sensekit_reader_t reader,

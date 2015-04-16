@@ -1,10 +1,9 @@
 ﻿#include "OpenNIPlugin.h"
+#include <SenseKit/SenseKit.h>
+#include <SenseKitUL/StreamTypes.h>
 #include "OniDepthStream.h"
 #include "OniColorStream.h"
 #include <iostream>
-#include <SenseKit/SenseKit.h>
-#include <SenseKitUL/StreamTypes.h>
-#include "../../SenseKit/sensekit_internal.h"
 
 using std::cout;
 using std::endl;

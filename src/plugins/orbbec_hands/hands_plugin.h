@@ -1,9 +1,9 @@
 #ifndef HANDS_PLUGIN_H
 #define HANDS_PLUGIN_H
 
-#include <SenseKit/Plugins/plugin_api.h>
-#include <unordered_map>
+#include <SenseKit/Plugins/PluginKit.h>
 #include <SenseKitUL/SenseKitUL.h>
+#include <unordered_map>
 #include "handtracker.h"
 
 namespace sensekit
