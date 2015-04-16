@@ -30,8 +30,8 @@ namespace sensekit
 
         float length() const;
         float length_squared() const;
-        float dot(const Vector3_& v);
-        Vector3_ cross(const Vector3_& v);
+        float dot(const Vector3_& v) const;
+        Vector3_ cross(const Vector3_& v) const;
 
         friend inline bool operator==(const Vector3_& lhs, const Vector3_& rhs);
         friend inline bool operator!=(const Vector3_& lhs, const Vector3_& rhs);
@@ -78,13 +78,13 @@ namespace sensekit
     }
 
     template<typename TType>
-    inline float Vector3_<TType>::dot(const Vector3_& v)
+    inline float Vector3_<TType>::dot(const Vector3_& v) const
     {
         return x * v.x + y * v.y + z * v.z;
     }
 
     template<typename TType>
-    inline Vector3_<TType> Vector3_<TType>::cross(const Vector3_& v)
+    inline Vector3_<TType> Vector3_<TType>::cross(const Vector3_& v) const
     {
         return Vector3_(y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x);
     }

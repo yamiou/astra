@@ -66,23 +66,8 @@ public:
     void processHands(sensekit::Frame& frame)
     {
         sensekit::HandFrame handFrame = frame.get<sensekit::HandFrame>();
-        size_t numHands = handFrame.get_numHands();
-        const sensekit_handpoint_t* hands = handFrame.hands();
 
-        m_handPositions.clear();
-
-        for (int i = 0; i < numHands; i++)
-        {
-            auto& hand = *hands;
-
-            if (hand.status == HAND_STATUS_TRACKING)
-            {
-                auto position = new sensekit::Vector2f(hand.depthPosition.x, hand.depthPosition.y);
-                m_handPositions.push_back(Vector2fPtr(position));
-            }
-
-            ++hands;
-        }
+        m_handPoints = handFrame.handpoints();
     }
 
     virtual void on_frame_ready(sensekit::StreamReader& reader,
@@ -116,11 +101,20 @@ public:
     {
         float radius = 25;
         auto size = window.getSize();
-        sf::Color color(100, 250, 50);
-        
-        for (auto p : m_handPositions)
+        sf::Color trackingColor(100, 250, 50);
+        sf::Color lostColor(200, 50, 50);
+
+        for (auto handPoint : m_handPoints)
         {
-            drawCircle(window, radius, p->x * m_scale, p->y * m_scale, color);
+            sf::Color& color = trackingColor;
+            if (handPoint.status() == HAND_STATUS_LOST)
+            {
+                color = lostColor;
+            }
+            
+            const sensekit::Vector2i& p = handPoint.depthPosition();
+
+            drawCircle(window, radius, p.x * m_scale, p.y * m_scale, color);
         }
     }
     void drawTo(sf::RenderWindow& window)
@@ -144,10 +138,7 @@ private:
     using DepthPtr = std::unique_ptr < uint8_t[] >;
     DepthPtr m_depthVizBuffer{ nullptr };
 
-    using Vector2fPtr = std::shared_ptr < sensekit::Vector2f > ;
-    using Vector2fList = std::vector < Vector2fPtr > ;
-
-    Vector2fList m_handPositions;
+    std::vector<sensekit::HandPoint> m_handPoints;
     
     int m_depthWidth { 0 };
     int m_depthHeight { 0 };

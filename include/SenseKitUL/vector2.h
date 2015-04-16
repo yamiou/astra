@@ -28,7 +28,7 @@ namespace sensekit
 
         float length() const;
         float length_squared() const;
-        float dot(const Vector2_& v);
+        float dot(const Vector2_& v) const;
 
         friend inline bool operator==(const Vector2_& lhs, const Vector2_& rhs);
         
@@ -73,7 +73,7 @@ namespace sensekit
     }
 
     template<typename TType>
-    inline float Vector2_<TType>::dot(const Vector2_& v)
+    inline float Vector2_<TType>::dot(const Vector2_& v) const
     {
         return x * v.x + y * v.y;
     }
