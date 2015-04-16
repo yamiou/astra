@@ -298,7 +298,9 @@ is replaced with replacement."
       (close infile)
       (close outfile))))
 
-(load "apidef.cl" :verbose nil)
+(defvar api-file "apidef.cl")
+
+(load api-file :verbose nil)
 (load "cl-fad/load.lisp" :verbose nil)
 
 (defun mapc-directory-tree (fn directory)
@@ -309,6 +311,10 @@ is replaced with replacement."
 
 (defun _ () (load "lpp.cl" :verbose nil))
 
+(defun file-modified-time (f)
+  (posix:file-stat-mtime (posix:file-stat f))
+)
+
 (defun process (dir)
   (let* ((target-directory (if (null dir)
                                (ext:cd)
@@ -318,6 +324,9 @@ is replaced with replacement."
                            ".pp-modification-cache.cl"))
          (pp-cache (with-open-file (fsi cache-file-path :if-does-not-exist nil)
                       (cond ((null fsi) (make-hash-table :test 'equal) )
+                            ((> (file-modified-time api-file) 
+                                (file-modified-time (format nil "~A.timestamp" api-file)))
+                             (make-hash-table :test 'equal))
                             (t (let ((data (read fsi nil)))
                                   (if (hash-table-p data)
                                       data
@@ -332,7 +341,8 @@ is replaced with replacement."
                            (when (equal (pathname-type x) preprocessor-file-extension)
                              (let* ((fwd-path (back-to-forward-slashes (namestring x)))
                                     (cache-modify (gethash fwd-path pp-cache 0))
-                                    (last-modify (posix:file-stat-mtime (posix:file-stat x))))
+                                    (last-modify (file-modified-time x))
+                                   )
                                (when (> last-modify cache-modify)
                                  (write-line (format nil "~A => ~A"
                                                      (enough-namestring x target-directory)
@@ -349,6 +359,7 @@ is replaced with replacement."
     (with-open-file (fso cache-file-path :direction :output :if-does-not-exist :create :if-exists :supersede)
       (write pp-cache :stream fso)
     )
+    (with-open-file (fso (format nil "~A.timestamp" api-file) :direction :output :if-does-not-exist :create :if-exists :supersede))
   )
 )
 
