@@ -2,6 +2,7 @@
 #define HAND_TYPES_H
 
 #include <SenseKit/sensekit_types.h>
+#include <SenseKitUL/cvector.h>
 
 #define SENSEKIT_HANDS_MAX_HANDPOINTS 20
 
@@ -11,17 +12,6 @@ typedef enum _sensekit_handstatus
     HAND_STATUS_TRACKING,
     HAND_STATUS_LOST
 } sensekit_handstatus_t;
-
-typedef struct _sensekit_vector2i {
-    int32_t x;
-    int32_t y;
-} sensekit_vector2i_t;
-
-typedef struct _sensekit_vector3f {
-    float x;
-    float y;
-    float z;
-} sensekit_vector3f_t;
 
 typedef struct _sensekit_handpoint {
     int32_t trackingId;

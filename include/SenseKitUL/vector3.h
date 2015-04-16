@@ -2,6 +2,7 @@
 #define VECTOR3_H
 
 #include <math.h>
+#include <SenseKitUL/cvector.h>
 
 struct cVector3i { };
 namespace sensekit
@@ -49,6 +50,20 @@ namespace sensekit
         friend Vector3_ operator*(const float& lhs, const Vector3_& rhs);
         friend Vector3_ operator/(const Vector3_& lhs, const float& rhs);
     };
+
+    inline Vector3f cvectorToVector(const sensekit_vector3f_t& other)
+    {
+        return Vector3f(other.x, other.y, other.z);
+    }
+
+    inline sensekit_vector3f_t vectorToCvector(const Vector3f& other)
+    {
+        sensekit_vector3f_t v;
+        v.x = other.x;
+        v.y = other.y;
+        v.z = other.z;
+        return v;
+    }
 
     template<typename TType>
     inline float Vector3_<TType>::length() const

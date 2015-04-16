@@ -11,12 +11,27 @@ namespace sensekit {
     class HandPoint
     {
     public:
-        explicit HandPoint(sensekit_handpoint_t handPoint)
-            : m_handPoint(handPoint) { }
+        explicit HandPoint(sensekit_handpoint_t handPoint) : 
+            m_handPoint(handPoint),
+            m_depthPosition(cvectorToVector(handPoint.depthPosition)),
+            m_worldPosition(cvectorToVector(handPoint.worldPosition)),
+            m_worldDeltaPosition(cvectorToVector(handPoint.worldDeltaPosition))
+        { }
+
+        inline int32_t get_trackingId() const { return m_handPoint.trackingId; }
+        inline sensekit_handstatus_t get_status() const { return m_handPoint.status; }
+        inline Vector2i get_depthPosition() const { return m_depthPosition; }
+        inline Vector3f get_worldPosition() const { return m_worldPosition; }
+        inline Vector3f get_worldDeltaPosition() const { return m_worldDeltaPosition; }
 
     private:
-        sensekit_handpoint_t m_handPoint;
+        
+        const sensekit_handpoint_t m_handPoint;
+        const Vector2i m_depthPosition;
+        const Vector3f m_worldPosition;
+        const Vector3f m_worldDeltaPosition;
     };
+
     class HandStream : public DataStream
     {
     public:

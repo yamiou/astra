@@ -2,14 +2,15 @@
 #define VECTOR2_H
 
 #include <math.h>
+#include <SenseKitUL/cvector.h>
 
 namespace sensekit
 {
     template<typename TType>
     struct Vector2_;
 
-    using Vector2i = Vector2_ < int > ;
-    using Vector2f = Vector2_ < float > ;
+    using Vector2i = Vector2_ < int >;
+    using Vector2f = Vector2_ < float >;
 
     template<typename TType>
     struct Vector2_
@@ -30,8 +31,7 @@ namespace sensekit
         float dot(const Vector2_& v);
 
         friend inline bool operator==(const Vector2_& lhs, const Vector2_& rhs);
-        friend inline bool operator!=(const Vector2_& lhs, const Vector2_& rhs);
-
+        
         Vector2_& operator+=(const Vector2_& rhs);
         Vector2_& operator-=(const Vector2_& rhs);
         Vector2_& operator*=(const float& rhs);
@@ -46,6 +46,19 @@ namespace sensekit
         friend Vector2_ operator*(const float& lhs, const Vector2_& rhs);
         friend Vector2_ operator/(const Vector2_& lhs, const float& rhs);
     };
+
+    inline Vector2i cvectorToVector(const sensekit_vector2i_t& other)
+    {
+        return Vector2i(other.x, other.y);
+    }
+
+    inline sensekit_vector2i_t vectorToCvector(const Vector2i& other)
+    {
+        sensekit_vector2i_t v;
+        v.x = other.x;
+        v.y = other.y;
+        return v;
+    }
 
     template<typename TType>
     inline float Vector2_<TType>::length() const
