@@ -2,6 +2,12 @@ set (_projname "SenseKit")
 
 set(${_projname}_SOURCES
   ../../include/SenseKit/SenseKit.h
+  ../../include/SenseKit/Sensor.h
+  ../../include/SenseKit/StreamDescription.h
+  ../../include/SenseKit/Frame.h
+  ../../include/SenseKit/FrameReadyListener.h
+  ../../include/SenseKit/StreamReader.h
+  ../../include/SenseKit/DataStream.h
   ../../include/SenseKit/sensekit_capi.h
   ../../include/SenseKit/sensekit_defines.h
   ../../include/SenseKit/sensekit_types.h
