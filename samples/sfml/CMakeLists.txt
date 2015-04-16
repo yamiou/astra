@@ -1,2 +1,3 @@
 add_subdirectory(SimpleDepthViewer-SFML)
-add_subdirectory(HandViewer-SFML)
+add_subdirectory(SimpleHandViewer-SFML)
+add_subdirectory(DebugHandViewer)

@@ -1,4 +1,4 @@
-set (_projname "HandViewer-SFML")
+set (_projname "SimpleHandViewer-SFML")
 
 set (${_projname}_SOURCES
   main.cpp
