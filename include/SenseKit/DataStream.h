@@ -37,11 +37,6 @@ namespace sensekit {
                 sensekit_stream_stop(m_connection);
             }
 
-        bool isValid()
-            {
-                return m_connection != nullptr;
-            }
-
         const StreamDescription& get_description()
             {
                 return static_cast<const StreamDescription&>(m_description);
