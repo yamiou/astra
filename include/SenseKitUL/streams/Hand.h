@@ -5,17 +5,17 @@
 #include <stdexcept>
 #include <SenseKitUL/StreamTypes.h>
 #include "hand_capi.h"
+#include <SenseKitUL/Vectorx.h>
 
 namespace sensekit {
-
     class HandPoint
     {
     public:
         explicit HandPoint(sensekit_handpoint_t handPoint) : 
             m_handPoint(handPoint),
-            m_depthPosition(cvectorToVector(handPoint.depthPosition)),
-            m_worldPosition(cvectorToVector(handPoint.worldPosition)),
-            m_worldDeltaPosition(cvectorToVector(handPoint.worldDeltaPosition))
+            m_depthPosition(cvector_to_vector(handPoint.depthPosition)),
+            m_worldPosition(cvector_to_vector(handPoint.worldPosition)),
+            m_worldDeltaPosition(cvector_to_vector(handPoint.worldDeltaPosition))
         { }
 
         inline int32_t get_trackingId() const { return m_handPoint.trackingId; }

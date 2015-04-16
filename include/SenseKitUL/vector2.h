@@ -27,7 +27,7 @@ namespace sensekit
         { }
 
         float length() const;
-        float lengthSquared() const;
+        float length_squared() const;
         float dot(const Vector2_& v);
 
         friend inline bool operator==(const Vector2_& lhs, const Vector2_& rhs);
@@ -47,17 +47,17 @@ namespace sensekit
         friend Vector2_ operator/(const Vector2_& lhs, const float& rhs);
     };
 
-    inline Vector2i cvectorToVector(const sensekit_vector2i_t& other)
+    inline Vector2i cvector_to_vector(const sensekit_vector2i_t& cvector)
     {
-        return Vector2i(other.x, other.y);
+        return Vector2i(cvector.x, cvector.y);
     }
 
-    inline sensekit_vector2i_t vectorToCvector(const Vector2i& other)
+    inline sensekit_vector2i_t vector_to_cvector(const Vector2i& vector)
     {
-        sensekit_vector2i_t v;
-        v.x = other.x;
-        v.y = other.y;
-        return v;
+        sensekit_vector2i_t cvector;
+        cvector.x = vector.x;
+        cvector.y = vector.y;
+        return cvector;
     }
 
     template<typename TType>
@@ -67,7 +67,7 @@ namespace sensekit
     }
 
     template<typename TType>
-    inline float Vector2_<TType>::lengthSquared() const
+    inline float Vector2_<TType>::length_squared() const
     {
         return x * x + y * y;
     }
