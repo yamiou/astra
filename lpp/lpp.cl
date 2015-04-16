@@ -312,7 +312,9 @@ is replaced with replacement."
 (defun _ () (load "lpp.cl" :verbose nil))
 
 (defun file-modified-time (f)
-  (posix:file-stat-mtime (posix:file-stat f))
+  (cond ((probe-file f) (posix:file-stat-mtime (posix:file-stat f)))
+        (t 0)
+  )
 )
 
 (defun process (dir)
