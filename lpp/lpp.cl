@@ -267,7 +267,7 @@ is replaced with replacement."
   (let ((infile (open infilename :if-does-not-exist nil))
         (outfile (open (in-to-out-filename infilename) :direction :output :if-exists :supersede))
         (filelines nil)
-        (templatelines nil)
+        (template-lines nil)
         (funcset-name nil))
     (when infile
       (loop
@@ -289,16 +289,19 @@ is replaced with replacement."
               ;;since we have a full template, expand template it
               (mapcar
                (lambda (v) (prepend-into filelines v))
-               (expand-methods-with-template (reverse templatelines) funcset-name))
-              (setq funcset-name nil))  ;;clear funcset-name -- return to normal operation above
+               (expand-methods-with-template (reverse template-lines) funcset-name))
+              (setq funcset-name nil)  ;;clear funcset-name -- return to normal operation above
+              (setq template-lines nil) ;;clear template so we can process another one in the same file
+             )
              ;;inside replace block, accumulate template
-             (t (prepend-into templatelines line))))
+             (t (prepend-into template-lines line))))
       (loop for line in (reverse filelines)
          do (write-line line outfile))
       (close infile)
       (close outfile))))
 
 (defvar api-file "apidef.cl")
+(defvar lpp-file "lpp.cl")
 
 (load api-file :verbose nil)
 (load "cl-fad/load.lisp" :verbose nil)
@@ -309,7 +312,7 @@ is replaced with replacement."
       (mapc-directory-tree fn entry))
     (funcall fn entry)))
 
-(defun _ () (load "lpp.cl" :verbose nil))
+(defun _ () (load lpp-file :verbose nil))
 
 (defun file-modified-time (f)
   (cond ((probe-file f) (posix:file-stat-mtime (posix:file-stat f)))
@@ -325,6 +328,7 @@ is replaced with replacement."
                            (cl-fad:pathname-as-directory target-directory)
                            ".pp-modification-cache.cl"))
          (api-modify (file-modified-time api-file))
+         (lpp-modify (file-modified-time lpp-file))
          (pp-cache (with-open-file (fsi cache-file-path :if-does-not-exist nil)
                       (cond ((null fsi) (make-hash-table :test 'equal) )
                             (t (let ((data (read fsi nil)))
@@ -341,7 +345,7 @@ is replaced with replacement."
                            (when (equal (pathname-type x) preprocessor-file-extension)
                              (let* ((fwd-path (back-to-forward-slashes (namestring x)))
                                     (cache-modify (gethash fwd-path pp-cache 0))
-                                    (last-modify (max api-modify (file-modified-time x)))
+                                    (last-modify (max lpp-modify api-modify (file-modified-time x)))
                                    )
                                (when (> last-modify cache-modify)
                                  (write-line (format nil "~A => ~A"
