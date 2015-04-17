@@ -3,7 +3,7 @@
 
 #include <SenseKit/sensekit_defines.h>
 #include <SenseKit/sensekit_types.h>
-#include "image_types.h"
+#include <SenseKitUL/streams/image_types.h>
 
 SENSEKIT_BEGIN_DECLS
 

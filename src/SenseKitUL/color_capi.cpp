@@ -6,7 +6,7 @@
 #include <string.h>
 #include <SenseKitUL/StreamTypes.h>
 #include <cassert>
-#include <SenseKitUL/streams/image_types.h>
+#include <SenseKitUL/streams/image_capi.h>
 
 SENSEKIT_BEGIN_DECLS
 
@@ -53,54 +53,46 @@ SENSEKIT_API_EX sensekit_status_t sensekit_color_stream_get_by_type(sensekit_rea
 SENSEKIT_API_EX sensekit_status_t sensekit_color_frame_get(sensekit_reader_frame_t readerFrame,
                                                            sensekit_colorframe_t* colorFrame)
 {
-    return sensekit_generic_frame_get<sensekit_imageframe_wrapper_t>(readerFrame,
-                                                                     SENSEKIT_STREAM_COLOR,
-                                                                     DEFAULT_SUBTYPE,
-                                                                     colorFrame);
+    return sensekit_reader_get_imageframe(readerFrame,
+                                          SENSEKIT_STREAM_COLOR,
+                                          DEFAULT_SUBTYPE,
+                                          colorFrame);
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_frameindex(sensekit_colorframe_t colorFrame,
                                                                      sensekit_frame_index_t* index)
 {
-    return sensekit_generic_frame_get_frameindex(colorFrame, index);
+    return sensekit_imageframe_get_frameindex(colorFrame, index);
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_data_length(sensekit_colorframe_t colorFrame,
                                                                       size_t* length)
 {
-    sensekit_image_metadata_t metadata = colorFrame->metadata;
-
-    size_t size = metadata.width * metadata.height * metadata.bytesPerPixel;
-    *length = size;
-
-    return SENSEKIT_STATUS_SUCCESS;
+    return sensekit_imageframe_get_data_byte_length(colorFrame, length);
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_data_ptr(sensekit_colorframe_t colorFrame,
                                                                    uint8_t** data,
                                                                    size_t* length)
 {
-    *data = static_cast<uint8_t*>(colorFrame->data);
-    sensekit_colorframe_get_data_length(colorFrame, length);
+    void* voidData = nullptr;
+    sensekit_imageframe_get_data_ptr(colorFrame, &voidData, length);
+    *data = static_cast<uint8_t*>(voidData);
 
     return SENSEKIT_STATUS_SUCCESS;
+
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_copy_data(sensekit_colorframe_t colorFrame,
                                                                 uint8_t* data)
 {
-    sensekit_image_metadata_t metadata = colorFrame->metadata;
-    size_t size = metadata.width * metadata.height * metadata.bytesPerPixel;
-
-    memcpy(data, colorFrame->data, size);
-
-    return SENSEKIT_STATUS_SUCCESS;
+    return sensekit_imageframe_copy_data(colorFrame, data);
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_metadata(sensekit_colorframe_t colorFrame,
-                                                                   sensekit_image_metadata_t* metadata ){
-    *metadata = colorFrame->metadata;
-    return SENSEKIT_STATUS_SUCCESS;
+                                                                   sensekit_image_metadata_t* metadata )
+{
+    return sensekit_imageframe_get_metadata(colorFrame, metadata);
 }
 
 SENSEKIT_END_DECLS
