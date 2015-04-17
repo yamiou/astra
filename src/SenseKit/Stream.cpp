@@ -64,27 +64,28 @@ namespace sensekit {
 
     void Stream::set_parameter(StreamConnection* connection,
                                sensekit_parameter_id id,
-                               size_t byteLength,
-                               sensekit_parameter_data_t* data)
+                               size_t inByteLength,
+                               sensekit_parameter_data_t inData)
     {
         if (is_available())
-            on_set_parameter(connection, id, byteLength, data);
+            on_set_parameter(connection, id, inByteLength, inData);
     }
 
-    void Stream::get_parameter_size(StreamConnection* connection,
-                                    sensekit_parameter_id id,
-                                    size_t& byteLength)
+    void Stream::get_parameter(StreamConnection* connection, 
+                               sensekit_parameter_id id,
+                               sensekit_parameter_bin_t& parameterBin)
     {
         if (is_available())
-            on_get_parameter_size(connection, id, byteLength);
+            on_get_parameter(connection, id, parameterBin);
     }
 
-    void Stream::get_parameter_data(StreamConnection* connection,
-                                    sensekit_parameter_id parameterId,
-                                    size_t byteLength,
-                                    sensekit_parameter_data_t* data)
+    void Stream::invoke(StreamConnection* connection, 
+                        sensekit_command_id commandId, 
+                        size_t inByteLength, 
+                        sensekit_parameter_data_t inData,
+                        sensekit_parameter_bin_t& parameterBin)
     {
         if (is_available())
-            on_get_parameter_data(connection, parameterId, byteLength, data);
+            on_invoke(connection, commandId, inByteLength, inData, parameterBin);
     }
 }

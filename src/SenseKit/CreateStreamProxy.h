@@ -29,8 +29,9 @@ namespace sensekit {
         proxy->reader_unregister_frame_ready_callback = &StreamServiceDelegate::reader_unregister_frame_ready_callback;
         proxy->reader_get_frame = &StreamServiceDelegate::reader_get_frame;
         proxy->stream_set_parameter = &StreamServiceDelegate::stream_set_parameter;
-        proxy->stream_get_parameter_size = &StreamServiceDelegate::stream_get_parameter_size;
-        proxy->stream_get_parameter_data = &StreamServiceDelegate::stream_get_parameter_data;
+        proxy->stream_get_parameter = &StreamServiceDelegate::stream_get_parameter;
+        proxy->stream_get_result = &StreamServiceDelegate::stream_get_result;
+        proxy->stream_invoke = &StreamServiceDelegate::stream_invoke;
         proxy->temp_update = &StreamServiceDelegate::temp_update;
         proxy->streamService = context;
 

@@ -55,14 +55,9 @@ namespace sensekit { namespace plugins {
                     m_conversionCache.coeffY = m_conversionCache.resolutionY / m_conversionCache.yzFactor;
                 }
 
-            virtual void get_parameter_size(sensekit_streamconnection_t connection,
-                                            sensekit_parameter_id id,
-                                            size_t& byteLength) override;
-
-            virtual void get_parameter_data(sensekit_streamconnection_t connection,
-                                            sensekit_parameter_id id,
-                                            size_t byteLength,
-                                            sensekit_parameter_data_t* data) override;
+            virtual void get_parameter(sensekit_streamconnection_t connection,
+                                       sensekit_parameter_id id,
+                                       sensekit_parameter_bin_t& parameterBin) override;
 
             conversion_cache_t m_conversionCache;
         };

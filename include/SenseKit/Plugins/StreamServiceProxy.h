@@ -106,25 +106,36 @@ namespace sensekit {
 
         sensekit_status_t stream_set_parameter(sensekit_streamconnection_t connection,
                                                sensekit_parameter_id parameterId,
-                                               size_t byteLength,
-                                               sensekit_parameter_data_t* data)
+                                               size_t inByteLength,
+                                               sensekit_parameter_data_t inData)
         {
-            return StreamServiceProxyBase::stream_set_parameter(streamService, connection, parameterId, byteLength, data);
+            return StreamServiceProxyBase::stream_set_parameter(streamService, connection, parameterId, inByteLength, inData);
         }
 
-        sensekit_status_t stream_get_parameter_size(sensekit_streamconnection_t connection,
-                                                    sensekit_parameter_id parameterId,
-                                                    size_t* byteLength)
+        sensekit_status_t stream_get_parameter(sensekit_streamconnection_t connection,
+                                               sensekit_parameter_id parameterId,
+                                               size_t* resultByteLength,
+                                               sensekit_result_token_t* token)
         {
-            return StreamServiceProxyBase::stream_get_parameter_size(streamService, connection, parameterId, byteLength);
+            return StreamServiceProxyBase::stream_get_parameter(streamService, connection, parameterId, resultByteLength, token);
         }
 
-        sensekit_status_t stream_get_parameter_data(sensekit_streamconnection_t connection,
-                                                    sensekit_parameter_id parameterId,
-                                                    size_t byteLength,
-                                                    sensekit_parameter_data_t* data)
+        sensekit_status_t stream_get_result(sensekit_streamconnection_t connection,
+                                            sensekit_result_token_t token,
+                                            size_t dataByteLength,
+                                            sensekit_parameter_data_t dataDestination)
         {
-            return StreamServiceProxyBase::stream_get_parameter_data(streamService, connection, parameterId, byteLength, data);
+            return StreamServiceProxyBase::stream_get_result(streamService, connection, token, dataByteLength, dataDestination);
+        }
+
+        sensekit_status_t stream_invoke(sensekit_streamconnection_t connection,
+                                        sensekit_command_id commandId,
+                                        size_t inByteLength,
+                                        sensekit_parameter_data_t inData,
+                                        size_t* resultByteLength,
+                                        sensekit_result_token_t* token)
+        {
+            return StreamServiceProxyBase::stream_invoke(streamService, connection, commandId, inByteLength, inData, resultByteLength, token);
         }
 
         sensekit_status_t temp_update()

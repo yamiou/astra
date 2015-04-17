@@ -34,8 +34,12 @@ typedef struct _sensekit_frame sensekit_frame_t;
 typedef struct _sensekit_reader* sensekit_reader_t;
 typedef sensekit_reader_t sensekit_reader_frame_t;
 
-typedef struct _sensekit_parameter_data sensekit_parameter_data_t;
+typedef void* sensekit_parameter_data_t;
 typedef int32_t sensekit_parameter_id;
+typedef int32_t sensekit_command_id;
+
+typedef struct _sensekit_parameter_bin* sensekit_result_token_t;
+typedef struct _sensekit_parameter_bin* sensekit_parameter_bin_t;
 
 typedef struct _sensekit_bin* sensekit_bin_t;
 

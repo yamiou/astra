@@ -37,13 +37,13 @@ namespace sensekit { namespace plugins {
 
         private:
             virtual void connection_added(sensekit_stream_t stream,
-                                          sensekit_streamconnection_t connection) final;
+                                          sensekit_streamconnection_t connection) override final;
 
             virtual void on_connection_added(sensekit_streamconnection_t connection) { }
 
             virtual void connection_removed(sensekit_stream_t stream,
                                             sensekit_bin_t bin,
-                                            sensekit_streamconnection_t connection) final;
+                                            sensekit_streamconnection_t connection) override final;
 
             virtual void on_connection_removed(sensekit_bin_t bin,
                                                sensekit_streamconnection_t connection) { }
@@ -71,6 +71,8 @@ namespace sensekit { namespace plugins {
             sensekit_stream_t m_streamHandle{nullptr};
 
         protected:
+            PluginServiceProxy& get_pluginService() const { return m_pluginService; }
+
             void create_bin(size_t binSize, sensekit_bin_t& binHandle, sensekit_frame_t*& buffer)
                 {
                     cout << "creating bin -- "

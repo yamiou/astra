@@ -42,15 +42,22 @@ namespace sensekit {
         void unregister_frame_ready_callback(sensekit_callback_id_t& callbackId);
 
         void set_parameter(sensekit_parameter_id id,
-                           size_t byteLength,
-                           sensekit_parameter_data_t* data);
+                           size_t inByteLength,
+                           sensekit_parameter_data_t inData);
 
-        void get_parameter_size(sensekit_parameter_id id,
-                                size_t& byteLength);
+        void get_parameter(sensekit_parameter_id id,
+                           size_t& resultByteLength,
+                           sensekit_result_token_t& token);
 
-        void get_parameter_data(sensekit_parameter_id id,
-                                size_t byteLength,
-                                sensekit_parameter_data_t* data);
+        void get_result(sensekit_result_token_t token,
+                        size_t dataByteLength,
+                        sensekit_parameter_data_t dataDestination);
+
+        void invoke(sensekit_command_id commandId, 
+                    size_t inByteLength, 
+                    sensekit_parameter_data_t    inData,
+                    size_t& resultByteLength,
+                    sensekit_result_token_t token);
 
     private:
         void on_bin_front_buffer_ready(StreamBin* bin, sensekit_frame_index_t frameIndex);

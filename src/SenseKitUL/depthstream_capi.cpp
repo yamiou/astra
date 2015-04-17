@@ -15,10 +15,10 @@ SENSEKIT_API_EX sensekit_status_t sensekit_convert_depth_to_world(sensekit_depth
                                                                   float* pWorldX, float* pWorldY, float* pWorldZ)
 {
     conversion_cache_t conversionCache;
-    sensekit_stream_get_parameter_data(depthStream,
-                                       DEPTH_PARAMETER_CONVERSION_CACHE,
-                                       sizeof(conversion_cache_t),
-                                       reinterpret_cast<sensekit_parameter_data_t*>(&conversionCache));
+    sensekit_stream_get_parameter_fixed(depthStream,
+                                        DEPTH_PARAMETER_CONVERSION_CACHE,
+                                        sizeof(conversion_cache_t),
+                                        reinterpret_cast<sensekit_parameter_data_t*>(&conversionCache));
 
     float normalizedX = depthX / conversionCache.resolutionX - .5f;
     float normalizedY = .5f - depthY / conversionCache.resolutionY;
@@ -35,10 +35,10 @@ SENSEKIT_API_EX sensekit_status_t sensekit_convert_world_to_depth(sensekit_depth
                                                                   float* pDepthX, float* pDepthY, float* pDepthZ)
 {
     conversion_cache_t conversionCache;
-    sensekit_stream_get_parameter_data(depthStream,
-                                       DEPTH_PARAMETER_CONVERSION_CACHE,
-                                       sizeof(conversion_cache_t),
-                                       reinterpret_cast<sensekit_parameter_data_t*>(&conversionCache));
+    sensekit_stream_get_parameter_fixed(depthStream,
+                                        DEPTH_PARAMETER_CONVERSION_CACHE,
+                                        sizeof(conversion_cache_t),
+                                        reinterpret_cast<sensekit_parameter_data_t*>(&conversionCache));
 
     *pDepthX = conversionCache.coeffX * worldX / worldZ + conversionCache.halfResX;
     *pDepthY = conversionCache.halfResY - conversionCache.coeffY * worldY / worldZ;
@@ -61,19 +61,19 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get(sensekit_reader_t re
 SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get_hfov(sensekit_depthstream_t depthStream,
                                                                  float* hFov)
 {
-    return sensekit_stream_get_parameter_data(depthStream,
-                                              STREAM_PARAMETER_HFOV,
-                                              sizeof(float),
-                                              reinterpret_cast<sensekit_parameter_data_t*>(hFov));
+    return sensekit_stream_get_parameter_fixed(depthStream,
+                                               STREAM_PARAMETER_HFOV,
+                                               sizeof(float),
+                                               reinterpret_cast<sensekit_parameter_data_t*>(hFov));
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get_vfov(sensekit_depthstream_t depthStream,
                                                                  float* vFov)
 {
-    return sensekit_stream_get_parameter_data(depthStream,
-                                              STREAM_PARAMETER_VFOV,
-                                              sizeof(float),
-                                              reinterpret_cast<sensekit_parameter_data_t*>(vFov));
+    return sensekit_stream_get_parameter_fixed(depthStream,
+                                               STREAM_PARAMETER_VFOV,
+                                               sizeof(float),
+                                               reinterpret_cast<sensekit_parameter_data_t*>(vFov));
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_depth_frame_get(sensekit_reader_frame_t readerFrame,

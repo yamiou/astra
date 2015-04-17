@@ -87,17 +87,25 @@ namespace sensekit {
 
         sensekit_status_t stream_set_parameter(sensekit_streamconnection_t connection,
                                                sensekit_parameter_id parameterId,
-                                               size_t byteLength,
-                                               sensekit_parameter_data_t* data);
+                                               size_t inByteLength,
+                                               sensekit_parameter_data_t inData);
 
-        sensekit_status_t stream_get_parameter_size(sensekit_streamconnection_t connection,
-                                                    sensekit_parameter_id parameterId,
-                                                    size_t& byteLength);
+        sensekit_status_t stream_get_parameter(sensekit_streamconnection_t connection,
+                                               sensekit_parameter_id parameterId,
+                                               size_t& resultByteLength,
+                                               sensekit_result_token_t& token);
 
-        sensekit_status_t stream_get_parameter_data(sensekit_streamconnection_t connection,
-                                                    sensekit_parameter_id parameterId,
-                                                    size_t byteLength,
-                                                    sensekit_parameter_data_t* data);
+        sensekit_status_t stream_get_result(sensekit_streamconnection_t connection,
+                                            sensekit_result_token_t token,
+                                            size_t dataByteLength,
+                                            sensekit_parameter_data_t dataDestination);
+
+        sensekit_status_t stream_invoke(sensekit_streamconnection_t connection,
+                                        sensekit_command_id commandId,
+                                        size_t inByteLength,
+                                        sensekit_parameter_data_t inData,
+                                        size_t& resultByteLength,
+                                        sensekit_result_token_t& token);
 
         sensekit_status_t temp_update();
 

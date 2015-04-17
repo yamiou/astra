@@ -18,39 +18,28 @@ namespace sensekit { namespace plugins {
             wrapper->frame.metadata = metadata;
         }
 
-        void OniDepthStream::get_parameter_size(sensekit_streamconnection_t connection,
-                                                sensekit_parameter_id id,
-                                                size_t& byteLength)
+        void OniDepthStream::get_parameter(sensekit_streamconnection_t connection,
+                                           sensekit_parameter_id id,
+                                           sensekit_parameter_bin_t& parameterBin)
         {
             switch (id)
             {
             case DEPTH_PARAMETER_CONVERSION_CACHE:
             {
-                byteLength = sizeof(conversion_cache_t);
+                size_t resultByteLength = sizeof(conversion_cache_t);
+
+                sensekit_parameter_data_t parameterData;
+                sensekit_status_t rc = get_pluginService().get_parameter_bin(resultByteLength,
+                                                                             &parameterBin,
+                                                                             &parameterData);
+                if (rc == SENSEKIT_STATUS_SUCCESS)
+                {
+                    memcpy(parameterData, &m_conversionCache, resultByteLength);
+                }
                 return;
             }
             }
 
-            OniDeviceStream::get_parameter_size(connection, id, byteLength);
-        }
-
-        void OniDepthStream::get_parameter_data(sensekit_streamconnection_t connection,
-                                                sensekit_parameter_id id,
-                                                size_t byteLength,
-                                                sensekit_parameter_data_t* data)
-        {
-            switch (id)
-            {
-            case DEPTH_PARAMETER_CONVERSION_CACHE:
-            {
-                assert(byteLength >= sizeof(conversion_cache_t));
-                conversion_cache_t* cache = reinterpret_cast<conversion_cache_t*>(data);
-                *cache = m_conversionCache;
-                return;
-            }
-            }
-
-            OniDeviceStream::get_parameter_data(connection, id, byteLength, data);
-
+            OniDeviceStream::get_parameter(connection, id, parameterBin);
         }
     }}

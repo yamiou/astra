@@ -89,6 +89,13 @@ namespace sensekit {
     {
         return PluginServiceProxyBase::link_connection_to_bin(pluginService, connection, binHandle);
     }
+
+    sensekit_status_t get_parameter_bin(size_t byteSize,
+                                        sensekit_parameter_bin_t* binHandle,
+                                        sensekit_parameter_data_t* parameterData)
+    {
+        return PluginServiceProxyBase::get_parameter_bin(pluginService, byteSize, binHandle, parameterData);
+    }
     };
 }
 

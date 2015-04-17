@@ -72,18 +72,27 @@ struct StreamServiceProxyBase
                                               sensekit_streamconnection_t,
                                               sensekit_parameter_id,
                                               size_t,
-                                              sensekit_parameter_data_t*);
+                                              sensekit_parameter_data_t);
 
-    sensekit_status_t (*stream_get_parameter_size)(void*,
-                                                   sensekit_streamconnection_t,
-                                                   sensekit_parameter_id,
-                                                   size_t*);
+    sensekit_status_t (*stream_get_parameter)(void*,
+                                              sensekit_streamconnection_t,
+                                              sensekit_parameter_id,
+                                              size_t*,
+                                              sensekit_result_token_t*);
 
-    sensekit_status_t (*stream_get_parameter_data)(void*,
-                                                   sensekit_streamconnection_t,
-                                                   sensekit_parameter_id,
-                                                   size_t,
-                                                   sensekit_parameter_data_t*);
+    sensekit_status_t (*stream_get_result)(void*,
+                                           sensekit_streamconnection_t,
+                                           sensekit_result_token_t,
+                                           size_t,
+                                           sensekit_parameter_data_t);
+
+    sensekit_status_t (*stream_invoke)(void*,
+                                       sensekit_streamconnection_t,
+                                       sensekit_command_id,
+                                       size_t,
+                                       sensekit_parameter_data_t,
+                                       size_t*,
+                                       sensekit_result_token_t*);
 
     sensekit_status_t (*temp_update)(void*);
 

@@ -53,6 +53,9 @@ namespace sensekit
                                             sensekit_frame_t*& binBuffer);
         sensekit_status_t link_connection_to_bin(sensekit_streamconnection_t connection,
                                                  sensekit_bin_t binHandle);
+        sensekit_status_t get_parameter_bin(size_t byteSize,
+                                            sensekit_parameter_bin_t& binHandle,
+                                            sensekit_parameter_data_t& parameterData);
 
     private:
         SenseKitContext& m_context;

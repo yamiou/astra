@@ -55,17 +55,25 @@ SENSEKIT_API sensekit_status_t sensekit_reader_get_frame(sensekit_reader_frame_t
 
 SENSEKIT_API sensekit_status_t sensekit_stream_set_parameter(sensekit_streamconnection_t connection,
                                                              sensekit_parameter_id parameterId,
-                                                             size_t byteLength,
-                                                             sensekit_parameter_data_t* data);
+                                                             size_t inByteLength,
+                                                             sensekit_parameter_data_t inData);
 
-SENSEKIT_API sensekit_status_t sensekit_stream_get_parameter_size(sensekit_streamconnection_t connection,
-                                                                  sensekit_parameter_id parameterId,
-                                                                  size_t* byteLength);
+SENSEKIT_API sensekit_status_t sensekit_stream_get_parameter(sensekit_streamconnection_t connection,
+                                                             sensekit_parameter_id parameterId,
+                                                             size_t* resultByteLength,
+                                                             sensekit_result_token_t* token);
 
-SENSEKIT_API sensekit_status_t sensekit_stream_get_parameter_data(sensekit_streamconnection_t connection,
-                                                                  sensekit_parameter_id parameterId,
-                                                                  size_t byteLength,
-                                                                  sensekit_parameter_data_t* data);
+SENSEKIT_API sensekit_status_t sensekit_stream_get_result(sensekit_streamconnection_t connection,
+                                                          sensekit_result_token_t token,
+                                                          size_t dataByteLength,
+                                                          sensekit_parameter_data_t dataDestination);
+
+SENSEKIT_API sensekit_status_t sensekit_stream_invoke(sensekit_streamconnection_t connection,
+                                                      sensekit_command_id commandId,
+                                                      size_t inByteLength,
+                                                      sensekit_parameter_data_t inData,
+                                                      size_t* resultByteLength,
+                                                      sensekit_result_token_t* token);
 
 SENSEKIT_API sensekit_status_t sensekit_temp_update();
 

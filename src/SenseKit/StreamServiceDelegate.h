@@ -123,27 +123,39 @@ namespace sensekit {
         static sensekit_status_t stream_set_parameter(void* streamService,
                                                       sensekit_streamconnection_t connection,
                                                       sensekit_parameter_id parameterId,
-                                                      size_t byteLength,
-                                                      sensekit_parameter_data_t* data)
+                                                      size_t inByteLength,
+                                                      sensekit_parameter_data_t inData)
         {
-            return static_cast<SenseKitContext*>(streamService)->stream_set_parameter(connection, parameterId, byteLength, data);
+            return static_cast<SenseKitContext*>(streamService)->stream_set_parameter(connection, parameterId, inByteLength, inData);
         }
 
-        static sensekit_status_t stream_get_parameter_size(void* streamService,
-                                                           sensekit_streamconnection_t connection,
-                                                           sensekit_parameter_id parameterId,
-                                                           size_t* byteLength)
+        static sensekit_status_t stream_get_parameter(void* streamService,
+                                                      sensekit_streamconnection_t connection,
+                                                      sensekit_parameter_id parameterId,
+                                                      size_t* resultByteLength,
+                                                      sensekit_result_token_t* token)
         {
-            return static_cast<SenseKitContext*>(streamService)->stream_get_parameter_size(connection, parameterId, *byteLength);
+            return static_cast<SenseKitContext*>(streamService)->stream_get_parameter(connection, parameterId, *resultByteLength, *token);
         }
 
-        static sensekit_status_t stream_get_parameter_data(void* streamService,
-                                                           sensekit_streamconnection_t connection,
-                                                           sensekit_parameter_id parameterId,
-                                                           size_t byteLength,
-                                                           sensekit_parameter_data_t* data)
+        static sensekit_status_t stream_get_result(void* streamService,
+                                                   sensekit_streamconnection_t connection,
+                                                   sensekit_result_token_t token,
+                                                   size_t dataByteLength,
+                                                   sensekit_parameter_data_t dataDestination)
         {
-            return static_cast<SenseKitContext*>(streamService)->stream_get_parameter_data(connection, parameterId, byteLength, data);
+            return static_cast<SenseKitContext*>(streamService)->stream_get_result(connection, token, dataByteLength, dataDestination);
+        }
+
+        static sensekit_status_t stream_invoke(void* streamService,
+                                               sensekit_streamconnection_t connection,
+                                               sensekit_command_id commandId,
+                                               size_t inByteLength,
+                                               sensekit_parameter_data_t inData,
+                                               size_t* resultByteLength,
+                                               sensekit_result_token_t* token)
+        {
+            return static_cast<SenseKitContext*>(streamService)->stream_invoke(connection, commandId, inByteLength, inData, *resultByteLength, *token);
         }
 
         static sensekit_status_t temp_update(void* streamService)

@@ -103,6 +103,14 @@ namespace sensekit {
         {
             return static_cast<PluginService*>(pluginService)->link_connection_to_bin(connection, binHandle);
         }
+
+        static sensekit_status_t get_parameter_bin(void* pluginService,
+                                                   size_t byteSize,
+                                                   sensekit_parameter_bin_t* binHandle,
+                                                   sensekit_parameter_data_t* parameterData)
+        {
+            return static_cast<PluginService*>(pluginService)->get_parameter_bin(byteSize, *binHandle, *parameterData);
+        }
     };
 }
 

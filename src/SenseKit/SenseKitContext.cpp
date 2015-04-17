@@ -308,42 +308,59 @@ namespace sensekit {
 
     sensekit_status_t SenseKitContext::stream_set_parameter(sensekit_streamconnection_t connection,
                                                             sensekit_parameter_id parameterId,
-                                                            size_t byteLength,
-                                                            sensekit_parameter_data_t* data)
+                                                            size_t inByteLength,
+                                                            sensekit_parameter_data_t inData)
     {
         assert(connection != nullptr);
         assert(connection->handle != nullptr);
 
         StreamConnection* actualConnection = StreamConnection::get_ptr(connection);
-        actualConnection->set_parameter(parameterId, byteLength, data);
+        actualConnection->set_parameter(parameterId, inByteLength, inData);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::stream_get_parameter_size(sensekit_streamconnection_t connection,
-                                                                 sensekit_parameter_id parameterId,
-                                                                 size_t& byteLength)
+    sensekit_status_t SenseKitContext::stream_get_parameter(sensekit_streamconnection_t connection,
+                                                            sensekit_parameter_id parameterId,
+                                                            size_t& resultByteLength,
+                                                            sensekit_result_token_t& token)
     {
         assert(connection != nullptr);
         assert(connection->handle != nullptr);
 
         StreamConnection* actualConnection = StreamConnection::get_ptr(connection);
 
-        actualConnection->get_parameter_size(parameterId, byteLength);
+        actualConnection->get_parameter(parameterId, resultByteLength, token);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::stream_get_parameter_data(sensekit_streamconnection_t connection,
-                                                                 sensekit_parameter_id parameterId,
-                                                                 size_t byteLength,
-                                                                 sensekit_parameter_data_t* data)
+    sensekit_status_t SenseKitContext::stream_get_result(sensekit_streamconnection_t connection,
+                                                         sensekit_result_token_t token,
+                                                         size_t dataByteLength,
+                                                         sensekit_parameter_data_t dataDestination)
     {
         assert(connection != nullptr);
         assert(connection->handle != nullptr);
 
         StreamConnection* actualConnection = StreamConnection::get_ptr(connection);
-        actualConnection->get_parameter_data(parameterId, byteLength, data);
+        actualConnection->get_result(token, dataByteLength, dataDestination);
+
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t SenseKitContext::stream_invoke(sensekit_streamconnection_t connection, 
+                                                     sensekit_command_id commandId, 
+                                                     size_t inByteLength, 
+                                                     sensekit_parameter_data_t inData,
+                                                     size_t& resultByteLength,
+                                                     sensekit_result_token_t& token)
+    {
+        assert(connection != nullptr);
+        assert(connection->handle != nullptr);
+
+        StreamConnection* actualConnection = StreamConnection::get_ptr(connection);
+        actualConnection->invoke(commandId, inByteLength, inData, resultByteLength, token);
 
         return SENSEKIT_STATUS_SUCCESS;
     }

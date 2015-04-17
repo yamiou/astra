@@ -34,6 +34,7 @@ set(${_projname}_SOURCES
   PluginService.cpp
   PluginService.h
   PluginServiceDelegate.h
+  ParameterBin.h
   StreamServiceDelegate.h
   StreamSet.cpp
   StreamSet.h

@@ -47,17 +47,18 @@ namespace sensekit {
 
         void on_set_parameter(StreamConnection* connection,
                               sensekit_parameter_id id,
-                              size_t byteLength,
-                              sensekit_parameter_data_t* data);
+                              size_t inByteLength,
+                              sensekit_parameter_data_t inData);
 
-        void on_get_parameter_size(StreamConnection* connection,
-                                   sensekit_parameter_id id,
-                                   size_t& byteLength);
+        void on_get_parameter(StreamConnection* connection,
+                              sensekit_parameter_id id,
+                              sensekit_parameter_bin_t& parameterBin);
 
-        void on_get_parameter_data(StreamConnection* connection,
-                                   sensekit_parameter_id id,
-                                   size_t byteLength,
-                                   sensekit_parameter_data_t* data);
+        void on_invoke(StreamConnection* connection, 
+                       sensekit_command_id commandId, 
+                       size_t inByteLength, 
+                       sensekit_parameter_data_t inData,
+                       sensekit_parameter_bin_t& parameterBin);
 
         virtual void on_availability_changed() = 0;
 

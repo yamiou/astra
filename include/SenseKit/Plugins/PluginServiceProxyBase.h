@@ -63,6 +63,11 @@ struct PluginServiceProxyBase
                                                 sensekit_streamconnection_t,
                                                 sensekit_bin_t);
 
+    sensekit_status_t (*get_parameter_bin)(void*,
+                                           size_t,
+                                           sensekit_parameter_bin_t*,
+                                           sensekit_parameter_data_t*);
+
 };
 
 #endif /* PLUGINSERVICEPROXYBASE_H */

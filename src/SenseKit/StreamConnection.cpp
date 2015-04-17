@@ -2,6 +2,7 @@
 #include "StreamConnection.h"
 #include "StreamBin.h"
 #include "Stream.h"
+#include "ParameterBin.h"
 
 namespace sensekit {
     using namespace std::placeholders;
@@ -126,25 +127,45 @@ namespace sensekit {
     }
 
     void StreamConnection::set_parameter(sensekit_parameter_id id,
-                                         size_t byteLength,
-                                         sensekit_parameter_data_t* data)
+                                         size_t inByteLength,
+                                         sensekit_parameter_data_t inData)
     {
-        m_stream->set_parameter(this, id, byteLength, data);
+        m_stream->set_parameter(this, id, inByteLength, inData);
     }
 
-    void StreamConnection::get_parameter_size(sensekit_parameter_id id,
-                                              size_t& byteLength)
+    void StreamConnection::get_parameter(sensekit_parameter_id id, 
+                                         size_t& resultByteLength, 
+                                         sensekit_result_token_t& token)
     {
-        m_stream->get_parameter_size(this, id, byteLength);
+
+        sensekit_parameter_bin_t parameterBinHandle;
+        m_stream->get_parameter(this, id, parameterBinHandle);
+        
+        ParameterBin* parameterBin = ParameterBin::get_ptr(parameterBinHandle);
+        resultByteLength = parameterBin->byteLength();
+        token = parameterBinHandle;
+        //TODO: cache resultData with a token lookup, set the token out parameter
     }
 
-    void StreamConnection::get_parameter_data(sensekit_parameter_id id,
-                                              size_t byteLength,
-                                              sensekit_parameter_data_t* data)
+    void StreamConnection::get_result(sensekit_result_token_t token, 
+                                      size_t dataByteLength, 
+                                      sensekit_parameter_data_t dataDestination)
     {
-        m_stream->get_parameter_data(this, id, byteLength, data);
+        //TODO lookup the token 
+        ParameterBin* parameterBin = ParameterBin::get_ptr(token);
+        memcpy(dataDestination, parameterBin->data(), dataByteLength);
     }
 
+    void StreamConnection::invoke(sensekit_command_id commandId, 
+                                  size_t inByteLength, 
+                                  sensekit_parameter_data_t inData,
+                                  size_t& resultByteLength,
+                                  sensekit_result_token_t token)
+    {
+        sensekit_parameter_bin_t parameterBin;
+        m_stream->invoke(this, commandId, inByteLength, inData, parameterBin);
+    }
+    
     StreamConnection::~StreamConnection()
     {
         set_bin(nullptr);

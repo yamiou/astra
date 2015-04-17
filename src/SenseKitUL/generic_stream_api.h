@@ -3,6 +3,8 @@
 
 #include <SenseKit/sensekit_capi.h>
 #include <SenseKit/Plugins/plugin_capi.h>
+#include <cassert>
+#include <string.h>
 
 template<typename TStreamType>
 sensekit_status_t sensekit_generic_stream_get(sensekit_reader_t reader,
@@ -58,5 +60,31 @@ sensekit_status_t sensekit_generic_frame_get_frameindex(TFrameType* frame,
     return SENSEKIT_STATUS_SUCCESS;
 }
 
+
+inline sensekit_status_t sensekit_stream_get_parameter_fixed(sensekit_streamconnection_t connection,
+                                                             sensekit_parameter_id parameterId,
+                                                             size_t byteLength,
+                                                             sensekit_parameter_data_t* data)
+{
+    sensekit_result_token_t token;
+    size_t paramSize;
+    sensekit_status_t rc = sensekit_stream_get_parameter(connection,
+                                                         parameterId,
+                                                         &paramSize,
+                                                         &token);
+
+    if (rc != SENSEKIT_STATUS_SUCCESS)
+    {
+        memset(data, 0, byteLength);
+        return rc;
+    }
+
+    assert(paramSize == byteLength);
+
+    return sensekit_stream_get_result(connection,
+                                      token,
+                                      byteLength,
+                                      data);
+}
 
 #endif /* GENERIC_STREAM_API_H */

@@ -3,9 +3,9 @@
 #include <SenseKitUL/streams/color_types.h>
 #include <SenseKitUL/streams/video_parameters.h>
 #include <SenseKitUL/Plugins/stream_types.h>
-#include <math.h>
 #include <string.h>
 #include <SenseKitUL/StreamTypes.h>
+#include <cassert>
 
 SENSEKIT_BEGIN_DECLS
 
@@ -22,19 +22,19 @@ SENSEKIT_API_EX sensekit_status_t sensekit_color_stream_get(sensekit_reader_t re
 SENSEKIT_API_EX sensekit_status_t sensekit_color_stream_get_hfov(sensekit_colorstream_t colorStream,
                                                                  float* hFov)
 {
-    return sensekit_stream_get_parameter_data(colorStream,
-                                              STREAM_PARAMETER_HFOV,
-                                              sizeof(float),
-                                              reinterpret_cast<sensekit_parameter_data_t*>(hFov));
+    return sensekit_stream_get_parameter_fixed(colorStream,
+                                               STREAM_PARAMETER_HFOV,
+                                               sizeof(float),
+                                               reinterpret_cast<sensekit_parameter_data_t*>(hFov));
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_color_stream_get_vfov(sensekit_colorstream_t colorStream,
                                                                  float* vFov)
 {
-    return sensekit_stream_get_parameter_data(colorStream,
-                                              STREAM_PARAMETER_VFOV,
-                                              sizeof(float),
-                                              reinterpret_cast<sensekit_parameter_data_t*>(vFov));
+    return sensekit_stream_get_parameter_fixed(colorStream,
+                                               STREAM_PARAMETER_VFOV,
+                                               sizeof(float),
+                                               reinterpret_cast<sensekit_parameter_data_t*>(vFov));
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_color_stream_get_by_type(sensekit_reader_t reader,

@@ -52,8 +52,8 @@ namespace sensekit {
 
     void StreamBackend::on_set_parameter(StreamConnection* connection,
                                          sensekit_parameter_id id,
-                                         size_t byteLength,
-                                         sensekit_parameter_data_t* data)
+                                         size_t inByteLength,
+                                         sensekit_parameter_data_t inData)
     {
 
         if (m_callbacks &&
@@ -62,41 +62,40 @@ namespace sensekit {
             m_callbacks->setParameterCallback(m_callbacks->context,
                                              connection->get_handle(),
                                              id,
-                                             byteLength,
-                                             data);
+                                             inByteLength,
+                                             inData);
         }
     }
 
-    void StreamBackend::on_get_parameter_size(StreamConnection* connection,
-                                              sensekit_parameter_id id,
-                                              size_t& byteLength)
+    void StreamBackend::on_get_parameter(StreamConnection* connection,
+                                         sensekit_parameter_id id,
+                                         sensekit_parameter_bin_t& parameterBin)
     {
         if (m_callbacks &&
-            m_callbacks->getParameterSizeCallback != nullptr)
+            m_callbacks->getParameterCallback != nullptr)
         {
-            m_callbacks->getParameterSizeCallback(m_callbacks->context,
-                                                 connection->get_handle(),
-                                                 id,
-                                                 &byteLength);
+            m_callbacks->getParameterCallback(m_callbacks->context,
+                                              connection->get_handle(),
+                                              id,
+                                              &parameterBin);
         }
     }
 
-    void StreamBackend::on_get_parameter_data(StreamConnection* connection,
-                                              sensekit_parameter_id parameterId,
-                                              size_t byteLength,
-                                              sensekit_parameter_data_t* data)
+    void StreamBackend::on_invoke(StreamConnection* connection, 
+                                  sensekit_command_id commandId, 
+                                  size_t inByteLength, 
+                                  sensekit_parameter_data_t inData,
+                                  sensekit_parameter_bin_t& parameterBin)
     {
-        sensekit_streamconnection_t* streamConnection =
-            reinterpret_cast<sensekit_streamconnection_t*>(connection->get_handle());
-
         if (m_callbacks &&
-            m_callbacks->getParameterDataCallback != nullptr)
+            m_callbacks->invokeCallback != nullptr)
         {
-            m_callbacks->getParameterDataCallback(m_callbacks->context,
-                                                 connection->get_handle(),
-                                                 parameterId,
-                                                 byteLength,
-                                                 data);
+            m_callbacks->invokeCallback(m_callbacks->context,
+                                        connection->get_handle(),
+                                        commandId,
+                                        inByteLength,
+                                        inData,
+                                        &parameterBin);
         }
     }
 }

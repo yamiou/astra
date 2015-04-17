@@ -55,23 +55,23 @@ namespace sensekit { namespace plugins {
                   m_oniDevice(oniDevice) { }
 
             virtual ~OniDeviceStream()
-                {
-                    stop();
-                    cout << "destroying oni stream of type: " << get_description().get_type() << endl;
-                    m_oniStream.destroy();
-                }
+            {
+                stop();
+                cout << "destroying oni stream of type: " << get_description().get_type() << endl;
+                m_oniStream.destroy();
+            }
 
-            virtual void start() override
-                {
-                    m_oniStream.start();
-                    cout << "starting stream of type: " << get_description().get_type() << endl;
-                }
+            virtual void start() override final
+            {
+                cout << "starting stream of type: " << get_description().get_type() << endl;
+                m_oniStream.start();
+            }
 
-            virtual void stop() override
-                {
-                    cout << "stop stream of type: " << get_description().get_type() << endl;
-                    m_oniStream.stop();
-                }
+            virtual void stop() override final
+            {
+                cout << "stop stream of type: " << get_description().get_type() << endl;
+                m_oniStream.stop();
+            }
 
             virtual void set_new_buffer(sensekit_frame_t* newBuffer);
 
@@ -83,47 +83,58 @@ namespace sensekit { namespace plugins {
             virtual void set_parameter(sensekit_streamconnection_t connection,
                                        sensekit_parameter_id id,
                                        size_t byteLength,
-                                       sensekit_parameter_data_t* data) override
-                {
+                                       sensekit_parameter_data_t data) override
+            {
 
-                }
+            }
 
-            virtual void get_parameter_size(sensekit_streamconnection_t connection,
-                                            sensekit_parameter_id id,
-                                            size_t& byteLength) override
+            virtual void get_parameter(sensekit_streamconnection_t connection,
+                                       sensekit_parameter_id id,
+                                       sensekit_parameter_bin_t& parameterBin) override
+            {
+                switch (id)
                 {
-                    switch (id)
-                    {
-                    case STREAM_PARAMETER_HFOV:
-                    case STREAM_PARAMETER_VFOV:
-                        byteLength = sizeof(float);
-                        break;
+                case STREAM_PARAMETER_HFOV:
+                    {   
+                        size_t resultByteLength = sizeof(float);
+                        
+                        sensekit_parameter_data_t parameterData;
+                        sensekit_status_t rc = get_pluginService().get_parameter_bin(resultByteLength, 
+                                                                                     &parameterBin, 
+                                                                                     &parameterData);
+                        if (rc == SENSEKIT_STATUS_SUCCESS)
+                        {
+                            float* hFov = reinterpret_cast<float*>(parameterData);
+                            *hFov = m_oniStream.getHorizontalFieldOfView();
+                        }
                     }
-                }
+                    break;
+                case STREAM_PARAMETER_VFOV:
+                    {
+                        size_t resultByteLength = sizeof(float);
 
-            virtual void get_parameter_data(sensekit_streamconnection_t connection,
-                                            sensekit_parameter_id id,
-                                            size_t byteLength,
-                                            sensekit_parameter_data_t* data) override
-                {
-                    switch (id)
-                    {
-                    case STREAM_PARAMETER_HFOV:
-                    {
-                        assert(byteLength >= sizeof(float));
-                        float* hFov = reinterpret_cast<float*>(data);
-                        *hFov = m_oniStream.getHorizontalFieldOfView();
-                        break;
+                        sensekit_parameter_data_t parameterData;
+                        sensekit_status_t rc = get_pluginService().get_parameter_bin(resultByteLength,
+                                                                                     &parameterBin,
+                                                                                     &parameterData);
+                        if (rc == SENSEKIT_STATUS_SUCCESS)
+                        {
+                            float* vFov = reinterpret_cast<float*>(parameterData);
+                            *vFov = m_oniStream.getVerticalFieldOfView();
+                        }
                     }
-                    case STREAM_PARAMETER_VFOV:
-                    {
-                        assert(byteLength >= sizeof(float));
-                        float* vFov = reinterpret_cast<float*>(data);
-                        *vFov = m_oniStream.getVerticalFieldOfView();
-                        break;
-                    }
-                    }
+                    break;
                 }
+            }
+
+            virtual void invoke(sensekit_streamconnection_t connection,
+                sensekit_command_id commandId,
+                size_t inByteLength,
+                sensekit_parameter_data_t inData,
+                sensekit_parameter_bin_t& parameterBin) override
+            {
+                
+            }
 
             virtual void on_new_buffer(sensekit_frame_t* newBuffer,
                                        wrapper_type* wrapper) { }

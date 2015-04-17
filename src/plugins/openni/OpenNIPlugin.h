@@ -36,8 +36,8 @@ namespace sensekit
         private:
             void init_openni();
 
-            virtual void onDeviceConnected(const ::openni::DeviceInfo* info);
-            virtual void onDeviceDisconnected(const ::openni::DeviceInfo* info);
+            virtual void onDeviceConnected(const ::openni::DeviceInfo* info) override;
+            virtual void onDeviceDisconnected(const ::openni::DeviceInfo* info) override;
 
             sensekit_status_t read_streams();
 
