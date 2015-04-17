@@ -64,12 +64,14 @@ namespace sensekit {
 
         size_t handpoint_count()
         {
+            throwIfInvalidFrame();
             verify_handpointlist();
             return m_handPoints.size();
         }
 
         const HandPointList& handpoints()
         {
+            throwIfInvalidFrame();
             verify_handpointlist();
             return m_handPoints;
         }
@@ -78,12 +80,12 @@ namespace sensekit {
 
     private:
         void throwIfInvalidFrame()
+        {
+            if (m_handFrame == nullptr)
             {
-                if (m_handFrame == nullptr)
-                {
-                    throw std::logic_error("Cannot operate on an invalid frame");
-                }
+                throw std::logic_error("Cannot operate on an invalid frame");
             }
+        }
 
         void verify_handpointlist()
         {

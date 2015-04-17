@@ -74,9 +74,12 @@ namespace sensekit {
                 if (readerFrame != nullptr)
                 {
                     sensekit_depth_frame_get(readerFrame, &m_depthFrame);
-                    sensekit_depthframe_get_metadata(m_depthFrame, &m_metadata);
-                    sensekit_depthframe_get_frameindex(m_depthFrame, &m_frameIndex);
-                    sensekit_depthframe_get_data_ptr(m_depthFrame, &m_dataPtr, &m_dataLength);
+                    if (m_depthFrame != nullptr)
+                    {
+                        sensekit_depthframe_get_metadata(m_depthFrame, &m_metadata);
+                        sensekit_depthframe_get_frameindex(m_depthFrame, &m_frameIndex);
+                        sensekit_depthframe_get_data_ptr(m_depthFrame, &m_dataPtr, &m_dataLength);
+                    }
                 }
             }
 
@@ -97,12 +100,12 @@ namespace sensekit {
 
     private:
         void throwIfInvalidFrame()
+        {
+            if (m_depthFrame == nullptr)
             {
-                if (m_depthFrame == nullptr)
-                {
-                    throw std::logic_error("Cannot operate on an invalid frame");
-                }
+                throw std::logic_error("Cannot operate on an invalid frame");
             }
+        }
         sensekit_depthframe_t m_depthFrame{nullptr};
         sensekit_depthframe_metadata_t m_metadata;
         sensekit_frame_index_t m_frameIndex;

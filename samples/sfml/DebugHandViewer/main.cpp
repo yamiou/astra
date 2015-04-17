@@ -157,6 +157,7 @@ int main(int argc, char** argv)
     
     reader.stream<sensekit::DepthStream>().start();
     reader.stream<sensekit::HandStream>().start();
+    reader.stream<sensekit::HandDebugStream>().start();
     reader.addListener(listener);
 
     while (window.isOpen())

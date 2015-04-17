@@ -47,9 +47,12 @@ namespace sensekit {
             if (readerFrame != nullptr)
             {
                 sensekit_color_frame_get(readerFrame, &m_colorFrame);
-                sensekit_colorframe_get_metadata(m_colorFrame, &m_metadata);
-                sensekit_colorframe_get_frameindex(m_colorFrame, &m_frameIndex);
-                sensekit_colorframe_get_data_ptr(m_colorFrame, &m_dataPtr, &m_dataLength);
+                if (m_colorFrame != nullptr)
+                {
+                    sensekit_colorframe_get_metadata(m_colorFrame, &m_metadata);
+                    sensekit_colorframe_get_frameindex(m_colorFrame, &m_frameIndex);
+                    sensekit_colorframe_get_data_ptr(m_colorFrame, &m_dataPtr, &m_dataLength);
+                }
             }
         }
 
