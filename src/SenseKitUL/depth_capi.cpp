@@ -54,10 +54,10 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get(sensekit_reader_t re
                                                             sensekit_depthstream_t* depthStream)
 
 {
-    return sensekit_generic_stream_get(reader,
-                                       SENSEKIT_STREAM_DEPTH,
-                                       DEFAULT_SUBTYPE,
-                                       depthStream);
+    return sensekit_reader_get_stream(reader,
+                                      SENSEKIT_STREAM_DEPTH,
+                                      DEFAULT_SUBTYPE,
+                                      depthStream);
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get_hfov(sensekit_depthstream_t depthStream,
@@ -90,7 +90,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depth_frame_get(sensekit_reader_frame
 SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_frameindex(sensekit_depthframe_t depthFrame,
                                                                      sensekit_frame_index_t* index)
 {
-    return sensekit_imageframe_get_frameindex(depthFrame, index);
+    return sensekit_generic_frame_get_frameindex(depthFrame, index);
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_data_length(sensekit_depthframe_t depthFrame,

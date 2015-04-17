@@ -13,20 +13,20 @@ SENSEKIT_API_EX sensekit_status_t sensekit_hand_get_stream(sensekit_reader_t rea
                                                            sensekit_handstream_t* handStream)
 
 {
-    return sensekit_generic_stream_get(reader,
-                                       SENSEKIT_STREAM_HAND,
-                                       DEFAULT_SUBTYPE,
-                                       handStream);
+    return sensekit_reader_get_stream(reader,
+                                      SENSEKIT_STREAM_HAND,
+                                      DEFAULT_SUBTYPE,
+                                      handStream);
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_hand_debug_image_get_stream(sensekit_reader_t reader,
                                                                        sensekit_colorstream_t* handDebugImageStream)
 
 {
-    return sensekit_generic_stream_get(reader,
-                                       SENSEKIT_STREAM_HAND_DEBUG_IMAGE,
-                                       DEFAULT_SUBTYPE,
-                                       handDebugImageStream);
+    return sensekit_reader_get_stream(reader,
+                                      SENSEKIT_STREAM_HAND_DEBUG_IMAGE,
+                                      DEFAULT_SUBTYPE,
+                                      handDebugImageStream);
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_hand_get_frame(sensekit_reader_frame_t readerFrame,

@@ -14,10 +14,10 @@ SENSEKIT_API_EX sensekit_status_t sensekit_color_stream_get(sensekit_reader_t re
                                                             sensekit_colorstream_t* colorStream)
 
 {
-    return sensekit_generic_stream_get(reader,
-                                       SENSEKIT_STREAM_COLOR,
-                                       DEFAULT_SUBTYPE,
-                                       colorStream);
+    return sensekit_reader_get_stream(reader,
+                                      SENSEKIT_STREAM_COLOR,
+                                      DEFAULT_SUBTYPE,
+                                      colorStream);
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_color_stream_get_hfov(sensekit_colorstream_t colorStream,
@@ -44,10 +44,10 @@ SENSEKIT_API_EX sensekit_status_t sensekit_color_stream_get_by_type(sensekit_rea
                                                                     sensekit_colorstream_t* colorStream)
 
 {
-    return sensekit_generic_stream_get(reader,
-                                       type,
-                                       subtype,
-                                       colorStream);
+    return sensekit_reader_get_stream(reader,
+                                      type,
+                                      subtype,
+                                      colorStream);
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_color_frame_get(sensekit_reader_frame_t readerFrame,
@@ -62,7 +62,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_color_frame_get(sensekit_reader_frame
 SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_frameindex(sensekit_colorframe_t colorFrame,
                                                                      sensekit_frame_index_t* index)
 {
-    return sensekit_imageframe_get_frameindex(colorFrame, index);
+    return sensekit_generic_frame_get_frameindex(colorFrame, index);
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_data_length(sensekit_colorframe_t colorFrame,
