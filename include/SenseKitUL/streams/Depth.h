@@ -107,7 +107,7 @@ namespace sensekit {
             }
         }
         sensekit_depthframe_t m_depthFrame{nullptr};
-        sensekit_depthframe_metadata_t m_metadata;
+        sensekit_image_metadata_t m_metadata;
         sensekit_frame_index_t m_frameIndex;
         int16_t* m_dataPtr;
         size_t m_dataLength;

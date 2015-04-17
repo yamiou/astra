@@ -94,10 +94,10 @@ private:
 
     static SampleViewer* ms_self;
     void initTextMap(int width, int height);
-    void calculateNormals(sensekit_depthframe_t& frame, sensekit_depthframe_metadata_t metadata);
+    void calculateNormals(sensekit_depthframe_t& frame, sensekit_image_metadata_t metadata);
     void showTex(int depthWidth, int depthHeight);
-    void updateTex(sensekit_depthframe_t depthFrame, sensekit_depthframe_metadata_t metadata);
-    void CalculateHistogram(float* pHistogram, int histogramSize, sensekit_depthframe_t frame, sensekit_depthframe_metadata_t metadata);
+    void updateTex(sensekit_depthframe_t depthFrame, sensekit_image_metadata_t metadata);
+    void CalculateHistogram(float* pHistogram, int histogramSize, sensekit_depthframe_t frame, sensekit_image_metadata_t metadata);
     static void glutIdle();
     static void glutDisplay();
     static void glutKeyboard(unsigned char key, int x, int y);

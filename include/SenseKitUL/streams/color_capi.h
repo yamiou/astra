@@ -34,7 +34,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_copy_data(sensekit_colorfr
                                                                 uint8_t* data);
 
 SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_metadata(sensekit_colorframe_t colorFrame,
-                                                                   sensekit_colorframe_metadata_t* metadata);
+                                                                   sensekit_image_metadata_t* metadata);
 
 SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_frameindex(sensekit_colorframe_t colorFrame,
                                                                      sensekit_frame_index_t* index);

@@ -7,6 +7,7 @@
 #include <SenseKitUL/streams/video_parameters.h>
 #include <SenseKitUL/streams/depth_parameters.h>
 #include <string.h>
+#include <SenseKitUL/streams/image_types.h>
 
 SENSEKIT_BEGIN_DECLS
 
@@ -94,7 +95,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_frameindex(sensekit_de
 SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_data_length(sensekit_depthframe_t depthFrame,
                                                                       size_t* length)
 {
-    sensekit_depthframe_metadata_t metadata = depthFrame->metadata;
+    sensekit_image_metadata_t metadata = depthFrame->metadata;
 
     size_t size = metadata.width * metadata.height * metadata.bytesPerPixel;
     *length = size;
@@ -115,7 +116,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_data_ptr(sensekit_dept
 SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_copy_data(sensekit_depthframe_t depthFrame,
                                                                 int16_t* data)
 {
-    sensekit_depthframe_metadata_t metadata = depthFrame->metadata;
+    sensekit_image_metadata_t metadata = depthFrame->metadata;
     size_t size = metadata.width * metadata.height * metadata.bytesPerPixel;
 
     memcpy(data, depthFrame->data, size);
@@ -124,7 +125,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_copy_data(sensekit_depthfr
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_metadata(sensekit_depthframe_t depthFrame,
-                                                                   sensekit_depthframe_metadata_t* metadata )
+                                                                   sensekit_image_metadata_t* metadata )
 {
     *metadata = depthFrame->metadata;
     return SENSEKIT_STATUS_SUCCESS;

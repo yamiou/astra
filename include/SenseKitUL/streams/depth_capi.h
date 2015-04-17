@@ -37,7 +37,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_copy_data(sensekit_depthfr
                                                                 int16_t* data);
 
 SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_metadata(sensekit_depthframe_t depthFrame,
-                                                                   sensekit_depthframe_metadata_t* metadata );
+                                                                   sensekit_image_metadata_t* metadata );
 
 SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_frameindex(sensekit_depthframe_t depthFrame,
                                                                      sensekit_frame_index_t* index);

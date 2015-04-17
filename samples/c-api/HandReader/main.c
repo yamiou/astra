@@ -54,7 +54,7 @@ void runHandStream(sensekit_reader_t reader)
             sensekit_colorframe_t handDebugImageFrame;
             sensekit_hand_debug_image_get_frame(frame, &handDebugImageFrame);
 
-            sensekit_colorframe_metadata_t metadata;
+            sensekit_image_metadata_t metadata;
             sensekit_colorframe_get_metadata(handDebugImageFrame, &metadata);
 
             sensekit_reader_close_frame(&frame);

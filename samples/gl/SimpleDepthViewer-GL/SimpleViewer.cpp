@@ -111,7 +111,7 @@ void SampleViewer::run()      //Does not return
 }
 
 void SampleViewer::calculateNormals(sensekit_depthframe_t& frame,
-                                    sensekit_depthframe_metadata_t metadata)
+                                    sensekit_image_metadata_t metadata)
 {
     int16_t* depthData;
     size_t depthLength;
@@ -333,7 +333,7 @@ void SampleViewer::showTex(int depthWidth, int depthHeight)
     glEnd();
 }
 
-void SampleViewer::updateTex(sensekit_depthframe_t depthFrame, sensekit_depthframe_metadata_t metadata)
+void SampleViewer::updateTex(sensekit_depthframe_t depthFrame, sensekit_image_metadata_t metadata)
 {
     int depthWidth = metadata.width;
     int depthHeight = metadata.height;
@@ -408,7 +408,7 @@ void SampleViewer::updateTex(sensekit_depthframe_t depthFrame, sensekit_depthfra
 }
 
 
-void SampleViewer::CalculateHistogram(float* pHistogram, int histogramSize, sensekit_depthframe_t frame, sensekit_depthframe_metadata_t metadata)
+void SampleViewer::CalculateHistogram(float* pHistogram, int histogramSize, sensekit_depthframe_t frame, sensekit_image_metadata_t metadata)
 {
     int16_t* pDepth;
     size_t length;
@@ -463,7 +463,7 @@ void SampleViewer::display()
         return;
     }
 
-    sensekit_depthframe_metadata_t metadata;
+    sensekit_image_metadata_t metadata;
     sensekit_depthframe_get_metadata(depthFrame, &metadata);
 
     int depthWidth = metadata.width;

@@ -110,7 +110,7 @@ void SimpleColorViewer::display()
 
     sensekit_colorframe_get_data_ptr(m_colorFrame, &colorData, &colorLength);
 
-    sensekit_colorframe_metadata_t metadata;
+    sensekit_image_metadata_t metadata;
     sensekit_colorframe_get_metadata(m_colorFrame, &metadata);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

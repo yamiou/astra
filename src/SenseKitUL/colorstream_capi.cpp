@@ -6,6 +6,7 @@
 #include <string.h>
 #include <SenseKitUL/StreamTypes.h>
 #include <cassert>
+#include <SenseKitUL/streams/image_types.h>
 
 SENSEKIT_BEGIN_DECLS
 
@@ -67,7 +68,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_frameindex(sensekit_co
 SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_data_length(sensekit_colorframe_t colorFrame,
                                                                       size_t* length)
 {
-    sensekit_colorframe_metadata_t metadata = colorFrame->metadata;
+    sensekit_image_metadata_t metadata = colorFrame->metadata;
 
     size_t size = metadata.width * metadata.height * metadata.bytesPerPixel;
     *length = size;
@@ -88,7 +89,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_data_ptr(sensekit_colo
 SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_copy_data(sensekit_colorframe_t colorFrame,
                                                                 uint8_t* data)
 {
-    sensekit_colorframe_metadata_t metadata = colorFrame->metadata;
+    sensekit_image_metadata_t metadata = colorFrame->metadata;
     size_t size = metadata.width * metadata.height * metadata.bytesPerPixel;
 
     memcpy(data, colorFrame->data, size);
@@ -97,7 +98,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_copy_data(sensekit_colorfr
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_metadata(sensekit_colorframe_t colorFrame,
-                                                                   sensekit_colorframe_metadata_t* metadata ){
+                                                                   sensekit_image_metadata_t* metadata ){
     *metadata = colorFrame->metadata;
     return SENSEKIT_STATUS_SUCCESS;
 }

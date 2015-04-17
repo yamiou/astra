@@ -81,7 +81,7 @@ namespace sensekit {
         }
 
         sensekit_colorframe_t m_colorFrame { nullptr };
-        sensekit_colorframe_metadata_t m_metadata;
+        sensekit_image_metadata_t m_metadata;
         sensekit_frame_index_t m_frameIndex;
         uint8_t* m_dataPtr;
         size_t m_dataLength;

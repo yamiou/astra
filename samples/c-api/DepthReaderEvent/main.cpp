@@ -8,7 +8,7 @@
 
 void print_depth(sensekit_depthframe_t depthFrame)
 {
-    sensekit_depthframe_metadata_t metadata;
+    sensekit_image_metadata_t metadata;
     int16_t* depthData;
     size_t depthLength;
 

@@ -140,7 +140,7 @@ namespace sensekit
                 {
                     debugImageFrame->frame.data = reinterpret_cast<uint8_t *>(&(debugImageFrame->frame_data));
 
-                    sensekit_colorframe_metadata_t metadata;
+                    sensekit_image_metadata_t metadata;
 
                     metadata.width = PROCESSING_SIZE_WIDTH;
                     metadata.height = PROCESSING_SIZE_HEIGHT;

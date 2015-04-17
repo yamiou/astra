@@ -8,7 +8,7 @@ namespace sensekit { namespace plugins {
             if (wrapper == nullptr)
                 return;
 
-            sensekit_colorframe_metadata_t metadata;
+            sensekit_image_metadata_t metadata;
 
             metadata.width = m_oniVideoMode.getResolutionX();
             metadata.height = m_oniVideoMode.getResolutionY();
