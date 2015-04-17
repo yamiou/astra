@@ -10,13 +10,13 @@ namespace sensekit {
     {
     public:
         Frame(sensekit_reader_frame_t readerFrame)
-            : m_frame(std::make_shared<FrameRef>(readerFrame))
+            : m_frameRef(std::make_shared<FrameRef>(readerFrame))
             { }
 
         template<typename T>
         T get()
             {
-                return T(m_frame->get());
+                return T(m_frameRef->get());
             }
 
     private:
@@ -40,7 +40,7 @@ namespace sensekit {
             sensekit_reader_frame_t m_frame;
         };
 
-        std::shared_ptr<FrameRef> m_frame;
+        std::shared_ptr<FrameRef> m_frameRef;
     };
 }
 
