@@ -66,4 +66,13 @@ typedef void(*sensekit_frame_ready_callback_t)(void* clientTag,
                                                sensekit_reader_t reader,
                                                sensekit_reader_frame_t frame);
 
+typedef enum {
+    FATAL,
+    ERROR,
+    WARN,
+    INFO,
+    DEBUG,
+    TRACE
+} sensekit_log_severity_t;
+
 #endif /* SENSEKIT_TYPES_H */

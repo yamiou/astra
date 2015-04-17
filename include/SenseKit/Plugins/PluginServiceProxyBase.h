@@ -3,7 +3,7 @@
 #define PLUGINSERVICEPROXYBASE_H
 
 #include <SenseKit/sensekit_types.h>
-#include <SenseKit/Plugins/plugin_callbacks.h>
+#include <stdarg.h>
 
 struct PluginServiceProxyBase
 {
@@ -67,6 +67,11 @@ struct PluginServiceProxyBase
                                            size_t,
                                            sensekit_parameter_bin_t*,
                                            sensekit_parameter_data_t*);
+
+    sensekit_status_t (*log)(void*,
+                             sensekit_log_severity_t,
+                             const char*,
+                             va_list);
 
 };
 

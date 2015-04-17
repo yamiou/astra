@@ -6,6 +6,7 @@
 #include "Stream.h"
 #include "StreamBin.h"
 #include "Core/Signal.h"
+#include <cstdarg>
 
 using CallbackId = size_t;
 

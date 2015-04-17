@@ -3,6 +3,7 @@
 
 #include <SenseKit/sensekit_types.h>
 #include "PluginServiceProxy.h"
+#include <SenseKit/Plugins/PluginLogger.h>
 #include <cassert>
 
 namespace sensekit {
@@ -11,7 +12,8 @@ namespace sensekit {
     {
     public:
         PluginBase(PluginServiceProxy* pluginService)
-            :  m_pluginService(pluginService)
+            :  m_pluginService(pluginService),
+               m_logger(*pluginService)
             {
                 assert(pluginService != nullptr);
             }
@@ -24,9 +26,12 @@ namespace sensekit {
 
     protected:
         inline PluginServiceProxy& get_pluginService() const  { return *m_pluginService; }
+        inline sensekit::plugins::PluginLogger& get_logger() { return m_logger; }
+
         virtual void on_initialize() { };
     private:
         PluginServiceProxy* m_pluginService{nullptr};
+        sensekit::plugins::PluginLogger m_logger;
 
     };
 }

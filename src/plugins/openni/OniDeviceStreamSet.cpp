@@ -6,7 +6,7 @@ namespace sensekit { namespace plugins {
         {
             ::openni::Status rc = ::openni::STATUS_OK;
 
-            cout << "opening depth stream" << endl;
+            m_logger.info("opening depth stream");
             if (rc == ::openni::STATUS_OK)
             {
                 OniDepthStream* stream = new OniDepthStream(m_pluginService,
@@ -18,10 +18,10 @@ namespace sensekit { namespace plugins {
             }
             else
             {
-                cout << "Failed to open depth stream" << endl;
+                m_logger.warn("Failed to open depth stream");
             }
 
-            cout << "opening color stream" << endl;
+            m_logger.info("opening color stream");
 
             if (rc == ::openni::STATUS_OK)
             {
@@ -34,7 +34,7 @@ namespace sensekit { namespace plugins {
             }
             else
             {
-                cout << "Failed to open color stream" << endl;
+                m_logger.warn("Failed to open color stream");
             }
 
             return SENSEKIT_STATUS_SUCCESS;

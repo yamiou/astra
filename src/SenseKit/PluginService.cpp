@@ -3,13 +3,12 @@
 #include "SenseKitContext.h"
 #include "PluginServiceDelegate.h"
 #include <SenseKit/Plugins/PluginServiceProxyBase.h>
-#include <iostream>
 #include <SenseKit/sensekit_types.h>
 #include "CreatePluginProxy.h"
 #include "ParameterBin.h"
-
-using std::cout;
-using std::endl;
+#include "Logging.h"
+#include <cstdio>
+#include <memory>
 
 namespace sensekit
 {
@@ -62,8 +61,8 @@ namespace sensekit
                                                                        CallbackId& callbackId)
     {
         auto thunk = [clientTag, callback](sensekit_streamset_t ss,
-            sensekit_stream_t s,
-            sensekit_stream_desc_t d)
+                                           sensekit_stream_t s,
+                                           sensekit_stream_desc_t d)
             { callback(clientTag, ss, s, d); };
 
         callbackId = m_streamRemovingSignal += thunk;
@@ -90,7 +89,7 @@ namespace sensekit
                                                    stream_callbacks_t pluginCallbacks,
                                                    sensekit_stream_t& handle)
     {
-        cout << "registering stream." << endl;
+        LOG(INFO) << "registering stream.";
 
         // TODO add to specific stream set
         Stream* stream = m_context.get_rootSet().create_stream(desc, pluginCallbacks);
@@ -106,8 +105,7 @@ namespace sensekit
         if (streamHandle == nullptr)
             return SENSEKIT_STATUS_INVALID_PARAMETER;
 
-        cout << "unregistered stream." << endl;
-
+        LOG(INFO) << "unregistered stream.";
         //TODO refactor this mess
 
         StreamSet* set = &m_context.get_rootSet();
@@ -192,6 +190,27 @@ namespace sensekit
 
         binHandle = parameterBin->get_handle();
         parameterData = parameterBin->data();
+
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t PluginService::log(sensekit_log_severity_t logLevel,
+                                         const char* format,
+                                         va_list args)
+    {
+#ifdef _WIN32
+        int len = _vscprintf(format, args);
+#else
+        va_list argsCopy;
+        va_copy(argsCopy, args);
+        int len = vsnprintf(nullptr, 0, format, argsCopy);
+        va_end(argsCopy);
+#endif
+
+        std::unique_ptr<char[]> buffer(new char[len + 1]);
+        vsnprintf(buffer.get(), len + 1, format, args);
+
+        sensekit::log(logLevel, buffer.get());
 
         return SENSEKIT_STATUS_SUCCESS;
     }

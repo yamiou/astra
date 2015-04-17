@@ -2,8 +2,11 @@
 #include "SenseKitContext.h"
 #include <SenseKit/Plugins/StreamServiceProxyBase.h>
 #include <SenseKitAPI.h>
+#include "Logging.h"
 
 static sensekit::SenseKitContext g_Context;
+
+INITIALIZE_LOGGING
 
 SENSEKIT_BEGIN_DECLS
 

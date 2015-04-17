@@ -4,12 +4,9 @@
 #include <SenseKit/SenseKit.h>
 #include <SenseKit/Plugins/PluginServiceProxy.h>
 #include <SenseKit/Plugins/StreamCallbackListener.h>
+#include <SenseKit/Plugins/PluginLogger.h>
 #include <system_error>
 #include <cassert>
-
-#include <iostream>
-using std::cout;
-using std::endl;
 
 namespace sensekit { namespace plugins {
 
@@ -22,20 +19,25 @@ namespace sensekit { namespace plugins {
                StreamDescription description) :
             m_pluginService(pluginService),
             m_streamSet(streamSet),
-            m_description(description)
+            m_description(description),
+            m_logger(pluginService)
         {
             create_stream(description);
         }
 
         virtual ~Stream()
         {
-            cout << "destroying sensekit stream of type " << m_description.get_type() << endl;
+            m_logger.info("destroying sensekit stream of type: %d", m_description.get_type());
             m_pluginService.destroy_stream(m_streamHandle);
         }
 
         inline const StreamDescription& get_description() { return m_description; }
 
+    protected:
+        inline sensekit::plugins::PluginLogger& get_logger() { return m_logger; }
+
     private:
+        sensekit::plugins::PluginLogger m_logger;
         virtual void connection_added(sensekit_stream_t stream,
                                       sensekit_streamconnection_t connection) override final;
 
@@ -54,7 +56,7 @@ namespace sensekit { namespace plugins {
         {
             assert(m_streamHandle == nullptr);
 
-            cout << "creating stream of type: " << m_description.get_type() << endl;
+            m_logger.info("creating stream of type: %d", m_description.get_type());
             stream_callbacks_t pluginCallbacks = create_plugin_callbacks(this);
 
             sensekit_stream_desc_t desc = description.get_desc_t();
@@ -75,10 +77,11 @@ namespace sensekit { namespace plugins {
 
         void create_bin(size_t binSize, sensekit_bin_t& binHandle, sensekit_frame_t*& buffer)
         {
-            cout << "creating bin -- "
-                 << " handle: " << m_streamHandle
-                 << " type: " << m_description.get_type()
-                 << " size: " << binSize << endl;
+            m_logger.info("creating bin -- handle: %d stream: %d type: %d size: %d",
+                 binHandle,
+                 m_streamHandle,
+                 m_description.get_type(),
+                 binSize);
 
             m_pluginService.create_stream_bin(m_streamHandle,
                                               binSize,
@@ -95,18 +98,18 @@ namespace sensekit { namespace plugins {
         {
             if (bin != nullptr)
             {
-                cout << "linking connection to bin -- "
-                     << " handle: " << m_streamHandle
-                     << " type: " << m_description.get_type()
-                     << " conn: " << connection
-                     << " bin: " << bin << endl;
+                m_logger.info("linking connection to bin -- stream: %d type: %d conn: %d bin: %d",
+                     m_streamHandle,
+                     m_description.get_type(),
+                     connection,
+                     bin);
             }
             else
             {
-                cout << "unlinking connection -- "
-                     << " handle: " << m_streamHandle
-                     << " type: " << m_description.get_type()
-                     << " conn: " << connection << endl;
+                m_logger.info("linking connection to bin -- stream: %d type: %d conn: %d",
+                     m_streamHandle,
+                     m_description.get_type(),
+                     connection);
             }
 
             m_pluginService.link_connection_to_bin(connection, bin);
@@ -114,10 +117,10 @@ namespace sensekit { namespace plugins {
 
         void destroy_bin(sensekit_bin_t& binHandle, sensekit_frame_t*& buffer)
         {
-            cout << "destroying bin -- "
-                 << " handle: " << m_streamHandle
-                 << " type: " << m_description.get_type()
-                 << " bin: " << binHandle << endl;
+            m_logger.info("destroying bin -- %d stream: %d type: %d size: %d",
+                 binHandle,
+                 m_streamHandle,
+                 m_description.get_type());
 
             m_pluginService.destroy_stream_bin(m_streamHandle, &binHandle, &buffer);
         }

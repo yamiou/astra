@@ -6,6 +6,7 @@
 #include "Stream.h"
 #include "StreamBin.h"
 #include "Core/Signal.h"
+#include <cstdarg>
 
 using CallbackId = size_t;
 
@@ -56,6 +57,9 @@ namespace sensekit
         sensekit_status_t get_parameter_bin(size_t byteSize,
                                             sensekit_parameter_bin_t& binHandle,
                                             sensekit_parameter_data_t& parameterData);
+        sensekit_status_t log(sensekit_log_severity_t logLevel,
+                              const char* format,
+                              va_list args);
 
     private:
         SenseKitContext& m_context;

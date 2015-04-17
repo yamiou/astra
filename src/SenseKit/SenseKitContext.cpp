@@ -8,6 +8,7 @@
 #include "StreamConnection.h"
 #include "StreamServiceDelegate.h"
 #include "CreateStreamProxy.h"
+#include "Logging.h"
 
 namespace sensekit {
 
@@ -23,6 +24,7 @@ namespace sensekit {
         if (m_initialized)
             return SENSEKIT_STATUS_SUCCESS;
 
+        log(WARN, "Hold on to yer butts");
         m_pluginServiceProxy = m_pluginService.create_proxy();
         m_streamServiceProxy = create_stream_proxy(this);
 
@@ -349,9 +351,9 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::stream_invoke(sensekit_streamconnection_t connection, 
-                                                     sensekit_command_id commandId, 
-                                                     size_t inByteLength, 
+    sensekit_status_t SenseKitContext::stream_invoke(sensekit_streamconnection_t connection,
+                                                     sensekit_command_id commandId,
+                                                     size_t inByteLength,
                                                      sensekit_parameter_data_t inData,
                                                      size_t& resultByteLength,
                                                      sensekit_result_token_t& token)

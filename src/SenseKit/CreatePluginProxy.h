@@ -25,6 +25,7 @@ PluginServiceProxyBase* create_plugin_proxy(PluginService* service)
         proxy->cycle_bin_buffers = &PluginServiceDelegate::cycle_bin_buffers;
         proxy->link_connection_to_bin = &PluginServiceDelegate::link_connection_to_bin;
         proxy->get_parameter_bin = &PluginServiceDelegate::get_parameter_bin;
+        proxy->log = &PluginServiceDelegate::log;
         proxy->pluginService = service;
 
         return proxy;

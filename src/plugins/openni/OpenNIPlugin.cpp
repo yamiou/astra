@@ -3,10 +3,6 @@
 #include <SenseKitUL/StreamTypes.h>
 #include "OniDepthStream.h"
 #include "OniColorStream.h"
-#include <iostream>
-
-using std::cout;
-using std::endl;
 
 EXPORT_PLUGIN(sensekit::plugins::OpenNIPlugin);
 
@@ -16,18 +12,25 @@ namespace sensekit
     {
         void OpenNIPlugin::init_openni()
         {
+            openni::Version version = openni::OpenNI::getVersion();
+
+            get_logger().info("Initializing OpenNI v%d.%d.%d.%d",
+                 version.major,
+                 version.minor,
+                 version.maintenance,
+                 version.build);
+
             ::openni::Status rc = ::openni::STATUS_OK;
 
             ::openni::OpenNI::addDeviceConnectedListener(this);
             ::openni::OpenNI::addDeviceDisconnectedListener(this);
 
-            cout << "Initializing openni" << endl;
             rc = ::openni::OpenNI::initialize();
         }
 
         void OpenNIPlugin::onDeviceConnected(const ::openni::DeviceInfo* info)
         {
-            cout << "device connected, opening device" << endl;
+            get_logger().info("device connected, opening device");
             OniDeviceStreamSet* set = new OniDeviceStreamSet(get_pluginService(), info);
 
             m_sets.push_back(SetPtr(set));
@@ -35,7 +38,7 @@ namespace sensekit
 
         void OpenNIPlugin::onDeviceDisconnected(const ::openni::DeviceInfo* info)
         {
-            cout << "device disconnected" << endl;
+            get_logger().info("device disconnected");
             auto it = std::find_if(m_sets.begin(), m_sets.end(),
                                    [&info] (SetPtr& setPtr)
                                    -> bool
@@ -49,7 +52,7 @@ namespace sensekit
         OpenNIPlugin::~OpenNIPlugin()
         {
             m_sets.clear();
-            cout << "shutting down openni" << endl;
+            get_logger().info("shutting down openni");
             ::openni::OpenNI::shutdown();
         }
 

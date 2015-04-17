@@ -352,7 +352,7 @@ is replaced with replacement."
                                                      (enough-namestring x target-directory)
                                                      (in-to-out-filename (file-namestring x))
                                              ))
-                                  
+
                                  (process-file (namestring x))
                                  (setf (gethash fwd-path pp-cache) last-modify)
                                )

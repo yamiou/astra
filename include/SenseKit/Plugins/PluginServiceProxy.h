@@ -3,6 +3,9 @@
 #define PLUGINSERVICEPROXY_H
 
 #include "PluginServiceProxyBase.h"
+#include <SenseKit/Plugins/plugin_capi.h>
+#include <cstdarg>
+#include <cstdio>
 
 namespace sensekit {
 
@@ -95,6 +98,13 @@ namespace sensekit {
                                         sensekit_parameter_data_t* parameterData)
     {
         return PluginServiceProxyBase::get_parameter_bin(pluginService, byteSize, binHandle, parameterData);
+    }
+
+    sensekit_status_t log(sensekit_log_severity_t logLevel,
+                          const char* format,
+                          va_list args)
+    {
+        return PluginServiceProxyBase::log(pluginService, logLevel, format, args);
     }
     };
 }

@@ -6,11 +6,6 @@
 #include <SenseKit/Plugins/Stream.h>
 #include <SenseKitUL/streams/video_parameters.h>
 #include <OpenNI.h>
-#include <iostream>
-
-using std::cout;
-using std::endl;
-
 
 #ifndef MIN
 #define MIN(a,b) (((a)<(b))?(a):(b))
@@ -57,19 +52,19 @@ namespace sensekit { namespace plugins {
         virtual ~OniDeviceStream()
         {
             stop();
-            cout << "destroying oni stream of type: " << get_description().get_type() << endl;
+            get_logger().info("destroying oni stream of type: %d", get_description().get_type());
             m_oniStream.destroy();
         }
 
         virtual void start() override final
         {
-            cout << "starting stream of type: " << get_description().get_type() << endl;
+            get_logger().info("starting stream of type: %d", get_description().get_type());
             m_oniStream.start();
         }
 
         virtual void stop() override final
         {
-            cout << "stop stream of type: " << get_description().get_type() << endl;
+            get_logger().info("stop stream of type: %d", get_description().get_type());
             m_oniStream.stop();
         }
 

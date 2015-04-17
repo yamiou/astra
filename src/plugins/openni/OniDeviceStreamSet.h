@@ -2,6 +2,7 @@
 #define ONIDEVICESTREAMSET_H
 
 #include <SenseKit/Plugins/plugin_capi.h>
+#include <SenseKit/Plugins/PluginLogger.h>
 #include <OpenNI.h>
 #include <memory>
 #include <vector>
@@ -10,11 +11,6 @@
 #include "OniDepthStream.h"
 #include "OniColorStream.h"
 
-#include <iostream>
-
-using std::cout;
-using std::endl;
-
 namespace sensekit { namespace plugins {
 
         class OniDeviceStreamSet
@@ -22,7 +18,8 @@ namespace sensekit { namespace plugins {
         public:
             OniDeviceStreamSet(PluginServiceProxy& pluginService,
                                const openni::DeviceInfo* info)
-                : m_pluginService(pluginService)
+                : m_pluginService(pluginService),
+                  m_logger(pluginService)
                 {
                     m_oniDevice.open(info->getUri());
 
@@ -30,15 +27,17 @@ namespace sensekit { namespace plugins {
                     m_pluginService.create_stream_set(m_streamSetHandle);
                     m_sensor = std::unique_ptr<Sensor>(new Sensor(m_streamSetHandle));
 
-                    cout << "creating device streamset" << endl;
+                    m_logger.info("creating device streamset");
                     open_sensor_streams();
                 }
+
+
 
             ~OniDeviceStreamSet()
                 {
                     close_sensor_streams();
 
-                    cout << "destroying device streamset (and oni device)" << endl;
+                    m_logger.info("destroying device streamset (and oni device)");
                     m_pluginService.destroy_stream_set(m_streamSetHandle);
                     m_oniDevice.close();
                 }
@@ -70,7 +69,12 @@ namespace sensekit { namespace plugins {
 
             std::string get_uri() { return m_uri; }
 
+        protected:
+            inline sensekit::plugins::PluginLogger& get_logger() { return m_logger; }
+
         private:
+            sensekit::plugins::PluginLogger m_logger;
+
             sensekit_status_t open_sensor_streams();
             sensekit_status_t close_sensor_streams();
 

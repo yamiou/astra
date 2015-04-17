@@ -11,7 +11,7 @@
 (add-void-param :funcset "plugincallbacks"
                 :type "void*"
                 :name "instance")
-                
+
 ;; void set_parameter(sensekit_streamconnection_t connection,
 ;;                    sensekit_parameter_id id,
 ;;                    size_t inByteLength,
@@ -179,6 +179,16 @@
                 :params (list (make-param :type "size_t" :name "byteSize")
                               (make-param :type "sensekit_parameter_bin_t*" :name "binHandle" :deref t)
                               (make-param :type "sensekit_parameter_data_t*" :name "parameterData" :deref t)))
+
+;; sensekit_status_t log(sensekit_log_severity_t logLeve,
+;;                       const char* format,
+;;                       va_list args)
+(add-func       :funcset "plugin"
+                :returntype "sensekit_status_t"
+                :funcname "log"
+                :params (list (make-param :type "sensekit_log_severity_t" :name "logLevel")
+                              (make-param :type "const char*" :name "format")
+                              (make-param :type "va_list" :name "args")))
 
 ;; SENSEKIT_API sensekit_status_t sensekit_initialize();
 (add-func       :funcset "stream"

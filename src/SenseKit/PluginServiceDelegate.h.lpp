@@ -3,6 +3,7 @@
 #define PLUGINSERVICEDELEGATE_H
 
 #include <SenseKit/sensekit_types.h>
+#include <stdarg.h>
 #include "SenseKitContext.h"
 
 namespace sensekit {

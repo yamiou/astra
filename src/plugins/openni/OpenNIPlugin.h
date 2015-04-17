@@ -2,6 +2,7 @@
 #define OPENNIPLUGIN_H
 
 #include <SenseKit/SenseKit.h>
+#define ORBBEC_LOGGING
 #include <SenseKit/Plugins/PluginKit.h>
 #include "OniDeviceStream.h"
 #include "OniDeviceStreamSet.h"

@@ -3,6 +3,7 @@
 #define PLUGINSERVICEDELEGATE_H
 
 #include <SenseKit/sensekit_types.h>
+#include <stdarg.h>
 #include "SenseKitContext.h"
 
 namespace sensekit {
@@ -110,6 +111,14 @@ namespace sensekit {
                                                    sensekit_parameter_data_t* parameterData)
         {
             return static_cast<PluginService*>(pluginService)->get_parameter_bin(byteSize, *binHandle, *parameterData);
+        }
+
+        static sensekit_status_t log(void* pluginService,
+                                     sensekit_log_severity_t logLevel,
+                                     const char* format,
+                                     va_list args)
+        {
+            return static_cast<PluginService*>(pluginService)->log(logLevel, format, args);
         }
     };
 }
