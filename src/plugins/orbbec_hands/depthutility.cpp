@@ -70,7 +70,6 @@ namespace sensekit
                 matTarget.create(height, width, CV_32FC1);
 
                 const int16_t* depthData = depthFrameSrc.data();
-                size_t length = depthFrameSrc.length();
 
                 for (int y = 0; y < height; ++y)
                 {

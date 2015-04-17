@@ -16,7 +16,7 @@ void print_depth(sensekit::DepthFrame& depthFrame,
         int height = depthFrame.get_resolutionY();
         int frameIndex = depthFrame.get_frameIndex();
 
-        int16_t* buffer = new int16_t[depthFrame.length()];
+        int16_t* buffer = new int16_t[depthFrame.numPixels()];
         depthFrame.copy_to(buffer);
 
         size_t index = ((width * (height / 2.0f)) + (width / 2.0f));
@@ -50,24 +50,10 @@ class SampleFrameListener : public sensekit::FrameReadyListener
         
         if (depthFrame.is_valid())
         {
-            ++count;
             print_depth(depthFrame,
                 reader.stream<sensekit::DepthStream>().get_coordinateMapper());
         }
-        else
-        {
-            std::cout << "invalid frame(s)" << std::endl;
-        }
-
-        if (count == 100)
-        {
-            std::cout << "removing listener" << std::endl;
-            reader.removeListener(*this);
-        }
     }
-
-private:
-    int count{0};
 };
 
 int main(int argc, char** argv)
