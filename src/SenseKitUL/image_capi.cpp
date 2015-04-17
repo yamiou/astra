@@ -9,10 +9,10 @@
 
 SENSEKIT_BEGIN_DECLS
 
-SENSEKIT_API_EX sensekit_status_t sensekit_image_frame_get(sensekit_reader_frame_t readerFrame,
-                                                           sensekit_stream_type_t type,
-                                                           sensekit_stream_subtype_t subType,
-                                                           sensekit_imageframe_t* imageFrame)
+SENSEKIT_API_EX sensekit_status_t sensekit_reader_get_imageframe(sensekit_reader_frame_t readerFrame,
+                                                                 sensekit_stream_type_t type,
+                                                                 sensekit_stream_subtype_t subType,
+                                                                 sensekit_imageframe_t* imageFrame)
 {
     return sensekit_generic_frame_get<sensekit_imageframe_wrapper_t>(readerFrame,
                                                                      type,
