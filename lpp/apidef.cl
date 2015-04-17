@@ -8,6 +8,64 @@
                 :type "void*"
                 :name "pluginService")
 
+(add-void-param :funcset "plugincallbacks"
+                :type "void*"
+                :name "instance")
+                
+;; void set_parameter(sensekit_streamconnection_t connection,
+;;                    sensekit_parameter_id id,
+;;                    size_t inByteLength,
+;;                    sensekit_parameter_data_t inData)
+(add-func       :funcset "plugincallbacks"
+                :returntype "void"
+                :funcname "set_parameter"
+                :params (list (make-param :type "sensekit_streamconnection_t" :name "connection")
+                              (make-param :type "sensekit_parameter_id" :name "id")
+                              (make-param :type "size_t" :name "inByteLength")
+                              (make-param :type "sensekit_parameter_data_t" :name "inData")))
+
+;; void get_parameter(sensekit_streamconnection_t connection,
+;;                    sensekit_parameter_id id,
+;;                    sensekit_parameter_bin_t* parameterBin)
+(add-func       :funcset "plugincallbacks"
+                :returntype "void"
+                :funcname "get_parameter"
+                :params (list (make-param :type "sensekit_streamconnection_t" :name "connection")
+                              (make-param :type "sensekit_parameter_id" :name "id")
+                              (make-param :type "sensekit_parameter_bin_t*" :name "parameterBin" :deref T)))
+
+;; void invoke(sensekit_streamconnection_t connection,
+;;             sensekit_command_id commandId,
+;;             size_t inByteLength,
+;;             sensekit_parameter_data_t inData,
+;;             sensekit_parameter_bin_t* parameterBin)
+(add-func       :funcset "plugincallbacks"
+                :returntype "void"
+                :funcname "invoke"
+                :params (list (make-param :type "sensekit_streamconnection_t" :name "connection")
+                              (make-param :type "sensekit_command_id" :name "commandId")
+                              (make-param :type "size_t" :name "inByteLength")
+                              (make-param :type "sensekit_parameter_data_t" :name "inData")
+                              (make-param :type "sensekit_parameter_bin_t*" :name "parameterBin" :deref T)))
+
+;; void connection_added(sensekit_stream_t stream,
+;;                       sensekit_streamconnection_t connection)
+(add-func       :funcset "plugincallbacks"
+                :returntype "void"
+                :funcname "connection_added"
+                :params (list (make-param :type "sensekit_stream_t" :name "stream")
+                              (make-param :type "sensekit_streamconnection_t" :name "connection")))
+
+;; void connection_removed(sensekit_stream_t stream,
+;;                         sensekit_bin_t bin,
+;;                         sensekit_streamconnection_t connection)
+(add-func       :funcset "plugincallbacks"
+                :returntype "void"
+                :funcname "connection_removed"
+                :params (list (make-param :type "sensekit_stream_t" :name "stream")
+                              (make-param :type "sensekit_bin_t" :name "bin")
+                              (make-param :type "sensekit_streamconnection_t" :name "connection")))
+
 ;; sensekit_status_t register_stream_added_callback(stream_added_callback_t callback, void* clientTag, sensekit_callback_id_t* callbackId)
 (add-func       :funcset "plugin"
                 :returntype "sensekit_status_t"

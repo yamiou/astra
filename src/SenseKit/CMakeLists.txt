@@ -62,6 +62,8 @@ set(${_projname}_SOURCES_GEN
   ../../include/SenseKit/Plugins/StreamServiceProxy.h.lpp
   ../../include/SenseKit/Plugins/PluginServiceProxyBase.h.lpp
   ../../include/SenseKit/Plugins/PluginServiceProxy.h.lpp
+  ../../include/SenseKit/Plugins/StreamCallbackListener.h.lpp
+  ../../include/SenseKit/Plugins/plugin_callbacks.h.lpp
   )
 
 include_directories(${PROJECT_SOURCE_DIR}/src/SenseKitAPI)

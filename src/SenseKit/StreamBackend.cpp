@@ -29,24 +29,24 @@ namespace sensekit {
     void StreamBackend::on_connection_created(StreamConnection* connection, sensekit_stream_t stream)
     {
         if (m_callbacks &&
-            m_callbacks->connectionAddedCallback)
-            m_callbacks->connectionAddedCallback(m_callbacks->context,
-                                                 stream,
-                                                 connection->get_handle());
+            m_callbacks->connection_added_callback)
+            m_callbacks->connection_added_callback(m_callbacks->context,
+                                                   stream,
+                                                   connection->get_handle());
 
     }
 
     void StreamBackend::on_connection_destroyed(StreamConnection* connection, sensekit_stream_t stream)
     {
         if (m_callbacks &&
-            m_callbacks->connectionRemovedCallback)
+            m_callbacks->connection_removed_callback)
         {
             sensekit_bin_t binHandle = connection->get_bin_handle();
 
-            m_callbacks->connectionRemovedCallback(m_callbacks->context,
-                                                   stream,
-                                                   binHandle,
-                                                   connection->get_handle());
+            m_callbacks->connection_removed_callback(m_callbacks->context,
+                                                     stream,
+                                                     binHandle,
+                                                     connection->get_handle());
         }
     }
 
@@ -57,13 +57,13 @@ namespace sensekit {
     {
 
         if (m_callbacks &&
-            m_callbacks->setParameterCallback != nullptr)
+            m_callbacks->set_parameter_callback != nullptr)
         {
-            m_callbacks->setParameterCallback(m_callbacks->context,
-                                             connection->get_handle(),
-                                             id,
-                                             inByteLength,
-                                             inData);
+            m_callbacks->set_parameter_callback(m_callbacks->context,
+                                                connection->get_handle(),
+                                                id,
+                                                inByteLength,
+                                                inData);
         }
     }
 
@@ -72,12 +72,12 @@ namespace sensekit {
                                          sensekit_parameter_bin_t& parameterBin)
     {
         if (m_callbacks &&
-            m_callbacks->getParameterCallback != nullptr)
+            m_callbacks->get_parameter_callback != nullptr)
         {
-            m_callbacks->getParameterCallback(m_callbacks->context,
-                                              connection->get_handle(),
-                                              id,
-                                              &parameterBin);
+            m_callbacks->get_parameter_callback(m_callbacks->context,
+                                                connection->get_handle(),
+                                                id,
+                                                &parameterBin);
         }
     }
 
@@ -88,14 +88,14 @@ namespace sensekit {
                                   sensekit_parameter_bin_t& parameterBin)
     {
         if (m_callbacks &&
-            m_callbacks->invokeCallback != nullptr)
+            m_callbacks->invoke_callback != nullptr)
         {
-            m_callbacks->invokeCallback(m_callbacks->context,
-                                        connection->get_handle(),
-                                        commandId,
-                                        inByteLength,
-                                        inData,
-                                        &parameterBin);
+            m_callbacks->invoke_callback(m_callbacks->context,
+                                         connection->get_handle(),
+                                         commandId,
+                                         inByteLength,
+                                         inData,
+                                         &parameterBin);
         }
     }
 }
