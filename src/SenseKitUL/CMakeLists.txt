@@ -8,6 +8,7 @@ set(${_projname}_SOURCES
   ../../include/SenseKitUL/Vector2.h
   ../../include/SenseKitUL/Vector3.h
   ../../include/SenseKitUL/cvector.h
+  ../../include/SenseKitUL/streams/image_capi.h
   ../../include/SenseKitUL/streams/Depth.h
   ../../include/SenseKitUL/streams/depth_capi.h
   ../../include/SenseKitUL/streams/depth_types.h
@@ -20,8 +21,9 @@ set(${_projname}_SOURCES
   ../../include/SenseKitUL/streams/hand_types.h
   ../../include/SenseKitUL/streams/image_types.h
   ../../include/SenseKitUL/Plugins/stream_types.h
-  depthstream_capi.cpp
-  colorstream_capi.cpp
+  depth_capi.cpp
+  color_capi.cpp
+  image_capi.cpp
   hand_capi.cpp
   SenseKitUL.cpp
   generic_stream_api.h

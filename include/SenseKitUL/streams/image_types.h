@@ -22,4 +22,6 @@ typedef struct {
     uint8_t bytesPerPixel;
 } sensekit_image_metadata_t;
 
+typedef struct _sensekit_imageframe* sensekit_imageframe_t;
+
 #endif // IMAGE_TYPES_H
