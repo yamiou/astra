@@ -53,7 +53,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_color_stream_get_by_type(sensekit_rea
 SENSEKIT_API_EX sensekit_status_t sensekit_color_frame_get(sensekit_reader_frame_t readerFrame,
                                                            sensekit_colorframe_t* colorFrame)
 {
-    return sensekit_generic_frame_get<sensekit_colorframe_wrapper_t>(readerFrame,
+    return sensekit_generic_frame_get<sensekit_imageframe_wrapper_t>(readerFrame,
                                                                      SENSEKIT_STREAM_COLOR,
                                                                      DEFAULT_SUBTYPE,
                                                                      colorFrame);
@@ -80,7 +80,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_data_ptr(sensekit_colo
                                                                    uint8_t** data,
                                                                    size_t* length)
 {
-    *data = colorFrame->data;
+    *data = static_cast<uint8_t*>(colorFrame->data);
     sensekit_colorframe_get_data_length(colorFrame, length);
 
     return SENSEKIT_STATUS_SUCCESS;

@@ -19,13 +19,13 @@ namespace sensekit
                 ~DebugVisualizer() {}
 
                 void overlayCrosshairs(vector<TrackedPoint>& points,
-                                      _sensekit_colorframe& colorFrame)
+                                      _sensekit_imageframe& imageFrame)
                 {
-                    int width = colorFrame.metadata.width;
-                    int height = colorFrame.metadata.height;
+                    int width = imageFrame.metadata.width;
+                    int height = imageFrame.metadata.height;
 
-                    uint8_t* colorData = colorFrame.data;
-                    uint8_t bytesPerPixel = colorFrame.metadata.bytesPerPixel;
+                    uint8_t* colorData = static_cast<uint8_t*>(imageFrame.data);
+                    uint8_t bytesPerPixel = imageFrame.metadata.bytesPerPixel;
 
                     for (auto iter = points.begin(); iter != points.end(); ++iter)
                     {
@@ -90,17 +90,17 @@ namespace sensekit
                 void showDepthMat(cv::Mat& matDepth,
                                   cv::Mat& matForeground,
                                   vector<TrackedPoint>& points,
-                                  _sensekit_colorframe& colorFrame)
+                                  _sensekit_imageframe& imageFrame)
                 {
-                    assert(matDepth.cols == colorFrame.metadata.width);
-                    assert(matDepth.rows == colorFrame.metadata.height);
+                    assert(matDepth.cols == imageFrame.metadata.width);
+                    assert(matDepth.rows == imageFrame.metadata.height);
                     assert(matDepth.size() == matForeground.size());
 
                     int width = matDepth.cols;
                     int height = matDepth.rows;
 
-                    uint8_t* colorData = colorFrame.data;
-                    uint8_t bytesPerPixel = colorFrame.metadata.bytesPerPixel;
+                    uint8_t* colorData = static_cast<uint8_t*>(imageFrame.data);
+                    uint8_t bytesPerPixel = imageFrame.metadata.bytesPerPixel;
 
                     bool m_showForeground = false;
 
@@ -167,17 +167,17 @@ namespace sensekit
                         }
                     }
 
-                    overlayCrosshairs(points, colorFrame);
+                    overlayCrosshairs(points, imageFrame);
                 }
 
                 void showVelocityMat(cv::Mat& matVelocity,
                                      float maxScale,
                                      cv::Mat& matForeground,
                                      vector<TrackedPoint>& points,
-                                     _sensekit_colorframe& colorFrame)
+                                     _sensekit_imageframe& imageFrame)
                 {
-                    assert(matVelocity.cols == colorFrame.metadata.width);
-                    assert(matVelocity.rows == colorFrame.metadata.height);
+                    assert(matVelocity.cols == imageFrame.metadata.width);
+                    assert(matVelocity.rows == imageFrame.metadata.height);
                     assert(matVelocity.size() == matForeground.size());
 
                     if (maxScale == 0)
@@ -188,8 +188,8 @@ namespace sensekit
                     int width = matVelocity.cols;
                     int height = matVelocity.rows;
 
-                    uint8_t* colorData = colorFrame.data;
-                    uint8_t bytesPerPixel = colorFrame.metadata.bytesPerPixel;
+                    uint8_t* colorData = static_cast<uint8_t*>(imageFrame.data);
+                    uint8_t bytesPerPixel = imageFrame.metadata.bytesPerPixel;
 
                     for (int y = 0; y < height; ++y)
                     {
@@ -225,17 +225,17 @@ namespace sensekit
                         }
                     }
 
-                    overlayCrosshairs(points, colorFrame);
+                    overlayCrosshairs(points, imageFrame);
                 }
                 /*
                   template<typename T>
                   void DebugVisualizer::showNormArray<T>(cv::Mat& mat,
                   cv::Mat& mask,
                   vector<TrackedPoint>& points,
-                  _sensekit_colorframe& colorFrame)
+                  _sensekit_imageframe& imageFrame)
                   {
-                  assert(mat.cols == colorFrame.metadata.width);
-                  assert(mat.rows == colorFrame.metadata.height);
+                  assert(mat.cols == imageFrame.metadata.width);
+                  assert(mat.rows == imageFrame.metadata.height);
                   assert(mat.size() == mask.size());
 
                   int width = mat.cols;
@@ -251,8 +251,8 @@ namespace sensekit
                   {
                   rangeFactor = 255.0 / range;
                   }
-                  uint8_t* colorData = colorFrame.data;
-                  uint8_t bytesPerPixel = colorFrame.metadata.bytesPerPixel;
+                  uint8_t* colorData = imageFrame.data;
+                  uint8_t bytesPerPixel = imageFrame.metadata.bytesPerPixel;
 
                   for (int y = 0; y < height; ++y)
                   {
@@ -284,7 +284,7 @@ namespace sensekit
                   }
                   }
 
-                  overlayCrosshairs(points, colorFrame);
+                  overlayCrosshairs(points, imageFrame);
                   }
                   */
 

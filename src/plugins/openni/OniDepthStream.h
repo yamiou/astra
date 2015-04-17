@@ -9,7 +9,7 @@
 
 namespace sensekit { namespace plugins {
 
-        class OniDepthStream : public OniDeviceStream<sensekit_depthframe_wrapper_t,
+        class OniDepthStream : public OniDeviceStream<sensekit_imageframe_wrapper_t,
                                                       int16_t>
         {
         public:
@@ -21,15 +21,10 @@ namespace sensekit { namespace plugins {
                                   StreamDescription(
                                       SENSEKIT_STREAM_DEPTH,
                                       DEFAULT_SUBTYPE),
-                                  oniDevice)
+                                  oniDevice,
+                                  ::openni::SENSOR_DEPTH,
+                                  1)
                 {
-                    m_oniStream.create(m_oniDevice, ::openni::SENSOR_DEPTH);
-                    m_oniVideoMode = m_oniStream.getVideoMode();
-                    m_bufferLength =
-                        m_oniVideoMode.getResolutionX() *
-                        m_oniVideoMode.getResolutionY() *
-                        2;
-
                     refresh_conversion_cache(m_oniStream.getHorizontalFieldOfView(),
                                              m_oniStream.getVerticalFieldOfView(),
                                              m_oniVideoMode.getResolutionX(),
@@ -37,9 +32,6 @@ namespace sensekit { namespace plugins {
                 }
 
         private:
-            virtual void on_new_buffer(sensekit_frame_t* newBuffer,
-                                       wrapper_type* wrapper) override;
-
             void refresh_conversion_cache(float horizontalFov,
                                           float verticalFov,
                                           int resolutionX,

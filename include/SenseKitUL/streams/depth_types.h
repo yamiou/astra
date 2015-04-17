@@ -17,6 +17,6 @@ typedef struct
 
 typedef sensekit_streamconnection_t sensekit_depthstream_t;
 
-typedef struct _sensekit_depthframe* sensekit_depthframe_t;
+typedef struct _sensekit_imageframe* sensekit_depthframe_t;
 
 #endif // DEPTH_TYPES_H

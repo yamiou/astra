@@ -6,6 +6,7 @@
 #include <SenseKit/Plugins/Stream.h>
 #include <SenseKitUL/streams/video_parameters.h>
 #include <OpenNI.h>
+#include <SenseKitUL/streams/image_types.h>
 
 #ifndef MIN
 #define MIN(a,b) (((a)<(b))?(a):(b))
@@ -43,11 +44,23 @@ namespace sensekit { namespace plugins {
         OniDeviceStream(PluginServiceProxy& pluginService,
                         Sensor& streamSet,
                         StreamDescription desc,
-                        ::openni::Device& oniDevice)
+                        ::openni::Device& oniDevice,
+                        ::openni::SensorType oniSensorType,
+                        size_t numComponentPerPixel)
             : OniDeviceStreamBase(pluginService,
                                   streamSet,
                                   desc),
-              m_oniDevice(oniDevice) { }
+              m_oniDevice(oniDevice),
+              m_numComponentPerPixel(numComponentPerPixel),
+              m_bytesPerPixel(sizeof(block_type) * numComponentPerPixel)
+        {
+            m_oniStream.create(m_oniDevice, oniSensorType);
+            m_oniVideoMode = m_oniStream.getVideoMode();
+            m_bufferLength =
+                m_oniVideoMode.getResolutionX() *
+                m_oniVideoMode.getResolutionY() *
+                m_bytesPerPixel;
+        }
 
         virtual ~OniDeviceStream()
         {
@@ -131,8 +144,20 @@ namespace sensekit { namespace plugins {
 
         }
 
-        virtual void on_new_buffer(sensekit_frame_t* newBuffer,
-                                   wrapper_type* wrapper) { }
+        void on_new_buffer(sensekit_frame_t* newBuffer,
+                                   wrapper_type* wrapper)
+        {
+            if (wrapper == nullptr)
+                return;
+
+            sensekit_image_metadata_t metadata;
+
+            metadata.width = m_oniVideoMode.getResolutionX();
+            metadata.height = m_oniVideoMode.getResolutionY();
+            metadata.bytesPerPixel = m_bytesPerPixel;
+
+            wrapper->frame.metadata = metadata;
+        }
 
         virtual void read_frame() override;
 
@@ -143,10 +168,12 @@ namespace sensekit { namespace plugins {
         ::openni::Device& m_oniDevice;
         ::openni::VideoStream m_oniStream;
         ::openni::VideoMode m_oniVideoMode;
-        size_t m_bufferLength{0};
 
     private:
-        sensekit_stream_t m_streamHandle{nullptr};
+        size_t m_bufferLength{ 0 };
+        size_t m_bytesPerPixel{ 0 };
+        size_t m_numComponentPerPixel{ 0 };
+        sensekit_stream_t m_streamHandle{ nullptr };
         sensekit_bin_t m_binHandle{nullptr};
         sensekit_frame_t* m_currentBuffer{nullptr};
         wrapper_type* m_currentFrame{nullptr};
@@ -217,10 +244,10 @@ namespace sensekit { namespace plugins {
         {
             const block_type* oniFrameData = static_cast<const block_type*>(ref.getData());
 
-            block_type* frameData = m_currentFrame->frame.data;
-            size_t dataSize = MIN(ref.getDataSize(), m_bufferLength);
+            block_type* frameData = static_cast<block_type*>(m_currentFrame->frame.data);
+            size_t byteSize = MIN(ref.getDataSize(), m_bufferLength);
 
-            memcpy(frameData, oniFrameData, dataSize);
+            memcpy(frameData, oniFrameData, byteSize);
 
             ++m_frameIndex;
 

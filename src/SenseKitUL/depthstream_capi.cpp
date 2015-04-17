@@ -80,7 +80,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get_vfov(sensekit_depths
 SENSEKIT_API_EX sensekit_status_t sensekit_depth_frame_get(sensekit_reader_frame_t readerFrame,
                                                            sensekit_depthframe_t* depthFrame)
 {
-    return sensekit_generic_frame_get<sensekit_depthframe_wrapper_t>(readerFrame,
+    return sensekit_generic_frame_get<sensekit_imageframe_wrapper_t>(readerFrame,
                                                                      SENSEKIT_STREAM_DEPTH,
                                                                      DEFAULT_SUBTYPE,
                                                                      depthFrame);
@@ -107,7 +107,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_data_ptr(sensekit_dept
                                                                    int16_t** data,
                                                                    size_t* length)
 {
-    *data = depthFrame->data;
+    *data = static_cast<int16_t*>(depthFrame->data);
     sensekit_depthframe_get_data_length(depthFrame, length);
 
     return SENSEKIT_STATUS_SUCCESS;

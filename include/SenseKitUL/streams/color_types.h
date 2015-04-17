@@ -5,6 +5,6 @@
 
 typedef sensekit_streamconnection_t sensekit_colorstream_t;
 
-typedef struct _sensekit_colorframe* sensekit_colorframe_t;
+typedef struct _sensekit_imageframe* sensekit_colorframe_t;
 
 #endif // COLOR_TYPES_H

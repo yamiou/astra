@@ -9,16 +9,10 @@
 // https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
 // http://stackoverflow.com/questions/3350852/how-to-correctly-fix-zero-sized-array-in-struct-union-warning-c4200-without
 
-struct _sensekit_depthframe {
+struct _sensekit_imageframe {
     sensekit_frame_ref_t* frameRef;
     sensekit_image_metadata_t metadata;
-    int16_t* data;
-};
-
-struct _sensekit_colorframe {
-    sensekit_frame_ref_t* frameRef;
-    sensekit_image_metadata_t metadata;
-    uint8_t* data;
+    void* data;
 };
 
 struct _sensekit_handframe {
@@ -30,15 +24,10 @@ struct _sensekit_handframe {
 #pragma warning( push )
 #pragma warning( disable : 4200 )
 
-typedef struct _sensekit_depthframe_wrapper {
-    _sensekit_depthframe frame;
+typedef struct _sensekit_imageframe_wrapper {
+    _sensekit_imageframe frame;
     char frame_data[];
-} sensekit_depthframe_wrapper_t;
-
-typedef struct _sensekit_colorframe_wrapper {
-    _sensekit_colorframe frame;
-    char frame_data[];
-} sensekit_colorframe_wrapper_t;
+} sensekit_imageframe_wrapper_t;
 
 typedef struct _sensekit_handframe_wrapper {
     _sensekit_handframe frame;

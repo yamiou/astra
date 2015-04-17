@@ -37,7 +37,7 @@ namespace sensekit
                 static sensekit_handstatus_t convert_hand_status(TrackingStatus status);
                 static void reset_hand_point(sensekit_handpoint_t& point);
 
-                void update_debug_image_frame(_sensekit_colorframe& sensekitColorframe);
+                void update_debug_image_frame(_sensekit_imageframe& sensekitColorframe);
                 void generate_hand_debug_image_frame(sensekit_frame_index_t frameIndex);
                 void update_tracking(DepthFrame& depthFrame);
                 void update_hand_frame(std::vector<TrackedPoint>& internalTrackedPoints, _sensekit_handframe& frame);
@@ -49,7 +49,7 @@ namespace sensekit
                 DepthStream m_depthStream;
                 PluginServiceProxy& m_pluginService;
 
-                using ColorStream = SingleBinStream<sensekit_colorframe_wrapper_t, uint8_t>;
+                using ColorStream = SingleBinStream<sensekit_imageframe_wrapper_t, uint8_t>;
                 using ColorStreamPtr = std::unique_ptr <ColorStream> ;
                 ColorStreamPtr m_debugImageStream;
 

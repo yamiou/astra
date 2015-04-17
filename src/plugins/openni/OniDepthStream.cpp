@@ -3,21 +3,6 @@
 
 namespace sensekit { namespace plugins {
 
-        void OniDepthStream::on_new_buffer(sensekit_frame_t* newBuffer,
-                                           wrapper_type* wrapper)
-        {
-            if (wrapper == nullptr)
-                return;
-
-            sensekit_image_metadata_t metadata;
-
-            metadata.width = m_oniVideoMode.getResolutionX();
-            metadata.height = m_oniVideoMode.getResolutionY();
-            metadata.bytesPerPixel = 2;
-
-            wrapper->frame.metadata = metadata;
-        }
-
         void OniDepthStream::get_parameter(sensekit_streamconnection_t connection,
                                            sensekit_parameter_id id,
                                            sensekit_parameter_bin_t& parameterBin)

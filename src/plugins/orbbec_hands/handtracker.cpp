@@ -134,7 +134,7 @@ namespace sensekit
 
             void HandTracker::generate_hand_debug_image_frame(sensekit_frame_index_t frameIndex)
             {
-                sensekit_colorframe_wrapper_t* debugImageFrame = m_debugImageStream->begin_write(frameIndex);
+                sensekit_imageframe_wrapper_t* debugImageFrame = m_debugImageStream->begin_write(frameIndex);
 
                 if (debugImageFrame != nullptr)
                 {
@@ -269,7 +269,7 @@ namespace sensekit
                 point.worldDeltaPosition = sensekit_vector3f_t();
             }
 
-            void HandTracker::update_debug_image_frame(_sensekit_colorframe& colorFrame)
+            void HandTracker::update_debug_image_frame(_sensekit_imageframe& colorFrame)
             {
                 m_debugVisualizer.showDepthMat(m_matDepth,
                                                m_matForeground,
