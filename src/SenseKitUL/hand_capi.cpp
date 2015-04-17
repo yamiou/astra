@@ -38,6 +38,16 @@ SENSEKIT_API_EX sensekit_status_t sensekit_hand_get_frame(sensekit_reader_frame_
                                                                     handFrame);
 }
 
+sensekit_status_t sensekit_hand_get_frame_with_subtype(sensekit_reader_frame_t readerFrame, 
+                                                       sensekit_stream_subtype_t subtype, 
+                                                       sensekit_handframe_t* handFrame)
+{
+    return sensekit_generic_frame_get<sensekit_handframe_wrapper_t>(readerFrame,
+                                                                    SENSEKIT_STREAM_HAND,
+                                                                    subtype,
+                                                                    handFrame);
+}
+
 SENSEKIT_API_EX sensekit_status_t sensekit_hand_debug_image_get_frame(sensekit_reader_frame_t readerFrame,
                                                                       sensekit_colorframe_t* handDebugImageFrame)
 {

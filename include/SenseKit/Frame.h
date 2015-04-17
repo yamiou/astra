@@ -11,13 +11,19 @@ namespace sensekit {
     public:
         Frame(sensekit_reader_frame_t readerFrame)
             : m_frameRef(std::make_shared<FrameRef>(readerFrame))
-            { }
+        { }
 
         template<typename T>
         T get()
-            {
-                return T(m_frameRef->get());
-            }
+        {
+            return get<T>(DEFAULT_SUBTYPE);
+        }
+
+        template<typename T>
+        T get(sensekit_stream_subtype_t subtype)
+        {
+            return T(m_frameRef->get(), subtype);
+        }
 
     private:
         class FrameRef

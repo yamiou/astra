@@ -26,6 +26,10 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get_vfov(sensekit_depths
 SENSEKIT_API_EX sensekit_status_t sensekit_depth_frame_get(sensekit_reader_frame_t readerFrame,
                                                            sensekit_depthframe_t* depthFrame);
 
+SENSEKIT_API_EX sensekit_status_t sensekit_depth_frame_get_with_subtype(sensekit_reader_frame_t readerFrame,
+                                                                        sensekit_stream_subtype_t subtype,
+                                                                        sensekit_depthframe_t* colorFrame);
+
 SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_data_length(sensekit_depthframe_t depthFrame,
                                                                       size_t* length);
 

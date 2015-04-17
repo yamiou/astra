@@ -23,6 +23,10 @@ SENSEKIT_API_EX sensekit_status_t sensekit_color_stream_get_vfov(sensekit_colors
 SENSEKIT_API_EX sensekit_status_t sensekit_color_frame_get(sensekit_reader_frame_t readerFrame,
                                                            sensekit_colorframe_t* colorFrame);
 
+SENSEKIT_API_EX sensekit_status_t sensekit_color_frame_get_with_subtype(sensekit_reader_frame_t readerFrame,
+                                                                        sensekit_stream_subtype_t subtype,
+                                                                        sensekit_colorframe_t* colorFrame);
+
 SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_data_length(sensekit_colorframe_t colorFrame,
                                                                       size_t* length);
 

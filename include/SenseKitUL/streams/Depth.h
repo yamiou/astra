@@ -69,8 +69,8 @@ namespace sensekit {
     class DepthFrame : public ImageFrame<int16_t>
     {
     public:
-        DepthFrame(sensekit_reader_frame_t readerFrame)
-            : ImageFrame(readerFrame, SENSEKIT_STREAM_DEPTH, DEFAULT_SUBTYPE)
+        DepthFrame(sensekit_reader_frame_t readerFrame, sensekit_stream_subtype_t subtype)
+            : ImageFrame(readerFrame, SENSEKIT_STREAM_DEPTH, subtype)
         { }
     };
 }

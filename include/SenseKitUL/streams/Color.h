@@ -43,16 +43,16 @@ namespace sensekit {
     class ColorFrame : public ImageFrame<RGBPixel>
     {
     public:
-        ColorFrame(sensekit_reader_frame_t readerFrame) 
-            : ImageFrame(readerFrame, SENSEKIT_STREAM_COLOR, DEFAULT_SUBTYPE)
+        ColorFrame(sensekit_reader_frame_t readerFrame, sensekit_stream_subtype_t subtype)
+            : ImageFrame(readerFrame, SENSEKIT_STREAM_COLOR, subtype)
         { }
     };
 
     class ColorFrameRaw : public ImageFrame<uint8_t>
     {
     public:
-        ColorFrameRaw(sensekit_reader_frame_t readerFrame)
-            : ImageFrame(readerFrame, SENSEKIT_STREAM_COLOR, DEFAULT_SUBTYPE)
+        ColorFrameRaw(sensekit_reader_frame_t readerFrame, sensekit_stream_subtype_t subtype)
+            : ImageFrame(readerFrame, SENSEKIT_STREAM_COLOR, subtype)
         { }
     };
 }

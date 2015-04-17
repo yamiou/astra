@@ -25,13 +25,13 @@ namespace sensekit {
             }
 
         template<typename T>
-        T stream(sensekit_stream_subtype_t subType)
+        T stream(sensekit_stream_subtype_t subtype)
             {
                 sensekit_streamconnection_t connection;
 
                 sensekit_reader_get_stream(m_readerRef->get(),
                                            T::id,
-                                           subType,
+                                           subtype,
                                            &connection);
 
                 return T(connection);

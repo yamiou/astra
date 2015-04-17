@@ -59,6 +59,16 @@ SENSEKIT_API_EX sensekit_status_t sensekit_color_frame_get(sensekit_reader_frame
                                           colorFrame);
 }
 
+SENSEKIT_API_EX sensekit_status_t sensekit_color_frame_get_with_subtype(sensekit_reader_frame_t readerFrame,
+                                                                        sensekit_stream_subtype_t subtype,
+                                                                        sensekit_colorframe_t* colorFrame)
+{
+    return sensekit_reader_get_imageframe(readerFrame,
+                                          SENSEKIT_STREAM_COLOR,
+                                          subtype,
+                                          colorFrame);
+}
+
 SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_frameindex(sensekit_colorframe_t colorFrame,
                                                                      sensekit_frame_index_t* index)
 {

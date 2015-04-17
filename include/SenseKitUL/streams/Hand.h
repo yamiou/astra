@@ -46,11 +46,11 @@ namespace sensekit {
     class HandFrame
     {
     public:
-        HandFrame(sensekit_reader_frame_t readerFrame)
+        HandFrame(sensekit_reader_frame_t readerFrame, sensekit_stream_subtype_t subtype)
             {
                 if (readerFrame != nullptr)
                 {
-                    sensekit_hand_get_frame(readerFrame, &m_handFrame);
+                    sensekit_hand_get_frame_with_subtype(readerFrame, subtype, &m_handFrame);
                     sensekit_handframe_get_frameindex(m_handFrame, &m_frameIndex);
                     
                     size_t maxNumHands;

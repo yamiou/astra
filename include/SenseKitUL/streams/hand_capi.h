@@ -14,6 +14,10 @@ SENSEKIT_API_EX sensekit_status_t sensekit_hand_debug_image_get_stream(sensekit_
 SENSEKIT_API_EX sensekit_status_t sensekit_hand_get_frame(sensekit_reader_frame_t readerFrame,
                                                           sensekit_handframe_t* handFrame);
 
+SENSEKIT_API_EX sensekit_status_t sensekit_hand_get_frame_with_subtype(sensekit_reader_frame_t readerFrame,
+                                                                       sensekit_stream_subtype_t subtype,
+                                                                       sensekit_handframe_t* handFrame);
+
 SENSEKIT_API_EX sensekit_status_t sensekit_hand_debug_image_get_frame(sensekit_reader_frame_t readerFrame,
                                                                       sensekit_colorframe_t* handDebugImageFrame);
 
