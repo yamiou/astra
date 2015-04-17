@@ -13,7 +13,6 @@ namespace sensekit {
         {
             //TODO pooling
             m_data = DataPtr(new uint8_t[byteSize]);
-
             memset(m_data.get(), 0, byteSize);
         }
 
@@ -29,7 +28,7 @@ namespace sensekit {
     private:
         using DataPtr = std::unique_ptr<uint8_t[]>;
 
-        DataPtr  m_data;
+        DataPtr m_data;
         size_t m_byteLength;
     };
 }

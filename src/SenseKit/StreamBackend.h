@@ -18,9 +18,9 @@ namespace sensekit {
             : m_description(description) {}
 
         virtual ~StreamBackend()
-            {
-                m_bins.clear();
-            }
+        {
+            m_bins.clear();
+        }
 
         StreamBin* create_bin(size_t byteLength);
         void destroy_bin(StreamBin* bin);
@@ -30,16 +30,16 @@ namespace sensekit {
         bool is_available() { return m_callbacks != nullptr; }
 
         void set_callbacks(const stream_callbacks_t& callbacks)
-            {
-                m_callbacks = std::make_unique<stream_callbacks_t>(callbacks);
-                on_availability_changed();
-            }
+        {
+            m_callbacks = std::make_unique<stream_callbacks_t>(callbacks);
+            on_availability_changed();
+        }
 
         void clear_callbacks()
-            {
-                m_callbacks.reset();
-                on_availability_changed();
-            }
+        {
+            m_callbacks.reset();
+            on_availability_changed();
+        }
 
     protected:
         void on_connection_created(StreamConnection* connection, sensekit_stream_t stream);
@@ -54,9 +54,9 @@ namespace sensekit {
                               sensekit_parameter_id id,
                               sensekit_parameter_bin_t& parameterBin);
 
-        void on_invoke(StreamConnection* connection, 
-                       sensekit_command_id commandId, 
-                       size_t inByteLength, 
+        void on_invoke(StreamConnection* connection,
+                       sensekit_command_id commandId,
+                       size_t inByteLength,
                        sensekit_parameter_data_t inData,
                        sensekit_parameter_bin_t& parameterBin);
 
@@ -72,6 +72,5 @@ namespace sensekit {
         BinList m_bins;
     };
 }
-
 
 #endif /* STREAMBACKEND_H */

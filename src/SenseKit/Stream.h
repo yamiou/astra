@@ -43,7 +43,6 @@ namespace sensekit {
         sensekit_stream_t get_handle()
             { return reinterpret_cast<sensekit_stream_t>(this); }
 
-
         static Stream* get_ptr(sensekit_stream_t stream)
             { return reinterpret_cast<Stream*>(stream); }
 
