@@ -8,6 +8,7 @@ set(${_projname}_SOURCES
   ../../include/SenseKitUL/Vector2.h
   ../../include/SenseKitUL/Vector3.h
   ../../include/SenseKitUL/cvector.h
+  ../../include/SenseKitUL/streams/Image.h
   ../../include/SenseKitUL/streams/image_capi.h
   ../../include/SenseKitUL/streams/Depth.h
   ../../include/SenseKitUL/streams/depth_capi.h

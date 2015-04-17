@@ -1,10 +1,6 @@
 # add subdirs
 
-set(include_PATHS
-  ${PROJECT_SOURCE_DIR}/include
-  )
-
-include_directories ("${include_PATHS}")
+include_directories(${SENSEKIT_INCLUDE_DIR})
 
 set(CMAKE_DEBUG_POSTFIX "-d")
 

@@ -7,14 +7,7 @@ typedef struct {
     uint8_t r;
     uint8_t g;
     uint8_t b;
-} sensekit_rgb888_pixel_t;
-
-typedef struct {
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-    uint8_t a;
-} sensekit_rgba8888_pixel_t;
+} sensekit_rgb_pixel_t;
 
 typedef struct {
     uint32_t width;

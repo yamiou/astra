@@ -18,6 +18,6 @@ $(LOCAL_PATH)/../../include/SenseKitUL \
 LOCAL_SHARED_LIBRARIES := libSenseKit libSenseKitUL
 
 # Output
-LOCAL_MODULE := DepthReaderEventCPP
+LOCAL_MODULE := ColorReaderEventCPP
 
 include $(BUILD_EXECUTABLE)

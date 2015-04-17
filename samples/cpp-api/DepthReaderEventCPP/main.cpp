@@ -27,7 +27,7 @@ void print_depth(sensekit::DepthFrame& depthFrame,
         mapper.convert_depth_to_world(width / 2.0f, height / 2.0f, middle, &worldX, &worldY, &worldZ);
         mapper.convert_world_to_depth(worldX, worldY, worldZ, &depthX, &depthY, &depthZ);
 
-        std::cout << "depth index: " << frameIndex
+        std::cout << "depth frameIndex: " << frameIndex
                   << " value: " << middle
                   << " wX: " << worldX
                   << " wY: " << worldY
@@ -45,26 +45,26 @@ class SampleFrameListener : public sensekit::FrameReadyListener
 {
     virtual void on_frame_ready(sensekit::StreamReader& reader,
                                  sensekit::Frame& frame) override
+    {
+        sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
+        
+        if (depthFrame.is_valid())
         {
-            sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
+            ++count;
             print_depth(depthFrame,
-                        reader.stream<sensekit::DepthStream>().get_coordinateMapper());
-
-            if (depthFrame.is_valid())
-            {
-                ++count;
-            }
-            else
-            {
-                std::cout << "invalid frame(s)" << std::endl;
-            }
-
-            if (count == 100)
-            {
-                std::cout << "removing listener" << std::endl;
-                reader.removeListener(*this);
-            }
+                reader.stream<sensekit::DepthStream>().get_coordinateMapper());
         }
+        else
+        {
+            std::cout << "invalid frame(s)" << std::endl;
+        }
+
+        if (count == 100)
+        {
+            std::cout << "removing listener" << std::endl;
+            reader.removeListener(*this);
+        }
+    }
 
 private:
     int count{0};

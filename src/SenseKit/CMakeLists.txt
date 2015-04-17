@@ -66,13 +66,13 @@ set(${_projname}_SOURCES_GEN
   ../../include/SenseKit/Plugins/plugin_callbacks.h.lpp
   )
 
-include_directories(${PROJECT_SOURCE_DIR}/src/SenseKitAPI)
-
 source_group(templates FILES ${${_projname}_SOURCES_GEN})
 
 add_definitions(-DSENSEKIT_BUILD)
 
 add_library(${_projname} SHARED ${${_projname}_SOURCES} ${${_projname}_SOURCES_GEN})
+
+include_directories(${PROJECT_SOURCE_DIR}/src/SenseKitAPI)
 
 target_link_libraries(${_projname} SenseKitAPI)
 
