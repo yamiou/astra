@@ -34,7 +34,9 @@ namespace sensekit {
         sensekit_bin_t get_bin_handle();
 
         static StreamConnection* get_ptr(sensekit_streamconnection_t conn)
-            { return reinterpret_cast<StreamConnection*>(conn->handle); }
+        {
+            return reinterpret_cast<StreamConnection*>(conn->handle);
+        }
 
         const sensekit_stream_desc_t& get_description() const;
 
@@ -53,8 +55,8 @@ namespace sensekit {
                         size_t dataByteLength,
                         sensekit_parameter_data_t dataDestination);
 
-        void invoke(sensekit_command_id commandId, 
-                    size_t inByteLength, 
+        void invoke(sensekit_command_id commandId,
+                    size_t inByteLength,
                     sensekit_parameter_data_t    inData,
                     size_t& resultByteLength,
                     sensekit_result_token_t token);

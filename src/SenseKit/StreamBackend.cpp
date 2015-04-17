@@ -81,9 +81,9 @@ namespace sensekit {
         }
     }
 
-    void StreamBackend::on_invoke(StreamConnection* connection, 
-                                  sensekit_command_id commandId, 
-                                  size_t inByteLength, 
+    void StreamBackend::on_invoke(StreamConnection* connection,
+                                  sensekit_command_id commandId,
+                                  size_t inByteLength,
                                   sensekit_parameter_data_t inData,
                                   sensekit_parameter_bin_t& parameterBin)
     {

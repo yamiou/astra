@@ -30,20 +30,20 @@ namespace sensekit {
                            size_t inByteLength,
                            sensekit_parameter_data_t inData);
 
-        void get_parameter(StreamConnection* connection, 
-                           sensekit_parameter_id id, 
+        void get_parameter(StreamConnection* connection,
+                           sensekit_parameter_id id,
                            sensekit_parameter_bin_t& parameterBin);
 
-        void invoke(StreamConnection* connection, 
-                    sensekit_command_id commandId, 
-                    size_t inByteLength, 
+        void invoke(StreamConnection* connection,
+                    sensekit_command_id commandId,
+                    size_t inByteLength,
                     sensekit_parameter_data_t inData,
                     sensekit_parameter_bin_t& parameterBin);
 
         sensekit_stream_t get_handle()
             { return reinterpret_cast<sensekit_stream_t>(this); }
 
-        
+
         static Stream* get_ptr(sensekit_stream_t stream)
             { return reinterpret_cast<Stream*>(stream); }
 

@@ -133,31 +133,30 @@ namespace sensekit {
         m_stream->set_parameter(this, id, inByteLength, inData);
     }
 
-    void StreamConnection::get_parameter(sensekit_parameter_id id, 
-                                         size_t& resultByteLength, 
+    void StreamConnection::get_parameter(sensekit_parameter_id id,
+                                         size_t& resultByteLength,
                                          sensekit_result_token_t& token)
     {
-
         sensekit_parameter_bin_t parameterBinHandle;
         m_stream->get_parameter(this, id, parameterBinHandle);
-        
+
         ParameterBin* parameterBin = ParameterBin::get_ptr(parameterBinHandle);
         resultByteLength = parameterBin->byteLength();
         token = parameterBinHandle;
         //TODO: cache resultData with a token lookup, set the token out parameter
     }
 
-    void StreamConnection::get_result(sensekit_result_token_t token, 
-                                      size_t dataByteLength, 
+    void StreamConnection::get_result(sensekit_result_token_t token,
+                                      size_t dataByteLength,
                                       sensekit_parameter_data_t dataDestination)
     {
-        //TODO lookup the token 
+        //TODO lookup the token
         ParameterBin* parameterBin = ParameterBin::get_ptr(token);
         memcpy(dataDestination, parameterBin->data(), dataByteLength);
     }
 
-    void StreamConnection::invoke(sensekit_command_id commandId, 
-                                  size_t inByteLength, 
+    void StreamConnection::invoke(sensekit_command_id commandId,
+                                  size_t inByteLength,
                                   sensekit_parameter_data_t inData,
                                   size_t& resultByteLength,
                                   sensekit_result_token_t token)
@@ -165,7 +164,7 @@ namespace sensekit {
         sensekit_parameter_bin_t parameterBin;
         m_stream->invoke(this, commandId, inByteLength, inData, parameterBin);
     }
-    
+
     StreamConnection::~StreamConnection()
     {
         set_bin(nullptr);

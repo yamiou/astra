@@ -71,7 +71,7 @@ namespace sensekit {
             on_set_parameter(connection, id, inByteLength, inData);
     }
 
-    void Stream::get_parameter(StreamConnection* connection, 
+    void Stream::get_parameter(StreamConnection* connection,
                                sensekit_parameter_id id,
                                sensekit_parameter_bin_t& parameterBin)
     {
@@ -79,9 +79,9 @@ namespace sensekit {
             on_get_parameter(connection, id, parameterBin);
     }
 
-    void Stream::invoke(StreamConnection* connection, 
-                        sensekit_command_id commandId, 
-                        size_t inByteLength, 
+    void Stream::invoke(StreamConnection* connection,
+                        sensekit_command_id commandId,
+                        size_t inByteLength,
                         sensekit_parameter_data_t inData,
                         sensekit_parameter_bin_t& parameterBin)
     {

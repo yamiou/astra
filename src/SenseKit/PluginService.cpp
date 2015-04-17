@@ -183,8 +183,8 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::get_parameter_bin(size_t byteSize, 
-                                                       sensekit_parameter_bin_t& binHandle, 
+    sensekit_status_t PluginService::get_parameter_bin(size_t byteSize,
+                                                       sensekit_parameter_bin_t& binHandle,
                                                        sensekit_parameter_data_t& parameterData)
     {
         //TODO pooling
@@ -192,7 +192,7 @@ namespace sensekit
 
         binHandle = parameterBin->get_handle();
         parameterData = parameterBin->data();
-        
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 }
