@@ -16,7 +16,7 @@ namespace sensekit {
         std::size_t operator()(const sensekit_stream_desc_t desc) const
             {
                 std::size_t h1 = std::hash<sensekit_stream_type_t>()(desc.type);
-                std::size_t h2 = std::hash<sensekit_stream_subtype_t>()(desc.subType);
+                std::size_t h2 = std::hash<sensekit_stream_subtype_t>()(desc.subtype);
 
                 return h1 ^ (h2 << 1);
             }
@@ -28,7 +28,7 @@ namespace sensekit {
         std::size_t operator()(const sensekit_stream_desc_t& lhs,
                                const sensekit_stream_desc_t& rhs) const
             {
-                return lhs.type == rhs.type && lhs.subType == rhs.subType;
+                return lhs.type == rhs.type && lhs.subtype == rhs.subtype;
             }
     };
 

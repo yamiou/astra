@@ -7,7 +7,7 @@ namespace sensekit {
 
     StreamConnection* StreamSet::create_stream_connection(const sensekit_stream_desc_t& desc)
     {
-        Stream* stream = find_stream_by_type_subtype_impl(desc.type, desc.subType);
+        Stream* stream = find_stream_by_type_subtype_impl(desc.type, desc.subtype);
 
         if (stream == nullptr)
         {
@@ -37,7 +37,7 @@ namespace sensekit {
     Stream* StreamSet::create_stream(sensekit_stream_desc_t desc,
                                      stream_callbacks_t callbacks)
     {
-        Stream* stream = find_stream_by_type_subtype_impl(desc.type, desc.subType);
+        Stream* stream = find_stream_by_type_subtype_impl(desc.type, desc.subtype);
 
         if (stream == nullptr)
         {
@@ -78,9 +78,9 @@ namespace sensekit {
     }
 
     sensekit_stream_t StreamSet::find_stream_by_type_subtype(sensekit_stream_type_t type,
-                                                             sensekit_stream_subtype_t subType) const
+                                                             sensekit_stream_subtype_t subtype) const
     {
-        Stream* stream = find_stream_by_type_subtype_impl(type, subType);
+        Stream* stream = find_stream_by_type_subtype_impl(type, subtype);
 
         sensekit_stream_t streamHandle = reinterpret_cast<sensekit_stream_t>(stream);
         return streamHandle;
@@ -95,13 +95,13 @@ namespace sensekit {
     }
 
     Stream* StreamSet::find_stream_by_type_subtype_impl(sensekit_stream_type_t type,
-                                                        sensekit_stream_subtype_t subType) const
+                                                        sensekit_stream_subtype_t subtype) const
     {
         for (auto* stream : m_streamCollection)
         {
             const sensekit_stream_desc_t& desc = stream->get_description();
 
-            if (desc.type == type && desc.subType == subType)
+            if (desc.type == type && desc.subtype == subtype)
             {
                 return stream;
             }

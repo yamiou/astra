@@ -9,10 +9,10 @@ namespace sensekit {
     {
     public:
         StreamDescription(sensekit_stream_type_t type,
-                          sensekit_stream_subtype_t subType = DEFAULT_SUBTYPE)
+                          sensekit_stream_subtype_t subtype = DEFAULT_SUBTYPE)
             {
                 m_desc.type = type;
-                m_desc.subType = subType;
+                m_desc.subtype = subtype;
             }
 
         StreamDescription(const sensekit_stream_desc_t& desc)
@@ -27,7 +27,7 @@ namespace sensekit {
         const sensekit_stream_desc_t& get_desc_t() const { return m_desc; }
 
         sensekit_stream_type_t get_type() const { return m_desc.type; }
-        sensekit_stream_subtype_t get_subType() const { return m_desc.subType; }
+        sensekit_stream_subtype_t get_subtype() const { return m_desc.subtype; }
 
     private:
         sensekit_stream_desc_t m_desc;
@@ -35,7 +35,7 @@ namespace sensekit {
 
     inline bool operator==(const StreamDescription& lhs, const StreamDescription& rhs)
     {
-        return lhs.get_type() == rhs.get_type() && lhs.get_subType() == rhs.get_subType();
+        return lhs.get_type() == rhs.get_type() && lhs.get_subtype() == rhs.get_subtype();
     }
 
     inline bool operator!=(const StreamDescription& lhs, const StreamDescription& rhs)

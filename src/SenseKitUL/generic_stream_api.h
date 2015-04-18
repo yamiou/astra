@@ -9,11 +9,11 @@
 template<typename TFrameWrapperType, typename TFrameType>
 sensekit_status_t sensekit_generic_frame_get(sensekit_reader_frame_t readerFrame,
                                              sensekit_stream_type_t type,
-                                             sensekit_stream_subtype_t subType,
+                                             sensekit_stream_subtype_t subtype,
                                              TFrameType** frame)
 {
     sensekit_frame_ref_t* frameRef;
-    sensekit_reader_get_frame(readerFrame, type, subType, &frameRef);
+    sensekit_reader_get_frame(readerFrame, type, subtype, &frameRef);
 
     TFrameWrapperType* wrapper = reinterpret_cast<TFrameWrapperType*>(frameRef->frame->data);
     *frame = reinterpret_cast<TFrameType*>(&(wrapper->frame));
@@ -25,11 +25,11 @@ sensekit_status_t sensekit_generic_frame_get(sensekit_reader_frame_t readerFrame
 template<typename TFrameType>
 sensekit_status_t sensekit_generic_frame_get(sensekit_reader_frame_t readerFrame,
                                              sensekit_stream_type_t type,
-                                             sensekit_stream_subtype_t subType,
+                                             sensekit_stream_subtype_t subtype,
                                              TFrameType** frame)
 {
     sensekit_frame_ref_t* frameRef;
-    sensekit_reader_get_frame(readerFrame, type, subType, &frameRef);
+    sensekit_reader_get_frame(readerFrame, type, subtype, &frameRef);
 
     *frame = reinterpret_cast<TFrameType*>(frameRef->frame->data);
     (*frame)->frameRef = frameRef;

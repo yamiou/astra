@@ -20,7 +20,7 @@ const sensekit_stream_subtype_t DEFAULT_SUBTYPE = 0;
 
 typedef struct {
     sensekit_stream_type_t type;
-    sensekit_stream_subtype_t subType;
+    sensekit_stream_subtype_t subtype;
 } sensekit_stream_desc_t;
 
 typedef struct _sensekit_streamset* sensekit_streamset_t;

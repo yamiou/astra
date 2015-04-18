@@ -57,7 +57,7 @@ namespace sensekit {
 
         sensekit_status_t reader_get_stream(sensekit_reader_t reader,
                                             sensekit_stream_type_t type,
-                                            sensekit_stream_subtype_t subType,
+                                            sensekit_stream_subtype_t subtype,
                                             sensekit_streamconnection_t& connection);
 
         sensekit_status_t stream_get_description(sensekit_streamconnection_t connection,
@@ -82,7 +82,7 @@ namespace sensekit {
 
         sensekit_status_t reader_get_frame(sensekit_reader_frame_t frame,
                                            sensekit_stream_type_t type,
-                                           sensekit_stream_subtype_t subType,
+                                           sensekit_stream_subtype_t subtype,
                                            sensekit_frame_ref_t*& frameRef);
 
         sensekit_status_t stream_set_parameter(sensekit_streamconnection_t connection,

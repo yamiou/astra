@@ -77,7 +77,7 @@ namespace sensekit
 
             void HandTracker::subscribe_to_depth_stream(Sensor& streamset, StreamDescription& depthDescription)
             {
-                m_depthStream = m_reader.stream<DepthStream>(depthDescription.get_subType());
+                m_depthStream = m_reader.stream<DepthStream>(depthDescription.get_subtype());
                 m_depthStream.start();
                 m_converter = std::make_unique<CoordinateConverter>(m_depthStream, 1.0f);
                 m_pointProcessor = std::make_unique<PointProcessor>(*(m_converter.get()));

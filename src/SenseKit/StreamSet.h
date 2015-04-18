@@ -26,7 +26,7 @@ namespace sensekit {
         bool is_member(sensekit_stream_t stream) const;
 
         sensekit_stream_t find_stream_by_type_subtype(sensekit_stream_type_t type,
-                                                      sensekit_stream_subtype_t subType) const;
+                                                      sensekit_stream_subtype_t subtype) const;
 
         sensekit_streamset_t get_handle()
             { return reinterpret_cast<sensekit_streamset_t>(this); }
@@ -38,7 +38,7 @@ namespace sensekit {
 
     private:
         Stream* find_stream_by_type_subtype_impl(sensekit_stream_type_t type,
-                                                 sensekit_stream_subtype_t subType) const;
+                                                 sensekit_stream_subtype_t subtype) const;
 
         using StreamCollection = std::unordered_set<Stream*>;
         StreamCollection m_streamCollection;
