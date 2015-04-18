@@ -42,8 +42,8 @@ public:
         {
             sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
 
-            int width = depthFrame.get_resolutionX();
-            int height = depthFrame.get_resolutionY();
+            int width = depthFrame.resolutionX();
+            int height = depthFrame.resolutionY();
 
             init_texture(width, height);
 
@@ -76,7 +76,7 @@ private:
     std::clock_t m_lastTimepoint { 0 };
     sf::Texture m_texture;
     sf::Sprite m_sprite;
-    
+
     using DepthPtr = std::unique_ptr < uint8_t[] > ;
     DepthPtr m_depthVizBuffer { nullptr };
     int m_depthWidth { 0 };

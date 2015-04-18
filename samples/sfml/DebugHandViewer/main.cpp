@@ -40,8 +40,8 @@ public:
     {
         sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
 
-        int width = depthFrame.get_resolutionX();
-        int height = depthFrame.get_resolutionY();
+        int width = depthFrame.resolutionX();
+        int height = depthFrame.resolutionY();
 
         init_texture(width, height);
 
@@ -111,7 +111,7 @@ public:
             {
                 color = lostColor;
             }
-            
+
             const sensekit::Vector2i& p = handPoint.depthPosition();
 
             drawCircle(window, radius, p.x * m_scale, p.y * m_scale, color);
@@ -139,7 +139,7 @@ private:
     DepthPtr m_depthVizBuffer{ nullptr };
 
     std::vector<sensekit::HandPoint> m_handPoints;
-    
+
     int m_depthWidth { 0 };
     int m_depthHeight { 0 };
 };
@@ -154,7 +154,7 @@ int main(int argc, char** argv)
     sensekit::StreamReader reader = sensor.create_reader();
 
     HandFrameListener listener;
-    
+
     reader.stream<sensekit::DepthStream>().start();
     reader.stream<sensekit::HandStream>().start();
     reader.stream<sensekit::HandDebugStream>().start();

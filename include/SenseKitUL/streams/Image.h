@@ -14,7 +14,7 @@ namespace sensekit {
     class ImageFrame
     {
     public:
-        ImageFrame(sensekit_reader_frame_t readerFrame, 
+        ImageFrame(sensekit_reader_frame_t readerFrame,
                    sensekit_stream_type_t type,
                    sensekit_stream_subtype_t subtype)
         {
@@ -34,14 +34,16 @@ namespace sensekit {
         }
 
         bool is_valid() { return m_imageFrame != nullptr; }
-        int get_resolutionX() { throwIfInvalidFrame(); return m_metadata.width; }
-        int get_resolutionY() { throwIfInvalidFrame(); return m_metadata.height; }
-        sensekit_frame_index_t get_frameIndex() { throwIfInvalidFrame(); return m_frameIndex; }
-        int get_bytesPerPixel() { throwIfInvalidFrame(); return m_metadata.bytesPerPixel; }
+
+        int resolutionX() { throwIfInvalidFrame(); return m_metadata.width; }
+        int resolutionY() { throwIfInvalidFrame(); return m_metadata.height; }
+        int bytesPerPixel() { throwIfInvalidFrame(); return m_metadata.bytesPerPixel; }
+
+        sensekit_frame_index_t frameIndex() { throwIfInvalidFrame(); return m_frameIndex; }
 
         const TDataType* data() { throwIfInvalidFrame(); return m_dataPtr; }
         size_t byteLength() { throwIfInvalidFrame(); return m_byteLength; }
-        size_t numPixels() { throwIfInvalidFrame(); return m_metadata.width * m_metadata.height; }
+        size_t numberOfPixels() { throwIfInvalidFrame(); return m_metadata.width * m_metadata.height; }
 
         void copy_to(TDataType* buffer)
         {
@@ -61,6 +63,7 @@ namespace sensekit {
         sensekit_imageframe_t m_imageFrame{ nullptr };
         sensekit_image_metadata_t m_metadata;
         sensekit_frame_index_t m_frameIndex;
+
         TDataType* m_dataPtr;
         size_t m_byteLength;
     };

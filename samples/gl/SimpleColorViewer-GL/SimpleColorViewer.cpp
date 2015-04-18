@@ -116,14 +116,14 @@ void SimpleColorViewer::display()
 
     RGB888Pixel* pColorRow = (RGB888Pixel*)colorData;
     RGB888Pixel* pTexRow = m_pTexMap;
-    int rowSize = colorFrame.get_resolutionX();
+    int rowSize = colorFrame.resolutionX();
 
-    for (int y = 0; y < colorFrame.get_resolutionY(); ++y)
+    for (int y = 0; y < colorFrame.resolutionY(); ++y)
     {
         RGB888Pixel* pColor = pColorRow;
         RGB888Pixel* pTex = pTexRow;
 
-        for (int x = 0; x < colorFrame.get_resolutionX(); ++x, ++pColor, ++pTex)
+        for (int x = 0; x < colorFrame.resolutionX(); ++x, ++pColor, ++pTex)
         {
             RGB888Pixel color = *pColor;
             pTex->r = color.r;

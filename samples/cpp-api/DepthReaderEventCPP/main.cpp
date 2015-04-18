@@ -12,11 +12,11 @@ void print_depth(sensekit::DepthFrame& depthFrame,
 {
     if (depthFrame.is_valid())
     {
-        int width = depthFrame.get_resolutionX();
-        int height = depthFrame.get_resolutionY();
-        int frameIndex = depthFrame.get_frameIndex();
+        int width = depthFrame.resolutionX();
+        int height = depthFrame.resolutionY();
+        int frameIndex = depthFrame.frameIndex();
 
-        int16_t* buffer = new int16_t[depthFrame.numPixels()];
+        int16_t* buffer = new int16_t[depthFrame.numberOfPixels()];
         depthFrame.copy_to(buffer);
 
         size_t index = ((width * (height / 2.0f)) + (width / 2.0f));
@@ -47,7 +47,7 @@ class SampleFrameListener : public sensekit::FrameReadyListener
                                  sensekit::Frame& frame) override
     {
         sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
-        
+
         if (depthFrame.is_valid())
         {
             print_depth(depthFrame,
@@ -58,7 +58,7 @@ class SampleFrameListener : public sensekit::FrameReadyListener
 
 int main(int argc, char** argv)
 {
-    sensekit_initialize();
+    sensekit::SenseKit::initialize();
 
     set_key_handler();
 
@@ -70,11 +70,10 @@ int main(int argc, char** argv)
     reader.stream<sensekit::DepthStream>().start();
 
     std::cout << "depthStream -- hFov: "
-              << reader.stream<sensekit::DepthStream>().get_horizontalFieldOfView()
+              << reader.stream<sensekit::DepthStream>().horizontalFieldOfView()
               << " vFov: "
-              << reader.stream<sensekit::DepthStream>().get_verticalFieldOfView()
+              << reader.stream<sensekit::DepthStream>().verticalFieldOfView()
               << std::endl;
-
 
     reader.addListener(listener);
 
@@ -85,5 +84,5 @@ int main(int argc, char** argv)
 
     reader.removeListener(listener);
 
-    sensekit_terminate();
+    sensekit::SenseKit::terminate();
 }

@@ -35,8 +35,8 @@ namespace sensekit
 
             void DepthUtility::processDepthToForeground(DepthFrame& depthFrame, cv::Mat& matDepth, cv::Mat& matForeground)
             {
-                int width = depthFrame.get_resolutionX();
-                int height = depthFrame.get_resolutionY();
+                int width = depthFrame.resolutionX();
+                int height = depthFrame.resolutionY();
 
                 matDepth.create(m_processingHeight, m_processingWidth, CV_32FC1);
                 matForeground = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_8UC1);

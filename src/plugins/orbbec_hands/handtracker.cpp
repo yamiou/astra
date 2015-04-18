@@ -93,7 +93,7 @@ namespace sensekit
 
             void HandTracker::update_tracking(DepthFrame& depthFrame)
             {
-                int width = depthFrame.get_resolutionX();
+                int width = depthFrame.resolutionX();
 
                 m_resizeFactor = width / static_cast<float>(PROCESSING_SIZE_WIDTH);
 
@@ -104,7 +104,7 @@ namespace sensekit
                 track_points(m_matDepth, m_matForeground);
 
                 //use same frameIndex as source depth frame
-                sensekit_frame_index_t frameIndex = depthFrame.get_frameIndex();
+                sensekit_frame_index_t frameIndex = depthFrame.frameIndex();
 
                 if (m_handStream->has_connections())
                 {

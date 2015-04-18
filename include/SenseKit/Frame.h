@@ -25,9 +25,14 @@ namespace sensekit {
             return T(m_frameRef->get(), subtype);
         }
 
-        operator bool()
+        bool is_valid()
         {
             return m_frameRef.get() != nullptr;
+        }
+
+        operator bool()
+        {
+            return is_valid();
         }
 
     private:

@@ -11,11 +11,11 @@ void print_color(sensekit::ColorFrame& colorFrame)
 {
     if (colorFrame.is_valid())
     {
-        int width = colorFrame.get_resolutionX();
-        int height = colorFrame.get_resolutionY();
-        int frameIndex = colorFrame.get_frameIndex();
-        
-        sensekit::RGBPixel* buffer = new sensekit::RGBPixel[colorFrame.numPixels()];
+        int width = colorFrame.resolutionX();
+        int height = colorFrame.resolutionY();
+        int frameIndex = colorFrame.frameIndex();
+
+        sensekit::RGBPixel* buffer = new sensekit::RGBPixel[colorFrame.numberOfPixels()];
         colorFrame.copy_to(buffer);
 
         size_t index = ((width * (height / 2.0f)) + (width / 2.0f));
@@ -47,7 +47,7 @@ class SampleFrameListener : public sensekit::FrameReadyListener
 
 int main(int argc, char** argv)
 {
-    sensekit_initialize();
+    sensekit::SenseKit::initialize();
 
     set_key_handler();
 
@@ -59,9 +59,9 @@ int main(int argc, char** argv)
     reader.stream<sensekit::ColorStream>().start();
 
     std::cout << "colorStream -- hFov: "
-              << reader.stream<sensekit::ColorStream>().get_horizontalFieldOfView()
+              << reader.stream<sensekit::ColorStream>().horizontalFieldOfView()
               << " vFov: "
-              << reader.stream<sensekit::ColorStream>().get_verticalFieldOfView()
+              << reader.stream<sensekit::ColorStream>().verticalFieldOfView()
               << std::endl;
 
 
@@ -74,5 +74,5 @@ int main(int argc, char** argv)
 
     reader.removeListener(listener);
 
-    sensekit_terminate();
+    sensekit::SenseKit::terminate();
 }

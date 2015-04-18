@@ -22,7 +22,7 @@ namespace sensekit {
 
         static const sensekit_stream_type_t id = SENSEKIT_STREAM_COLOR;
 
-        float get_horizontalFieldOfView()
+        float horizontalFieldOfView()
         {
             float hFov;
             sensekit_color_stream_get_hfov(m_colorStream, &hFov);
@@ -30,7 +30,7 @@ namespace sensekit {
             return hFov;
         }
 
-        float get_verticalFieldOfView()
+        float verticalFieldOfView()
         {
             float vFov;
             sensekit_color_stream_get_vfov(m_colorStream, &vFov);
