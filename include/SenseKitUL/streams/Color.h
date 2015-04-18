@@ -25,7 +25,7 @@ namespace sensekit {
         float horizontalFieldOfView()
         {
             float hFov;
-            sensekit_color_stream_get_hfov(m_colorStream, &hFov);
+            sensekit_colorstream_get_hfov(m_colorStream, &hFov);
 
             return hFov;
         }
@@ -33,7 +33,7 @@ namespace sensekit {
         float verticalFieldOfView()
         {
             float vFov;
-            sensekit_color_stream_get_vfov(m_colorStream, &vFov);
+            sensekit_colorstream_get_vfov(m_colorStream, &vFov);
 
             return vFov;
         }

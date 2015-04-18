@@ -6,33 +6,28 @@
 
 SENSEKIT_BEGIN_DECLS
 
-SENSEKIT_API_EX sensekit_status_t sensekit_color_stream_get(sensekit_reader_t reader,
-                                                            sensekit_colorstream_t* colorStream);
+SENSEKIT_API_EX sensekit_status_t sensekit_reader_get_colorstream(sensekit_reader_t reader,
+                                                                  sensekit_colorstream_t* colorStream);
 
-SENSEKIT_API_EX sensekit_status_t sensekit_color_stream_get_by_type(sensekit_reader_t reader,
-                                                                    sensekit_stream_type_t type,
-                                                                    sensekit_stream_subtype_t subtype,
-                                                                    sensekit_colorstream_t* colorStream);
+SENSEKIT_API_EX sensekit_status_t sensekit_colorstream_get_hfov(sensekit_colorstream_t colorStream,
+                                                                float* hFov);
 
-SENSEKIT_API_EX sensekit_status_t sensekit_color_stream_get_hfov(sensekit_colorstream_t colorStream,
-                                                                 float* hFov);
+SENSEKIT_API_EX sensekit_status_t sensekit_colorstream_get_vfov(sensekit_colorstream_t colorStream,
+                                                                float* vFov);
 
-SENSEKIT_API_EX sensekit_status_t sensekit_color_stream_get_vfov(sensekit_colorstream_t colorStream,
-                                                                 float* vFov);
+SENSEKIT_API_EX sensekit_status_t sensekit_frame_get_colorframe(sensekit_reader_frame_t readerFrame,
+                                                                sensekit_colorframe_t* colorFrame);
 
-SENSEKIT_API_EX sensekit_status_t sensekit_color_frame_get(sensekit_reader_frame_t readerFrame,
-                                                           sensekit_colorframe_t* colorFrame);
+SENSEKIT_API_EX sensekit_status_t sensekit_frame_get_colorframe_with_subtype(sensekit_reader_frame_t readerFrame,
+                                                                             sensekit_stream_subtype_t subtype,
+                                                                             sensekit_colorframe_t* colorFrame);
 
-SENSEKIT_API_EX sensekit_status_t sensekit_color_frame_get_with_subtype(sensekit_reader_frame_t readerFrame,
-                                                                        sensekit_stream_subtype_t subtype,
-                                                                        sensekit_colorframe_t* colorFrame);
-
-SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_data_length(sensekit_colorframe_t colorFrame,
-                                                                      size_t* length);
+SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_data_byte_length(sensekit_colorframe_t colorFrame,
+                                                                           size_t* byteLength);
 
 SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_data_ptr(sensekit_colorframe_t colorFrame,
                                                                    uint8_t** data,
-                                                                   size_t* length);
+                                                                   size_t* byteLength);
 
 SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_copy_data(sensekit_colorframe_t colorFrame,
                                                                 uint8_t* data);

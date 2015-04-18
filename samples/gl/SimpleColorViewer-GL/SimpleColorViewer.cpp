@@ -96,7 +96,7 @@ void SimpleColorViewer::display()
     sensekit_temp_update();
     sensekit::Frame frame(m_reader.get_latest_frame(15));
 
-    if (!frame)
+    if (!frame.is_valid())
         return;
 
     sensekit::ColorFrame colorFrame = frame.get<sensekit::ColorFrame>();
