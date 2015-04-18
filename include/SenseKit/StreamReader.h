@@ -32,7 +32,7 @@ namespace sensekit {
             {
                 sensekit_streamconnection_t connection;
 
-                sensekit_reader_get_stream(m_readerRef->get(),
+                sensekit_reader_get_stream(m_readerRef->get_reader(),
                                            T::id,
                                            subtype,
                                            &connection);
@@ -55,7 +55,7 @@ namespace sensekit {
         Frame get_latest_frame(int timeoutMillis = SENSEKIT_TIMEOUT_FOREVER)
             {
                 sensekit_reader_frame_t frame;
-                sensekit_reader_open_frame(m_readerRef->get(), timeoutMillis, &frame);
+                sensekit_reader_open_frame(m_readerRef->get_reader(), timeoutMillis, &frame);
 
                 return Frame(frame);
             }
@@ -168,7 +168,7 @@ namespace sensekit {
                     m_isNotifying = false;
                 }
 
-            sensekit_reader_t get() { return m_reader; }
+            sensekit_reader_t get_reader() { return m_reader; }
 
         private:
             sensekit_reader_t m_reader;

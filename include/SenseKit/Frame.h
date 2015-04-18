@@ -22,12 +22,12 @@ namespace sensekit {
         template<typename T>
         T get(sensekit_stream_subtype_t subtype)
         {
-            return T(m_frameRef->get(), subtype);
+            return T(m_frameRef->get_frame(), subtype);
         }
 
         bool is_valid()
         {
-            return m_frameRef.get() != nullptr;
+            return m_frameRef->get_frame() != nullptr;
         }
 
         operator bool()
@@ -50,7 +50,7 @@ namespace sensekit {
                 }
             }
 
-            sensekit_reader_frame_t get() { return m_frame; }
+            sensekit_reader_frame_t get_frame() { return m_frame; }
 
         private:
             sensekit_reader_frame_t m_frame;
