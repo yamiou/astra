@@ -162,6 +162,9 @@ is replaced with replacement."
 (setq lambda-source-path-to-source-dir (lambda (str) (regexp-replace (back-to-forward-slashes str) 
                                                                      (back-to-forward-slashes source-dir)
                                                                      "$(SolutionDir)..")))
+(setq lambda-convert-include-path (lambda (str) (funcall lambda-build-path-to-sln-dir 
+                                                         (funcall lambda-source-path-to-source-dir str)
+                                                         )))
 (setq lambda-int-dir-to-obj-dir (lambda (str) (regexp-replace (back-to-forward-slashes str)
                                                               "[^.]*[.]dir"
                                                               "obj")))
@@ -169,7 +172,7 @@ is replaced with replacement."
 
 (add-projdata :start-marker "<AdditionalIncludeDirectories>" 
               :end-marker "</AdditionalIncludeDirectories>"
-              :replacement-callback lambda-build-path-to-sln-dir)
+              :replacement-callback lambda-convert-include-path)
 (add-projdata :start-marker "<OutDir[^>]*>" 
               :end-marker "</OutDir>"
               :replacement-callback lambda-build-path-to-sln-dir)
@@ -191,14 +194,14 @@ is replaced with replacement."
               :end-marker ";"
               :replacement-callback lambda-remove
               :include-markers T)
-(add-projdata :start-marker "<Cl\\(Include\\|Compile\\)[^iI]*Include=\"" 
+(add-projdata :start-marker "<Cl\\(Include\\|Compile\\)[^iI>]*Include=\"" 
               :end-marker "\""
               :replacement-callback lambda-source-path-to-source-dir)
 (add-projdata :start-marker "<IntDir[^>]*>" 
               :end-marker "<"
               :replacement-callback lambda-int-dir-to-obj-dir)
 
-(add-filterdata :start-marker "<Cl\\(Include\\|Compile\\)[^iI]*Include=\"" 
+(add-filterdata :start-marker "<Cl\\(Include\\|Compile\\)[^iI>]*Include=\"" 
               :end-marker "\""
               :replacement-callback lambda-source-path-to-source-dir)
 (add-filterdata :start-marker "[^<>]*<ItemGroup[^>]*>[^<]*<CustomBuild[^>]*CMakeLists[.]txt[^>]*>"
