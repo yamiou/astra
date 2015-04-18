@@ -7,16 +7,16 @@ class HandFrameListener : public sensekit::FrameReadyListener
 public:
     void init_texture(int width, int height)
     {
-        if (m_depthVizBuffer == nullptr || width != m_depthWidth || height != m_depthHeight)
+        if (m_displayBuffer == nullptr || width != m_displayWidth || height != m_displayHeight)
         {
-            m_depthWidth = width;
-            m_depthHeight = height;
-            int byteLength = m_depthWidth * m_depthHeight * 4;
+            m_displayWidth = width;
+            m_displayHeight = height;
+            int byteLength = m_displayWidth * m_displayHeight * 4;
 
-            m_depthVizBuffer = DepthPtr(new uint8_t[byteLength]);
-            memset(m_depthVizBuffer.get(), 0, byteLength);
+            m_displayBuffer = BufferPtr(new uint8_t[byteLength]);
+            memset(m_displayBuffer.get(), 0, byteLength);
 
-            m_texture.create(m_depthWidth, m_depthHeight);
+            m_texture.create(m_displayWidth, m_displayHeight);
             m_sprite.setTexture(m_texture);
             m_sprite.setPosition(0, 0);
         }
@@ -51,16 +51,19 @@ public:
             for(int x = 0; x < width; x++)
             {
                 int index = (x + y * width);
+                int index4 = index * 4;
+                
                 int16_t depth = depthPtr[index];
                 uint8_t value = depth % 255;
-                m_depthVizBuffer[index * 4] = value;
-                m_depthVizBuffer[index * 4 + 1] = value;
-                m_depthVizBuffer[index * 4 + 2] = value;
-                m_depthVizBuffer[index * 4 + 3] = 255;
+                
+                m_displayBuffer[index4] = value;
+                m_displayBuffer[index4 + 1] = value;
+                m_displayBuffer[index4 + 2] = value;
+                m_displayBuffer[index4 + 3] = 255;
             }
         }
 
-        m_texture.update(m_depthVizBuffer.get());
+        m_texture.update(m_displayBuffer.get());
     }
 
     void processHands(sensekit::Frame& frame)
@@ -72,19 +75,12 @@ public:
 
     virtual void on_frame_ready(sensekit::StreamReader& reader,
                                 sensekit::Frame& frame) override
-        {
-            processDepth(frame);
-            processHands(frame);
+    {
+        processDepth(frame);
+        processHands(frame);
 
-            /*m_handPositions.clear();
-
-            m_handPositions.push_back(Vector2fPtr(new sensekit::Vector2f(0, 0)));
-            m_handPositions.push_back(Vector2fPtr(new sensekit::Vector2f(320, 0)));
-            m_handPositions.push_back(Vector2fPtr(new sensekit::Vector2f(320, 240)));
-            m_handPositions.push_back(Vector2fPtr(new sensekit::Vector2f(160, 120)));
-            */
-            check_fps();
-        }
+        check_fps();
+    }
 
     void drawCircle(sf::RenderWindow& window, float radius, float x, float y, sf::Color color)
     {
@@ -117,9 +113,12 @@ public:
             drawCircle(window, radius, p.x * m_scale, p.y * m_scale, color);
         }
     }
+
     void drawTo(sf::RenderWindow& window)
+    {
+        if (m_displayBuffer != nullptr)
         {
-            m_scale = window.getSize().x / m_depthWidth;
+            m_scale = window.getSize().x / m_displayWidth;
 
             m_sprite.setScale(m_scale, m_scale);
 
@@ -127,6 +126,7 @@ public:
 
             drawHands(window);
         }
+    }
 
 private:
     float m_scale{ 2 };
@@ -135,13 +135,13 @@ private:
     sf::Texture m_texture;
     sf::Sprite m_sprite;
 
-    using DepthPtr = std::unique_ptr < uint8_t[] >;
-    DepthPtr m_depthVizBuffer{ nullptr };
+    using BufferPtr = std::unique_ptr < uint8_t[] >;
+    BufferPtr m_displayBuffer{ nullptr };
 
     std::vector<sensekit::HandPoint> m_handPoints;
 
-    int m_depthWidth { 0 };
-    int m_depthHeight { 0 };
+    int m_displayWidth { 0 };
+    int m_displayHeight { 0 };
 };
 
 int main(int argc, char** argv)
