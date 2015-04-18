@@ -70,9 +70,8 @@ void SimpleColorViewer::init(int argc, char **argv)
     sensekit::SenseKit::initialize();
 
     m_reader = m_sensor.create_reader();
-    m_colorStream = m_reader.stream<sensekit::ColorStream>();
-    m_colorStream.start();
-
+    m_reader.stream<sensekit::ColorStream>().start();
+    
     int colorWidth = 320;
     int colorHeight = 240;
     m_width = colorWidth;

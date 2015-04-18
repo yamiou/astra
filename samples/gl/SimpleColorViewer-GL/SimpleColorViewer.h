@@ -54,7 +54,6 @@ private:
 
     sensekit::Sensor m_sensor;
     sensekit::StreamReader m_reader;
-    sensekit::ColorStream m_colorStream;
 };
 
 
