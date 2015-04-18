@@ -2,10 +2,8 @@
 #define HANDDEBUG_H
 
 #include <SenseKit/SenseKit.h>
-#include <stdexcept>
 #include <SenseKitUL/StreamTypes.h>
-#include "hand_capi.h"
-#include <SenseKitUL/Vectorx.h>
+#include <SenseKitUL/streams/hand_capi.h>
 
 namespace sensekit {
     
@@ -17,6 +15,14 @@ namespace sensekit {
             { }
 
         static const sensekit_stream_type_t id = SENSEKIT_STREAM_HAND_DEBUG_IMAGE;
+    };
+
+    class HandDebugFrame : public ImageFrame<RGBPixel>
+    {
+    public:
+        HandDebugFrame(sensekit_reader_frame_t readerFrame, sensekit_stream_subtype_t subtype)
+            : ImageFrame(readerFrame, SENSEKIT_STREAM_HAND_DEBUG_IMAGE, subtype)
+        { }
     };
 }
 

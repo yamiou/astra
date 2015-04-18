@@ -2,9 +2,8 @@
 #define DEPTH_H
 
 #include <SenseKit/SenseKit.h>
-#include <stdexcept>
 #include <SenseKitUL/StreamTypes.h>
-#include "depth_capi.h"
+#include <SenseKitUL/streams/depth_capi.h>
 #include <SenseKitUL/streams/Image.h>
 
 namespace sensekit {

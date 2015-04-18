@@ -4,7 +4,7 @@
 #include <SenseKit/SenseKit.h>
 #include <stdexcept>
 #include <SenseKitUL/StreamTypes.h>
-#include "hand_capi.h"
+#include <SenseKitUL/streams/hand_capi.h>
 #include <SenseKitUL/Vectorx.h>
 
 namespace sensekit {
