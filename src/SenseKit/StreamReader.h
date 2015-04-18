@@ -74,6 +74,7 @@ namespace sensekit {
         blockresult block_until_frame_ready_or_timeout(int timeoutMillis);
         void check_for_all_frames_ready();
         void raise_frame_ready();
+        void lock_private();
 
         StreamConnection* find_stream_of_type(sensekit_stream_desc_t& desc);
         StreamConnection::FrameReadyCallback get_sc_frame_ready_callback();
@@ -85,7 +86,7 @@ namespace sensekit {
                                                  StreamDescEqualTo>;
 
         bool m_locked{false};
-        bool m_isFrameReady{ false };
+        bool m_isFrameReadyForLock{ false };
         sensekit_frame_index_t m_lastFrameIndex{ -1 };
         sensekit_reader_frame_t* m_currentFrame{nullptr};
         StreamSet& m_streamSet;

@@ -118,7 +118,7 @@ namespace sensekit {
 
     StreamReader::blockresult StreamReader::block_until_frame_ready_or_timeout(int timeoutMillis)
     {
-        if (m_isFrameReady)
+        if (m_isFrameReadyForLock)
         {
             return blockresult::BLOCKRESULT_FRAMEREADY;
         }
@@ -132,7 +132,7 @@ namespace sensekit {
             do
             {
                 sensekit_temp_update();
-                if (m_isFrameReady)
+                if (m_isFrameReadyForLock)
                 {
                     return blockresult::BLOCKRESULT_FRAMEREADY;
                 }
@@ -143,7 +143,7 @@ namespace sensekit {
             } while (forever || milliseconds < timeoutMillis);
         }
 
-        return m_isFrameReady ? blockresult::BLOCKRESULT_FRAMEREADY : blockresult::BLOCKRESULT_TIMEOUT;
+        return m_isFrameReadyForLock ? blockresult::BLOCKRESULT_FRAMEREADY : blockresult::BLOCKRESULT_TIMEOUT;
     }
 
     sensekit_status_t StreamReader::lock(int timeoutMillis)
@@ -153,19 +153,26 @@ namespace sensekit {
 
         StreamReader::blockresult result = block_until_frame_ready_or_timeout(timeoutMillis);
 
+        m_isFrameReadyForLock = false;
+
         if (result == blockresult::BLOCKRESULT_TIMEOUT)
         {
             return SENSEKIT_STATUS_TIMEOUT;
         }
 
-        for(auto pair : m_streamMap)
+        lock_private();
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    void StreamReader::lock_private()
+    {
+        for (auto pair : m_streamMap)
         {
             ReaderConnectionData* data = pair.second;
             data->connection->lock();
         }
 
         m_locked = true;
-        return SENSEKIT_STATUS_SUCCESS;
     }
 
     void StreamReader::unlock()
@@ -184,7 +191,6 @@ namespace sensekit {
             }
         }
 
-        m_isFrameReady = false;
         m_locked = false;
     }
 
@@ -204,7 +210,7 @@ namespace sensekit {
 
         if (allReady)
         {
-            m_isFrameReady = true;
+            m_isFrameReadyForLock = true;
             raise_frame_ready();
         }
     }
@@ -219,7 +225,7 @@ namespace sensekit {
         bool wasLocked = m_locked;
         if (!wasLocked)
         {
-            lock(SENSEKIT_TIMEOUT_RETURN_IMMEDIATELY);
+            lock_private();
         }
         sensekit_reader_t reader = get_handle();
         sensekit_reader_frame_t frame = get_handle();
