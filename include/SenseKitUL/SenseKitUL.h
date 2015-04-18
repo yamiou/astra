@@ -5,6 +5,6 @@
 #include "streams/Depth.h"
 #include "streams/Color.h"
 #include "streams/Hand.h"
-#include "streams/HandDebug.h"
+#include "streams/DebugHand.h"
 
 #endif /* SENSEKITUL_H */

@@ -17,7 +17,7 @@ set(${_projname}_SOURCES
   ../../include/SenseKitUL/streams/color_capi.h
   ../../include/SenseKitUL/streams/color_types.h
   ../../include/SenseKitUL/streams/Hand.h
-  ../../include/SenseKitUL/streams/HandDebug.h
+  ../../include/SenseKitUL/streams/DebugHand.h
   ../../include/SenseKitUL/streams/hand_capi.h
   ../../include/SenseKitUL/streams/hand_types.h
   ../../include/SenseKitUL/streams/image_types.h

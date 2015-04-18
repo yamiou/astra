@@ -67,7 +67,7 @@ namespace sensekit
                 m_handStream = make_unique<HandStream>(pluginService, streamset, SENSEKIT_HANDS_MAX_HANDPOINTS);
 
                 size_t debugImageByteLength = PROCESSING_SIZE_WIDTH * PROCESSING_SIZE_HEIGHT * 3;
-                StreamDescription debugImageDescription(SENSEKIT_STREAM_HAND_DEBUG_IMAGE);
+                StreamDescription debugImageDescription(SENSEKIT_STREAM_DEBUG_HAND);
 
                 m_debugImageStream = make_unique<ColorStream>(pluginService,
                                                               streamset,

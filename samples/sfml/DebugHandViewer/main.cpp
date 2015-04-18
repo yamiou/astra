@@ -72,7 +72,7 @@ public:
 
     void processHandsDebug(sensekit::Frame& frame)
     {
-        sensekit::HandDebugFrame handFrame = frame.get<sensekit::HandDebugFrame>();
+        sensekit::DebugHandFrame handFrame = frame.get<sensekit::DebugHandFrame>();
 
         int width = handFrame.resolutionX();
         int height = handFrame.resolutionY();
@@ -183,7 +183,7 @@ int main(int argc, char** argv)
 
     reader.stream<sensekit::DepthStream>().start();
     reader.stream<sensekit::HandStream>().start();
-    reader.stream<sensekit::HandDebugStream>().start();
+    reader.stream<sensekit::DebugHandStream>().start();
     reader.addListener(listener);
 
     while (window.isOpen())

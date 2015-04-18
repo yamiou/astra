@@ -50,11 +50,11 @@ namespace sensekit {
             {
                 if (readerFrame != nullptr)
                 {
-                    sensekit_hand_get_frame_with_subtype(readerFrame, subtype, &m_handFrame);
+                    sensekit_frame_get_handframe_with_subtype(readerFrame, subtype, &m_handFrame);
                     sensekit_handframe_get_frameindex(m_handFrame, &m_frameIndex);
                     
                     size_t maxNumHands;
-                    sensekit_handframe_get_num_hands(m_handFrame, &maxNumHands);
+                    sensekit_handframe_get_hand_count(m_handFrame, &maxNumHands);
 
                     m_handPoints.reserve(maxNumHands);
                 }

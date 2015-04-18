@@ -10,7 +10,7 @@ void print_hands(sensekit_handframe_t handFrame)
     sensekit_handpoint_t* handPoints;
     size_t numHands;
 
-    sensekit_handframe_get_num_hands(handFrame, &numHands);
+    sensekit_handframe_get_hand_count(handFrame, &numHands);
 
     handPoints = (sensekit_handpoint_t*)malloc(numHands * sizeof(sensekit_handpoint_t));
     sensekit_handframe_copy_hands(handFrame, handPoints);
@@ -47,12 +47,12 @@ void runHandStream(sensekit_reader_t reader)
         if (rc == SENSEKIT_STATUS_SUCCESS)
         {
             sensekit_handframe_t handFrame;
-            sensekit_hand_get_frame(frame, &handFrame);
+            sensekit_frame_get_handframe(frame, &handFrame);
 
             print_hands(handFrame);
 
             sensekit_colorframe_t handDebugImageFrame;
-            sensekit_hand_debug_image_get_frame(frame, &handDebugImageFrame);
+            sensekit_frame_get_debug_handframe(frame, &handDebugImageFrame);
 
             sensekit_image_metadata_t metadata;
             sensekit_colorframe_get_metadata(handDebugImageFrame, &metadata);
@@ -77,11 +77,11 @@ int main(int argc, char* argv[])
     sensekit_reader_create(sensor, &reader);
 
     sensekit_handstream_t handStream;
-    sensekit_hand_get_stream(reader, &handStream);
+    sensekit_reader_get_handstream(reader, &handStream);
     sensekit_stream_start(handStream);
 
     sensekit_colorstream_t handDebugImageStream;
-    sensekit_hand_debug_image_get_stream(reader, &handDebugImageStream);
+    sensekit_reader_get_debug_handstream(reader, &handDebugImageStream);
     sensekit_stream_start(handDebugImageStream);
 
     runHandStream(reader);

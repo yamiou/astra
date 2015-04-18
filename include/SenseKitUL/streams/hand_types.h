@@ -24,4 +24,7 @@ typedef struct _sensekit_handpoint {
 typedef struct _sensekit_handframe* sensekit_handframe_t;
 typedef sensekit_streamconnection_t sensekit_handstream_t;
 
+typedef struct _sensekit_imageframe* sensekit_debug_handframe_t;
+typedef sensekit_streamconnection_t sensekit_debug_handstream_t;
+
 #endif // HAND_TYPES_H
