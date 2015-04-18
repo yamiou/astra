@@ -90,7 +90,7 @@ void SampleViewer::init(int argc, char **argv)
     sensekit_streamset_open("1d27/0601@20/30", &m_sensor);
     sensekit_reader_create(m_sensor, &m_reader);
 
-    sensekit_depth_stream_get(m_reader, &m_depthStream);
+    sensekit_reader_get_depthstream(m_reader, &m_depthStream);
 
     m_lightVector = Vector3::Normalize(Vector3(.5, -0.2, 1));
     //m_lightVector = Vector3::Normalize(Vector3(0, 0, 1));
@@ -456,7 +456,7 @@ void SampleViewer::display()
     }
 
     sensekit_depthframe_t depthFrame;
-    rc = sensekit_depth_frame_get(frame, &depthFrame);
+    rc = sensekit_frame_get_depthframe(frame, &depthFrame);
 
     if (rc != SENSEKIT_STATUS_SUCCESS)
     {

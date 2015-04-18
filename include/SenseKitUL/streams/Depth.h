@@ -48,7 +48,7 @@ namespace sensekit {
         float horizontalFieldOfView()
         {
             float hFov;
-            sensekit_depth_stream_get_hfov(m_depthStream, &hFov);
+            sensekit_depthstream_get_hfov(m_depthStream, &hFov);
 
             return hFov;
         }
@@ -56,7 +56,7 @@ namespace sensekit {
         float verticalFieldOfView()
         {
             float vFov;
-            sensekit_depth_stream_get_vfov(m_depthStream, &vFov);
+            sensekit_depthstream_get_vfov(m_depthStream, &vFov);
 
             return vFov;
         }

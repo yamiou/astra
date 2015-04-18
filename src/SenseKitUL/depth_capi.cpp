@@ -50,8 +50,8 @@ SENSEKIT_API_EX sensekit_status_t sensekit_convert_world_to_depth(sensekit_depth
 }
 
 
-SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get(sensekit_reader_t reader,
-                                                            sensekit_depthstream_t* depthStream)
+SENSEKIT_API_EX sensekit_status_t sensekit_reader_get_depthstream(sensekit_reader_t reader,
+                                                                  sensekit_depthstream_t* depthStream)
 
 {
     return sensekit_reader_get_stream(reader,
@@ -60,8 +60,8 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get(sensekit_reader_t re
                                       depthStream);
 }
 
-SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get_hfov(sensekit_depthstream_t depthStream,
-                                                                 float* hFov)
+SENSEKIT_API_EX sensekit_status_t sensekit_depthstream_get_hfov(sensekit_depthstream_t depthStream,
+                                                                float* hFov)
 {
     return sensekit_stream_get_parameter_fixed(depthStream,
                                                STREAM_PARAMETER_HFOV,
@@ -69,8 +69,8 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get_hfov(sensekit_depths
                                                reinterpret_cast<sensekit_parameter_data_t*>(hFov));
 }
 
-SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get_vfov(sensekit_depthstream_t depthStream,
-                                                                 float* vFov)
+SENSEKIT_API_EX sensekit_status_t sensekit_depthstream_get_vfov(sensekit_depthstream_t depthStream,
+                                                                float* vFov)
 {
     return sensekit_stream_get_parameter_fixed(depthStream,
                                                STREAM_PARAMETER_VFOV,
@@ -78,8 +78,8 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get_vfov(sensekit_depths
                                                reinterpret_cast<sensekit_parameter_data_t*>(vFov));
 }
 
-SENSEKIT_API_EX sensekit_status_t sensekit_depth_frame_get(sensekit_reader_frame_t readerFrame,
-                                                           sensekit_depthframe_t* depthFrame)
+SENSEKIT_API_EX sensekit_status_t sensekit_frame_get_depthframe(sensekit_reader_frame_t readerFrame,
+                                                                sensekit_depthframe_t* depthFrame)
 {
     return sensekit_reader_get_imageframe(readerFrame, 
                                           SENSEKIT_STREAM_DEPTH,
@@ -87,9 +87,9 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depth_frame_get(sensekit_reader_frame
                                           depthFrame);
 }
 
-SENSEKIT_API_EX sensekit_status_t sensekit_depth_frame_get_with_subtype(sensekit_reader_frame_t readerFrame,
-                                                                        sensekit_stream_subtype_t subtype,
-                                                                        sensekit_depthframe_t* colorFrame)
+SENSEKIT_API_EX sensekit_status_t sensekit_frame_get_depthframe_with_subtype(sensekit_reader_frame_t readerFrame,
+                                                                             sensekit_stream_subtype_t subtype,
+                                                                             sensekit_depthframe_t* colorFrame)
 {
     return sensekit_reader_get_imageframe(readerFrame,
                                           SENSEKIT_STREAM_DEPTH,
@@ -103,18 +103,18 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_frameindex(sensekit_de
     return sensekit_generic_frame_get_frameindex(depthFrame, index);
 }
 
-SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_data_length(sensekit_depthframe_t depthFrame,
-                                                                      size_t* length)
+SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_data_byte_length(sensekit_depthframe_t depthFrame,
+                                                                           size_t* byteLength)
 {
-    return sensekit_imageframe_get_data_byte_length(depthFrame, length);
+    return sensekit_imageframe_get_data_byte_length(depthFrame, byteLength);
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_data_ptr(sensekit_depthframe_t depthFrame,
                                                                    int16_t** data,
-                                                                   size_t* length)
+                                                                   size_t* byteLength)
 {
     void* voidData = nullptr;
-    sensekit_imageframe_get_data_ptr(depthFrame, &voidData, length);
+    sensekit_imageframe_get_data_ptr(depthFrame, &voidData, byteLength);
     *data = static_cast<int16_t*>(voidData);
 
     return SENSEKIT_STATUS_SUCCESS;

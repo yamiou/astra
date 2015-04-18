@@ -12,7 +12,7 @@ void print_depth(sensekit_depthframe_t depthFrame)
     int16_t* depthData;
     size_t depthLength;
 
-    sensekit_depthframe_get_data_length(depthFrame, &depthLength);
+    sensekit_depthframe_get_data_byte_length(depthFrame, &depthLength);
     sensekit_depthframe_get_metadata(depthFrame, &metadata);
 
     depthData = (int16_t*)malloc(depthLength);
@@ -45,11 +45,11 @@ int main(int argc, char* argv[])
     sensekit_reader_create(sensor, &reader);
 
     sensekit_depthstream_t depthStream;
-    sensekit_depth_stream_get(reader, &depthStream);
+    sensekit_reader_get_depthstream(reader, &depthStream);
 
     float hFov, vFov;
-    sensekit_depth_stream_get_hfov(depthStream, &hFov);
-    sensekit_depth_stream_get_vfov(depthStream, &vFov);
+    sensekit_depthstream_get_hfov(depthStream, &hFov);
+    sensekit_depthstream_get_vfov(depthStream, &vFov);
 
     printf("depth sensor -- hFov: %f radians vFov: %f radians\n", hFov, vFov);
 
@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
         if (rc == SENSEKIT_STATUS_SUCCESS)
         {
             sensekit_depthframe_t depthFrame;
-            sensekit_depth_frame_get(frame, &depthFrame);
+            sensekit_frame_get_depthframe(frame, &depthFrame);
 
             sensekit_frame_index_t newFrameIndex;
             sensekit_depthframe_get_frameindex(depthFrame, &newFrameIndex);

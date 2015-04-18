@@ -14,28 +14,28 @@ SENSEKIT_API_EX sensekit_status_t sensekit_convert_world_to_depth(sensekit_depth
                                                                   float worldX, float worldY, float worldZ,
                                                                   float* pDepthX, float* pDepthY, float* pDepthZ);
 
-SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get(sensekit_reader_t reader,
-                                                            sensekit_depthstream_t* depthStream);
+SENSEKIT_API_EX sensekit_status_t sensekit_reader_get_depthstream(sensekit_reader_t reader,
+                                                                  sensekit_depthstream_t* depthStream);
 
-SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get_hfov(sensekit_depthstream_t depthStream,
-                                                                 float* hFov);
+SENSEKIT_API_EX sensekit_status_t sensekit_depthstream_get_hfov(sensekit_depthstream_t depthStream,
+                                                                float* hFov);
 
-SENSEKIT_API_EX sensekit_status_t sensekit_depth_stream_get_vfov(sensekit_depthstream_t depthStream,
-                                                                 float* vFov);
+SENSEKIT_API_EX sensekit_status_t sensekit_depthstream_get_vfov(sensekit_depthstream_t depthStream,
+                                                                float* vFov);
 
-SENSEKIT_API_EX sensekit_status_t sensekit_depth_frame_get(sensekit_reader_frame_t readerFrame,
-                                                           sensekit_depthframe_t* depthFrame);
+SENSEKIT_API_EX sensekit_status_t sensekit_frame_get_depthframe(sensekit_reader_frame_t readerFrame,
+                                                                sensekit_depthframe_t* depthFrame);
 
-SENSEKIT_API_EX sensekit_status_t sensekit_depth_frame_get_with_subtype(sensekit_reader_frame_t readerFrame,
-                                                                        sensekit_stream_subtype_t subtype,
-                                                                        sensekit_depthframe_t* colorFrame);
+SENSEKIT_API_EX sensekit_status_t sensekit_frame_get_depthframe_with_subtype(sensekit_reader_frame_t readerFrame,
+                                                                             sensekit_stream_subtype_t subtype,
+                                                                             sensekit_depthframe_t* colorFrame);
 
-SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_data_length(sensekit_depthframe_t depthFrame,
-                                                                      size_t* length);
+SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_data_byte_length(sensekit_depthframe_t depthFrame,
+                                                                           size_t* byteLength);
 
 SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_data_ptr(sensekit_depthframe_t depthFrame,
                                                                    int16_t** data,
-                                                                   size_t* length);
+                                                                   size_t* byteLength);
 
 SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_copy_data(sensekit_depthframe_t depthFrame,
                                                                 int16_t* data);
