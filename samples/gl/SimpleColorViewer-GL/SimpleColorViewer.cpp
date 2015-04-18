@@ -58,9 +58,7 @@ m_pTexMap(NULL)
 
 SimpleColorViewer::~SimpleColorViewer()
 {
-    sensekit_reader_destroy(&m_reader);
-    sensekit_streamset_close(&m_sensor);
-    sensekit_terminate();
+    sensekit::SenseKit::terminate();
 
     delete[] m_pTexMap;
 
@@ -69,11 +67,11 @@ SimpleColorViewer::~SimpleColorViewer()
 
 void SimpleColorViewer::init(int argc, char **argv)
 {
-    sensekit_initialize();
+    sensekit::SenseKit::initialize();
 
-    sensekit_streamset_open("1d27/0601@20/30", &m_sensor);
-    sensekit_reader_create(m_sensor, &m_reader);
-    sensekit_color_stream_get(m_reader, &m_colorStream);
+    m_reader = m_sensor.create_reader();
+    m_colorStream = m_reader.stream<sensekit::ColorStream>();
+    m_colorStream.start();
 
     int colorWidth = 320;
     int colorHeight = 240;
@@ -96,22 +94,16 @@ void SimpleColorViewer::run()      //Does not return
 void SimpleColorViewer::display()
 {
     sensekit_temp_update();
-    sensekit_reader_frame_t frame;
-    sensekit_status_t rc = sensekit_reader_open_frame(m_reader, 30, &frame);
+    sensekit::Frame frame(m_reader.get_latest_frame(15));
 
-    if (rc != SENSEKIT_STATUS_SUCCESS)
-    {
+    if (!frame)
         return;
-    }
-    sensekit_color_frame_get(frame, &m_colorFrame);
 
-    uint8_t* colorData;
+    sensekit::ColorFrame colorFrame = frame.get<sensekit::ColorFrame>();
+
     size_t colorLength;
 
-    sensekit_colorframe_get_data_ptr(m_colorFrame, &colorData, &colorLength);
-
-    sensekit_image_metadata_t metadata;
-    sensekit_colorframe_get_metadata(m_colorFrame, &metadata);
+    auto colorData = colorFrame.data();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -124,14 +116,14 @@ void SimpleColorViewer::display()
 
     RGB888Pixel* pColorRow = (RGB888Pixel*)colorData;
     RGB888Pixel* pTexRow = m_pTexMap;
-    int rowSize = metadata.width;
+    int rowSize = colorFrame.get_resolutionX();
 
-    for (int y = 0; y < metadata.height; ++y)
+    for (int y = 0; y < colorFrame.get_resolutionY(); ++y)
     {
         RGB888Pixel* pColor = pColorRow;
         RGB888Pixel* pTex = pTexRow;
 
-        for (int x = 0; x < metadata.width; ++x, ++pColor, ++pTex)
+        for (int x = 0; x < colorFrame.get_resolutionX(); ++x, ++pColor, ++pTex)
         {
             RGB888Pixel color = *pColor;
             pTex->r = color.r;
@@ -142,8 +134,6 @@ void SimpleColorViewer::display()
         pColorRow += rowSize;
         pTexRow += m_nTexMapX;
     }
-
-    sensekit_reader_close_frame(&frame);
 
     glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -183,9 +173,7 @@ void SimpleColorViewer::onKey(unsigned char key, int /*x*/, int /*y*/)
     {
     case 27:
         //shutdown sensekit
-        sensekit_reader_destroy(&m_reader);
-        sensekit_streamset_close(&m_sensor);
-        sensekit_terminate();
+        sensekit::SenseKit::terminate();
         exit(1);
     }
 }

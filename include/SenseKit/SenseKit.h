@@ -14,14 +14,14 @@ namespace sensekit {
     {
     public:
         static sensekit_status_t initialize()
-            {
-                return sensekit_initialize();
-            }
+        {
+            return sensekit_initialize();
+        }
 
         static sensekit_status_t terminate()
-            {
-                return sensekit_terminate();
-            }
+        {
+            return sensekit_terminate();
+        }
     };
 }
 

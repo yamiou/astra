@@ -25,6 +25,11 @@ namespace sensekit {
             return T(m_frameRef->get(), subtype);
         }
 
+        operator bool()
+        {
+            return m_frameRef.get() != nullptr;
+        }
+
     private:
         class FrameRef
         {
@@ -33,12 +38,12 @@ namespace sensekit {
                 :  m_frame(readerFrame) { }
 
             ~FrameRef()
+            {
+                if (m_frame != nullptr)
                 {
-                    if (m_frame != nullptr)
-                    {
-                        sensekit_reader_close_frame(&m_frame);
-                    }
+                    sensekit_reader_close_frame(&m_frame);
                 }
+            }
 
             sensekit_reader_frame_t get() { return m_frame; }
 

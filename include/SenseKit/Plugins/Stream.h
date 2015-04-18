@@ -77,7 +77,7 @@ namespace sensekit { namespace plugins {
 
         void create_bin(size_t binSize, sensekit_bin_t& binHandle, sensekit_frame_t*& buffer)
         {
-            m_logger.info("creating bin -- handle: %d stream: %d type: %d size: %d",
+            m_logger.info("creating bin -- handle: %x stream: %x type: %d size: %u",
                  binHandle,
                  m_streamHandle,
                  m_description.get_type(),
@@ -98,7 +98,7 @@ namespace sensekit { namespace plugins {
         {
             if (bin != nullptr)
             {
-                m_logger.info("linking connection to bin -- stream: %d type: %d conn: %d bin: %d",
+                m_logger.info("linking connection to bin -- stream: %x type: %d conn: %x bin: %x",
                      m_streamHandle,
                      m_description.get_type(),
                      connection,
@@ -106,7 +106,7 @@ namespace sensekit { namespace plugins {
             }
             else
             {
-                m_logger.info("linking connection to bin -- stream: %d type: %d conn: %d",
+                m_logger.info("linking connection to bin -- stream: %x type: %d conn: %x",
                      m_streamHandle,
                      m_description.get_type(),
                      connection);
@@ -117,7 +117,7 @@ namespace sensekit { namespace plugins {
 
         void destroy_bin(sensekit_bin_t& binHandle, sensekit_frame_t*& buffer)
         {
-            m_logger.info("destroying bin -- %d stream: %d type: %d size: %d",
+            m_logger.info("destroying bin -- %d stream: %x type: %d size: %u",
                  binHandle,
                  m_streamHandle,
                  m_description.get_type());

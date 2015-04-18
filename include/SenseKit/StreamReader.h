@@ -14,6 +14,9 @@ namespace sensekit {
     class StreamReader
     {
     public:
+        StreamReader()
+        {}
+
         StreamReader(sensekit_reader_t reader)
             : m_readerRef(std::make_shared<ReaderRef>(reader))
             {}
@@ -46,6 +49,8 @@ namespace sensekit {
             {
                 m_readerRef.get()->removeListener(listener);
             }
+
+        bool is_valid() { return m_readerRef != nullptr; }
 
         Frame get_latest_frame(int timeoutMillis = SENSEKIT_TIMEOUT_FOREVER)
             {

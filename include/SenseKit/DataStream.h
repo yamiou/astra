@@ -10,40 +10,45 @@ namespace sensekit {
     class DataStream
     {
     public:
+        DataStream()
+        {}
+
         DataStream(sensekit_streamconnection_t connection)
             : m_connection(connection)
+        {
+            if (m_connection != nullptr)
             {
-                if (m_connection != nullptr)
-                {
-                    sensekit_stream_get_description(connection, &m_description);
-                }
+                sensekit_stream_get_description(connection, &m_description);
             }
+        }
 
         bool is_available() { return m_connection != nullptr; }
+
         void start()
+        {
+            if (m_connection == nullptr)
             {
-                if (m_connection == nullptr)
-                {
-                    throw std::logic_error("Cannot start a stream that is not available");
-                }
-                sensekit_stream_start(m_connection);
+                throw std::logic_error("Cannot start a stream that is not available");
             }
+            sensekit_stream_start(m_connection);
+        }
         void stop()
+
+        {
+            if (m_connection == nullptr)
             {
-                if (m_connection == nullptr)
-                {
-                    throw std::logic_error("Cannot stop a stream that is not available");
-                }
-                sensekit_stream_stop(m_connection);
+                throw std::logic_error("Cannot stop a stream that is not available");
             }
+            sensekit_stream_stop(m_connection);
+        }
 
         const StreamDescription& get_description()
-            {
-                return static_cast<const StreamDescription&>(m_description);
-            }
+        {
+            return static_cast<const StreamDescription&>(m_description);
+        }
 
     private:
-        sensekit_streamconnection_t m_connection;
+        sensekit_streamconnection_t m_connection{nullptr};
         sensekit_stream_desc_t m_description;
     };
 }
