@@ -2,7 +2,6 @@
 #include "StreamConnection.h"
 #include "StreamBin.h"
 #include "Stream.h"
-#include "ParameterBin.h"
 
 namespace sensekit {
     using namespace std::placeholders;
@@ -22,6 +21,12 @@ namespace sensekit {
             {
                 this->on_bin_front_buffer_ready(b, frameIndex);
             };
+    }
+
+    StreamConnection::~StreamConnection()
+    {
+        clear_pending_parameter_result();
+        set_bin(nullptr);
     }
 
     sensekit_bin_t StreamConnection::get_bin_handle()
@@ -140,19 +145,32 @@ namespace sensekit {
         sensekit_parameter_bin_t parameterBinHandle;
         m_stream->get_parameter(this, id, parameterBinHandle);
 
-        ParameterBin* parameterBin = ParameterBin::get_ptr(parameterBinHandle);
-        resultByteLength = parameterBin->byteLength();
+        //delete old parameter result -- only one outstanding allowed at a time
+        clear_pending_parameter_result();
+        m_pendingParameterResult = ParameterBin::get_ptr(parameterBinHandle);
+        resultByteLength = m_pendingParameterResult->byteLength();
         token = parameterBinHandle;
         //TODO: cache resultData with a token lookup, set the token out parameter
     }
 
-    void StreamConnection::get_result(sensekit_result_token_t token,
+    sensekit_status_t StreamConnection::get_result(sensekit_result_token_t token,
                                       size_t dataByteLength,
                                       sensekit_parameter_data_t dataDestination)
     {
-        //TODO lookup the token
         ParameterBin* parameterBin = ParameterBin::get_ptr(token);
-        memcpy(dataDestination, parameterBin->data(), dataByteLength);
+        if (m_pendingParameterResult != nullptr && parameterBin == m_pendingParameterResult)
+        {
+            memcpy(dataDestination, parameterBin->data(), dataByteLength);
+            clear_pending_parameter_result();
+            return SENSEKIT_STATUS_SUCCESS;
+        }
+        else
+        {
+            //Results are read-once-only, then they self destruct.
+            //Client tried to get result in wrong order, or with duplicate or stale token
+            clear_pending_parameter_result();
+            return SENSEKIT_STATUS_INVALID_PARAMETER_TOKEN;
+        }
     }
 
     void StreamConnection::invoke(sensekit_command_id commandId,
@@ -165,8 +183,12 @@ namespace sensekit {
         m_stream->invoke(this, commandId, inByteLength, inData, parameterBin);
     }
 
-    StreamConnection::~StreamConnection()
+    void StreamConnection::clear_pending_parameter_result()
     {
-        set_bin(nullptr);
+        if (m_pendingParameterResult != nullptr)
+        {
+            delete m_pendingParameterResult;
+            m_pendingParameterResult = nullptr;
+        }
     }
 }

@@ -3,8 +3,8 @@
 
 #include <SenseKit/sensekit_types.h>
 #include <SenseKit/Plugins/plugin_capi.h>
-#include <cassert>
 #include "StreamBin.h"
+#include "ParameterBin.h"
 
 namespace sensekit {
 
@@ -50,10 +50,10 @@ namespace sensekit {
         void get_parameter(sensekit_parameter_id id,
                            size_t& resultByteLength,
                            sensekit_result_token_t& token);
-
-        void get_result(sensekit_result_token_t token,
-                        size_t dataByteLength,
-                        sensekit_parameter_data_t dataDestination);
+        
+        sensekit_status_t get_result(sensekit_result_token_t token,
+                                     size_t dataByteLength,
+                                     sensekit_parameter_data_t dataDestination);
 
         void invoke(sensekit_command_id commandId,
                     size_t inByteLength,
@@ -63,6 +63,7 @@ namespace sensekit {
 
     private:
         void on_bin_front_buffer_ready(StreamBin* bin, sensekit_frame_index_t frameIndex);
+        void clear_pending_parameter_result();
 
         _sensekit_streamconnection m_connection;
         sensekit_frame_ref_t m_currentFrame;
@@ -73,6 +74,7 @@ namespace sensekit {
         Stream* m_stream{nullptr};
         StreamBin* m_bin{nullptr};
         sensekit_stream_t m_handle{nullptr};
+        ParameterBin* m_pendingParameterResult{ nullptr };
 
         FrontBufferReadyCallback m_binFrontBufferReadyCallback;
         sensekit_callback_id_t m_binFrontBufferReadyCallbackId;

@@ -346,9 +346,7 @@ namespace sensekit {
         assert(connection->handle != nullptr);
 
         StreamConnection* actualConnection = StreamConnection::get_ptr(connection);
-        actualConnection->get_result(token, dataByteLength, dataDestination);
-
-        return SENSEKIT_STATUS_SUCCESS;
+        return actualConnection->get_result(token, dataByteLength, dataDestination);
     }
 
     sensekit_status_t SenseKitContext::stream_invoke(sensekit_streamconnection_t connection,
