@@ -121,7 +121,7 @@ namespace sensekit
                                 foreground = *foregroundRow;
                             }
                             float depth = *depthRow;
-                            int value = 255 * ((depth - 400.0f) / 3200.0f);
+                            uint8_t value = 255 * (depth / 4000.0f);
 
                             g = value;
                             b = value;
