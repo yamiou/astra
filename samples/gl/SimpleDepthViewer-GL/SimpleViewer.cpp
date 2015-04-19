@@ -24,8 +24,8 @@
 #include <stdexcept>
 #endif
 
-#define GL_WIN_SIZE_X   1280
-#define GL_WIN_SIZE_Y   1024
+#define GL_WIN_SIZE_X   640
+#define GL_WIN_SIZE_Y   480
 #define TEXTURE_SIZE    1024
 
 #define DEFAULT_DISPLAY_MODE    DISPLAY_MODE_DEPTH
