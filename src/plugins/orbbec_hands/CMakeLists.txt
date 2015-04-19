@@ -18,6 +18,9 @@ set(${_projname}_SOURCES
 )
 
 find_package( OpenCV REQUIRED core imgproc)
+#maps relwithbedinfo to release, so don't include debug version of opencv
+set_target_properties(${OpenCV_LIBS} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO RELEASE)
+set_target_properties(${OpenCV_LIBS} PROPERTIES MAP_IMPORTED_CONFIG_MINSIZEREL RELEASE)
 
 add_library(${_projname} SHARED ${${_projname}_SOURCES})
 
