@@ -6,6 +6,7 @@
 #include <SenseKitUL/StreamTypes.h>
 #include <cassert>
 #include <SenseKitUL/streams/image_capi.h>
+#include <SenseKitUL/streams/image_parameters.h>
 
 SENSEKIT_BEGIN_DECLS
 

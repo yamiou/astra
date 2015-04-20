@@ -1,0 +1,9 @@
+#ifndef HAND_PARAMETERS_H
+#define HAND_PARAMETERS_H
+
+enum
+{
+    SENSEKIT_PARAMETER_DEBUG_HAND_MODE = 0,
+};
+
+#endif /* HAND_PARAMETERS_H */

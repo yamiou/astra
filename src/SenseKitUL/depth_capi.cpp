@@ -7,6 +7,7 @@
 #include <SenseKitUL/streams/depth_parameters.h>
 #include <string.h>
 #include <SenseKitUL/streams/image_capi.h>
+#include <SenseKitUL/streams/image_parameters.h>
 #include <unordered_map>
 
 using ConversionMap = std::unordered_map < sensekit_depthstream_t, conversion_cache_t > ;
