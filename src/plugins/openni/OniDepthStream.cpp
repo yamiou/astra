@@ -9,7 +9,7 @@ namespace sensekit { namespace plugins {
         {
             switch (id)
             {
-            case DEPTH_PARAMETER_CONVERSION_CACHE:
+            case SENSEKIT_PARAMETER_DEPTH_CONVERSION_CACHE:
             {
                 size_t resultByteLength = sizeof(conversion_cache_t);
 

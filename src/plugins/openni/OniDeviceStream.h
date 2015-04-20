@@ -4,7 +4,7 @@
 #include <SenseKit/SenseKit.h>
 #include <SenseKit/Plugins/plugin_capi.h>
 #include <SenseKit/Plugins/Stream.h>
-#include <SenseKitUL/streams/video_parameters.h>
+#include <SenseKitUL/streams/image_parameters.h>
 #include <OpenNI.h>
 #include <SenseKitUL/streams/image_types.h>
 
@@ -102,7 +102,7 @@ namespace sensekit { namespace plugins {
         {
             switch (id)
             {
-            case STREAM_PARAMETER_HFOV:
+            case SENSEKIT_PARAMETER_IMAGE_HFOV:
             {
                 size_t resultByteLength = sizeof(float);
 
@@ -117,7 +117,7 @@ namespace sensekit { namespace plugins {
                 }
             }
             break;
-            case STREAM_PARAMETER_VFOV:
+            case SENSEKIT_PARAMETER_IMAGE_VFOV:
             {
                 size_t resultByteLength = sizeof(float);
 

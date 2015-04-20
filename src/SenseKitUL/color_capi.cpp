@@ -1,7 +1,6 @@
 #include <SenseKit/sensekit_types.h>
 #include "generic_stream_api.h"
 #include <SenseKitUL/streams/color_types.h>
-#include <SenseKitUL/streams/video_parameters.h>
 #include <SenseKitUL/Plugins/stream_types.h>
 #include <string.h>
 #include <SenseKitUL/StreamTypes.h>
@@ -24,7 +23,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_colorstream_get_hfov(sensekit_colorst
                                                                 float* hFov)
 {
     return sensekit_stream_get_parameter_fixed(colorStream,
-                                               STREAM_PARAMETER_HFOV,
+                                               SENSEKIT_PARAMETER_IMAGE_HFOV,
                                                sizeof(float),
                                                reinterpret_cast<sensekit_parameter_data_t*>(hFov));
 }
@@ -33,7 +32,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_colorstream_get_vfov(sensekit_colorst
                                                                 float* vFov)
 {
     return sensekit_stream_get_parameter_fixed(colorStream,
-                                               STREAM_PARAMETER_VFOV,
+                                               SENSEKIT_PARAMETER_IMAGE_VFOV,
                                                sizeof(float),
                                                reinterpret_cast<sensekit_parameter_data_t*>(vFov));
 }

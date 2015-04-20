@@ -4,10 +4,8 @@
 #include <memory.h>
 #include <SenseKitUL/StreamTypes.h>
 #include <SenseKitUL/Plugins/stream_types.h>
-#include <SenseKitUL/streams/video_parameters.h>
 #include <SenseKitUL/streams/depth_parameters.h>
 #include <string.h>
-#include <SenseKitUL/streams/image_types.h>
 #include <SenseKitUL/streams/image_capi.h>
 #include <unordered_map>
 
@@ -26,7 +24,7 @@ conversion_cache_t sensekit_depth_fetch_conversion_cache(sensekit_depthstream_t 
     {
         conversion_cache_t conversionCache;
         sensekit_stream_get_parameter_fixed(depthStream,
-                                            DEPTH_PARAMETER_CONVERSION_CACHE,
+                                            SENSEKIT_PARAMETER_DEPTH_CONVERSION_CACHE,
                                             sizeof(conversion_cache_t),
                                             reinterpret_cast<sensekit_parameter_data_t*>(&conversionCache));
         g_sensekit_conversion_map.insert(std::make_pair(depthStream, conversionCache));
@@ -58,7 +56,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_convert_world_to_depth(sensekit_depth
 {
     conversion_cache_t conversionCache;
     sensekit_stream_get_parameter_fixed(depthStream,
-                                        DEPTH_PARAMETER_CONVERSION_CACHE,
+                                        SENSEKIT_PARAMETER_DEPTH_CONVERSION_CACHE,
                                         sizeof(conversion_cache_t),
                                         reinterpret_cast<sensekit_parameter_data_t*>(&conversionCache));
 
@@ -84,7 +82,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depthstream_get_hfov(sensekit_depthst
                                                                 float* hFov)
 {
     return sensekit_stream_get_parameter_fixed(depthStream,
-                                               STREAM_PARAMETER_HFOV,
+                                               SENSEKIT_PARAMETER_IMAGE_HFOV,
                                                sizeof(float),
                                                reinterpret_cast<sensekit_parameter_data_t*>(hFov));
 }
@@ -93,7 +91,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depthstream_get_vfov(sensekit_depthst
                                                                 float* vFov)
 {
     return sensekit_stream_get_parameter_fixed(depthStream,
-                                               STREAM_PARAMETER_VFOV,
+                                               SENSEKIT_PARAMETER_IMAGE_VFOV,
                                                sizeof(float),
                                                reinterpret_cast<sensekit_parameter_data_t*>(vFov));
 }
