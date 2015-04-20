@@ -195,8 +195,8 @@ namespace sensekit { namespace plugins { namespace hands {
                 TrackedPoint internalPoint = *it;
 
                 TrackingStatus status = internalPoint.m_status;
-                if (//internalPoint.m_type == TrackedPointType::ActivePoint &&
-                    status != Dead && handIndex < maxNumHands)
+                
+                if (status != Dead && handIndex < maxNumHands)
                 {
                     sensekit_handpoint_t& point = frame.handpoints[handIndex];
                     ++handIndex;
@@ -211,7 +211,7 @@ namespace sensekit { namespace plugins { namespace hands {
                     copy_position(internalPoint.m_worldPosition, point.worldPosition);
                     copy_position(internalPoint.m_worldDeltaPosition, point.worldDeltaPosition);
 
-                    point.status = convert_hand_status(status);
+                    point.status = convert_hand_status(status, internalPoint.m_type);
                 }
             }
             for (int i = handIndex; i < maxNumHands; ++i)
@@ -228,8 +228,12 @@ namespace sensekit { namespace plugins { namespace hands {
             target.z = source.z;
         }
 
-        sensekit_handstatus_t HandTracker::convert_hand_status(TrackingStatus status)
+        sensekit_handstatus_t HandTracker::convert_hand_status(TrackingStatus status, TrackedPointType type)
         {
+            if (type == TrackedPointType::CandidatePoint)
+            {
+                return HAND_STATUS_CANDIDATE;
+            }
             switch (status)
             {
             case Tracking:

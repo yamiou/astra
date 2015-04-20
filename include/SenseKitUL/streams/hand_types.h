@@ -18,6 +18,7 @@ typedef enum _sensekit_debug_hand_view_type {
 
 typedef enum _sensekit_handstatus {
     HAND_STATUS_NOTTRACKING,
+    HAND_STATUS_CANDIDATE,
     HAND_STATUS_TRACKING,
     HAND_STATUS_LOST
 } sensekit_handstatus_t;

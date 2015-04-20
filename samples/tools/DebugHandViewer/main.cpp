@@ -124,10 +124,11 @@ public:
 
     void drawHands(sf::RenderWindow& window, float depthScale)
     {
-        float radius = 25;
+        float radius = 20;
         auto size = window.getSize();
         sf::Color trackingColor(100, 250, 50);
         sf::Color lostColor(200, 50, 50);
+        sf::Color candidateColor(50, 200, 200);
 
         for (auto handPoint : m_handPoints)
         {
@@ -136,10 +137,13 @@ public:
             {
                 color = lostColor;
             }
+            else if (handPoint.status() == HAND_STATUS_CANDIDATE)
+            {
+                color = candidateColor;
+            }
 
             const sensekit::Vector2i& p = handPoint.depthPosition();
 
-            //add 0.5 to center on the middle of the pixel
             float circleX = (p.x + 0.5) * depthScale;
             float circleY = (p.y + 0.5) * depthScale;
             drawCircle(window, radius, circleX, circleY, color);

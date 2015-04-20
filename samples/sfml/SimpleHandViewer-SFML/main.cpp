@@ -7,16 +7,16 @@ class HandFrameListener : public sensekit::FrameReadyListener
 public:
     void init_texture(int width, int height)
     {
-        if (m_displayBuffer == nullptr || width != m_displayWidth || height != m_displayHeight)
+        if (m_displayBuffer == nullptr || width != m_depthWidth || height != m_depthHeight)
         {
-            m_displayWidth = width;
-            m_displayHeight = height;
-            int byteLength = m_displayWidth * m_displayHeight * 4;
+            m_depthWidth = width;
+            m_depthHeight = height;
+            int byteLength = m_depthWidth * m_depthHeight * 4;
 
             m_displayBuffer = BufferPtr(new uint8_t[byteLength]);
             memset(m_displayBuffer.get(), 0, byteLength);
 
-            m_texture.create(m_displayWidth, m_displayHeight);
+            m_texture.create(m_depthWidth, m_depthHeight);
             m_sprite.setTexture(m_texture);
             m_sprite.setPosition(0, 0);
         }
@@ -93,12 +93,13 @@ public:
         window.draw(shape);
     }
 
-    void drawHands(sf::RenderWindow& window)
+    void drawHands(sf::RenderWindow& window, float depthScale)
     {
-        float radius = 25;
+        float radius = 20;
         auto size = window.getSize();
         sf::Color trackingColor(100, 250, 50);
         sf::Color lostColor(200, 50, 50);
+        sf::Color candidateColor(10, 10, 200);
 
         for (auto handPoint : m_handPoints)
         {
@@ -107,10 +108,16 @@ public:
             {
                 color = lostColor;
             }
+            else if (handPoint.status() == HAND_STATUS_CANDIDATE)
+            {
+                color = candidateColor;
+            }
 
             const sensekit::Vector2i& p = handPoint.depthPosition();
 
-            drawCircle(window, radius, p.x * m_scale, p.y * m_scale, color);
+            float circleX = (p.x + 0.5) * depthScale;
+            float circleY = (p.y + 0.5) * depthScale;
+            drawCircle(window, radius, circleX, circleY, color);
         }
     }
 
@@ -118,18 +125,17 @@ public:
     {
         if (m_displayBuffer != nullptr)
         {
-            m_scale = window.getSize().x / m_displayWidth;
+            float depthScale = window.getSize().x / m_depthWidth;
 
-            m_sprite.setScale(m_scale, m_scale);
+            m_sprite.setScale(depthScale, depthScale);
 
             window.draw(m_sprite);
 
-            drawHands(window);
+            drawHands(window, depthScale);
         }
     }
 
 private:
-    float m_scale{ 2 };
     long double m_frameDuration{ 0 };
     std::clock_t m_lastTimepoint { 0 };
     sf::Texture m_texture;
@@ -140,8 +146,8 @@ private:
 
     std::vector<sensekit::HandPoint> m_handPoints;
 
-    int m_displayWidth { 0 };
-    int m_displayHeight { 0 };
+    int m_depthWidth { 0 };
+    int m_depthHeight { 0 };
 };
 
 int main(int argc, char** argv)

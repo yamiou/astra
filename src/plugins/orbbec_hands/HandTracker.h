@@ -31,7 +31,7 @@ namespace sensekit { namespace plugins { namespace hands {
         void reset();
         void generate_hand_frame(sensekit_frame_index_t frameIndex);
         static void copy_position(cv::Point3f& source, sensekit_vector3f_t& target);
-        static sensekit_handstatus_t convert_hand_status(TrackingStatus status);
+        static sensekit_handstatus_t convert_hand_status(TrackingStatus status, TrackedPointType type);
         static void reset_hand_point(sensekit_handpoint_t& point);
 
         void update_debug_image_frame(_sensekit_imageframe& sensekitColorframe);
