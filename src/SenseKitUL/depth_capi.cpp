@@ -2,7 +2,6 @@
 #include "generic_stream_api.h"
 #include <SenseKitUL/streams/depth_types.h>
 #include <memory.h>
-#include <SenseKitUL/StreamTypes.h>
 #include <SenseKitUL/Plugins/stream_types.h>
 #include <SenseKitUL/streams/depth_parameters.h>
 #include <string.h>
@@ -10,7 +9,8 @@
 #include <SenseKitUL/streams/image_parameters.h>
 #include <unordered_map>
 
-using ConversionMap = std::unordered_map < sensekit_depthstream_t, conversion_cache_t > ;
+using ConversionMap = std::unordered_map <sensekit_depthstream_t, conversion_cache_t>;
+
 ConversionMap g_sensekit_conversion_map;
 
 conversion_cache_t sensekit_depth_fetch_conversion_cache(sensekit_depthstream_t depthStream)
@@ -100,7 +100,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_depthstream_get_vfov(sensekit_depthst
 SENSEKIT_API_EX sensekit_status_t sensekit_frame_get_depthframe(sensekit_reader_frame_t readerFrame,
                                                                 sensekit_depthframe_t* depthFrame)
 {
-    return sensekit_reader_get_imageframe(readerFrame, 
+    return sensekit_reader_get_imageframe(readerFrame,
                                           SENSEKIT_STREAM_DEPTH,
                                           DEFAULT_SUBTYPE,
                                           depthFrame);

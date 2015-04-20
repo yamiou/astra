@@ -2,7 +2,7 @@
 #define HANDDEBUG_H
 
 #include <SenseKit/SenseKit.h>
-#include <SenseKitUL/StreamTypes.h>
+#include <SenseKitUL/skul_ctypes.h>
 #include <SenseKitUL/streams/hand_capi.h>
 
 namespace sensekit {

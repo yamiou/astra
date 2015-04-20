@@ -2,10 +2,9 @@
 #define DEPTH_TYPES_H
 
 #include <SenseKit/sensekit_types.h>
-#include "image_types.h"
+#include <SenseKitUL/streams/image_types.h>
 
-typedef struct
-{
+typedef struct {
     float xzFactor;
     float yzFactor;
     float coeffX;
@@ -17,7 +16,6 @@ typedef struct
 } conversion_cache_t;
 
 typedef sensekit_streamconnection_t sensekit_depthstream_t;
-
 typedef struct _sensekit_imageframe* sensekit_depthframe_t;
 
 #endif // DEPTH_TYPES_H

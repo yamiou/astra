@@ -1,7 +1,7 @@
 #include <SenseKit/sensekit_types.h>
 #include "generic_stream_api.h"
 #include <SenseKitUL/streams/depth_types.h>
-#include <SenseKitUL/StreamTypes.h>
+#include <SenseKitUL/skul_ctypes.h>
 #include <SenseKitUL/Plugins/stream_types.h>
 #include <string.h>
 #include <SenseKitUL/streams/image_types.h>

@@ -3,16 +3,16 @@
 
 #include <SenseKit/SenseKit.h>
 #include <stdexcept>
-#include <SenseKitUL/StreamTypes.h>
+#include <SenseKitUL/skul_ctypes.h>
 #include <SenseKitUL/streams/hand_capi.h>
-#include <SenseKitUL/Vectorx.h>
+#include <SenseKitUL/Vector.h>
 
 namespace sensekit {
-    
+
     class HandPoint
     {
     public:
-        explicit HandPoint(sensekit_handpoint_t handPoint) : 
+        explicit HandPoint(sensekit_handpoint_t handPoint) :
             m_handPoint(handPoint),
             m_depthPosition(cvector_to_vector(handPoint.depthPosition)),
             m_worldPosition(cvector_to_vector(handPoint.worldPosition)),
@@ -26,20 +26,20 @@ namespace sensekit {
         inline const Vector3f& worldDeltaPosition() const { return m_worldDeltaPosition; }
 
     private:
-        
         sensekit_handpoint_t m_handPoint;
         Vector2i m_depthPosition;
         Vector3f m_worldPosition;
         Vector3f m_worldDeltaPosition;
     };
-    using HandPointList = std::vector < HandPoint > ;
+
+    using HandPointList = std::vector<HandPoint>;
 
     class HandStream : public DataStream
     {
     public:
-        explicit HandStream(sensekit_streamconnection_t connection) :
-            DataStream(connection)
-            { }
+        explicit HandStream(sensekit_streamconnection_t connection)
+            : DataStream(connection)
+        { }
 
         static const sensekit_stream_type_t id = SENSEKIT_STREAM_HAND;
     };
@@ -48,18 +48,18 @@ namespace sensekit {
     {
     public:
         HandFrame(sensekit_reader_frame_t readerFrame, sensekit_stream_subtype_t subtype)
+        {
+            if (readerFrame != nullptr)
             {
-                if (readerFrame != nullptr)
-                {
-                    sensekit_frame_get_handframe_with_subtype(readerFrame, subtype, &m_handFrame);
-                    sensekit_handframe_get_frameindex(m_handFrame, &m_frameIndex);
-                    
-                    size_t maxNumHands;
-                    sensekit_handframe_get_hand_count(m_handFrame, &maxNumHands);
+                sensekit_frame_get_handframe_with_subtype(readerFrame, subtype, &m_handFrame);
+                sensekit_handframe_get_frameindex(m_handFrame, &m_frameIndex);
 
-                    m_handPoints.reserve(maxNumHands);
-                }
+                size_t maxNumHands;
+                sensekit_handframe_get_hand_count(m_handFrame, &maxNumHands);
+
+                m_handPoints.reserve(maxNumHands);
             }
+        }
 
         bool is_valid() { return m_handFrame != nullptr; }
 
@@ -94,6 +94,7 @@ namespace sensekit {
             {
                 return;
             }
+
             m_handPointsInitialized = true;
 
             sensekit_handpoint_t* handPtr;
@@ -116,8 +117,6 @@ namespace sensekit {
         sensekit_handframe_t m_handFrame{nullptr};
         sensekit_frame_index_t m_frameIndex;
     };
-
-
 }
 
 #endif /* HAND_H */

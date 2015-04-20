@@ -2,7 +2,7 @@
 #define VECTOR3_H
 
 #include <math.h>
-#include <SenseKitUL/cvector.h>
+#include <SenseKitUL/skul_ctypes.h>
 
 struct cVector3i { };
 namespace sensekit

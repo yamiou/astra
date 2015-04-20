@@ -1,5 +1,4 @@
 ﻿#include "StreamSet.h"
-#include <SenseKitUL/StreamTypes.h>
 #include <iostream>
 #include <cassert>
 

@@ -3,7 +3,7 @@
 
 #include <SenseKit/SenseKit.h>
 #include <stdexcept>
-#include <SenseKitUL/StreamTypes.h>
+#include <SenseKitUL/skul_ctypes.h>
 #include <SenseKitUL/streams/image_capi.h>
 
 namespace sensekit {

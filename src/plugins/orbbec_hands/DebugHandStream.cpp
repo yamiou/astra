@@ -60,4 +60,5 @@ namespace sensekit { namespace plugins { namespace hands {
             set_view_type(newViewType);
         }
     }
-} } }
+
+}}}

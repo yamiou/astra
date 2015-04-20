@@ -1,9 +1,9 @@
 #include <SenseKit/sensekit_types.h>
+#include <SenseKitUL/skul_ctypes.h>
 #include "generic_stream_api.h"
 #include <SenseKitUL/streams/color_types.h>
 #include <SenseKitUL/Plugins/stream_types.h>
 #include <string.h>
-#include <SenseKitUL/StreamTypes.h>
 #include <cassert>
 #include <SenseKitUL/streams/image_capi.h>
 #include <SenseKitUL/streams/image_parameters.h>

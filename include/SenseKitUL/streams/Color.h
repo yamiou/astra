@@ -2,7 +2,7 @@
 #define COLOR_H
 
 #include <SenseKit/SenseKit.h>
-#include <SenseKitUL/StreamTypes.h>
+#include <SenseKitUL/skul_ctypes.h>
 #include <SenseKitUL/streams/color_capi.h>
 #include <SenseKitUL/streams/Image.h>
 

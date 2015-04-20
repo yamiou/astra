@@ -3,11 +3,10 @@ set (_projname "SenseKitUL")
 set(${_projname}_SOURCES
   ../../include/SenseKitUL/SenseKitUL.h
   ../../include/SenseKitUL/skul_capi.h
-  ../../include/SenseKitUL/StreamTypes.h
-  ../../include/SenseKitUL/Vectorx.h
+  ../../include/SenseKitUL/Vector.h
   ../../include/SenseKitUL/Vector2.h
   ../../include/SenseKitUL/Vector3.h
-  ../../include/SenseKitUL/cvector.h
+  ../../include/SenseKitUL/skul_ctypes.h
   ../../include/SenseKitUL/streams/Image.h
   ../../include/SenseKitUL/streams/image_capi.h
   ../../include/SenseKitUL/streams/image_types.h

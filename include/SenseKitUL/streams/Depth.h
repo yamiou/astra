@@ -2,7 +2,7 @@
 #define DEPTH_H
 
 #include <SenseKit/SenseKit.h>
-#include <SenseKitUL/StreamTypes.h>
+#include <SenseKitUL/skul_ctypes.h>
 #include <SenseKitUL/streams/depth_capi.h>
 #include <SenseKitUL/streams/Image.h>
 
@@ -12,15 +12,17 @@ namespace sensekit {
     {
     public:
         CoordinateMapper(sensekit_depthstream_t depthStream)
-            : m_depthStream(depthStream) {}
-        void convert_depth_to_world(float depthX, float depthY, float depthZ,
+            : m_depthStream(depthStream)
+        { }
+
+        void convert_depth_to_world(float  depthX, float  depthY, float  depthZ,
                                     float* worldX, float* worldY, float* worldZ) const
         {
             sensekit_convert_depth_to_world(m_depthStream, depthX, depthY, depthZ,
                                             worldX, worldY, worldZ);
         }
 
-        void convert_world_to_depth(float worldX, float worldY, float worldZ,
+        void convert_world_to_depth(float  worldX, float  worldY, float  worldZ,
                                     float* depthX, float* depthY, float* depthZ) const
         {
             sensekit_convert_world_to_depth(m_depthStream,
@@ -60,6 +62,7 @@ namespace sensekit {
 
             return vFov;
         }
+
     private:
         CoordinateMapper m_coordinateMapper;
         sensekit_depthstream_t m_depthStream;

@@ -2,12 +2,11 @@
 #define HAND_TYPES_H
 
 #include <SenseKit/sensekit_types.h>
-#include <SenseKitUL/cvector.h>
+#include <SenseKitUL/skul_ctypes.h>
 
 #define SENSEKIT_HANDS_MAX_HANDPOINTS 20
 
-typedef enum _sensekit_debug_hand_view_type
-{
+typedef enum _sensekit_debug_hand_view_type {
     DEBUG_HAND_VIEW_DEPTH,
     DEBUG_HAND_VIEW_VELOCITY,
     DEBUG_HAND_VIEW_FILTEREDVELOCITY,
@@ -17,8 +16,7 @@ typedef enum _sensekit_debug_hand_view_type
     DEBUG_HAND_VIEW_LOCALAREA
 } sensekit_debug_hand_view_type_t;
 
-typedef enum _sensekit_handstatus
-{
+typedef enum _sensekit_handstatus {
     HAND_STATUS_NOTTRACKING,
     HAND_STATUS_TRACKING,
     HAND_STATUS_LOST

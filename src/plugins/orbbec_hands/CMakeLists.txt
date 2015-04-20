@@ -1,23 +1,23 @@
 set (_projname "orbbec_hands")
 
 set(${_projname}_SOURCES
-  handtracker.cpp
-  handtracker.h
+  HandTracker.cpp
+  HandTracker.h
   HandStream.h
   DebugHandStream.h
   DebugHandStream.cpp
-  debugvisualizer.h
-  depthutility.h
-  depthutility.cpp
-  segmentationutility.h
-  segmentationutility.cpp
-  trackedpoint.h
-  pointprocessor.h
-  pointprocessor.cpp
-  trackingdata.h
-  coordinateconverter.h
-  hands_plugin.cpp
-  hands_plugin.h
+  DebugVisualizer.h
+  DepthUtility.h
+  DepthUtility.cpp
+  SegmentationUtility.h
+  SegmentationUtility.cpp
+  TrackedPoint.h
+  PointProcessor.h
+  PointProcessor.cpp
+  TrackingData.h
+  CoordinateConverter.h
+  HandsPlugin.cpp
+  HandsPlugin.h
 )
 
 find_package( OpenCV REQUIRED core imgproc)

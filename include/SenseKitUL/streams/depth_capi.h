@@ -3,7 +3,7 @@
 
 #include <SenseKit/sensekit_defines.h>
 #include <SenseKit/sensekit_types.h>
-#include "depth_types.h"
+#include <SenseKitUL/streams/depth_types.h>
 
 SENSEKIT_BEGIN_DECLS
 

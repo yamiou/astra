@@ -2,11 +2,11 @@
 #define DEBUGHANDSTREAM_H
 
 #include <SenseKit/Plugins/SingleBinStream.h>
-#include <SenseKitUL/StreamTypes.h>
+#include <SenseKitUL/skul_ctypes.h>
 #include <SenseKitUL/Plugins/stream_types.h>
 
 namespace sensekit { namespace plugins { namespace hands {
-    
+
     using DebugHandViewType = sensekit_debug_hand_view_type_t;
 
     class DebugHandStream : public SingleBinStream<sensekit_imageframe_wrapper_t, uint8_t>
@@ -19,11 +19,11 @@ namespace sensekit { namespace plugins { namespace hands {
                         uint32_t height,
                         uint32_t bytesPerPixel)
             : SingleBinStream(pluginService,
-                                streamSet,
-                                StreamDescription(SENSEKIT_STREAM_DEBUG_HAND,
-                                                  DEFAULT_SUBTYPE),
-                                width * height * bytesPerPixel)
-            { }
+                              streamSet,
+                              StreamDescription(SENSEKIT_STREAM_DEBUG_HAND,
+                                                DEFAULT_SUBTYPE),
+                              width * height * bytesPerPixel)
+        { }
 
         DebugHandViewType view_type() const { return m_viewType; }
         void set_view_type(DebugHandViewType view) { m_viewType = view; }
@@ -42,13 +42,14 @@ namespace sensekit { namespace plugins { namespace hands {
                             size_t inByteLength,
                             sensekit_parameter_data_t inData,
                             sensekit_parameter_bin_t& parameterBin) override;
-    private: 
+    private:
         void get_view_parameter(sensekit_parameter_bin_t& parameterBin);
         void set_view_parameter(size_t inByteLength,
                                 sensekit_parameter_data_t& inData);
 
         DebugHandViewType m_viewType{ DEBUG_HAND_VIEW_DEPTH };
     };
-} } }
+
+}}}
 
 #endif /* DEBUGHANDSTREAM_H */

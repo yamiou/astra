@@ -1,7 +1,7 @@
 #include <SenseKit/sensekit_types.h>
 #include "generic_stream_api.h"
 #include <memory.h>
-#include <SenseKitUL/StreamTypes.h>
+#include <SenseKitUL/skul_ctypes.h>
 #include <SenseKitUL/Plugins/stream_types.h>
 #include <SenseKitUL/streams/hand_capi.h>
 #include <string.h>
@@ -30,7 +30,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_frame_get_handframe(sensekit_reader_f
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_frame_get_handframe_with_subtype(sensekit_reader_frame_t readerFrame,
-                                                                            sensekit_stream_subtype_t subtype, 
+                                                                            sensekit_stream_subtype_t subtype,
                                                                             sensekit_handframe_t* handFrame)
 {
     return sensekit_generic_frame_get<sensekit_handframe_wrapper_t>(readerFrame,
