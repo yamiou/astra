@@ -2,6 +2,7 @@
 #include "StreamConnection.h"
 #include "StreamBin.h"
 #include "Stream.h"
+#include <cassert>
 
 namespace sensekit {
     using namespace std::placeholders;
