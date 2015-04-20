@@ -45,7 +45,7 @@ namespace sensekit { namespace plugins { namespace hands {
                         uint8_t g = 0;
                         uint8_t b = 0;
 
-                        if ((g == position.y || r == position.x))
+                        if ((y == position.y || x == position.x))
                         {
                             if (isLostTrackingPoint)
                             {
@@ -86,7 +86,6 @@ namespace sensekit { namespace plugins { namespace hands {
 
         void showDepthMat(const cv::Mat& matDepth,
                           const cv::Mat& matForeground,
-                          const vector<TrackedPoint>& points,
                           _sensekit_imageframe& imageFrame)
         {
             assert(matDepth.cols == imageFrame.metadata.width);
@@ -106,7 +105,7 @@ namespace sensekit { namespace plugins { namespace hands {
                 const float* depthRow = matDepth.ptr<float>(y);
                 const char* foregroundRow = matForeground.ptr<char>(y);
 
-                for (int x = 0; x < width; ++x)
+                for (int x = 0; x < width; ++x, ++depthRow, ++foregroundRow, colorData += bytesPerPixel)
                 {
                     uint8_t r = 0;
                     uint8_t g = 0;
@@ -157,20 +156,13 @@ namespace sensekit { namespace plugins { namespace hands {
                     *(colorData) = r;
                     *(colorData + 1) = g;
                     *(colorData + 2) = b;
-
-                    ++depthRow;
-                    ++foregroundRow;
-                    colorData += bytesPerPixel;
                 }
             }
-
-            overlayCrosshairs(points, imageFrame);
         }
 
         void showVelocityMat(const cv::Mat& matVelocity,
                              float maxScale,
                              const cv::Mat& matForeground,
-                             const vector<TrackedPoint>& points,
                              _sensekit_imageframe& imageFrame)
         {
             assert(matVelocity.cols == imageFrame.metadata.width);
@@ -192,7 +184,7 @@ namespace sensekit { namespace plugins { namespace hands {
             {
                 const float* velocityRow = matVelocity.ptr<float>(y);
                 const char* foregroundRow = matForeground.ptr<char>(y);
-                for (int x = 0; x < width; ++x)
+                for (int x = 0; x < width; ++x, ++velocityRow, ++foregroundRow, colorData += bytesPerPixel)
                 {
                     float velocity = *velocityRow;
                     char foreground = *foregroundRow;
@@ -215,49 +207,43 @@ namespace sensekit { namespace plugins { namespace hands {
                     *(colorData) = bvalue;
                     *(colorData + 1) = gvalue;
                     *(colorData + 2) = rvalue;
-
-                    ++velocityRow;
-                    ++foregroundRow;
-                    colorData += bytesPerPixel;
                 }
             }
-
-            overlayCrosshairs(points, imageFrame);
         }
 
         template<typename T>
         void showNormArray(const cv::Mat& mat,
-                           //const cv::Mat& mask,
-                           const vector<TrackedPoint>& points,
+                           const cv::Mat& mask,
                            _sensekit_imageframe& imageFrame)
         {
             assert(mat.cols == imageFrame.metadata.width);
             assert(mat.rows == imageFrame.metadata.height);
-            //assert(mat.size() == mask.size());
+            assert(mat.size() == mask.size());
 
             int width = mat.cols;
             int height = mat.rows;
 
             double min, max;
             cv::Point minLoc, maxLoc;
-            cv::minMaxLoc(mat, &min, &max, &minLoc, &maxLoc);// , mask);
+            cv::minMaxLoc(mat, &min, &max, &minLoc, &maxLoc , mask);
 
             double range = max - min;
             bool rangeZero = abs(range) < 0.00001;
 
             uint8_t* colorData = static_cast<uint8_t*>(imageFrame.data);
-            uint8_t bytesPerPixel = imageFrame.metadata.bytesPerPixel;
+            const uint8_t bytesPerPixel = imageFrame.metadata.bytesPerPixel;
 
             for (int y = 0; y < height; ++y)
             {
-                const T* row = mat.ptr<T>(y);
+                const T* dataRow = mat.ptr<T>(y);
+                const uint8_t* maskRow = mask.ptr<uint8_t>(y);
 
-                for (int x = 0; x < width; ++x)
+                for (int x = 0; x < width; ++x, ++dataRow, ++maskRow, colorData += bytesPerPixel)
                 {
-                    float data = *row;
-
+                    float data = *dataRow;
+                    uint8_t maskValue = *maskRow;
                     float value = 1;
-                    if (0 == data)
+                    if (0 == data || 0 == maskValue)
                     {
                         value = 0;
                     }
@@ -267,18 +253,13 @@ namespace sensekit { namespace plugins { namespace hands {
                     }
                     else
                     {
-                        value = 255 * ((*row - min) / range);
+                        value = 255 * ((*dataRow - min) / range);
                     }
                     *(colorData) = value;
                     *(colorData + 1) = value;
                     *(colorData + 2) = value;
-
-                    ++row;
-                    colorData += bytesPerPixel;
                 }
             }
-
-            overlayCrosshairs(points, imageFrame);
         }
     };
 }}}

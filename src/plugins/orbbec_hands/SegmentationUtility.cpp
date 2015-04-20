@@ -116,8 +116,14 @@ namespace sensekit { namespace plugins { namespace hands {
     cv::Point SegmentationUtility::trackPointFromSeed(TrackingData data)
     {
         data.matrices.matLayerSegmentation = cv::Mat::zeros(data.matrices.matDepth.size(), CV_8UC1);
-
+        
+        //data.matrices.matLayerSegmentation.setTo(cv::Scalar(0));
         segmentForeground(data);
+
+        cv::bitwise_or(data.matrices.matLayerSegmentation, 
+                       data.matrices.matSegmentation, 
+                       data.matrices.matSegmentation,
+                       data.matrices.matLayerSegmentation);
 
         double min, max;
         cv::Point minLoc, maxLoc;

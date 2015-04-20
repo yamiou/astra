@@ -42,7 +42,9 @@ public:
 
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
-
+        m_depthWidth = width;
+        m_depthHeight = height;
+        /*
         init_texture(width, height);
 
         const int16_t* depthPtr = depthFrame.data();
@@ -61,6 +63,7 @@ public:
         }
 
         m_texture.update(m_displayBuffer.get());
+        */
     }
 
     void processHands(sensekit::Frame& frame)
@@ -101,7 +104,7 @@ public:
     virtual void on_frame_ready(sensekit::StreamReader& reader,
                                 sensekit::Frame& frame) override
         {
-            //processDepth(frame);
+            processDepth(frame);
             processHands(frame);
             processHandsDebug(frame);
 
@@ -119,7 +122,7 @@ public:
         window.draw(shape);
     }
 
-    void drawHands(sf::RenderWindow& window)
+    void drawHands(sf::RenderWindow& window, float depthScale)
     {
         float radius = 25;
         auto size = window.getSize();
@@ -136,25 +139,28 @@ public:
 
             const sensekit::Vector2i& p = handPoint.depthPosition();
 
-            drawCircle(window, radius, p.x * m_scale, p.y * m_scale, color);
+            //add 0.5 to center on the middle of the pixel
+            float circleX = (p.x + 0.5) * depthScale;
+            float circleY = (p.y + 0.5) * depthScale;
+            drawCircle(window, radius, circleX, circleY, color);
         }
     }
     void drawTo(sf::RenderWindow& window)
     {
         if (m_displayBuffer != nullptr)
         {
-            m_scale = window.getSize().x / m_displayWidth;
+            float debugScale = window.getSize().x / m_displayWidth;
+            float depthScale = window.getSize().x / m_depthWidth;
 
-            m_sprite.setScale(m_scale, m_scale);
+            m_sprite.setScale(debugScale, debugScale);
 
             window.draw(m_sprite);
 
-            drawHands(window);
+            drawHands(window, depthScale);
         }
     }
 
 private:
-    float m_scale{ 1 };
     long double m_frameDuration{ 0 };
     std::clock_t m_lastTimepoint { 0 };
     sf::Texture m_texture;
@@ -166,8 +172,10 @@ private:
 
     std::vector<sensekit::HandPoint> m_handPoints;
 
-    int m_displayWidth { 0 };
-    int m_displayHeight { 0 };
+    int m_depthWidth{ 1 };
+    int m_depthHeight{ 1 };
+    int m_displayWidth { 1 };
+    int m_displayHeight { 1 };
 };
 
 void request_view_mode(sensekit::StreamReader& reader, sensekit::DebugHandViewType view)
@@ -191,13 +199,14 @@ void process_key_input(sensekit::StreamReader& reader, sf::Event::KeyEvent key)
     }
     else if (key.code == sf::Keyboard::Num4)
     {
+        request_view_mode(reader, DEBUG_HAND_VIEW_SEGMENTATION);
+    }
+    else if (key.code == sf::Keyboard::Num5)
+    {
         request_view_mode(reader, DEBUG_HAND_VIEW_SCORE);
     }
     //disabled temporarily
-/*    else if (key.code == sf::Keyboard::Num5)
-    {
-        request_view_mode(reader, DEBUG_HAND_VIEW_SEGMENTATION);
-    }
+/*    
     else if (key.code == sf::Keyboard::Num6)
     {
         request_view_mode(reader, DEBUG_HAND_VIEW_LOCALAREA);

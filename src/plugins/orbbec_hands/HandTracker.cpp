@@ -13,8 +13,8 @@ namespace sensekit { namespace plugins { namespace hands {
 
         using namespace std;
 
-        const int PROCESSING_SIZE_WIDTH = 80;
-        const int PROCESSING_SIZE_HEIGHT = 60;
+        const int PROCESSING_SIZE_WIDTH = 40;
+        const int PROCESSING_SIZE_HEIGHT = 30;
 
         HandTracker::HandTracker(PluginServiceProxy& pluginService,
                                  Sensor& streamset,
@@ -156,8 +156,9 @@ namespace sensekit { namespace plugins { namespace hands {
 
             m_matScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             //cv::Mat matEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-            cv::Mat m_matArea = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-            cv::Mat m_layerSegmentation;
+            m_matArea = cv::Mat::zeros(matDepth.size(), CV_32FC1);
+            m_segmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
+            m_layerSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
 
             float heightFactor = 1;
             float depthFactor = 1.5;
@@ -167,7 +168,7 @@ namespace sensekit { namespace plugins { namespace hands {
 
             cv::Mat foregroundCopy = matForeground.clone();
 
-            TrackingMatrices matrices(matDepth, m_matArea, m_matScore, matForeground, m_layerSegmentation);
+            TrackingMatrices matrices(matDepth, m_matArea, m_matScore, matForeground, m_segmentation, m_layerSegmentation);
 
             m_pointProcessor->updateTrackedPoints(matrices);
 
@@ -203,8 +204,9 @@ namespace sensekit { namespace plugins { namespace hands {
                     point.trackingId = internalPoint.m_trackingId;
 
                     //convert from internal depth resolution to original depth resolution
-                    point.depthPosition.x = internalPoint.m_position.x * m_resizeFactor;
-                    point.depthPosition.y = internalPoint.m_position.y * m_resizeFactor;
+                    //add 0.5 to center on the middle of the pixel
+                    point.depthPosition.x = (internalPoint.m_position.x + 0.5) * m_resizeFactor;
+                    point.depthPosition.y = (internalPoint.m_position.y + 0.5) * m_resizeFactor;
 
                     copy_position(internalPoint.m_worldPosition, point.worldPosition);
                     copy_position(internalPoint.m_worldDeltaPosition, point.worldDeltaPosition);
@@ -262,47 +264,45 @@ namespace sensekit { namespace plugins { namespace hands {
             case DEBUG_HAND_VIEW_DEPTH:
                 m_debugVisualizer.showDepthMat(m_matDepth,
                                                m_matForeground,
-                                               m_pointProcessor->get_trackedPoints(),
                                                colorFrame);
                 break;
             case DEBUG_HAND_VIEW_VELOCITY:
                 m_debugVisualizer.showVelocityMat(m_depthUtility.matDepthVel(),
                                                   m_maxVelocity,
                                                   m_matForeground,
-                                                  m_pointProcessor->get_trackedPoints(),
                                                   colorFrame);
                 break;
             case DEBUG_HAND_VIEW_FILTEREDVELOCITY:
                 m_debugVisualizer.showVelocityMat(m_depthUtility.matDepthVelErode(),
                                                   m_maxVelocity,
                                                   m_matForeground,
-                                                  m_pointProcessor->get_trackedPoints(),
                                                   colorFrame);
+                break;
+            case DEBUG_HAND_VIEW_SEGMENTATION:
+                m_debugVisualizer.showNormArray<char>(m_segmentation,
+                                                      m_segmentation,
+                                                      colorFrame);
                 break;
             case DEBUG_HAND_VIEW_SCORE:
                 m_debugVisualizer.showNormArray<float>(m_matScore,
-                                                       //m_layerSegmentation,
-                                                       m_pointProcessor->get_trackedPoints(),
+                                                       m_segmentation,
                                                        colorFrame);
-                break;
-            case DEBUG_HAND_VIEW_SEGMENTATION:
-                m_debugVisualizer.showNormArray<char>(m_layerSegmentation,
-                                                      //m_layerSegmentation,
-                                                      m_pointProcessor->get_trackedPoints(),
-                                                      colorFrame);
                 break;
             case DEBUG_HAND_VIEW_LOCALAREA:
                 m_debugVisualizer.showNormArray<float>(m_matArea,
-                                                       //m_layerSegmentation,
-                                                       m_pointProcessor->get_trackedPoints(),
+                                                       m_segmentation,
                                                        colorFrame);
                 break;
             case DEBUG_HAND_VIEW_EDGEDISTANCE:
                 //m_debugVisualizer.showNormArray<float>(m_matEdgeDistance,
                 //                                       m_layerSegmentation,
-                //                                       m_pointProcessor->get_trackedPoints(),
                 //                                       colorFrame);
                 break;
+            }
+
+            if (true)
+            {
+                m_debugVisualizer.overlayCrosshairs(m_pointProcessor->get_trackedPoints(), colorFrame);
             }
         }
 }}}
