@@ -300,7 +300,7 @@ namespace sensekit { namespace plugins { namespace hands {
                 break;
             }
 
-            if (true)
+            if (false)
             {
                 m_debugVisualizer.overlayCrosshairs(m_pointProcessor->get_trackedPoints(), colorFrame);
             }

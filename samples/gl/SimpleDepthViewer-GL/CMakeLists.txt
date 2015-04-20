@@ -25,3 +25,5 @@ if (WIN32)
 endif()
 
 set_debug_working_dir(${_projname} "$(TargetDir)")
+
+add_sensekit_sdk_dependency(${_projname})

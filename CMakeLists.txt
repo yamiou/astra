@@ -34,6 +34,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 set(SAMPLE_DIR_FOLDER "samples/")
 
+set (SDK_DEPENDENT_TARGET "SDK_dependent")
+add_custom_target(${SDK_DEPENDENT_TARGET})
+
 add_subdirectory(src)
 add_subdirectory(samples)
 

@@ -15,3 +15,5 @@ include_directories(${SFML_INCLUDE_DIR})
 target_link_libraries(${_projname} ${SENSEKIT_LIBRARIES} ${SFML_LIBRARIES})
 
 set_debug_working_dir(${_projname} "$(TargetDir)")
+
+add_sensekit_sdk_dependency(${_projname})

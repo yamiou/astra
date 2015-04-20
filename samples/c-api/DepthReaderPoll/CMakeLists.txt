@@ -12,3 +12,5 @@ set_target_properties(${_projname} PROPERTIES FOLDER "${SAMPLE_DIR_FOLDER}c-api"
 target_link_libraries(${_projname} ${SENSEKIT_LIBRARIES})
 
 set_debug_working_dir(${_projname} "$(TargetDir)")
+
+add_sensekit_sdk_dependency(${_projname})
