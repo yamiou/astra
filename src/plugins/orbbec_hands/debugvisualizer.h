@@ -18,7 +18,7 @@ namespace sensekit
                 DebugVisualizer() {}
                 ~DebugVisualizer() {}
 
-                void overlayCrosshairs(vector<TrackedPoint>& points,
+                void overlayCrosshairs(const vector<TrackedPoint>& points,
                                       _sensekit_imageframe& imageFrame)
                 {
                     int width = imageFrame.metadata.width;
@@ -87,9 +87,9 @@ namespace sensekit
                     }
                 }
 
-                void showDepthMat(cv::Mat& matDepth,
-                                  cv::Mat& matForeground,
-                                  vector<TrackedPoint>& points,
+                void showDepthMat(const cv::Mat& matDepth,
+                                  const cv::Mat& matForeground,
+                                  const vector<TrackedPoint>& points,
                                   _sensekit_imageframe& imageFrame)
                 {
                     assert(matDepth.cols == imageFrame.metadata.width);
@@ -106,8 +106,8 @@ namespace sensekit
 
                     for (int y = 0; y < height; ++y)
                     {
-                        float* depthRow = matDepth.ptr<float>(y);
-                        char* foregroundRow = matForeground.ptr<char>(y);
+                        const float* depthRow = matDepth.ptr<float>(y);
+                        const char* foregroundRow = matForeground.ptr<char>(y);
 
                         for (int x = 0; x < width; ++x)
                         {
@@ -170,10 +170,10 @@ namespace sensekit
                     overlayCrosshairs(points, imageFrame);
                 }
 
-                void showVelocityMat(cv::Mat& matVelocity,
+                void showVelocityMat(const cv::Mat& matVelocity,
                                      float maxScale,
-                                     cv::Mat& matForeground,
-                                     vector<TrackedPoint>& points,
+                                     const cv::Mat& matForeground,
+                                     const vector<TrackedPoint>& points,
                                      _sensekit_imageframe& imageFrame)
                 {
                     assert(matVelocity.cols == imageFrame.metadata.width);
@@ -193,8 +193,8 @@ namespace sensekit
 
                     for (int y = 0; y < height; ++y)
                     {
-                        float* velocityRow = matVelocity.ptr<float>(y);
-                        char* foregroundRow = matForeground.ptr<char>(y);
+                        const float* velocityRow = matVelocity.ptr<float>(y);
+                        const char* foregroundRow = matForeground.ptr<char>(y);
                         for (int x = 0; x < width; ++x)
                         {
                             float velocity = *velocityRow;
@@ -227,69 +227,62 @@ namespace sensekit
 
                     overlayCrosshairs(points, imageFrame);
                 }
-                /*
-                  template<typename T>
-                  void DebugVisualizer::showNormArray<T>(cv::Mat& mat,
-                  cv::Mat& mask,
-                  vector<TrackedPoint>& points,
-                  _sensekit_imageframe& imageFrame)
-                  {
-                  assert(mat.cols == imageFrame.metadata.width);
-                  assert(mat.rows == imageFrame.metadata.height);
-                  assert(mat.size() == mask.size());
 
-                  int width = mat.cols;
-                  int height = mat.rows;
+                template<typename T>
+                void showNormArray(const cv::Mat& mat,
+                                   const cv::Mat& mask,
+                                   const vector<TrackedPoint>& points,
+                                   _sensekit_imageframe& imageFrame)
+                {
+                    assert(mat.cols == imageFrame.metadata.width);
+                    assert(mat.rows == imageFrame.metadata.height);
+                    assert(mat.size() == mask.size());
 
-                  double min, max;
-                  cv::Point minLoc, maxLoc;
-                  cv::minMaxLoc(mat, &min, &max, &minLoc, &maxLoc, mask);
+                    int width = mat.cols;
+                    int height = mat.rows;
 
-                  double range = max - min;
-                  double rangeFactor = 0;
-                  if (range > 0)
-                  {
-                  rangeFactor = 255.0 / range;
-                  }
-                  uint8_t* colorData = imageFrame.data;
-                  uint8_t bytesPerPixel = imageFrame.metadata.bytesPerPixel;
+                    double min, max;
+                    cv::Point minLoc, maxLoc;
+                    cv::minMaxLoc(mat, &min, &max, &minLoc, &maxLoc, mask);
 
-                  for (int y = 0; y < height; ++y)
-                  {
-                  T* row = mat.ptr<T>(y);
+                    double range = max - min;
+                    bool rangeZero = abs(range) < 0.00001;
 
-                  for (int x = 0; x < width; ++x)
-                  {
-                  float data = *row;
+                    uint8_t* colorData = static_cast<uint8_t*>(imageFrame.data);
+                    uint8_t bytesPerPixel = imageFrame.metadata.bytesPerPixel;
 
-                  float value = 1;
-                  if (0 == data)
-                  {
-                  value = 0;
-                  }
-                  else if (0 == range)
-                  {
-                  value = 255;
-                  }
-                  else
-                  {
-                  value = 255 * ((*row - min) / range);
-                  }
-                  *(colorData    ) = value;
-                  *(colorData + 1) = value;
-                  *(colorData + 2) = value;
+                    for (int y = 0; y < height; ++y)
+                    {
+                        const T* row = mat.ptr<T>(y);
 
-                  ++row;
-                  colorData += bytesPerPixel;
-                  }
-                  }
+                        for (int x = 0; x < width; ++x)
+                        {
+                            float data = *row;
 
-                  overlayCrosshairs(points, imageFrame);
-                  }
-                  */
+                            float value = 1;
+                            if (0 == data)
+                            {
+                                value = 0;
+                            }
+                            else if (rangeZero)
+                            {
+                                value = 255;
+                            }
+                            else
+                            {
+                                value = 255 * ((*row - min) / range);
+                            }
+                            *(colorData) = value;
+                            *(colorData + 1) = value;
+                            *(colorData + 2) = value;
 
-            private:
+                            ++row;
+                            colorData += bytesPerPixel;
+                        }
+                    }
 
+                    overlayCrosshairs(points, imageFrame);
+                }
             };
         }
     }

@@ -45,14 +45,14 @@ struct TrackingMatrices
 
 struct TrackingData
 {
-    TrackingMatrices matrices;
-    cv::Point seedPosition;
+    TrackingMatrices& matrices;
+    const cv::Point& seedPosition;
     const float referenceDepth;
     const float bandwidthDepth;
     const TrackedPointType pointType;
     const int iterationMax;
 
-    TrackingData(TrackingMatrices matrices, cv::Point seedPosition, const float referenceDepth, const float bandwidthDepth, const TrackedPointType pointType, const int iterationMax) :
+    TrackingData(TrackingMatrices& matrices, const cv::Point& seedPosition, const float referenceDepth, const float bandwidthDepth, const TrackedPointType pointType, const int iterationMax) :
         matrices(matrices),
         seedPosition(seedPosition),
         referenceDepth(referenceDepth),

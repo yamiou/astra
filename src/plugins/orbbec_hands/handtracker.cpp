@@ -170,20 +170,20 @@ namespace sensekit
                 //TODO ?make dead points go to lost tracking instead so they can recover (only use dead for duplicate...rename status?)
                 //TODO look at initial points jumping to nearby desk instead of hand, then never leaving
 
-                cv::Mat matScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
+                m_matScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
                 //cv::Mat matEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-                cv::Mat matArea = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-                cv::Mat layerSegmentation;
+                cv::Mat m_matArea = cv::Mat::zeros(matDepth.size(), CV_32FC1);
+                cv::Mat m_layerSegmentation;
 
                 float heightFactor = 1;
                 float depthFactor = 1.5;
 
-                SegmentationUtility::calculateBasicScore(matDepth, matScore, heightFactor, depthFactor, *(m_converter.get()));
-                SegmentationUtility::calculateSegmentArea(matDepth, matArea, *(m_converter.get()));
+                SegmentationUtility::calculateBasicScore(matDepth, m_matScore, heightFactor, depthFactor, *(m_converter.get()));
+                SegmentationUtility::calculateSegmentArea(matDepth, m_matArea, *(m_converter.get()));
 
                 cv::Mat foregroundCopy = matForeground.clone();
 
-                TrackingMatrices matrices(matDepth, matArea, matScore, matForeground, layerSegmentation);
+                TrackingMatrices matrices(matDepth, m_matArea, m_matScore, matForeground, m_layerSegmentation);
 
                 m_pointProcessor->updateTrackedPoints(matrices);
 
@@ -271,67 +271,55 @@ namespace sensekit
 
             void HandTracker::update_debug_image_frame(_sensekit_imageframe& colorFrame)
             {
-                m_debugVisualizer.showDepthMat(m_matDepth,
-                                               m_matForeground,
-                                               m_pointProcessor->get_trackedPoints(),
-                                               colorFrame);
+                float m_maxVelocity = 0.1;
 
-                /*
-                
-                case '1':
-		m_view = View::Depth;
-		break;
-	case '2':
-		m_view = View::Velocity;
-		break;
-	case '3':
-		m_view = View::FilteredVelocity;
-		break;
-	case '4':
-		m_view = View::Segmentation;
-		break;
-	case '5':
-		m_view = View::Score;
-		break;
-	case '6':
-		m_view = View::EdgeDistance;
-		break;
-	case '7':
-		m_view = View::LocalArea;
-        break;
-        */
-                /*
-                
-	if (m_view == View::Depth)
-	{
-		showDepthMat(m_matDepthResized, m_matForeground, m_trackedPoints);
-	}
-	else if (m_view == View::Velocity)
-	{
-		showVelocityMat(m_matDepthVel, m_maxVelocity, m_matForeground, m_trackedPoints);
-	}
-	else if (m_view == View::FilteredVelocity)
-	{
-		showVelocityMat(m_matDepthVelErode, m_maxVelocity, m_matForeground, m_trackedPoints);
-	}
-	else if (m_view == View::Segmentation)
-	{
-		showNormArray<char>(m_matHandSegmentation, m_matHandSegmentation, m_trackedPoints);
-	}
-	else if (m_view == View::Score)
-	{
-		showNormArray<float>(m_matScore, m_matHandSegmentation, m_trackedPoints);
-	}
-	else if (m_view == View::EdgeDistance)
-	{
-		showNormArray<float>(m_matEdgeDistance, m_matHandSegmentation, m_trackedPoints);
-	}
-	else if (m_view == View::LocalArea)
-	{
-		showNormArray<float>(m_matLocalArea, m_matHandSegmentation, m_trackedPoints);
-	}
-
-                */
+                switch (m_debugImageStream->view_type())
+                {
+                case DEBUG_HAND_VIEW_DEPTH:
+                    m_debugVisualizer.showDepthMat(m_matDepth,
+                                                   m_matForeground,
+                                                   m_pointProcessor->get_trackedPoints(),
+                                                   colorFrame);
+                    break;
+                case DEBUG_HAND_VIEW_VELOCITY:
+                    m_debugVisualizer.showVelocityMat(m_depthUtility.matDepthVel(),
+                                                      m_maxVelocity,
+                                                      m_matForeground,
+                                                      m_pointProcessor->get_trackedPoints(),
+                                                      colorFrame);
+                    break;
+                case DEBUG_HAND_VIEW_FILTEREDVELOCITY:
+                    m_debugVisualizer.showVelocityMat(m_depthUtility.matDepthVelErode(),
+                                                      m_maxVelocity,
+                                                      m_matForeground,
+                                                      m_pointProcessor->get_trackedPoints(),
+                                                      colorFrame);
+                    break;
+                case DEBUG_HAND_VIEW_SEGMENTATION:
+                    m_debugVisualizer.showNormArray<char>(m_layerSegmentation,
+                                                          m_layerSegmentation,
+                                                          m_pointProcessor->get_trackedPoints(),
+                                                          colorFrame);
+                    break;
+                case DEBUG_HAND_VIEW_SCORE:
+                    m_debugVisualizer.showNormArray<float>(m_matScore,
+                                                           m_layerSegmentation,
+                                                           m_pointProcessor->get_trackedPoints(),
+                                                           colorFrame);
+                    break;
+                case DEBUG_HAND_VIEW_LOCALAREA:
+                    m_debugVisualizer.showNormArray<float>(m_matArea,
+                                                           m_layerSegmentation,
+                                                           m_pointProcessor->get_trackedPoints(),
+                                                           colorFrame);
+                    break;
+                case DEBUG_HAND_VIEW_EDGEDISTANCE:
+                    //m_debugVisualizer.showNormArray<float>(m_matEdgeDistance,
+                    //                                       m_layerSegmentation,
+                    //                                       m_pointProcessor->get_trackedPoints(),
+                    //                                       colorFrame);
+                    break;
+                }
             }
         }
     }

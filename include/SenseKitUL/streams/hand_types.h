@@ -6,16 +6,16 @@
 
 #define SENSEKIT_HANDS_MAX_HANDPOINTS 20
 
-typedef enum _sensekit_debug_hand_mode
+typedef enum _sensekit_debug_hand_view_type
 {
-    Depth,
-    Velocity,
-    FilteredVelocity,
-    Segmentation,
-    Score,
-    EdgeDistance,
-    LocalArea
-} sensekit_debug_hand_mode;
+    DEBUG_HAND_VIEW_DEPTH,
+    DEBUG_HAND_VIEW_VELOCITY,
+    DEBUG_HAND_VIEW_FILTEREDVELOCITY,
+    DEBUG_HAND_VIEW_SEGMENTATION,
+    DEBUG_HAND_VIEW_SCORE,
+    DEBUG_HAND_VIEW_EDGEDISTANCE,
+    DEBUG_HAND_VIEW_LOCALAREA
+} sensekit_debug_hand_view_type_t;
 
 typedef enum _sensekit_handstatus
 {

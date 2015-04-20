@@ -69,7 +69,9 @@ namespace sensekit
 
                 cv::Mat m_matDepth;
                 cv::Mat m_matForeground;
-
+                cv::Mat m_matScore;
+                cv::Mat m_matArea;
+                cv::Mat m_layerSegmentation;
 
                 DebugVisualizer m_debugVisualizer;
             };

@@ -33,6 +33,11 @@ SENSEKIT_API_EX sensekit_status_t sensekit_reader_get_debug_handstream(sensekit_
 SENSEKIT_API_EX sensekit_status_t sensekit_frame_get_debug_handframe(sensekit_reader_frame_t readerFrame,
                                                                      sensekit_debug_handframe_t* debugHandFrame);
 
+SENSEKIT_API_EX sensekit_status_t sensekit_debug_handstream_get_view_type(sensekit_debug_handstream_t debugHandStream,
+                                                                          sensekit_debug_hand_view_type_t* viewType);
+
+SENSEKIT_API_EX sensekit_status_t sensekit_debug_handstream_set_view_type(sensekit_debug_handstream_t debugHandStream,
+                                                                          sensekit_debug_hand_view_type_t viewType);
 
 SENSEKIT_END_DECLS
 

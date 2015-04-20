@@ -16,6 +16,9 @@ namespace sensekit
                 void processDepthToForeground(DepthFrame& depthFrame, cv::Mat& matDepth, cv::Mat& matForeground);
                 void reset();
 
+                const cv::Mat& matDepthVel() const { return m_matDepthVel; }
+                const cv::Mat& matDepthVelErode() const { return m_matDepthVelErode; }
+
             private:
                 static void depthFrameToMat(DepthFrame& depthFrameSrc, int width, int height, cv::Mat& matTarget);
 

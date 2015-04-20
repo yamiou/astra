@@ -170,6 +170,44 @@ private:
     int m_displayHeight { 0 };
 };
 
+void request_view_mode(sensekit::StreamReader& reader, sensekit::DebugHandViewType view)
+{
+    reader.stream<sensekit::DebugHandStream>().set_view_type(view);
+}
+
+void process_key_input(sensekit::StreamReader& reader, sf::Event::KeyEvent key)
+{
+    if (key.code == sf::Keyboard::Num1)
+    {
+        request_view_mode(reader, DEBUG_HAND_VIEW_DEPTH);
+    }
+    else if (key.code == sf::Keyboard::Num2)
+    {
+        request_view_mode(reader, DEBUG_HAND_VIEW_VELOCITY);
+    }
+    else if (key.code == sf::Keyboard::Num3)
+    {
+        request_view_mode(reader, DEBUG_HAND_VIEW_FILTEREDVELOCITY);
+    }
+    else if (key.code == sf::Keyboard::Num4)
+    {
+        request_view_mode(reader, DEBUG_HAND_VIEW_SCORE);
+    }
+    //disabled temporarily
+/*    else if (key.code == sf::Keyboard::Num5)
+    {
+        request_view_mode(reader, DEBUG_HAND_VIEW_SEGMENTATION);
+    }
+    else if (key.code == sf::Keyboard::Num6)
+    {
+        request_view_mode(reader, DEBUG_HAND_VIEW_LOCALAREA);
+    }
+    else if (key.code == sf::Keyboard::Num7)
+    {
+        request_view_mode(reader, DEBUG_HAND_VIEW_EDGEDISTANCE);
+    } */       
+}
+
 int main(int argc, char** argv)
 {
     sensekit::SenseKit::initialize();
@@ -194,9 +232,20 @@ int main(int argc, char** argv)
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
+            {
                 window.close();
-            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
-                window.close();
+            }
+            if (event.type == sf::Event::KeyPressed) 
+            {
+                if (event.key.code == sf::Keyboard::Escape)
+                {
+                    window.close();
+                }
+                else
+                {
+                    process_key_input(reader, event.key);
+                }
+            }
         }
 
         // clear the window with black color

@@ -1,12 +1,12 @@
 #include <SenseKit/sensekit_types.h>
 #include "generic_stream_api.h"
-#include <math.h>
 #include <memory.h>
 #include <SenseKitUL/StreamTypes.h>
 #include <SenseKitUL/Plugins/stream_types.h>
 #include <SenseKitUL/streams/hand_capi.h>
 #include <string.h>
 #include <SenseKitUL/streams/image_capi.h>
+#include <SenseKitUL/streams/hand_parameters.h>
 
 SENSEKIT_BEGIN_DECLS
 
@@ -92,5 +92,22 @@ SENSEKIT_API_EX sensekit_status_t sensekit_frame_get_debug_handframe(sensekit_re
                                           debugHandFrame);
 }
 
+SENSEKIT_API_EX sensekit_status_t sensekit_debug_handstream_get_view_type(sensekit_debug_handstream_t debugHandStream,
+                                                                          sensekit_debug_hand_view_type_t* viewType)
+{
+    return sensekit_stream_get_parameter_fixed(debugHandStream,
+                                               SENSEKIT_PARAMETER_DEBUG_HAND_VIEW_TYPE,
+                                               sizeof(sensekit_debug_hand_view_type_t),
+                                               reinterpret_cast<sensekit_parameter_data_t*>(viewType));
+}
+
+SENSEKIT_API_EX sensekit_status_t sensekit_debug_handstream_set_view_type(sensekit_debug_handstream_t debugHandStream,
+                                                                          sensekit_debug_hand_view_type_t viewType)
+{
+    return sensekit_stream_set_parameter(debugHandStream,
+                                         SENSEKIT_PARAMETER_DEBUG_HAND_VIEW_TYPE,
+                                         sizeof(sensekit_debug_hand_view_type_t),
+                                         reinterpret_cast<sensekit_parameter_data_t>(&viewType));
+}
 
 SENSEKIT_END_DECLS

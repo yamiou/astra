@@ -23,6 +23,7 @@ set(${_projname}_SOURCES
   ../../include/SenseKitUL/streams/DebugHand.h
   ../../include/SenseKitUL/streams/hand_capi.h
   ../../include/SenseKitUL/streams/hand_types.h
+  ../../include/SenseKitUL/streams/hand_parameters.h
   ../../include/SenseKitUL/Plugins/stream_types.h
   depth_capi.cpp
   color_capi.cpp

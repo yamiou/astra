@@ -23,7 +23,7 @@ PointProcessor::~PointProcessor()
 {
 }
 
-void PointProcessor::updateTrackedPoints(TrackingMatrices matrices)
+void PointProcessor::updateTrackedPoints(TrackingMatrices& matrices)
 {
     for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
     {
@@ -39,7 +39,7 @@ void PointProcessor::reset()
     m_nextTrackingId = 0;
 }
 
-void PointProcessor::updateTrackedPoint(TrackingMatrices matrices, TrackedPoint& trackedPoint)
+void PointProcessor::updateTrackedPoint(TrackingMatrices& matrices, TrackedPoint& trackedPoint)
 {
     const float width = matrices.matDepth.cols;
     const float height = matrices.matDepth.rows;
@@ -86,7 +86,9 @@ void PointProcessor::updateTrackedPoint(TrackingMatrices matrices, TrackedPoint&
 }
 
 
-void PointProcessor::validateAndUpdateTrackedPoint(TrackingMatrices matrices, TrackedPoint& trackedPoint, cv::Point newTargetPoint)
+void PointProcessor::validateAndUpdateTrackedPoint(TrackingMatrices& matrices, 
+                                                   TrackedPoint& trackedPoint, 
+                                                   const cv::Point& newTargetPoint)
 {
     bool updatedPoint = false;
     const float steadyDist = 150; //mm
@@ -215,7 +217,8 @@ void PointProcessor::removeOldOrDeadPoints()
     }
 }
 
-void PointProcessor::updateTrackedPointOrCreateNewPointFromSeedPosition(TrackingMatrices matrices, cv::Point seedPosition)
+void PointProcessor::updateTrackedPointOrCreateNewPointFromSeedPosition(TrackingMatrices& matrices, 
+                                                                        const cv::Point& seedPosition)
 {
     float seedDepth = matrices.matDepth.at<float>(seedPosition);
     TrackingData trackingData(matrices, seedPosition, seedDepth, m_initialBandwidthDepth, TrackedPointType::CandidatePoint, m_iterationMaxInitial);

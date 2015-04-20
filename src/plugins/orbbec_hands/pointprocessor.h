@@ -12,11 +12,12 @@ public:
     PointProcessor(const CoordinateConverter& converter);
     virtual ~PointProcessor();
 
-    void updateTrackedPoints(TrackingMatrices matrices);
+    void updateTrackedPoints(TrackingMatrices& matrices);
 
     void removeOldOrDeadPoints();
     void removeDuplicatePoints();
-    void updateTrackedPointOrCreateNewPointFromSeedPosition(TrackingMatrices matrices, cv::Point seedPosition);
+    void updateTrackedPointOrCreateNewPointFromSeedPosition(TrackingMatrices& matrices, 
+                                                            const cv::Point& seedPosition);
 
     std::vector<TrackedPoint>& get_trackedPoints() { return m_trackedPoints; }
 
@@ -27,8 +28,10 @@ public:
 
 private:
 
-    void updateTrackedPoint(TrackingMatrices matrices, TrackedPoint& trackedPoint);
-    void validateAndUpdateTrackedPoint(TrackingMatrices matrices, TrackedPoint& tracked, cv::Point targetPoint);
+    void updateTrackedPoint(TrackingMatrices& matrices, TrackedPoint& trackedPoint);
+    void validateAndUpdateTrackedPoint(TrackingMatrices& matrices, 
+                                       TrackedPoint& tracked, 
+                                       const cv::Point& targetPoint);
     bool isValidPointArea(TrackingMatrices& matrices, cv::Point targetPoint);
 
     const CoordinateConverter& m_converter;

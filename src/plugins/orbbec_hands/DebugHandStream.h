@@ -7,6 +7,8 @@
 
 namespace sensekit { namespace plugins { namespace hands {
     
+    using DebugHandViewType = sensekit_debug_hand_view_type_t;
+
     class DebugHandStream : public SingleBinStream<sensekit_imageframe_wrapper_t, uint8_t>
 
     {
@@ -22,23 +24,30 @@ namespace sensekit { namespace plugins { namespace hands {
                                                   DEFAULT_SUBTYPE),
                                 width * height * bytesPerPixel)
             { }
+
+        DebugHandViewType view_type() const { return m_viewType; }
+        void set_view_type(DebugHandViewType view) { m_viewType = view; }
     protected:
         virtual void set_parameter(sensekit_streamconnection_t connection,
-                                    sensekit_parameter_id id,
-                                    size_t inByteLength,
-                                    sensekit_parameter_data_t inData) override;
+                                   sensekit_parameter_id id,
+                                   size_t inByteLength,
+                                   sensekit_parameter_data_t inData) override;
 
         virtual void get_parameter(sensekit_streamconnection_t connection,
-                                    sensekit_parameter_id id,
-                                    sensekit_parameter_bin_t& parameterBin) override;
+                                   sensekit_parameter_id id,
+                                   sensekit_parameter_bin_t& parameterBin) override;
 
         virtual void invoke(sensekit_streamconnection_t connection,
                             sensekit_command_id commandId,
                             size_t inByteLength,
                             sensekit_parameter_data_t inData,
                             sensekit_parameter_bin_t& parameterBin) override;
-
     private: 
+        void get_view_parameter(sensekit_parameter_bin_t& parameterBin);
+        void set_view_parameter(size_t inByteLength,
+                                sensekit_parameter_data_t& inData);
+
+        DebugHandViewType m_viewType{ DEBUG_HAND_VIEW_DEPTH };
     };
 } } }
 

@@ -8,6 +8,7 @@
 #include <SenseKitUL/Vectorx.h>
 
 namespace sensekit {
+    
     class HandPoint
     {
     public:
@@ -36,8 +37,8 @@ namespace sensekit {
     class HandStream : public DataStream
     {
     public:
-        explicit HandStream(sensekit_streamconnection_t connection)
-            : DataStream(connection)
+        explicit HandStream(sensekit_streamconnection_t connection) :
+            DataStream(connection)
             { }
 
         static const sensekit_stream_type_t id = SENSEKIT_STREAM_HAND;
