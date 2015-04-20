@@ -187,7 +187,8 @@ void SegmentationUtility::calculateBasicScore(cv::Mat& matDepth, cv::Mat& matSco
             {
                 cv::Point3f worldPosition = converter.convertDepthToRealWorld(x, y, depth);
 
-                float score = worldPosition.y * heightFactor;
+                float score = 0;
+                score += worldPosition.y * heightFactor;
                 score += (MAX_DEPTH - worldPosition.z) * depthFactor;
 
                 *scoreRow = score;

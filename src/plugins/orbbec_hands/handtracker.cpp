@@ -79,6 +79,7 @@ namespace sensekit
             {
                 m_depthStream = m_reader.stream<DepthStream>(depthDescription.get_subtype());
                 m_depthStream.start();
+
                 m_converter = std::make_unique<CoordinateConverter>(m_depthStream, 1.0f);
                 m_pointProcessor = std::make_unique<PointProcessor>(*(m_converter.get()));
 
@@ -96,6 +97,7 @@ namespace sensekit
                 int width = depthFrame.resolutionX();
 
                 m_resizeFactor = width / static_cast<float>(PROCESSING_SIZE_WIDTH);
+                m_converter->set_resizeFactor(m_resizeFactor);
 
                 m_depthUtility.processDepthToForeground(depthFrame, m_matDepth, m_matForeground);
 
@@ -295,21 +297,21 @@ namespace sensekit
                                                       m_pointProcessor->get_trackedPoints(),
                                                       colorFrame);
                     break;
-                case DEBUG_HAND_VIEW_SEGMENTATION:
-                    m_debugVisualizer.showNormArray<char>(m_layerSegmentation,
-                                                          m_layerSegmentation,
-                                                          m_pointProcessor->get_trackedPoints(),
-                                                          colorFrame);
-                    break;
                 case DEBUG_HAND_VIEW_SCORE:
                     m_debugVisualizer.showNormArray<float>(m_matScore,
-                                                           m_layerSegmentation,
+                                                           //m_layerSegmentation,
                                                            m_pointProcessor->get_trackedPoints(),
                                                            colorFrame);
                     break;
+                case DEBUG_HAND_VIEW_SEGMENTATION:
+                    m_debugVisualizer.showNormArray<char>(m_layerSegmentation,
+                                                          //m_layerSegmentation,
+                                                          m_pointProcessor->get_trackedPoints(),
+                                                          colorFrame);
+                    break;
                 case DEBUG_HAND_VIEW_LOCALAREA:
                     m_debugVisualizer.showNormArray<float>(m_matArea,
-                                                           m_layerSegmentation,
+                                                           //m_layerSegmentation,
                                                            m_pointProcessor->get_trackedPoints(),
                                                            colorFrame);
                     break;

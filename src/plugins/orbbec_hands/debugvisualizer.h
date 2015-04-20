@@ -230,20 +230,20 @@ namespace sensekit
 
                 template<typename T>
                 void showNormArray(const cv::Mat& mat,
-                                   const cv::Mat& mask,
+                                   //const cv::Mat& mask,
                                    const vector<TrackedPoint>& points,
                                    _sensekit_imageframe& imageFrame)
                 {
                     assert(mat.cols == imageFrame.metadata.width);
                     assert(mat.rows == imageFrame.metadata.height);
-                    assert(mat.size() == mask.size());
+                    //assert(mat.size() == mask.size());
 
                     int width = mat.cols;
                     int height = mat.rows;
 
                     double min, max;
                     cv::Point minLoc, maxLoc;
-                    cv::minMaxLoc(mat, &min, &max, &minLoc, &maxLoc, mask);
+                    cv::minMaxLoc(mat, &min, &max, &minLoc, &maxLoc);// , mask);
 
                     double range = max - min;
                     bool rangeZero = abs(range) < 0.00001;
