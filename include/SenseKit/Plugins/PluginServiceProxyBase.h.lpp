@@ -3,6 +3,7 @@
 #define PLUGINSERVICEPROXYBASE_H
 
 #include <SenseKit/sensekit_types.h>
+#include <SenseKit/Plugins/plugin_capi.h>
 #include <stdarg.h>
 
 struct PluginServiceProxyBase

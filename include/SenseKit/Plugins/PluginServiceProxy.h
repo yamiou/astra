@@ -3,7 +3,6 @@
 #define PLUGINSERVICEPROXY_H
 
 #include "PluginServiceProxyBase.h"
-#include <SenseKit/Plugins/plugin_capi.h>
 #include <cstdarg>
 #include <cstdio>
 
