@@ -126,9 +126,9 @@ public:
     {
         float radius = 20;
         auto size = window.getSize();
-        sf::Color trackingColor(100, 250, 50);
+        sf::Color candidateColor(100, 250, 50);
         sf::Color lostColor(200, 50, 50);
-        sf::Color candidateColor(50, 200, 200);
+        sf::Color trackingColor(10, 10, 200);
 
         for (auto handPoint : m_handPoints)
         {
