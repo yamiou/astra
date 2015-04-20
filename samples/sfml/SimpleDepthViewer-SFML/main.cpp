@@ -33,40 +33,42 @@ public:
         m_lastTimepoint = newTimepoint;
         double fps = 1.0 / m_frameDuration;
 
-        printf("FPS: %3.1f (%3.4f ms)\n", fps, m_frameDuration * 1000);
+        printf("FPS: %3.1f (%3.4Lf ms)\n", fps, m_frameDuration * 1000);
+    }
+
+    void process_depth(const int16_t* depthPtr, int width, int height)
+    {
+        for(int y = 0; y < height; y++)
+        {
+            for(int x = 0; x < width; x++)
+            {
+                int index = (x + y * width);
+                int index4 = index * 4;
+
+                int16_t depth = depthPtr[index];
+                uint8_t value = depth % 255;
+
+                m_displayBuffer[index4] = value;
+                m_displayBuffer[index4 + 1] = value;
+                m_displayBuffer[index4 + 2] = value;
+                m_displayBuffer[index4 + 3] = 255;
+            }
+        }
     }
 
     virtual void on_frame_ready(sensekit::StreamReader& reader,
                                 sensekit::Frame& frame) override
-        {
-            sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
+    {
+        sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
 
-            int width = depthFrame.resolutionX();
-            int height = depthFrame.resolutionY();
+        int width = depthFrame.resolutionX();
+        int height = depthFrame.resolutionY();
 
-            init_texture(width, height);
-
-            const int16_t* depthPtr = depthFrame.data();
-            for(int y = 0; y < height; y++)
-            {
-                for(int x = 0; x < width; x++)
-                {
-                    int index = (x + y * width);
-                    int index4 = index * 4;
-                    
-                    int16_t depth = depthPtr[index];
-                    uint8_t value = depth % 255;
-                    
-                    m_displayBuffer[index4] = value;
-                    m_displayBuffer[index4 + 1] = value;
-                    m_displayBuffer[index4 + 2] = value;
-                    m_displayBuffer[index4 + 3] = 255;
-                }
-            }
-
-            m_texture.update(m_displayBuffer.get());
-            check_fps();
-        }
+        init_texture(width, height);
+        process_depth(depthFrame.data(), width, height);
+        m_texture.update(m_displayBuffer.get());
+        check_fps();
+    }
 
     void drawTo(sf::RenderWindow& window)
     {

@@ -5,7 +5,6 @@
 #include <cassert>
 
 namespace sensekit {
-    using namespace std::placeholders;
 
     StreamConnection::StreamConnection(Stream* stream)
         : m_stream(stream)
@@ -155,8 +154,8 @@ namespace sensekit {
     }
 
     sensekit_status_t StreamConnection::get_result(sensekit_result_token_t token,
-                                      size_t dataByteLength,
-                                      sensekit_parameter_data_t dataDestination)
+                                                   size_t dataByteLength,
+                                                   sensekit_parameter_data_t dataDestination)
     {
         ParameterBin* parameterBin = ParameterBin::get_ptr(token);
         if (m_pendingParameterResult != nullptr && parameterBin == m_pendingParameterResult)

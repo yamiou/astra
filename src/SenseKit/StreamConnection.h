@@ -15,7 +15,8 @@ namespace sensekit {
     class StreamConnection
     {
     public:
-        using FrameReadyCallback = std::function<void(StreamConnection*,sensekit_frame_index_t)>;
+        using FrameReadyCallback = std::function<void(StreamConnection*, sensekit_frame_index_t)>;
+
         StreamConnection(Stream* stream);
         ~StreamConnection();
 
@@ -50,7 +51,7 @@ namespace sensekit {
         void get_parameter(sensekit_parameter_id id,
                            size_t& resultByteLength,
                            sensekit_result_token_t& token);
-        
+
         sensekit_status_t get_result(sensekit_result_token_t token,
                                      size_t dataByteLength,
                                      sensekit_parameter_data_t dataDestination);
