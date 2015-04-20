@@ -11,6 +11,7 @@
 #include "coordinateconverter.h"
 #include <SenseKit/Plugins/PluginKit.h>
 #include "HandStream.h"
+#include "DebugHandStream.h"
 #include "debugvisualizer.h"
 #include <memory>
 
@@ -49,8 +50,7 @@ namespace sensekit
                 DepthStream m_depthStream;
                 PluginServiceProxy& m_pluginService;
 
-                using ColorStream = SingleBinStream<sensekit_imageframe_wrapper_t, uint8_t>;
-                using ColorStreamPtr = std::unique_ptr <ColorStream> ;
+                using ColorStreamPtr = std::unique_ptr <DebugHandStream> ;
                 ColorStreamPtr m_debugImageStream;
 
                 using HandStreamPtr = std::unique_ptr<HandStream>;

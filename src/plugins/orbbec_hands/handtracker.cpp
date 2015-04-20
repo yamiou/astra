@@ -66,13 +66,13 @@ namespace sensekit
             {
                 m_handStream = make_unique<HandStream>(pluginService, streamset, SENSEKIT_HANDS_MAX_HANDPOINTS);
 
-                size_t debugImageByteLength = PROCESSING_SIZE_WIDTH * PROCESSING_SIZE_HEIGHT * 3;
-                StreamDescription debugImageDescription(SENSEKIT_STREAM_DEBUG_HAND);
+                int bytesPerPixel = 3;
 
-                m_debugImageStream = make_unique<ColorStream>(pluginService,
-                                                              streamset,
-                                                              debugImageDescription,
-                                                              debugImageByteLength);
+                m_debugImageStream = make_unique<DebugHandStream>(pluginService,
+                                                                  streamset,
+                                                                  PROCESSING_SIZE_WIDTH,
+                                                                  PROCESSING_SIZE_HEIGHT,
+                                                                  bytesPerPixel);
             }
 
             void HandTracker::subscribe_to_depth_stream(Sensor& streamset, StreamDescription& depthDescription)
@@ -275,6 +275,63 @@ namespace sensekit
                                                m_matForeground,
                                                m_pointProcessor->get_trackedPoints(),
                                                colorFrame);
+
+                /*
+                
+                case '1':
+		m_view = View::Depth;
+		break;
+	case '2':
+		m_view = View::Velocity;
+		break;
+	case '3':
+		m_view = View::FilteredVelocity;
+		break;
+	case '4':
+		m_view = View::Segmentation;
+		break;
+	case '5':
+		m_view = View::Score;
+		break;
+	case '6':
+		m_view = View::EdgeDistance;
+		break;
+	case '7':
+		m_view = View::LocalArea;
+        break;
+        */
+                /*
+                
+	if (m_view == View::Depth)
+	{
+		showDepthMat(m_matDepthResized, m_matForeground, m_trackedPoints);
+	}
+	else if (m_view == View::Velocity)
+	{
+		showVelocityMat(m_matDepthVel, m_maxVelocity, m_matForeground, m_trackedPoints);
+	}
+	else if (m_view == View::FilteredVelocity)
+	{
+		showVelocityMat(m_matDepthVelErode, m_maxVelocity, m_matForeground, m_trackedPoints);
+	}
+	else if (m_view == View::Segmentation)
+	{
+		showNormArray<char>(m_matHandSegmentation, m_matHandSegmentation, m_trackedPoints);
+	}
+	else if (m_view == View::Score)
+	{
+		showNormArray<float>(m_matScore, m_matHandSegmentation, m_trackedPoints);
+	}
+	else if (m_view == View::EdgeDistance)
+	{
+		showNormArray<float>(m_matEdgeDistance, m_matHandSegmentation, m_trackedPoints);
+	}
+	else if (m_view == View::LocalArea)
+	{
+		showNormArray<float>(m_matLocalArea, m_matHandSegmentation, m_trackedPoints);
+	}
+
+                */
             }
         }
     }

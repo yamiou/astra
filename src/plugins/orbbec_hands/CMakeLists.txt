@@ -3,6 +3,9 @@ set (_projname "orbbec_hands")
 set(${_projname}_SOURCES
   handtracker.cpp
   handtracker.h
+  HandStream.h
+  DebugHandStream.h
+  DebugHandStream.cpp
   debugvisualizer.h
   depthutility.h
   depthutility.cpp
