@@ -47,6 +47,7 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/include
   DESTINATION .
   FILES_MATCHING PATTERN "*.h"
   PATTERN "include/SenseKit/Plugins" EXCLUDE
+  PATTERN "include/SenseKitUL/Plugins" EXCLUDE
   )
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples

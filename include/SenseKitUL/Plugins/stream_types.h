@@ -1,5 +1,5 @@
-#ifndef SENSEKITUL_INTERNAL_H
-#define SENSEKITUL_INTERNAL_H
+#ifndef STREAM_TYPES_H
+#define STREAM_TYPES_H
 
 #include <SenseKitUL/streams/depth_types.h>
 #include <SenseKitUL/streams/color_types.h>
@@ -36,4 +36,4 @@ typedef struct _sensekit_handframe_wrapper {
 
 #pragma warning( pop )
 
-#endif /* SENSEKITUL_INTERNAL_H */
+#endif /* STREAM_TYPES_H */
