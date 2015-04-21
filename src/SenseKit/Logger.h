@@ -11,7 +11,6 @@ namespace sensekit {
 
     class Logger
     {
-
     public:
         Logger(const char* loggerName)
             : m_loggerName(loggerName)
@@ -33,6 +32,7 @@ namespace sensekit {
 
         void log_vargs(sensekit_log_severity_t logLevel, const char* format, va_list args)
         {
+
 #ifdef _WIN32
             int len = _vscprintf(format, args);
 #else
@@ -122,10 +122,7 @@ namespace sensekit {
         }
 
         std::string m_loggerName;
-
     };
-
-
 }
 
 #endif /* LOGGER_H */

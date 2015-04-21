@@ -39,7 +39,7 @@ namespace sensekit {
         std::vector<std::string> libs = get_libs();
         if (libs.size() == 0)
         {
-            m_logger.warn("Warning: Sensekit found no plugins. Is there a Plugins folder? Is the working directory correct?");
+            m_logger.warn("SenseKit found no plugins. Is there a Plugins folder? Is the working directory correct?");
         }
 
         for(auto lib : libs)
