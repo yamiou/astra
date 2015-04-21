@@ -38,6 +38,8 @@ set(${_projname}_SOURCES
   StreamServiceDelegate.h
   StreamSet.cpp
   StreamSet.h
+  Logger.h
+  Logging.h
   StreamConnection.h
   StreamConnection.cpp
   StreamBin.h
