@@ -67,7 +67,8 @@ namespace sensekit { namespace plugins { namespace hands {
         cv::Mat m_matForeground;
         cv::Mat m_matScore;
         cv::Mat m_matArea;
-        cv::Mat m_segmentation;
+        cv::Mat m_updateSegmentation;
+        cv::Mat m_createSegmentation;
         cv::Mat m_layerSegmentation;
 
         DebugVisualizer m_debugVisualizer;

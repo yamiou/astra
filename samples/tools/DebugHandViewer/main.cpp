@@ -203,22 +203,26 @@ void process_key_input(sensekit::StreamReader& reader, sf::Event::KeyEvent key)
     }
     else if (key.code == sf::Keyboard::Num4)
     {
-        request_view_mode(reader, DEBUG_HAND_VIEW_SEGMENTATION);
+        request_view_mode(reader, DEBUG_HAND_VIEW_UPDATE_SEGMENTATION);
     }
     else if (key.code == sf::Keyboard::Num5)
+    {
+        request_view_mode(reader, DEBUG_HAND_VIEW_CREATE_SEGMENTATION);
+    }
+    else if (key.code == sf::Keyboard::Num6)
     {
         request_view_mode(reader, DEBUG_HAND_VIEW_SCORE);
     }
     //disabled temporarily
-/*    
-    else if (key.code == sf::Keyboard::Num6)
+
+    else if (key.code == sf::Keyboard::Num7)
     {
         request_view_mode(reader, DEBUG_HAND_VIEW_LOCALAREA);
     }
-    else if (key.code == sf::Keyboard::Num7)
+    else if (key.code == sf::Keyboard::Num8)
     {
         request_view_mode(reader, DEBUG_HAND_VIEW_EDGEDISTANCE);
-    } */       
+    }
 }
 
 int main(int argc, char** argv)

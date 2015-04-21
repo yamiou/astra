@@ -113,15 +113,16 @@ namespace sensekit { namespace plugins { namespace hands {
             //TODO-done make a lost active tracking state with lower count for removal
             //TODO-done make new points look for nearby lost active tracking points
             //TODO-done reject tracking updates that move the point to a too large area (prevent hand point from jumping to head and not recovering)
+            //TODO-done make dead points go to lost tracking instead so they can recover (only use dead for duplicate...rename status?)
             //TODO calculate refined tracking position (with high res image and edge distance) for tracked points, not intermediate
             //TODO optimization - memoize best scoring position during segmentation step
-            //TODO ?make dead points go to lost tracking instead so they can recover (only use dead for duplicate...rename status?)
             //TODO look at initial points jumping to nearby desk instead of hand, then never leaving
 
             m_matScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             //cv::Mat matEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_matArea = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-            m_segmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
+            m_updateSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
+            m_createSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_layerSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
 
             float heightFactor = 1;
@@ -132,18 +133,20 @@ namespace sensekit { namespace plugins { namespace hands {
 
             cv::Mat foregroundCopy = matForeground.clone();
 
-            TrackingMatrices matrices(matDepth, m_matArea, m_matScore, matForeground, m_segmentation, m_layerSegmentation);
+            TrackingMatrices matrices(matDepth, m_matArea, m_matScore, matForeground, m_updateSegmentation, m_layerSegmentation);
 
             m_pointProcessor->updateTrackedPoints(matrices);
 
             m_pointProcessor->removeDuplicatePoints();
+
+            TrackingMatrices createMatrices(matDepth, m_matArea, m_matScore, matForeground, m_createSegmentation, m_layerSegmentation);
 
             cv::Point seedPosition;
             //add new points (unless already tracking)
             //TODO use last seedPosition as starting position of findForegroundPixel
             while (SegmentationUtility::findForegroundPixel(foregroundCopy, seedPosition))
             {
-                m_pointProcessor->updateTrackedPointOrCreateNewPointFromSeedPosition(matrices, seedPosition);
+                m_pointProcessor->updateTrackedPointOrCreateNewPointFromSeedPosition(createMatrices, seedPosition);
             }
 
             //remove old points
@@ -283,19 +286,24 @@ namespace sensekit { namespace plugins { namespace hands {
                                                   m_matForeground,
                                                   colorFrame);
                 break;
-            case DEBUG_HAND_VIEW_SEGMENTATION:
-                m_debugVisualizer.showNormArray<char>(m_segmentation,
-                                                      m_segmentation,
+            case DEBUG_HAND_VIEW_UPDATE_SEGMENTATION:
+                m_debugVisualizer.showNormArray<char>(m_updateSegmentation,
+                                                      m_updateSegmentation,
+                                                      colorFrame);
+                break;
+            case DEBUG_HAND_VIEW_CREATE_SEGMENTATION:
+                m_debugVisualizer.showNormArray<char>(m_createSegmentation,
+                                                      m_createSegmentation,
                                                       colorFrame);
                 break;
             case DEBUG_HAND_VIEW_SCORE:
                 m_debugVisualizer.showNormArray<float>(m_matScore,
-                                                       m_segmentation,
+                                                       m_updateSegmentation,
                                                        colorFrame);
                 break;
             case DEBUG_HAND_VIEW_LOCALAREA:
                 m_debugVisualizer.showNormArray<float>(m_matArea,
-                                                       m_segmentation,
+                                                       m_updateSegmentation,
                                                        colorFrame);
                 break;
             case DEBUG_HAND_VIEW_EDGEDISTANCE:

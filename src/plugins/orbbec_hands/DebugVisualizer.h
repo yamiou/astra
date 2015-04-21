@@ -98,8 +98,6 @@ namespace sensekit { namespace plugins { namespace hands {
             uint8_t* colorData = static_cast<uint8_t*>(imageFrame.data);
             uint8_t bytesPerPixel = imageFrame.metadata.bytesPerPixel;
 
-            bool m_showForeground = false;
-
             for (int y = 0; y < height; ++y)
             {
                 const float* depthRow = matDepth.ptr<float>(y);
@@ -190,7 +188,7 @@ namespace sensekit { namespace plugins { namespace hands {
                     char foreground = *foregroundRow;
 
                     int bvalue = 0;
-                    if (foreground == PixelType::Foreground)
+                    if (foreground != PixelType::Background)
                     {
                         bvalue = 255;
                     }
@@ -261,6 +259,9 @@ namespace sensekit { namespace plugins { namespace hands {
                 }
             }
         }
+    private:
+        bool m_showForeground { true };
+
     };
 }}}
 

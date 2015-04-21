@@ -37,6 +37,7 @@ namespace sensekit { namespace plugins { namespace hands {
         cv::Mat& matForeground;
         cv::Mat& matSegmentation;
         cv::Mat& matLayerSegmentation;
+        int layerCount;
         TrackingMatrices(cv::Mat& matDepth, 
                          cv::Mat& matArea, 
                          cv::Mat& matScore, 
@@ -49,7 +50,8 @@ namespace sensekit { namespace plugins { namespace hands {
             matScore(matScore),
             matForeground(matForeground),
             matSegmentation(matSegmentation),
-            matLayerSegmentation(matLayerSegmentation)
+            matLayerSegmentation(matLayerSegmentation),
+            layerCount(0)
         {}
     };
 
