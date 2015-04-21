@@ -56,7 +56,7 @@ namespace sensekit { namespace plugins { namespace hands {
 
         validateAndUpdateTrackedPoint(matrices, trackedPoint, newTargetPoint);
 
-        //lost a tracked point, try to guest the position using previous position delta for second chance to recover
+        //lost a tracked point, try to guess the position using previous position delta for second chance to recover
 
         if (trackedPoint.m_status != TrackingStatus::Tracking && cv::norm(trackedPoint.m_worldDeltaPosition) > 0)
         {

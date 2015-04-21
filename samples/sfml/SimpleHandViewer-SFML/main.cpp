@@ -95,7 +95,7 @@ public:
 
     void drawHands(sf::RenderWindow& window, float depthScale)
     {
-        float radius = 20;
+        float radius = 16;
         auto size = window.getSize();
         sf::Color candidateColor(100, 250, 50);
         sf::Color lostColor(200, 50, 50);

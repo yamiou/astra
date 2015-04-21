@@ -33,17 +33,6 @@ namespace sensekit { namespace plugins { namespace hands {
         {
         }
 
-        void HandTracker::on_frame_ready(StreamReader& reader, Frame& frame)
-        {
-            if (m_handStream->has_connections() ||
-                m_debugImageStream->has_connections())
-            {
-                DepthFrame depthFrame = frame.get<DepthFrame>();
-
-                update_tracking(depthFrame);
-            }
-        }
-
         void HandTracker::create_streams(PluginServiceProxy& pluginService, Sensor streamset)
         {
             m_handStream = make_unique<HandStream>(pluginService, streamset, SENSEKIT_HANDS_MAX_HANDPOINTS);
@@ -66,6 +55,17 @@ namespace sensekit { namespace plugins { namespace hands {
             m_pointProcessor = std::make_unique<PointProcessor>(*(m_converter.get()));
 
             m_reader.addListener(*this);
+        }
+
+        void HandTracker::on_frame_ready(StreamReader& reader, Frame& frame)
+        {
+            if (m_handStream->has_connections() ||
+                m_debugImageStream->has_connections())
+            {
+                DepthFrame depthFrame = frame.get<DepthFrame>();
+
+                update_tracking(depthFrame);
+            }
         }
 
         void HandTracker::reset()
@@ -140,6 +140,7 @@ namespace sensekit { namespace plugins { namespace hands {
 
             cv::Point seedPosition;
             //add new points (unless already tracking)
+            //TODO use last seedPosition as starting position of findForegroundPixel
             while (SegmentationUtility::findForegroundPixel(foregroundCopy, seedPosition))
             {
                 m_pointProcessor->updateTrackedPointOrCreateNewPointFromSeedPosition(matrices, seedPosition);

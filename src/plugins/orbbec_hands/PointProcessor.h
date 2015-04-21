@@ -50,6 +50,7 @@ namespace sensekit { namespace plugins { namespace hands {
         float m_areaBandwidthDepth;
 
         int m_nextTrackingId{ 0 };
+        //TODO consider std::list<TrackedPoint>
         std::vector<TrackedPoint> m_trackedPoints;
 
     };
