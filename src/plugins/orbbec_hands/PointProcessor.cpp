@@ -1,12 +1,11 @@
 #include "TrackedPoint.h"
 #include "PointProcessor.h"
 #include "SegmentationUtility.h"
-#include "CoordinateConverter.h"
 
 namespace sensekit { namespace plugins { namespace hands {
 
-    PointProcessor::PointProcessor(const CoordinateConverter& converter) :
-        m_converter(converter),
+    PointProcessor::PointProcessor(const ScalingCoordinateMapper& mapper) :
+        m_mapper(mapper),
         m_trackingBandwidthDepth(150),  //mm
         m_initialBandwidthDepth(450),   //mm
         m_maxMatchDistLostActive(500),  //mm
@@ -62,7 +61,7 @@ namespace sensekit { namespace plugins { namespace hands {
         {
             auto estimatedWorldPosition = trackedPoint.m_worldPosition + trackedPoint.m_worldDeltaPosition;
 
-            cv::Point3f estimatedPosition = m_converter.convertRealWorldToDepth(estimatedWorldPosition);
+            cv::Point3f estimatedPosition = m_mapper.convert_world_to_depth(estimatedWorldPosition);
 
             seedPosition.x = MAX(0, MIN(width - 1, static_cast<int>(estimatedPosition.x)));
             seedPosition.y = MAX(0, MIN(height - 1, static_cast<int>(estimatedPosition.y)));
@@ -99,12 +98,12 @@ namespace sensekit { namespace plugins { namespace hands {
         {
             float depth = matrices.matDepth.at<float>(newTargetPoint);
 
-            cv::Point3f worldPosition = m_converter.convertDepthToRealWorld(newTargetPoint.x, newTargetPoint.y, depth);
+            cv::Point3f worldPosition = m_mapper.convert_depth_to_world(newTargetPoint.x, newTargetPoint.y, depth);
 
             auto dist = cv::norm(worldPosition - trackedPoint.m_worldPosition);
             auto deadbandDist = cv::norm(worldPosition - trackedPoint.m_steadyWorldPosition);
 
-            float area = SegmentationUtility::countNeighborhoodArea(matrices.matLayerSegmentation, matrices.matDepth, matrices.matArea, newTargetPoint, m_areaBandwidth, m_areaBandwidthDepth, m_converter);
+            float area = SegmentationUtility::countNeighborhoodArea(matrices.matLayerSegmentation, matrices.matDepth, matrices.matArea, newTargetPoint, m_areaBandwidth, m_areaBandwidthDepth, m_mapper);
 
             if (dist < maxJumpDist && area > m_minArea && area < m_maxArea)
             {
@@ -150,7 +149,7 @@ namespace sensekit { namespace plugins { namespace hands {
         bool validPointArea = false;
         if (targetPoint.x != -1 && targetPoint.y != -1)
         {
-            float area = SegmentationUtility::countNeighborhoodArea(matrices.matLayerSegmentation, matrices.matDepth, matrices.matArea, targetPoint, m_areaBandwidth, m_areaBandwidthDepth, m_converter);
+            float area = SegmentationUtility::countNeighborhoodArea(matrices.matLayerSegmentation, matrices.matDepth, matrices.matArea, targetPoint, m_areaBandwidth, m_areaBandwidthDepth, m_mapper);
 
             if (area > m_minArea && area < m_maxArea)
             {
@@ -256,7 +255,7 @@ namespace sensekit { namespace plugins { namespace hands {
             {
                 float depth = matrices.matDepth.at<float>(targetPoint);
 
-                cv::Point3f worldPosition = m_converter.convertDepthToRealWorld(targetPoint.x, targetPoint.y, depth);
+                cv::Point3f worldPosition = m_mapper.convert_depth_to_world(targetPoint.x, targetPoint.y, depth);
 
                 TrackedPoint newPoint(targetPoint, worldPosition, m_nextTrackingId);
                 newPoint.m_type = TrackedPointType::CandidatePoint;

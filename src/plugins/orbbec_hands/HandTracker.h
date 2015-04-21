@@ -8,7 +8,7 @@
 #include "TrackedPoint.h"
 #include "PointProcessor.h"
 #include <SenseKitUL/Plugins/stream_types.h>
-#include "CoordinateConverter.h"
+#include "ScalingCoordinateMapper.h"
 #include <SenseKit/Plugins/PluginKit.h>
 #include "HandStream.h"
 #include "DebugHandStream.h"
@@ -55,7 +55,7 @@ namespace sensekit { namespace plugins { namespace hands {
         StreamReader m_reader;
 
         DepthUtility m_depthUtility;
-        std::unique_ptr<CoordinateConverter> m_converter;
+        std::unique_ptr<ScalingCoordinateMapper> m_mapper;
         std::unique_ptr<PointProcessor> m_pointProcessor;
 
         int m_width;

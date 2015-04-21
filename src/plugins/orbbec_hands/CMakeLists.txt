@@ -15,7 +15,8 @@ set(${_projname}_SOURCES
   PointProcessor.h
   PointProcessor.cpp
   TrackingData.h
-  CoordinateConverter.h
+  ScalingCoordinateMapper.h
+  ScalingCoordinateMapper.cpp
   HandsPlugin.cpp
   HandsPlugin.h
 )

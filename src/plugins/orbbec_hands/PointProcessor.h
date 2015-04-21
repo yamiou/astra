@@ -3,7 +3,7 @@
 
 #include <opencv2/core/affine.hpp>
 #include "TrackingData.h"
-#include "CoordinateConverter.h"
+#include "ScalingCoordinateMapper.h"
 
 namespace sensekit { namespace plugins { namespace hands {
 
@@ -12,7 +12,7 @@ namespace sensekit { namespace plugins { namespace hands {
     class PointProcessor
     {
     public:
-        PointProcessor(const CoordinateConverter& converter);
+        PointProcessor(const ScalingCoordinateMapper& mapper);
         virtual ~PointProcessor();
 
         void updateTrackedPoints(TrackingMatrices& matrices);
@@ -37,7 +37,7 @@ namespace sensekit { namespace plugins { namespace hands {
                                            const cv::Point& targetPoint);
         bool isValidPointArea(TrackingMatrices& matrices, cv::Point targetPoint);
 
-        const CoordinateConverter& m_converter;
+        const ScalingCoordinateMapper& m_mapper;
         float m_trackingBandwidthDepth;
         float m_initialBandwidthDepth;
         float m_maxMatchDistLostActive;

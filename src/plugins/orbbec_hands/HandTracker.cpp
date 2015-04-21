@@ -37,7 +37,7 @@ namespace sensekit { namespace plugins { namespace hands {
         {
             m_handStream = make_unique<HandStream>(pluginService, streamset, SENSEKIT_HANDS_MAX_HANDPOINTS);
 
-            int bytesPerPixel = 3;
+            const int bytesPerPixel = 3;
 
             m_debugImageStream = make_unique<DebugHandStream>(pluginService,
                                                               streamset,
@@ -51,8 +51,8 @@ namespace sensekit { namespace plugins { namespace hands {
             m_depthStream = m_reader.stream<DepthStream>(depthDescription.get_subtype());
             m_depthStream.start();
 
-            m_converter = std::make_unique<CoordinateConverter>(m_depthStream, 1.0f);
-            m_pointProcessor = std::make_unique<PointProcessor>(*(m_converter.get()));
+            m_mapper = std::make_unique<ScalingCoordinateMapper>(m_depthStream.get_coordinateMapper(), 1.0f);
+            m_pointProcessor = std::make_unique<PointProcessor>(*(m_mapper.get()));
 
             m_reader.addListener(*this);
         }
@@ -79,7 +79,7 @@ namespace sensekit { namespace plugins { namespace hands {
             int width = depthFrame.resolutionX();
 
             m_resizeFactor = width / static_cast<float>(PROCESSING_SIZE_WIDTH);
-            m_converter->set_resizeFactor(m_resizeFactor);
+            m_mapper->set_scale(m_resizeFactor);
 
             m_depthUtility.processDepthToForeground(depthFrame, m_matDepth, m_matForeground);
 
@@ -128,8 +128,8 @@ namespace sensekit { namespace plugins { namespace hands {
             float heightFactor = 1;
             float depthFactor = 1.5;
 
-            SegmentationUtility::calculateBasicScore(matDepth, m_matScore, heightFactor, depthFactor, *(m_converter.get()));
-            SegmentationUtility::calculateSegmentArea(matDepth, m_matArea, *(m_converter.get()));
+            SegmentationUtility::calculateBasicScore(matDepth, m_matScore, heightFactor, depthFactor, *(m_mapper.get()));
+            SegmentationUtility::calculateSegmentArea(matDepth, m_matArea, *(m_mapper.get()));
 
             cv::Mat foregroundCopy = matForeground.clone();
 
@@ -199,7 +199,7 @@ namespace sensekit { namespace plugins { namespace hands {
                 TrackedPoint internalPoint = *it;
 
                 TrackingStatus status = internalPoint.m_status;
-                
+
                 if (status != Dead && handIndex < maxNumHands)
                 {
                     sensekit_handpoint_t& point = frame.handpoints[handIndex];

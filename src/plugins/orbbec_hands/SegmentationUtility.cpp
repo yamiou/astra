@@ -1,7 +1,7 @@
 #include "SegmentationUtility.h"
 #include "TrackingData.h"
 #include <queue>
-#include "CoordinateConverter.h"
+#include "ScalingCoordinateMapper.h"
 #include <cmath>
 
 #define MAX_DEPTH 10000
@@ -117,13 +117,13 @@ namespace sensekit { namespace plugins { namespace hands {
     {
         cv::Size size = data.matrices.matDepth.size();
         data.matrices.matLayerSegmentation = cv::Mat::zeros(size, CV_8UC1);
-        
+
         //data.matrices.matLayerSegmentation.setTo(cv::Scalar(0));
         segmentForeground(data);
 
         ++data.matrices.layerCount;
         cv::bitwise_or(cv::Mat(size, CV_8UC1, cv::Scalar(data.matrices.layerCount)),
-                       data.matrices.matSegmentation, 
+                       data.matrices.matSegmentation,
                        data.matrices.matSegmentation,
                        data.matrices.matLayerSegmentation);
 
@@ -150,9 +150,8 @@ namespace sensekit { namespace plugins { namespace hands {
 
         return point;
     }
-
-
-    bool SegmentationUtility::findForegroundPixel(cv::Mat& matForeground, cv::Point& foregroundPosition)
+    bool SegmentationUtility::findForegroundPixel(cv::Mat& matForeground,
+                                                  cv::Point& foregroundPosition)
     {
         int width = matForeground.cols;
         int height = matForeground.rows;
@@ -179,7 +178,11 @@ namespace sensekit { namespace plugins { namespace hands {
         return false;
     }
 
-    void SegmentationUtility::calculateBasicScore(cv::Mat& matDepth, cv::Mat& matScore, const float heightFactor, const float depthFactor, const CoordinateConverter& converter)
+    void SegmentationUtility::calculateBasicScore(cv::Mat& matDepth,
+                                                  cv::Mat& matScore,
+                                                  const float heightFactor,
+                                                  const float depthFactor,
+                                                  const ScalingCoordinateMapper& mapper)
     {
         int width = matDepth.cols;
         int height = matDepth.rows;
@@ -194,7 +197,7 @@ namespace sensekit { namespace plugins { namespace hands {
                 float depth = *depthRow;
                 if (depth != 0)
                 {
-                    cv::Point3f worldPosition = converter.convertDepthToRealWorld(x, y, depth);
+                    cv::Point3f worldPosition = mapper.convert_depth_to_world(x, y, depth);
 
                     float score = 0;
                     score += worldPosition.y * heightFactor;
@@ -212,7 +215,9 @@ namespace sensekit { namespace plugins { namespace hands {
         }
     }
 
-    void SegmentationUtility::calculateEdgeDistance(cv::Mat& matSegmentation, cv::Mat& matArea, cv::Mat& matEdgeDistance)
+    void SegmentationUtility::calculateEdgeDistance(cv::Mat& matSegmentation,
+                                                    cv::Mat& matArea,
+                                                    cv::Mat& matEdgeDistance)
     {
         cv::Mat eroded, temp;
         cv::Mat crossElement = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
@@ -248,7 +253,7 @@ namespace sensekit { namespace plugins { namespace hands {
         } while (!done && nonZeroCount < imageLength && ++iterations < maxIterations);
     }
 
-    void SegmentationUtility::calculateSegmentArea(cv::Mat& matDepth, cv::Mat& matArea, const CoordinateConverter& converter)
+    void SegmentationUtility::calculateSegmentArea(cv::Mat& matDepth, cv::Mat& matArea, const ScalingCoordinateMapper& mapper)
     {
         int width = matDepth.cols;
         int height = matDepth.rows;
@@ -273,8 +278,8 @@ namespace sensekit { namespace plugins { namespace hands {
                     cv::Point3f p3(x, y + 1, depth1);
                     cv::Point3f p4(x + 1, y + 1, depth1);
 
-                    area += getDepthArea(p1, p2, p3, converter);
-                    area += getDepthArea(p2, p3, p4, converter);
+                    area += getDepthArea(p1, p2, p3, mapper);
+                    area += getDepthArea(p2, p3, p4, mapper);
                 }
 
                 *areaRow = area;
@@ -286,11 +291,14 @@ namespace sensekit { namespace plugins { namespace hands {
         }
     }
 
-    float SegmentationUtility::getDepthArea(cv::Point3f& p1, cv::Point3f& p2, cv::Point3f& p3, const CoordinateConverter& converter)
+    float SegmentationUtility::getDepthArea(cv::Point3f& p1,
+                                            cv::Point3f& p2,
+                                            cv::Point3f& p3,
+                                            const ScalingCoordinateMapper& mapper)
     {
-        cv::Point3f world1 = converter.convertDepthToRealWorld(p1);
-        cv::Point3f world2 = converter.convertDepthToRealWorld(p2);
-        cv::Point3f world3 = converter.convertDepthToRealWorld(p3);
+        cv::Point3f world1 = mapper.convert_depth_to_world(p1);
+        cv::Point3f world2 = mapper.convert_depth_to_world(p2);
+        cv::Point3f world3 = mapper.convert_depth_to_world(p3);
 
         cv::Point3f v1 = world2 - world1;
         cv::Point3f v2 = world3 - world1;
@@ -299,12 +307,19 @@ namespace sensekit { namespace plugins { namespace hands {
         return area;
     }
 
-    float SegmentationUtility::countNeighborhoodArea(cv::Mat& matSegmentation, cv::Mat& matDepth, cv::Mat& matArea, cv::Point center, const float bandwidth, const float bandwidthDepth, const CoordinateConverter& converter)
+    float SegmentationUtility::countNeighborhoodArea(cv::Mat& matSegmentation,
+                                                     cv::Mat& matDepth,
+                                                     cv::Mat& matArea,
+                                                     cv::Point center,
+                                                     const float bandwidth,
+                                                     const float bandwidthDepth,
+                                                     const ScalingCoordinateMapper& mapper)
     {
         float startingDepth = matDepth.at<float>(center);
 
-        cv::Point topLeft = converter.offsetPixelLocationByMM(center, -bandwidth, bandwidth, startingDepth);
-        cv::Point bottomRight = converter.offsetPixelLocationByMM(center, bandwidth, -bandwidth, startingDepth);
+        cv::Point topLeft = offset_pixel_location_by_mm(mapper, center, -bandwidth, bandwidth, startingDepth);
+        cv::Point bottomRight = offset_pixel_location_by_mm(mapper, center, bandwidth, -bandwidth, startingDepth);
+
         int32_t x0 = MAX(0, topLeft.x);
         int32_t y0 = MAX(0, topLeft.y);
         int32_t x1 = MIN(matDepth.cols - 1, bottomRight.x);
