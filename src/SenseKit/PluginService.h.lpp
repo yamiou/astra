@@ -6,7 +6,7 @@
 #include "Stream.h"
 #include "StreamBin.h"
 #include "Core/Signal.h"
-#include <cstdarg>
+#include "Logger.h"
 
 using CallbackId = size_t;
 
@@ -21,7 +21,8 @@ namespace sensekit
     {
     public:
         PluginService(SenseKitContext& context)
-            : m_context(context)
+            : m_context(context),
+              m_logger("PluginService")
             {}
 
         PluginServiceProxyBase* create_proxy();
@@ -35,6 +36,7 @@ namespace sensekit
         Signal<sensekit_streamset_t, sensekit_stream_t, sensekit_stream_desc_t> m_streamAddedSignal;
         Signal<sensekit_streamset_t, sensekit_stream_t, sensekit_stream_desc_t> m_streamRemovingSignal;
 
+        Logger m_logger;
     };
 }
 

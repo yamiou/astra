@@ -10,21 +10,24 @@
 #include "CreateStreamProxy.h"
 #include "Logging.h"
 
+INITIALIZE_LOGGING
+
 namespace sensekit {
 
     SenseKitContext::SenseKitContext()
-        : m_pluginService(*this) {}
+        : m_pluginService(*this),
+          m_logger("Context")
+    {}
 
     SenseKitContext::~SenseKitContext()
-    {
-    }
+    {}
 
     sensekit_status_t SenseKitContext::initialize()
     {
         if (m_initialized)
             return SENSEKIT_STATUS_SUCCESS;
 
-        log(WARN, "Hold on to yer butts");
+        m_logger.warn("Hold on to yer butts");
         m_pluginServiceProxy = m_pluginService.create_proxy();
         m_streamServiceProxy = create_stream_proxy(this);
 
@@ -36,8 +39,9 @@ namespace sensekit {
         std::vector<std::string> libs = get_libs();
         if (libs.size() == 0)
         {
-            std::cout << "Warning: Sensekit found no plugins. Is there a Plugins folder? Is the working directory correct?" << std::endl;
+            m_logger.warn("Warning: Sensekit found no plugins. Is there a Plugins folder? Is the working directory correct?");
         }
+
         for(auto lib : libs)
         {
             os_load_library((PLUGIN_DIRECTORY + lib).c_str(), libHandle);

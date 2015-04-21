@@ -8,6 +8,7 @@
 #include "StreamSet.h"
 #include "StreamReader.h"
 #include "Core/shared_library.h"
+#include "Logger.h"
 
 struct StreamServiceProxyBase;
 struct PluginServiceProxyBase;
@@ -53,6 +54,7 @@ namespace sensekit {
     private:
         bool m_initialized{false};
 
+        Logger m_logger;
         StreamSet m_rootSet;
 
         PluginService m_pluginService;

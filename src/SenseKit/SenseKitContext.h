@@ -8,6 +8,7 @@
 #include "StreamSet.h"
 #include "StreamReader.h"
 #include "Core/shared_library.h"
+#include "Logger.h"
 
 struct StreamServiceProxyBase;
 struct PluginServiceProxyBase;
@@ -57,7 +58,7 @@ namespace sensekit {
 
         sensekit_status_t reader_get_stream(sensekit_reader_t reader,
                                             sensekit_stream_type_t type,
-                                            sensekit_stream_subtype_t subtype,
+                                            sensekit_stream_subtype_t subType,
                                             sensekit_streamconnection_t& connection);
 
         sensekit_status_t stream_get_description(sensekit_streamconnection_t connection,
@@ -82,7 +83,7 @@ namespace sensekit {
 
         sensekit_status_t reader_get_frame(sensekit_reader_frame_t frame,
                                            sensekit_stream_type_t type,
-                                           sensekit_stream_subtype_t subtype,
+                                           sensekit_stream_subtype_t subType,
                                            sensekit_frame_ref_t*& frameRef);
 
         sensekit_status_t stream_set_parameter(sensekit_streamconnection_t connection,
@@ -119,6 +120,7 @@ namespace sensekit {
     private:
         bool m_initialized{false};
 
+        Logger m_logger;
         StreamSet m_rootSet;
 
         PluginService m_pluginService;

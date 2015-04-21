@@ -6,32 +6,4 @@
 
 #define INITIALIZE_LOGGING INITIALIZE_EASYLOGGINGPP
 
-namespace sensekit {
-
-    inline void log(sensekit_log_severity_t logLevel, const char* message)
-    {
-        switch(logLevel)
-        {
-        case TRACE:
-            LOG(TRACE) << message;
-            break;
-        case DEBUG:
-            LOG(DEBUG) << message;
-            break;
-        case INFO:
-            LOG(INFO) << message;
-            break;
-        case WARN:
-            LOG(WARNING) << message;
-            break;
-        case ERROR:
-            LOG(ERROR) << message;
-            break;
-        case FATAL:
-            LOG(FATAL) << message;
-            break;
-        }
-    }
-}
-
 #endif /* LOGGING_H */
