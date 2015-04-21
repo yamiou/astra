@@ -1,4 +1,4 @@
-SenseKit SDK v0.1.2 for Windows
+SenseKit SDK v0.1.3 for Windows
 Copyright (c) 2015 Orbbec
 
 ALPHA - NOT FOR PUBLIC DISTRIBUTION
@@ -7,6 +7,8 @@ josh@orbbec3d.com
 
 What's New
 ==========
+
+v0.1.3 2015/04/21 More fixes in VS2013 project generation - should be good now. Hand tracker now works, and there is now a debug hand viewer sample/tool. Push number keys (above the letters, not numpad) 1-5 to see different visualization modes: Depth, Velocity, Filtered velocity, Segmentation, Score. Various clean up of the SDK header files. Various bug fixes. Get/set parameter mechanism is working. Preliminary logging has been added. A log file is generated in the logs/ directory under the exe working directory.
 
 v0.1.2 2015/04/15 Fixed absolute paths in VS2013 projects. Moved sample folders around. Fixed hand tracker so it gets data, but hand tracking plugin still is not working. Improved SFML samples. Added HandViewer-SFML, but it again hand plugin is not working yet. Various internal improvements to SDK and plugins. The pre-compiled sample binaries will be Release mode, so hopefully won't require VS2013 to be installed.
 
@@ -63,8 +65,8 @@ To exit samples with a GUI window, simply close the window.
 
 Known issues
 ==========
-1) The hand reader app is currently broken. Don't bother trying to test it, except to see that it 
-runs or to look at the API.
+1) Hand tracking works but at the moment only shows a single hand point. The hand point is also aliased
+to the nearest 40x30 coordinate. This is all being investigated currently.
 
 2) There isn't an error message if no sensor is found or plugged in. (But, it doesn't crash!) You can 
 plug in a sensor after the program starts and it should detect it and continue. 
@@ -76,6 +78,3 @@ It may or may not work for sensors that do have a color stream.
 4) If a sample crashes or you stop debugging before it cleans itself up nicely, the sensor driver 
 may be put into a weird state. Before the next run you may need to replug the sensor or turn the sensor 
 off and then on first. (This is primarily an OpenNI driver issue.)
-
-5) The DepthReaderCPP sample will automatically remove its event listener after 100 callbacks. This is
-not a bug, but is testing part of the API.
