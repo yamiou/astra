@@ -13,8 +13,8 @@ namespace sensekit { namespace plugins { namespace hands {
 
         using namespace std;
 
-        const int PROCESSING_SIZE_WIDTH = 40;
-        const int PROCESSING_SIZE_HEIGHT = 30;
+        const int PROCESSING_SIZE_WIDTH = 80;
+        const int PROCESSING_SIZE_HEIGHT = 60;
 
         HandTracker::HandTracker(PluginServiceProxy& pluginService,
                                  Sensor& streamset,
@@ -101,42 +101,6 @@ namespace sensekit { namespace plugins { namespace hands {
             }
         }
 
-        void HandTracker::generate_hand_frame(sensekit_frame_index_t frameIndex)
-        {
-            sensekit_handframe_wrapper_t* handFrame = m_handStream->begin_write(frameIndex);
-
-            if (handFrame != nullptr)
-            {
-                handFrame->frame.handpoints = reinterpret_cast<sensekit_handpoint_t*>(&(handFrame->frame_data));
-                handFrame->frame.numHands = SENSEKIT_HANDS_MAX_HANDPOINTS;
-
-                update_hand_frame(m_pointProcessor->get_trackedPoints(), handFrame->frame);
-
-                m_handStream->end_write();
-            }
-        }
-
-        void HandTracker::generate_hand_debug_image_frame(sensekit_frame_index_t frameIndex)
-        {
-            sensekit_imageframe_wrapper_t* debugImageFrame = m_debugImageStream->begin_write(frameIndex);
-
-            if (debugImageFrame != nullptr)
-            {
-                debugImageFrame->frame.data = reinterpret_cast<uint8_t *>(&(debugImageFrame->frame_data));
-
-                sensekit_image_metadata_t metadata;
-
-                metadata.width = PROCESSING_SIZE_WIDTH;
-                metadata.height = PROCESSING_SIZE_HEIGHT;
-                metadata.bytesPerPixel = 3;
-
-                debugImageFrame->frame.metadata = metadata;
-                update_debug_image_frame(debugImageFrame->frame);
-
-                m_debugImageStream->end_write();
-            }
-        }
-
         void HandTracker::track_points(cv::Mat& matDepth, cv::Mat& matForeground)
         {
             //TODO-done try tracking without edge distance
@@ -183,6 +147,42 @@ namespace sensekit { namespace plugins { namespace hands {
 
             //remove old points
             m_pointProcessor->removeOldOrDeadPoints();
+        }
+
+        void HandTracker::generate_hand_frame(sensekit_frame_index_t frameIndex)
+        {
+            sensekit_handframe_wrapper_t* handFrame = m_handStream->begin_write(frameIndex);
+
+            if (handFrame != nullptr)
+            {
+                handFrame->frame.handpoints = reinterpret_cast<sensekit_handpoint_t*>(&(handFrame->frame_data));
+                handFrame->frame.numHands = SENSEKIT_HANDS_MAX_HANDPOINTS;
+
+                update_hand_frame(m_pointProcessor->get_trackedPoints(), handFrame->frame);
+
+                m_handStream->end_write();
+            }
+        }
+
+        void HandTracker::generate_hand_debug_image_frame(sensekit_frame_index_t frameIndex)
+        {
+            sensekit_imageframe_wrapper_t* debugImageFrame = m_debugImageStream->begin_write(frameIndex);
+
+            if (debugImageFrame != nullptr)
+            {
+                debugImageFrame->frame.data = reinterpret_cast<uint8_t *>(&(debugImageFrame->frame_data));
+
+                sensekit_image_metadata_t metadata;
+
+                metadata.width = PROCESSING_SIZE_WIDTH;
+                metadata.height = PROCESSING_SIZE_HEIGHT;
+                metadata.bytesPerPixel = 3;
+
+                debugImageFrame->frame.metadata = metadata;
+                update_debug_image_frame(debugImageFrame->frame);
+
+                m_debugImageStream->end_write();
+            }
         }
 
         void HandTracker::update_hand_frame(vector<TrackedPoint>& internalTrackedPoints, _sensekit_handframe& frame)
