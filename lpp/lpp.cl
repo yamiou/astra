@@ -366,6 +366,6 @@ is replaced with replacement."
   )
 )
 
-;(process (car *args*))
-(process "../include")
-(process "../src")
+(process (car *args*))
+;(process "../include")
+;(process "../src")
