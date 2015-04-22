@@ -16,12 +16,10 @@ namespace sensekit { namespace plugins { namespace hands {
         m_maxArea(20000),           //mm^2
         m_areaBandwidth(150),       //mm
         m_areaBandwidthDepth(100)   //mm
-    {
-    }
+    {}
 
     PointProcessor::~PointProcessor()
-    {
-    }
+    {}
 
     void PointProcessor::updateTrackedPoints(TrackingMatrices& matrices)
     {

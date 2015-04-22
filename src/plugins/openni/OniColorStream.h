@@ -13,7 +13,7 @@ namespace sensekit { namespace plugins {
         {
         public:
             OniColorStream(PluginServiceProxy& pluginService,
-                           Sensor& streamSet,
+                           Sensor streamSet,
                            ::openni::Device& oniDevice)
                 : OniDeviceStream(pluginService,
                                   streamSet,

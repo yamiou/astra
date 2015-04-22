@@ -115,7 +115,7 @@ namespace sensekit { namespace plugins { namespace hands {
             }
         }
 
-        cv::Point track_point_from_seed(TrackingData data)
+        static cv::Point track_point_from_seed(TrackingData data)
         {
             cv::Size size = data.matrices.depth.size();
             data.matrices.layerSegmentation = cv::Mat::zeros(size, CV_8UC1);

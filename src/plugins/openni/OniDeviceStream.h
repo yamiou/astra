@@ -22,7 +22,7 @@ namespace sensekit { namespace plugins {
     {
     public:
         OniDeviceStreamBase(PluginServiceProxy& pluginService,
-                            Sensor& streamSet,
+                            Sensor streamSet,
                             StreamDescription desc)
             : Stream(pluginService,
                      streamSet,
@@ -42,7 +42,7 @@ namespace sensekit { namespace plugins {
         using block_type = TBufferBlockType;
 
         OniDeviceStream(PluginServiceProxy& pluginService,
-                        Sensor& streamSet,
+                        Sensor streamSet,
                         StreamDescription desc,
                         ::openni::Device& oniDevice,
                         ::openni::SensorType oniSensorType,

@@ -11,7 +11,7 @@ namespace sensekit { namespace plugins {
     public:
 
         SingleBinStream(PluginServiceProxy& pluginService,
-                        Sensor& streamSet,
+                        Sensor streamSet,
                         StreamDescription description,
                         size_t bufferSize)
             : Stream(pluginService,

@@ -15,7 +15,7 @@ namespace sensekit { namespace plugins {
     public:
 
         Stream(PluginServiceProxy& pluginService,
-               Sensor& streamSet,
+               Sensor streamSet,
                StreamDescription description) :
             m_pluginService(pluginService),
             m_streamSet(streamSet),
@@ -68,7 +68,7 @@ namespace sensekit { namespace plugins {
         }
 
         PluginServiceProxy& m_pluginService;
-        Sensor& m_streamSet;
+        Sensor m_streamSet;
         StreamDescription m_description;
         sensekit_stream_t m_streamHandle{nullptr};
 

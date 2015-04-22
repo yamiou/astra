@@ -25,7 +25,7 @@ SENSEKIT_API sensekit_status_t sensekit_reader_destroy(sensekit_reader_t* reader
 
 SENSEKIT_API sensekit_status_t sensekit_reader_get_stream(sensekit_reader_t reader,
                                                           sensekit_stream_type_t type,
-                                                          sensekit_stream_subtype_t subtype,
+                                                          sensekit_stream_subtype_t subType,
                                                           sensekit_streamconnection_t* connection);
 
 SENSEKIT_API sensekit_status_t sensekit_stream_get_description(sensekit_streamconnection_t connection,
@@ -50,7 +50,7 @@ SENSEKIT_API sensekit_status_t sensekit_reader_unregister_frame_ready_callback(s
 
 SENSEKIT_API sensekit_status_t sensekit_reader_get_frame(sensekit_reader_frame_t frame,
                                                          sensekit_stream_type_t type,
-                                                         sensekit_stream_subtype_t subtype,
+                                                         sensekit_stream_subtype_t subType,
                                                          sensekit_frame_ref_t** frameRef);
 
 SENSEKIT_API sensekit_status_t sensekit_stream_set_parameter(sensekit_streamconnection_t connection,
