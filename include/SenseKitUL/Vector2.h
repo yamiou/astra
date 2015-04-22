@@ -60,6 +60,19 @@ namespace sensekit
         return cvector;
     }
 
+    inline Vector2f cvector_to_vector(const sensekit_vector2f_t& cvector)
+    {
+        return Vector2f(cvector.x, cvector.y);
+    }
+
+    inline sensekit_vector2f_t vector_to_cvector(const Vector2f& vector)
+    {
+        sensekit_vector2f_t cvector;
+        cvector.x = vector.x;
+        cvector.y = vector.y;
+        return cvector;
+    }
+
     template<typename TType>
     inline float Vector2_<TType>::length() const
     {
