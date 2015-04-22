@@ -9,8 +9,8 @@ set(${_projname}_SOURCES
   DebugVisualizer.h
   DepthUtility.h
   DepthUtility.cpp
-  SegmentationUtility.h
-  SegmentationUtility.cpp
+  Segmentation.h
+  Segmentation.cpp
   TrackedPoint.h
   PointProcessor.h
   PointProcessor.cpp

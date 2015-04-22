@@ -1,6 +1,6 @@
 #include "TrackedPoint.h"
 #include "PointProcessor.h"
-#include "SegmentationUtility.h"
+#include "Segmentation.h"
 
 namespace sensekit { namespace plugins { namespace hands {
 
@@ -41,8 +41,8 @@ namespace sensekit { namespace plugins { namespace hands {
 
     void PointProcessor::updateTrackedPoint(TrackingMatrices& matrices, TrackedPoint& trackedPoint)
     {
-        const float width = matrices.matDepth.cols;
-        const float height = matrices.matDepth.rows;
+        const float width = matrices.depth.cols;
+        const float height = matrices.depth.rows;
 
         trackedPoint.m_inactiveFrameCount++;
 
@@ -51,7 +51,7 @@ namespace sensekit { namespace plugins { namespace hands {
 
         TrackingData updateTrackingData(matrices, seedPosition, referenceDepth, m_trackingBandwidthDepth, trackedPoint.m_type, m_iterationMaxTracking);
 
-        cv::Point newTargetPoint = SegmentationUtility::convergeTrackPointFromSeed(updateTrackingData);
+        cv::Point newTargetPoint = segmentation::converge_track_point_from_seed(updateTrackingData);
 
         validateAndUpdateTrackedPoint(matrices, trackedPoint, newTargetPoint);
 
@@ -69,7 +69,7 @@ namespace sensekit { namespace plugins { namespace hands {
 
             TrackingData recoverTrackingData(matrices, seedPosition, referenceDepth, m_initialBandwidthDepth, trackedPoint.m_type, m_iterationMaxTracking);
 
-            newTargetPoint = SegmentationUtility::convergeTrackPointFromSeed(recoverTrackingData);
+            newTargetPoint = segmentation::converge_track_point_from_seed(recoverTrackingData);
             validateAndUpdateTrackedPoint(matrices, trackedPoint, newTargetPoint);
 
             if (trackedPoint.m_status == TrackingStatus::Tracking)
@@ -96,14 +96,20 @@ namespace sensekit { namespace plugins { namespace hands {
 
         if (newTargetPoint.x != -1 && newTargetPoint.y != -1)
         {
-            float depth = matrices.matDepth.at<float>(newTargetPoint);
+            float depth = matrices.depth.at<float>(newTargetPoint);
 
             cv::Point3f worldPosition = m_mapper.convert_depth_to_world(newTargetPoint.x, newTargetPoint.y, depth);
 
             auto dist = cv::norm(worldPosition - trackedPoint.m_worldPosition);
             auto deadbandDist = cv::norm(worldPosition - trackedPoint.m_steadyWorldPosition);
 
-            float area = SegmentationUtility::countNeighborhoodArea(matrices.matLayerSegmentation, matrices.matDepth, matrices.matArea, newTargetPoint, m_areaBandwidth, m_areaBandwidthDepth, m_mapper);
+            float area = segmentation::count_neighborhood_area(matrices.layerSegmentation,
+                                                               matrices.depth,
+                                                               matrices.area,
+                                                               newTargetPoint,
+                                                               m_areaBandwidth,
+                                                               m_areaBandwidthDepth,
+                                                               m_mapper);
 
             if (dist < maxJumpDist && area > m_minArea && area < m_maxArea)
             {
@@ -149,7 +155,13 @@ namespace sensekit { namespace plugins { namespace hands {
         bool validPointArea = false;
         if (targetPoint.x != -1 && targetPoint.y != -1)
         {
-            float area = SegmentationUtility::countNeighborhoodArea(matrices.matLayerSegmentation, matrices.matDepth, matrices.matArea, targetPoint, m_areaBandwidth, m_areaBandwidthDepth, m_mapper);
+            float area = segmentation::count_neighborhood_area(matrices.layerSegmentation,
+                                                               matrices.depth,
+                                                               matrices.area,
+                                                               targetPoint,
+                                                               m_areaBandwidth,
+                                                               m_areaBandwidthDepth,
+                                                               m_mapper);
 
             if (area > m_minArea && area < m_maxArea)
             {
@@ -220,10 +232,10 @@ namespace sensekit { namespace plugins { namespace hands {
     void PointProcessor::updateTrackedPointOrCreateNewPointFromSeedPosition(TrackingMatrices& matrices,
                                                                             const cv::Point& seedPosition)
     {
-        float seedDepth = matrices.matDepth.at<float>(seedPosition);
+        float seedDepth = matrices.depth.at<float>(seedPosition);
         TrackingData trackingData(matrices, seedPosition, seedDepth, m_initialBandwidthDepth, TrackedPointType::CandidatePoint, m_iterationMaxInitial);
 
-        cv::Point targetPoint = SegmentationUtility::convergeTrackPointFromSeed(trackingData);
+        cv::Point targetPoint = segmentation::converge_track_point_from_seed(trackingData);
 
         bool validPointArea = isValidPointArea(matrices, targetPoint);
 
@@ -253,7 +265,7 @@ namespace sensekit { namespace plugins { namespace hands {
             }
             if (!existingPoint)
             {
-                float depth = matrices.matDepth.at<float>(targetPoint);
+                float depth = matrices.depth.at<float>(targetPoint);
 
                 cv::Point3f worldPosition = m_mapper.convert_depth_to_world(targetPoint.x, targetPoint.y, depth);
 

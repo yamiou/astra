@@ -31,26 +31,27 @@ namespace sensekit { namespace plugins { namespace hands {
 
     struct TrackingMatrices
     {
-        cv::Mat& matDepth;
-        cv::Mat& matArea;
-        cv::Mat& matScore;
-        cv::Mat& matForeground;
-        cv::Mat& matSegmentation;
-        cv::Mat& matLayerSegmentation;
+        cv::Mat& depth;
+        cv::Mat& area;
+        cv::Mat& score;
+        cv::Mat& foreground;
+        cv::Mat& segmentation;
+        cv::Mat& layerSegmentation;
         int layerCount;
-        TrackingMatrices(cv::Mat& matDepth, 
-                         cv::Mat& matArea, 
-                         cv::Mat& matScore, 
-                         cv::Mat& matForeground,
-                         cv::Mat& matSegmentation,
-                         cv::Mat& matLayerSegmentation)
+
+        TrackingMatrices(cv::Mat& depth,
+                         cv::Mat& area,
+                         cv::Mat& score,
+                         cv::Mat& foreground,
+                         cv::Mat& segmentation,
+                         cv::Mat& layerSegmentation)
             :
-            matDepth(matDepth),
-            matArea(matArea),
-            matScore(matScore),
-            matForeground(matForeground),
-            matSegmentation(matSegmentation),
-            matLayerSegmentation(matLayerSegmentation),
+            depth(depth),
+            area(area),
+            score(score),
+            foreground(foreground),
+            segmentation(segmentation),
+            layerSegmentation(layerSegmentation),
             layerCount(0)
         {}
     };
@@ -64,13 +65,18 @@ namespace sensekit { namespace plugins { namespace hands {
         const TrackedPointType pointType;
         const int iterationMax;
 
-        TrackingData(TrackingMatrices& matrices, const cv::Point& seedPosition, const float referenceDepth, const float bandwidthDepth, const TrackedPointType pointType, const int iterationMax) :
-            matrices(matrices),
-            seedPosition(seedPosition),
-            referenceDepth(referenceDepth),
-            bandwidthDepth(bandwidthDepth),
-            pointType(pointType),
-            iterationMax(iterationMax)
+        TrackingData(TrackingMatrices& matrices,
+                     const cv::Point& seedPosition,
+                     const float referenceDepth,
+                     const float bandwidthDepth,
+                     const TrackedPointType pointType,
+                     const int iterationMax)
+            : matrices(matrices),
+              seedPosition(seedPosition),
+              referenceDepth(referenceDepth),
+              bandwidthDepth(bandwidthDepth),
+              pointType(pointType),
+              iterationMax(iterationMax)
         {}
     };
 }}}

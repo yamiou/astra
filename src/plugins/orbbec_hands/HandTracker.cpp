@@ -4,7 +4,7 @@
 #endif
 
 #include "HandTracker.h"
-#include "SegmentationUtility.h"
+#include "Segmentation.h"
 #include <SenseKitUL/streams/hand_types.h>
 #include <SenseKitUL/skul_ctypes.h>
 #include <SenseKit/Plugins/PluginKit.h>
@@ -128,8 +128,8 @@ namespace sensekit { namespace plugins { namespace hands {
             float heightFactor = 1;
             float depthFactor = 1.5;
 
-            SegmentationUtility::calculateBasicScore(matDepth, m_matScore, heightFactor, depthFactor, *(m_mapper.get()));
-            SegmentationUtility::calculateSegmentArea(matDepth, m_matArea, *(m_mapper.get()));
+            segmentation::calculate_basic_score(matDepth, m_matScore, heightFactor, depthFactor, *(m_mapper.get()));
+            segmentation::calculate_segment_area(matDepth, m_matArea, *(m_mapper.get()));
 
             cv::Mat foregroundCopy = matForeground.clone();
 
@@ -144,7 +144,7 @@ namespace sensekit { namespace plugins { namespace hands {
             cv::Point seedPosition;
             //add new points (unless already tracking)
             //TODO use last seedPosition as starting position of findForegroundPixel
-            while (SegmentationUtility::findForegroundPixel(foregroundCopy, seedPosition))
+            while (segmentation::find_next_foreground_pixel(foregroundCopy, seedPosition))
             {
                 m_pointProcessor->updateTrackedPointOrCreateNewPointFromSeedPosition(createMatrices, seedPosition);
             }
