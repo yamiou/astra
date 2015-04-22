@@ -238,14 +238,14 @@
 
 ;; SENSEKIT_API sensekit_status_t sensekit_reader_get_stream(sensekit_reader_t reader,
 ;;                                                           sensekit_stream_type_t type,
-;;                                                           sensekit_stream_subtype_t subType,
+;;                                                           sensekit_stream_subtype_t subtype,
 ;;                                                           sensekit_streamconnection_t* connection);
 (add-func       :funcset "stream"
                 :returntype "sensekit_status_t"
                 :funcname "reader_get_stream"
                 :params (list (make-param :type "sensekit_reader_t" :name "reader")
                               (make-param :type "sensekit_stream_type_t" :name "type")
-                              (make-param :type "sensekit_stream_subtype_t" :name "subType")
+                              (make-param :type "sensekit_stream_subtype_t" :name "subtype")
                               (make-param :type "sensekit_streamconnection_t*" :name "connection" :deref T)))
 
 ;; SENSEKIT_API sensekit_status_t sensekit_stream_get_description(sensekit_streamconnection_t connection,
@@ -304,14 +304,14 @@
 
 ;; SENSEKIT_API sensekit_status_t sensekit_reader_get_frame(sensekit_reader_frame_t frame,
 ;;                                                          sensekit_stream_type_t type,
-;;                                                          sensekit_stream_subtype_t subType,
+;;                                                          sensekit_stream_subtype_t subtype,
 ;;                                                          sensekit_frame_ref_t** frameRef);
 (add-func       :funcset "stream"
                 :returntype "sensekit_status_t"
                 :funcname "reader_get_frame"
                 :params (list (make-param :type "sensekit_reader_frame_t" :name "frame")
                               (make-param :type "sensekit_stream_type_t" :name "type")
-                              (make-param :type "sensekit_stream_subtype_t" :name "subType")
+                              (make-param :type "sensekit_stream_subtype_t" :name "subtype")
                               (make-param :type "sensekit_frame_ref_t**" :name "frameRef" :deref T)))
 
 ;; SENSEKIT_API sensekit_status_t sensekit_stream_set_parameter(sensekit_streamconnection_t connection,
