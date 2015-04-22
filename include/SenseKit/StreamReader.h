@@ -33,9 +33,9 @@ namespace sensekit {
             sensekit_streamconnection_t connection;
 
             sensekit_reader_get_stream(m_readerRef->get_reader(),
-                                        T::id,
-                                        subtype,
-                                        &connection);
+                                       T::id,
+                                       subtype,
+                                       &connection);
 
             return T(connection);
         }
@@ -67,7 +67,7 @@ namespace sensekit {
 
         StreamReader(ReaderRefPtr readerRef)
             : m_readerRef(readerRef)
-            { }
+        { }
 
         class ReaderRef :
             public std::enable_shared_from_this<ReaderRef>
@@ -153,12 +153,12 @@ namespace sensekit {
                 }
 
                 std::move(m_addedListeners.begin(),
-                            m_addedListeners.end(),
-                            std::back_inserter(m_listeners));
+                          m_addedListeners.end(),
+                          std::back_inserter(m_listeners));
 
                 if (m_listeners.size() == 0)
                 {
-                        ensure_callback_removed();
+                    ensure_callback_removed();
                     return;
                 }
 
@@ -178,30 +178,30 @@ namespace sensekit {
         private:
             void ensure_callback_added()
             {
-                if (!m_callbackAdded)
+                if (!m_callbackRegistered)
                 {
                     sensekit_reader_register_frame_ready_callback(m_reader,
-                                                                    &ReaderRef::frame_ready_thunk,
-                                                                    this,
-                                                                    &m_callbackId);
+                                                                  &ReaderRef::frame_ready_thunk,
+                                                                  this,
+                                                                  &m_callbackId);
 
-                    m_callbackAdded = true;
+                    m_callbackRegistered = true;
                 }
             }
 
             void ensure_callback_removed()
             {
-                if (m_callbackAdded)
+                if (m_callbackRegistered)
                 {
                     sensekit_reader_unregister_frame_ready_callback(&m_callbackId);
-                    m_callbackAdded = false;
+                    m_callbackRegistered = false;
                 }
             }
 
             sensekit_reader_t m_reader;
 
             bool m_isNotifying{false};
-            bool m_callbackAdded{ false };
+            bool m_callbackRegistered{false};
 
             using ListenerList = std::vector<std::reference_wrapper<FrameReadyListener> >;
 
