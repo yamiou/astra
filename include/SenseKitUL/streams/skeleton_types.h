@@ -29,7 +29,7 @@ const size_t SENSEKIT_MAX_JOINTS = 20;
 
 typedef struct _sensekit_skeleton_joint {
     int32_t trackingId;
-    sensekit_joint_type status;
+    sensekit_joint_status status;
     sensekit_joint_type jointType;
     sensekit_vector3f_t position;
 } sensekit_skeleton_joint_t;

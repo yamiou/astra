@@ -9,6 +9,20 @@
 
 namespace sensekit {
 
+    class SkeletonJoint
+    {
+    public:
+        SkeletonJoint(sensekit_skeleton_joint_t joint)
+            : m_joint(joint) {}
+
+        inline sensekit_joint_status status() { return m_joint.status; }
+        inline sensekit_joint_type type() { return m_joint.jointType; }
+        inline Vector3f position() { return cvector_to_vector(m_joint.position); }
+
+    private:
+        sensekit_skeleton_joint_t m_joint;
+    };
+
     class Skeleton
     {
     public:
@@ -19,8 +33,34 @@ namespace sensekit {
         inline int32_t trackingId() const { return m_skeleton.trackingId; }
         inline sensekit_skeleton_status status() const { return m_skeleton.status; }
 
+        inline std::vector<SkeletonJoint> joints()
+        {
+            verify_jointlist();
+            return m_joints;
+        }
+
+        void verify_jointlist()
+        {
+            if (m_jointsInitialized)
+            {
+                return;
+            }
+
+            m_jointsInitialized = true;
+            for (int i = 0; i < m_skeleton.jointCount; ++i)
+            {
+                if (m_skeleton.joints[i].status ==
+                    SENSEKIT_JOINT_STATUS_TRACKED)
+                {
+                    m_joints.push_back(SkeletonJoint(m_skeleton.joints[i]));
+                }
+            }
+        }
+
     private:
+        bool m_jointsInitialized{false};
         sensekit_skeleton_t m_skeleton;
+        std::vector<SkeletonJoint> m_joints;
     };
 
     using SkeletonList = std::vector<Skeleton>;
@@ -61,7 +101,7 @@ namespace sensekit {
             return m_skeletons.size();
         }
 
-        const SkeletonList& skeleton()
+        const SkeletonList& skeletons()
         {
             throwIfInvalidFrame();
             verify_skeletonlist();
