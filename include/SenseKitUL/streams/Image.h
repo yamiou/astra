@@ -37,7 +37,6 @@ namespace sensekit {
                 {
                     sensekit_imageframe_get_metadata(m_imageFrame, &m_metadata);
                     sensekit_imageframe_get_frameindex(m_imageFrame, &m_frameIndex);
-                    sensekit_imageframe_get_stream(m_imageFrame, &m_streamConnection);
 
                     void* voidData = nullptr;
                     sensekit_imageframe_get_data_ptr(m_imageFrame, &voidData, &m_byteLength);
@@ -64,9 +63,6 @@ namespace sensekit {
             sensekit_imageframe_copy_data(m_imageFrame, buffer);
         }
 
-    protected:
-        sensekit_streamconnection_t streamHandle() { return m_streamConnection; }
-
     private:
         void throwIfInvalidFrame()
         {
@@ -79,9 +75,9 @@ namespace sensekit {
         sensekit_imageframe_t m_imageFrame{ nullptr };
         sensekit_image_metadata_t m_metadata;
         sensekit_frame_index_t m_frameIndex;
-        sensekit_streamconnection_t m_streamConnection;
 
         TDataType* m_dataPtr;
+
         size_t m_byteLength;
     };
 }

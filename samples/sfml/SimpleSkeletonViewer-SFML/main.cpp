@@ -80,7 +80,7 @@ public:
             for(auto joint : skeleton.joints())
             {
                 auto depthPosition =
-                    depthFrame.coordinateMapper().convert_world_to_depth(joint.position());
+                    m_mapper->convert_world_to_depth(joint.position());
 
                 m_jointPositions.push_back(depthPosition);
             }
@@ -90,6 +90,12 @@ public:
     virtual void on_frame_ready(sensekit::StreamReader& reader,
                                 sensekit::Frame& frame) override
     {
+        if (m_mapper == nullptr)
+        {
+            auto& mapper = reader.stream<sensekit::DepthStream>().coordinateMapper();
+            m_mapper = std::make_unique<sensekit::CoordinateMapper>(mapper);
+        }
+
         processDepth(frame);
         processSkeletons(frame);
 
@@ -146,6 +152,7 @@ private:
     using BufferPtr = std::unique_ptr < uint8_t[] >;
     BufferPtr m_displayBuffer{ nullptr };
 
+    std::unique_ptr<sensekit::CoordinateMapper> m_mapper;
     std::vector<sensekit::Skeleton> m_skeletons;
     std::vector<sensekit::Vector3f> m_jointPositions;
 

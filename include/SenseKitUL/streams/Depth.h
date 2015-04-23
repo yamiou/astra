@@ -16,6 +16,17 @@ namespace sensekit {
             : m_depthStream(depthStream)
         { }
 
+        CoordinateMapper(const CoordinateMapper& rhs)
+        {
+            this->m_depthStream = rhs.m_depthStream;
+        }
+
+        CoordinateMapper operator=(const CoordinateMapper& rhs)
+        {
+            this->m_depthStream = rhs.m_depthStream;
+            return *this;
+        }
+
         Vector3f convert_depth_to_world(sensekit::Vector3f depthPosition) const
         {
             float worldX, worldY, worldZ;
@@ -70,8 +81,6 @@ namespace sensekit {
 
         static const sensekit_stream_type_t id = SENSEKIT_STREAM_DEPTH;
 
-        const CoordinateMapper& coordinateMapper() const { return m_coordinateMapper; };
-
         float horizontalFieldOfView()
         {
             float hFov;
@@ -88,9 +97,11 @@ namespace sensekit {
             return vFov;
         }
 
+        const CoordinateMapper& coordinateMapper() { return m_coordinateMapper; };
+
     private:
-        CoordinateMapper m_coordinateMapper;
         sensekit_depthstream_t m_depthStream;
+        CoordinateMapper m_coordinateMapper;
     };
 
     class DepthFrame : public ImageFrame<int16_t>
@@ -98,14 +109,9 @@ namespace sensekit {
     public:
         DepthFrame(sensekit_reader_frame_t readerFrame,
                    sensekit_stream_subtype_t subtype)
-            : ImageFrame(readerFrame, SENSEKIT_STREAM_DEPTH, subtype),
-              m_coordinateMapper(streamHandle())
+            : ImageFrame(readerFrame, SENSEKIT_STREAM_DEPTH, subtype)
         { }
 
-        const CoordinateMapper& coordinateMapper() const { return m_coordinateMapper; };
-
-    private:
-         CoordinateMapper m_coordinateMapper;
     };
 }
 

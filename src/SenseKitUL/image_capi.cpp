@@ -20,13 +20,6 @@ SENSEKIT_API_EX sensekit_status_t sensekit_reader_get_imageframe(sensekit_reader
                                                                      imageFrame);
 }
 
-SENSEKIT_API_EX sensekit_status_t sensekit_imageframe_get_stream(sensekit_imageframe_t imageFrame,
-                                                                 sensekit_streamconnection_t* stream)
-{
-    *stream = static_cast<sensekit_streamconnection_t>(imageFrame->frameRef->streamConnection);
-    return SENSEKIT_STATUS_SUCCESS;
-}
-
 SENSEKIT_API_EX sensekit_status_t sensekit_imageframe_get_frameindex(sensekit_imageframe_t imageFrame,
                                                                      sensekit_frame_index_t* index)
 {
