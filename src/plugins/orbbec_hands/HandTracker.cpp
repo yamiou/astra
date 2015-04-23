@@ -131,21 +131,32 @@ namespace sensekit { namespace plugins { namespace hands {
             segmentation::calculate_basic_score(matDepth, m_matScore, heightFactor, depthFactor, *(m_mapper.get()));
             segmentation::calculate_segment_area(matDepth, m_matArea, *(m_mapper.get()));
 
-            cv::Mat foregroundCopy = matForeground.clone();
+            m_matSearched = matForeground.clone();
 
-            TrackingMatrices matrices(matDepth, m_matArea, m_matScore, matForeground, m_updateSegmentation, m_layerSegmentation);
+            TrackingMatrices matrices(matDepth, m_matArea, m_matScore, m_matSearched, m_updateSegmentation, m_layerSegmentation);
 
             m_pointProcessor->updateTrackedPoints(matrices);
 
             m_pointProcessor->removeDuplicatePoints();
 
-            TrackingMatrices createMatrices(matDepth, m_matArea, m_matScore, matForeground, m_createSegmentation, m_layerSegmentation);
+            TrackingMatrices createMatrices(matDepth, m_matArea, m_matScore, m_matSearched, m_createSegmentation, m_layerSegmentation);
 
-            cv::Point seedPosition;
             //add new points (unless already tracking)
-            //TODO use last seedPosition as starting position of findForegroundPixel
-            while (segmentation::find_next_foreground_pixel(foregroundCopy, seedPosition))
+            if (!m_debugImageStream->use_mouse_probe())
             {
+                cv::Point seedPosition;
+                cv::Point nextSearchStart(0, 0);
+                while (segmentation::find_next_foreground_pixel(matForeground, seedPosition, nextSearchStart))
+                {
+                    m_pointProcessor->updateTrackedPointOrCreateNewPointFromSeedPosition(createMatrices, seedPosition);
+                }
+            }
+            else
+            {
+                auto normPosition = m_debugImageStream->mouse_norm_position();
+                int x = MAX(0, MIN(PROCESSING_SIZE_WIDTH, normPosition.x * PROCESSING_SIZE_WIDTH));
+                int y = MAX(0, MIN(PROCESSING_SIZE_HEIGHT, normPosition.y * PROCESSING_SIZE_HEIGHT));
+                cv::Point seedPosition(x, y);
                 m_pointProcessor->updateTrackedPointOrCreateNewPointFromSeedPosition(createMatrices, seedPosition);
             }
 
@@ -295,6 +306,11 @@ namespace sensekit { namespace plugins { namespace hands {
                 m_debugVisualizer.showNormArray<char>(m_createSegmentation,
                                                       m_createSegmentation,
                                                       colorFrame);
+                break;
+            case DEBUG_HAND_VIEW_CREATE_SEARCHED:
+                m_debugVisualizer.showDepthMat(m_matDepth,
+                                               m_matSearched,
+                                               colorFrame);
                 break;
             case DEBUG_HAND_VIEW_SCORE:
                 m_debugVisualizer.showNormArray<float>(m_matScore,

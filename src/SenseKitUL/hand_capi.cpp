@@ -110,4 +110,22 @@ SENSEKIT_API_EX sensekit_status_t sensekit_debug_handstream_set_view_type(sensek
                                          reinterpret_cast<sensekit_parameter_data_t>(&viewType));
 }
 
+SENSEKIT_API_EX sensekit_status_t sensekit_debug_handstream_set_mouse_position(sensekit_debug_handstream_t debugHandStream,
+                                                                          sensekit_vector2f_t normPosition)
+{
+    return sensekit_stream_set_parameter(debugHandStream,
+                                         SENSEKIT_PARAMETER_DEBUG_HAND_MOUSE_NORM_POSITION,
+                                         sizeof(sensekit_vector2f_t),
+                                         reinterpret_cast<sensekit_parameter_data_t>(&normPosition));
+}
+
+SENSEKIT_API_EX sensekit_status_t sensekit_debug_handstream_set_use_mouse_probe(sensekit_debug_handstream_t debugHandStream,
+                                                                          bool useMouseProbe)
+{
+    return sensekit_stream_set_parameter(debugHandStream,
+                                         SENSEKIT_PARAMETER_DEBUG_HAND_USE_MOUSE_PROBE,
+                                         sizeof(bool),
+                                         reinterpret_cast<sensekit_parameter_data_t>(&useMouseProbe));
+}
+
 SENSEKIT_END_DECLS

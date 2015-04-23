@@ -9,10 +9,7 @@ namespace sensekit { namespace plugins { namespace hands {
     {
         Background = 0,
         Foreground = 1,
-        Searched = 2,
-        IntermediateClosest = 3,
-        Closest = 4,
-        Neighborhood = 5
+        Searched = 2
     };
 
     enum TrackedPointType

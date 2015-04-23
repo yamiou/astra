@@ -155,30 +155,43 @@ namespace sensekit { namespace plugins { namespace hands {
         }
 
         bool find_next_foreground_pixel(cv::Mat& foregroundMatrix,
-                                        cv::Point& foregroundPosition)
+                                        cv::Point& foregroundPosition,
+                                        cv::Point& nextSearchStart)
         {
             int width = foregroundMatrix.cols;
             int height = foregroundMatrix.rows;
 
-            for (int y = 0; y < height; y++)
-            {
-                char* foregroundRow = foregroundMatrix.ptr<char>(y);
-                for (int x = 0; x < width; x++)
-                {
-                    char foreground = *foregroundRow;
+            const int startX = MAX(0, MIN(width - 1, nextSearchStart.x));
+            const int startY = MAX(0, MIN(height - 1, nextSearchStart.y));
 
+            for (int y = startY; y < height; y++)
+            {
+                for (int x = startX; x < width; x++)
+                {
+                    char foreground = *foregroundMatrix.ptr<char>(y, x);
                     if (foreground == PixelType::Foreground)
                     {
                         foregroundPosition.x = x;
                         foregroundPosition.y = y;
-                        *foregroundRow = PixelType::Searched;
+
+                        nextSearchStart.x = x + 1;
+                        if (nextSearchStart.x < width)
+                        {
+                            nextSearchStart.y = y;
+                        }
+                        else
+                        {
+                            nextSearchStart.x = 0;
+                            nextSearchStart.y = y + 1;
+                        }
                         return true;
                     }
-                    ++foregroundRow;
                 }
             }
             foregroundPosition.x = -1;
             foregroundPosition.y = -1;
+            nextSearchStart.x = width;
+            nextSearchStart.y = height;
             return false;
         }
 

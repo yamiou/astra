@@ -13,6 +13,12 @@ namespace sensekit { namespace plugins { namespace hands {
         case SENSEKIT_PARAMETER_DEBUG_HAND_VIEW_TYPE:
             set_view_parameter(inByteLength, inData);
             break;
+        case SENSEKIT_PARAMETER_DEBUG_HAND_USE_MOUSE_PROBE:
+            set_use_mouse_probe(inByteLength, inData);
+            break;
+        case SENSEKIT_PARAMETER_DEBUG_HAND_MOUSE_NORM_POSITION:
+            set_mouse_norm_position(inByteLength, inData);
+            break;
         }
     }
 
@@ -61,4 +67,25 @@ namespace sensekit { namespace plugins { namespace hands {
         }
     }
 
+    void DebugHandStream::set_use_mouse_probe(size_t inByteLength, sensekit_parameter_data_t inData)
+    {
+        if (inByteLength >= sizeof(bool))
+        {
+            bool newUseMouseProbe;
+            memcpy(&newUseMouseProbe, inData, sizeof(bool));
+
+            m_useMouseProbe = newUseMouseProbe;
+        }
+    }
+
+    void DebugHandStream::set_mouse_norm_position(size_t inByteLength, sensekit_parameter_data_t inData)
+    {
+        if (inByteLength >= sizeof(sensekit_vector2f_t))
+        {
+            sensekit_vector2f_t newMousePosition;
+            memcpy(&newMousePosition, inData, sizeof(sensekit_vector2f_t));
+
+            m_mouseNormPosition = cvector_to_vector(newMousePosition);
+        }
+    }
 }}}

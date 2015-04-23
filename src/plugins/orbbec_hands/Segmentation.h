@@ -11,7 +11,8 @@ namespace sensekit { namespace plugins { namespace hands {
     namespace segmentation {
 
         bool find_next_foreground_pixel(cv::Mat& foregroundMatrix,
-                                        cv::Point& foregroundPosition);
+                                        cv::Point& foregroundPosition, 
+                                        cv::Point& nextSearchStart);
 
         void calculate_edge_distance(cv::Mat& segmentationMatrix,
                                      cv::Mat& areaMatrix,

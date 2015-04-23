@@ -129,23 +129,6 @@ namespace sensekit { namespace plugins { namespace hands {
                         r = 128;
                         b = 255;
                     }
-                    else if (foreground == PixelType::IntermediateClosest)
-                    {
-                        r = 0;
-                        g = 0;
-                        b = 255;
-                    }
-                    else if (foreground == PixelType::Closest)
-                    {
-                        r = 0;
-                        g = 0;
-                        b = 0;
-                    }
-                    else if (foreground == PixelType::Neighborhood)
-                    {
-                        r = 0;
-                        g = 0;
-                    }
                     else
                     {
                         r = 0;
@@ -251,7 +234,7 @@ namespace sensekit { namespace plugins { namespace hands {
                     }
                     else
                     {
-                        value = 255 * ((*dataRow - min) / range);
+                        value = 55 + 200 * ((*dataRow - min) / range);
                     }
                     *(colorData) = value;
                     *(colorData + 1) = value;

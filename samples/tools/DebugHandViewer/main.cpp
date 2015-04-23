@@ -187,6 +187,25 @@ void request_view_mode(sensekit::StreamReader& reader, sensekit::DebugHandViewTy
     reader.stream<sensekit::DebugHandStream>().set_view_type(view);
 }
 
+void process_mouse_move(sf::RenderWindow& window, sensekit::StreamReader& reader)
+{
+    sf::Vector2i position = sf::Mouse::getPosition(window);
+    sensekit::Vector2f normPosition;
+    auto windowSize = window.getSize();
+    normPosition.x = position.x / (float)windowSize.x;
+    normPosition.y = position.y / (float)windowSize.y;
+
+    reader.stream<sensekit::DebugHandStream>().set_mouse_position(normPosition);
+}
+
+static bool g_mouseProbe = false;
+
+void toggle_mouse_probe(sensekit::StreamReader& reader)
+{
+    g_mouseProbe = !g_mouseProbe;
+    reader.stream<sensekit::DebugHandStream>().set_use_mouse_probe(g_mouseProbe);
+}
+
 void process_key_input(sensekit::StreamReader& reader, sf::Event::KeyEvent key)
 {
     if (key.code == sf::Keyboard::Num1)
@@ -213,15 +232,21 @@ void process_key_input(sensekit::StreamReader& reader, sf::Event::KeyEvent key)
     {
         request_view_mode(reader, DEBUG_HAND_VIEW_SCORE);
     }
-    //disabled temporarily
-
     else if (key.code == sf::Keyboard::Num7)
     {
-        request_view_mode(reader, DEBUG_HAND_VIEW_LOCALAREA);
+        request_view_mode(reader, DEBUG_HAND_VIEW_CREATE_SEARCHED);
     }
     else if (key.code == sf::Keyboard::Num8)
     {
+        request_view_mode(reader, DEBUG_HAND_VIEW_LOCALAREA);
+    }
+    else if (key.code == sf::Keyboard::Num9)
+    {
         request_view_mode(reader, DEBUG_HAND_VIEW_EDGEDISTANCE);
+    }
+    else if (key.code == sf::Keyboard::M)
+    {
+        toggle_mouse_probe(reader);
     }
 }
 
@@ -262,6 +287,10 @@ int main(int argc, char** argv)
                 {
                     process_key_input(reader, event.key);
                 }
+            }
+            else if (event.type == sf::Event::MouseMoved)
+            {
+                process_mouse_move(window, reader);
             }
         }
 

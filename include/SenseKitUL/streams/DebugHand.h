@@ -24,6 +24,16 @@ namespace sensekit {
             sensekit_debug_handstream_set_view_type(m_debugHandStream, view);
         }
 
+        void set_use_mouse_probe(bool useMouseProbe)
+        {
+            sensekit_debug_handstream_set_use_mouse_probe(m_debugHandStream, useMouseProbe);
+        }
+
+        void set_mouse_position(Vector2f position)
+        {
+            sensekit_debug_handstream_set_mouse_position(m_debugHandStream, vector_to_cvector(position));
+        }
+
         DebugHandViewType get_view_type()
         {
             DebugHandViewType view;

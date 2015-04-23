@@ -4,6 +4,7 @@
 #include <SenseKit/sensekit_defines.h>
 #include <SenseKit/sensekit_types.h>
 #include "hand_types.h"
+#include <stdbool.h>
 
 SENSEKIT_BEGIN_DECLS
 
@@ -40,6 +41,12 @@ SENSEKIT_API_EX sensekit_status_t sensekit_debug_handstream_get_view_type(sensek
 
 SENSEKIT_API_EX sensekit_status_t sensekit_debug_handstream_set_view_type(sensekit_debug_handstream_t debugHandStream,
                                                                           sensekit_debug_hand_view_type_t viewType);
+
+SENSEKIT_API_EX sensekit_status_t sensekit_debug_handstream_set_mouse_position(sensekit_debug_handstream_t debugHandStream,
+                                                                               sensekit_vector2f_t normPosition);
+
+SENSEKIT_API_EX sensekit_status_t sensekit_debug_handstream_set_use_mouse_probe(sensekit_debug_handstream_t debugHandStream,
+                                                                                bool useMouseProbe);
 
 SENSEKIT_END_DECLS
 
