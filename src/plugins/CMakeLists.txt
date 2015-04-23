@@ -17,4 +17,5 @@ endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
 
 add_subdirectory(openni_sensor)
 add_subdirectory(orbbec_hand)
+add_subdirectory(orbbec_depth)
 add_subdirectory(dummy)
