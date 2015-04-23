@@ -8,7 +8,19 @@
 
 namespace sensekit {
 
-    using RGBPixel = sensekit_rgb_pixel_t;
+    struct RGBPixel : public sensekit_rgb_pixel_t
+    {
+        RGBPixel()
+          : RGBPixel(0, 0, 0)
+        {}
+
+        RGBPixel(uint8_t r, uint8_t g, uint8_t b)
+        {
+            this->r = r;
+            this->g = g;
+            this->b = b;
+        }
+    };
 
     template < typename TDataType >
     class ImageFrame
