@@ -47,7 +47,7 @@ MESSAGE("CMAKE_INSTALL_PREFIX : ${CMAKE_INSTALL_PREFIX}")
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include
   DESTINATION .
   FILES_MATCHING PATTERN "*.h"
-  PATTERN "include/SenseKit/Plugins" EXCLUDE
+  PATTERN "include/SenseKit/Plugins"
   PATTERN "include/SenseKitUL/Plugins" EXCLUDE
   )
 
@@ -64,7 +64,7 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
   )
 
 if (MSVC)
-  
+
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013
         DESTINATION samples
         PATTERN "build" EXCLUDE
@@ -78,7 +78,7 @@ if (MSVC)
                    "${PROJECT_SOURCE_DIR}/InstallVS.txt"
                    @ONLY)
     install(SCRIPT "InstallVS.txt")
-    
+
     install(DIRECTORY ${SAMPLES_BUILD_TEMP_DIR}
         DESTINATION samples/vs2013
         PATTERN "build" EXCLUDE
