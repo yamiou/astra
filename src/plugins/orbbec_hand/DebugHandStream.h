@@ -52,8 +52,8 @@ namespace sensekit { namespace plugins { namespace hand {
         void get_view_parameter(sensekit_parameter_bin_t& parameterBin);
         void set_view_parameter(size_t inByteLength,
                                 sensekit_parameter_data_t& inData);
-        void set_use_mouse_probe(size_t inByteLength, sensekit_parameter_data_t inData);
-        void set_mouse_norm_position(size_t inByteLength, sensekit_parameter_data_t inData);
+        void set_use_mouse_probe(size_t inByteLength, sensekit_parameter_data_t& inData);
+        void set_mouse_norm_position(size_t inByteLength, sensekit_parameter_data_t& inData);
 
         DebugHandViewType m_viewType{ DEBUG_HAND_VIEW_DEPTH };
         bool m_useMouseProbe { false };

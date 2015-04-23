@@ -67,7 +67,7 @@ namespace sensekit { namespace plugins { namespace hand {
         }
     }
 
-    void DebugHandStream::set_use_mouse_probe(size_t inByteLength, sensekit_parameter_data_t inData)
+    void DebugHandStream::set_use_mouse_probe(size_t inByteLength, sensekit_parameter_data_t& inData)
     {
         if (inByteLength >= sizeof(bool))
         {
@@ -78,7 +78,7 @@ namespace sensekit { namespace plugins { namespace hand {
         }
     }
 
-    void DebugHandStream::set_mouse_norm_position(size_t inByteLength, sensekit_parameter_data_t inData)
+    void DebugHandStream::set_mouse_norm_position(size_t inByteLength, sensekit_parameter_data_t& inData)
     {
         if (inByteLength >= sizeof(sensekit_vector2f_t))
         {
