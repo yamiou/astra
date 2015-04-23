@@ -121,9 +121,10 @@ namespace sensekit { namespace plugins { namespace hand {
             m_matScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             //cv::Mat matEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_matArea = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-            m_updateSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
-            m_createSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
+            m_debugUpdateSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
+            m_debugCreateSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_layerSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
+            m_debugSearched = cv::Mat::zeros(matDepth.size(), CV_8UC1);
 
             float heightFactor = 1;
             float depthFactor = 1.5;
@@ -131,15 +132,14 @@ namespace sensekit { namespace plugins { namespace hand {
             segmentation::calculate_basic_score(matDepth, m_matScore, heightFactor, depthFactor, *(m_mapper.get()));
             segmentation::calculate_segment_area(matDepth, m_matArea, *(m_mapper.get()));
 
-            m_matSearched = matForeground.clone();
-
-            TrackingMatrices matrices(matDepth, m_matArea, m_matScore, m_matSearched, m_updateSegmentation, m_layerSegmentation);
+            
+            TrackingMatrices matrices(matDepth, m_matArea, m_matScore, matForeground, m_layerSegmentation, m_debugUpdateSegmentation, m_debugSearched);
 
             m_pointProcessor->updateTrackedPoints(matrices);
 
             m_pointProcessor->removeDuplicatePoints();
 
-            TrackingMatrices createMatrices(matDepth, m_matArea, m_matScore, m_matSearched, m_createSegmentation, m_layerSegmentation);
+            TrackingMatrices createMatrices(matDepth, m_matArea, m_matScore, matForeground, m_layerSegmentation, m_debugCreateSegmentation, m_debugSearched);
 
             //add new points (unless already tracking)
             if (!m_debugImageStream->use_mouse_probe())
@@ -278,48 +278,49 @@ namespace sensekit { namespace plugins { namespace hand {
         {
             float m_maxVelocity = 0.1;
 
-            switch (m_debugImageStream->view_type())
+            RGBPixel foregroundColor(255, 0, 0);
+            RGBPixel searchedColor(128, 255, 0);
+
+            DebugHandViewType view = m_debugImageStream->view_type();
+
+            switch (view)
             {
             case DEBUG_HAND_VIEW_DEPTH:
                 m_debugVisualizer.showDepthMat(m_matDepth,
-                                               m_matForeground,
                                                colorFrame);
                 break;
             case DEBUG_HAND_VIEW_VELOCITY:
                 m_debugVisualizer.showVelocityMat(m_depthUtility.matDepthVel(),
                                                   m_maxVelocity,
-                                                  m_matForeground,
                                                   colorFrame);
                 break;
             case DEBUG_HAND_VIEW_FILTEREDVELOCITY:
                 m_debugVisualizer.showVelocityMat(m_depthUtility.matDepthVelErode(),
                                                   m_maxVelocity,
-                                                  m_matForeground,
                                                   colorFrame);
                 break;
             case DEBUG_HAND_VIEW_UPDATE_SEGMENTATION:
-                m_debugVisualizer.showNormArray<char>(m_updateSegmentation,
-                                                      m_updateSegmentation,
+                m_debugVisualizer.showNormArray<char>(m_debugUpdateSegmentation,
+                                                      m_debugUpdateSegmentation,
                                                       colorFrame);
                 break;
             case DEBUG_HAND_VIEW_CREATE_SEGMENTATION:
-                m_debugVisualizer.showNormArray<char>(m_createSegmentation,
-                                                      m_createSegmentation,
+                m_debugVisualizer.showNormArray<char>(m_debugCreateSegmentation,
+                                                      m_debugCreateSegmentation,
                                                       colorFrame);
                 break;
             case DEBUG_HAND_VIEW_CREATE_SEARCHED:
                 m_debugVisualizer.showDepthMat(m_matDepth,
-                                               m_matSearched,
                                                colorFrame);
                 break;
             case DEBUG_HAND_VIEW_SCORE:
                 m_debugVisualizer.showNormArray<float>(m_matScore,
-                                                       m_updateSegmentation,
+                                                       m_debugUpdateSegmentation,
                                                        colorFrame);
                 break;
             case DEBUG_HAND_VIEW_LOCALAREA:
                 m_debugVisualizer.showNormArray<float>(m_matArea,
-                                                       m_updateSegmentation,
+                                                       m_debugUpdateSegmentation,
                                                        colorFrame);
                 break;
             case DEBUG_HAND_VIEW_EDGEDISTANCE:
@@ -329,9 +330,11 @@ namespace sensekit { namespace plugins { namespace hand {
                 break;
             }
 
-            if (false)
+            if (view == DEBUG_HAND_VIEW_CREATE_SEARCHED)
             {
-                m_debugVisualizer.overlayCrosshairs(m_pointProcessor->get_trackedPoints(), colorFrame);
+                m_debugVisualizer.overlayMask(m_debugSearched, colorFrame, searchedColor);
             }
+
+            m_debugVisualizer.overlayMask(m_matForeground, colorFrame, foregroundColor);
         }
 }}}

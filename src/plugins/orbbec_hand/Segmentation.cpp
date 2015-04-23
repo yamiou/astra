@@ -31,6 +31,8 @@ namespace sensekit { namespace plugins { namespace hand {
             cv::Mat& foregroundMatrix = data.matrices.foreground;
             cv::Mat& areaMatrix = data.matrices.area;
             cv::Mat& segmentationMatrix = data.matrices.layerSegmentation;
+            cv::Mat& searchedMatrix = data.matrices.debugSearched;
+
             bool isActivePoint = data.pointType == TrackedPointType::ActivePoint;
             std::queue<PointTTL> pointQueue;
 
@@ -63,7 +65,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 }
                 if (ttl > 0)
                 {
-                    foregroundMatrix.at<char>(p) = PixelType::Searched;
+                    searchedMatrix.at<char>(p) = PixelType::Searched;
 
                     float depth = depthMatrix.at<float>(p);
                     bool pointInRange = depth != 0 && depth < maxDepth;
@@ -126,8 +128,8 @@ namespace sensekit { namespace plugins { namespace hand {
             ++data.matrices.layerCount;
 
             cv::bitwise_or(cv::Mat(size, CV_8UC1, cv::Scalar(data.matrices.layerCount)),
-                           data.matrices.segmentation,
-                           data.matrices.segmentation,
+                           data.matrices.debugSegmentation,
+                           data.matrices.debugSegmentation,
                            data.matrices.layerSegmentation);
 
             double min, max;

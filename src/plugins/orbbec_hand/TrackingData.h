@@ -32,23 +32,26 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat& area;
         cv::Mat& score;
         cv::Mat& foreground;
-        cv::Mat& segmentation;
         cv::Mat& layerSegmentation;
+        cv::Mat& debugSegmentation;
+        cv::Mat& debugSearched;
         int layerCount;
 
         TrackingMatrices(cv::Mat& depth,
                          cv::Mat& area,
                          cv::Mat& score,
                          cv::Mat& foreground,
-                         cv::Mat& segmentation,
-                         cv::Mat& layerSegmentation)
+                         cv::Mat& layerSegmentation,
+                         cv::Mat& debugSegmentation,
+                         cv::Mat& debugSearched)
             :
             depth(depth),
             area(area),
             score(score),
             foreground(foreground),
-            segmentation(segmentation),
+            debugSegmentation(debugSegmentation),
             layerSegmentation(layerSegmentation),
+            debugSearched(debugSearched),
             layerCount(0)
         {}
     };

@@ -83,72 +83,66 @@ namespace sensekit { namespace plugins { namespace hand {
                 }
             }
         }
+        void overlayMask(const cv::Mat& matMask,
+                         _sensekit_imageframe& imageFrame,
+                         const RGBPixel& maskColor)
+        {
+            assert(matMask.cols == imageFrame.metadata.width);
+            assert(matMask.rows == imageFrame.metadata.height);
+
+            int width = matMask.cols;
+            int height = matMask.rows;
+
+            RGBPixel* colorData = static_cast<RGBPixel*>(imageFrame.data);
+            
+            for (int y = 0; y < height; ++y)
+            {
+                const char* maskRow = matMask.ptr<char>(y);
+
+                for (int x = 0; x < width; ++x, ++maskRow, ++colorData)
+                {
+                    uint8_t maskValue = *maskRow;
+                    
+                    if (maskValue != PixelType::Background)
+                    {
+                        *colorData = maskColor;
+                    }
+                }
+            }
+        }
 
         void showDepthMat(const cv::Mat& matDepth,
-                          const cv::Mat& matForeground,
                           _sensekit_imageframe& imageFrame)
         {
             assert(matDepth.cols == imageFrame.metadata.width);
             assert(matDepth.rows == imageFrame.metadata.height);
-            assert(matDepth.size() == matForeground.size());
 
             int width = matDepth.cols;
             int height = matDepth.rows;
 
-            uint8_t* colorData = static_cast<uint8_t*>(imageFrame.data);
-            uint8_t bytesPerPixel = imageFrame.metadata.bytesPerPixel;
+            RGBPixel* colorData = static_cast<RGBPixel*>(imageFrame.data);
 
             for (int y = 0; y < height; ++y)
             {
                 const float* depthRow = matDepth.ptr<float>(y);
-                const char* foregroundRow = matForeground.ptr<char>(y);
 
-                for (int x = 0; x < width; ++x, ++depthRow, ++foregroundRow, colorData += bytesPerPixel)
+                for (int x = 0; x < width; ++x, ++depthRow, ++colorData)
                 {
-                    uint8_t r = 0;
-                    uint8_t g = 0;
-                    uint8_t b = 0;
-
-                    char foreground = 0;
-                    if (m_showForeground)
-                    {
-                        foreground = *foregroundRow;
-                    }
                     float depth = *depthRow;
                     uint8_t value = 255 * (depth / 4000.0f);
-
-                    g = value;
-                    b = value;
-
-                    if (foreground == PixelType::Foreground)
-                    {
-                        r = 255;
-                    }
-                    else if (foreground == PixelType::Searched)
-                    {
-                        r = 128;
-                        b = 255;
-                    }
-                    else
-                    {
-                        r = 0;
-                    }
-
-                    *(colorData) = r;
-                    *(colorData + 1) = g;
-                    *(colorData + 2) = b;
+                    RGBPixel color(0, value, value);
+                    
+                    *colorData = color;
                 }
             }
         }
 
         void showVelocityMat(const cv::Mat& matVelocity,
                              float maxScale,
-                             const cv::Mat& matForeground,
                              _sensekit_imageframe& imageFrame)
         {
             assert(matVelocity.cols == imageFrame.metadata.width);
             assert(matVelocity.rows == imageFrame.metadata.height);
-            assert(matVelocity.size() == matForeground.size());
 
             if (maxScale == 0)
             {
@@ -158,36 +152,25 @@ namespace sensekit { namespace plugins { namespace hand {
             int width = matVelocity.cols;
             int height = matVelocity.rows;
 
-            uint8_t* colorData = static_cast<uint8_t*>(imageFrame.data);
-            uint8_t bytesPerPixel = imageFrame.metadata.bytesPerPixel;
-
+            RGBPixel* colorData = static_cast<RGBPixel*>(imageFrame.data);
+            
             for (int y = 0; y < height; ++y)
             {
                 const float* velocityRow = matVelocity.ptr<float>(y);
-                const char* foregroundRow = matForeground.ptr<char>(y);
-                for (int x = 0; x < width; ++x, ++velocityRow, ++foregroundRow, colorData += bytesPerPixel)
+                for (int x = 0; x < width; ++x, ++velocityRow, ++colorData)
                 {
                     float velocity = *velocityRow;
-                    char foreground = *foregroundRow;
 
-                    int bvalue = 0;
-                    if (foreground != PixelType::Background)
-                    {
-                        bvalue = 255;
-                    }
-
-                    int gvalue = static_cast<int>(255 * sqrt(min(1.0f, abs(velocity / maxScale))));
-                    int rvalue = 0;
+                    uint8_t velocityValue = static_cast<uint8_t>(255 * sqrt(min(1.0f, abs(velocity / maxScale))));
+                    
+                    RGBPixel color(0, velocityValue, 0);
                     if (velocity < 0)
                     {
-                        rvalue = gvalue;
-                        gvalue = 0;
+                        color.r = velocityValue;
+                        color.g = velocityValue;
                     }
 
-
-                    *(colorData) = bvalue;
-                    *(colorData + 1) = gvalue;
-                    *(colorData + 2) = rvalue;
+                    *colorData = color;
                 }
             }
         }
@@ -243,7 +226,6 @@ namespace sensekit { namespace plugins { namespace hand {
             }
         }
     private:
-        bool m_showForeground { true };
 
     };
 }}}
