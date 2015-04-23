@@ -5,34 +5,34 @@
 #include <stdio.h>
 #include <key_handler.h>
 
-void print_hands(sensekit_handframe_t handFrame)
+void print_hand_frame(sensekit_handframe_t handFrame)
 {
     sensekit_handpoint_t* handPoints;
-    size_t numHands;
+    size_t handCount;
 
-    sensekit_handframe_get_hand_count(handFrame, &numHands);
+    sensekit_handframe_get_hand_count(handFrame, &handCount);
 
-    handPoints = (sensekit_handpoint_t*)malloc(numHands * sizeof(sensekit_handpoint_t));
+    handPoints = (sensekit_handpoint_t*)malloc(handCount * sizeof(sensekit_handpoint_t));
     sensekit_handframe_copy_hands(handFrame, handPoints);
 
     sensekit_frame_index_t frameIndex;
     sensekit_handframe_get_frameindex(handFrame, &frameIndex);
 
-    int numActiveHands = 0;
+    int activeHandCount = 0;
 
     sensekit_handpoint_t* point = handPoints;
-    for (int i = 0; i < numHands; i++)
+    for (int i = 0; i < handCount; i++)
     {
         if (point->status == HAND_STATUS_TRACKING)
         {
-            ++numActiveHands;
+            ++activeHandCount;
         }
         ++point;
     }
 
     free(handPoints);
 
-    printf("index %d activeHands %d\n", frameIndex, numActiveHands);
+    printf("index %d active hand count %d\n", frameIndex, activeHandCount);
 }
 
 void runHandStream(sensekit_reader_t reader)
@@ -49,7 +49,7 @@ void runHandStream(sensekit_reader_t reader)
             sensekit_handframe_t handFrame;
             sensekit_frame_get_handframe(frame, &handFrame);
 
-            print_hands(handFrame);
+            print_hand_frame(handFrame);
 
             sensekit_colorframe_t handDebugImageFrame;
             sensekit_frame_get_debug_handframe(frame, &handDebugImageFrame);

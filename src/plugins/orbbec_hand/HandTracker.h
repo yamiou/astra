@@ -15,7 +15,7 @@
 #include "DebugVisualizer.h"
 #include <memory>
 
-namespace sensekit { namespace plugins { namespace hands {
+namespace sensekit { namespace plugins { namespace hand {
 
     class HandTracker : public FrameReadyListener
     {

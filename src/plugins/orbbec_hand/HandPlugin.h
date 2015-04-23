@@ -1,12 +1,12 @@
-#ifndef HANDS_PLUGIN_H
-#define HANDS_PLUGIN_H
+#ifndef HAND_PLUGIN_H
+#define HAND_PLUGIN_H
 
 #include <SenseKit/Plugins/PluginKit.h>
 #include <SenseKitUL/SenseKitUL.h>
 #include <unordered_map>
 #include "handtracker.h"
 
-namespace sensekit { namespace plugins { namespace hands {
+namespace sensekit { namespace plugins { namespace hand {
 
     class StreamHandleHash
     {
@@ -27,11 +27,11 @@ namespace sensekit { namespace plugins { namespace hands {
         }
     };
 
-    class HandsPlugin : public PluginBase
+    class HandPlugin : public PluginBase
     {
     public:
-        HandsPlugin(PluginServiceProxy* pluginProxy);
-        virtual ~HandsPlugin();
+        HandPlugin(PluginServiceProxy* pluginProxy);
+        virtual ~HandPlugin();
 
         virtual void temp_update() override {}
 
@@ -68,4 +68,4 @@ namespace sensekit { namespace plugins { namespace hands {
     };
 }}}
 
-#endif /* HANDS_PLUGIN_H */
+#endif /* HAND_PLUGIN_H */

@@ -2,7 +2,7 @@
 #include <opencv2/core/core.hpp>
 #include <SenseKitUL/streams/Depth.h>
 
-namespace sensekit { namespace plugins { namespace hands {
+namespace sensekit { namespace plugins { namespace hand {
 
     cv::Point3f cv_convert_depth_to_world(const sensekit::CoordinateMapper& mapper,
                                           float depthX, float depthY, float depthZ)

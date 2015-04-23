@@ -1,7 +1,7 @@
 #ifndef POINT_H
 #define POINT_H
 
-namespace sensekit { namespace plugins { namespace hands {
+namespace sensekit { namespace plugins { namespace hand {
 
     struct Point3D
     {

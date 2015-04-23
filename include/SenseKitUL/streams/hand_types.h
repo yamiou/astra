@@ -4,7 +4,7 @@
 #include <SenseKit/sensekit_types.h>
 #include <SenseKitUL/skul_ctypes.h>
 
-#define SENSEKIT_HANDS_MAX_HANDPOINTS 20
+#define SENSEKIT_HANDS_MAX_HAND_COUNT 20
 
 typedef enum _sensekit_debug_hand_view_type {
     DEBUG_HAND_VIEW_DEPTH,

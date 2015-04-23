@@ -5,7 +5,7 @@
 #include <SenseKitUL/streams/hand_types.h>
 #include <SenseKitUL/skul_ctypes.h>
 
-namespace sensekit { namespace plugins { namespace hands {
+namespace sensekit { namespace plugins { namespace hand {
 
     class HandStream : public SingleBinStream<sensekit_handframe_wrapper_t,
                                               sensekit_handpoint_t>
@@ -14,12 +14,12 @@ namespace sensekit { namespace plugins { namespace hands {
     public:
         HandStream(PluginServiceProxy& pluginService,
                    Sensor& streamSet,
-                   size_t maxHands)
+                   size_t maxHandCount)
             : SingleBinStream(pluginService,
                               streamSet,
                               StreamDescription(SENSEKIT_STREAM_HAND,
                                                 DEFAULT_SUBTYPE),
-                              sizeof(sensekit_handpoint_t) * maxHands)
+                              sizeof(sensekit_handpoint_t) * maxHandCount)
         { }
     };
 

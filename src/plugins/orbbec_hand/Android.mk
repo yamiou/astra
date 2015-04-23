@@ -29,6 +29,6 @@
 
 # # Output
 # LOCAL_SHARED_LIBRARIES := libOpenCV libSenseKitAPI
-# LOCAL_MODULE := libOrbbecHands
+# LOCAL_MODULE := libOrbbecHand
 
 # include $(BUILD_SHARED_LIBRARY)

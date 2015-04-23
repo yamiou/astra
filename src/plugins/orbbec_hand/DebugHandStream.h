@@ -6,7 +6,7 @@
 #include <SenseKitUL/Plugins/stream_types.h>
 #include <SensekitUL/Vector.h>
 
-namespace sensekit { namespace plugins { namespace hands {
+namespace sensekit { namespace plugins { namespace hand {
 
     using DebugHandViewType = sensekit_debug_hand_view_type_t;
 

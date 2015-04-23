@@ -66,7 +66,7 @@ public:
         m_texture.update(m_displayBuffer.get());
     }
 
-    void processHands(sensekit::Frame& frame)
+    void processHandFrame(sensekit::Frame& frame)
     {
         sensekit::HandFrame handFrame = frame.get<sensekit::HandFrame>();
 
@@ -77,7 +77,7 @@ public:
                                 sensekit::Frame& frame) override
     {
         processDepth(frame);
-        processHands(frame);
+        processHandFrame(frame);
 
         check_fps();
     }
@@ -93,7 +93,7 @@ public:
         window.draw(shape);
     }
 
-    void drawHands(sf::RenderWindow& window, float depthScale)
+    void drawHandPoints(sf::RenderWindow& window, float depthScale)
     {
         float radius = 16;
         auto size = window.getSize();
@@ -131,7 +131,7 @@ public:
 
             window.draw(m_sprite);
 
-            drawHands(window, depthScale);
+            drawHandPoints(window, depthScale);
         }
     }
 

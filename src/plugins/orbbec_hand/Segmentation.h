@@ -4,7 +4,7 @@
 #include "ScalingCoordinateMapper.h"
 #include <opencv2/opencv.hpp>
 
-namespace sensekit { namespace plugins { namespace hands {
+namespace sensekit { namespace plugins { namespace hand {
 
     struct TrackingData;
 

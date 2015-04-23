@@ -4,7 +4,7 @@
 #include <opencv2/opencv.hpp>
 #include <SenseKitUL/SenseKitUL.h>
 
-namespace sensekit { namespace plugins { namespace hands {
+namespace sensekit { namespace plugins { namespace hand {
 
     class DepthUtility
     {

@@ -1,5 +1,5 @@
-#ifndef HANDS_CAPI_H
-#define HANDS_CAPI_H
+#ifndef HAND_CAPI_H
+#define HAND_CAPI_H
 
 #include <SenseKit/sensekit_defines.h>
 #include <SenseKit/sensekit_types.h>
@@ -21,14 +21,14 @@ SENSEKIT_API_EX sensekit_status_t sensekit_handframe_get_frameindex(sensekit_han
                                                                     sensekit_frame_index_t* index);
 
 SENSEKIT_API_EX sensekit_status_t sensekit_handframe_get_hand_count(sensekit_handframe_t handFrame,
-                                                                    size_t* numHands);
+                                                                    size_t* handCount);
 
 SENSEKIT_API_EX sensekit_status_t sensekit_handframe_copy_hands(sensekit_handframe_t handFrame,
                                                                 sensekit_handpoint_t* handPointsDestination);
 
-SENSEKIT_API_EX sensekit_status_t sensekit_handframe_get_hands_ptr(sensekit_handframe_t handFrame,
-                                                                   sensekit_handpoint_t** handpoints,
-                                                                   size_t* numHands);
+SENSEKIT_API_EX sensekit_status_t sensekit_handframe_get_shared_hand_array(sensekit_handframe_t handFrame,
+                                                                           sensekit_handpoint_t** handpoints,
+                                                                           size_t* handCount);
 
 SENSEKIT_API_EX sensekit_status_t sensekit_reader_get_debug_handstream(sensekit_reader_t reader,
                                                                        sensekit_debug_handstream_t* debugHandStream);
@@ -50,4 +50,4 @@ SENSEKIT_API_EX sensekit_status_t sensekit_debug_handstream_set_use_mouse_probe(
 
 SENSEKIT_END_DECLS
 
-#endif // HANDS_CAPI_H
+#endif // HAND_CAPI_H

@@ -17,7 +17,7 @@ struct _sensekit_imageframe {
 
 struct _sensekit_handframe {
     sensekit_frame_ref_t* frameRef;
-    size_t numHands;
+    size_t handCount;
     sensekit_handpoint_t* handpoints;
 };
 

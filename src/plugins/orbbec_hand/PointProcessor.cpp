@@ -2,7 +2,7 @@
 #include "PointProcessor.h"
 #include "Segmentation.h"
 
-namespace sensekit { namespace plugins { namespace hands {
+namespace sensekit { namespace plugins { namespace hand {
 
     PointProcessor::PointProcessor(const ScalingCoordinateMapper& mapper) :
         m_mapper(mapper),

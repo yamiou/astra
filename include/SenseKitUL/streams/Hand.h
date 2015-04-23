@@ -54,10 +54,10 @@ namespace sensekit {
                 sensekit_frame_get_handframe_with_subtype(readerFrame, subtype, &m_handFrame);
                 sensekit_handframe_get_frameindex(m_handFrame, &m_frameIndex);
 
-                size_t maxNumHands;
-                sensekit_handframe_get_hand_count(m_handFrame, &maxNumHands);
+                size_t maxHandCount;
+                sensekit_handframe_get_hand_count(m_handFrame, &maxHandCount);
 
-                m_handPoints.reserve(maxNumHands);
+                m_handPoints.reserve(maxHandCount);
             }
         }
 
@@ -98,11 +98,11 @@ namespace sensekit {
             m_handPointsInitialized = true;
 
             sensekit_handpoint_t* handPtr;
-            size_t maxNumHands;
+            size_t maxHandCount;
 
-            sensekit_handframe_get_hands_ptr(m_handFrame, &handPtr, &maxNumHands);
+            sensekit_handframe_get_shared_hand_array(m_handFrame, &handPtr, &maxHandCount);
 
-            for (int i = 0; i < maxNumHands; ++i, ++handPtr)
+            for (int i = 0; i < maxHandCount; ++i, ++handPtr)
             {
                 sensekit_handpoint_t& p = *handPtr;
                 if (p.status != sensekit_handstatus_t::HAND_STATUS_NOTTRACKING)

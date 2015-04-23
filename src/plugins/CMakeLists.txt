@@ -16,6 +16,6 @@ foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
 endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
 
 add_subdirectory(openni)
-add_subdirectory(orbbec_hands)
+add_subdirectory(orbbec_hand)
 add_subdirectory(orbbec_skeleton)
 add_subdirectory(dummy)

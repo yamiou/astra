@@ -9,7 +9,7 @@
 #include <SenseKitUL/skul_ctypes.h>
 #include <SenseKit/Plugins/PluginKit.h>
 
-namespace sensekit { namespace plugins { namespace hands {
+namespace sensekit { namespace plugins { namespace hand {
 
         using namespace std;
 
@@ -35,7 +35,7 @@ namespace sensekit { namespace plugins { namespace hands {
 
         void HandTracker::create_streams(PluginServiceProxy& pluginService, Sensor streamset)
         {
-            m_handStream = make_unique<HandStream>(pluginService, streamset, SENSEKIT_HANDS_MAX_HANDPOINTS);
+            m_handStream = make_unique<HandStream>(pluginService, streamset, SENSEKIT_HANDS_MAX_HAND_COUNT);
 
             const int bytesPerPixel = 3;
 
@@ -171,7 +171,7 @@ namespace sensekit { namespace plugins { namespace hands {
             if (handFrame != nullptr)
             {
                 handFrame->frame.handpoints = reinterpret_cast<sensekit_handpoint_t*>(&(handFrame->frame_data));
-                handFrame->frame.numHands = SENSEKIT_HANDS_MAX_HANDPOINTS;
+                handFrame->frame.handCount = SENSEKIT_HANDS_MAX_HAND_COUNT;
 
                 update_hand_frame(m_pointProcessor->get_trackedPoints(), handFrame->frame);
 
@@ -203,7 +203,7 @@ namespace sensekit { namespace plugins { namespace hands {
         void HandTracker::update_hand_frame(vector<TrackedPoint>& internalTrackedPoints, _sensekit_handframe& frame)
         {
             int handIndex = 0;
-            int maxNumHands = frame.numHands;
+            int maxHandCount = frame.handCount;
 
             for (auto it = internalTrackedPoints.begin(); it != internalTrackedPoints.end(); ++it)
             {
@@ -211,7 +211,7 @@ namespace sensekit { namespace plugins { namespace hands {
 
                 TrackingStatus status = internalPoint.m_status;
 
-                if (status != Dead && handIndex < maxNumHands)
+                if (status != Dead && handIndex < maxHandCount)
                 {
                     sensekit_handpoint_t& point = frame.handpoints[handIndex];
                     ++handIndex;
@@ -229,7 +229,7 @@ namespace sensekit { namespace plugins { namespace hands {
                     point.status = convert_hand_status(status, internalPoint.m_type);
                 }
             }
-            for (int i = handIndex; i < maxNumHands; ++i)
+            for (int i = handIndex; i < maxHandCount; ++i)
             {
                 sensekit_handpoint_t& point = frame.handpoints[i];
                 reset_hand_point(point);

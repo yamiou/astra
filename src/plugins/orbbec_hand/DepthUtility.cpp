@@ -3,7 +3,7 @@
 #include "TrackingData.h"
 #include <cmath>
 
-namespace sensekit { namespace plugins { namespace hands {
+namespace sensekit { namespace plugins { namespace hand {
 
     DepthUtility::DepthUtility(int width, int height) :
         m_processingWidth(width),

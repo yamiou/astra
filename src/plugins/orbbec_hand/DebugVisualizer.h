@@ -5,7 +5,7 @@
 #include "TrackedPoint.h"
 #include <SenseKitUL/Plugins/stream_types.h>
 
-namespace sensekit { namespace plugins { namespace hands {
+namespace sensekit { namespace plugins { namespace hand {
 
     using namespace std;
 

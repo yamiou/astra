@@ -5,7 +5,7 @@
 #include "TrackingData.h"
 #include "ScalingCoordinateMapper.h"
 
-namespace sensekit { namespace plugins { namespace hands {
+namespace sensekit { namespace plugins { namespace hand {
 
     struct TrackedPoint;
 

@@ -5,7 +5,7 @@
 #include <opencv2/opencv.hpp>
 
 #define MAX_DEPTH 10000
-namespace sensekit { namespace plugins { namespace hands {
+namespace sensekit { namespace plugins { namespace hand {
 
     namespace segmentation {
 

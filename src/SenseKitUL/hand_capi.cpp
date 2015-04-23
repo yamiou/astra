@@ -46,9 +46,9 @@ SENSEKIT_API_EX sensekit_status_t sensekit_handframe_get_frameindex(sensekit_han
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_handframe_get_hand_count(sensekit_handframe_t handFrame,
-                                                                   size_t* numHands)
+                                                                   size_t* handCount)
 {
-    *numHands = handFrame->numHands;
+    *handCount = handFrame->handCount;
 
     return SENSEKIT_STATUS_SUCCESS;
 }
@@ -56,19 +56,19 @@ SENSEKIT_API_EX sensekit_status_t sensekit_handframe_get_hand_count(sensekit_han
 SENSEKIT_API_EX sensekit_status_t sensekit_handframe_copy_hands(sensekit_handframe_t handFrame,
                                                                 sensekit_handpoint_t* handPointsDestination)
 {
-    size_t size = handFrame->numHands * sizeof(sensekit_handpoint_t);
+    size_t size = handFrame->handCount * sizeof(sensekit_handpoint_t);
 
     memcpy(handPointsDestination, handFrame->handpoints, size);
 
     return SENSEKIT_STATUS_SUCCESS;
 }
 
-SENSEKIT_API_EX sensekit_status_t sensekit_handframe_get_hands_ptr(sensekit_handframe_t handFrame,
-                                                                   sensekit_handpoint_t** handpoints,
-                                                                   size_t* numHands)
+SENSEKIT_API_EX sensekit_status_t sensekit_handframe_get_shared_hand_array(sensekit_handframe_t handFrame,
+                                                                           sensekit_handpoint_t** handpoints,
+                                                                           size_t* handCount)
 {
     *handpoints = handFrame->handpoints;
-    sensekit_handframe_get_hand_count(handFrame, numHands);
+    sensekit_handframe_get_hand_count(handFrame, handCount);
 
     return SENSEKIT_STATUS_SUCCESS;
 }

@@ -1,4 +1,4 @@
-set (_projname "orbbec_hands")
+set (_projname "orbbec_hand")
 
 set(${_projname}_SOURCES
   HandTracker.cpp
@@ -17,8 +17,8 @@ set(${_projname}_SOURCES
   TrackingData.h
   ScalingCoordinateMapper.h
   ScalingCoordinateMapper.cpp
-  HandsPlugin.cpp
-  HandsPlugin.h
+  HandPlugin.cpp
+  HandPlugin.h
 )
 
 find_package( OpenCV REQUIRED core imgproc)

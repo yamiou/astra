@@ -4,7 +4,7 @@
 #include <opencv2/core/core.hpp>
 #include <SenseKitUL/streams/Depth.h>
 
-namespace sensekit { namespace plugins { namespace hands {
+namespace sensekit { namespace plugins { namespace hand {
 
     class ScalingCoordinateMapper;
 
