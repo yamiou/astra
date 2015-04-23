@@ -106,6 +106,14 @@ SENSEKIT_API_EX sensekit_status_t sensekit_frame_get_depthframe(sensekit_reader_
                                           depthFrame);
 }
 
+SENSEKIT_API_EX sensekit_status_t sensekit_depthframe_get_depthstream(sensekit_depthframe_t depthFrame,
+                                                                      sensekit_depthstream_t* depthStream)
+{
+    sensekit_imageframe_get_stream(depthFrame, depthStream);
+    return SENSEKIT_STATUS_SUCCESS;
+}
+
+
 SENSEKIT_API_EX sensekit_status_t sensekit_frame_get_depthframe_with_subtype(sensekit_reader_frame_t readerFrame,
                                                                              sensekit_stream_subtype_t subtype,
                                                                              sensekit_depthframe_t* colorFrame)

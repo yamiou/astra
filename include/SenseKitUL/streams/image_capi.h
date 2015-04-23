@@ -12,6 +12,9 @@ SENSEKIT_API_EX sensekit_status_t sensekit_reader_get_imageframe(sensekit_reader
                                                                  sensekit_stream_subtype_t subtype,
                                                                  sensekit_imageframe_t* imageFrame);
 
+SENSEKIT_API_EX sensekit_status_t sensekit_imageframe_get_stream(sensekit_imageframe_t imageFrame,
+                                                                 sensekit_streamconnection_t* stream);
+
 SENSEKIT_API_EX sensekit_status_t sensekit_imageframe_get_frameindex(sensekit_imageframe_t imageFrame,
                                                                      sensekit_frame_index_t* index);
 

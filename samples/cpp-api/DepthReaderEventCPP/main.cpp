@@ -51,7 +51,7 @@ class SampleFrameListener : public sensekit::FrameReadyListener
         if (depthFrame.is_valid())
         {
             print_depth(depthFrame,
-                reader.stream<sensekit::DepthStream>().get_coordinateMapper());
+                reader.stream<sensekit::DepthStream>().coordinateMapper());
         }
     }
 };

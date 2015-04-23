@@ -70,15 +70,26 @@ public:
     void processSkeletons(sensekit::Frame& frame)
     {
         sensekit::SkeletonFrame skeletonFrame = frame.get<sensekit::SkeletonFrame>();
+        sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
 
         m_skeletons = skeletonFrame.skeletons();
+        m_jointPositions.clear();
+
+        for (auto skeleton : m_skeletons)
+        {
+            for(auto joint : skeleton.joints())
+            {
+                auto depthPosition =
+                    depthFrame.coordinateMapper().convert_world_to_depth(joint.position());
+
+                m_jointPositions.push_back(depthPosition);
+            }
+        }
     }
 
     virtual void on_frame_ready(sensekit::StreamReader& reader,
                                 sensekit::Frame& frame) override
     {
-        m_depthStream = reader.stream<sensekit::DepthStream>();
-
         processDepth(frame);
         processSkeletons(frame);
 
@@ -102,25 +113,13 @@ public:
         auto size = window.getSize();
         sf::Color trackingColor(10, 10, 200);
 
-        for (auto skeleton : m_skeletons)
+        for (auto position : m_jointPositions)
         {
-            for(auto joint : skeleton.joints())
-            {
-                float depthX, depthY, depthZ;
-
-                m_depthStream
-                    .get_coordinateMapper()
-                    .convert_world_to_depth(joint.position().x,
-                                            joint.position().y,
-                                            joint.position().z,
-                                            &depthX, &depthY, &depthZ);
-
-                drawCircle(window,
-                           radius,
-                           depthX * depthScale,
-                           depthY * depthScale,
-                           trackingColor);
-            }
+            drawCircle(window,
+                       radius,
+                       position.x * depthScale,
+                       position.y * depthScale,
+                       trackingColor);
         }
     }
 
@@ -139,7 +138,6 @@ public:
     }
 
 private:
-    sensekit::DepthStream m_depthStream{nullptr};
     long double m_frameDuration{ 0 };
     std::clock_t m_lastTimepoint { 0 };
     sf::Texture m_texture;
@@ -149,6 +147,7 @@ private:
     BufferPtr m_displayBuffer{ nullptr };
 
     std::vector<sensekit::Skeleton> m_skeletons;
+    std::vector<sensekit::Vector3f> m_jointPositions;
 
     int m_depthWidth{0};
     int m_depthHeight{0};

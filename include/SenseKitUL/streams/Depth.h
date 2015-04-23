@@ -5,6 +5,7 @@
 #include <SenseKitUL/skul_ctypes.h>
 #include <SenseKitUL/streams/depth_capi.h>
 #include <SenseKitUL/streams/Image.h>
+#include <SenseKitUL/Vector.h>
 
 namespace sensekit {
 
@@ -14,6 +15,30 @@ namespace sensekit {
         CoordinateMapper(sensekit_depthstream_t depthStream)
             : m_depthStream(depthStream)
         { }
+
+        Vector3f convert_depth_to_world(sensekit::Vector3f depthPosition) const
+        {
+            float worldX, worldY, worldZ;
+            sensekit_convert_depth_to_world(m_depthStream,
+                                            depthPosition.x,
+                                            depthPosition.y,
+                                            depthPosition.z,
+                                            &worldX, &worldY, &worldZ);
+
+            return Vector3f(worldX, worldY, worldZ);
+        }
+
+        Vector3f convert_world_to_depth(Vector3f worldPosition) const
+        {
+            float depthX, depthY, depthZ;
+            sensekit_convert_world_to_depth(m_depthStream,
+                                            worldPosition.x,
+                                            worldPosition.y,
+                                            worldPosition.z,
+                                            &depthX, &depthY, &depthZ);
+
+            return Vector3f(depthX, depthY, depthZ);
+        }
 
         void convert_depth_to_world(float  depthX, float  depthY, float  depthZ,
                                     float* worldX, float* worldY, float* worldZ) const
@@ -45,7 +70,7 @@ namespace sensekit {
 
         static const sensekit_stream_type_t id = SENSEKIT_STREAM_DEPTH;
 
-        const CoordinateMapper& get_coordinateMapper() const { return m_coordinateMapper; };
+        const CoordinateMapper& coordinateMapper() const { return m_coordinateMapper; };
 
         float horizontalFieldOfView()
         {
@@ -71,9 +96,16 @@ namespace sensekit {
     class DepthFrame : public ImageFrame<int16_t>
     {
     public:
-        DepthFrame(sensekit_reader_frame_t readerFrame, sensekit_stream_subtype_t subtype)
-            : ImageFrame(readerFrame, SENSEKIT_STREAM_DEPTH, subtype)
+        DepthFrame(sensekit_reader_frame_t readerFrame,
+                   sensekit_stream_subtype_t subtype)
+            : ImageFrame(readerFrame, SENSEKIT_STREAM_DEPTH, subtype),
+              m_coordinateMapper(streamHandle())
         { }
+
+        const CoordinateMapper& coordinateMapper() const { return m_coordinateMapper; };
+
+    private:
+         CoordinateMapper m_coordinateMapper;
     };
 }
 

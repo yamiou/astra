@@ -51,7 +51,7 @@ namespace sensekit { namespace plugins { namespace hand {
             m_depthStream = m_reader.stream<DepthStream>(depthDescription.get_subtype());
             m_depthStream.start();
 
-            m_mapper = std::make_unique<ScalingCoordinateMapper>(m_depthStream.get_coordinateMapper(), 1.0f);
+            m_mapper = std::make_unique<ScalingCoordinateMapper>(m_depthStream.coordinateMapper(), 1.0f);
             m_pointProcessor = std::make_unique<PointProcessor>(*(m_mapper.get()));
 
             m_reader.addListener(*this);
@@ -132,7 +132,7 @@ namespace sensekit { namespace plugins { namespace hand {
             segmentation::calculate_basic_score(matDepth, m_matScore, heightFactor, depthFactor, *(m_mapper.get()));
             segmentation::calculate_segment_area(matDepth, m_matArea, *(m_mapper.get()));
 
-            
+
             TrackingMatrices matrices(matDepth, m_matArea, m_matScore, matForeground, m_layerSegmentation, m_debugUpdateSegmentation, m_debugSearched);
 
             m_pointProcessor->updateTrackedPoints(matrices);

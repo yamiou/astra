@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define MAX_STRING_FIELD_LENGTH 256
 const uint8_t SENSEKIT_MAX_READER_STREAMS = 16;
 
 const int SENSEKIT_TIMEOUT_FOREVER = -1;
@@ -50,14 +49,6 @@ typedef enum {
     SENSEKIT_STATUS_TIMEOUT = 3,
     SENSEKIT_STATUS_INVALID_PARAMETER_TOKEN = 4
 } sensekit_status_t;
-
-typedef struct {
-    char uri[MAX_STRING_FIELD_LENGTH];
-    char vendor[MAX_STRING_FIELD_LENGTH];
-    char name[MAX_STRING_FIELD_LENGTH];
-    uint16_t usbVendorId;
-    uint16_t usbProductId;
-} sensekit_device_desc_t;
 
 typedef size_t sensekit_callback_id_t;
 
