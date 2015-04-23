@@ -33,7 +33,7 @@ public:
         m_lastTimepoint = newTimepoint;
         double fps = 1.0 / m_frameDuration;
 
-        printf("FPS: %3.1f (%3.4f ms)\n", fps, m_frameDuration * 1000);
+        printf("FPS: %3.1f (%3.4Lf ms)\n", fps, m_frameDuration * 1000);
     }
 
     void processDepth(sensekit::Frame& frame)
@@ -90,7 +90,7 @@ public:
                 int index = (x + y * width);
                 int index4 = index * 4;
                 sensekit::RGBPixel rgb = imagePtr[index];
-                
+
                 m_displayBuffer[index4] = rgb.r;
                 m_displayBuffer[index4 + 1] = rgb.g;
                 m_displayBuffer[index4 + 2] = rgb.b;
@@ -277,7 +277,7 @@ int main(int argc, char** argv)
             {
                 window.close();
             }
-            if (event.type == sf::Event::KeyPressed) 
+            if (event.type == sf::Event::KeyPressed)
             {
                 if (event.key.code == sf::Keyboard::Escape)
                 {

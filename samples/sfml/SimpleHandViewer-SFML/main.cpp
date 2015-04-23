@@ -33,7 +33,7 @@ public:
         m_lastTimepoint = newTimepoint;
         double fps = 1.0 / m_frameDuration;
 
-        printf("FPS: %3.1f (%3.4f ms)\n", fps, m_frameDuration * 1000);
+        printf("FPS: %3.1f (%3.4Lf ms)\n", fps, m_frameDuration * 1000);
     }
 
     void processDepth(sensekit::Frame& frame)
@@ -52,10 +52,10 @@ public:
             {
                 int index = (x + y * width);
                 int index4 = index * 4;
-                
+
                 int16_t depth = depthPtr[index];
                 uint8_t value = depth % 255;
-                
+
                 m_displayBuffer[index4] = value;
                 m_displayBuffer[index4 + 1] = value;
                 m_displayBuffer[index4 + 2] = value;
