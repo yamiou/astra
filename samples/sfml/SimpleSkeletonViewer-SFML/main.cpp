@@ -164,7 +164,7 @@ int main(int argc, char** argv)
 {
     sensekit::SenseKit::initialize();
 
-    sf::RenderWindow window(sf::VideoMode(1280, 960), "Hand Viewer");
+    sf::RenderWindow window(sf::VideoMode(1280, 960), "Skeleton Viewer");
 
     sensekit::Sensor sensor;
     sensekit::StreamReader reader = sensor.create_reader();
