@@ -1,4 +1,4 @@
-SenseKit SDK v0.1.3 for Windows
+SenseKit SDK v0.1.4 for Windows
 Copyright (c) 2015 Orbbec
 
 ALPHA - NOT FOR PUBLIC DISTRIBUTION
@@ -7,6 +7,8 @@ josh@orbbec3d.com
 
 What's New
 ==========
+
+v0.1.4 2015/04/24 Internal reorganization, bug fixes, consistency. Improved debug hand viewer visualizations. Initial re-work of coordinate mapper. Arranged files to support additional plugin development.
 
 v0.1.3 2015/04/21 More fixes in VS2013 project generation - should be good now. Hand tracker now works, and there is now a debug hand viewer sample/tool. Push number keys (above the letters, not numpad) 1-5 to see different visualization modes: Depth, Velocity, Filtered velocity, Segmentation, Score. Various clean up of the SDK header files. Various bug fixes. Get/set parameter mechanism is working. Preliminary logging has been added. A log file is generated in the logs/ directory under the exe working directory.
 
@@ -66,7 +68,7 @@ To exit samples with a GUI window, simply close the window.
 Known issues
 ==========
 1) Hand tracking works but at the moment only shows a single hand point. The hand point is also aliased
-to the nearest 40x30 coordinate. This is all being investigated currently.
+to the nearest 80x60 coordinate. This is all being investigated currently.
 
 2) There isn't an error message if no sensor is found or plugged in. (But, it doesn't crash!) You can 
 plug in a sensor after the program starts and it should detect it and continue. 

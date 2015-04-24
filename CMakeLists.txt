@@ -6,7 +6,7 @@ project (SenseKit)
 string (TIMESTAMP BUILD_DATE "%Y%m%dT%H%M%SZ" UTC)
 set (SenseKit_VERSION_MAJOR 0)
 set (SenseKit_VERSION_MINOR 1)
-set (SenseKit_VERSION_PATCH 3)
+set (SenseKit_VERSION_PATCH 4)
 set (SenseKit_VERSION_BUILD 0)
 
 if (NOT WIN32)
@@ -47,7 +47,7 @@ MESSAGE("CMAKE_INSTALL_PREFIX : ${CMAKE_INSTALL_PREFIX}")
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include
   DESTINATION .
   FILES_MATCHING PATTERN "*.h"
-  PATTERN "include/SenseKit/Plugins"
+#  PATTERN "include/SenseKit/Plugins" EXCLUDE
   PATTERN "include/SenseKitUL/Plugins" EXCLUDE
   )
 
@@ -61,6 +61,10 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
   DESTINATION samples
   PATTERN "build" EXCLUDE
   PATTERN ".gitignore" EXCLUDE
+  )
+
+install(FILES ${PROJECT_SOURCE_DIR}/samples-aux/README.txt
+  DESTINATION .
   )
 
 if (MSVC)
