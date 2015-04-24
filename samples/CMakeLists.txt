@@ -34,3 +34,5 @@ add_subdirectory(gl)
 add_subdirectory(sfml)
 add_subdirectory(tools)
 add_subdirectory(plugins)
+
+add_dependencies(SimpleSkeletonViewer-SFML orbbec_skeleton)
