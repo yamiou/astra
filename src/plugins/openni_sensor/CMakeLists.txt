@@ -1,4 +1,4 @@
-set (_projname "OpenNIPlugin")
+set (_projname "openni_sensor")
 
 set(${_projname}_SOURCES
   OpenNIPlugin.cpp

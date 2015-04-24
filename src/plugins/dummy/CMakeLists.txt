@@ -1,4 +1,4 @@
-set (_projname "DummyPlugin")
+set (_projname "dummy_plugin")
 
 set (${_projname}_SOURCES
   DummyPlugin.h
