@@ -188,6 +188,10 @@ namespace sensekit { namespace plugins { namespace hand {
                         {
                             nextSearchStart.x = 0;
                             nextSearchStart.y = y + 1;
+                            if (nextSearchStart.y >= height)
+                            {
+                                return false;
+                            }
                         }
                         return true;
                     }
