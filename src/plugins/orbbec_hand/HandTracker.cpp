@@ -121,10 +121,11 @@ namespace sensekit { namespace plugins { namespace hand {
             m_matScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             //cv::Mat matEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_matArea = cv::Mat::zeros(matDepth.size(), CV_32FC1);
+            m_layerSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_debugUpdateSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_debugCreateSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
-            m_layerSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
-            m_debugSearched = cv::Mat::zeros(matDepth.size(), CV_8UC1);
+            m_debugUpdateSearched = cv::Mat::zeros(matDepth.size(), CV_8UC1);
+            m_debugCreateSearched = cv::Mat::zeros(matDepth.size(), CV_8UC1);
 
             float heightFactor = 1;
             float depthFactor = 1.5;
@@ -133,13 +134,13 @@ namespace sensekit { namespace plugins { namespace hand {
             segmentation::calculate_segment_area(matDepth, m_matArea, *(m_mapper.get()));
 
 
-            TrackingMatrices matrices(matDepth, m_matArea, m_matScore, matForeground, m_layerSegmentation, m_debugUpdateSegmentation, m_debugSearched);
+            TrackingMatrices updateMatrices(matDepth, m_matArea, m_matScore, matForeground, m_layerSegmentation, m_debugUpdateSegmentation, m_debugUpdateSearched);
 
-            m_pointProcessor->updateTrackedPoints(matrices);
+            m_pointProcessor->updateTrackedPoints(updateMatrices);
 
             m_pointProcessor->removeDuplicatePoints();
 
-            TrackingMatrices createMatrices(matDepth, m_matArea, m_matScore, matForeground, m_layerSegmentation, m_debugCreateSegmentation, m_debugSearched);
+            TrackingMatrices createMatrices(matDepth, m_matArea, m_matScore, matForeground, m_layerSegmentation, m_debugCreateSegmentation, m_debugCreateSearched);
 
             //add new points (unless already tracking)
             if (!m_debugImageStream->use_mouse_probe())
@@ -309,6 +310,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                       m_debugCreateSegmentation,
                                                       colorFrame);
                 break;
+            case DEBUG_HAND_VIEW_UPDATE_SEARCHED:
             case DEBUG_HAND_VIEW_CREATE_SEARCHED:
                 m_debugVisualizer.showDepthMat(m_matDepth,
                                                colorFrame);
@@ -332,7 +334,11 @@ namespace sensekit { namespace plugins { namespace hand {
 
             if (view == DEBUG_HAND_VIEW_CREATE_SEARCHED)
             {
-                m_debugVisualizer.overlayMask(m_debugSearched, colorFrame, searchedColor);
+                m_debugVisualizer.overlayMask(m_debugCreateSearched, colorFrame, searchedColor);
+            }
+            else if (view == DEBUG_HAND_VIEW_UPDATE_SEARCHED)
+            {
+                m_debugVisualizer.overlayMask(m_debugUpdateSearched, colorFrame, searchedColor);
             }
 
             m_debugVisualizer.overlayMask(m_matForeground, colorFrame, foregroundColor);
