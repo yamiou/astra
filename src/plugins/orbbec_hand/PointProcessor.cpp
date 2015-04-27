@@ -237,16 +237,22 @@ namespace sensekit { namespace plugins { namespace hand {
 
         bool validPointArea = isValidPointArea(matrices, targetPoint);
 
-        if (validPointArea)
+        if (targetPoint.x != -1 && targetPoint.y != -1 && validPointArea)
         {
             bool existingPoint = false;
+            
+            float depth = matrices.depth.at<float>(targetPoint);
+
+            cv::Point3f worldPosition = m_mapper.convert_depth_to_world(targetPoint.x, 
+                                                                                   targetPoint.y, 
+                                                                                   depth);
 
             for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
             {
                 TrackedPoint& tracked = *iter;
                 if (tracked.m_status != TrackingStatus::Dead)
                 {
-                    float dist = cv::norm(tracked.m_position - targetPoint);
+                    float dist = cv::norm(tracked.m_worldPosition - worldPosition);
                     float maxDist = m_maxMatchDistDefault;
                     if (tracked.m_type == TrackedPointType::ActivePoint && tracked.m_status == TrackingStatus::Lost)
                     {
@@ -263,10 +269,6 @@ namespace sensekit { namespace plugins { namespace hand {
             }
             if (!existingPoint)
             {
-                float depth = matrices.depth.at<float>(targetPoint);
-
-                cv::Point3f worldPosition = m_mapper.convert_depth_to_world(targetPoint.x, targetPoint.y, depth);
-
                 TrackedPoint newPoint(targetPoint, worldPosition, m_nextTrackingId);
                 newPoint.m_type = TrackedPointType::CandidatePoint;
                 newPoint.m_status = TrackingStatus::Tracking;
