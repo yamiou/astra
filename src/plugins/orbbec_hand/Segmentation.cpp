@@ -5,6 +5,7 @@
 #include <opencv2/opencv.hpp>
 
 #define MAX_DEPTH 10000
+
 namespace sensekit { namespace plugins { namespace hand {
 
     namespace segmentation {
@@ -25,7 +26,8 @@ namespace sensekit { namespace plugins { namespace hand {
 
         static void segment_foreground(TrackingData data)
         {
-            const float maxTTL = 250; //mm
+            const float maxSegmentationDist = data.maxSegmentationDist;
+            SegmentationForegroundPolicy foregroundPolicy = data.foregroundPolicy;
             float seedDepth = data.matrices.depth.at<float>(data.seedPosition);
             cv::Mat& depthMatrix = data.matrices.depth;
             cv::Mat& foregroundMatrix = data.matrices.foreground;
@@ -42,7 +44,7 @@ namespace sensekit { namespace plugins { namespace hand {
             bool seedInRange = seedDepth != 0 && seedDepth < maxDepth;
             bool anyInRange = seedInRange;
 
-            pointQueue.push(PointTTL(data.seedPosition, maxTTL, seedInRange));
+            pointQueue.push(PointTTL(data.seedPosition, maxSegmentationDist, seedInRange));
 
             cv::Mat matVisited = cv::Mat::zeros(depthMatrix.size(), CV_8UC1);
 
@@ -59,9 +61,10 @@ namespace sensekit { namespace plugins { namespace hand {
                 float ttl = pt.m_ttl;
                 bool pathInRange = pt.m_pathInRange;
 
-                if (foregroundMatrix.at<char>(p) == PixelType::Foreground)
+                if (foregroundPolicy == FG_POLICY_RESET_TTL &&
+                    foregroundMatrix.at<char>(p) == PixelType::Foreground)
                 {
-                    ttl = maxTTL;
+                    ttl = maxSegmentationDist;
                 }
                 if (ttl > 0)
                 {

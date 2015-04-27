@@ -26,6 +26,12 @@ namespace sensekit { namespace plugins { namespace hand {
         Dead
     };
 
+    enum SegmentationForegroundPolicy
+    {
+        FG_POLICY_IGNORE = 0,
+        FG_POLICY_RESET_TTL = 1
+    };
+
     struct TrackingMatrices
     {
         cv::Mat& depth;
@@ -64,19 +70,25 @@ namespace sensekit { namespace plugins { namespace hand {
         const float bandwidthDepth;
         const TrackedPointType pointType;
         const int iterationMax;
+        const float maxSegmentationDist;
+        const SegmentationForegroundPolicy foregroundPolicy;
 
         TrackingData(TrackingMatrices& matrices,
                      const cv::Point& seedPosition,
                      const float referenceDepth,
                      const float bandwidthDepth,
                      const TrackedPointType pointType,
-                     const int iterationMax)
+                     const int iterationMax,
+                     const float maxSegmentationDist,
+                     const SegmentationForegroundPolicy foregroundPolicy)
             : matrices(matrices),
               seedPosition(seedPosition),
               referenceDepth(referenceDepth),
               bandwidthDepth(bandwidthDepth),
               pointType(pointType),
-              iterationMax(iterationMax)
+              iterationMax(iterationMax),
+              maxSegmentationDist(maxSegmentationDist),
+              foregroundPolicy(foregroundPolicy)
         {}
     };
 }}}

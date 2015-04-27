@@ -15,7 +15,8 @@ namespace sensekit { namespace plugins { namespace hand {
         m_minArea(5000),            //mm^2
         m_maxArea(20000),           //mm^2
         m_areaBandwidth(150),       //mm
-        m_areaBandwidthDepth(100)   //mm
+        m_areaBandwidthDepth(100),  //mm
+        m_maxSegmentationDist(250)  //mm
     {}
 
     PointProcessor::~PointProcessor()
@@ -47,7 +48,14 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Point seedPosition = trackedPoint.m_position;
         float referenceDepth = trackedPoint.m_worldPosition.z;
 
-        TrackingData updateTrackingData(matrices, seedPosition, referenceDepth, m_trackingBandwidthDepth, trackedPoint.m_type, m_iterationMaxTracking);
+        TrackingData updateTrackingData(matrices, 
+                                        seedPosition, 
+                                        referenceDepth, 
+                                        m_trackingBandwidthDepth, 
+                                        trackedPoint.m_type, 
+                                        m_iterationMaxTracking,
+                                        m_maxSegmentationDist,
+                                        FG_POLICY_IGNORE);
 
         cv::Point newTargetPoint = segmentation::converge_track_point_from_seed(updateTrackingData);
 
@@ -65,7 +73,14 @@ namespace sensekit { namespace plugins { namespace hand {
             seedPosition.y = MAX(0, MIN(height - 1, static_cast<int>(estimatedPosition.y)));
             referenceDepth = estimatedPosition.z;
 
-            TrackingData recoverTrackingData(matrices, seedPosition, referenceDepth, m_initialBandwidthDepth, trackedPoint.m_type, m_iterationMaxTracking);
+            TrackingData recoverTrackingData(matrices, 
+                                             seedPosition, 
+                                             referenceDepth, 
+                                             m_initialBandwidthDepth, 
+                                             trackedPoint.m_type, 
+                                             m_iterationMaxTracking,
+                                             m_maxSegmentationDist,
+                                             FG_POLICY_IGNORE);
 
             newTargetPoint = segmentation::converge_track_point_from_seed(recoverTrackingData);
             validateAndUpdateTrackedPoint(matrices, trackedPoint, newTargetPoint);
@@ -231,7 +246,14 @@ namespace sensekit { namespace plugins { namespace hand {
                                                                             const cv::Point& seedPosition)
     {
         float seedDepth = matrices.depth.at<float>(seedPosition);
-        TrackingData trackingData(matrices, seedPosition, seedDepth, m_initialBandwidthDepth, TrackedPointType::CandidatePoint, m_iterationMaxInitial);
+        TrackingData trackingData(matrices, 
+                                  seedPosition, 
+                                  seedDepth, 
+                                  m_initialBandwidthDepth, 
+                                  TrackedPointType::CandidatePoint, 
+                                  m_iterationMaxInitial,
+                                  m_maxSegmentationDist,
+                                  FG_POLICY_RESET_TTL);
 
         cv::Point targetPoint = segmentation::converge_track_point_from_seed(trackingData);
 
