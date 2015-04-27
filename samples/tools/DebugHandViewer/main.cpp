@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <Sensekit/SenseKit.h>
 #include <SensekitUL/SenseKitUL.h>
+#include <sstream>
 
 class HandDebugFrameListener : public sensekit::FrameReadyListener
 {
@@ -31,7 +32,7 @@ public:
     {
         double fpsFactor = 0.02;
 
-        std::clock_t newTimepoint= std::clock();
+        std::clock_t newTimepoint = std::clock();
         long double frameDuration = (newTimepoint - m_lastTimepoint) / static_cast<long double>(CLOCKS_PER_SEC);
 
         m_frameDuration = frameDuration * fpsFactor + m_frameDuration * (1 - fpsFactor);
@@ -55,16 +56,16 @@ public:
         const int16_t* depthPtr = depthFrame.data();
         for(int y = 0; y < height; y++)
         {
-            for(int x = 0; x < width; x++)
-            {
-                int index = (x + y * width);
-                int16_t depth = depthPtr[index];
-                uint8_t value = depth % 255;
-                m_displayBuffer[index * 4] = value;
-                m_displayBuffer[index * 4 + 1] = value;
-                m_displayBuffer[index * 4 + 2] = value;
-                m_displayBuffer[index * 4 + 3] = 255;
-            }
+        for(int x = 0; x < width; x++)
+        {
+        int index = (x + y * width);
+        int16_t depth = depthPtr[index];
+        uint8_t value = depth % 255;
+        m_displayBuffer[index * 4] = value;
+        m_displayBuffer[index * 4 + 1] = value;
+        m_displayBuffer[index * 4 + 2] = value;
+        m_displayBuffer[index * 4 + 3] = 255;
+        }
         }
 
         m_texture.update(m_displayBuffer.get());
@@ -107,16 +108,16 @@ public:
     }
 
     virtual void on_frame_ready(sensekit::StreamReader& reader,
-                                sensekit::Frame& frame) override
-        {
-            processDepth(frame);
-            processHandFrame(frame);
-            processDebugHandFrame(frame);
+        sensekit::Frame& frame) override
+    {
+        processDepth(frame);
+        processHandFrame(frame);
+        processDebugHandFrame(frame);
 
-            m_viewType = reader.stream<sensekit::DebugHandStream>().get_view_type();
+        m_viewType = reader.stream<sensekit::DebugHandStream>().get_view_type();
 
-            check_fps();
-        }
+        check_fps();
+    }
 
     void drawCircle(sf::RenderWindow& window, float radius, float x, float y, sf::Color color)
     {
@@ -140,11 +141,12 @@ public:
         for (auto handPoint : m_handPoints)
         {
             sf::Color& color = trackingColor;
-            if (handPoint.status() == HAND_STATUS_LOST)
+            sensekit_handstatus_t status = handPoint.status();
+            if (status == HAND_STATUS_LOST)
             {
                 color = lostColor;
             }
-            else if (handPoint.status() == HAND_STATUS_CANDIDATE)
+            else if (status == HAND_STATUS_CANDIDATE)
             {
                 color = candidateColor;
             }
@@ -154,15 +156,27 @@ public:
             float circleX = (p.x + 0.5) * depthScale;
             float circleY = (p.y + 0.5) * depthScale;
             drawCircle(window, radius, circleX, circleY, color);
+
+            int32_t trackingId = handPoint.trackingId();
+            std::stringstream str;
+            str << trackingId;
+            sf::Text label(str.str(), m_font);
+            int characterSize = 60;
+            label.setCharacterSize(characterSize);
+
+            auto bounds = label.getLocalBounds();
+            label.setOrigin(bounds.left + bounds.width / 2.0, characterSize);
+            drawShadowText(window, label, sf::Color::White, circleX, circleY - radius - 10);
         }
     }
 
-    void drawShadowText(sf::RenderWindow& window, sf::Text& text, int x, int y)
+    void drawShadowText(sf::RenderWindow& window, sf::Text& text, sf::Color color, int x, int y)
     {
+        text.setColor(sf::Color::Black);
         text.setPosition(x + 5, y + 5);
         window.draw(text);
 
-        text.setColor(sf::Color::White);
+        text.setColor(color);
         text.setPosition(x, y);
         window.draw(text);
     }
@@ -200,7 +214,7 @@ public:
             break;
         }
     }
-    
+
     void drawDebugViewName(sf::RenderWindow& window)
     {
         std::string viewName = getViewName(m_viewType);
@@ -208,12 +222,11 @@ public:
         int characterSize = 60;
         text.setCharacterSize(characterSize);
         text.setStyle(sf::Text::Bold);
-        text.setColor(sf::Color::Black);
 
-        int x = 10; 
+        int x = 10;
         int y = window.getSize().y - 20 - characterSize;
 
-        drawShadowText(window, text, x, y);
+        drawShadowText(window, text, sf::Color::White, x, y);
     }
 
     void drawTo(sf::RenderWindow& window)
@@ -235,13 +248,13 @@ public:
 
 private:
     long double m_frameDuration{ 0 };
-    std::clock_t m_lastTimepoint { 0 };
+    std::clock_t m_lastTimepoint{ 0 };
     sf::Texture m_texture;
     sf::Sprite m_sprite;
 
     sf::Font m_font;
 
-    using BufferPtr = std::unique_ptr < uint8_t[] >;
+    using BufferPtr = std::unique_ptr < uint8_t[] > ;
     BufferPtr m_displayBuffer{ nullptr };
     BufferPtr m_debugBuffer{ nullptr };
 
@@ -249,8 +262,8 @@ private:
     sensekit::DebugHandViewType m_viewType;
     int m_depthWidth{ 1 };
     int m_depthHeight{ 1 };
-    int m_displayWidth { 1 };
-    int m_displayHeight { 1 };
+    int m_displayWidth{ 1 };
+    int m_displayHeight{ 1 };
 };
 
 void request_view_mode(sensekit::StreamReader& reader, sensekit::DebugHandViewType view)
