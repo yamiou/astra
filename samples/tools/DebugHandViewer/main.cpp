@@ -11,6 +11,9 @@ public:
         m_font.loadFromFile("Inconsolata.otf");
     }
 
+    HandDebugFrameListener(const HandDebugFrameListener&) = delete;
+    HandDebugFrameListener& operator=(const HandDebugFrameListener&) = delete;
+
     void init_texture(int width, int height)
     {
         if (m_displayBuffer == nullptr || width != m_displayWidth || height != m_displayHeight)
@@ -39,7 +42,10 @@ public:
         m_lastTimepoint = newTimepoint;
         double fps = 1.0 / m_frameDuration;
 
-        printf("FPS: %3.1f (%3.4Lf ms)\n", fps, m_frameDuration * 1000);
+        if (m_outputFPS)
+        {
+            printf("FPS: %3.1f (%3.4Lf ms)\n", fps, m_frameDuration * 1000);
+        }
     }
 
     void processDepth(sensekit::Frame& frame)
@@ -249,6 +255,10 @@ public:
         }
     }
 
+    void toggle_output_fps()
+    {
+        m_outputFPS = !m_outputFPS;
+    }
 private:
     long double m_frameDuration{ 0 };
     std::clock_t m_lastTimepoint{ 0 };
@@ -258,8 +268,7 @@ private:
     sf::Font m_font;
 
     using BufferPtr = std::unique_ptr < uint8_t[] > ;
-    BufferPtr m_displayBuffer{ nullptr };
-    BufferPtr m_debugBuffer{ nullptr };
+    BufferPtr m_displayBuffer;
 
     std::vector<sensekit::HandPoint> m_handPoints;
     sensekit::DebugHandViewType m_viewType;
@@ -267,6 +276,7 @@ private:
     int m_depthHeight{ 1 };
     int m_displayWidth{ 1 };
     int m_displayHeight{ 1 };
+    bool m_outputFPS{ true };
 };
 
 void request_view_mode(sensekit::StreamReader& reader, sensekit::DebugHandViewType view)
@@ -293,8 +303,12 @@ void toggle_mouse_probe(sensekit::StreamReader& reader)
     reader.stream<sensekit::DebugHandStream>().set_use_mouse_probe(g_mouseProbe);
 }
 
-void process_key_input(sensekit::StreamReader& reader, sf::Event::KeyEvent key)
+void process_key_input(sensekit::StreamReader& reader, HandDebugFrameListener& listener, sf::Event::KeyEvent key)
 {
+    if (key.code == sf::Keyboard::F)
+    {
+        listener.toggle_output_fps();
+    }
     if (key.code == sf::Keyboard::Num1)
     {
         request_view_mode(reader, DEBUG_HAND_VIEW_DEPTH);
@@ -376,7 +390,7 @@ int main(int argc, char** argv)
                 }
                 else
                 {
-                    process_key_input(reader, event.key);
+                    process_key_input(reader, listener, event.key);
                 }
             }
             else if (event.type == sf::Event::MouseMoved)
