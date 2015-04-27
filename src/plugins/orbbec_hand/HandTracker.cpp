@@ -147,7 +147,7 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 cv::Point seedPosition;
                 cv::Point nextSearchStart(0, 0);
-                while (segmentation::find_next_foreground_pixel(matForeground, seedPosition, nextSearchStart))
+                while (segmentation::find_next_foreground_pixel(matForeground, m_debugCreateSearched, seedPosition, nextSearchStart))
                 {
                     m_pointProcessor->updateTrackedPointOrCreateNewPointFromSeedPosition(createMatrices, seedPosition);
                 }

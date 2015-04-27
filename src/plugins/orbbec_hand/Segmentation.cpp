@@ -160,9 +160,12 @@ namespace sensekit { namespace plugins { namespace hand {
         }
 
         bool find_next_foreground_pixel(cv::Mat& foregroundMatrix,
+                                        cv::Mat& searchedMatrix,
                                         cv::Point& foregroundPosition,
                                         cv::Point& nextSearchStart)
         {
+            assert(foregroundMatrix.cols == searchedMatrix.cols);
+            assert(foregroundMatrix.rows == searchedMatrix.rows);
             int width = foregroundMatrix.cols;
             int height = foregroundMatrix.rows;
 
@@ -173,8 +176,9 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 for (int x = startX; x < width; x++)
                 {
-                    char foreground = *foregroundMatrix.ptr<char>(y, x);
-                    if (foreground == PixelType::Foreground)
+                    uint8_t foreground = *foregroundMatrix.ptr<uint8_t>(y, x);
+                    uint8_t searched = *searchedMatrix.ptr<uint8_t>(y, x);
+                    if (foreground == PixelType::Foreground && searched != PixelType::Searched)
                     {
                         foregroundPosition.x = x;
                         foregroundPosition.y = y;

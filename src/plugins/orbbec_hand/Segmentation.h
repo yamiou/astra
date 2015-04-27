@@ -11,6 +11,7 @@ namespace sensekit { namespace plugins { namespace hand {
     namespace segmentation {
 
         bool find_next_foreground_pixel(cv::Mat& foregroundMatrix,
+                                        cv::Mat& searchedMatrix,
                                         cv::Point& foregroundPosition, 
                                         cv::Point& nextSearchStart);
 
