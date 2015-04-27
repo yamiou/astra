@@ -118,11 +118,6 @@ namespace sensekit { namespace plugins { namespace hand {
                                                                m_areaBandwidthDepth,
                                                                m_mapper);
 
-            if (dist > m_maxJumpDist)
-            {
-                printf("jump\n");
-            }
-
             if (dist < m_maxJumpDist && area > m_minArea && area < m_maxArea)
             {
                 updatedPoint = true;
@@ -243,10 +238,15 @@ namespace sensekit { namespace plugins { namespace hand {
     void PointProcessor::updateTrackedPointOrCreateNewPointFromSeedPosition(TrackingMatrices& matrices,
                                                                             const cv::Point& seedPosition)
     {
-        float seedDepth = matrices.depth.at<float>(seedPosition);
+        float referenceDepth = matrices.depth.at<float>(seedPosition);
+        if (referenceDepth == 0)
+        {
+            //Cannot expect to properly segment when the seedPosition has zero depth
+            return;
+        }
         TrackingData trackingData(matrices, 
                                   seedPosition, 
-                                  seedDepth, 
+                                  referenceDepth, 
                                   m_initialBandwidthDepth, 
                                   TrackedPointType::CandidatePoint, 
                                   m_iterationMaxInitial,

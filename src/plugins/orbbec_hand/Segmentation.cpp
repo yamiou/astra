@@ -61,17 +61,24 @@ namespace sensekit { namespace plugins { namespace hand {
                 float ttl = pt.m_ttl;
                 bool pathInRange = pt.m_pathInRange;
 
+                //Some other path has come ashore first, so cut off this path's exploration
+                bool rejectedOutOfRangePath = !pathInRange && anyInRange;
+
                 if (foregroundPolicy == FG_POLICY_RESET_TTL &&
                     foregroundMatrix.at<char>(p) == PixelType::Foreground)
                 {
                     ttl = maxSegmentationDist;
                 }
-                if (ttl > 0)
+                if (ttl > 0 && !rejectedOutOfRangePath)
                 {
                     searchedMatrix.at<char>(p) = PixelType::Searched;
 
                     float depth = depthMatrix.at<float>(p);
                     bool pointInRange = depth != 0 && depth < maxDepth;
+                    
+                    //Keep exploring this pixel's neighbors if: TTL > 0 and
+                    // either this point is in range, or
+                    // the path has not been in range yet
                     if (ttl > 0 && (!pathInRange || pointInRange))
                     {
                         //If active tracking, then must be in range to decrement TTL.
