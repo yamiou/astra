@@ -278,7 +278,7 @@ namespace sensekit { namespace plugins { namespace hand {
         {
             float m_maxVelocity = 0.1;
 
-            RGBPixel foregroundColor(255, 0, 0);
+            RGBPixel foregroundColor(0, 0, 255);
             RGBPixel searchedColor(128, 255, 0);
 
             DebugHandViewType view = m_debugImageStream->view_type();

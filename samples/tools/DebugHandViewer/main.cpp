@@ -5,6 +5,11 @@
 class HandDebugFrameListener : public sensekit::FrameReadyListener
 {
 public:
+    HandDebugFrameListener()
+    {
+        m_font.loadFromFile("Inconsolata.otf");
+    }
+
     void init_texture(int width, int height)
     {
         if (m_displayBuffer == nullptr || width != m_displayWidth || height != m_displayHeight)
@@ -108,6 +113,8 @@ public:
             processHandFrame(frame);
             processDebugHandFrame(frame);
 
+            m_viewType = reader.stream<sensekit::DebugHandStream>().get_view_type();
+
             check_fps();
         }
 
@@ -149,6 +156,66 @@ public:
             drawCircle(window, radius, circleX, circleY, color);
         }
     }
+
+    void drawShadowText(sf::RenderWindow& window, sf::Text& text, int x, int y)
+    {
+        text.setPosition(x + 5, y + 5);
+        window.draw(text);
+
+        text.setColor(sf::Color::White);
+        text.setPosition(x, y);
+        window.draw(text);
+    }
+
+    std::string getViewName(sensekit::DebugHandViewType viewType)
+    {
+        switch (viewType)
+        {
+        case DEBUG_HAND_VIEW_DEPTH:
+            return "Depth";
+            break;
+        case DEBUG_HAND_VIEW_VELOCITY:
+            return "Velocity";
+            break;
+        case DEBUG_HAND_VIEW_FILTEREDVELOCITY:
+            return "Filtered velocity";
+            break;
+        case DEBUG_HAND_VIEW_UPDATE_SEGMENTATION:
+            return "Update segmentation";
+            break;
+        case DEBUG_HAND_VIEW_CREATE_SEGMENTATION:
+            return "Create segmentation";
+            break;
+        case DEBUG_HAND_VIEW_CREATE_SEARCHED:
+            return "Create searched";
+            break;
+        case DEBUG_HAND_VIEW_SCORE:
+            return "Score";
+            break;
+        case DEBUG_HAND_VIEW_EDGEDISTANCE:
+            return "Edge distance";
+            break;
+        case DEBUG_HAND_VIEW_LOCALAREA:
+            return "Area";
+            break;
+        }
+    }
+    
+    void drawDebugViewName(sf::RenderWindow& window)
+    {
+        std::string viewName = getViewName(m_viewType);
+        sf::Text text(viewName, m_font);
+        int characterSize = 60;
+        text.setCharacterSize(characterSize);
+        text.setStyle(sf::Text::Bold);
+        text.setColor(sf::Color::Black);
+
+        int x = 10; 
+        int y = window.getSize().y - 20 - characterSize;
+
+        drawShadowText(window, text, x, y);
+    }
+
     void drawTo(sf::RenderWindow& window)
     {
         if (m_displayBuffer != nullptr)
@@ -161,6 +228,8 @@ public:
             window.draw(m_sprite);
 
             drawHandPoints(window, depthScale);
+
+            drawDebugViewName(window);
         }
     }
 
@@ -170,12 +239,14 @@ private:
     sf::Texture m_texture;
     sf::Sprite m_sprite;
 
+    sf::Font m_font;
+
     using BufferPtr = std::unique_ptr < uint8_t[] >;
     BufferPtr m_displayBuffer{ nullptr };
     BufferPtr m_debugBuffer{ nullptr };
 
     std::vector<sensekit::HandPoint> m_handPoints;
-
+    sensekit::DebugHandViewType m_viewType;
     int m_depthWidth{ 1 };
     int m_depthHeight{ 1 };
     int m_displayWidth { 1 };
