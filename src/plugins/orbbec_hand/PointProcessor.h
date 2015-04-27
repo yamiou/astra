@@ -28,14 +28,14 @@ namespace sensekit { namespace plugins { namespace hand {
 
         float get_trackingBandwidthDepth() { return m_trackingBandwidthDepth; }
 
-
+        float get_point_area(TrackingMatrices& matrices, const cv::Point& point);
     private:
 
         void updateTrackedPoint(TrackingMatrices& matrices, TrackedPoint& trackedPoint);
         void validateAndUpdateTrackedPoint(TrackingMatrices& matrices,
                                            TrackedPoint& tracked,
                                            const cv::Point& targetPoint);
-        bool isValidPointArea(TrackingMatrices& matrices, cv::Point targetPoint);
+        bool is_valid_point_area(TrackingMatrices& matrices, cv::Point targetPoint);
 
         const ScalingCoordinateMapper& m_mapper;
         float m_trackingBandwidthDepth;

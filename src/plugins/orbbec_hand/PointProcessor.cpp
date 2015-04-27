@@ -40,6 +40,27 @@ namespace sensekit { namespace plugins { namespace hand {
         m_nextTrackingId = 0;
     }
 
+    float PointProcessor::get_point_area(TrackingMatrices& matrices, const cv::Point& point)
+    {
+        float area = segmentation::count_neighborhood_area(matrices.layerSegmentation,
+                                                           matrices.depth,
+                                                           matrices.area,
+                                                           point,
+                                                           m_areaBandwidth,
+                                                           m_areaBandwidthDepth,
+                                                           m_mapper);
+
+        return area;
+    }
+
+    bool PointProcessor::is_valid_point_area(TrackingMatrices& matrices, cv::Point targetPoint)
+    {
+        float area = get_point_area(matrices, targetPoint);
+
+        bool validPointArea = area > m_minArea && area < m_maxArea;
+        return validPointArea;
+    }
+
     void PointProcessor::updateTrackedPoint(TrackingMatrices& matrices, TrackedPoint& trackedPoint)
     {
         const float width = matrices.depth.cols;
@@ -110,15 +131,9 @@ namespace sensekit { namespace plugins { namespace hand {
             auto dist = cv::norm(worldPosition - trackedPoint.m_worldPosition);
             auto steadyDist = cv::norm(worldPosition - trackedPoint.m_steadyWorldPosition);
 
-            float area = segmentation::count_neighborhood_area(matrices.layerSegmentation,
-                                                               matrices.depth,
-                                                               matrices.area,
-                                                               newTargetPoint,
-                                                               m_areaBandwidth,
-                                                               m_areaBandwidthDepth,
-                                                               m_mapper);
+            bool validArea = is_valid_point_area(matrices, newTargetPoint);
 
-            if (dist < m_maxJumpDist && area > m_minArea && area < m_maxArea)
+            if (dist < m_maxJumpDist && validArea)
             {
                 updatedPoint = true;
                 cv::Point3f deltaPosition = worldPosition - trackedPoint.m_worldPosition;
@@ -153,28 +168,6 @@ namespace sensekit { namespace plugins { namespace hand {
         {
             trackedPoint.m_status = TrackingStatus::Lost;
         }
-    }
-
-
-    bool PointProcessor::isValidPointArea(TrackingMatrices& matrices, cv::Point targetPoint)
-    {
-        bool validPointArea = false;
-        if (targetPoint.x != -1 && targetPoint.y != -1)
-        {
-            float area = segmentation::count_neighborhood_area(matrices.layerSegmentation,
-                                                               matrices.depth,
-                                                               matrices.area,
-                                                               targetPoint,
-                                                               m_areaBandwidth,
-                                                               m_areaBandwidthDepth,
-                                                               m_mapper);
-
-            if (area > m_minArea && area < m_maxArea)
-            {
-                validPointArea = true;
-            }
-        }
-        return validPointArea;
     }
 
     void PointProcessor::removeDuplicatePoints()
@@ -255,7 +248,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         cv::Point targetPoint = segmentation::converge_track_point_from_seed(trackingData);
 
-        bool validPointArea = isValidPointArea(matrices, targetPoint);
+        bool validPointArea = is_valid_point_area(matrices, targetPoint);
 
         if (targetPoint.x != -1 && targetPoint.y != -1 && validPointArea)
         {

@@ -159,6 +159,9 @@ namespace sensekit { namespace plugins { namespace hand {
                 int y = MAX(0, MIN(PROCESSING_SIZE_HEIGHT, normPosition.y * PROCESSING_SIZE_HEIGHT));
                 cv::Point seedPosition(x, y);
                 m_pointProcessor->updateTrackedPointOrCreateNewPointFromSeedPosition(createMatrices, seedPosition);
+
+                float area = m_pointProcessor->get_point_area(createMatrices, seedPosition);
+                printf("probe depth: %f area: %f\n", matDepth.at<float>(seedPosition), area);
             }
 
             //remove old points

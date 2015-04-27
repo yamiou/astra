@@ -352,6 +352,12 @@ namespace sensekit { namespace plugins { namespace hand {
                                       const float bandwidthDepth,
                                       const ScalingCoordinateMapper& mapper)
         {
+            if (center.x < 0 || center.y < 0 ||
+                center.x >= depthMatrix.cols || center.y >= depthMatrix.rows)
+            {
+                return 0;
+            }
+
             float startingDepth = depthMatrix.at<float>(center);
 
             cv::Point topLeft = offset_pixel_location_by_mm(mapper, center, -bandwidth, bandwidth, startingDepth);
