@@ -89,12 +89,6 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 printf("Recovered point %d\n", trackedPoint.m_trackingId);
             }
-            else
-            {
-                /*tracked.m_position = seedPosition;
-                  tracked.m_worldPosition = estimatedWorldPosition;
-                  tracked.m_worldDeltaPosition = cv::Point3f();*/
-            }
         }
     }
 
