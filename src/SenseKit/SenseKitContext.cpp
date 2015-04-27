@@ -52,7 +52,7 @@ namespace sensekit {
             os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_update), (FarProc&)pluginFuncs.update);
             pluginFuncs.libHandle = libHandle;
 
-            if (pluginFuncs.isValid())
+            if (pluginFuncs.is_valid())
             {
                 pluginFuncs.initialize(m_pluginServiceProxy);
                 m_pluginList.push_back(pluginFuncs);

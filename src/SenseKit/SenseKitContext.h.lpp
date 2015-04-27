@@ -26,7 +26,7 @@ namespace sensekit {
         update_fn update{nullptr};
         LibHandle libHandle{nullptr};
 
-        bool isValid()
+        bool is_valid()
             {
                 return initialize != nullptr &&
                     terminate != nullptr &&
