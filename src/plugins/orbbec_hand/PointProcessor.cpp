@@ -16,7 +16,9 @@ namespace sensekit { namespace plugins { namespace hand {
         m_maxArea(20000),           //mm^2
         m_areaBandwidth(150),       //mm
         m_areaBandwidthDepth(100),  //mm
-        m_maxSegmentationDist(250)  //mm
+        m_maxSegmentationDist(250), //mm
+        m_steadyDeadBandRadius(150),          //mm
+        m_maxJumpDist(450)          //mm
     {}
 
     PointProcessor::~PointProcessor()
@@ -98,9 +100,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                        const cv::Point& newTargetPoint)
     {
         bool updatedPoint = false;
-        const float steadyDist = 150; //mm
-        const float maxJumpDist = 450; //mm
-
+        
         if (newTargetPoint.x != -1 && newTargetPoint.y != -1)
         {
             float depth = matrices.depth.at<float>(newTargetPoint);
@@ -108,7 +108,7 @@ namespace sensekit { namespace plugins { namespace hand {
             cv::Point3f worldPosition = m_mapper.convert_depth_to_world(newTargetPoint.x, newTargetPoint.y, depth);
 
             auto dist = cv::norm(worldPosition - trackedPoint.m_worldPosition);
-            auto deadbandDist = cv::norm(worldPosition - trackedPoint.m_steadyWorldPosition);
+            auto steadyDist = cv::norm(worldPosition - trackedPoint.m_steadyWorldPosition);
 
             float area = segmentation::count_neighborhood_area(matrices.layerSegmentation,
                                                                matrices.depth,
@@ -118,7 +118,12 @@ namespace sensekit { namespace plugins { namespace hand {
                                                                m_areaBandwidthDepth,
                                                                m_mapper);
 
-            if (dist < maxJumpDist && area > m_minArea && area < m_maxArea)
+            if (dist > m_maxJumpDist)
+            {
+                printf("jump\n");
+            }
+
+            if (dist < m_maxJumpDist && area > m_minArea && area < m_maxArea)
             {
                 updatedPoint = true;
                 cv::Point3f deltaPosition = worldPosition - trackedPoint.m_worldPosition;
@@ -126,7 +131,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 trackedPoint.m_worldDeltaPosition = deltaPosition;
 
                 trackedPoint.m_position = newTargetPoint;
-                if (deadbandDist > steadyDist)
+                if (steadyDist > m_steadyDeadBandRadius)
                 {
                     trackedPoint.m_steadyWorldPosition = worldPosition;
                     trackedPoint.m_inactiveFrameCount = 0;
@@ -143,16 +148,15 @@ namespace sensekit { namespace plugins { namespace hand {
             }
         }
 
-        if (trackedPoint.m_status != TrackingStatus::Dead)
+        assert(trackedPoint.m_status != TrackingStatus::Dead);
+
+        if (updatedPoint)
         {
-            if (updatedPoint)
-            {
-                trackedPoint.m_status = TrackingStatus::Tracking;
-            }
-            else
-            {
-                trackedPoint.m_status = TrackingStatus::Lost;
-            }
+            trackedPoint.m_status = TrackingStatus::Tracking;
+        }
+        else
+        {
+            trackedPoint.m_status = TrackingStatus::Lost;
         }
     }
 

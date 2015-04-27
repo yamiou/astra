@@ -49,6 +49,8 @@ namespace sensekit { namespace plugins { namespace hand {
         float m_areaBandwidth;
         float m_areaBandwidthDepth;
         float m_maxSegmentationDist;
+        float m_steadyDeadBandRadius;
+        float m_maxJumpDist;
 
         int m_nextTrackingId{ 0 };
         //TODO consider std::list<TrackedPoint>
