@@ -256,7 +256,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                      cv::Mat& areaMatrix,
                                      cv::Mat& edgeDistanceMatrix)
         {
-            cv::Mat eroded, temp;
+            cv::Mat eroded;
             cv::Mat crossElement = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
 
             edgeDistanceMatrix = cv::Mat::zeros(segmentationMatrix.size(), CV_32FC1);
@@ -279,13 +279,13 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 //erode makes the image smaller
                 cv::erode(eroded, eroded, crossElement);
-                //accumulate the eroded image to the matGlobalSegmentation buffer
+                //accumulate the eroded image to the edgeDistance buffer
                 cv::add(areaMatrix, edgeDistanceMatrix, edgeDistanceMatrix, eroded, CV_32FC1);
 
                 nonZeroCount = cv::countNonZero(eroded);
                 done = (nonZeroCount == 0);
 
-                //nonZerCount < imageLength guards against image with all 1's, which will never erode
+                //nonZeroCount < imageLength guards against segmentation with all 1's, which will never erode
             } while (!done && nonZeroCount < imageLength && ++iterations < maxIterations);
         }
 

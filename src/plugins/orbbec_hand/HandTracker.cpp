@@ -119,7 +119,7 @@ namespace sensekit { namespace plugins { namespace hand {
             //TODO look at initial points jumping to nearby desk instead of hand, then never leaving
 
             m_matScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-            //cv::Mat matEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
+            m_matEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_matArea = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_layerSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_debugUpdateSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
@@ -162,6 +162,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
                 float area = m_pointProcessor->get_point_area(createMatrices, seedPosition);
                 printf("probe depth: %f area: %f\n", matDepth.at<float>(seedPosition), area);
+                segmentation::calculate_edge_distance(m_debugCreateSegmentation, m_matArea, m_matEdgeDistance);
             }
 
             //remove old points
@@ -329,9 +330,9 @@ namespace sensekit { namespace plugins { namespace hand {
                                                        colorFrame);
                 break;
             case DEBUG_HAND_VIEW_EDGEDISTANCE:
-                //m_debugVisualizer.showNormArray<float>(m_matEdgeDistance,
-                //                                       m_layerSegmentation,
-                //                                       colorFrame);
+                m_debugVisualizer.showNormArray<float>(m_matEdgeDistance,
+                                                       m_debugCreateSegmentation,
+                                                       colorFrame);
                 break;
             }
 
