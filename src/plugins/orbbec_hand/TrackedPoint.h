@@ -10,6 +10,7 @@ namespace sensekit { namespace plugins { namespace hand {
     {
     public:
         cv::Point position;
+        cv::Point fullSizePosition;
         cv::Point3f worldPosition;
         cv::Point3f worldDeltaPosition;
         cv::Point3f steadyWorldPosition;
@@ -21,6 +22,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         TrackedPoint(cv::Point position, cv::Point3f worldPosition, int trackingId) :
             position(position),
+            fullSizePosition(),
             worldPosition(worldPosition),
             worldDeltaPosition(),
             steadyWorldPosition(worldPosition),

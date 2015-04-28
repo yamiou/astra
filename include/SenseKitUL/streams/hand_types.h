@@ -16,7 +16,7 @@ typedef enum _sensekit_debug_hand_view_type {
     DEBUG_HAND_VIEW_CREATE_SEARCHED,
     DEBUG_HAND_VIEW_SCORE,
     DEBUG_HAND_VIEW_EDGEDISTANCE,
-    DEBUG_HAND_VIEW_LOCALAREA
+    DEBUG_HAND_VIEW_HANDWINDOW
 } sensekit_debug_hand_view_type_t;
 
 typedef enum _sensekit_handstatus {

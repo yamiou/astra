@@ -34,6 +34,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
     struct TrackingMatrices
     {
+        cv::Mat& depthFullSize;
         cv::Mat& depth;
         cv::Mat& area;
         cv::Mat& areaSqrt;
@@ -47,7 +48,8 @@ namespace sensekit { namespace plugins { namespace hand {
         int layerCount;
         bool debugLayersEnabled;
 
-        TrackingMatrices(cv::Mat& depth,
+        TrackingMatrices(cv::Mat& depthFullSize,
+                         cv::Mat& depth,
                          cv::Mat& area,
                          cv::Mat& areaSqrt,
                          cv::Mat& basicScore,
@@ -59,6 +61,7 @@ namespace sensekit { namespace plugins { namespace hand {
                          cv::Mat& debugSegmentation,
                          bool debugLayersEnabled)
             :
+            depthFullSize(depthFullSize),
             depth(depth),
             area(area),
             areaSqrt(areaSqrt),
@@ -84,6 +87,8 @@ namespace sensekit { namespace plugins { namespace hand {
         const int iterationMax;
         const float maxSegmentationDist;
         const SegmentationForegroundPolicy foregroundPolicy;
+        const float edgeDistanceFactor;
+        const float targetEdgeDistance;
 
         TrackingData(TrackingMatrices& matrices,
                      const cv::Point& seedPosition,
@@ -92,7 +97,9 @@ namespace sensekit { namespace plugins { namespace hand {
                      const TrackedPointType pointType,
                      const int iterationMax,
                      const float maxSegmentationDist,
-                     const SegmentationForegroundPolicy foregroundPolicy)
+                     const SegmentationForegroundPolicy foregroundPolicy,
+                     const float edgeDistanceFactor,
+                     const float targetEdgeDistance)
             : matrices(matrices),
               seedPosition(seedPosition),
               referenceDepth(referenceDepth),
@@ -100,7 +107,9 @@ namespace sensekit { namespace plugins { namespace hand {
               pointType(pointType),
               iterationMax(iterationMax),
               maxSegmentationDist(maxSegmentationDist),
-              foregroundPolicy(foregroundPolicy)
+              foregroundPolicy(foregroundPolicy),
+              edgeDistanceFactor(edgeDistanceFactor),
+              targetEdgeDistance(targetEdgeDistance)
         {}
     };
 }}}

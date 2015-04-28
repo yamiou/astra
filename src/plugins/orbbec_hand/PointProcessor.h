@@ -12,15 +12,17 @@ namespace sensekit { namespace plugins { namespace hand {
     class PointProcessor
     {
     public:
-        PointProcessor(const ScalingCoordinateMapper& mapper);
+        PointProcessor(const sensekit::CoordinateMapper& mapper);
         virtual ~PointProcessor();
 
+        void initialize_common_calculations(TrackingMatrices& matrices);
         void updateTrackedPoints(TrackingMatrices& matrices);
 
-        void removeOldOrDeadPoints();
         void removeDuplicatePoints();
         void updateTrackedPointOrCreateNewPointFromSeedPosition(TrackingMatrices& matrices,
                                                                 const cv::Point& seedPosition);
+        void removeOldOrDeadPoints();
+        void refine_active_points(TrackingMatrices& matrices);
 
         std::vector<TrackedPoint>& get_trackedPoints() { return m_trackedPoints; }
 
@@ -30,21 +32,30 @@ namespace sensekit { namespace plugins { namespace hand {
 
         float get_point_area(TrackingMatrices& matrices, const cv::Point& point);
     private:
+        float get_resize_factor(TrackingMatrices& matrices);
+        ScalingCoordinateMapper get_scaling_mapper(TrackingMatrices& matrices);
 
-        cv::Point adjustPointForEdge(TrackingMatrices& matrices, const cv::Point& rawTargetPoint);
-        void updateTrackedPoint(TrackingMatrices& matrices, TrackedPoint& trackedPoint);
+        void updateTrackedPoint(TrackingMatrices& matrices,
+                                ScalingCoordinateMapper& scalingMapper,
+                                TrackedPoint& trackedPoint);
+
+        void refine_high_res_position(TrackingMatrices& matrices,
+                                      TrackedPoint& trackedPoint);
+
         void validateAndUpdateTrackedPoint(TrackingMatrices& matrices,
-                                           TrackedPoint& tracked,
+                                           ScalingCoordinateMapper& scalingMapper,
+                                           TrackedPoint& trackedPoint,
                                            const cv::Point& targetPoint);
         bool is_valid_point_area(TrackingMatrices& matrices, const cv::Point& targetPoint);
 
-        const ScalingCoordinateMapper& m_mapper;
+        const sensekit::CoordinateMapper& m_fullSizeMapper;
         float m_trackingBandwidthDepth;
         float m_initialBandwidthDepth;
         float m_maxMatchDistLostActive;
         float m_maxMatchDistDefault;
         int m_iterationMaxInitial;
         int m_iterationMaxTracking;
+        int m_iterationMaxRefinement;
         float m_minArea;
         float m_maxArea;
         float m_areaBandwidth;
@@ -53,7 +64,9 @@ namespace sensekit { namespace plugins { namespace hand {
         float m_steadyDeadBandRadius;
         float m_maxJumpDist;
         float m_targetEdgeDistance;
-        float m_edgeDistanceFactor;
+        float m_heightScoreFactor;
+        float m_depthScoreFactor;
+        float m_edgeDistanceScoreFactor;
         int m_maxInactiveFramesToBeConsideredActive;
         int m_minActiveFramesToLockTracking;
         int m_maxInactiveFramesForCandidatePoints;

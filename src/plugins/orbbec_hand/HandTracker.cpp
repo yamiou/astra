@@ -52,7 +52,7 @@ namespace sensekit { namespace plugins { namespace hand {
             m_depthStream.start();
 
             m_mapper = std::make_unique<ScalingCoordinateMapper>(m_depthStream.coordinateMapper(), 1.0f);
-            m_pointProcessor = std::make_unique<PointProcessor>(*(m_mapper.get()));
+            m_pointProcessor = std::make_unique<PointProcessor>(m_depthStream.coordinateMapper());
 
             m_reader.addListener(*this);
         }
@@ -76,14 +76,9 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void HandTracker::update_tracking(DepthFrame& depthFrame)
         {
-            int width = depthFrame.resolutionX();
+            m_depthUtility.processDepthToForeground(depthFrame, m_matDepth, m_matDepthFullSize, m_matForeground);
 
-            m_resizeFactor = width / static_cast<float>(PROCESSING_SIZE_WIDTH);
-            m_mapper->set_scale(m_resizeFactor);
-
-            m_depthUtility.processDepthToForeground(depthFrame, m_matDepth, m_matForeground);
-
-            track_points(m_matDepth, m_matForeground);
+            track_points(m_matDepth, m_matDepthFullSize, m_matForeground);
 
             //use same frameIndex as source depth frame
             sensekit_frame_index_t frameIndex = depthFrame.frameIndex();
@@ -99,50 +94,35 @@ namespace sensekit { namespace plugins { namespace hand {
             }
         }
 
-        void HandTracker::track_points(cv::Mat& matDepth, cv::Mat& matForeground)
+        void HandTracker::track_points(cv::Mat& matDepth, 
+                                       cv::Mat& matDepthFullSize, 
+                                       cv::Mat& matForeground)
         {
-            //TODO-done try tracking without edge distance
-            //TODO-done calculate global score once
-            //TODO-done adjust scores so hand can go below elbow
-            //TODO-done use velocity to predict next position - search there as well
-            //TODO-done adopt the min tracking id? or id of the most active parent?
-            //TODO-done recover tracking IDs for recently lost points (maybe after focus gesture)
-            //TODO-done look at head area being allowed
-            //TODO-done make a lost active tracking state with lower count for removal
-            //TODO-done make new points look for nearby lost active tracking points
-            //TODO-done reject tracking updates that move the point to a too large area (prevent hand point from jumping to head and not recovering)
-            //TODO-done make dead points go to lost tracking instead so they can recover (only use dead for duplicate...rename status?)
-            //TODO-done look at initial points jumping to nearby desk instead of hand, then never leaving
-            //TODO calculate refined tracking position (with high res image and edge distance) for tracked points, not intermediate
-            //TODO optimization - memoize best scoring position during segmentation step
-            
-            m_matScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-            m_layerEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-            m_layerScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_layerSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
+            m_layerScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
+            m_layerEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_debugUpdateSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_debugCreateSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_updateForegroundSearched = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_createForegroundSearched = cv::Mat::zeros(matDepth.size(), CV_8UC1);
-
-            float heightFactor = 2.0f;
-            float depthFactor = 0.25f;
-
-            segmentation::calculate_basic_score(matDepth, m_matScore, heightFactor, depthFactor, *(m_mapper.get()));
-            segmentation::calculate_segment_area(matDepth, m_matArea, m_matAreaSqrt, *(m_mapper.get()));
+            m_matDepthWindow = cv::Mat::zeros(m_matDepth.size(), CV_32FC1);
 
             bool debugLayersEnabled = m_debugImageStream->has_connections();
-            TrackingMatrices updateMatrices(matDepth, 
-                                            m_matArea, 
+            
+            TrackingMatrices updateMatrices(matDepthFullSize,
+                                            matDepth,
+                                            m_matArea,
                                             m_matAreaSqrt,
-                                            m_matScore, 
-                                            matForeground, 
+                                            m_matBasicScore,
+                                            matForeground,
                                             m_updateForegroundSearched,
                                             m_layerSegmentation,
-                                            m_layerScore, 
+                                            m_layerScore,
                                             m_layerEdgeDistance,
-                                            m_debugUpdateSegmentation, 
+                                            m_debugUpdateSegmentation,
                                             debugLayersEnabled);
+
+            m_pointProcessor->initialize_common_calculations(updateMatrices);
 
             //Update existing points first so that if we lose a point, we might recover it in the "add new" stage below
             //without having at least one frame of a lost point.
@@ -151,16 +131,17 @@ namespace sensekit { namespace plugins { namespace hand {
 
             m_pointProcessor->removeDuplicatePoints();
 
-            TrackingMatrices createMatrices(matDepth, 
-                                            m_matArea, 
+            TrackingMatrices createMatrices(matDepthFullSize,
+                                            matDepth,
+                                            m_matArea,
                                             m_matAreaSqrt,
-                                            m_matScore, 
-                                            matForeground, 
+                                            m_matBasicScore,
+                                            matForeground,
                                             m_createForegroundSearched,
                                             m_layerSegmentation,
                                             m_layerScore,
                                             m_layerEdgeDistance,
-                                            m_debugCreateSegmentation, 
+                                            m_debugCreateSegmentation,
                                             debugLayersEnabled);
 
             //add new points (unless already tracking)
@@ -190,6 +171,21 @@ namespace sensekit { namespace plugins { namespace hand {
 
             //remove old points
             m_pointProcessor->removeOldOrDeadPoints();
+
+            TrackingMatrices refinementMatrices(matDepthFullSize,
+                                                m_matDepthWindow, 
+                                                m_matArea, 
+                                                m_matAreaSqrt,
+                                                m_matBasicScore, 
+                                                matForeground, 
+                                                m_createForegroundSearched,
+                                                m_layerSegmentation,
+                                                m_layerScore,
+                                                m_layerEdgeDistance,
+                                                m_debugUpdateSegmentation, 
+                                                false);
+
+            m_pointProcessor->refine_active_points(refinementMatrices);
         }
 
         void HandTracker::generate_hand_frame(sensekit_frame_index_t frameIndex)
@@ -246,10 +242,8 @@ namespace sensekit { namespace plugins { namespace hand {
 
                     point.trackingId = internalPoint.trackingId;
 
-                    //convert from internal depth resolution to original depth resolution
-                    //add 0.5 to center on the middle of the pixel
-                    point.depthPosition.x = (internalPoint.position.x + 0.5) * m_resizeFactor;
-                    point.depthPosition.y = (internalPoint.position.y + 0.5) * m_resizeFactor;
+                    point.depthPosition.x = internalPoint.fullSizePosition.x;
+                    point.depthPosition.y = internalPoint.fullSizePosition.y;
 
                     copy_position(internalPoint.worldPosition, point.worldPosition);
                     copy_position(internalPoint.worldDeltaPosition, point.worldDeltaPosition);
@@ -343,14 +337,13 @@ namespace sensekit { namespace plugins { namespace hand {
                                                colorFrame);
                 break;
             case DEBUG_HAND_VIEW_SCORE:
-                m_debugVisualizer.showNormArray<float>(m_matScore,
+                m_debugVisualizer.showNormArray<float>(m_matBasicScore,
                                                        m_debugUpdateSegmentation,
                                                        colorFrame);
                 break;
-            case DEBUG_HAND_VIEW_LOCALAREA:
-                m_debugVisualizer.showNormArray<float>(m_matArea,
-                                                       m_debugUpdateSegmentation,
-                                                       colorFrame);
+            case DEBUG_HAND_VIEW_HANDWINDOW:
+                m_debugVisualizer.showDepthMat(m_matDepthWindow,
+                                               colorFrame);
                 break;
             case DEBUG_HAND_VIEW_EDGEDISTANCE:
                 m_debugVisualizer.showNormArray<float>(m_layerScore,
@@ -359,15 +352,18 @@ namespace sensekit { namespace plugins { namespace hand {
                 break;
             }
 
-            if (view == DEBUG_HAND_VIEW_CREATE_SEARCHED)
+            if (view != DEBUG_HAND_VIEW_HANDWINDOW)
             {
-                m_debugVisualizer.overlayMask(m_createForegroundSearched, colorFrame, searchedColor);
-            }
-            else if (view == DEBUG_HAND_VIEW_UPDATE_SEARCHED)
-            {
-                m_debugVisualizer.overlayMask(m_updateForegroundSearched, colorFrame, searchedColor);
-            }
+                if (view == DEBUG_HAND_VIEW_CREATE_SEARCHED)
+                {
+                    m_debugVisualizer.overlayMask(m_createForegroundSearched, colorFrame, searchedColor);
+                }
+                else if (view == DEBUG_HAND_VIEW_UPDATE_SEARCHED)
+                {
+                    m_debugVisualizer.overlayMask(m_updateForegroundSearched, colorFrame, searchedColor);
+                }
 
-            m_debugVisualizer.overlayMask(m_matForeground, colorFrame, foregroundColor);
+                m_debugVisualizer.overlayMask(m_matForeground, colorFrame, foregroundColor);
+            }
         }
 }}}

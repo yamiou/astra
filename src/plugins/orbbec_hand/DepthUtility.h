@@ -12,7 +12,10 @@ namespace sensekit { namespace plugins { namespace hand {
         DepthUtility(int width, int height);
         virtual ~DepthUtility();
 
-        void processDepthToForeground(DepthFrame& depthFrame, cv::Mat& matDepth, cv::Mat& matForeground);
+        void processDepthToForeground(DepthFrame& depthFrame, 
+                                      cv::Mat& matDepth,
+                                      cv::Mat& matDepthFullSize, 
+                                      cv::Mat& matForeground);
         void reset();
 
         const cv::Mat& matDepthVel() const { return m_matDepthVel; }

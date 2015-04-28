@@ -3,6 +3,7 @@
 #include "ScalingCoordinateMapper.h"
 #include <cmath>
 #include <opencv2/opencv.hpp>
+#include "Segmentation.h"
 
 #define MAX_DEPTH 10000
 
@@ -27,8 +28,8 @@ namespace sensekit { namespace plugins { namespace hand {
         static void segment_foreground(TrackingData data)
         {
             const float maxSegmentationDist = data.maxSegmentationDist;
-            SegmentationForegroundPolicy foregroundPolicy = data.foregroundPolicy;
-            float seedDepth = data.matrices.depth.at<float>(data.seedPosition);
+            const SegmentationForegroundPolicy foregroundPolicy = data.foregroundPolicy;
+            const float seedDepth = data.matrices.depth.at<float>(data.seedPosition);
             cv::Mat& depthMatrix = data.matrices.depth;
             cv::Mat& foregroundMatrix = data.matrices.foreground;
             cv::Mat& areaSqrtMatrix = data.matrices.areaSqrt;
@@ -131,9 +132,22 @@ namespace sensekit { namespace plugins { namespace hand {
         {
             cv::Size size = data.matrices.depth.size();
             data.matrices.layerSegmentation = cv::Mat::zeros(size, CV_8UC1);
-            
+            data.matrices.layerEdgeDistance = cv::Mat::zeros(size, CV_32FC1);
+            data.matrices.layerScore = cv::Mat::zeros(size, CV_32FC1);
             //data.matrices.matLayerSegmentation.setTo(cv::Scalar(0));
+
             segment_foreground(data);
+            
+            calculate_edge_distance(data.matrices.layerSegmentation,
+                                    data.matrices.areaSqrt,
+                                    data.matrices.layerEdgeDistance);
+
+            calculate_layer_score(data.matrices.depth,
+                                  data.matrices.basicScore,
+                                  data.matrices.layerEdgeDistance,
+                                  data.edgeDistanceFactor,
+                                  data.targetEdgeDistance,
+                                  data.matrices.layerScore);
 
             if (data.matrices.debugLayersEnabled)
             {
@@ -148,7 +162,7 @@ namespace sensekit { namespace plugins { namespace hand {
             double min, max;
             cv::Point minLoc, maxLoc;
 
-            cv::minMaxLoc(data.matrices.basicScore, &min, &max, &minLoc, &maxLoc, data.matrices.layerSegmentation);
+            cv::minMaxLoc(data.matrices.layerScore, &min, &max, &minLoc, &maxLoc, data.matrices.layerSegmentation);
 
             return maxLoc;
         }
@@ -224,6 +238,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                    const float depthFactor,
                                    const ScalingCoordinateMapper& mapper)
         {
+            scoreMatrix = cv::Mat::zeros(depthMatrix.size(), CV_32FC1);
+
             int width = depthMatrix.cols;
             int height = depthMatrix.rows;
 
@@ -255,12 +271,12 @@ namespace sensekit { namespace plugins { namespace hand {
             }
         }
         
-        void calculate_layer_score(cv::Mat& depthMatrix,
-                                   cv::Mat& basicScoreMatrix,
-                                   cv::Mat& layerScoreMatrix,
-                                   cv::Mat& edgeDistanceMatrix,
-                                   const float edgeDistanceFactor,
-                                   const float targetEdgeDist)
+        void calculate_layer_score(cv::Mat& depthMatrix, 
+                                   cv::Mat& basicScoreMatrix, 
+                                   cv::Mat& edgeDistanceMatrix, 
+                                   const float edgeDistanceFactor, 
+                                   const float targetEdgeDist, 
+                                   cv::Mat& layerScoreMatrix)
         {
             int width = depthMatrix.cols;
             int height = depthMatrix.rows;
@@ -269,8 +285,8 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 float* depthRow = depthMatrix.ptr<float>(y);
                 float* basicScoreRow = basicScoreMatrix.ptr<float>(y);
-                float* layerScoreRow = layerScoreMatrix.ptr<float>(y);
                 float* edgeDistanceRow = edgeDistanceMatrix.ptr<float>(y);
+                float* layerScoreRow = layerScoreMatrix.ptr<float>(y);
 
                 for (int x = 0; x < width; x++)
                 {
@@ -289,8 +305,8 @@ namespace sensekit { namespace plugins { namespace hand {
                     }
                     ++depthRow;
                     ++basicScoreRow;
-                    ++layerScoreRow;
                     ++edgeDistanceRow;
+                    ++layerScoreRow;
                 }
             }
         }

@@ -4,14 +4,15 @@
 
 namespace sensekit { namespace plugins { namespace hand {
 
-    PointProcessor::PointProcessor(const ScalingCoordinateMapper& mapper) :
-        m_mapper(mapper),
+    PointProcessor::PointProcessor(const sensekit::CoordinateMapper& mapper) :
+        m_fullSizeMapper(mapper),
         m_trackingBandwidthDepth(150),  //mm
         m_initialBandwidthDepth(450),   //mm
         m_maxMatchDistLostActive(500),  //mm
         m_maxMatchDistDefault(200),     //mm
         m_iterationMaxInitial(1),
         m_iterationMaxTracking(1),
+        m_iterationMaxRefinement(1),
         m_minArea(5000),                //mm^2
         m_maxArea(25000),               //mm^2
         m_areaBandwidth(150),           //mm
@@ -20,7 +21,9 @@ namespace sensekit { namespace plugins { namespace hand {
         m_steadyDeadBandRadius(150),    //mm
         m_maxJumpDist(100),             //mm
         m_targetEdgeDistance(60),       //mm
-        m_edgeDistanceFactor(10),
+        m_heightScoreFactor(2.0),
+        m_depthScoreFactor(0.25),
+        m_edgeDistanceScoreFactor(10),
         m_maxInactiveFramesToBeConsideredActive(10),
         m_minActiveFramesToLockTracking(60),
         m_maxInactiveFramesForCandidatePoints(60),
@@ -31,13 +34,107 @@ namespace sensekit { namespace plugins { namespace hand {
     PointProcessor::~PointProcessor()
     {}
 
+    float PointProcessor::get_resize_factor(TrackingMatrices& matrices)
+    {
+        float resizeFactor = matrices.depthFullSize.cols / static_cast<float>(matrices.depth.cols);
+
+        return resizeFactor;
+    }
+
+    ScalingCoordinateMapper PointProcessor::get_scaling_mapper(TrackingMatrices& matrices)
+    {
+        const float resizeFactor = get_resize_factor(matrices);
+
+        return ScalingCoordinateMapper(m_fullSizeMapper, resizeFactor);
+    }
+
+    void PointProcessor::initialize_common_calculations(TrackingMatrices& matrices)
+    {
+        auto scalingMapper = get_scaling_mapper(matrices);
+
+        segmentation::calculate_basic_score(matrices.depth,
+                                            matrices.basicScore,
+                                            m_heightScoreFactor,
+                                            m_depthScoreFactor,
+                                            scalingMapper);
+
+        segmentation::calculate_segment_area(matrices.depth,
+                                             matrices.area,
+                                             matrices.areaSqrt,
+                                             scalingMapper);
+
+    }
+
     void PointProcessor::updateTrackedPoints(TrackingMatrices& matrices)
     {
+        auto scalingMapper = get_scaling_mapper(matrices);
+
         for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
         {
             //TODO take this and make it a method on TrackedPoint
             TrackedPoint& trackedPoint = *iter;
-            updateTrackedPoint(matrices, trackedPoint);
+            updateTrackedPoint(matrices, scalingMapper, trackedPoint);
+        }
+    }
+
+    void PointProcessor::updateTrackedPoint(TrackingMatrices& matrices,
+                                            ScalingCoordinateMapper& scalingMapper,
+                                            TrackedPoint& trackedPoint)
+    {
+        const float width = matrices.depth.cols;
+        const float height = matrices.depth.rows;
+
+        ++trackedPoint.inactiveFrameCount;
+
+        cv::Point seedPosition = trackedPoint.position;
+        float referenceDepth = trackedPoint.worldPosition.z;
+
+        TrackingData updateTrackingData(matrices,
+            seedPosition,
+            referenceDepth,
+            m_trackingBandwidthDepth,
+            trackedPoint.pointType,
+            m_iterationMaxTracking,
+            m_maxSegmentationDist,
+            FG_POLICY_IGNORE,
+            m_edgeDistanceScoreFactor,
+            m_targetEdgeDistance);
+
+        cv::Point newTargetPoint = segmentation::converge_track_point_from_seed(updateTrackingData);
+
+        validateAndUpdateTrackedPoint(matrices, scalingMapper, trackedPoint, newTargetPoint);
+
+        //lost a tracked point, try to guess the position using previous position delta for second chance to recover
+
+        if (trackedPoint.trackingStatus != TrackingStatus::Tracking && cv::norm(trackedPoint.worldDeltaPosition) > 0)
+        {
+            auto estimatedWorldPosition = trackedPoint.worldPosition + trackedPoint.worldDeltaPosition;
+
+            cv::Point3f estimatedPosition = scalingMapper.convert_world_to_depth(estimatedWorldPosition);
+
+            seedPosition.x = MAX(0, MIN(width - 1, static_cast<int>(estimatedPosition.x)));
+            seedPosition.y = MAX(0, MIN(height - 1, static_cast<int>(estimatedPosition.y)));
+            referenceDepth = estimatedPosition.z;
+
+            TrackingData recoverTrackingData(matrices,
+                seedPosition,
+                referenceDepth,
+                m_initialBandwidthDepth,
+                trackedPoint.pointType,
+                m_iterationMaxTracking,
+                m_maxSegmentationDist,
+                FG_POLICY_IGNORE,
+                m_edgeDistanceScoreFactor,
+                m_targetEdgeDistance);
+
+            newTargetPoint = segmentation::converge_track_point_from_seed(recoverTrackingData);
+
+            validateAndUpdateTrackedPoint(matrices, scalingMapper, trackedPoint, newTargetPoint);
+
+            if (trackedPoint.trackingStatus == TrackingStatus::Tracking)
+            {
+                printf("Recovered point %d\n", trackedPoint.trackingId);
+            }
         }
     }
 
@@ -49,13 +146,15 @@ namespace sensekit { namespace plugins { namespace hand {
 
     float PointProcessor::get_point_area(TrackingMatrices& matrices, const cv::Point& point)
     {
+        auto scalingMapper = get_scaling_mapper(matrices);
+
         float area = segmentation::count_neighborhood_area(matrices.layerSegmentation,
                                                            matrices.depth,
                                                            matrices.area,
                                                            point,
                                                            m_areaBandwidth,
                                                            m_areaBandwidthDepth,
-                                                           m_mapper);
+                                                           scalingMapper);
 
         return area;
     }
@@ -68,92 +167,99 @@ namespace sensekit { namespace plugins { namespace hand {
         return validPointArea;
     }
 
-    cv::Point PointProcessor::adjustPointForEdge(TrackingMatrices& matrices, const cv::Point& rawTargetPoint)
+    void PointProcessor::refine_active_points(TrackingMatrices& matrices)
     {
-        cv::Size size = matrices.depth.size();
-        matrices.layerEdgeDistance = cv::Mat::zeros(size, CV_32FC1);
-        matrices.layerScore = cv::Mat::zeros(size, CV_32FC1);
-
-        segmentation::calculate_edge_distance(matrices.layerSegmentation,
-                                              matrices.areaSqrt,
-                                              matrices.layerEdgeDistance);
-
-        segmentation::calculate_layer_score(matrices.depth,
-                                            matrices.basicScore,
-                                            matrices.layerScore,
-                                            matrices.layerEdgeDistance,
-                                            m_edgeDistanceFactor,
-                                            m_targetEdgeDistance);
-
-        double min, max;
-        cv::Point minLoc, maxLoc;
-
-        cv::minMaxLoc(matrices.layerScore, &min, &max, &minLoc, &maxLoc, matrices.layerSegmentation);
-
-        return maxLoc;
-    }
-
-    void PointProcessor::updateTrackedPoint(TrackingMatrices& matrices, TrackedPoint& trackedPoint)
-    {
-        const float width = matrices.depth.cols;
-        const float height = matrices.depth.rows;
-
-        trackedPoint.inactiveFrameCount++;
-
-        cv::Point seedPosition = trackedPoint.position;
-        float referenceDepth = trackedPoint.worldPosition.z;
-
-        TrackingData updateTrackingData(matrices, 
-                                        seedPosition, 
-                                        referenceDepth, 
-                                        m_trackingBandwidthDepth, 
-                                        trackedPoint.pointType, 
-                                        m_iterationMaxTracking,
-                                        m_maxSegmentationDist,
-                                        FG_POLICY_IGNORE);
-
-        cv::Point rawTargetPoint = segmentation::converge_track_point_from_seed(updateTrackingData);
-        
-        cv::Point newTargetPoint = adjustPointForEdge(matrices, rawTargetPoint);
-
-        validateAndUpdateTrackedPoint(matrices, trackedPoint, newTargetPoint);
-
-        //lost a tracked point, try to guess the position using previous position delta for second chance to recover
-
-        if (trackedPoint.trackingStatus != TrackingStatus::Tracking && cv::norm(trackedPoint.worldDeltaPosition) > 0)
+        for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
         {
-            auto estimatedWorldPosition = trackedPoint.worldPosition + trackedPoint.worldDeltaPosition;
+            //TODO take this and make it a method on TrackedPoint
+            TrackedPoint& trackedPoint = *iter;
 
-            cv::Point3f estimatedPosition = m_mapper.convert_world_to_depth(estimatedWorldPosition);
+            float resizeFactor = get_resize_factor(matrices);
 
-            seedPosition.x = MAX(0, MIN(width - 1, static_cast<int>(estimatedPosition.x)));
-            seedPosition.y = MAX(0, MIN(height - 1, static_cast<int>(estimatedPosition.y)));
-            referenceDepth = estimatedPosition.z;
+            //add 0.5 to center on the middle of the pixel
+            trackedPoint.fullSizePosition.x = (trackedPoint.position.x + 0.5) * resizeFactor;
+            trackedPoint.fullSizePosition.y = (trackedPoint.position.y + 0.5) * resizeFactor;
 
-            TrackingData recoverTrackingData(matrices, 
-                                             seedPosition, 
-                                             referenceDepth, 
-                                             m_initialBandwidthDepth, 
-                                             trackedPoint.pointType, 
-                                             m_iterationMaxTracking,
-                                             m_maxSegmentationDist,
-                                             FG_POLICY_IGNORE);
-
-            rawTargetPoint = segmentation::converge_track_point_from_seed(recoverTrackingData);
-
-            newTargetPoint = adjustPointForEdge(matrices, rawTargetPoint);
-
-            validateAndUpdateTrackedPoint(matrices, trackedPoint, newTargetPoint);
-
-            if (trackedPoint.trackingStatus == TrackingStatus::Tracking)
+            if (trackedPoint.trackingStatus == TrackingStatus::Tracking &&
+                trackedPoint.pointType == TrackedPointType::ActivePoint)
             {
-                printf("Recovered point %d\n", trackedPoint.trackingId);
+                refine_high_res_position(matrices, trackedPoint);
             }
         }
     }
 
+    void PointProcessor::refine_high_res_position(TrackingMatrices& matrices, 
+                                                  TrackedPoint& trackedPoint)
+    {
+        assert(trackedPoint.pointType == TrackedPointType::ActivePoint);
+
+        int fullWidth = matrices.depthFullSize.cols;
+        int fullHeight = matrices.depthFullSize.rows;
+        int processingWidth = matrices.depth.cols;
+        int processingHeight = matrices.depth.rows;
+        
+        int fullSizeX = trackedPoint.fullSizePosition.x;
+        int fullSizeY = trackedPoint.fullSizePosition.y;
+        int windowLeft = MAX(0, MIN(fullWidth - processingWidth, fullSizeX - processingWidth / 2));
+        int windowTop = MAX(0, MIN(fullHeight - processingHeight, fullSizeY - processingHeight / 2));
+
+        //Create a window into the full size data
+        cv::Mat roi = matrices.depthFullSize(cv::Rect(windowLeft, windowTop, processingWidth, processingHeight));
+        //copyTo for now so .at works with local coords in functions that use it
+        roi.copyTo(matrices.depth);
+
+        //initialize_common_calculations(matrices);
+        ScalingCoordinateMapper roiMapper(m_fullSizeMapper, 1.0, windowLeft, windowTop);
+
+        segmentation::calculate_basic_score(matrices.depth,
+                                            matrices.basicScore,
+                                            m_heightScoreFactor,
+                                            m_depthScoreFactor,
+                                            roiMapper);
+
+        segmentation::calculate_segment_area(matrices.depth,
+                                             matrices.area,
+                                             matrices.areaSqrt,
+                                             roiMapper);
+
+        cv::Point roiPosition(fullSizeX - windowLeft, fullSizeY - windowTop);
+
+        float referenceDepth = trackedPoint.worldPosition.z;
+
+        TrackingData refinementTrackingData(matrices,
+                                            roiPosition,
+                                            referenceDepth,
+                                            m_trackingBandwidthDepth,
+                                            TrackedPointType::ActivePoint,
+                                            m_iterationMaxRefinement,
+                                            m_maxSegmentationDist,
+                                            FG_POLICY_IGNORE,
+                                            m_edgeDistanceScoreFactor,
+                                            m_targetEdgeDistance);
+
+        cv::Point targetPoint = segmentation::converge_track_point_from_seed(refinementTrackingData);
+
+        int refinedFullSizeX = targetPoint.x + windowLeft;
+        int refinedFullSizeY = targetPoint.y + windowTop;
+        
+        trackedPoint.fullSizePosition.x = refinedFullSizeX;
+        trackedPoint.fullSizePosition.y = refinedFullSizeY;
+        float resizeFactor = get_resize_factor(matrices);
+        trackedPoint.position.x = refinedFullSizeX / resizeFactor;
+        trackedPoint.position.y = refinedFullSizeY / resizeFactor;
+
+        float refinedDepth = matrices.depthFullSize.at<float>(trackedPoint.fullSizePosition);
+        
+        cv::Point3f worldPosition =  cv_convert_depth_to_world(m_fullSizeMapper, 
+                                                               refinedFullSizeX, 
+                                                               refinedFullSizeY, 
+                                                               refinedDepth);
+
+        trackedPoint.worldPosition = worldPosition;
+    }
 
     void PointProcessor::validateAndUpdateTrackedPoint(TrackingMatrices& matrices,
+                                                       ScalingCoordinateMapper& scalingMapper,
                                                        TrackedPoint& trackedPoint,
                                                        const cv::Point& newTargetPoint)
     {
@@ -163,7 +269,7 @@ namespace sensekit { namespace plugins { namespace hand {
         {
             float depth = matrices.depth.at<float>(newTargetPoint);
 
-            cv::Point3f worldPosition = m_mapper.convert_depth_to_world(newTargetPoint.x, newTargetPoint.y, depth);
+            cv::Point3f worldPosition = scalingMapper.convert_depth_to_world(newTargetPoint.x, newTargetPoint.y, depth);
 
             auto dist = cv::norm(worldPosition - trackedPoint.worldPosition);
             auto steadyDist = cv::norm(worldPosition - trackedPoint.steadyWorldPosition);
@@ -270,18 +376,18 @@ namespace sensekit { namespace plugins { namespace hand {
             //Cannot expect to properly segment when the seedPosition has zero depth
             return;
         }
-        TrackingData trackingData(matrices, 
-                                  seedPosition, 
-                                  referenceDepth, 
-                                  m_initialBandwidthDepth, 
-                                  TrackedPointType::CandidatePoint, 
+        TrackingData trackingData(matrices,
+                                  seedPosition,
+                                  referenceDepth,
+                                  m_initialBandwidthDepth,
+                                  TrackedPointType::CandidatePoint,
                                   m_iterationMaxInitial,
                                   m_maxSegmentationDist,
-                                  FG_POLICY_RESET_TTL);
+                                  FG_POLICY_RESET_TTL,
+                                  m_edgeDistanceScoreFactor,
+                                  m_targetEdgeDistance);
 
-        cv::Point rawTargetPoint = segmentation::converge_track_point_from_seed(trackingData);
-
-        cv::Point targetPoint = adjustPointForEdge(matrices, rawTargetPoint);
+        cv::Point targetPoint = segmentation::converge_track_point_from_seed(trackingData);
 
         bool validPointArea = is_valid_point_area(matrices, targetPoint);
 
@@ -291,7 +397,8 @@ namespace sensekit { namespace plugins { namespace hand {
             
             float depth = matrices.depth.at<float>(targetPoint);
 
-            cv::Point3f worldPosition = m_mapper.convert_depth_to_world(targetPoint.x, 
+            auto scalingMapper = get_scaling_mapper(matrices);
+            cv::Point3f worldPosition = scalingMapper.convert_depth_to_world(targetPoint.x,
                                                                                    targetPoint.y, 
                                                                                    depth);
 

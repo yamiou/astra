@@ -32,7 +32,10 @@ namespace sensekit { namespace plugins { namespace hand {
         m_matDepthVelErode.create(m_processingHeight, m_processingWidth, CV_32FC1);
     }
 
-    void DepthUtility::processDepthToForeground(DepthFrame& depthFrame, cv::Mat& matDepth, cv::Mat& matForeground)
+    void DepthUtility::processDepthToForeground(DepthFrame& depthFrame,
+                                                cv::Mat& matDepth,
+                                                cv::Mat& matDepthFullSize,
+                                                cv::Mat& matForeground)
     {
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
@@ -40,11 +43,11 @@ namespace sensekit { namespace plugins { namespace hand {
         matDepth.create(m_processingHeight, m_processingWidth, CV_32FC1);
         matForeground = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_8UC1);
 
-        depthFrameToMat(depthFrame, width, height, m_matDepthOriginal);
+        depthFrameToMat(depthFrame, width, height, matDepthFullSize);
 
         //convert to the target processing size with nearest neighbor
 
-        cv::resize(m_matDepthOriginal, matDepth, matDepth.size(), 0, 0, CV_INTER_NN);
+        cv::resize(matDepthFullSize, matDepth, matDepth.size(), 0, 0, CV_INTER_NN);
 
         //current minus average, scaled by average = velocity as a percent change
 

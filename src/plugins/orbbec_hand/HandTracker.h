@@ -39,8 +39,8 @@ namespace sensekit { namespace plugins { namespace hand {
         void update_tracking(DepthFrame& depthFrame);
         void update_hand_frame(std::vector<TrackedPoint>& internalTrackedPoints, _sensekit_handframe& frame);
 
-        void track_points(cv::Mat& matDepth, cv::Mat& matForeground);
-
+        void track_points(cv::Mat& matDepth, cv::Mat& matDepthFullSize, cv::Mat& matForeground);
+        
         //fields
 
         DepthStream m_depthStream;
@@ -61,11 +61,11 @@ namespace sensekit { namespace plugins { namespace hand {
         int m_width;
         int m_height;
 
-        float m_resizeFactor;
-
         cv::Mat m_matDepth;
+        cv::Mat m_matDepthFullSize;
+        cv::Mat m_matDepthWindow;
         cv::Mat m_matForeground;
-        cv::Mat m_matScore;
+        cv::Mat m_matBasicScore;
         cv::Mat m_matArea;
         cv::Mat m_matAreaSqrt;
         cv::Mat m_debugUpdateSegmentation;

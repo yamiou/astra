@@ -218,8 +218,8 @@ public:
         case DEBUG_HAND_VIEW_EDGEDISTANCE:
             return "Edge distance";
             break;
-        case DEBUG_HAND_VIEW_LOCALAREA:
-            return "Area";
+        case DEBUG_HAND_VIEW_HANDWINDOW:
+            return "Hand window";
             break;
         }
     }
@@ -343,7 +343,7 @@ void process_key_input(sensekit::StreamReader& reader, HandDebugFrameListener& l
     }
     else if (key.code == sf::Keyboard::Num9)
     {
-        request_view_mode(reader, DEBUG_HAND_VIEW_LOCALAREA);
+        request_view_mode(reader, DEBUG_HAND_VIEW_HANDWINDOW);
     }
     else if (key.code == sf::Keyboard::Num0)
     {

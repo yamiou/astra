@@ -33,26 +33,29 @@ namespace sensekit { namespace plugins { namespace hand {
     {
     public:
         ScalingCoordinateMapper(const sensekit::CoordinateMapper& mapper,
-                                float scale)
-            : m_scale(scale),
-              m_mapper(mapper)
+                                const float scale,
+                                const float offsetX = 0,
+                                const float offsetY = 0)
+            : m_mapper(mapper),
+              m_scale(scale),
+              m_offsetX(offsetX),
+              m_offsetY(offsetY)
         { }
 
         float scale() const { return m_scale; }
-        void set_scale(float scale) { m_scale = scale; }
-
+        
         inline cv::Point3f convert_depth_to_world(int depthX, int depthY, float depthZ) const
         {
-            depthX *= m_scale;
-            depthY *= m_scale;
+            depthX = (depthX + m_offsetX) * m_scale;
+            depthY = (depthY + m_offsetY) * m_scale;
 
             return cv_convert_depth_to_world(m_mapper, depthX, depthY, depthZ);
         }
 
         inline cv::Point3f convert_depth_to_world(float depthX, float depthY, float depthZ) const
         {
-            depthX *= m_scale;
-            depthY *= m_scale;
+            depthX = (depthX + m_offsetX) * m_scale;
+            depthY = (depthY + m_offsetY) * m_scale;
 
             return cv_convert_depth_to_world(m_mapper, depthX, depthY, depthZ);
         }
@@ -66,15 +69,17 @@ namespace sensekit { namespace plugins { namespace hand {
         {
             cv::Point3f depth = cv_convert_world_to_depth(m_mapper, worldPosition);
 
-            depth.x /= m_scale;
-            depth.y /= m_scale;
+            depth.x = (depth.x / m_scale) - m_offsetX;
+            depth.y = (depth.y / m_scale) - m_offsetX;
 
             return depth;
         }
 
     private:
         const sensekit::CoordinateMapper m_mapper;
-        float m_scale;
+        const float m_scale;
+        const float m_offsetX;
+        const float m_offsetY;
     };
 
 }}}
