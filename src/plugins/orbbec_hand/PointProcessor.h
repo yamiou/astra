@@ -31,11 +31,12 @@ namespace sensekit { namespace plugins { namespace hand {
         float get_point_area(TrackingMatrices& matrices, const cv::Point& point);
     private:
 
+        cv::Point adjustPointForEdge(TrackingMatrices& matrices, const cv::Point& rawTargetPoint);
         void updateTrackedPoint(TrackingMatrices& matrices, TrackedPoint& trackedPoint);
         void validateAndUpdateTrackedPoint(TrackingMatrices& matrices,
                                            TrackedPoint& tracked,
                                            const cv::Point& targetPoint);
-        bool is_valid_point_area(TrackingMatrices& matrices, cv::Point targetPoint);
+        bool is_valid_point_area(TrackingMatrices& matrices, const cv::Point& targetPoint);
 
         const ScalingCoordinateMapper& m_mapper;
         float m_trackingBandwidthDepth;
@@ -51,6 +52,8 @@ namespace sensekit { namespace plugins { namespace hand {
         float m_maxSegmentationDist;
         float m_steadyDeadBandRadius;
         float m_maxJumpDist;
+        float m_targetEdgeDistance;
+        float m_edgeDistanceFactor;
 
         int m_nextTrackingId{ 0 };
         //TODO consider std::list<TrackedPoint>

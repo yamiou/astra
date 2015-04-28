@@ -31,10 +31,10 @@ namespace sensekit { namespace plugins { namespace hand {
             float seedDepth = data.matrices.depth.at<float>(data.seedPosition);
             cv::Mat& depthMatrix = data.matrices.depth;
             cv::Mat& foregroundMatrix = data.matrices.foreground;
-            cv::Mat& areaMatrix = data.matrices.area;
+            cv::Mat& areaSqrtMatrix = data.matrices.areaSqrt;
             cv::Mat& segmentationMatrix = data.matrices.layerSegmentation;
-            cv::Mat& searchedMatrix = data.matrices.debugSearched;
-
+            cv::Mat& searchedMatrix = data.matrices.foregroundSearched;
+            
             bool isActivePoint = data.pointType == TrackedPointType::ActivePoint;
             std::queue<PointTTL> pointQueue;
 
@@ -72,7 +72,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 if (ttl > 0 && !rejectedOutOfRangePath)
                 {
                     searchedMatrix.at<char>(p) = PixelType::Searched;
-
+                
                     float depth = depthMatrix.at<float>(p);
                     bool pointInRange = depth != 0 && depth < maxDepth;
                     
@@ -86,7 +86,7 @@ namespace sensekit { namespace plugins { namespace hand {
                         //If not active tracking, will always decrement TTL.
                         if (!isActivePoint || anyInRange)
                         {
-                            ttl -= sqrt(areaMatrix.at<float>(p));
+                            ttl -= areaSqrtMatrix.at<float>(p);
                         }
 
                         if (pointInRange)
@@ -131,21 +131,24 @@ namespace sensekit { namespace plugins { namespace hand {
         {
             cv::Size size = data.matrices.depth.size();
             data.matrices.layerSegmentation = cv::Mat::zeros(size, CV_8UC1);
-
+            
             //data.matrices.matLayerSegmentation.setTo(cv::Scalar(0));
             segment_foreground(data);
 
-            ++data.matrices.layerCount;
+            if (data.matrices.debugLayersEnabled)
+            {
+                ++data.matrices.layerCount;
 
-            cv::bitwise_or(cv::Mat(size, CV_8UC1, cv::Scalar(data.matrices.layerCount)),
-                           data.matrices.debugSegmentation,
-                           data.matrices.debugSegmentation,
-                           data.matrices.layerSegmentation);
+                cv::bitwise_or(cv::Mat(size, CV_8UC1, cv::Scalar(data.matrices.layerCount)),
+                               data.matrices.debugSegmentation,
+                               data.matrices.debugSegmentation,
+                               data.matrices.layerSegmentation);
+            }
 
             double min, max;
             cv::Point minLoc, maxLoc;
 
-            cv::minMaxLoc(data.matrices.score, &min, &max, &minLoc, &maxLoc, data.matrices.layerSegmentation);
+            cv::minMaxLoc(data.matrices.basicScore, &min, &max, &minLoc, &maxLoc, data.matrices.layerSegmentation);
 
             return maxLoc;
         }
@@ -251,9 +254,49 @@ namespace sensekit { namespace plugins { namespace hand {
                 }
             }
         }
+        
+        void calculate_layer_score(cv::Mat& depthMatrix,
+                                   cv::Mat& basicScoreMatrix,
+                                   cv::Mat& layerScoreMatrix,
+                                   cv::Mat& edgeDistanceMatrix,
+                                   const float edgeDistanceFactor,
+                                   const float targetEdgeDist)
+        {
+            int width = depthMatrix.cols;
+            int height = depthMatrix.rows;
+
+            for (int y = 0; y < height; y++)
+            {
+                float* depthRow = depthMatrix.ptr<float>(y);
+                float* basicScoreRow = basicScoreMatrix.ptr<float>(y);
+                float* layerScoreRow = layerScoreMatrix.ptr<float>(y);
+                float* edgeDistanceRow = edgeDistanceMatrix.ptr<float>(y);
+
+                for (int x = 0; x < width; x++)
+                {
+                    float depth = *depthRow;
+                    if (depth != 0)
+                    {
+                        float score = *basicScoreRow;
+                        float edgeDistance = *edgeDistanceRow;
+                        score += (targetEdgeDist - abs(targetEdgeDist - edgeDistance)) * edgeDistanceFactor;
+
+                        *layerScoreRow = score;
+                    }
+                    else
+                    {
+                        *layerScoreRow = 0;
+                    }
+                    ++depthRow;
+                    ++basicScoreRow;
+                    ++layerScoreRow;
+                    ++edgeDistanceRow;
+                }
+            }
+        }
 
         void calculate_edge_distance(cv::Mat& segmentationMatrix,
-                                     cv::Mat& areaMatrix,
+                                     cv::Mat& areaSqrtMatrix,
                                      cv::Mat& edgeDistanceMatrix)
         {
             cv::Mat eroded;
@@ -280,7 +323,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 //erode makes the image smaller
                 cv::erode(eroded, eroded, crossElement);
                 //accumulate the eroded image to the edgeDistance buffer
-                cv::add(areaMatrix, edgeDistanceMatrix, edgeDistanceMatrix, eroded, CV_32FC1);
+                cv::add(areaSqrtMatrix, edgeDistanceMatrix, edgeDistanceMatrix, eroded, CV_32FC1);
 
                 nonZeroCount = cv::countNonZero(eroded);
                 done = (nonZeroCount == 0);
@@ -305,18 +348,20 @@ namespace sensekit { namespace plugins { namespace hand {
             return area;
         }
 
-        void calculate_segment_area(cv::Mat& depthMatrix, cv::Mat& areaMatrix, const ScalingCoordinateMapper& mapper)
+        void calculate_segment_area(cv::Mat& depthMatrix, cv::Mat& areaMatrix, cv::Mat& areaSqrtMatrix, const ScalingCoordinateMapper& mapper)
         {
             int width = depthMatrix.cols;
             int height = depthMatrix.rows;
 
             areaMatrix = cv::Mat::zeros(depthMatrix.size(), CV_32FC1);
+            areaSqrtMatrix = cv::Mat::zeros(depthMatrix.size(), CV_32FC1);
 
             for (int y = 0; y < height - 1; y++)
             {
                 float* depthRow = depthMatrix.ptr<float>(y);
                 float* nextDepthRow = depthMatrix.ptr<float>(y + 1);
                 float* areaRow = areaMatrix.ptr<float>(y);
+                float* areaSqrtRow = areaSqrtMatrix.ptr<float>(y);
 
                 for (int x = 0; x < width - 1; x++)
                 {
@@ -335,10 +380,12 @@ namespace sensekit { namespace plugins { namespace hand {
                     }
 
                     *areaRow = area;
+                    *areaSqrtRow = sqrt(area);
 
                     ++depthRow;
                     ++nextDepthRow;
                     ++areaRow;
+                    ++areaSqrtRow;
                 }
             }
         }
@@ -347,7 +394,7 @@ namespace sensekit { namespace plugins { namespace hand {
         float count_neighborhood_area(cv::Mat& segmentationMatrix,
                                       cv::Mat& depthMatrix,
                                       cv::Mat& areaMatrix,
-                                      cv::Point center,
+                                      const cv::Point& center,
                                       const float bandwidth,
                                       const float bandwidthDepth,
                                       const ScalingCoordinateMapper& mapper)

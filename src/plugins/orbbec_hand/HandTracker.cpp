@@ -119,35 +119,55 @@ namespace sensekit { namespace plugins { namespace hand {
             //TODO look at initial points jumping to nearby desk instead of hand, then never leaving
 
             m_matScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-            m_matEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-            m_matArea = cv::Mat::zeros(matDepth.size(), CV_32FC1);
+            m_layerEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
+            m_layerScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_layerSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_debugUpdateSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_debugCreateSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
-            m_debugUpdateSearched = cv::Mat::zeros(matDepth.size(), CV_8UC1);
-            m_debugCreateSearched = cv::Mat::zeros(matDepth.size(), CV_8UC1);
+            m_updateForegroundSearched = cv::Mat::zeros(matDepth.size(), CV_8UC1);
+            m_createForegroundSearched = cv::Mat::zeros(matDepth.size(), CV_8UC1);
 
             float heightFactor = 1;
             float depthFactor = 1.5;
 
             segmentation::calculate_basic_score(matDepth, m_matScore, heightFactor, depthFactor, *(m_mapper.get()));
-            segmentation::calculate_segment_area(matDepth, m_matArea, *(m_mapper.get()));
+            segmentation::calculate_segment_area(matDepth, m_matArea, m_matAreaSqrt, *(m_mapper.get()));
 
-
-            TrackingMatrices updateMatrices(matDepth, m_matArea, m_matScore, matForeground, m_layerSegmentation, m_debugUpdateSegmentation, m_debugUpdateSearched);
+            bool debugLayersEnabled = m_debugImageStream->has_connections();
+            TrackingMatrices updateMatrices(matDepth, 
+                                            m_matArea, 
+                                            m_matAreaSqrt,
+                                            m_matScore, 
+                                            matForeground, 
+                                            m_updateForegroundSearched,
+                                            m_layerSegmentation,
+                                            m_layerScore, 
+                                            m_layerEdgeDistance,
+                                            m_debugUpdateSegmentation, 
+                                            debugLayersEnabled);
 
             m_pointProcessor->updateTrackedPoints(updateMatrices);
 
             m_pointProcessor->removeDuplicatePoints();
 
-            TrackingMatrices createMatrices(matDepth, m_matArea, m_matScore, matForeground, m_layerSegmentation, m_debugCreateSegmentation, m_debugCreateSearched);
+            TrackingMatrices createMatrices(matDepth, 
+                                            m_matArea, 
+                                            m_matAreaSqrt,
+                                            m_matScore, 
+                                            matForeground, 
+                                            m_createForegroundSearched,
+                                            m_layerSegmentation,
+                                            m_layerScore,
+                                            m_layerEdgeDistance,
+                                            m_debugCreateSegmentation, 
+                                            debugLayersEnabled);
 
             //add new points (unless already tracking)
             if (!m_debugImageStream->use_mouse_probe())
             {
                 cv::Point seedPosition;
                 cv::Point nextSearchStart(0, 0);
-                while (segmentation::find_next_foreground_pixel(matForeground, m_debugCreateSearched, seedPosition, nextSearchStart))
+                while (segmentation::find_next_foreground_pixel(matForeground, m_createForegroundSearched, seedPosition, nextSearchStart))
                 {
                     m_pointProcessor->updateTrackedPointOrCreateNewPointFromSeedPosition(createMatrices, seedPosition);
                 }
@@ -161,8 +181,10 @@ namespace sensekit { namespace plugins { namespace hand {
                 m_pointProcessor->updateTrackedPointOrCreateNewPointFromSeedPosition(createMatrices, seedPosition);
 
                 float area = m_pointProcessor->get_point_area(createMatrices, seedPosition);
-                printf("probe depth: %f area: %f\n", matDepth.at<float>(seedPosition), area);
-                segmentation::calculate_edge_distance(m_debugCreateSegmentation, m_matArea, m_matEdgeDistance);
+                float depth = matDepth.at<float>(seedPosition);
+                float score = m_layerScore.at<float>(seedPosition);
+                float edgeDist = m_layerEdgeDistance.at<float>(seedPosition);
+                printf("probe depth: %f area: %f score: %f edgeDist %f\n", depth, area, score, edgeDist);
             }
 
             //remove old points
@@ -330,7 +352,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                        colorFrame);
                 break;
             case DEBUG_HAND_VIEW_EDGEDISTANCE:
-                m_debugVisualizer.showNormArray<float>(m_matEdgeDistance,
+                m_debugVisualizer.showNormArray<float>(m_layerScore,
                                                        m_debugCreateSegmentation,
                                                        colorFrame);
                 break;
@@ -338,11 +360,11 @@ namespace sensekit { namespace plugins { namespace hand {
 
             if (view == DEBUG_HAND_VIEW_CREATE_SEARCHED)
             {
-                m_debugVisualizer.overlayMask(m_debugCreateSearched, colorFrame, searchedColor);
+                m_debugVisualizer.overlayMask(m_createForegroundSearched, colorFrame, searchedColor);
             }
             else if (view == DEBUG_HAND_VIEW_UPDATE_SEARCHED)
             {
-                m_debugVisualizer.overlayMask(m_debugUpdateSearched, colorFrame, searchedColor);
+                m_debugVisualizer.overlayMask(m_updateForegroundSearched, colorFrame, searchedColor);
             }
 
             m_debugVisualizer.overlayMask(m_matForeground, colorFrame, foregroundColor);

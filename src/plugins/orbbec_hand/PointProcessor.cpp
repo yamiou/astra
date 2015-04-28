@@ -12,13 +12,15 @@ namespace sensekit { namespace plugins { namespace hand {
         m_maxMatchDistDefault(200),     //mm
         m_iterationMaxInitial(1),
         m_iterationMaxTracking(1),
-        m_minArea(5000),            //mm^2
-        m_maxArea(20000),           //mm^2
-        m_areaBandwidth(150),       //mm
-        m_areaBandwidthDepth(100),  //mm
-        m_maxSegmentationDist(250), //mm
-        m_steadyDeadBandRadius(150),          //mm
-        m_maxJumpDist(450)          //mm
+        m_minArea(5000),                //mm^2
+        m_maxArea(25000),               //mm^2
+        m_areaBandwidth(150),           //mm
+        m_areaBandwidthDepth(100),      //mm
+        m_maxSegmentationDist(250),     //mm
+        m_steadyDeadBandRadius(150),    //mm
+        m_maxJumpDist(450),             //mm
+        m_targetEdgeDistance(60),       //mm
+        m_edgeDistanceFactor(10)
     {}
 
     PointProcessor::~PointProcessor()
@@ -53,12 +55,37 @@ namespace sensekit { namespace plugins { namespace hand {
         return area;
     }
 
-    bool PointProcessor::is_valid_point_area(TrackingMatrices& matrices, cv::Point targetPoint)
+    bool PointProcessor::is_valid_point_area(TrackingMatrices& matrices, const cv::Point& targetPoint)
     {
         float area = get_point_area(matrices, targetPoint);
 
         bool validPointArea = area > m_minArea && area < m_maxArea;
         return validPointArea;
+    }
+
+    cv::Point PointProcessor::adjustPointForEdge(TrackingMatrices& matrices, const cv::Point& rawTargetPoint)
+    {
+        cv::Size size = matrices.depth.size();
+        matrices.layerEdgeDistance = cv::Mat::zeros(size, CV_32FC1);
+        matrices.layerScore = cv::Mat::zeros(size, CV_32FC1);
+
+        segmentation::calculate_edge_distance(matrices.layerSegmentation,
+                                              matrices.areaSqrt,
+                                              matrices.layerEdgeDistance);
+
+        segmentation::calculate_layer_score(matrices.depth,
+                                            matrices.basicScore,
+                                            matrices.layerScore,
+                                            matrices.layerEdgeDistance,
+                                            m_edgeDistanceFactor,
+                                            m_targetEdgeDistance);
+
+        double min, max;
+        cv::Point minLoc, maxLoc;
+
+        cv::minMaxLoc(matrices.layerScore, &min, &max, &minLoc, &maxLoc, matrices.layerSegmentation);
+
+        return maxLoc;
     }
 
     void PointProcessor::updateTrackedPoint(TrackingMatrices& matrices, TrackedPoint& trackedPoint)
@@ -80,7 +107,9 @@ namespace sensekit { namespace plugins { namespace hand {
                                         m_maxSegmentationDist,
                                         FG_POLICY_IGNORE);
 
-        cv::Point newTargetPoint = segmentation::converge_track_point_from_seed(updateTrackingData);
+        cv::Point rawTargetPoint = segmentation::converge_track_point_from_seed(updateTrackingData);
+        
+        cv::Point newTargetPoint = adjustPointForEdge(matrices, rawTargetPoint);
 
         validateAndUpdateTrackedPoint(matrices, trackedPoint, newTargetPoint);
 
@@ -105,7 +134,10 @@ namespace sensekit { namespace plugins { namespace hand {
                                              m_maxSegmentationDist,
                                              FG_POLICY_IGNORE);
 
-            newTargetPoint = segmentation::converge_track_point_from_seed(recoverTrackingData);
+            rawTargetPoint = segmentation::converge_track_point_from_seed(recoverTrackingData);
+
+            newTargetPoint = adjustPointForEdge(matrices, rawTargetPoint);
+
             validateAndUpdateTrackedPoint(matrices, trackedPoint, newTargetPoint);
 
             if (trackedPoint.m_status == TrackingStatus::Tracking)
@@ -246,7 +278,9 @@ namespace sensekit { namespace plugins { namespace hand {
                                   m_maxSegmentationDist,
                                   FG_POLICY_RESET_TTL);
 
-        cv::Point targetPoint = segmentation::converge_track_point_from_seed(trackingData);
+        cv::Point rawTargetPoint = segmentation::converge_track_point_from_seed(trackingData);
+
+        cv::Point targetPoint = adjustPointForEdge(matrices, rawTargetPoint);
 
         bool validPointArea = is_valid_point_area(matrices, targetPoint);
 

@@ -16,7 +16,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                         cv::Point& nextSearchStart);
 
         void calculate_edge_distance(cv::Mat& segmentationMatrix,
-                                     cv::Mat& areaMatrix,
+                                     cv::Mat& areaSqrtMatrix,
                                      cv::Mat& edgeDistanceMatrix);
 
         void calculate_basic_score(cv::Mat& depthMatrix,
@@ -25,14 +25,22 @@ namespace sensekit { namespace plugins { namespace hand {
                                    const float depthFactor,
                                    const ScalingCoordinateMapper& mapper);
 
+        void calculate_layer_score(cv::Mat& depthMatrix,
+                                   cv::Mat& basicScoreMatrix,
+                                   cv::Mat& layerScoreMatrix,
+                                   cv::Mat& edgeDistanceMatrix,
+                                   const float edgeDistanceFactor,
+                                   const float targetEdgeDist);
+
         void calculate_segment_area(cv::Mat& depthMatrix,
                                     cv::Mat& areaMatrix,
+                                    cv::Mat& areaSqrtMatrix,
                                     const ScalingCoordinateMapper& mapper);
 
         float count_neighborhood_area(cv::Mat& segmentationMatrix,
                                       cv::Mat& depthMatrix,
                                       cv::Mat& areaMatrix,
-                                      cv::Point center,
+                                      const cv::Point& center,
                                       const float bandwidth,
                                       const float bandwidthDepth,
                                       const ScalingCoordinateMapper& mapper);

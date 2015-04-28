@@ -24,7 +24,7 @@ namespace sensekit { namespace plugins { namespace hand {
     }
 
     cv::Point3f cv_convert_depth_to_world(const sensekit::CoordinateMapper& mapper,
-                                          cv::Point3f depth)
+                                          const cv::Point3f& depth)
     {
         float worldX, worldY, worldZ;
 
@@ -46,14 +46,14 @@ namespace sensekit { namespace plugins { namespace hand {
     }
 
     cv::Point3f cv_convert_world_to_depth(const sensekit::CoordinateMapper& mapper,
-                                          cv::Point3f world)
+                                          const cv::Point3f& world)
     {
         return cv_convert_world_to_depth(mapper, world.x, world.y, world.z);
     }
 
 
     cv::Point offset_pixel_location_by_mm(const ScalingCoordinateMapper& mapper,
-                                          cv::Point& position,
+                                          const cv::Point& position,
                                           float offsetX,
                                           float offsetY,
                                           float depth)
