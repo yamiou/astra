@@ -302,13 +302,21 @@ namespace sensekit { namespace plugins { namespace hand {
                 {
                     float dist = cv::norm(tracked.m_worldPosition - worldPosition);
                     float maxDist = m_maxMatchDistDefault;
-                    if (tracked.m_type == TrackedPointType::ActivePoint && tracked.m_status == TrackingStatus::Lost)
+                    bool activeLost = tracked.m_type == TrackedPointType::ActivePoint && tracked.m_status == TrackingStatus::Lost;
+                    if (activeLost)
                     {
                         maxDist = m_maxMatchDistLostActive;
                     }
                     if (dist < maxDist)
                     {
                         tracked.m_inactiveFrameCount = 0;
+                        if (activeLost)
+                        {
+                            //Recover a lost point -- move it to the recovery position
+                            tracked.m_position = targetPoint;
+                            tracked.m_worldPosition = worldPosition;
+                            tracked.m_worldDeltaPosition = cv::Point3f();
+                        }
                         tracked.m_status = TrackingStatus::Tracking;
                         existingPoint = true;
                         break;
