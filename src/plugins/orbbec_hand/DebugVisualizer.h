@@ -182,15 +182,26 @@ namespace sensekit { namespace plugins { namespace hand {
         {
             assert(mat.cols == imageFrame.metadata.width);
             assert(mat.rows == imageFrame.metadata.height);
-            assert(mat.size() == mask.size());
-
+            
             int width = mat.cols;
             int height = mat.rows;
-
+            
             double min, max;
             cv::Point minLoc, maxLoc;
-            cv::minMaxLoc(mat, &min, &max, &minLoc, &maxLoc , mask);
-
+            
+            bool emptyMask = mask.empty();
+            
+            if (!emptyMask)
+            {
+                assert(mat.size() == mask.size());
+                cv::minMaxLoc(mat, &min, &max, &minLoc, &maxLoc, mask);
+            }
+            else
+            {
+                cv::minMaxLoc(mat, &min, &max, &minLoc, &maxLoc);
+            }
+            
+            
             double range = max - min;
             bool rangeZero = abs(range) < 0.00001;
 
@@ -200,13 +211,22 @@ namespace sensekit { namespace plugins { namespace hand {
             for (int y = 0; y < height; ++y)
             {
                 const T* dataRow = mat.ptr<T>(y);
-                const uint8_t* maskRow = mask.ptr<uint8_t>(y);
+                const uint8_t* maskRow = nullptr;
+                if (!emptyMask)
+                {
+                    maskRow = mask.ptr<uint8_t>(y);
+                }
 
-                for (int x = 0; x < width; ++x, ++dataRow, ++maskRow, colorData += bytesPerPixel)
+                for (int x = 0; x < width; ++x, ++dataRow, colorData += bytesPerPixel)
                 {
                     float data = *dataRow;
-                    uint8_t maskValue = *maskRow;
-                    float value = 1;
+                    uint8_t maskValue = 1;
+                    if (!emptyMask)
+                    {
+                        maskValue = *maskRow;
+                        ++maskRow;
+                    }
+                    float value;
                     if (0 == data || 0 == maskValue)
                     {
                         value = 0;
