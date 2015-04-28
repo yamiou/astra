@@ -83,8 +83,6 @@ namespace sensekit { namespace plugins { namespace hand {
 
             m_depthUtility.processDepthToForeground(depthFrame, m_matDepth, m_matForeground);
 
-            float minArea = 10000;
-            float maxArea = 20000;
             track_points(m_matDepth, m_matForeground);
 
             //use same frameIndex as source depth frame
@@ -114,10 +112,10 @@ namespace sensekit { namespace plugins { namespace hand {
             //TODO-done make new points look for nearby lost active tracking points
             //TODO-done reject tracking updates that move the point to a too large area (prevent hand point from jumping to head and not recovering)
             //TODO-done make dead points go to lost tracking instead so they can recover (only use dead for duplicate...rename status?)
+            //TODO-done look at initial points jumping to nearby desk instead of hand, then never leaving
             //TODO calculate refined tracking position (with high res image and edge distance) for tracked points, not intermediate
             //TODO optimization - memoize best scoring position during segmentation step
-            //TODO look at initial points jumping to nearby desk instead of hand, then never leaving
-
+            
             m_matScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_layerEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_layerScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
@@ -127,8 +125,8 @@ namespace sensekit { namespace plugins { namespace hand {
             m_updateForegroundSearched = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_createForegroundSearched = cv::Mat::zeros(matDepth.size(), CV_8UC1);
 
-            float heightFactor = 1;
-            float depthFactor = 1.5;
+            float heightFactor = 2.0f;
+            float depthFactor = 0.25f;
 
             segmentation::calculate_basic_score(matDepth, m_matScore, heightFactor, depthFactor, *(m_mapper.get()));
             segmentation::calculate_segment_area(matDepth, m_matArea, m_matAreaSqrt, *(m_mapper.get()));

@@ -15,12 +15,17 @@ namespace sensekit { namespace plugins { namespace hand {
         m_minArea(5000),                //mm^2
         m_maxArea(25000),               //mm^2
         m_areaBandwidth(150),           //mm
-        m_areaBandwidthDepth(100),      //mm
+        m_areaBandwidthDepth(200),      //mm
         m_maxSegmentationDist(250),     //mm
         m_steadyDeadBandRadius(150),    //mm
         m_maxJumpDist(450),             //mm
         m_targetEdgeDistance(60),       //mm
-        m_edgeDistanceFactor(10)
+        m_edgeDistanceFactor(10),
+        m_maxInactiveFramesToBeConsideredActive(10),
+        m_minActiveFramesToLockTracking(60),
+        m_maxInactiveFramesForCandidatePoints(60),
+        m_maxInactiveFramesForLostPoints(240),
+        m_maxInactiveFramesForActivePoints(480)
     {}
 
     PointProcessor::~PointProcessor()
@@ -179,10 +184,10 @@ namespace sensekit { namespace plugins { namespace hand {
                     trackedPoint.m_inactiveFrameCount = 0;
                 }
 
-                if (trackedPoint.m_inactiveFrameCount < 10)
+                if (trackedPoint.m_inactiveFrameCount < m_maxInactiveFramesToBeConsideredActive)
                 {
                     trackedPoint.m_activeFrameCount++;
-                    if (trackedPoint.m_activeFrameCount > 120)
+                    if (trackedPoint.m_activeFrameCount > m_minActiveFramesToLockTracking)
                     {
                         trackedPoint.m_type = TrackedPointType::ActivePoint;
                     }
@@ -228,24 +233,20 @@ namespace sensekit { namespace plugins { namespace hand {
 
     void PointProcessor::removeOldOrDeadPoints()
     {
-        const int maxInactiveFrames = 60;
-        const int maxInactiveFramesForLostPoints = 240;
-        const int maxInactiveFramesForActivePoints = 480;
-
         for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end();)
         {
             TrackedPoint& tracked = *iter;
 
-            int max = maxInactiveFrames;
+            int max = m_maxInactiveFramesForCandidatePoints;
             if (tracked.m_type == TrackedPointType::ActivePoint)
             {
                 if (tracked.m_status == TrackingStatus::Lost)
                 {
-                    max = maxInactiveFramesForLostPoints;
+                    max = m_maxInactiveFramesForLostPoints;
                 }
                 else
                 {
-                    max = maxInactiveFramesForActivePoints;
+                    max = m_maxInactiveFramesForActivePoints;
                 }
             }
             //if inactive for more than a certain number of frames, or dead, remove point

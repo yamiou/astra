@@ -54,6 +54,11 @@ namespace sensekit { namespace plugins { namespace hand {
         float m_maxJumpDist;
         float m_targetEdgeDistance;
         float m_edgeDistanceFactor;
+        int m_maxInactiveFramesToBeConsideredActive;
+        int m_minActiveFramesToLockTracking;
+        int m_maxInactiveFramesForCandidatePoints;
+        int m_maxInactiveFramesForLostPoints;
+        int m_maxInactiveFramesForActivePoints;
 
         int m_nextTrackingId{ 0 };
         //TODO consider std::list<TrackedPoint>
