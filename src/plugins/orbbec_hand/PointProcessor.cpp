@@ -16,13 +16,13 @@ namespace sensekit { namespace plugins { namespace hand {
         m_minArea(5000),                //mm^2
         m_maxArea(25000),               //mm^2
         m_areaBandwidth(150),           //mm
-        m_areaBandwidthDepth(200),      //mm
+        m_areaBandwidthDepth(100),      //mm
         m_maxSegmentationDist(250),     //mm
         m_steadyDeadBandRadius(150),    //mm
         m_maxJumpDist(100),             //mm
         m_targetEdgeDistance(60),       //mm
-        m_heightScoreFactor(2.0),
-        m_depthScoreFactor(0.25),
+        m_heightScoreFactor(0.5),
+        m_depthScoreFactor(2.0),
         m_edgeDistanceScoreFactor(4),
         m_maxInactiveFramesToBeConsideredActive(10),
         m_minActiveFramesToLockTracking(60),
@@ -31,7 +31,7 @@ namespace sensekit { namespace plugins { namespace hand {
         m_maxInactiveFramesForActivePoints(480),
         m_pointSmoothingFactor(0.75),
         m_pointDeadBandSmoothingFactor(0.05),
-        m_pointSmoothingDeadZone(20)      //mm
+        m_pointSmoothingDeadZone(50)      //mm
     {}
 
     PointProcessor::~PointProcessor()
