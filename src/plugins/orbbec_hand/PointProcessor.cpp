@@ -293,9 +293,6 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Point3f deltaPosition = newWorldPosition - trackedPoint.fullSizeWorldPosition;
         trackedPoint.fullSizeWorldPosition = newWorldPosition;
         trackedPoint.fullSizeWorldDeltaPosition = deltaPosition;
-        trackedPoint.worldPosition = newWorldPosition;
-        trackedPoint.worldDeltaPosition = deltaPosition;
-
     }
 
     void PointProcessor::validateAndUpdateTrackedPoint(TrackingMatrices& matrices,

@@ -123,6 +123,7 @@ public:
         m_viewType = reader.stream<sensekit::DebugHandStream>().get_view_type();
 
         check_fps();
+        m_newFrameReady = true;
     }
 
     void drawCircle(sf::RenderWindow& window, float radius, float x, float y, sf::Color color)
@@ -155,6 +156,21 @@ public:
             else if (status == HAND_STATUS_CANDIDATE)
             {
                 color = candidateColor;
+            }
+            else if (status == HAND_STATUS_TRACKING)
+            {
+                if (m_newFrameReady)
+                {
+                    m_newFrameReady = false;
+                    auto depthPosition = handPoint.depthPosition();
+                    auto worldPosition = handPoint.worldPosition();
+                    printf("Hand: id: %d D: (%d,%d) W: (%f,%f,%f)\n", handPoint.trackingId(),
+                        depthPosition.x,
+                        depthPosition.y,
+                        worldPosition.x,
+                        worldPosition.y,
+                        worldPosition.z);
+                }
             }
 
             const sensekit::Vector2i& p = handPoint.depthPosition();
@@ -276,7 +292,8 @@ private:
     int m_depthHeight{ 1 };
     int m_displayWidth{ 1 };
     int m_displayHeight{ 1 };
-    bool m_outputFPS{ true };
+    bool m_outputFPS{ false };
+    bool m_newFrameReady{false};
 };
 
 void request_view_mode(sensekit::StreamReader& reader, sensekit::DebugHandViewType view)
