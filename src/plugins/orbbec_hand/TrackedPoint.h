@@ -11,12 +11,10 @@ namespace sensekit { namespace plugins { namespace hand {
     public:
         cv::Point m_position;
         cv::Point3f m_worldPosition;
-        cv::Point3f m_steadyWorldPosition;
         cv::Point3f m_worldDeltaPosition;
+        cv::Point3f m_steadyWorldPosition;
         int m_trackingId;
         int m_inactiveFrameCount;
-        float m_totalContributionArea;
-        int m_wrongAreaCount;
         int m_activeFrameCount;
         TrackedPointType m_type;
         TrackingStatus m_status;
@@ -32,8 +30,6 @@ namespace sensekit { namespace plugins { namespace hand {
             m_trackingId = trackingId;
             m_inactiveFrameCount = 0;
             m_activeFrameCount = 0;
-            m_totalContributionArea = 0;
-            m_wrongAreaCount = 0;
         }
     };
 }}}
