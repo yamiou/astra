@@ -55,11 +55,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_convert_world_to_depth(sensekit_depth
                                                                   float worldX, float worldY, float worldZ,
                                                                   float* pDepthX, float* pDepthY, float* pDepthZ)
 {
-    conversion_cache_t conversionCache;
-    sensekit_stream_get_parameter_fixed(depthStream,
-                                        SENSEKIT_PARAMETER_DEPTH_CONVERSION_CACHE,
-                                        sizeof(conversion_cache_t),
-                                        reinterpret_cast<sensekit_parameter_data_t*>(&conversionCache));
+    conversion_cache_t conversionCache = sensekit_depth_fetch_conversion_cache(depthStream);
 
     *pDepthX = conversionCache.coeffX * worldX / worldZ + conversionCache.halfResX;
     *pDepthY = conversionCache.halfResY - conversionCache.coeffY * worldY / worldZ;
