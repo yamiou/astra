@@ -27,10 +27,10 @@ namespace sensekit { namespace plugins { namespace hand {
             for (auto iter = points.begin(); iter != points.end(); ++iter)
             {
                 TrackedPoint tracked = *iter;
-                cv::Point position = tracked.m_position;
+                cv::Point position = tracked.position;
 
-                bool isActivePoint = tracked.m_type == TrackedPointType::ActivePoint;
-                bool isLostTrackingPoint = isActivePoint && tracked.m_status == TrackingStatus::Lost;
+                bool isActivePoint = tracked.pointType == TrackedPointType::ActivePoint;
+                bool isLostTrackingPoint = isActivePoint && tracked.trackingStatus == TrackingStatus::Lost;
 
                 int y0 = MAX(0, position.y - 1);
                 int y1 = MIN(height - 1, position.y + 1);

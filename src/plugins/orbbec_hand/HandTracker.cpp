@@ -234,24 +234,24 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 TrackedPoint internalPoint = *it;
 
-                TrackingStatus status = internalPoint.m_status;
+                TrackingStatus status = internalPoint.trackingStatus;
 
                 if (status != Dead && handIndex < maxHandCount)
                 {
                     sensekit_handpoint_t& point = frame.handpoints[handIndex];
                     ++handIndex;
 
-                    point.trackingId = internalPoint.m_trackingId;
+                    point.trackingId = internalPoint.trackingId;
 
                     //convert from internal depth resolution to original depth resolution
                     //add 0.5 to center on the middle of the pixel
-                    point.depthPosition.x = (internalPoint.m_position.x + 0.5) * m_resizeFactor;
-                    point.depthPosition.y = (internalPoint.m_position.y + 0.5) * m_resizeFactor;
+                    point.depthPosition.x = (internalPoint.position.x + 0.5) * m_resizeFactor;
+                    point.depthPosition.y = (internalPoint.position.y + 0.5) * m_resizeFactor;
 
-                    copy_position(internalPoint.m_worldPosition, point.worldPosition);
-                    copy_position(internalPoint.m_worldDeltaPosition, point.worldDeltaPosition);
+                    copy_position(internalPoint.worldPosition, point.worldPosition);
+                    copy_position(internalPoint.worldDeltaPosition, point.worldDeltaPosition);
 
-                    point.status = convert_hand_status(status, internalPoint.m_type);
+                    point.status = convert_hand_status(status, internalPoint.pointType);
                 }
             }
             for (int i = handIndex; i < maxHandCount; ++i)

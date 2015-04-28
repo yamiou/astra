@@ -9,28 +9,27 @@ namespace sensekit { namespace plugins { namespace hand {
     struct TrackedPoint
     {
     public:
-        cv::Point m_position;
-        cv::Point3f m_worldPosition;
-        cv::Point3f m_worldDeltaPosition;
-        cv::Point3f m_steadyWorldPosition;
-        int m_trackingId;
-        int m_inactiveFrameCount;
-        int m_activeFrameCount;
-        TrackedPointType m_type;
-        TrackingStatus m_status;
+        cv::Point position;
+        cv::Point3f worldPosition;
+        cv::Point3f worldDeltaPosition;
+        cv::Point3f steadyWorldPosition;
+        int trackingId;
+        int inactiveFrameCount;
+        int activeFrameCount;
+        TrackedPointType pointType;
+        TrackingStatus trackingStatus;
 
-        TrackedPoint(cv::Point position, cv::Point3f worldPosition, int trackingId)
-        {
-            m_type = TrackedPointType::CandidatePoint;
-            m_status = TrackingStatus::NotTracking;
-            m_position = position;
-            m_worldPosition = worldPosition;
-            m_steadyWorldPosition = worldPosition;
-            m_worldDeltaPosition = cv::Point3f(0, 0, 0);
-            m_trackingId = trackingId;
-            m_inactiveFrameCount = 0;
-            m_activeFrameCount = 0;
-        }
+        TrackedPoint(cv::Point position, cv::Point3f worldPosition, int trackingId) :
+            position(position),
+            worldPosition(worldPosition),
+            worldDeltaPosition(),
+            steadyWorldPosition(worldPosition),
+            trackingId(trackingId),
+            inactiveFrameCount(0),
+            activeFrameCount(0),
+            pointType(TrackedPointType::CandidatePoint),
+            trackingStatus(TrackingStatus::NotTracking)
+        { }
     };
 }}}
 

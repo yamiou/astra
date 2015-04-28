@@ -98,16 +98,16 @@ namespace sensekit { namespace plugins { namespace hand {
         const float width = matrices.depth.cols;
         const float height = matrices.depth.rows;
 
-        trackedPoint.m_inactiveFrameCount++;
+        trackedPoint.inactiveFrameCount++;
 
-        cv::Point seedPosition = trackedPoint.m_position;
-        float referenceDepth = trackedPoint.m_worldPosition.z;
+        cv::Point seedPosition = trackedPoint.position;
+        float referenceDepth = trackedPoint.worldPosition.z;
 
         TrackingData updateTrackingData(matrices, 
                                         seedPosition, 
                                         referenceDepth, 
                                         m_trackingBandwidthDepth, 
-                                        trackedPoint.m_type, 
+                                        trackedPoint.pointType, 
                                         m_iterationMaxTracking,
                                         m_maxSegmentationDist,
                                         FG_POLICY_IGNORE);
@@ -120,9 +120,9 @@ namespace sensekit { namespace plugins { namespace hand {
 
         //lost a tracked point, try to guess the position using previous position delta for second chance to recover
 
-        if (trackedPoint.m_status != TrackingStatus::Tracking && cv::norm(trackedPoint.m_worldDeltaPosition) > 0)
+        if (trackedPoint.trackingStatus != TrackingStatus::Tracking && cv::norm(trackedPoint.worldDeltaPosition) > 0)
         {
-            auto estimatedWorldPosition = trackedPoint.m_worldPosition + trackedPoint.m_worldDeltaPosition;
+            auto estimatedWorldPosition = trackedPoint.worldPosition + trackedPoint.worldDeltaPosition;
 
             cv::Point3f estimatedPosition = m_mapper.convert_world_to_depth(estimatedWorldPosition);
 
@@ -134,7 +134,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                              seedPosition, 
                                              referenceDepth, 
                                              m_initialBandwidthDepth, 
-                                             trackedPoint.m_type, 
+                                             trackedPoint.pointType, 
                                              m_iterationMaxTracking,
                                              m_maxSegmentationDist,
                                              FG_POLICY_IGNORE);
@@ -145,9 +145,9 @@ namespace sensekit { namespace plugins { namespace hand {
 
             validateAndUpdateTrackedPoint(matrices, trackedPoint, newTargetPoint);
 
-            if (trackedPoint.m_status == TrackingStatus::Tracking)
+            if (trackedPoint.trackingStatus == TrackingStatus::Tracking)
             {
-                printf("Recovered point %d\n", trackedPoint.m_trackingId);
+                printf("Recovered point %d\n", trackedPoint.trackingId);
             }
         }
     }
@@ -165,45 +165,45 @@ namespace sensekit { namespace plugins { namespace hand {
 
             cv::Point3f worldPosition = m_mapper.convert_depth_to_world(newTargetPoint.x, newTargetPoint.y, depth);
 
-            auto dist = cv::norm(worldPosition - trackedPoint.m_worldPosition);
-            auto steadyDist = cv::norm(worldPosition - trackedPoint.m_steadyWorldPosition);
+            auto dist = cv::norm(worldPosition - trackedPoint.worldPosition);
+            auto steadyDist = cv::norm(worldPosition - trackedPoint.steadyWorldPosition);
 
             bool validArea = is_valid_point_area(matrices, newTargetPoint);
 
             if (dist < m_maxJumpDist && validArea)
             {
                 updatedPoint = true;
-                cv::Point3f deltaPosition = worldPosition - trackedPoint.m_worldPosition;
-                trackedPoint.m_worldPosition = worldPosition;
-                trackedPoint.m_worldDeltaPosition = deltaPosition;
+                cv::Point3f deltaPosition = worldPosition - trackedPoint.worldPosition;
+                trackedPoint.worldPosition = worldPosition;
+                trackedPoint.worldDeltaPosition = deltaPosition;
 
-                trackedPoint.m_position = newTargetPoint;
+                trackedPoint.position = newTargetPoint;
                 if (steadyDist > m_steadyDeadBandRadius)
                 {
-                    trackedPoint.m_steadyWorldPosition = worldPosition;
-                    trackedPoint.m_inactiveFrameCount = 0;
+                    trackedPoint.steadyWorldPosition = worldPosition;
+                    trackedPoint.inactiveFrameCount = 0;
                 }
 
-                if (trackedPoint.m_inactiveFrameCount < m_maxInactiveFramesToBeConsideredActive)
+                if (trackedPoint.inactiveFrameCount < m_maxInactiveFramesToBeConsideredActive)
                 {
-                    trackedPoint.m_activeFrameCount++;
-                    if (trackedPoint.m_activeFrameCount > m_minActiveFramesToLockTracking)
+                    trackedPoint.activeFrameCount++;
+                    if (trackedPoint.activeFrameCount > m_minActiveFramesToLockTracking)
                     {
-                        trackedPoint.m_type = TrackedPointType::ActivePoint;
+                        trackedPoint.pointType = TrackedPointType::ActivePoint;
                     }
                 }
             }
         }
 
-        assert(trackedPoint.m_status != TrackingStatus::Dead);
+        assert(trackedPoint.trackingStatus != TrackingStatus::Dead);
 
         if (updatedPoint)
         {
-            trackedPoint.m_status = TrackingStatus::Tracking;
+            trackedPoint.trackingStatus = TrackingStatus::Tracking;
         }
         else
         {
-            trackedPoint.m_status = TrackingStatus::Lost;
+            trackedPoint.trackingStatus = TrackingStatus::Lost;
         }
     }
 
@@ -215,17 +215,17 @@ namespace sensekit { namespace plugins { namespace hand {
             for (auto otherIter = m_trackedPoints.begin(); otherIter != m_trackedPoints.end(); ++otherIter)
             {
                 TrackedPoint& otherTracked = *otherIter;
-                bool bothNotDead = tracked.m_status != TrackingStatus::Dead && otherTracked.m_status != TrackingStatus::Dead;
-                if (tracked.m_trackingId != otherTracked.m_trackingId && bothNotDead && tracked.m_position == otherTracked.m_position)
+                bool bothNotDead = tracked.trackingStatus != TrackingStatus::Dead && otherTracked.trackingStatus != TrackingStatus::Dead;
+                if (tracked.trackingId != otherTracked.trackingId && bothNotDead && tracked.position == otherTracked.position)
                 {
-                    tracked.m_activeFrameCount = MAX(tracked.m_activeFrameCount, otherTracked.m_activeFrameCount);
-                    tracked.m_inactiveFrameCount = MIN(tracked.m_inactiveFrameCount, otherTracked.m_inactiveFrameCount);
-                    if (otherTracked.m_type == TrackedPointType::ActivePoint && tracked.m_type != TrackedPointType::ActivePoint)
+                    tracked.activeFrameCount = MAX(tracked.activeFrameCount, otherTracked.activeFrameCount);
+                    tracked.inactiveFrameCount = MIN(tracked.inactiveFrameCount, otherTracked.inactiveFrameCount);
+                    if (otherTracked.pointType == TrackedPointType::ActivePoint && tracked.pointType != TrackedPointType::ActivePoint)
                     {
-                        tracked.m_trackingId = otherTracked.m_trackingId;
-                        tracked.m_type = TrackedPointType::ActivePoint;
+                        tracked.trackingId = otherTracked.trackingId;
+                        tracked.pointType = TrackedPointType::ActivePoint;
                     }
-                    otherTracked.m_status = TrackingStatus::Dead;
+                    otherTracked.trackingStatus = TrackingStatus::Dead;
                 }
             }
         }
@@ -238,9 +238,9 @@ namespace sensekit { namespace plugins { namespace hand {
             TrackedPoint& tracked = *iter;
 
             int max = m_maxInactiveFramesForCandidatePoints;
-            if (tracked.m_type == TrackedPointType::ActivePoint)
+            if (tracked.pointType == TrackedPointType::ActivePoint)
             {
-                if (tracked.m_status == TrackingStatus::Lost)
+                if (tracked.trackingStatus == TrackingStatus::Lost)
                 {
                     max = m_maxInactiveFramesForLostPoints;
                 }
@@ -250,7 +250,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 }
             }
             //if inactive for more than a certain number of frames, or dead, remove point
-            if (tracked.m_inactiveFrameCount > max || tracked.m_status == TrackingStatus::Dead)
+            if (tracked.inactiveFrameCount > max || tracked.trackingStatus == TrackingStatus::Dead)
             {
                 iter = m_trackedPoints.erase(iter);
             }
@@ -298,26 +298,26 @@ namespace sensekit { namespace plugins { namespace hand {
             for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
             {
                 TrackedPoint& tracked = *iter;
-                if (tracked.m_status != TrackingStatus::Dead)
+                if (tracked.trackingStatus != TrackingStatus::Dead)
                 {
-                    float dist = cv::norm(tracked.m_worldPosition - worldPosition);
+                    float dist = cv::norm(tracked.worldPosition - worldPosition);
                     float maxDist = m_maxMatchDistDefault;
-                    bool activeLost = tracked.m_type == TrackedPointType::ActivePoint && tracked.m_status == TrackingStatus::Lost;
+                    bool activeLost = tracked.pointType == TrackedPointType::ActivePoint && tracked.trackingStatus == TrackingStatus::Lost;
                     if (activeLost)
                     {
                         maxDist = m_maxMatchDistLostActive;
                     }
                     if (dist < maxDist)
                     {
-                        tracked.m_inactiveFrameCount = 0;
+                        tracked.inactiveFrameCount = 0;
                         if (activeLost)
                         {
                             //Recover a lost point -- move it to the recovery position
-                            tracked.m_position = targetPoint;
-                            tracked.m_worldPosition = worldPosition;
-                            tracked.m_worldDeltaPosition = cv::Point3f();
+                            tracked.position = targetPoint;
+                            tracked.worldPosition = worldPosition;
+                            tracked.worldDeltaPosition = cv::Point3f();
                         }
-                        tracked.m_status = TrackingStatus::Tracking;
+                        tracked.trackingStatus = TrackingStatus::Tracking;
                         existingPoint = true;
                         break;
                     }
@@ -326,8 +326,8 @@ namespace sensekit { namespace plugins { namespace hand {
             if (!existingPoint)
             {
                 TrackedPoint newPoint(targetPoint, worldPosition, m_nextTrackingId);
-                newPoint.m_type = TrackedPointType::CandidatePoint;
-                newPoint.m_status = TrackingStatus::Tracking;
+                newPoint.pointType = TrackedPointType::CandidatePoint;
+                newPoint.trackingStatus = TrackingStatus::Tracking;
                 ++m_nextTrackingId;
                 m_trackedPoints.push_back(newPoint);
             }
