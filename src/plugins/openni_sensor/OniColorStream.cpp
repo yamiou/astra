@@ -2,4 +2,4 @@
 
 namespace sensekit { namespace plugins {
 
-    }}
+}}

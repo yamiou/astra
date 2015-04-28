@@ -8,5 +8,6 @@
 #include <SenseKit/Plugins/StreamCallbackListener.h>
 #include <SenseKit/Plugins/Stream.h>
 #include <SenseKit/Plugins/SingleBinStream.h>
+#include <SenseKit/Plugins/MultiBinStream.h>
 
 #endif /* PLUGINKIT_H */

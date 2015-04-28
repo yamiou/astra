@@ -63,8 +63,10 @@ namespace sensekit {
 
         bool is_active() { return m_activeCount > 0; }
         bool has_clients_connected() { return m_connectedCount > 0; }
+        size_t bufferSize() { return m_bufferSize; }
 
         sensekit_bin_t get_handle() { return reinterpret_cast<sensekit_bin_t>(this); }
+
         static StreamBin* get_ptr(sensekit_bin_t bin)
             { return reinterpret_cast<StreamBin*>(bin); }
 
@@ -73,6 +75,7 @@ namespace sensekit {
         sensekit_frame_t* get_frontBuffer();
         size_t inc_index(size_t index);
 
+        size_t m_bufferSize{0};
         std::atomic_bool m_frontBufferLocked;
 
         size_t m_frontBufferIndex{0};

@@ -24,7 +24,7 @@ namespace sensekit { namespace plugins { namespace hand {
                               StreamDescription(SENSEKIT_STREAM_DEBUG_HAND,
                                                 DEFAULT_SUBTYPE),
                               width * height * bytesPerPixel),
-                              m_mouseNormPosition()
+              m_mouseNormPosition()
         { }
 
         DebugHandViewType view_type() const { return m_viewType; }
@@ -34,20 +34,20 @@ namespace sensekit { namespace plugins { namespace hand {
         const Vector2f& mouse_norm_position() const { return m_mouseNormPosition; }
 
     protected:
-        virtual void set_parameter(sensekit_streamconnection_t connection,
-                                   sensekit_parameter_id id,
-                                   size_t inByteLength,
-                                   sensekit_parameter_data_t inData) override;
+        virtual void on_set_parameter(sensekit_streamconnection_t connection,
+                                      sensekit_parameter_id id,
+                                      size_t inByteLength,
+                                      sensekit_parameter_data_t inData) override;
 
-        virtual void get_parameter(sensekit_streamconnection_t connection,
-                                   sensekit_parameter_id id,
-                                   sensekit_parameter_bin_t& parameterBin) override;
+        virtual void on_get_parameter(sensekit_streamconnection_t connection,
+                                      sensekit_parameter_id id,
+                                      sensekit_parameter_bin_t& parameterBin) override;
 
-        virtual void invoke(sensekit_streamconnection_t connection,
-                            sensekit_command_id commandId,
-                            size_t inByteLength,
-                            sensekit_parameter_data_t inData,
-                            sensekit_parameter_bin_t& parameterBin) override;
+        virtual void on_invoke(sensekit_streamconnection_t connection,
+                               sensekit_command_id commandId,
+                               size_t inByteLength,
+                               sensekit_parameter_data_t inData,
+                               sensekit_parameter_bin_t& parameterBin) override;
     private:
         void get_view_parameter(sensekit_parameter_bin_t& parameterBin);
         void set_view_parameter(size_t inByteLength,

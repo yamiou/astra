@@ -89,7 +89,6 @@ namespace sensekit {
                                         sensekit_bin_t bin,
                                         sensekit_streamconnection_t connection) {}
 
-        
         friend stream_callbacks_t create_plugin_callbacks(StreamCallbackListener* context);
     };
 

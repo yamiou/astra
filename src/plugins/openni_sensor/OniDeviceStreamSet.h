@@ -25,20 +25,17 @@ namespace sensekit { namespace plugins {
 
                     m_uri = info->getUri();
                     m_pluginService.create_stream_set(m_streamSetHandle);
-                    m_sensor = std::unique_ptr<Sensor>(new Sensor(m_streamSetHandle));
+                    m_sensor = std::make_unique<Sensor>(m_streamSetHandle);
 
-                    m_logger.info("creating device streamset");
                     open_sensor_streams();
                 }
-
-
 
             ~OniDeviceStreamSet()
                 {
                     close_sensor_streams();
-
-                    m_logger.info("destroying device streamset (and oni device)");
                     m_pluginService.destroy_stream_set(m_streamSetHandle);
+
+                    m_logger.info("closing oni device");
                     m_oniDevice.close();
                 }
 
@@ -85,9 +82,9 @@ namespace sensekit { namespace plugins {
             std::string m_uri;
 
             using StreamPtr = std::unique_ptr<OniDeviceStreamBase>;
-            using StreamList = std::vector<StreamPtr>;
+            using StreamPtrList = std::vector<StreamPtr>;
 
-            StreamList m_streams;
+            StreamPtrList m_streams;
 
             const static size_t MAX_ONI_STREAMS = 4;
             std::array<openni::VideoStream*, MAX_ONI_STREAMS> m_oniStreams;

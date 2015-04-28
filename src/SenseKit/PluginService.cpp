@@ -20,8 +20,11 @@ namespace sensekit
     sensekit_status_t PluginService::create_stream_set(sensekit_streamset_t& streamSet)
     {
         //TODO: normally would create a new streamset
+
         StreamSet* actualStreamSet = &m_context.get_rootSet();
         streamSet = actualStreamSet->get_handle();
+
+        m_logger.info("creating streamset: %x", streamSet);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -34,6 +37,8 @@ namespace sensekit
         //if streamset has direct child streams, return error
         //if streamset has child streamsets, reparent them to this streamset's parent (or null parent)
         //then delete the streamset
+
+        m_logger.info("destroying streamset: %x", streamSet);
 
         streamSet = nullptr;
 
@@ -93,11 +98,11 @@ namespace sensekit
                                                    stream_callbacks_t pluginCallbacks,
                                                    sensekit_stream_t& handle)
     {
-        m_logger.info("registering stream");
-
         // TODO add to specific stream set
         Stream* stream = m_context.get_rootSet().create_stream(desc, pluginCallbacks);
         handle = stream->get_handle();
+
+        m_logger.info("created stream -- handle %x type: %d", handle, desc.type);
 
         m_streamAddedSignal.raise(setHandle, handle, desc);
 
@@ -109,7 +114,6 @@ namespace sensekit
         if (streamHandle == nullptr)
             return SENSEKIT_STATUS_INVALID_PARAMETER;
 
-        m_logger.info("unregistered stream.");
         //TODO refactor this mess
 
         StreamSet* set = &m_context.get_rootSet();
@@ -117,6 +121,8 @@ namespace sensekit
 
         Stream* stream = Stream::get_ptr(streamHandle);
         const sensekit_stream_desc_t& desc = stream->get_description();
+
+        m_logger.info("destroying stream -- handle: %x type: %d", stream->get_handle(), desc.type);
 
         m_streamRemovingSignal.raise(setHandle, streamHandle, desc);
 
@@ -138,6 +144,12 @@ namespace sensekit
         binHandle = bin->get_handle();
         binBuffer = bin->get_backBuffer();
 
+        m_logger.info("creating bin -- handle: %x stream: %x type: %d size: %u",
+                      binHandle,
+                      streamHandle,
+                      actualStream->get_description().type,
+                      lengthInBytes);
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 
@@ -147,6 +159,13 @@ namespace sensekit
     {
         Stream* actualStream = Stream::get_ptr(streamHandle);
         StreamBin* bin = StreamBin::get_ptr(binHandle);
+
+        m_logger.info("destroying bin -- %x stream: %x type: %d size: %u",
+                      binHandle,
+                      streamHandle,
+                      actualStream->get_description().type,
+                      bin->bufferSize());
+
         actualStream->destroy_bin(bin);
 
         binHandle = nullptr;
@@ -179,6 +198,23 @@ namespace sensekit
     {
         StreamConnection* underlyingConnection = StreamConnection::get_ptr(connection);
         StreamBin* bin = StreamBin::get_ptr(binHandle);
+
+        Stream* stream = underlyingConnection->get_stream();
+        if (binHandle != nullptr)
+        {
+            m_logger.info("linking connection to bin -- stream: %x type: %d conn: %x bin: %x",
+                          stream->get_handle(),
+                          stream->get_description().type,
+                          connection,
+                          bin);
+        }
+        else
+        {
+            m_logger.info("unlinking connection to bin -- stream: %x type: %d conn: %x",
+                          stream->get_handle(),
+                          stream->get_description().type,
+                          connection);
+        }
 
         underlyingConnection->set_bin(bin);
 

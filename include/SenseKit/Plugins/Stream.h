@@ -13,7 +13,6 @@ namespace sensekit { namespace plugins {
     class Stream : public StreamCallbackListener
     {
     public:
-
         Stream(PluginServiceProxy& pluginService,
                Sensor streamSet,
                StreamDescription description) :
@@ -27,28 +26,60 @@ namespace sensekit { namespace plugins {
 
         virtual ~Stream()
         {
-            m_logger.info("destroying sensekit stream of type: %d", m_description.get_type());
             m_pluginService.destroy_stream(m_streamHandle);
         }
 
         inline const StreamDescription& get_description() { return m_description; }
+        inline sensekit_stream_t get_handle() { return m_streamHandle; }
 
     protected:
         inline sensekit::plugins::PluginLogger& get_logger() { return m_logger; }
+        inline PluginServiceProxy& get_pluginService() const { return m_pluginService; }
 
     private:
         sensekit::plugins::PluginLogger m_logger;
+
         virtual void connection_added(sensekit_stream_t stream,
                                       sensekit_streamconnection_t connection) override final;
-
-        virtual void on_connection_added(sensekit_streamconnection_t connection) { }
 
         virtual void connection_removed(sensekit_stream_t stream,
                                         sensekit_bin_t bin,
                                         sensekit_streamconnection_t connection) override final;
 
+        virtual void set_parameter(sensekit_streamconnection_t connection,
+                                   sensekit_parameter_id id,
+                                   size_t inByteLength,
+                                   sensekit_parameter_data_t inData) override final;
+
+        virtual void get_parameter(sensekit_streamconnection_t connection,
+                                   sensekit_parameter_id id,
+                                   sensekit_parameter_bin_t& parameterBin) override final;
+
+        virtual void invoke(sensekit_streamconnection_t connection,
+                            sensekit_command_id commandId,
+                            size_t inByteLength,
+                            sensekit_parameter_data_t inData,
+                            sensekit_parameter_bin_t& parameterBin) override final;
+
+        virtual void on_connection_added(sensekit_streamconnection_t connection) { }
+
         virtual void on_connection_removed(sensekit_bin_t bin,
                                            sensekit_streamconnection_t connection) { }
+
+        virtual void on_set_parameter(sensekit_streamconnection_t connection,
+                                      sensekit_parameter_id id,
+                                      size_t inByteLength,
+                                      sensekit_parameter_data_t inData) {}
+
+        virtual void on_get_parameter(sensekit_streamconnection_t connection,
+                                      sensekit_parameter_id id,
+                                      sensekit_parameter_bin_t& parameterBin) {}
+
+        virtual void on_invoke(sensekit_streamconnection_t connection,
+                               sensekit_command_id commandId,
+                               size_t inByteLength,
+                               sensekit_parameter_data_t inData,
+                               sensekit_parameter_bin_t& parameterBin) {};
 
         virtual void on_new_buffer(sensekit_frame_t* newBuffer) { }
 
@@ -56,7 +87,6 @@ namespace sensekit { namespace plugins {
         {
             assert(m_streamHandle == nullptr);
 
-            m_logger.info("creating stream of type: %d", m_description.get_type());
             stream_callbacks_t pluginCallbacks = create_plugin_callbacks(this);
 
             sensekit_stream_desc_t desc = description.get_desc_t();
@@ -73,66 +103,32 @@ namespace sensekit { namespace plugins {
         sensekit_stream_t m_streamHandle{nullptr};
 
     protected:
-        PluginServiceProxy& get_pluginService() const { return m_pluginService; }
 
-        void create_bin(size_t binSize, sensekit_bin_t& binHandle, sensekit_frame_t*& buffer)
-        {
-            m_logger.info("creating bin -- handle: %x stream: %x type: %d size: %u",
-                 binHandle,
-                 m_streamHandle,
-                 m_description.get_type(),
-                 binSize);
-
-            m_pluginService.create_stream_bin(m_streamHandle,
-                                              binSize,
-                                              &binHandle,
-                                              &buffer);
-        }
-
-        void cycle_bin(sensekit_bin_t binHandle, sensekit_frame_t*& buffer)
-        {
-            m_pluginService.cycle_bin_buffers(binHandle, &buffer);
-        }
-
-        void link_connection_to_bin(sensekit_streamconnection_t connection, sensekit_bin_t bin)
-        {
-            if (bin != nullptr)
-            {
-                m_logger.info("linking connection to bin -- stream: %x type: %d conn: %x bin: %x",
-                     m_streamHandle,
-                     m_description.get_type(),
-                     connection,
-                     bin);
-            }
-            else
-            {
-                m_logger.info("linking connection to bin -- stream: %x type: %d conn: %x",
-                     m_streamHandle,
-                     m_description.get_type(),
-                     connection);
-            }
-
-            m_pluginService.link_connection_to_bin(connection, bin);
-        }
-
-        void destroy_bin(sensekit_bin_t& binHandle, sensekit_frame_t*& buffer)
-        {
-            m_logger.info("destroying bin -- %d stream: %x type: %d size: %u",
-                 binHandle,
-                 m_streamHandle,
-                 m_description.get_type());
-
-            m_pluginService.destroy_stream_bin(m_streamHandle, &binHandle, &buffer);
-        }
-
-        bool bin_has_connections(sensekit_bin_t binHandle)
-        {
-            bool hasConnections = false;
-            m_pluginService.bin_has_connections(binHandle, &hasConnections);
-
-            return hasConnections;
-        }
     };
+
+    inline void Stream::set_parameter(sensekit_streamconnection_t connection,
+                                      sensekit_parameter_id id,
+                                      size_t inByteLength,
+                                      sensekit_parameter_data_t inData)
+    {
+        on_set_parameter(connection, id, inByteLength, inData);
+    }
+
+    inline void Stream::get_parameter(sensekit_streamconnection_t connection,
+                                      sensekit_parameter_id id,
+                                      sensekit_parameter_bin_t& parameterBin)
+    {
+        on_get_parameter(connection, id, parameterBin);
+    }
+
+    inline void Stream::invoke(sensekit_streamconnection_t connection,
+                               sensekit_command_id commandId,
+                               size_t inByteLength,
+                               sensekit_parameter_data_t inData,
+                               sensekit_parameter_bin_t& parameterBin)
+    {
+        on_invoke(connection, commandId, inByteLength, inData, parameterBin);
+    }
 
     inline void Stream::connection_added(sensekit_stream_t stream,
                                          sensekit_streamconnection_t connection)

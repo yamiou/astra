@@ -6,7 +6,8 @@
 namespace sensekit {
 
     StreamBin::StreamBin(size_t bufferLengthInBytes)
-        : m_frontBufferLocked(ATOMIC_VAR_INIT(false))
+        : m_frontBufferLocked(ATOMIC_VAR_INIT(false)),
+          m_bufferSize(bufferLengthInBytes)
     {
         allocate_buffers(bufferLengthInBytes);
     }

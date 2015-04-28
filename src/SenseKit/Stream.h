@@ -18,9 +18,9 @@ namespace sensekit {
             : StreamBackend(description) {}
 
         virtual ~Stream()
-            {
-                m_connections.clear();
-            }
+        {
+            m_connections.clear();
+        }
 
         StreamConnection* create_connection();
         void destroy_connection(StreamConnection* connection);
@@ -41,15 +41,25 @@ namespace sensekit {
                     sensekit_parameter_bin_t& parameterBin);
 
         sensekit_stream_t get_handle()
-            { return reinterpret_cast<sensekit_stream_t>(this); }
+        {
+            return reinterpret_cast<sensekit_stream_t>(this);
+        }
 
         static Stream* get_ptr(sensekit_stream_t stream)
-            { return reinterpret_cast<Stream*>(stream); }
+        {
+            return reinterpret_cast<Stream*>(stream);
+        }
 
         virtual void on_availability_changed() override;
 
+        virtual void on_destroying_bin(StreamBin* bin) override
+        {
+            disconnect_connections(bin);
+        }
+
         bool has_connections() { return m_connections.size() > 0; }
     private:
+        void disconnect_connections(StreamBin* bin);
 
         using ConnPtr = std::unique_ptr<StreamConnection>;
         using ConnectionList = std::vector<ConnPtr>;

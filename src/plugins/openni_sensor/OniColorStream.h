@@ -24,9 +24,6 @@ namespace sensekit { namespace plugins {
                                   ::openni::SENSOR_COLOR,
                                   3)
                 { }
-
-        private:
-
         };
     }}
 

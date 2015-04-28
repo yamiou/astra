@@ -4,7 +4,6 @@ set(${_projname}_SOURCES
   OpenNIPlugin.cpp
   OpenNIPlugin.h
   OniDeviceStream.h
-  OniDeviceStream.cpp
   OniDepthStream.h
   OniDepthStream.cpp
   OniColorStream.h

@@ -22,8 +22,13 @@ namespace sensekit {
                                    return bin == element.get();
                                });
 
+
+
         if (it != m_bins.cend())
+        {
+            on_destroying_bin(it->get());
             m_bins.erase(it);
+        }
     }
 
     void StreamBackend::on_connection_created(StreamConnection* connection, sensekit_stream_t stream)

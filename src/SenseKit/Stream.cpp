@@ -8,6 +8,17 @@
 
 namespace sensekit {
 
+    void Stream::disconnect_connections(StreamBin* bin)
+    {
+        for (auto& connection : m_connections)
+        {
+            if (connection->get_bin() == bin)
+            {
+                connection->set_bin(nullptr);
+            }
+        }
+    }
+
     StreamConnection* Stream::create_connection()
     {
         ConnPtr conn(new StreamConnection(this));

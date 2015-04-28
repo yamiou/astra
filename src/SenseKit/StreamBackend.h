@@ -60,6 +60,8 @@ namespace sensekit {
                        sensekit_parameter_data_t inData,
                        sensekit_parameter_bin_t& parameterBin);
 
+        virtual void on_destroying_bin(StreamBin* bin) {};
+
         virtual void on_availability_changed() = 0;
 
     private:

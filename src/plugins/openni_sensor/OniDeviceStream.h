@@ -4,9 +4,11 @@
 #include <SenseKit/SenseKit.h>
 #include <SenseKit/Plugins/plugin_capi.h>
 #include <SenseKit/Plugins/Stream.h>
+#include <SenseKit/Plugins/StreamBin.h>
 #include <SenseKitUL/streams/image_parameters.h>
 #include <OpenNI.h>
 #include <SenseKitUL/streams/image_types.h>
+#include <memory>
 
 #ifndef MIN
 #define MIN(a,b) (((a)<(b))?(a):(b))
@@ -60,6 +62,10 @@ namespace sensekit { namespace plugins {
                 m_oniVideoMode.getResolutionX() *
                 m_oniVideoMode.getResolutionY() *
                 m_bytesPerPixel;
+
+            m_bin = std::make_unique<StreamBin<wrapper_type> >(get_pluginService(),
+                                                               get_handle(),
+                                                               m_bufferLength);
         }
 
         virtual ~OniDeviceStream()
@@ -71,34 +77,24 @@ namespace sensekit { namespace plugins {
 
         virtual void start() override final
         {
-            get_logger().info("starting stream of type: %d", get_description().get_type());
+            get_logger().info("starting oni stream of type: %d", get_description().get_type());
             m_oniStream.start();
         }
 
         virtual void stop() override final
         {
-            get_logger().info("stop stream of type: %d", get_description().get_type());
+            get_logger().info("stopping oni stream of type: %d", get_description().get_type());
             m_oniStream.stop();
         }
-
-        virtual void set_new_buffer(sensekit_frame_t* newBuffer);
 
         virtual void on_connection_added(sensekit_streamconnection_t connection) override;
 
         virtual void on_connection_removed(sensekit_bin_t bin,
                                            sensekit_streamconnection_t connection) override;
 
-        virtual void set_parameter(sensekit_streamconnection_t connection,
-                                   sensekit_parameter_id id,
-                                   size_t byteLength,
-                                   sensekit_parameter_data_t data) override
-        {
-
-        }
-
-        virtual void get_parameter(sensekit_streamconnection_t connection,
-                                   sensekit_parameter_id id,
-                                   sensekit_parameter_bin_t& parameterBin) override
+        virtual void on_get_parameter(sensekit_streamconnection_t connection,
+                                      sensekit_parameter_id id,
+                                      sensekit_parameter_bin_t& parameterBin) override
         {
             switch (id)
             {
@@ -115,8 +111,8 @@ namespace sensekit { namespace plugins {
                     float* hFov = reinterpret_cast<float*>(parameterData);
                     *hFov = m_oniStream.getHorizontalFieldOfView();
                 }
+                break;
             }
-            break;
             case SENSEKIT_PARAMETER_IMAGE_VFOV:
             {
                 size_t resultByteLength = sizeof(float);
@@ -130,22 +126,12 @@ namespace sensekit { namespace plugins {
                     float* vFov = reinterpret_cast<float*>(parameterData);
                     *vFov = m_oniStream.getVerticalFieldOfView();
                 }
+                break;
             }
-            break;
             }
         }
 
-        virtual void invoke(sensekit_streamconnection_t connection,
-                            sensekit_command_id commandId,
-                            size_t inByteLength,
-                            sensekit_parameter_data_t inData,
-                            sensekit_parameter_bin_t& parameterBin) override
-        {
-
-        }
-
-        void on_new_buffer(sensekit_frame_t* newBuffer,
-                                   wrapper_type* wrapper)
+        virtual void on_new_buffer(wrapper_type* wrapper)
         {
             if (wrapper == nullptr)
                 return;
@@ -170,14 +156,13 @@ namespace sensekit { namespace plugins {
         ::openni::VideoMode m_oniVideoMode;
 
     private:
-        size_t m_bufferLength{ 0 };
-        size_t m_bytesPerPixel{ 0 };
-        size_t m_numComponentPerPixel{ 0 };
-        sensekit_stream_t m_streamHandle{ nullptr };
-        sensekit_bin_t m_binHandle{nullptr};
-        sensekit_frame_t* m_currentBuffer{nullptr};
-        wrapper_type* m_currentFrame{nullptr};
-        sensekit_frame_index_t m_frameIndex {0};
+        std::unique_ptr<StreamBin<wrapper_type> > m_bin;
+
+        size_t m_bufferLength{0};
+        size_t m_bytesPerPixel{0};
+        size_t m_numComponentPerPixel{0};
+        sensekit_stream_t m_streamHandle{nullptr};
+        sensekit_frame_index_t m_frameIndex{0};
 
     };
 
@@ -185,14 +170,7 @@ namespace sensekit { namespace plugins {
     void OniDeviceStream<TFrameWrapper,
                          TBufferBlockType>::on_connection_added(sensekit_streamconnection_t connection)
     {
-        if (m_binHandle == nullptr)
-        {
-            size_t binSize = sizeof(wrapper_type) + m_bufferLength;
-            create_bin(binSize, m_binHandle, m_currentBuffer);
-            set_new_buffer(m_currentBuffer);
-        }
-
-        link_connection_to_bin(connection, m_binHandle);
+        m_bin->link_connection(connection);
     }
 
     template<typename TFrameWrapper, typename TBufferBlockType>
@@ -200,63 +178,38 @@ namespace sensekit { namespace plugins {
                          TBufferBlockType>::on_connection_removed(sensekit_bin_t bin,
                                                                   sensekit_streamconnection_t connection)
     {
-        link_connection_to_bin(connection,
-                               static_cast<sensekit_bin_t>(nullptr));
+        m_bin->unlink_connection(connection);
 
-        //don't destroy bin if other connections are linked assigned to it
-        if (!bin_has_connections(bin))
+        if (!m_bin->has_connections())
         {
-            destroy_bin(m_binHandle, m_currentBuffer);
-        }
-    }
-
-
-    template<typename TFrameWrapper, typename TBufferBlockType>
-    void OniDeviceStream<TFrameWrapper,
-                         TBufferBlockType>::set_new_buffer(sensekit_frame_t* newBuffer)
-    {
-        m_currentBuffer = newBuffer;
-        m_currentFrame = nullptr;
-
-        if (m_currentBuffer != nullptr)
-        {
-            m_currentBuffer->frameIndex = m_frameIndex;
-            m_currentFrame = reinterpret_cast<wrapper_type*>(m_currentBuffer->data);
-
-            if (m_currentFrame != nullptr)
-            {
-                m_currentFrame->frame.data =
-                    reinterpret_cast<block_type*>(&(m_currentFrame->frame_data));
-
-                on_new_buffer(m_currentBuffer, m_currentFrame);
-            }
+            m_bin = nullptr;
         }
     }
 
     template<typename TFrameWrapper, typename TBufferBlockType>
     void OniDeviceStream<TFrameWrapper, TBufferBlockType>::read_frame()
     {
-        if (m_binHandle == nullptr)
-            return;
-
         openni::VideoFrameRef ref;
         if (m_oniStream.readFrame(&ref) == ::openni::STATUS_OK)
         {
             const block_type* oniFrameData = static_cast<const block_type*>(ref.getData());
 
-            block_type* frameData = static_cast<block_type*>(m_currentFrame->frame.data);
             size_t byteSize = MIN(ref.getDataSize(), m_bufferLength);
 
-            memcpy(frameData, oniFrameData, byteSize);
+            wrapper_type* wrapper = m_bin->begin_write(m_frameIndex);
+
+            wrapper->frame.data =
+                reinterpret_cast<block_type*>(&(wrapper->frame_data));
+
+            on_new_buffer(wrapper);
+
+            memcpy(wrapper->frame.data, oniFrameData, byteSize);
+
+            m_bin->end_write();
 
             ++m_frameIndex;
-
-            sensekit_frame_t* nextBuffer;
-            cycle_bin(m_binHandle, nextBuffer);
-            set_new_buffer(nextBuffer);
         }
     }
 }}
-
 
 #endif /* ONIDEVICESTREAM_H */

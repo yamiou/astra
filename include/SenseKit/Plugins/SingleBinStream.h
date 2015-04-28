@@ -2,6 +2,8 @@
 #define SINGLEBINSTREAM_H
 
 #include "Stream.h"
+#include "StreamBin.h"
+#include <memory>
 
 namespace sensekit { namespace plugins {
 
@@ -9,63 +11,51 @@ namespace sensekit { namespace plugins {
     class SingleBinStream : public Stream
     {
     public:
-
         SingleBinStream(PluginServiceProxy& pluginService,
                         Sensor streamSet,
                         StreamDescription description,
                         size_t bufferSize)
             : Stream(pluginService,
-                        streamSet,
-                        description)
-            {
-                create_bin(sizeof(TFrameType) + bufferSize, m_binHandle, m_frame);
-            }
+                     streamSet,
+                     description)
+        {
+            m_bin = std::make_unique<bin_type>(get_pluginService(),
+                                               get_handle(),
+                                               sizeof(TFrameType) + bufferSize);
+        }
 
         using frame_type = TFrameType;
         using block_type = TBlockType;
 
         bool has_connections()
-            {
-                if (m_binHandle == nullptr)
-                    return false;
+        {
+            return m_bin->has_connections();
+        }
 
-                return bin_has_connections(m_binHandle);
-            }
-
-        frame_type* begin_write(size_t frameIndex)
-            {
-                if (m_locked)
-                    return reinterpret_cast<TFrameType*>(m_frame->data);
-
-                m_locked = true;
-                m_frame->frameIndex = frameIndex;
-                return reinterpret_cast<TFrameType*>(m_frame->data);
-            }
+        TFrameType* begin_write(size_t frameIndex)
+        {
+            return m_bin->begin_write(frameIndex);
+        }
 
         void end_write()
-            {
-                if (!m_locked)
-                    return;
-
-                cycle_bin(m_binHandle, m_frame);
-                m_locked = false;
-            }
+        {
+            return m_bin->end_write();
+        }
 
         virtual void on_connection_added(sensekit_streamconnection_t connection) override
-            {
-                link_connection_to_bin(connection, m_binHandle);
-            }
+        {
+            m_bin->link_connection(connection);
+        }
 
         virtual void on_connection_removed(sensekit_bin_t bin,
-                                            sensekit_streamconnection_t connection) override
-            {
-                link_connection_to_bin(connection, nullptr);
-            }
+                                           sensekit_streamconnection_t connection) override
+        {
+            m_bin->unlink_connection(connection);
+        }
 
     private:
-        bool m_locked{false};
-        sensekit_bin_t m_binHandle{nullptr};
-        sensekit_frame_t* m_frame{nullptr};
+        using bin_type = StreamBin<TFrameType>;
+        std::unique_ptr<bin_type> m_bin;
     };
 }}
 
