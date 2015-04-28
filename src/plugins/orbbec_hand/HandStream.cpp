@@ -3,10 +3,10 @@
 
 namespace sensekit { namespace plugins { namespace hand {
 
-    void HandStream::set_parameter(sensekit_streamconnection_t connection,
-                                        sensekit_parameter_id id,
-                                        size_t inByteLength,
-                                        sensekit_parameter_data_t inData)
+    void HandStream::on_set_parameter(sensekit_streamconnection_t connection,
+                                      sensekit_parameter_id id,
+                                      size_t inByteLength,
+                                      sensekit_parameter_data_t inData)
     {
         switch (id)
         {
@@ -16,9 +16,9 @@ namespace sensekit { namespace plugins { namespace hand {
         }
     }
 
-    void HandStream::get_parameter(sensekit_streamconnection_t connection,
-                                        sensekit_parameter_id id,
-                                        sensekit_parameter_bin_t& parameterBin)
+    void HandStream::on_get_parameter(sensekit_streamconnection_t connection,
+                                      sensekit_parameter_id id,
+                                      sensekit_parameter_bin_t& parameterBin)
     {
         switch (id)
         {

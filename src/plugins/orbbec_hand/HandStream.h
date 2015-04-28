@@ -29,14 +29,14 @@ namespace sensekit { namespace plugins { namespace hand {
             m_includeCandidatePoints = includeCandidatePoints;
         }
     protected:
-        virtual void set_parameter(sensekit_streamconnection_t connection,
-                                   sensekit_parameter_id id,
-                                   size_t inByteLength,
-                                   sensekit_parameter_data_t inData) override;
+        virtual void on_set_parameter(sensekit_streamconnection_t connection,
+                                      sensekit_parameter_id id,
+                                      size_t inByteLength,
+                                      sensekit_parameter_data_t inData) override;
 
-        virtual void get_parameter(sensekit_streamconnection_t connection,
-                                   sensekit_parameter_id id,
-                                   sensekit_parameter_bin_t& parameterBin) override;
+        virtual void on_get_parameter(sensekit_streamconnection_t connection,
+                                      sensekit_parameter_id id,
+                                      sensekit_parameter_bin_t& parameterBin) override;
     private:
         void get_include_candidates(sensekit_parameter_bin_t& parameterBin);
         void set_include_candidates(size_t inByteLength, sensekit_parameter_data_t& inData);
