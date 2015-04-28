@@ -103,7 +103,7 @@ public:
 
         for (auto handPoint : m_handPoints)
         {
-            sf::Color& color = trackingColor;
+            sf::Color color = trackingColor;
             if (handPoint.status() == HAND_STATUS_LOST)
             {
                 color = lostColor;

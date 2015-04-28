@@ -146,7 +146,7 @@ public:
 
         for (auto handPoint : m_handPoints)
         {
-            sf::Color& color = trackingColor;
+            sf::Color color = trackingColor;
             sensekit_handstatus_t status = handPoint.status();
             if (status == HAND_STATUS_LOST)
             {
