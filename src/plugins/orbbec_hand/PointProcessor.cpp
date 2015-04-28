@@ -23,7 +23,7 @@ namespace sensekit { namespace plugins { namespace hand {
         m_targetEdgeDistance(60),       //mm
         m_heightScoreFactor(2.0),
         m_depthScoreFactor(0.25),
-        m_edgeDistanceScoreFactor(10),
+        m_edgeDistanceScoreFactor(4),
         m_maxInactiveFramesToBeConsideredActive(10),
         m_minActiveFramesToLockTracking(60),
         m_maxInactiveFramesForCandidatePoints(60),

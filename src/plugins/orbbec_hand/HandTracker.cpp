@@ -345,7 +345,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 break;
             case DEBUG_HAND_VIEW_SCORE:
                 m_debugVisualizer.showNormArray<float>(m_matBasicScore,
-                                                       m_debugUpdateSegmentation,
+                                                       m_layerSegmentation,
                                                        colorFrame);
                 break;
             case DEBUG_HAND_VIEW_HANDWINDOW:
@@ -354,7 +354,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 break;
             case DEBUG_HAND_VIEW_EDGEDISTANCE:
                 m_debugVisualizer.showNormArray<float>(m_layerScore,
-                                                       m_debugCreateSegmentation,
+                                                       m_layerSegmentation,
                                                        colorFrame);
                 break;
             }
