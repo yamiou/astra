@@ -185,7 +185,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                 m_debugUpdateSegmentation, 
                                                 false);
 
-            m_pointProcessor->refine_active_points(refinementMatrices);
+            m_pointProcessor->update_full_resolution_points(refinementMatrices);
         }
 
         void HandTracker::generate_hand_frame(sensekit_frame_index_t frameIndex)
@@ -252,8 +252,8 @@ namespace sensekit { namespace plugins { namespace hand {
                     point.depthPosition.x = internalPoint.fullSizePosition.x;
                     point.depthPosition.y = internalPoint.fullSizePosition.y;
 
-                    copy_position(internalPoint.worldPosition, point.worldPosition);
-                    copy_position(internalPoint.worldDeltaPosition, point.worldDeltaPosition);
+                    copy_position(internalPoint.fullSizeWorldPosition, point.worldPosition);
+                    copy_position(internalPoint.fullSizeWorldDeltaPosition, point.worldDeltaPosition);
 
                     point.status = convert_hand_status(status, pointType);
                 }
@@ -345,7 +345,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 break;
             case DEBUG_HAND_VIEW_SCORE:
                 m_debugVisualizer.showNormArray<float>(m_matBasicScore,
-                                                       m_layerSegmentation,
+                                                       m_layerSegmentation, //m_debugUpdateSegmentation,
                                                        colorFrame);
                 break;
             case DEBUG_HAND_VIEW_HANDWINDOW:
@@ -354,7 +354,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 break;
             case DEBUG_HAND_VIEW_EDGEDISTANCE:
                 m_debugVisualizer.showNormArray<float>(m_layerScore,
-                                                       m_layerSegmentation,
+                                                       m_layerSegmentation, //m_debugUpdateSegmentation,
                                                        colorFrame);
                 break;
             }

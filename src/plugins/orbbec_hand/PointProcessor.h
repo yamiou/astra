@@ -22,7 +22,8 @@ namespace sensekit { namespace plugins { namespace hand {
         void updateTrackedPointOrCreateNewPointFromSeedPosition(TrackingMatrices& matrices,
                                                                 const cv::Point& seedPosition);
         void removeOldOrDeadPoints();
-        void refine_active_points(TrackingMatrices& matrices);
+        
+        void update_full_resolution_points(TrackingMatrices& matrices);
 
         std::vector<TrackedPoint>& get_trackedPoints() { return m_trackedPoints; }
 
@@ -34,19 +35,23 @@ namespace sensekit { namespace plugins { namespace hand {
     private:
         float get_resize_factor(TrackingMatrices& matrices);
         ScalingCoordinateMapper get_scaling_mapper(TrackingMatrices& matrices);
+        cv::Point3f smooth_world_positions(const cv::Point3f& oldWorldPosition, const cv::Point3f& newWorldPosition);
 
         void updateTrackedPoint(TrackingMatrices& matrices,
                                 ScalingCoordinateMapper& scalingMapper,
                                 TrackedPoint& trackedPoint);
 
-        void refine_high_res_position(TrackingMatrices& matrices,
-                                      TrackedPoint& trackedPoint);
+        cv::Point get_refined_high_res_position(TrackingMatrices& matrices,
+                                                const TrackedPoint& trackedPoint);
 
         void validateAndUpdateTrackedPoint(TrackingMatrices& matrices,
                                            ScalingCoordinateMapper& scalingMapper,
                                            TrackedPoint& trackedPoint,
                                            const cv::Point& targetPoint);
         bool is_valid_point_area(TrackingMatrices& matrices, const cv::Point& targetPoint);
+        void update_tracked_point_from_world_position(TrackedPoint& trackedPoint,
+                                                      const cv::Point3f& newWorldPosition,
+                                                      const float resizeFactor);
 
         const sensekit::CoordinateMapper& m_fullSizeMapper;
         float m_trackingBandwidthDepth;
@@ -72,6 +77,9 @@ namespace sensekit { namespace plugins { namespace hand {
         int m_maxInactiveFramesForCandidatePoints;
         int m_maxInactiveFramesForLostPoints;
         int m_maxInactiveFramesForActivePoints;
+        float m_pointSmoothingFactor;
+        float m_pointDeadBandSmoothingFactor;
+        float m_pointSmoothingDeadZone;
 
         int m_nextTrackingId{ 0 };
         //TODO consider std::list<TrackedPoint>

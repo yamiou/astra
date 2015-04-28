@@ -28,7 +28,10 @@ namespace sensekit { namespace plugins { namespace hand {
         m_minActiveFramesToLockTracking(60),
         m_maxInactiveFramesForCandidatePoints(60),
         m_maxInactiveFramesForLostPoints(240),
-        m_maxInactiveFramesForActivePoints(480)
+        m_maxInactiveFramesForActivePoints(480),
+        m_pointSmoothingFactor(0.75),
+        m_pointDeadBandSmoothingFactor(0.05),
+        m_pointSmoothingDeadZone(20)      //mm
     {}
 
     PointProcessor::~PointProcessor()
@@ -90,15 +93,15 @@ namespace sensekit { namespace plugins { namespace hand {
         float referenceDepth = trackedPoint.worldPosition.z;
 
         TrackingData updateTrackingData(matrices,
-            seedPosition,
-            referenceDepth,
-            m_trackingBandwidthDepth,
-            trackedPoint.pointType,
-            m_iterationMaxTracking,
-            m_maxSegmentationDist,
-            FG_POLICY_IGNORE,
-            m_edgeDistanceScoreFactor,
-            m_targetEdgeDistance);
+                                        seedPosition,
+                                        referenceDepth,
+                                        m_trackingBandwidthDepth,
+                                        trackedPoint.pointType,
+                                        m_iterationMaxTracking,
+                                        m_maxSegmentationDist,
+                                        FG_POLICY_IGNORE,
+                                        m_edgeDistanceScoreFactor,
+                                        m_targetEdgeDistance);
 
         cv::Point newTargetPoint = segmentation::converge_track_point_from_seed(updateTrackingData);
 
@@ -117,15 +120,15 @@ namespace sensekit { namespace plugins { namespace hand {
             referenceDepth = estimatedPosition.z;
 
             TrackingData recoverTrackingData(matrices,
-                seedPosition,
-                referenceDepth,
-                m_initialBandwidthDepth,
-                trackedPoint.pointType,
-                m_iterationMaxTracking,
-                m_maxSegmentationDist,
-                FG_POLICY_IGNORE,
-                m_edgeDistanceScoreFactor,
-                m_targetEdgeDistance);
+                                             seedPosition,
+                                             referenceDepth,
+                                             m_initialBandwidthDepth,
+                                             trackedPoint.pointType,
+                                             m_iterationMaxTracking,
+                                             m_maxSegmentationDist,
+                                             FG_POLICY_IGNORE,
+                                             m_edgeDistanceScoreFactor,
+                                             m_targetEdgeDistance);
 
             newTargetPoint = segmentation::converge_track_point_from_seed(recoverTrackingData);
 
@@ -167,7 +170,7 @@ namespace sensekit { namespace plugins { namespace hand {
         return validPointArea;
     }
 
-    void PointProcessor::refine_active_points(TrackingMatrices& matrices)
+    void PointProcessor::update_full_resolution_points(TrackingMatrices& matrices)
     {
         for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
         {
@@ -183,13 +186,29 @@ namespace sensekit { namespace plugins { namespace hand {
             if (trackedPoint.trackingStatus == TrackingStatus::Tracking &&
                 trackedPoint.pointType == TrackedPointType::ActivePoint)
             {
-                refine_high_res_position(matrices, trackedPoint);
+                cv::Point refinedPosition = get_refined_high_res_position(matrices, trackedPoint);
+
+                float refinedDepth = matrices.depthFullSize.at<float>(trackedPoint.fullSizePosition);
+
+                cv::Point3f worldPosition = cv_convert_depth_to_world(m_fullSizeMapper,
+                                                                      refinedPosition.x,
+                                                                      refinedPosition.y,
+                                                                      refinedDepth);
+
+                cv::Point3f smoothedWorldPosition = smooth_world_positions(trackedPoint.fullSizeWorldPosition, worldPosition);
+
+                update_tracked_point_from_world_position(trackedPoint, smoothedWorldPosition, resizeFactor);
+            }
+            else
+            {
+                trackedPoint.fullSizeWorldPosition = trackedPoint.worldPosition;
+                trackedPoint.fullSizeWorldDeltaPosition = trackedPoint.worldDeltaPosition;
             }
         }
     }
 
-    void PointProcessor::refine_high_res_position(TrackingMatrices& matrices, 
-                                                  TrackedPoint& trackedPoint)
+    cv::Point PointProcessor::get_refined_high_res_position(TrackingMatrices& matrices, 
+                                                            const TrackedPoint& trackedPoint)
     {
         assert(trackedPoint.pointType == TrackedPointType::ActivePoint);
 
@@ -242,20 +261,41 @@ namespace sensekit { namespace plugins { namespace hand {
         int refinedFullSizeX = targetPoint.x + windowLeft;
         int refinedFullSizeY = targetPoint.y + windowTop;
         
-        trackedPoint.fullSizePosition.x = refinedFullSizeX;
-        trackedPoint.fullSizePosition.y = refinedFullSizeY;
-        float resizeFactor = get_resize_factor(matrices);
-        trackedPoint.position.x = refinedFullSizeX / resizeFactor;
-        trackedPoint.position.y = refinedFullSizeY / resizeFactor;
+        return cv::Point(refinedFullSizeX, refinedFullSizeY);
+    }
 
-        float refinedDepth = matrices.depthFullSize.at<float>(trackedPoint.fullSizePosition);
-        
-        cv::Point3f worldPosition =  cv_convert_depth_to_world(m_fullSizeMapper, 
-                                                               refinedFullSizeX, 
-                                                               refinedFullSizeY, 
-                                                               refinedDepth);
+    cv::Point3f PointProcessor::smooth_world_positions(const cv::Point3f& oldWorldPosition, 
+                                                       const cv::Point3f& newWorldPosition)
+    {
+        float smoothingFactor = m_pointSmoothingFactor;
 
-        trackedPoint.worldPosition = worldPosition;
+        float delta = cv::norm(newWorldPosition - oldWorldPosition);
+        if (delta < m_pointSmoothingDeadZone)
+        {
+            float factorRamp = delta / m_pointSmoothingDeadZone;
+            smoothingFactor = m_pointSmoothingFactor * factorRamp + m_pointDeadBandSmoothingFactor * (1 - factorRamp);
+        }
+
+        return oldWorldPosition * (1 - smoothingFactor) + newWorldPosition * smoothingFactor;
+    }
+
+    void PointProcessor::update_tracked_point_from_world_position(TrackedPoint& trackedPoint, 
+                                                                  const cv::Point3f& newWorldPosition, 
+                                                                  const float resizeFactor)
+    {
+        cv::Point3f fullSizeDepthPosition = cv_convert_world_to_depth(m_fullSizeMapper, newWorldPosition);
+
+        trackedPoint.fullSizePosition = cv::Point(fullSizeDepthPosition.x, fullSizeDepthPosition.y);
+
+        trackedPoint.position.x = fullSizeDepthPosition.x / resizeFactor;
+        trackedPoint.position.y = fullSizeDepthPosition.y / resizeFactor;
+
+        cv::Point3f deltaPosition = newWorldPosition - trackedPoint.fullSizeWorldPosition;
+        trackedPoint.fullSizeWorldPosition = newWorldPosition;
+        trackedPoint.fullSizeWorldDeltaPosition = deltaPosition;
+        trackedPoint.worldPosition = newWorldPosition;
+        trackedPoint.worldDeltaPosition = deltaPosition;
+
     }
 
     void PointProcessor::validateAndUpdateTrackedPoint(TrackingMatrices& matrices,
@@ -279,6 +319,7 @@ namespace sensekit { namespace plugins { namespace hand {
             if (dist < m_maxJumpDist && validArea)
             {
                 updatedPoint = true;
+
                 cv::Point3f deltaPosition = worldPosition - trackedPoint.worldPosition;
                 trackedPoint.worldPosition = worldPosition;
                 trackedPoint.worldDeltaPosition = deltaPosition;
