@@ -1,4 +1,4 @@
-SenseKit SDK v0.1.4 for Windows
+SenseKit SDK v0.1.5 for Windows
 Copyright (c) 2015 Orbbec
 
 ALPHA - NOT FOR PUBLIC DISTRIBUTION
@@ -7,6 +7,8 @@ josh@orbbec3d.com
 
 What's New
 ==========
+
+v0.1.5 2015/04/28 Significant improvement in the hand tracker, now including full resolution depth refinement, hand point smoothing, and text id labels in the hand viewer apps. All of the hand tracker parameters have been tuned for better performance. Hand points now are near the center or upper-center of the hand. Note - to lock on to hands, the hand tracker currently requires your hand to move consistently for about two seconds. The easiest way is to move your hand forward and back a few times. Note - hand viewer samples now require Inconsolata.otf, which is included in the vs2013/thirdparty/copy_to_bin_dir/ directory.
 
 v0.1.4 2015/04/24 Internal reorganization, bug fixes, consistency. Improved debug hand viewer visualizations. Initial re-work of coordinate mapper. Arranged files to support additional plugin development.
 
@@ -67,16 +69,13 @@ To exit samples with a GUI window, simply close the window.
 
 Known issues
 ==========
-1) Hand tracking works but at the moment only shows a single hand point. The hand point is also aliased
-to the nearest 80x60 coordinate. This is all being investigated currently.
-
-2) There isn't an error message if no sensor is found or plugged in. (But, it doesn't crash!) You can 
+1) There is no error message if no sensor is found or plugged in. (But, it doesn't crash!) You can 
 plug in a sensor after the program starts and it should detect it and continue. 
 Repeated hotplugging (in and out) does not work though.
 
-3) The color sample will crash if the sensor has no color stream. 
+2) The color sample may crash if the sensor has no color stream. 
 It may or may not work for sensors that do have a color stream.
 
-4) If a sample crashes or you stop debugging before it cleans itself up nicely, the sensor driver 
+3) If a sample crashes or you stop debugging before it cleans itself up nicely, the sensor driver 
 may be put into a weird state. Before the next run you may need to replug the sensor or turn the sensor 
 off and then on first. (This is primarily an OpenNI driver issue.)
