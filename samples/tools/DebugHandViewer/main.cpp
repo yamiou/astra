@@ -137,6 +137,31 @@ public:
         window.draw(shape);
     }
 
+    void drawShadowText(sf::RenderWindow& window, sf::Text& text, sf::Color color, int x, int y)
+    {
+        text.setColor(sf::Color::Black);
+        text.setPosition(x + 5, y + 5);
+        window.draw(text);
+
+        text.setColor(color);
+        text.setPosition(x, y);
+        window.draw(text);
+    }
+
+    void drawHandLabel(sf::RenderWindow& window, float radius, float x, float y, sensekit::HandPoint& handPoint)
+    {
+        int32_t trackingId = handPoint.trackingId();
+        std::stringstream str;
+        str << trackingId;
+        sf::Text label(str.str(), m_font);
+        int characterSize = 60;
+        label.setCharacterSize(characterSize);
+
+        auto bounds = label.getLocalBounds();
+        label.setOrigin(bounds.left + bounds.width / 2.0, characterSize);
+        drawShadowText(window, label, sf::Color::White, x, y - radius - 10);
+    }
+
     void drawHandPoints(sf::RenderWindow& window, float depthScale)
     {
         float radius = 16;
@@ -179,28 +204,8 @@ public:
             float circleY = (p.y + 0.5) * depthScale;
             drawCircle(window, radius, circleX, circleY, color);
 
-            int32_t trackingId = handPoint.trackingId();
-            std::stringstream str;
-            str << trackingId;
-            sf::Text label(str.str(), m_font);
-            int characterSize = 60;
-            label.setCharacterSize(characterSize);
-
-            auto bounds = label.getLocalBounds();
-            label.setOrigin(bounds.left + bounds.width / 2.0, characterSize);
-            drawShadowText(window, label, sf::Color::White, circleX, circleY - radius - 10);
+            drawHandLabel(window, radius, circleX, circleY, handPoint);
         }
-    }
-
-    void drawShadowText(sf::RenderWindow& window, sf::Text& text, sf::Color color, int x, int y)
-    {
-        text.setColor(sf::Color::Black);
-        text.setPosition(x + 5, y + 5);
-        window.draw(text);
-
-        text.setColor(color);
-        text.setPosition(x, y);
-        window.draw(text);
     }
 
     std::string getViewName(sensekit::DebugHandViewType viewType)

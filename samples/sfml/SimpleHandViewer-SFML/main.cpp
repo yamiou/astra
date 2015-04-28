@@ -1,10 +1,19 @@
 #include <SFML/Graphics.hpp>
 #include <Sensekit/SenseKit.h>
 #include <SensekitUL/SenseKitUL.h>
+#include <sstream>
 
 class HandFrameListener : public sensekit::FrameReadyListener
 {
 public:
+    HandFrameListener()
+    {
+        m_font.loadFromFile("Inconsolata.otf");
+    }
+
+    HandFrameListener(const HandFrameListener&) = delete;
+    HandFrameListener& operator=(const HandFrameListener&) = delete;
+
     void init_texture(int width, int height)
     {
         if (m_displayBuffer == nullptr || width != m_depthWidth || height != m_depthHeight)
@@ -93,6 +102,31 @@ public:
         window.draw(shape);
     }
 
+    void drawShadowText(sf::RenderWindow& window, sf::Text& text, sf::Color color, int x, int y)
+    {
+        text.setColor(sf::Color::Black);
+        text.setPosition(x + 5, y + 5);
+        window.draw(text);
+
+        text.setColor(color);
+        text.setPosition(x, y);
+        window.draw(text);
+    }
+
+    void drawHandLabel(sf::RenderWindow& window, float radius, float x, float y, sensekit::HandPoint& handPoint)
+    {
+        int32_t trackingId = handPoint.trackingId();
+        std::stringstream str;
+        str << trackingId;
+        sf::Text label(str.str(), m_font);
+        int characterSize = 60;
+        label.setCharacterSize(characterSize);
+
+        auto bounds = label.getLocalBounds();
+        label.setOrigin(bounds.left + bounds.width / 2.0, characterSize);
+        drawShadowText(window, label, sf::Color::White, x, y - radius - 10);
+    }
+
     void drawHandPoints(sf::RenderWindow& window, float depthScale)
     {
         float radius = 16;
@@ -118,6 +152,8 @@ public:
             float circleX = (p.x + 0.5) * depthScale;
             float circleY = (p.y + 0.5) * depthScale;
             drawCircle(window, radius, circleX, circleY, color);
+
+            drawHandLabel(window, radius, circleX, circleY, handPoint);
         }
     }
 
@@ -140,6 +176,7 @@ private:
     std::clock_t m_lastTimepoint { 0 };
     sf::Texture m_texture;
     sf::Sprite m_sprite;
+    sf::Font m_font;
 
     using BufferPtr = std::unique_ptr < uint8_t[] >;
     BufferPtr m_displayBuffer{ nullptr };
