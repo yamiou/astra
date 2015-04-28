@@ -74,7 +74,7 @@ namespace sensekit { namespace plugins {
         sensekit_stream_t m_streamHandle;
         sensekit_bin_t m_binHandle;
         size_t m_bufferSize{0};
-        sensekit_frame_t* m_currentBuffer;
+        sensekit_frame_t* m_currentBuffer{nullptr};
         PluginServiceProxy& m_pluginService;
         bool m_locked{false};
 

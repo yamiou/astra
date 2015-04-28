@@ -5,7 +5,7 @@ namespace sensekit {
 
     StreamBin* StreamBackend::create_bin(size_t bufferLengthInBytes)
     {
-        BinPtr bin(new StreamBin(bufferLengthInBytes));
+        BinPtr bin(std::make_unique<StreamBin>(bufferLengthInBytes));
         StreamBin* rawPtr = bin.get();
 
         m_bins.push_back(std::move(bin));
