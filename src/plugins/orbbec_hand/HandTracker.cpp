@@ -144,6 +144,9 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_debugUpdateSegmentation, 
                                             debugLayersEnabled);
 
+            //Update existing points first so that if we lose a point, we might recover it in the "add new" stage below
+            //without having at least one frame of a lost point.
+
             m_pointProcessor->updateTrackedPoints(updateMatrices);
 
             m_pointProcessor->removeDuplicatePoints();
