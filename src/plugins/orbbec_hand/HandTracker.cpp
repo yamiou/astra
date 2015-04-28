@@ -229,13 +229,20 @@ namespace sensekit { namespace plugins { namespace hand {
             int handIndex = 0;
             int maxHandCount = frame.handCount;
 
+            bool includeCandidates = m_handStream->include_candidate_points();
+
             for (auto it = internalTrackedPoints.begin(); it != internalTrackedPoints.end(); ++it)
             {
                 TrackedPoint internalPoint = *it;
 
                 TrackingStatus status = internalPoint.trackingStatus;
+                TrackedPointType pointType = internalPoint.pointType;
 
-                if (status != Dead && handIndex < maxHandCount)
+                bool includeByStatus = status == Tracking ||
+                                       status == Lost;
+                bool includeByType = pointType == ActivePoint ||
+                                     (pointType == CandidatePoint && includeCandidates);
+                if (includeByStatus && includeByType && handIndex < maxHandCount)
                 {
                     sensekit_handpoint_t& point = frame.handpoints[handIndex];
                     ++handIndex;
@@ -248,7 +255,7 @@ namespace sensekit { namespace plugins { namespace hand {
                     copy_position(internalPoint.worldPosition, point.worldPosition);
                     copy_position(internalPoint.worldDeltaPosition, point.worldDeltaPosition);
 
-                    point.status = convert_hand_status(status, internalPoint.pointType);
+                    point.status = convert_hand_status(status, pointType);
                 }
             }
             for (int i = handIndex; i < maxHandCount; ++i)

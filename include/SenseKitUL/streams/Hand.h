@@ -38,10 +38,25 @@ namespace sensekit {
     {
     public:
         explicit HandStream(sensekit_streamconnection_t connection)
-            : DataStream(connection)
+            : DataStream(connection),
+            m_handStream(connection)
         { }
 
         static const sensekit_stream_type_t id = SENSEKIT_STREAM_HAND;
+
+        bool get_include_candidate_points()
+        {
+            bool includeCandidatePoints;
+            sensekit_handstream_get_include_candidate_points(m_handStream, &includeCandidatePoints);
+            return includeCandidatePoints;
+        }
+
+        void set_include_candidate_points(bool includeCandidatePoints)
+        {
+            sensekit_handstream_set_include_candidate_points(m_handStream, includeCandidatePoints);
+        }
+    private:
+        sensekit_handstream_t m_handStream;
     };
 
     class HandFrame

@@ -30,6 +30,12 @@ SENSEKIT_API_EX sensekit_status_t sensekit_handframe_get_shared_hand_array(sense
                                                                            sensekit_handpoint_t** handpoints,
                                                                            size_t* handCount);
 
+SENSEKIT_API_EX sensekit_status_t sensekit_handstream_get_include_candidate_points(sensekit_handstream_t handStream,
+                                                                                   bool* includeCandidatePoints);
+
+SENSEKIT_API_EX sensekit_status_t sensekit_handstream_set_include_candidate_points(sensekit_handstream_t handStream,
+                                                                                   bool includeCandidatePoints);
+
 SENSEKIT_API_EX sensekit_status_t sensekit_reader_get_debug_handstream(sensekit_reader_t reader,
                                                                        sensekit_debug_handstream_t* debugHandStream);
 

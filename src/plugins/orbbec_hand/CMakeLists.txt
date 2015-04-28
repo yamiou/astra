@@ -4,6 +4,7 @@ set(${_projname}_SOURCES
   HandTracker.cpp
   HandTracker.h
   HandStream.h
+  HandStream.cpp
   DebugHandStream.h
   DebugHandStream.cpp
   DebugVisualizer.h

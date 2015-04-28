@@ -367,7 +367,10 @@ int main(int argc, char** argv)
     HandDebugFrameListener listener;
 
     reader.stream<sensekit::DepthStream>().start();
-    reader.stream<sensekit::HandStream>().start();
+    auto handStream = reader.stream<sensekit::HandStream>();
+    handStream.start();
+    handStream.set_include_candidate_points(true);
+    
     reader.stream<sensekit::DebugHandStream>().start();
     reader.addListener(listener);
 

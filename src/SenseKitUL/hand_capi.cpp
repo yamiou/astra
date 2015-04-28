@@ -73,6 +73,26 @@ SENSEKIT_API_EX sensekit_status_t sensekit_handframe_get_shared_hand_array(sense
     return SENSEKIT_STATUS_SUCCESS;
 }
 
+SENSEKIT_API_EX sensekit_status_t sensekit_handstream_get_include_candidate_points(sensekit_handstream_t handStream,
+                                                                                   bool* includeCandidatePoints)
+{
+    return sensekit_stream_get_parameter_fixed(handStream,
+                                               SENSEKIT_PARAMETER_HAND_INCLUDE_CANDIDATE_POINTS,
+                                               sizeof(bool),
+                                               reinterpret_cast<sensekit_parameter_data_t*>(includeCandidatePoints));
+
+}
+
+SENSEKIT_API_EX sensekit_status_t sensekit_handstream_set_include_candidate_points(sensekit_handstream_t handStream,
+                                                                                   bool includeCandidatePoints)
+{
+    return sensekit_stream_set_parameter(handStream,
+                                         SENSEKIT_PARAMETER_HAND_INCLUDE_CANDIDATE_POINTS,
+                                         sizeof(bool),
+                                         reinterpret_cast<sensekit_parameter_data_t>(&includeCandidatePoints));
+
+}
+
 SENSEKIT_API_EX sensekit_status_t sensekit_reader_get_debug_handstream(sensekit_reader_t reader,
                                                                        sensekit_debug_handstream_t* debugHandStream)
 
