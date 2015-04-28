@@ -133,7 +133,7 @@ public:
     {
         if (m_displayBuffer != nullptr)
         {
-            float depthScale = window.getSize().x / m_depthWidth;
+            float depthScale = window.getView().getSize().x / m_depthWidth;
 
             m_sprite.setScale(depthScale, depthScale);
 

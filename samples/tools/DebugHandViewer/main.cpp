@@ -242,8 +242,8 @@ public:
     {
         if (m_displayBuffer != nullptr)
         {
-            float debugScale = window.getSize().x / m_displayWidth;
-            float depthScale = window.getSize().x / m_depthWidth;
+            float debugScale = window.getView().getSize().x / m_displayWidth;
+            float depthScale = window.getView().getSize().x / m_depthWidth;
 
             m_sprite.setScale(debugScale, debugScale);
 
