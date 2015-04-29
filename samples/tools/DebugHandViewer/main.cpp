@@ -254,7 +254,7 @@ public:
         text.setStyle(sf::Text::Bold);
 
         int x = 10;
-        int y = window.getSize().y - 20 - characterSize;
+        int y = window.getView().getSize().y - 20 - characterSize;
 
         drawShadowText(window, text, sf::Color::White, x, y);
     }
