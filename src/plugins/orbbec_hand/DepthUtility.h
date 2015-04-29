@@ -45,6 +45,7 @@ namespace sensekit { namespace plugins { namespace hand {
         float m_depthSmoothingFactor;
         float m_foregroundThresholdFactor;
         float m_maxDepthJumpPercent;
+        int m_erodeSize;
     };
 }}}
 

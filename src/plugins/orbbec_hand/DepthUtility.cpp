@@ -10,12 +10,12 @@ namespace sensekit { namespace plugins { namespace hand {
         m_processingHeight(height),
         m_depthSmoothingFactor(0.05),
         m_foregroundThresholdFactor(0.02),
-        m_maxDepthJumpPercent(0.1)
+        m_maxDepthJumpPercent(0.1),
+        m_erodeSize(1)
     {
-        int erodeNum = 1;
         m_rectElement = cv::getStructuringElement(cv::MORPH_RECT,
-                                                  cv::Size(erodeNum * 2 + 1, erodeNum * 2 + 1),
-                                                  cv::Point(erodeNum, erodeNum));
+            cv::Size(m_erodeSize * 2 + 1, m_erodeSize * 2 + 1),
+            cv::Point(m_erodeSize, m_erodeSize));
 
         reset();
     }
@@ -78,7 +78,8 @@ namespace sensekit { namespace plugins { namespace hand {
             float* row = matTarget.ptr<float>(y);
             for (int x = 0; x < width; ++x)
             {
-                row[x] = static_cast<float>(*depthData);
+                *row = static_cast<float>(*depthData);
+                ++row;
                 ++depthData;
             }
         }
@@ -136,6 +137,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
             for (int x = 0; x < width; ++x)
             {
+                //matVelocity is already abs(vel)
                 float vel = *velRow;
                 if (vel > foregroundThresholdFactor)
                 {
