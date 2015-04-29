@@ -18,6 +18,7 @@ set(${_projname}_SOURCES
   ../../include/SenseKit/Plugins/Stream.h
   ../../include/SenseKit/Plugins/StreamCallbackListener.h
   ../../include/SenseKit/Plugins/SingleBinStream.h
+  ../../include/SenseKit/Plugins/StreamBin.h
   ../../include/SenseKit/Plugins/MultiBinStream.h
   ../../include/SenseKit/Plugins/PluginServiceProxy.h
   ../../include/SenseKit/Plugins/PluginServiceProxyBase.h
