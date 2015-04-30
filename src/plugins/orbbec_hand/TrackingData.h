@@ -2,6 +2,7 @@
 #define TRACKINGDATA_H
 
 #include <opencv2/core/core.hpp>
+#include "ScalingCoordinateMapper.h"
 
 namespace sensekit { namespace plugins { namespace hand {
 
@@ -48,6 +49,7 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat& debugScore;
         bool debugLayersEnabled;
         int layerCount;
+        const sensekit::CoordinateMapper& fullSizeMapper;
 
         TrackingMatrices(cv::Mat& depthFullSize,
                          cv::Mat& depth,
@@ -61,7 +63,8 @@ namespace sensekit { namespace plugins { namespace hand {
                          cv::Mat& layerEdgeDistance,
                          cv::Mat& debugSegmentation,
                          cv::Mat& debugScore,
-                         bool debugLayersEnabled)
+                         bool debugLayersEnabled,
+                         const sensekit::CoordinateMapper& fullSizeMapper)
             :
             depthFullSize(depthFullSize),
             depth(depth),
@@ -76,9 +79,24 @@ namespace sensekit { namespace plugins { namespace hand {
             debugSegmentation(debugSegmentation),
             debugScore(debugScore),
             debugLayersEnabled(debugLayersEnabled),
-            layerCount(0)
+            layerCount(0),
+            fullSizeMapper(fullSizeMapper)
             {}
     };
+
+    inline float get_resize_factor(TrackingMatrices& matrices)
+    {
+        float resizeFactor = matrices.depthFullSize.cols / static_cast<float>(matrices.depth.cols);
+
+        return resizeFactor;
+    }
+
+    inline ScalingCoordinateMapper get_scaling_mapper(TrackingMatrices& matrices)
+    {
+        const float resizeFactor = get_resize_factor(matrices);
+
+        return ScalingCoordinateMapper(matrices.fullSizeMapper, resizeFactor);
+    }
 
     struct TrackingData
     {
@@ -92,6 +110,8 @@ namespace sensekit { namespace plugins { namespace hand {
         const SegmentationForegroundPolicy foregroundPolicy;
         const float edgeDistanceFactor;
         const float targetEdgeDistance;
+        const float pointInertiaFactor;
+        const float pointInertiaRadius;
 
         TrackingData(TrackingMatrices& matrices,
                      const cv::Point& seedPosition,
@@ -102,7 +122,9 @@ namespace sensekit { namespace plugins { namespace hand {
                      const float maxSegmentationDist,
                      const SegmentationForegroundPolicy foregroundPolicy,
                      const float edgeDistanceFactor,
-                     const float targetEdgeDistance)
+                     const float targetEdgeDistance,
+                     const float pointInertiaFactor,
+                     const float pointInertiaRadius)
             : matrices(matrices),
               seedPosition(seedPosition),
               referenceDepth(referenceDepth),
@@ -112,7 +134,9 @@ namespace sensekit { namespace plugins { namespace hand {
               maxSegmentationDist(maxSegmentationDist),
               foregroundPolicy(foregroundPolicy),
               edgeDistanceFactor(edgeDistanceFactor),
-              targetEdgeDistance(targetEdgeDistance)
+              targetEdgeDistance(targetEdgeDistance),
+              pointInertiaFactor(pointInertiaFactor),
+              pointInertiaRadius(pointInertiaRadius)
         {}
     };
 }}}

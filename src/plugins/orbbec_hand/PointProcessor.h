@@ -12,7 +12,7 @@ namespace sensekit { namespace plugins { namespace hand {
     class PointProcessor
     {
     public:
-        PointProcessor(const sensekit::CoordinateMapper& mapper);
+        PointProcessor();
         virtual ~PointProcessor();
 
         void initialize_common_calculations(TrackingMatrices& matrices);
@@ -33,8 +33,6 @@ namespace sensekit { namespace plugins { namespace hand {
 
         float get_point_area(TrackingMatrices& matrices, const cv::Point& point);
     private:
-        float get_resize_factor(TrackingMatrices& matrices);
-        ScalingCoordinateMapper get_scaling_mapper(TrackingMatrices& matrices);
         cv::Point3f smooth_world_positions(const cv::Point3f& oldWorldPosition, const cv::Point3f& newWorldPosition);
 
         void updateTrackedPoint(TrackingMatrices& matrices,
@@ -51,9 +49,9 @@ namespace sensekit { namespace plugins { namespace hand {
         bool is_valid_point_area(TrackingMatrices& matrices, const cv::Point& targetPoint);
         void update_tracked_point_from_world_position(TrackedPoint& trackedPoint,
                                                       const cv::Point3f& newWorldPosition,
-                                                      const float resizeFactor);
+                                                      const float resizeFactor,
+                                                      const CoordinateMapper& fullSizeMapper);
 
-        const sensekit::CoordinateMapper& m_fullSizeMapper;
         float m_trackingBandwidthDepth;
         float m_initialBandwidthDepth;
         float m_maxMatchDistLostActive;
@@ -72,6 +70,8 @@ namespace sensekit { namespace plugins { namespace hand {
         float m_heightScoreFactor;
         float m_depthScoreFactor;
         float m_edgeDistanceScoreFactor;
+        float m_pointInertiaFactor;
+        float m_pointInertiaRadius;
         int m_maxInactiveFramesToBeConsideredActive;
         int m_minActiveFramesToLockTracking;
         int m_maxInactiveFramesForCandidatePoints;

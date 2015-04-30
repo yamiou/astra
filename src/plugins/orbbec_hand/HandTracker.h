@@ -55,7 +55,6 @@ namespace sensekit { namespace plugins { namespace hand {
         StreamReader m_reader;
 
         DepthUtility m_depthUtility;
-        std::unique_ptr<ScalingCoordinateMapper> m_mapper;
         std::unique_ptr<PointProcessor> m_pointProcessor;
 
         int m_width;

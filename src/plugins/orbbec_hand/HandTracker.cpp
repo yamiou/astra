@@ -51,8 +51,7 @@ namespace sensekit { namespace plugins { namespace hand {
             m_depthStream = m_reader.stream<DepthStream>(depthDescription.get_subtype());
             m_depthStream.start();
 
-            m_mapper = std::make_unique<ScalingCoordinateMapper>(m_depthStream.coordinateMapper(), 1.0f);
-            m_pointProcessor = std::make_unique<PointProcessor>(m_depthStream.coordinateMapper());
+            m_pointProcessor = std::make_unique<PointProcessor>();
 
             m_reader.addListener(*this);
         }
@@ -129,7 +128,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_layerEdgeDistance,
                                             m_debugUpdateSegmentation,
                                             m_debugUpdateScore,
-                                            debugLayersEnabled);
+                                            debugLayersEnabled,
+                                            m_depthStream.coordinateMapper());
 
             m_pointProcessor->initialize_common_calculations(updateMatrices);
 
@@ -152,7 +152,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_layerEdgeDistance,
                                             m_debugCreateSegmentation,
                                             m_debugCreateScore,
-                                            debugLayersEnabled);
+                                            debugLayersEnabled,
+                                            m_depthStream.coordinateMapper());
 
             //add new points (unless already tracking)
             if (!m_debugImageStream->use_mouse_probe())
@@ -194,7 +195,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                                 m_refineEdgeDistance,
                                                 m_debugRefineSegmentation,
                                                 m_debugRefineScore,
-                                                false);
+                                                false,
+                                                m_depthStream.coordinateMapper());
 
             m_pointProcessor->update_full_resolution_points(refinementMatrices);
         }

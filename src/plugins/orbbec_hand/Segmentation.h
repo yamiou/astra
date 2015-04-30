@@ -25,8 +25,6 @@ namespace sensekit { namespace plugins { namespace hand {
                                    const float depthFactor,
                                    const ScalingCoordinateMapper& mapper);
 
-        void calculate_layer_score(cv::Mat& depthMatrix, cv::Mat& basicScoreMatrix, cv::Mat& edgeDistanceMatrix, const float edgeDistanceFactor, const float targetEdgeDist, cv::Mat& layerScoreMatrix);
-
         void calculate_segment_area(cv::Mat& depthMatrix,
                                     cv::Mat& areaMatrix,
                                     cv::Mat& areaSqrtMatrix,

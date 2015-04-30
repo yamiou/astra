@@ -4,8 +4,7 @@
 
 namespace sensekit { namespace plugins { namespace hand {
 
-    PointProcessor::PointProcessor(const sensekit::CoordinateMapper& mapper) :
-        m_fullSizeMapper(mapper),
+    PointProcessor::PointProcessor() :
         m_trackingBandwidthDepth(150),  //mm
         m_initialBandwidthDepth(450),   //mm
         m_maxMatchDistLostActive(500),  //mm
@@ -23,7 +22,9 @@ namespace sensekit { namespace plugins { namespace hand {
         m_targetEdgeDistance(60),       //mm
         m_heightScoreFactor(0.5),
         m_depthScoreFactor(2.0),
-        m_edgeDistanceScoreFactor(4),
+        m_edgeDistanceScoreFactor(4.0),
+        m_pointInertiaFactor(1.0),
+        m_pointInertiaRadius(40),       //mm
         m_maxInactiveFramesToBeConsideredActive(10),
         m_minActiveFramesToLockTracking(60),
         m_maxInactiveFramesForCandidatePoints(60),
@@ -36,20 +37,6 @@ namespace sensekit { namespace plugins { namespace hand {
 
     PointProcessor::~PointProcessor()
     {}
-
-    float PointProcessor::get_resize_factor(TrackingMatrices& matrices)
-    {
-        float resizeFactor = matrices.depthFullSize.cols / static_cast<float>(matrices.depth.cols);
-
-        return resizeFactor;
-    }
-
-    ScalingCoordinateMapper PointProcessor::get_scaling_mapper(TrackingMatrices& matrices)
-    {
-        const float resizeFactor = get_resize_factor(matrices);
-
-        return ScalingCoordinateMapper(m_fullSizeMapper, resizeFactor);
-    }
 
     void PointProcessor::initialize_common_calculations(TrackingMatrices& matrices)
     {
@@ -101,7 +88,9 @@ namespace sensekit { namespace plugins { namespace hand {
                                         m_maxSegmentationDist,
                                         FG_POLICY_IGNORE,
                                         m_edgeDistanceScoreFactor,
-                                        m_targetEdgeDistance);
+                                        m_targetEdgeDistance,
+                                        m_pointInertiaFactor,
+                                        m_pointInertiaRadius);
 
         cv::Point newTargetPoint = segmentation::converge_track_point_from_seed(updateTrackingData);
 
@@ -128,7 +117,9 @@ namespace sensekit { namespace plugins { namespace hand {
                                              m_maxSegmentationDist,
                                              FG_POLICY_IGNORE,
                                              m_edgeDistanceScoreFactor,
-                                             m_targetEdgeDistance);
+                                             m_targetEdgeDistance,
+                                             m_pointInertiaFactor,
+                                             m_pointInertiaRadius);
 
             newTargetPoint = segmentation::converge_track_point_from_seed(recoverTrackingData);
 
@@ -190,14 +181,17 @@ namespace sensekit { namespace plugins { namespace hand {
 
                 float refinedDepth = matrices.depthFullSize.at<float>(trackedPoint.fullSizePosition);
 
-                cv::Point3f worldPosition = cv_convert_depth_to_world(m_fullSizeMapper,
+                cv::Point3f worldPosition = cv_convert_depth_to_world(matrices.fullSizeMapper,
                                                                       refinedPosition.x,
                                                                       refinedPosition.y,
                                                                       refinedDepth);
 
                 cv::Point3f smoothedWorldPosition = smooth_world_positions(trackedPoint.fullSizeWorldPosition, worldPosition);
 
-                update_tracked_point_from_world_position(trackedPoint, smoothedWorldPosition, resizeFactor);
+                update_tracked_point_from_world_position(trackedPoint,
+                                                         smoothedWorldPosition,
+                                                         resizeFactor,
+                                                         matrices.fullSizeMapper);
             }
             else
             {
@@ -228,7 +222,7 @@ namespace sensekit { namespace plugins { namespace hand {
         roi.copyTo(matrices.depth);
 
         //initialize_common_calculations(matrices);
-        ScalingCoordinateMapper roiMapper(m_fullSizeMapper, 1.0, windowLeft, windowTop);
+        ScalingCoordinateMapper roiMapper(matrices.fullSizeMapper, 1.0, windowLeft, windowTop);
 
         segmentation::calculate_basic_score(matrices.depth,
                                             matrices.basicScore,
@@ -254,7 +248,9 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_maxSegmentationDist,
                                             FG_POLICY_IGNORE,
                                             m_edgeDistanceScoreFactor,
-                                            m_targetEdgeDistance);
+                                            m_targetEdgeDistance,
+                                            m_pointInertiaFactor,
+                                            m_pointInertiaRadius);
 
         cv::Point targetPoint = segmentation::converge_track_point_from_seed(refinementTrackingData);
 
@@ -281,9 +277,10 @@ namespace sensekit { namespace plugins { namespace hand {
 
     void PointProcessor::update_tracked_point_from_world_position(TrackedPoint& trackedPoint, 
                                                                   const cv::Point3f& newWorldPosition, 
-                                                                  const float resizeFactor)
+                                                                  const float resizeFactor,
+                                                                  const CoordinateMapper& fullSizeMapper)
     {
-        cv::Point3f fullSizeDepthPosition = cv_convert_world_to_depth(m_fullSizeMapper, newWorldPosition);
+        cv::Point3f fullSizeDepthPosition = cv_convert_world_to_depth(fullSizeMapper, newWorldPosition);
 
         trackedPoint.fullSizePosition = cv::Point(fullSizeDepthPosition.x, fullSizeDepthPosition.y);
 
@@ -423,7 +420,9 @@ namespace sensekit { namespace plugins { namespace hand {
                                   m_maxSegmentationDist,
                                   FG_POLICY_RESET_TTL,
                                   m_edgeDistanceScoreFactor,
-                                  m_targetEdgeDistance);
+                                  m_targetEdgeDistance,
+                                  m_pointInertiaFactor,
+                                  m_pointInertiaRadius);
 
         cv::Point targetPoint = segmentation::converge_track_point_from_seed(trackingData);
 

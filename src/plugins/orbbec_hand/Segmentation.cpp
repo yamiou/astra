@@ -128,6 +128,54 @@ namespace sensekit { namespace plugins { namespace hand {
             }
         }
 
+        void calculate_layer_score(TrackingData& data)
+        {
+            cv::Mat& depthMatrix = data.matrices.depth;
+            cv::Mat& basicScoreMatrix = data.matrices.basicScore;
+            cv::Mat& edgeDistanceMatrix = data.matrices.layerEdgeDistance;
+            const float edgeDistanceFactor = data.edgeDistanceFactor;
+            const float targetEdgeDist = data.targetEdgeDistance;
+            cv::Mat& layerScoreMatrix = data.matrices.layerScore;
+            const float pointInertiaFactor = data.pointInertiaFactor;
+            const float pointInertiaRadius = data.pointInertiaRadius;
+
+            ScalingCoordinateMapper mapper = get_scaling_mapper(data.matrices);
+
+            int width = depthMatrix.cols;
+            int height = depthMatrix.rows;
+
+            for (int y = 0; y < height; y++)
+            {
+                float* depthRow = depthMatrix.ptr<float>(y);
+                float* basicScoreRow = basicScoreMatrix.ptr<float>(y);
+                float* edgeDistanceRow = edgeDistanceMatrix.ptr<float>(y);
+                float* layerScoreRow = layerScoreMatrix.ptr<float>(y);
+
+                for (int x = 0; x < width; x++)
+                {
+                    float depth = *depthRow;
+                    if (depth != 0)
+                    {
+                        cv::Point3f worldPosition = mapper.convert_depth_to_world(x, y, depth);
+
+                        float score = *basicScoreRow;
+                        float edgeDistance = *edgeDistanceRow;
+                        score += (targetEdgeDist - abs(targetEdgeDist - edgeDistance)) * edgeDistanceFactor;
+
+                        *layerScoreRow = score;
+                    }
+                    else
+                    {
+                        *layerScoreRow = 0;
+                    }
+                    ++depthRow;
+                    ++basicScoreRow;
+                    ++edgeDistanceRow;
+                    ++layerScoreRow;
+                }
+            }
+        }
+
         static cv::Point track_point_from_seed(TrackingData& data)
         {
             cv::Size size = data.matrices.depth.size();
@@ -142,12 +190,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                     data.matrices.areaSqrt,
                                     data.matrices.layerEdgeDistance);
 
-            calculate_layer_score(data.matrices.depth,
-                                  data.matrices.basicScore,
-                                  data.matrices.layerEdgeDistance,
-                                  data.edgeDistanceFactor,
-                                  data.targetEdgeDistance,
-                                  data.matrices.layerScore);
+            calculate_layer_score(data);
 
             double min, max;
             cv::Point minLoc, maxLoc;
@@ -268,46 +311,6 @@ namespace sensekit { namespace plugins { namespace hand {
                     }
                     ++depthRow;
                     ++scoreRow;
-                }
-            }
-        }
-        
-        void calculate_layer_score(cv::Mat& depthMatrix, 
-                                   cv::Mat& basicScoreMatrix, 
-                                   cv::Mat& edgeDistanceMatrix, 
-                                   const float edgeDistanceFactor, 
-                                   const float targetEdgeDist, 
-                                   cv::Mat& layerScoreMatrix)
-        {
-            int width = depthMatrix.cols;
-            int height = depthMatrix.rows;
-
-            for (int y = 0; y < height; y++)
-            {
-                float* depthRow = depthMatrix.ptr<float>(y);
-                float* basicScoreRow = basicScoreMatrix.ptr<float>(y);
-                float* edgeDistanceRow = edgeDistanceMatrix.ptr<float>(y);
-                float* layerScoreRow = layerScoreMatrix.ptr<float>(y);
-
-                for (int x = 0; x < width; x++)
-                {
-                    float depth = *depthRow;
-                    if (depth != 0)
-                    {
-                        float score = *basicScoreRow;
-                        float edgeDistance = *edgeDistanceRow;
-                        score += (targetEdgeDist - abs(targetEdgeDist - edgeDistance)) * edgeDistanceFactor;
-
-                        *layerScoreRow = score;
-                    }
-                    else
-                    {
-                        *layerScoreRow = 0;
-                    }
-                    ++depthRow;
-                    ++basicScoreRow;
-                    ++edgeDistanceRow;
-                    ++layerScoreRow;
                 }
             }
         }
