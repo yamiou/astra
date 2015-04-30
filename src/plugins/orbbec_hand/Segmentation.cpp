@@ -25,7 +25,7 @@ namespace sensekit { namespace plugins { namespace hand {
             }
         };
 
-        static void segment_foreground(TrackingData data)
+        static void segment_foreground(TrackingData& data)
         {
             const float maxSegmentationDist = data.maxSegmentationDist;
             const SegmentationForegroundPolicy foregroundPolicy = data.foregroundPolicy;
@@ -128,7 +128,7 @@ namespace sensekit { namespace plugins { namespace hand {
             }
         }
 
-        static cv::Point track_point_from_seed(TrackingData data)
+        static cv::Point track_point_from_seed(TrackingData& data)
         {
             cv::Size size = data.matrices.depth.size();
             data.matrices.layerSegmentation = cv::Mat::zeros(size, CV_8UC1);
@@ -168,7 +168,7 @@ namespace sensekit { namespace plugins { namespace hand {
             return maxLoc;
         }
 
-        cv::Point converge_track_point_from_seed(TrackingData data)
+        cv::Point converge_track_point_from_seed(TrackingData& data)
         {
             cv::Point point = data.seedPosition;
             cv::Point lastPoint = data.seedPosition;

@@ -40,7 +40,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                       const float bandwidthDepth,
                                       const ScalingCoordinateMapper& mapper);
 
-        cv::Point converge_track_point_from_seed(TrackingData data);
+        cv::Point converge_track_point_from_seed(TrackingData& data);
 
     }
 }}}
