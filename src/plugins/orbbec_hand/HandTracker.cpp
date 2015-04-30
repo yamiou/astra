@@ -332,7 +332,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                colorFrame);
                 break;
             case DEBUG_HAND_VIEW_DEPTH_MOD:
-                m_debugVisualizer.showDepthMat(m_depthUtility.matDepthMod(),
+                m_debugVisualizer.showDepthMat(m_depthUtility.matDepthAvg(),
                                                colorFrame);
                 break;
             case DEBUG_HAND_VIEW_VELOCITY:
@@ -378,7 +378,8 @@ namespace sensekit { namespace plugins { namespace hand {
 
             if (view != DEBUG_HAND_VIEW_HANDWINDOW && 
                 view != DEBUG_HAND_VIEW_CREATE_SCORE &&
-                view != DEBUG_HAND_VIEW_UPDATE_SCORE)
+                view != DEBUG_HAND_VIEW_UPDATE_SCORE &&
+                view != DEBUG_HAND_VIEW_DEPTH_MOD)
             {
                 if (view == DEBUG_HAND_VIEW_CREATE_SEARCHED)
                 {

@@ -19,10 +19,18 @@ namespace sensekit { namespace plugins { namespace hand {
         void reset();
 
         const cv::Mat& matDepthVel() const { return m_matDepthVel; }
+        const cv::Mat& matDepthAvg() const { return m_matDepthAvg; }
         const cv::Mat& matDepthVelErode() const { return m_matDepthVelErode; }
         const cv::Mat& matDepthMod() const { return m_matDepthFilled; }
 
     private:
+
+        enum FillMaskType
+        {
+            Normal = 0,
+            Filled = 1,
+            PreviousFilled = 2
+        };
         static void depthFrameToMat(DepthFrame& depthFrameSrc, 
                                     const int width, 
                                     const int height, 
@@ -30,16 +38,22 @@ namespace sensekit { namespace plugins { namespace hand {
                                     cv::Mat& matTarget,
                                     const float farDepth);
 
-        static void fillZeroValues(cv::Mat& matDepth, cv::Mat& matDepthFilled, cv::Mat& matDepthPrevious, const float invalidDepth);
+        static void fillZeroValues(cv::Mat& matDepth,
+                                   cv::Mat& matDepthFilled,
+                                   cv::Mat& matDepthFilledMask,
+                                   cv::Mat& matDepthPrevious);
 
         static void filterZeroValuesAndJumps(cv::Mat& depthCurrent,
                                              cv::Mat& depthPrev,
                                              cv::Mat& depthAvg,
                                              cv::Mat& depthVel,
+                                             cv::Mat& matDepthFilledMask,
                                              const float maxDepthJumpPercent,
-                                             const float invalidDepth);
+                                             const float farDepth);
 
-        void thresholdForeground(cv::Mat& matForeground, cv::Mat& matVelocity, float foregroundThresholdFactor);
+        void thresholdForeground(cv::Mat& matForeground,
+                                 cv::Mat& matVelocity,
+                                 const float foregroundThresholdFactor);
 
         const float m_processingWidth;
         const float m_processingHeight;
@@ -49,6 +63,7 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat m_matDepthOriginal;
         cv::Mat m_matDepthPrevious;
         cv::Mat m_matDepthFilled;
+        cv::Mat m_matDepthFilledMask;
         cv::Mat m_matDepthAvg;
         cv::Mat m_matDepthVel;
         cv::Mat m_matDepthVelErode;

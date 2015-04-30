@@ -30,6 +30,7 @@ namespace sensekit { namespace plugins { namespace hand {
     void DepthUtility::reset()
     {
         m_matDepthFilled = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_32FC1);
+        m_matDepthFilledMask = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_8UC1);
         m_matDepthPrevious = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_32FC1);
         m_matDepthAvg = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_32FC1);
         m_matDepthVel.create(m_processingHeight, m_processingWidth, CV_32FC1);
@@ -54,7 +55,7 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::resize(matDepthFullSize, matDepth, matDepth.size(), 0, 0, CV_INTER_NN);
 
         //fill 0 depth pixels with the value from the previous frame
-        fillZeroValues(matDepth, m_matDepthFilled, m_matDepthPrevious, m_farDepth);
+        fillZeroValues(matDepth, m_matDepthFilled, m_matDepthFilledMask, m_matDepthPrevious);
 
         //current minus average, scaled by average = velocity as a percent change
 
@@ -64,11 +65,12 @@ namespace sensekit { namespace plugins { namespace hand {
 
         cv::accumulateWeighted(m_matDepthFilled, m_matDepthAvg, m_depthSmoothingFactor);
 
-        filterZeroValuesAndJumps(m_matDepthFilled, 
-                                 m_matDepthPrevious, 
-                                 m_matDepthAvg, 
-                                 m_matDepthVel, 
-                                 m_maxDepthJumpPercent, 
+        filterZeroValuesAndJumps(m_matDepthFilled,
+                                 m_matDepthPrevious,
+                                 m_matDepthAvg,
+                                 m_matDepthVel,
+                                 m_matDepthFilledMask,
+                                 m_maxDepthJumpPercent,
                                  m_farDepth);
 
         //erode to eliminate single pixel velocity artifacts
@@ -76,7 +78,9 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::erode(m_matDepthVelErode, m_matDepthVelErode, m_rectElement);
         cv::dilate(m_matDepthVelErode, m_matDepthVelErode, m_rectElement);
 
-        thresholdForeground(matForeground, m_matDepthVelErode, m_foregroundThresholdFactor);
+        thresholdForeground(matForeground,
+                            m_matDepthVelErode,
+                            m_foregroundThresholdFactor);
     }
 
     void DepthUtility::depthFrameToMat(DepthFrame& depthFrameSrc, 
@@ -108,7 +112,10 @@ namespace sensekit { namespace plugins { namespace hand {
         }
     }
 
-    void DepthUtility::fillZeroValues(cv::Mat& matDepth, cv::Mat& matDepthFilled, cv::Mat& matDepthPrevious, const float invalidDepth)
+    void DepthUtility::fillZeroValues(cv::Mat& matDepth,
+                                      cv::Mat& matDepthFilled,
+                                      cv::Mat& matDepthFilledMask,
+                                      cv::Mat& matDepthPrevious)
     {
         int width = matDepth.cols;
         int height = matDepth.rows;
@@ -118,14 +125,26 @@ namespace sensekit { namespace plugins { namespace hand {
             float* depthRow = matDepth.ptr<float>(y);
             float* prevDepthRow = matDepthPrevious.ptr<float>(y);
             float* filledDepthRow = matDepthFilled.ptr<float>(y);
+            uint8_t* filledDepthMaskRow = matDepthFilledMask.ptr<uint8_t>(y);
 
             for (int x = 0; x < width; ++x)
             {
                 float depth = *depthRow;
 
+                uint8_t fillType = *filledDepthMaskRow;
+
                 if (depth == 0)
                 {
                     depth = *prevDepthRow;
+                    *filledDepthMaskRow = FillMaskType::Filled;
+                }
+                else if (fillType == FillMaskType::Filled)
+                {
+                    *filledDepthMaskRow = FillMaskType::PreviousFilled;
+                }
+                else
+                {
+                    *filledDepthMaskRow = FillMaskType::Normal;
                 }
 
                 *filledDepthRow = depth;
@@ -133,6 +152,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 ++depthRow;
                 ++prevDepthRow;
                 ++filledDepthRow;
+                ++filledDepthMaskRow;
             }
         }
     }
@@ -141,8 +161,9 @@ namespace sensekit { namespace plugins { namespace hand {
                                                 cv::Mat& matDepthPrevious,
                                                 cv::Mat& matDepthAvg,
                                                 cv::Mat& matDepthVel,
+                                                cv::Mat& matDepthFilledMask,
                                                 const float maxDepthJumpPercent,
-                                                const float invalidDepth)
+                                                const float farDepth)
     {
         int width = matDepth.cols;
         int height = matDepth.rows;
@@ -153,19 +174,29 @@ namespace sensekit { namespace plugins { namespace hand {
             float* prevDepthRow = matDepthPrevious.ptr<float>(y);
             float* avgRow = matDepthAvg.ptr<float>(y);
             float* velRow = matDepthVel.ptr<float>(y);
+            uint8_t* filledDepthMaskRow = matDepthFilledMask.ptr<uint8_t>(y);
 
             for (int x = 0; x < width; ++x)
             {
                 float depth = *depthRow;
                 float previousDepth = *prevDepthRow;
+                uint8_t fillType = *filledDepthMaskRow;
 
                 //calculate percent change since last frame
                 float deltaPercent = (depth - previousDepth) / previousDepth;
                 float absDeltaPercent = std::fabs(deltaPercent);
-                //if this frame or last frame are zero depth, or there is a large jump
+                bool movingAway = deltaPercent > 0;
 
-                if (0 == depth || 0 == previousDepth ||
-                    (absDeltaPercent > maxDepthJumpPercent && deltaPercent > 0))
+                //suppress signal if either current or previous pixel are invalid
+                bool isZeroDepth = (0 == depth || 0 == previousDepth);
+
+                //suppress signal when a pixel was artificially filled
+                bool isFilled = (fillType == FillMaskType::Filled);
+
+                //suppress signal when a pixel jumps a long distance from near to far
+                bool isJumpingAway = (absDeltaPercent > maxDepthJumpPercent && movingAway);
+
+                if (isZeroDepth || isFilled || isJumpingAway)
                 {
                     //set the average to the current depth, and set velocity to zero
                     //this suppresses the velocity signal for edge jumping artifacts
@@ -177,11 +208,14 @@ namespace sensekit { namespace plugins { namespace hand {
 
                 ++depthRow;
                 ++prevDepthRow;
+                ++filledDepthMaskRow;
             }
         }
     }
 
-    void DepthUtility::thresholdForeground(cv::Mat& matForeground, cv::Mat& matVelocity, float foregroundThresholdFactor)
+    void DepthUtility::thresholdForeground(cv::Mat& matForeground, 
+                                           cv::Mat& matVelocity,
+                                           const float foregroundThresholdFactor)
     {
         int width = matForeground.cols;
         int height = matForeground.rows;
@@ -190,7 +224,7 @@ namespace sensekit { namespace plugins { namespace hand {
         for (int y = 0; y < height; ++y)
         {
             float* velRow = matVelocity.ptr<float>(y);
-            char* foregroundRow = matForeground.ptr<char>(y);
+            uint8_t* foregroundRow = matForeground.ptr<uint8_t>(y);
 
             for (int x = 0; x < width; ++x)
             {
@@ -200,6 +234,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 {
                     m_maxVel = vel;
                 }
+
                 if (vel > foregroundThresholdFactor)
                 {
                     *foregroundRow = PixelType::Foreground;
@@ -209,8 +244,8 @@ namespace sensekit { namespace plugins { namespace hand {
                     *foregroundRow = PixelType::Background;
                 }
 
-                ++foregroundRow;
                 ++velRow;
+                ++foregroundRow;
             }
         }
         //printf("max vel: %f\n", m_maxVel);
