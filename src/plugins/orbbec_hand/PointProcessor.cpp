@@ -19,12 +19,12 @@ namespace sensekit { namespace plugins { namespace hand {
         m_maxSegmentationDist(250),     //mm
         m_steadyDeadBandRadius(150),    //mm
         m_maxJumpDist(100),             //mm
-        m_targetEdgeDistance(60),       //mm
+        m_targetEdgeDistance(40),       //mm
         m_heightScoreFactor(0.5),
         m_depthScoreFactor(2.0),
         m_edgeDistanceScoreFactor(4.0),
-        m_pointInertiaFactor(1.0),
-        m_pointInertiaRadius(40),       //mm
+        m_pointInertiaFactor(50.0),
+        m_pointInertiaRadius(60),       //mm
         m_maxInactiveFramesToBeConsideredActive(10),
         m_minActiveFramesToLockTracking(60),
         m_maxInactiveFramesForCandidatePoints(60),

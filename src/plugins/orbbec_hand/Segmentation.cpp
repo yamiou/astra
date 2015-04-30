@@ -141,6 +141,11 @@ namespace sensekit { namespace plugins { namespace hand {
 
             ScalingCoordinateMapper mapper = get_scaling_mapper(data.matrices);
 
+            cv::Point3f seedWorldPosition = mapper.convert_depth_to_world(data.seedPosition.x,
+                                                                          data.seedPosition.y,
+                                                                          data.referenceDepth);
+            bool activePoint = data.pointType == TrackedPointType::ActivePoint;
+
             int width = depthMatrix.cols;
             int height = depthMatrix.rows;
 
@@ -161,6 +166,13 @@ namespace sensekit { namespace plugins { namespace hand {
                         float score = *basicScoreRow;
                         float edgeDistance = *edgeDistanceRow;
                         score += (targetEdgeDist - abs(targetEdgeDist - edgeDistance)) * edgeDistanceFactor;
+                        
+                        if (activePoint && pointInertiaRadius > 0)
+                        {
+                            float distFromSeedNorm = std::max(0.0, std::min(1.0, 
+                                                        cv::norm(worldPosition - seedWorldPosition) / pointInertiaRadius));
+                            score += (1.0f - distFromSeedNorm) * pointInertiaFactor;
+                        }
 
                         *layerScoreRow = score;
                     }
@@ -205,7 +217,10 @@ namespace sensekit { namespace plugins { namespace hand {
                     data.matrices.debugSegmentation,
                     data.matrices.debugSegmentation,
                     data.matrices.layerSegmentation);
-                cv::normalize(data.matrices.layerScore, data.matrices.debugScore, 0, 1, cv::NORM_MINMAX, -1, data.matrices.layerSegmentation);
+                if (data.pointType == TrackedPointType::ActivePoint)
+                {
+                    cv::normalize(data.matrices.layerScore, data.matrices.debugScore, 0, 1, cv::NORM_MINMAX, -1, data.matrices.layerSegmentation);
+                }
             }
 
             return maxLoc;
