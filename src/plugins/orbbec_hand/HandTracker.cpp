@@ -13,8 +13,8 @@ namespace sensekit { namespace plugins { namespace hand {
 
         using namespace std;
 
-        const int PROCESSING_SIZE_WIDTH = 80;
-        const int PROCESSING_SIZE_HEIGHT = 60;
+        const int PROCESSING_SIZE_WIDTH = 160;
+        const int PROCESSING_SIZE_HEIGHT = 120;
 
         HandTracker::HandTracker(PluginServiceProxy& pluginService,
                                  Sensor& streamset,
