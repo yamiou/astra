@@ -103,9 +103,17 @@ namespace sensekit { namespace plugins { namespace hand {
             m_layerEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_debugUpdateSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_debugCreateSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
+            m_debugRefineSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_updateForegroundSearched = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_createForegroundSearched = cv::Mat::zeros(matDepth.size(), CV_8UC1);
+            m_refineForegroundSearched = cv::Mat::zeros(matDepth.size(), CV_8UC1);
+            m_debugUpdateScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
+            m_debugCreateScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_matDepthWindow = cv::Mat::zeros(m_matDepth.size(), CV_32FC1);
+            m_refineSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
+            m_refineScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
+            m_refineEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
+
 
             bool debugLayersEnabled = m_debugImageStream->has_connections();
             
@@ -120,6 +128,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_layerScore,
                                             m_layerEdgeDistance,
                                             m_debugUpdateSegmentation,
+                                            m_debugUpdateScore,
                                             debugLayersEnabled);
 
             m_pointProcessor->initialize_common_calculations(updateMatrices);
@@ -142,6 +151,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_layerScore,
                                             m_layerEdgeDistance,
                                             m_debugCreateSegmentation,
+                                            m_debugCreateScore,
                                             debugLayersEnabled);
 
             //add new points (unless already tracking)
@@ -173,16 +183,17 @@ namespace sensekit { namespace plugins { namespace hand {
             m_pointProcessor->removeOldOrDeadPoints();
 
             TrackingMatrices refinementMatrices(matDepthFullSize,
-                                                m_matDepthWindow, 
-                                                m_matArea, 
+                                                m_matDepthWindow,
+                                                m_matArea,
                                                 m_matAreaSqrt,
-                                                m_matBasicScore, 
-                                                matForeground, 
-                                                m_createForegroundSearched,
-                                                m_layerSegmentation,
-                                                m_layerScore,
-                                                m_layerEdgeDistance,
-                                                m_debugUpdateSegmentation, 
+                                                m_matBasicScore,
+                                                matForeground,
+                                                m_refineForegroundSearched,
+                                                m_refineSegmentation,
+                                                m_refineScore,
+                                                m_refineEdgeDistance,
+                                                m_debugRefineSegmentation,
+                                                m_debugRefineScore,
                                                 false);
 
             m_pointProcessor->update_full_resolution_points(refinementMatrices);
@@ -347,23 +358,25 @@ namespace sensekit { namespace plugins { namespace hand {
                 m_debugVisualizer.showDepthMat(m_matDepth,
                                                colorFrame);
                 break;
-            case DEBUG_HAND_VIEW_SCORE:
-                m_debugVisualizer.showNormArray<float>(m_matBasicScore,
-                                                       m_layerSegmentation, //m_debugUpdateSegmentation,
+            case DEBUG_HAND_VIEW_CREATE_SCORE:
+                m_debugVisualizer.showNormArray<float>(m_debugCreateScore,
+                                                       m_debugCreateSegmentation,
+                                                       colorFrame);
+                break;
+            case DEBUG_HAND_VIEW_UPDATE_SCORE:
+                m_debugVisualizer.showNormArray<float>(m_debugUpdateScore,
+                                                       m_debugUpdateSegmentation,
                                                        colorFrame);
                 break;
             case DEBUG_HAND_VIEW_HANDWINDOW:
                 m_debugVisualizer.showDepthMat(m_matDepthWindow,
                                                colorFrame);
                 break;
-            case DEBUG_HAND_VIEW_EDGEDISTANCE:
-                m_debugVisualizer.showNormArray<float>(m_layerScore,
-                                                       m_layerSegmentation, //m_debugUpdateSegmentation,
-                                                       colorFrame);
-                break;
             }
 
-            if (view != DEBUG_HAND_VIEW_HANDWINDOW)
+            if (view != DEBUG_HAND_VIEW_HANDWINDOW && 
+                view != DEBUG_HAND_VIEW_CREATE_SCORE &&
+                view != DEBUG_HAND_VIEW_UPDATE_SCORE)
             {
                 if (view == DEBUG_HAND_VIEW_CREATE_SEARCHED)
                 {

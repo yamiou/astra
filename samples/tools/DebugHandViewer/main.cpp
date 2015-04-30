@@ -262,11 +262,11 @@ public:
         case DEBUG_HAND_VIEW_CREATE_SEARCHED:
             return "Create searched";
             break;
-        case DEBUG_HAND_VIEW_SCORE:
-            return "Score";
+        case DEBUG_HAND_VIEW_CREATE_SCORE:
+            return "Create score";
             break;
-        case DEBUG_HAND_VIEW_EDGEDISTANCE:
-            return "Edge distance";
+        case DEBUG_HAND_VIEW_UPDATE_SCORE:
+            return "Update score";
             break;
         case DEBUG_HAND_VIEW_HANDWINDOW:
             return "Hand window";
@@ -381,7 +381,7 @@ void process_key_input(sensekit::StreamReader& reader, HandDebugFrameListener& l
     }
     else if (key.code == sf::Keyboard::Num4)
     {
-        request_view_mode(reader, DEBUG_HAND_VIEW_SCORE);
+        request_view_mode(reader, DEBUG_HAND_VIEW_UPDATE_SCORE);
     }
     else if (key.code == sf::Keyboard::Num5)
     {
@@ -393,19 +393,19 @@ void process_key_input(sensekit::StreamReader& reader, HandDebugFrameListener& l
     }
     else if (key.code == sf::Keyboard::Num7)
     {
-        request_view_mode(reader, DEBUG_HAND_VIEW_CREATE_SEGMENTATION);
+        request_view_mode(reader, DEBUG_HAND_VIEW_CREATE_SCORE);
     }
     else if (key.code == sf::Keyboard::Num8)
     {
-        request_view_mode(reader, DEBUG_HAND_VIEW_CREATE_SEARCHED);
+        request_view_mode(reader, DEBUG_HAND_VIEW_CREATE_SEGMENTATION);
     }
     else if (key.code == sf::Keyboard::Num9)
     {
-        request_view_mode(reader, DEBUG_HAND_VIEW_HANDWINDOW);
+        request_view_mode(reader, DEBUG_HAND_VIEW_CREATE_SEARCHED);
     }
     else if (key.code == sf::Keyboard::Num0)
     {
-        request_view_mode(reader, DEBUG_HAND_VIEW_EDGEDISTANCE);
+        request_view_mode(reader, DEBUG_HAND_VIEW_HANDWINDOW);
     }
     else if (key.code == sf::Keyboard::M)
     {

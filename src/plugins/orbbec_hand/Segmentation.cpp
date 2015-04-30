@@ -149,20 +149,21 @@ namespace sensekit { namespace plugins { namespace hand {
                                   data.targetEdgeDistance,
                                   data.matrices.layerScore);
 
+            double min, max;
+            cv::Point minLoc, maxLoc;
+
+            cv::minMaxLoc(data.matrices.layerScore, &min, &max, &minLoc, &maxLoc, data.matrices.layerSegmentation);
+
             if (data.matrices.debugLayersEnabled)
             {
                 ++data.matrices.layerCount;
 
                 cv::bitwise_or(cv::Mat(size, CV_8UC1, cv::Scalar(data.matrices.layerCount)),
-                               data.matrices.debugSegmentation,
-                               data.matrices.debugSegmentation,
-                               data.matrices.layerSegmentation);
+                    data.matrices.debugSegmentation,
+                    data.matrices.debugSegmentation,
+                    data.matrices.layerSegmentation);
+                cv::normalize(data.matrices.layerScore, data.matrices.debugScore, 0, 1, cv::NORM_MINMAX, -1, data.matrices.layerSegmentation);
             }
-
-            double min, max;
-            cv::Point minLoc, maxLoc;
-
-            cv::minMaxLoc(data.matrices.layerScore, &min, &max, &minLoc, &maxLoc, data.matrices.layerSegmentation);
 
             return maxLoc;
         }

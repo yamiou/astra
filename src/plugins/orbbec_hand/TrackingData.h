@@ -45,8 +45,9 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat& layerEdgeDistance;
         cv::Mat& foregroundSearched;
         cv::Mat& debugSegmentation;
-        int layerCount;
+        cv::Mat& debugScore;
         bool debugLayersEnabled;
+        int layerCount;
 
         TrackingMatrices(cv::Mat& depthFullSize,
                          cv::Mat& depth,
@@ -59,6 +60,7 @@ namespace sensekit { namespace plugins { namespace hand {
                          cv::Mat& layerScore,
                          cv::Mat& layerEdgeDistance,
                          cv::Mat& debugSegmentation,
+                         cv::Mat& debugScore,
                          bool debugLayersEnabled)
             :
             depthFullSize(depthFullSize),
@@ -72,9 +74,10 @@ namespace sensekit { namespace plugins { namespace hand {
             layerEdgeDistance(layerEdgeDistance),
             foregroundSearched(foregroundSearched),
             debugSegmentation(debugSegmentation),
-            layerCount(0),
-            debugLayersEnabled(debugLayersEnabled)
-        {}
+            debugScore(debugScore),
+            debugLayersEnabled(debugLayersEnabled),
+            layerCount(0)
+            {}
     };
 
     struct TrackingData
