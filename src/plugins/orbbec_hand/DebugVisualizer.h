@@ -129,7 +129,12 @@ namespace sensekit { namespace plugins { namespace hand {
                 for (int x = 0; x < width; ++x, ++depthRow, ++colorData)
                 {
                     float depth = *depthRow;
-                    uint8_t value = 255 * (depth / 4000.0f);
+                    float normDepth = std::min(1.0f, std::max(0.0f, (depth - 400.0f) / 5600.0f));
+                    uint8_t value = 255 * (1 - normDepth);
+                    if (depth == 0)
+                    {
+                        value = 0;
+                    }
                     RGBPixel color(0, value, value);
                     
                     *colorData = color;
