@@ -14,11 +14,11 @@ namespace sensekit { namespace plugins { namespace hand {
         m_iterationMaxRefinement(1),
         m_minArea(0),                //mm^2
         m_maxArea(25000),               //mm^2
-        m_areaBandwidth(150),           //mm
+        m_areaBandwidth(250),           //mm
         m_areaBandwidthDepth(100),      //mm
         m_maxSegmentationDist(250),     //mm
         m_steadyDeadBandRadius(150),    //mm
-        m_maxJumpDist(100),             //mm
+        m_maxJumpDist(250),             //mm
         m_targetEdgeDistance(40),       //mm
         m_heightScoreFactor(0.5),
         m_depthScoreFactor(2.0),
