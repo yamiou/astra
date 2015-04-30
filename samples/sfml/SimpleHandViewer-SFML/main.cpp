@@ -64,7 +64,12 @@ public:
                 int index4 = index * 4;
 
                 int16_t depth = depthPtr[index];
-                uint8_t value = depth % 255;
+                float normDepth = std::min(1.0f,std::max(0.0f,(depth - 400.0f) / 5600.0f));
+                uint8_t value = 255*(1-normDepth);
+                if (depth == 0)
+                {
+                    value = 0;
+                }
 
                 m_displayBuffer[index4] = value;
                 m_displayBuffer[index4 + 1] = value;
