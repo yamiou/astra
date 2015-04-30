@@ -2,6 +2,7 @@
 #include <Sensekit/SenseKit.h>
 #include <SensekitUL/SenseKitUL.h>
 #include <sstream>
+#include <iomanip>
 
 class HandDebugFrameListener : public sensekit::FrameReadyListener
 {
@@ -166,6 +167,21 @@ public:
         drawShadowText(window, label, sf::Color::White, x, y - radius - 10);
     }
 
+    void drawHandPosition(sf::RenderWindow& window, float radius, float x, float y, sensekit::HandPoint& handPoint)
+    {
+        auto worldPosition = handPoint.worldPosition();
+        std::stringstream str;
+        str << std::fixed << std::setprecision(0);
+        str << worldPosition.x << "," << worldPosition.y << "," << worldPosition.z;
+        sf::Text label(str.str(), m_font);
+        int characterSize = 60;
+        label.setCharacterSize(characterSize);
+
+        auto bounds = label.getLocalBounds();
+        label.setOrigin(bounds.left + bounds.width / 2.0, 0);
+        drawShadowText(window, label, sf::Color::White, x, y + radius + 10);
+    }
+
     void drawHandPoints(sf::RenderWindow& window, float depthScale)
     {
         float radius = 16;
@@ -211,6 +227,10 @@ public:
             drawCircle(window, radius, circleX, circleY, color);
 
             drawHandLabel(window, radius, circleX, circleY, handPoint);
+            if (status == HAND_STATUS_TRACKING)
+            {
+                drawHandPosition(window, radius, circleX, circleY, handPoint);
+            }
         }
     }
 
