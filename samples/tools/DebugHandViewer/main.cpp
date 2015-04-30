@@ -153,6 +153,10 @@ public:
         int32_t trackingId = handPoint.trackingId();
         std::stringstream str;
         str << trackingId;
+        if (handPoint.status() == HAND_STATUS_LOST)
+        {
+            str << " Lost";
+        }
         sf::Text label(str.str(), m_font);
         int characterSize = 60;
         label.setCharacterSize(characterSize);
@@ -166,9 +170,9 @@ public:
     {
         float radius = 16;
         auto size = window.getSize();
-        sf::Color candidateColor(100, 250, 50);
-        sf::Color lostColor(200, 50, 50);
-        sf::Color trackingColor(10, 10, 200);
+        sf::Color candidateColor(255, 255, 0);
+        sf::Color lostColor(255, 0, 0);
+        sf::Color trackingColor(128, 138, 0);
 
         for (auto handPoint : m_handPoints)
         {
@@ -189,12 +193,14 @@ public:
                     m_newFrameReady = false;
                     auto depthPosition = handPoint.depthPosition();
                     auto worldPosition = handPoint.worldPosition();
+                    
                     printf("Hand: id: %d D: (%d,%d) W: (%f,%f,%f)\n", handPoint.trackingId(),
                         depthPosition.x,
                         depthPosition.y,
                         worldPosition.x,
                         worldPosition.y,
                         worldPosition.z);
+                        
                 }
             }
 
@@ -214,6 +220,9 @@ public:
         {
         case DEBUG_HAND_VIEW_DEPTH:
             return "Depth";
+            break;
+        case DEBUG_HAND_VIEW_DEPTH_MOD:
+            return "Depth mod";
             break;
         case DEBUG_HAND_VIEW_VELOCITY:
             return "Velocity";
@@ -241,6 +250,9 @@ public:
             break;
         case DEBUG_HAND_VIEW_HANDWINDOW:
             return "Hand window";
+            break;
+        default:
+            return "Unknown view";
             break;
         }
     }
@@ -331,9 +343,13 @@ void process_key_input(sensekit::StreamReader& reader, HandDebugFrameListener& l
     {
         listener.toggle_output_fps();
     }
-    if (key.code == sf::Keyboard::Num1)
+    if (key.code == sf::Keyboard::Tilde)
     {
         request_view_mode(reader, DEBUG_HAND_VIEW_DEPTH);
+    }
+    else if (key.code == sf::Keyboard::Num1)
+    {
+        request_view_mode(reader, DEBUG_HAND_VIEW_DEPTH_MOD);
     }
     else if (key.code == sf::Keyboard::Num2)
     {

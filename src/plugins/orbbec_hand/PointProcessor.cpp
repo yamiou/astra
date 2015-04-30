@@ -13,7 +13,7 @@ namespace sensekit { namespace plugins { namespace hand {
         m_iterationMaxInitial(1),
         m_iterationMaxTracking(1),
         m_iterationMaxRefinement(1),
-        m_minArea(5000),                //mm^2
+        m_minArea(0),                //mm^2
         m_maxArea(25000),               //mm^2
         m_areaBandwidth(150),           //mm
         m_areaBandwidthDepth(100),      //mm
@@ -136,7 +136,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
             if (trackedPoint.trackingStatus == TrackingStatus::Tracking)
             {
-                printf("Recovered point %d\n", trackedPoint.trackingId);
+                //printf("Recovered point %d\n", trackedPoint.trackingId);
             }
         }
     }

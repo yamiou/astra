@@ -318,6 +318,10 @@ namespace sensekit { namespace plugins { namespace hand {
                 m_debugVisualizer.showDepthMat(m_matDepth,
                                                colorFrame);
                 break;
+            case DEBUG_HAND_VIEW_DEPTH_MOD:
+                m_debugVisualizer.showDepthMat(m_depthUtility.matDepthMod(),
+                                               colorFrame);
+                break;
             case DEBUG_HAND_VIEW_VELOCITY:
                 m_debugVisualizer.showVelocityMat(m_depthUtility.matDepthVel(),
                                                   m_maxVelocity,
