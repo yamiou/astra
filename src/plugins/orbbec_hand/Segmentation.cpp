@@ -36,7 +36,7 @@ namespace sensekit { namespace plugins { namespace hand {
             cv::Mat& segmentationMatrix = data.matrices.layerSegmentation;
             cv::Mat& searchedMatrix = data.matrices.foregroundSearched;
             
-            bool isActivePoint = data.pointType == TrackedPointType::ActivePoint;
+            bool isCandidatePoint = data.pointType == TrackedPointType::CandidatePoint;
             std::queue<PointTTL> pointQueue;
 
             //does the seed point start in range?
@@ -80,12 +80,12 @@ namespace sensekit { namespace plugins { namespace hand {
                     //Keep exploring this pixel's neighbors if: TTL > 0 and
                     // either this point is in range, or
                     // the path has not been in range yet
-                    if (ttl > 0 && (!pathInRange || pointInRange))
+                    if (!pathInRange || pointInRange)
                     {
-                        //If active tracking, then must be in range to decrement TTL.
-                        //This will give active points a larger range, more likely to recover.
-                        //If not active tracking, will always decrement TTL.
-                        if (!isActivePoint || anyInRange)
+                        //If candidate point, always decrement TTL.
+                        //Otherwise, active points get a larger range, more likely to recover.
+                        //If active tracking and any points are in range, start decrementing TTL.
+                        if (isCandidatePoint || anyInRange)
                         {
                             ttl -= areaSqrtMatrix.at<float>(p);
                         }
@@ -164,15 +164,25 @@ namespace sensekit { namespace plugins { namespace hand {
                         cv::Point3f worldPosition = mapper.convert_depth_to_world(x, y, depth);
 
                         float score = *basicScoreRow;
-                        float edgeDistance = *edgeDistanceRow;
-                        score += (targetEdgeDist - abs(targetEdgeDist - edgeDistance)) * edgeDistanceFactor;
-                        
+
                         if (activePoint && pointInertiaRadius > 0)
                         {
                             float distFromSeedNorm = std::max(0.0, std::min(1.0, 
                                                         cv::norm(worldPosition - seedWorldPosition) / pointInertiaRadius));
                             score += (1.0f - distFromSeedNorm) * pointInertiaFactor;
                         }
+                        
+                        float edgeDistance = *edgeDistanceRow;
+                        float edgeScore = (targetEdgeDist - abs(targetEdgeDist - edgeDistance)) * edgeDistanceFactor;
+                        if (edgeScore > 0)
+                        {
+                            score += edgeScore;
+                        }
+                        else
+                        {
+                            score = 0;
+                        }
+
 
                         *layerScoreRow = score;
                     }
@@ -219,7 +229,10 @@ namespace sensekit { namespace plugins { namespace hand {
                     data.matrices.layerSegmentation);
                 if (data.pointType == TrackedPointType::ActivePoint)
                 {
-                    cv::normalize(data.matrices.layerScore, data.matrices.debugScore, 0, 1, cv::NORM_MINMAX, -1, data.matrices.layerSegmentation);
+                    cv::Mat scoreMask;
+                    
+                    cv::inRange(data.matrices.layerScore, 1, INT_MAX, scoreMask);
+                    cv::normalize(data.matrices.layerScore, data.matrices.debugScore, 0, 1, cv::NORM_MINMAX, -1, scoreMask);
                 }
             }
 
