@@ -21,15 +21,14 @@ namespace sensekit { namespace plugins { namespace hand {
         const cv::Mat& matDepthVel() const { return m_matDepthVel; }
         const cv::Mat& matDepthAvg() const { return m_matDepthAvg; }
         const cv::Mat& matDepthVelErode() const { return m_matDepthVelErode; }
-        const cv::Mat& matDepthMod() const { return m_matDepthFilled; }
+        const cv::Mat& matDepthFilled() const { return m_matDepthFilled; }
 
     private:
 
         enum FillMaskType
         {
             Normal = 0,
-            Filled = 1,
-            PreviousFilled = 2
+            Filled = 1
         };
         static void depthFrameToMat(DepthFrame& depthFrameSrc, 
                                     const int width, 

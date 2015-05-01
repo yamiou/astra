@@ -138,10 +138,6 @@ namespace sensekit { namespace plugins { namespace hand {
                     depth = *prevDepthRow;
                     *filledDepthMaskRow = FillMaskType::Filled;
                 }
-                else if (fillType == FillMaskType::Filled)
-                {
-                    *filledDepthMaskRow = FillMaskType::PreviousFilled;
-                }
                 else
                 {
                     *filledDepthMaskRow = FillMaskType::Normal;

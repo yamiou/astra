@@ -18,6 +18,7 @@ typedef enum _sensekit_debug_hand_view_type {
     DEBUG_HAND_VIEW_UPDATE_SCORE,
     DEBUG_HAND_VIEW_HANDWINDOW,
     DEBUG_HAND_VIEW_DEPTH_MOD,
+    DEBUG_HAND_VIEW_DEPTH_AVG,
 } sensekit_debug_hand_view_type_t;
 
 typedef enum _sensekit_handstatus {

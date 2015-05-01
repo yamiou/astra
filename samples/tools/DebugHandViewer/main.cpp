@@ -226,6 +226,9 @@ public:
         case DEBUG_HAND_VIEW_DEPTH_MOD:
             return "Depth mod";
             break;
+        case DEBUG_HAND_VIEW_DEPTH_AVG:
+            return "Depth avg";
+            break;
         case DEBUG_HAND_VIEW_VELOCITY:
             return "Velocity";
             break;
@@ -387,6 +390,10 @@ void process_key_input(sensekit::StreamReader& reader, HandDebugFrameListener& l
     else if (key.code == sf::Keyboard::Num0)
     {
         request_view_mode(reader, DEBUG_HAND_VIEW_HANDWINDOW);
+    }
+    else if (key.code == sf::Keyboard::Dash)
+    {
+        request_view_mode(reader, DEBUG_HAND_VIEW_DEPTH_AVG);
     }
     else if (key.code == sf::Keyboard::M)
     {
