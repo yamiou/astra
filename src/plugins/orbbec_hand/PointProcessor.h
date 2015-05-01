@@ -29,7 +29,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void reset();
 
-        float get_trackingBandwidthDepth() { return m_trackingBandwidthDepth; }
+        float get_trackingBandwidthDepth() { return m_updateCycleBandwidthDepth; }
 
         float get_point_area(TrackingMatrices& matrices, const cv::Point& point);
     private:
@@ -52,8 +52,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                                       const float resizeFactor,
                                                       const CoordinateMapper& fullSizeMapper);
 
-        float m_trackingBandwidthDepth;
-        float m_initialBandwidthDepth;
+        float m_updateCycleBandwidthDepth;
+        float m_createCycleBandwidthDepth;
         float m_maxMatchDistLostActive;
         float m_maxMatchDistDefault;
         int m_iterationMaxInitial;

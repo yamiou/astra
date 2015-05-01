@@ -5,8 +5,8 @@
 namespace sensekit { namespace plugins { namespace hand {
 
     PointProcessor::PointProcessor() :
-        m_trackingBandwidthDepth(150),  //mm
-        m_initialBandwidthDepth(450),   //mm
+        m_updateCycleBandwidthDepth(150),  //mm
+        m_createCycleBandwidthDepth(450),   //mm
         m_maxMatchDistLostActive(500),  //mm
         m_maxMatchDistDefault(200),     //mm
         m_iterationMaxInitial(1),
@@ -82,7 +82,7 @@ namespace sensekit { namespace plugins { namespace hand {
         TrackingData updateTrackingData(matrices,
                                         seedPosition,
                                         referenceDepth,
-                                        m_trackingBandwidthDepth,
+                                        m_updateCycleBandwidthDepth,
                                         trackedPoint.pointType,
                                         m_iterationMaxTracking,
                                         m_maxSegmentationDist,
@@ -111,7 +111,7 @@ namespace sensekit { namespace plugins { namespace hand {
             TrackingData recoverTrackingData(matrices,
                                              seedPosition,
                                              referenceDepth,
-                                             m_initialBandwidthDepth,
+                                             m_createCycleBandwidthDepth,
                                              trackedPoint.pointType,
                                              m_iterationMaxTracking,
                                              m_maxSegmentationDist,
@@ -242,7 +242,7 @@ namespace sensekit { namespace plugins { namespace hand {
         TrackingData refinementTrackingData(matrices,
                                             roiPosition,
                                             referenceDepth,
-                                            m_trackingBandwidthDepth,
+                                            m_updateCycleBandwidthDepth,
                                             TrackedPointType::ActivePoint,
                                             m_iterationMaxRefinement,
                                             m_maxSegmentationDist,
@@ -308,9 +308,9 @@ namespace sensekit { namespace plugins { namespace hand {
             auto dist = cv::norm(worldPosition - trackedPoint.worldPosition);
             auto steadyDist = cv::norm(worldPosition - trackedPoint.steadyWorldPosition);
 
-            bool validArea = is_valid_point_area(matrices, newTargetPoint);
+            bool validPointArea = is_valid_point_area(matrices, newTargetPoint);
 
-            if (dist < m_maxJumpDist && validArea)
+            if (dist < m_maxJumpDist && validPointArea)
             {
                 updatedPoint = true;
 
@@ -414,7 +414,7 @@ namespace sensekit { namespace plugins { namespace hand {
         TrackingData trackingData(matrices,
                                   seedPosition,
                                   referenceDepth,
-                                  m_initialBandwidthDepth,
+                                  m_createCycleBandwidthDepth,
                                   TrackedPointType::CandidatePoint,
                                   m_iterationMaxInitial,
                                   m_maxSegmentationDist,
