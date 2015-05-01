@@ -12,10 +12,10 @@ namespace sensekit { namespace plugins { namespace hand {
         DepthUtility(int width, int height);
         virtual ~DepthUtility();
 
-        void processDepthToForeground(DepthFrame& depthFrame, 
-                                      cv::Mat& matDepth,
-                                      cv::Mat& matDepthFullSize, 
-                                      cv::Mat& matForeground);
+        void processDepthToVelocitySignal(DepthFrame& depthFrame,
+                                          cv::Mat& matDepth,
+                                          cv::Mat& matDepthFullSize,
+                                          cv::Mat& matVelocitySignal);
         void reset();
 
         const cv::Mat& matDepthVel() const { return m_matDepthVel; }
@@ -50,9 +50,9 @@ namespace sensekit { namespace plugins { namespace hand {
                                              const float maxDepthJumpPercent,
                                              const float farDepth);
 
-        void thresholdForeground(cv::Mat& matForeground,
-                                 cv::Mat& matVelocity,
-                                 const float foregroundThresholdFactor);
+        void thresholdVelocitySignal(cv::Mat& matVelocitySignal,
+                                     cv::Mat& matVelocity,
+                                     const float velocityThresholdFactor);
 
         const float m_processingWidth;
         const float m_processingHeight;
@@ -68,7 +68,7 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat m_matDepthVelErode;
 
         float m_depthSmoothingFactor;
-        float m_foregroundThresholdFactor;
+        float m_velocityThresholdFactor;
         float m_maxDepthJumpPercent;
         int m_erodeSize;
         float m_maxVel;

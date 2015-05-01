@@ -9,7 +9,7 @@ namespace sensekit { namespace plugins { namespace hand {
         m_processingWidth(width),
         m_processingHeight(height),
         m_depthSmoothingFactor(0.05),
-        m_foregroundThresholdFactor(0.02),
+        m_velocityThresholdFactor(0.02),
         m_maxDepthJumpPercent(0.1),
         m_erodeSize(1),
         m_maxVel(0),
@@ -37,16 +37,16 @@ namespace sensekit { namespace plugins { namespace hand {
         m_matDepthVelErode.create(m_processingHeight, m_processingWidth, CV_32FC1);
     }
 
-    void DepthUtility::processDepthToForeground(DepthFrame& depthFrame,
-                                                cv::Mat& matDepth,
-                                                cv::Mat& matDepthFullSize,
-                                                cv::Mat& matForeground)
+    void DepthUtility::processDepthToVelocitySignal(DepthFrame& depthFrame,
+                                                    cv::Mat& matDepth,
+                                                    cv::Mat& matDepthFullSize,
+                                                    cv::Mat& matVelocitySignal)
     {
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
 
         matDepth.create(m_processingHeight, m_processingWidth, CV_32FC1);
-        matForeground = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_8UC1);
+        matVelocitySignal = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_8UC1);
 
         depthFrameToMat(depthFrame, width, height, m_maxDepth, matDepthFullSize, m_farDepth);
 
@@ -78,9 +78,9 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::erode(m_matDepthVelErode, m_matDepthVelErode, m_rectElement);
         cv::dilate(m_matDepthVelErode, m_matDepthVelErode, m_rectElement);
 
-        thresholdForeground(matForeground,
-                            m_matDepthVelErode,
-                            m_foregroundThresholdFactor);
+        thresholdVelocitySignal(matVelocitySignal,
+                                m_matDepthVelErode,
+                                m_velocityThresholdFactor);
     }
 
     void DepthUtility::depthFrameToMat(DepthFrame& depthFrameSrc, 
@@ -209,18 +209,18 @@ namespace sensekit { namespace plugins { namespace hand {
         }
     }
 
-    void DepthUtility::thresholdForeground(cv::Mat& matForeground, 
-                                           cv::Mat& matVelocity,
-                                           const float foregroundThresholdFactor)
+    void DepthUtility::thresholdVelocitySignal(cv::Mat& matVelocitySignal, 
+                                               cv::Mat& matVelocity,
+                                               const float velocityThresholdFactor)
     {
-        int width = matForeground.cols;
-        int height = matForeground.rows;
+        int width = matVelocitySignal.cols;
+        int height = matVelocitySignal.rows;
 
         m_maxVel *= 0.98;
         for (int y = 0; y < height; ++y)
         {
             float* velRow = matVelocity.ptr<float>(y);
-            uint8_t* foregroundRow = matForeground.ptr<uint8_t>(y);
+            uint8_t* velocitySignalRow = matVelocitySignal.ptr<uint8_t>(y);
 
             for (int x = 0; x < width; ++x)
             {
@@ -231,17 +231,17 @@ namespace sensekit { namespace plugins { namespace hand {
                     m_maxVel = vel;
                 }
 
-                if (vel > foregroundThresholdFactor)
+                if (vel > velocityThresholdFactor)
                 {
-                    *foregroundRow = PixelType::Foreground;
+                    *velocitySignalRow = PixelType::Foreground;
                 }
                 else
                 {
-                    *foregroundRow = PixelType::Background;
+                    *velocitySignalRow = PixelType::Background;
                 }
 
                 ++velRow;
-                ++foregroundRow;
+                ++velocitySignalRow;
             }
         }
         //printf("max vel: %f\n", m_maxVel);

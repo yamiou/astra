@@ -63,7 +63,7 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat m_matDepth;
         cv::Mat m_matDepthFullSize;
         cv::Mat m_matDepthWindow;
-        cv::Mat m_matForeground;
+        cv::Mat m_matVelocitySignal;
         cv::Mat m_matBasicScore;
         cv::Mat m_matArea;
         cv::Mat m_matAreaSqrt;

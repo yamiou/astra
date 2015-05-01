@@ -27,10 +27,10 @@ namespace sensekit { namespace plugins { namespace hand {
         Dead
     };
 
-    enum SegmentationForegroundPolicy
+    enum SegmentationVelocityPolicy
     {
-        FG_POLICY_IGNORE = 0,
-        FG_POLICY_RESET_TTL = 1
+        VELOCITY_POLICY_IGNORE = 0,
+        VELOCITY_POLICY_RESET_TTL = 1
     };
 
     struct TrackingMatrices
@@ -40,7 +40,7 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat& area;
         cv::Mat& areaSqrt;
         cv::Mat& basicScore;
-        cv::Mat& foreground;
+        cv::Mat& velocitySignal;
         cv::Mat& layerSegmentation;
         cv::Mat& layerScore;
         cv::Mat& layerEdgeDistance;
@@ -56,7 +56,7 @@ namespace sensekit { namespace plugins { namespace hand {
                          cv::Mat& area,
                          cv::Mat& areaSqrt,
                          cv::Mat& basicScore,
-                         cv::Mat& foreground,
+                         cv::Mat& velocitySignal,
                          cv::Mat& foregroundSearched,
                          cv::Mat& layerSegmentation,
                          cv::Mat& layerScore,
@@ -71,7 +71,7 @@ namespace sensekit { namespace plugins { namespace hand {
             area(area),
             areaSqrt(areaSqrt),
             basicScore(basicScore),
-            foreground(foreground),
+            velocitySignal(velocitySignal),
             layerSegmentation(layerSegmentation),
             layerScore(layerScore),
             layerEdgeDistance(layerEdgeDistance),
@@ -107,7 +107,7 @@ namespace sensekit { namespace plugins { namespace hand {
         const TrackedPointType pointType;
         const int iterationMax;
         const float maxSegmentationDist;
-        const SegmentationForegroundPolicy foregroundPolicy;
+        const SegmentationVelocityPolicy velocityPolicy;
         const float edgeDistanceFactor;
         const float targetEdgeDistance;
         const float pointInertiaFactor;
@@ -120,7 +120,7 @@ namespace sensekit { namespace plugins { namespace hand {
                      const TrackedPointType pointType,
                      const int iterationMax,
                      const float maxSegmentationDist,
-                     const SegmentationForegroundPolicy foregroundPolicy,
+                     const SegmentationVelocityPolicy velocityPolicy,
                      const float edgeDistanceFactor,
                      const float targetEdgeDistance,
                      const float pointInertiaFactor,
@@ -132,7 +132,7 @@ namespace sensekit { namespace plugins { namespace hand {
               pointType(pointType),
               iterationMax(iterationMax),
               maxSegmentationDist(maxSegmentationDist),
-              foregroundPolicy(foregroundPolicy),
+              velocityPolicy(velocityPolicy),
               edgeDistanceFactor(edgeDistanceFactor),
               targetEdgeDistance(targetEdgeDistance),
               pointInertiaFactor(pointInertiaFactor),

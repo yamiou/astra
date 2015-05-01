@@ -28,10 +28,10 @@ namespace sensekit { namespace plugins { namespace hand {
         static void segment_foreground(TrackingData& data)
         {
             const float maxSegmentationDist = data.maxSegmentationDist;
-            const SegmentationForegroundPolicy foregroundPolicy = data.foregroundPolicy;
+            const SegmentationVelocityPolicy velocitySignalPolicy = data.velocityPolicy;
             const float seedDepth = data.matrices.depth.at<float>(data.seedPosition);
             cv::Mat& depthMatrix = data.matrices.depth;
-            cv::Mat& foregroundMatrix = data.matrices.foreground;
+            cv::Mat& velocitySignalMatrix = data.matrices.velocitySignal;
             cv::Mat& areaSqrtMatrix = data.matrices.areaSqrt;
             cv::Mat& segmentationMatrix = data.matrices.layerSegmentation;
             cv::Mat& searchedMatrix = data.matrices.foregroundSearched;
@@ -65,8 +65,8 @@ namespace sensekit { namespace plugins { namespace hand {
                 //Some other path has come ashore first, so cut off this path's exploration
                 bool rejectedOutOfRangePath = !pathInRange && anyInRange;
 
-                if (foregroundPolicy == FG_POLICY_RESET_TTL &&
-                    foregroundMatrix.at<char>(p) == PixelType::Foreground)
+                if (velocitySignalPolicy == VELOCITY_POLICY_RESET_TTL &&
+                    velocitySignalMatrix.at<char>(p) == PixelType::Foreground)
                 {
                     ttl = maxSegmentationDist;
                 }
@@ -255,15 +255,15 @@ namespace sensekit { namespace plugins { namespace hand {
             return point;
         }
 
-        bool find_next_foreground_pixel(cv::Mat& foregroundMatrix,
-                                        cv::Mat& searchedMatrix,
-                                        cv::Point& foregroundPosition,
-                                        cv::Point& nextSearchStart)
+        bool find_next_velocity_seed_pixel(cv::Mat& velocitySignalMatrix,
+                                          cv::Mat& searchedMatrix,
+                                          cv::Point& foregroundPosition,
+                                          cv::Point& nextSearchStart)
         {
             assert(foregroundMatrix.cols == searchedMatrix.cols);
             assert(foregroundMatrix.rows == searchedMatrix.rows);
-            int width = foregroundMatrix.cols;
-            int height = foregroundMatrix.rows;
+            int width = velocitySignalMatrix.cols;
+            int height = velocitySignalMatrix.rows;
 
             const int startX = MAX(0, MIN(width - 1, nextSearchStart.x));
             const int startY = MAX(0, MIN(height - 1, nextSearchStart.y));
@@ -272,9 +272,9 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 for (int x = startX; x < width; x++)
                 {
-                    uint8_t foreground = *foregroundMatrix.ptr<uint8_t>(y, x);
+                    uint8_t velocitySignal = *velocitySignalMatrix.ptr<uint8_t>(y, x);
                     uint8_t searched = *searchedMatrix.ptr<uint8_t>(y, x);
-                    if (foreground == PixelType::Foreground && searched != PixelType::Searched)
+                    if (velocitySignal == PixelType::Foreground && searched != PixelType::Searched)
                     {
                         foregroundPosition.x = x;
                         foregroundPosition.y = y;

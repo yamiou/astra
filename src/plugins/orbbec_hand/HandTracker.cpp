@@ -75,9 +75,9 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void HandTracker::update_tracking(DepthFrame& depthFrame)
         {
-            m_depthUtility.processDepthToForeground(depthFrame, m_matDepth, m_matDepthFullSize, m_matForeground);
+            m_depthUtility.processDepthToVelocitySignal(depthFrame, m_matDepth, m_matDepthFullSize, m_matVelocitySignal);
 
-            track_points(m_matDepth, m_matDepthFullSize, m_matForeground);
+            track_points(m_matDepth, m_matDepthFullSize, m_matVelocitySignal);
 
             //use same frameIndex as source depth frame
             sensekit_frame_index_t frameIndex = depthFrame.frameIndex();
@@ -95,7 +95,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void HandTracker::track_points(cv::Mat& matDepth, 
                                        cv::Mat& matDepthFullSize, 
-                                       cv::Mat& matForeground)
+                                       cv::Mat& matVelocitySignal)
         {
             m_layerSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_layerScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
@@ -121,7 +121,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_matArea,
                                             m_matAreaSqrt,
                                             m_matBasicScore,
-                                            matForeground,
+                                            matVelocitySignal,
                                             m_updateForegroundSearched,
                                             m_layerSegmentation,
                                             m_layerScore,
@@ -145,7 +145,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_matArea,
                                             m_matAreaSqrt,
                                             m_matBasicScore,
-                                            matForeground,
+                                            matVelocitySignal,
                                             m_createForegroundSearched,
                                             m_layerSegmentation,
                                             m_layerScore,
@@ -160,7 +160,7 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 cv::Point seedPosition;
                 cv::Point nextSearchStart(0, 0);
-                while (segmentation::find_next_foreground_pixel(matForeground, m_createForegroundSearched, seedPosition, nextSearchStart))
+                while (segmentation::find_next_velocity_seed_pixel(matVelocitySignal, m_createForegroundSearched, seedPosition, nextSearchStart))
                 {
                     m_pointProcessor->updateTrackedPointOrCreateNewPointFromSeedPosition(createMatrices, seedPosition);
                 }
@@ -188,7 +188,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                 m_matArea,
                                                 m_matAreaSqrt,
                                                 m_matBasicScore,
-                                                matForeground,
+                                                matVelocitySignal,
                                                 m_refineForegroundSearched,
                                                 m_refineSegmentation,
                                                 m_refineScore,
@@ -395,7 +395,7 @@ namespace sensekit { namespace plugins { namespace hand {
                     m_debugVisualizer.overlayMask(m_updateForegroundSearched, colorFrame, searchedColor);
                 }
 
-                m_debugVisualizer.overlayMask(m_matForeground, colorFrame, foregroundColor);
+                m_debugVisualizer.overlayMask(m_matVelocitySignal, colorFrame, foregroundColor);
             }
         }
 }}}
