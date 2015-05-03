@@ -58,6 +58,10 @@ namespace sensekit { namespace plugins { namespace hand {
                                           float offsetY,
                                           float depth)
     {
+        if (depth == 0)
+        {
+            return position;
+        }
         cv::Point3f world = mapper.convert_depth_to_world(static_cast<float>(position.x),
                                                            static_cast<float>(position.y),
                                                            depth);

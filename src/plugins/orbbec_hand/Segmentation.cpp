@@ -5,6 +5,9 @@
 #include <opencv2/opencv.hpp>
 #include "Segmentation.h"
 
+const double PI = 3.141592653589793238463;
+const float  PI_F = 3.14159265358979f;
+
 #define MAX_DEPTH 10000
 
 namespace sensekit { namespace plugins { namespace hand { namespace segmentation {
@@ -309,8 +312,8 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                         cv::Point& foregroundPosition,
                                         cv::Point& nextSearchStart)
     {
-        assert(foregroundMatrix.cols == searchedMatrix.cols);
-        assert(foregroundMatrix.rows == searchedMatrix.rows);
+        assert(velocitySignalMatrix.cols == searchedMatrix.cols);
+        assert(velocitySignalMatrix.rows == searchedMatrix.rows);
         int width = velocitySignalMatrix.cols;
         int height = velocitySignalMatrix.rows;
 
@@ -393,8 +396,8 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
     }
 
     void calculate_edge_distance(cv::Mat& segmentationMatrix,
-                                    cv::Mat& areaSqrtMatrix,
-                                    cv::Mat& edgeDistanceMatrix)
+                                 cv::Mat& areaSqrtMatrix,
+                                 cv::Mat& edgeDistanceMatrix)
     {
         cv::Mat eroded;
         cv::Mat crossElement = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
@@ -445,7 +448,10 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         return area;
     }
 
-    void calculate_segment_area(cv::Mat& depthMatrix, cv::Mat& areaMatrix, cv::Mat& areaSqrtMatrix, const ScalingCoordinateMapper& mapper)
+    void calculate_segment_area(cv::Mat& depthMatrix, 
+                                cv::Mat& areaMatrix, 
+                                cv::Mat& areaSqrtMatrix, 
+                                const ScalingCoordinateMapper& mapper)
     {
         int width = depthMatrix.cols;
         int height = depthMatrix.rows;
@@ -487,38 +493,139 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         }
     }
 
+    void visit_callback_if_valid_position(int width, 
+                                          int height,
+                                          int x,
+                                          int y,
+                                          std::function<void(cv::Point)> callback)
+    {
+        if (x >= 0 && x < width &&
+            y >= 0 && y < height)
+        {
+            callback(cv::Point(x, y));
+        }
+    }
 
-    float count_neighborhood_area(cv::Mat& segmentationMatrix,
-                                    cv::Mat& depthMatrix,
-                                    cv::Mat& areaMatrix,
+    void visit_circle_circumference(cv::Mat& matDepth,
                                     const cv::Point& center,
-                                    const float bandwidth,
-                                    const float bandwidthDepth,
-                                    const ScalingCoordinateMapper& mapper)
+                                    const float& radius,
+                                    const ScalingCoordinateMapper& mapper,
+                                    std::function<void(cv::Point)> callback)
+    {
+        int width = matDepth.cols;
+        int height = matDepth.rows;
+        if (center.x < 0 || center.x >= width ||
+            center.y < 0 || center.y >= height ||
+            radius < 1)
+        {
+            return;
+        }
+
+        float referenceDepth = matDepth.at<float>(center);
+        if (referenceDepth == 0)
+        {
+            return;
+        }
+
+        cv::Point offsetRight = offset_pixel_location_by_mm(mapper, center, radius, 0, referenceDepth);
+
+        //http://en.wikipedia.org/wiki/Midpoint_circle_algorithm
+        int pixelRadius = offsetRight.x - center.x;
+        int cx = center.x;
+        int cy = center.y;
+        int dx = pixelRadius; //radius in pixels
+        int dy = 0;
+        int radiusError = 1 - dx;
+
+        while (dx >= dy)
+        {
+            visit_callback_if_valid_position(width, height, cx + dx, cy + dy, callback);
+            visit_callback_if_valid_position(width, height, cx + dy, cy + dx, callback);
+            visit_callback_if_valid_position(width, height, cx - dx, cy + dy, callback);
+            visit_callback_if_valid_position(width, height, cx - dy, cy + dx, callback);
+            visit_callback_if_valid_position(width, height, cx - dx, cy - dy, callback);
+            visit_callback_if_valid_position(width, height, cx - dy, cy - dx, callback);
+            visit_callback_if_valid_position(width, height, cx + dx, cy - dy, callback);
+            visit_callback_if_valid_position(width, height, cx + dy, cy - dx, callback);
+
+            dy++;
+            if (radiusError < 0)
+            {
+                radiusError += 2 * dy + 1;
+            }
+            else
+            {
+                dx--;
+                radiusError += 2 * (dy - dx) + 1;
+            }
+        }
+    }
+
+    void accumulate_foreground_at_position(cv::Mat& matSegmentation,
+                                           cv::Mat& matAreaSqrt,
+                                           cv::Point p,
+                                           float& foregroundDistance)
+    {
+        if (matSegmentation.at<uint8_t>(p) == PixelType::Foreground)
+        {
+            float areaSqrt = matAreaSqrt.at<float>(p);
+            foregroundDistance += areaSqrt;
+        }
+    }
+
+    float get_percent_foreground_along_circumference(cv::Mat& matDepth,
+                                                     cv::Mat& matSegmentation,
+                                                     cv::Mat& matAreaSqrt,
+                                                     const cv::Point& center,
+                                                     const float& radius,
+                                                     const ScalingCoordinateMapper& mapper)
+    {
+        float foregroundDistance = 0;
+
+        auto callback = [&](cv::Point p)
+        {
+            accumulate_foreground_at_position(matSegmentation, matAreaSqrt, p, foregroundDistance);
+        };
+
+        visit_circle_circumference(matDepth, center, radius, mapper, callback);
+
+        float totalDistance = 2.0f * PI_F * radius;
+        float percentForeground = foregroundDistance / totalDistance;
+
+        return percentForeground;
+    }
+
+    float count_neighborhood_area(cv::Mat& matSegmentation,
+                                  cv::Mat& matDepth,
+                                  cv::Mat& matArea,
+                                  const cv::Point& center,
+                                  const float bandwidth,
+                                  const float bandwidthDepth,
+                                  const ScalingCoordinateMapper& mapper)
     {
         if (center.x < 0 || center.y < 0 ||
-            center.x >= depthMatrix.cols || center.y >= depthMatrix.rows)
+            center.x >= matDepth.cols || center.y >= matDepth.rows)
         {
             return 0;
         }
 
-        float startingDepth = depthMatrix.at<float>(center);
+        float startingDepth = matDepth.at<float>(center);
 
         cv::Point topLeft = offset_pixel_location_by_mm(mapper, center, -bandwidth, bandwidth, startingDepth);
         cv::Point bottomRight = offset_pixel_location_by_mm(mapper, center, bandwidth, -bandwidth, startingDepth);
 
         int32_t x0 = MAX(0, topLeft.x);
         int32_t y0 = MAX(0, topLeft.y);
-        int32_t x1 = MIN(depthMatrix.cols - 1, bottomRight.x);
-        int32_t y1 = MIN(depthMatrix.rows - 1, bottomRight.y);
+        int32_t x1 = MIN(matDepth.cols - 1, bottomRight.x);
+        int32_t y1 = MIN(matDepth.rows - 1, bottomRight.y);
 
         float area = 0;
 
         for (int y = y0; y < y1; y++)
         {
-            float* depthRow = depthMatrix.ptr<float>(y);
-            char* segmentationRow = segmentationMatrix.ptr<char>(y);
-            float* areaRow = areaMatrix.ptr<float>(y);
+            float* depthRow = matDepth.ptr<float>(y);
+            char* segmentationRow = matSegmentation.ptr<char>(y);
+            float* areaRow = matArea.ptr<float>(y);
 
             depthRow += x0;
             segmentationRow += x0;

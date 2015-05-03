@@ -34,6 +34,7 @@ namespace sensekit { namespace plugins { namespace hand {
         static sensekit_handstatus_t convert_hand_status(TrackingStatus status, TrackedPointType type);
         static void reset_hand_point(sensekit_handpoint_t& point);
 
+        void overlay_circle(_sensekit_imageframe& imageFrame);
         void update_debug_image_frame(_sensekit_imageframe& sensekitColorframe);
         void generate_hand_debug_image_frame(sensekit_frame_index_t frameIndex);
         void update_tracking(DepthFrame& depthFrame);

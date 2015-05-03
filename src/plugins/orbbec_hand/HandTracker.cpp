@@ -175,9 +175,17 @@ namespace sensekit { namespace plugins { namespace hand {
 
                 float area = m_pointProcessor->get_point_area(createMatrices, seedPosition);
                 float depth = matDepth.at<float>(seedPosition);
-                float score = m_layerScore.at<float>(seedPosition);
                 float edgeDist = m_layerEdgeDistance.at<float>(seedPosition);
-                printf("probe depth: %f area: %f score: %f edgeDist %f\n", depth, area, score, edgeDist);
+
+                float foregroundRadius = 80;
+                auto mapper = get_scaling_mapper(createMatrices);
+                float percentForeground = segmentation::get_percent_foreground_along_circumference(matDepth,
+                                                                                                   m_layerSegmentation,
+                                                                                                   m_matAreaSqrt,
+                                                                                                   seedPosition,
+                                                                                                   foregroundRadius,
+                                                                                                   mapper);
+                printf("probe depth: %f area: %f fg_perc: %f edgeDist %f\n", depth, area, percentForeground, edgeDist);
             }
 
             //remove old points
@@ -316,6 +324,35 @@ namespace sensekit { namespace plugins { namespace hand {
             point.worldDeltaPosition = sensekit_vector3f_t();
         }
 
+        void mark_image_pixel(_sensekit_imageframe& imageFrame,
+                              RGBPixel color,
+                              cv::Point p)
+        {
+            RGBPixel* colorData = static_cast<RGBPixel*>(imageFrame.data);
+            int index = p.x + p.y * imageFrame.metadata.width;
+            colorData[index] = color;
+        }
+
+        void HandTracker::overlay_circle(_sensekit_imageframe& imageFrame)
+        {
+            auto normPosition = m_debugImageStream->mouse_norm_position();
+            int x = MAX(0, MIN(PROCESSING_SIZE_WIDTH, normPosition.x * PROCESSING_SIZE_WIDTH));
+            int y = MAX(0, MIN(PROCESSING_SIZE_HEIGHT, normPosition.y * PROCESSING_SIZE_HEIGHT));
+
+            float foregroundRadius = 80;
+            float resizeFactor = m_matDepthFullSize.cols / static_cast<float>(m_matDepth.cols);
+            ScalingCoordinateMapper mapper(m_depthStream.coordinateMapper(), resizeFactor);
+
+            RGBPixel color(255, 0, 255);
+
+            auto callback = [&](cv::Point p)
+            {
+                mark_image_pixel(imageFrame, color, p);
+            };
+
+            segmentation::visit_circle_circumference(m_matDepth, cv::Point(x, y), foregroundRadius, mapper, callback);
+        }
+
         void HandTracker::update_debug_image_frame(_sensekit_imageframe& colorFrame)
         {
             float m_maxVelocity = 0.1;
@@ -396,6 +433,11 @@ namespace sensekit { namespace plugins { namespace hand {
                 }
 
                 m_debugVisualizer.overlayMask(m_matVelocitySignal, colorFrame, foregroundColor);
+            }
+
+            if (m_debugImageStream->use_mouse_probe())
+            {
+                overlay_circle(colorFrame);
             }
         }
 }}}

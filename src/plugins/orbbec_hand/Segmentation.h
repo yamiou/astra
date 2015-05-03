@@ -30,15 +30,28 @@ namespace sensekit { namespace plugins { namespace hand {
                                     cv::Mat& areaSqrtMatrix,
                                     const ScalingCoordinateMapper& mapper);
 
-        float count_neighborhood_area(cv::Mat& segmentationMatrix,
-                                      cv::Mat& depthMatrix,
-                                      cv::Mat& areaMatrix,
+        float count_neighborhood_area(cv::Mat& matSegmentation,
+                                      cv::Mat& matDepth,
+                                      cv::Mat& matArea,
                                       const cv::Point& center,
                                       const float bandwidth,
                                       const float bandwidthDepth,
                                       const ScalingCoordinateMapper& mapper);
 
         cv::Point converge_track_point_from_seed(TrackingData& data);
+
+        void visit_circle_circumference(cv::Mat& matDepth,
+                                        const cv::Point& center,
+                                        const float& radius,
+                                        const ScalingCoordinateMapper& mapper,
+                                        std::function<void(cv::Point)> callback);
+
+        float get_percent_foreground_along_circumference(cv::Mat& matDepth,
+                                                         cv::Mat& matSegmentation,
+                                                         cv::Mat& matAreaSqrt,
+                                                         const cv::Point& center,
+                                                         const float& radius,
+                                                         const ScalingCoordinateMapper& mapper);
 
     }
 }}}
