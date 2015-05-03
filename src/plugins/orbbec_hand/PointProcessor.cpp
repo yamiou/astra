@@ -6,7 +6,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
     PointProcessor::PointProcessor() :
         m_updateCycleBandwidthDepth(150),  //mm
-        m_createCycleBandwidthDepth(450),   //mm
+        m_createCycleBandwidthDepth(150),   //mm
         m_maxMatchDistLostActive(500),  //mm
         m_maxMatchDistDefault(200),     //mm
         m_iterationMaxInitial(1),
@@ -32,7 +32,11 @@ namespace sensekit { namespace plugins { namespace hand {
         m_maxInactiveFramesForActivePoints(480),
         m_pointSmoothingFactor(0.75),
         m_pointDeadBandSmoothingFactor(0.05),
-        m_pointSmoothingDeadZone(50)      //mm
+        m_pointSmoothingDeadZone(50),     //mm
+        m_foregroundRadius1(100),
+        m_foregroundRadius2(150),
+        m_foregroundRadiusMaxPercent1(.25),
+        m_foregroundRadiusMaxPercent2(.12)
     {}
 
     PointProcessor::~PointProcessor()
@@ -153,12 +157,36 @@ namespace sensekit { namespace plugins { namespace hand {
         return area;
     }
 
-    bool PointProcessor::is_valid_point_area(TrackingMatrices& matrices, const cv::Point& targetPoint)
+    bool PointProcessor::test_valid_point_area(TrackingMatrices& matrices, const cv::Point& targetPoint)
     {
         float area = get_point_area(matrices, targetPoint);
 
         bool validPointArea = area > m_minArea && area < m_maxArea;
         return validPointArea;
+    }
+
+    bool PointProcessor::test_valid_foreground_radius_percentage(TrackingMatrices& matrices, const cv::Point& targetPoint)
+    {
+        auto scalingMapper = get_scaling_mapper(matrices);
+
+        float percentForeground1 = segmentation::get_percent_foreground_along_circumference(matrices.depth,
+                                                                                            matrices.layerSegmentation,
+                                                                                            matrices.areaSqrt,
+                                                                                            targetPoint,
+                                                                                            m_foregroundRadius1,
+                                                                                            scalingMapper);
+
+        float percentForeground2 = segmentation::get_percent_foreground_along_circumference(matrices.depth,
+                                                                                            matrices.layerSegmentation,
+                                                                                            matrices.areaSqrt,
+                                                                                            targetPoint,
+                                                                                            m_foregroundRadius2,
+                                                                                            scalingMapper);
+
+        bool passTest1 = percentForeground1 < m_foregroundRadiusMaxPercent1;
+        bool passTest2 = percentForeground2 < m_foregroundRadiusMaxPercent2;
+
+        return passTest1 && passTest2;
     }
 
     void PointProcessor::update_full_resolution_points(TrackingMatrices& matrices)
@@ -299,39 +327,42 @@ namespace sensekit { namespace plugins { namespace hand {
     {
         bool updatedPoint = false;
         
-        if (newTargetPoint.x != -1 && newTargetPoint.y != -1)
+        if (newTargetPoint == segmentation::INVALID_POINT)
         {
-            float depth = matrices.depth.at<float>(newTargetPoint);
+            return;
+        }
 
-            cv::Point3f worldPosition = scalingMapper.convert_depth_to_world(newTargetPoint.x, newTargetPoint.y, depth);
+        float depth = matrices.depth.at<float>(newTargetPoint);
 
-            auto dist = cv::norm(worldPosition - trackedPoint.worldPosition);
-            auto steadyDist = cv::norm(worldPosition - trackedPoint.steadyWorldPosition);
+        cv::Point3f worldPosition = scalingMapper.convert_depth_to_world(newTargetPoint.x, newTargetPoint.y, depth);
 
-            bool validPointArea = is_valid_point_area(matrices, newTargetPoint);
+        auto dist = cv::norm(worldPosition - trackedPoint.worldPosition);
+        auto steadyDist = cv::norm(worldPosition - trackedPoint.steadyWorldPosition);
 
-            if (dist < m_maxJumpDist && validPointArea)
+        bool validPointArea = test_valid_point_area(matrices, newTargetPoint);
+        bool validRadiusTest = test_valid_foreground_radius_percentage(matrices, newTargetPoint);
+
+        if (dist < m_maxJumpDist && validPointArea && validRadiusTest)
+        {
+            updatedPoint = true;
+
+            cv::Point3f deltaPosition = worldPosition - trackedPoint.worldPosition;
+            trackedPoint.worldPosition = worldPosition;
+            trackedPoint.worldDeltaPosition = deltaPosition;
+
+            trackedPoint.position = newTargetPoint;
+            if (steadyDist > m_steadyDeadBandRadius)
             {
-                updatedPoint = true;
+                trackedPoint.steadyWorldPosition = worldPosition;
+                trackedPoint.inactiveFrameCount = 0;
+            }
 
-                cv::Point3f deltaPosition = worldPosition - trackedPoint.worldPosition;
-                trackedPoint.worldPosition = worldPosition;
-                trackedPoint.worldDeltaPosition = deltaPosition;
-
-                trackedPoint.position = newTargetPoint;
-                if (steadyDist > m_steadyDeadBandRadius)
+            if (trackedPoint.inactiveFrameCount < m_maxInactiveFramesToBeConsideredActive)
+            {
+                trackedPoint.activeFrameCount++;
+                if (trackedPoint.activeFrameCount > m_minActiveFramesToLockTracking)
                 {
-                    trackedPoint.steadyWorldPosition = worldPosition;
-                    trackedPoint.inactiveFrameCount = 0;
-                }
-
-                if (trackedPoint.inactiveFrameCount < m_maxInactiveFramesToBeConsideredActive)
-                {
-                    trackedPoint.activeFrameCount++;
-                    if (trackedPoint.activeFrameCount > m_minActiveFramesToLockTracking)
-                    {
-                        trackedPoint.pointType = TrackedPointType::ActivePoint;
-                    }
+                    trackedPoint.pointType = TrackedPointType::ActivePoint;
                 }
             }
         }
@@ -406,7 +437,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                                             const cv::Point& seedPosition)
     {
         float referenceDepth = matrices.depth.at<float>(seedPosition);
-        if (referenceDepth == 0)
+        if (referenceDepth == 0 || seedPosition == segmentation::INVALID_POINT)
         {
             //Cannot expect to properly segment when the seedPosition has zero depth
             return;
@@ -426,55 +457,58 @@ namespace sensekit { namespace plugins { namespace hand {
 
         cv::Point targetPoint = segmentation::converge_track_point_from_seed(trackingData);
 
-        bool validPointArea = is_valid_point_area(matrices, targetPoint);
+        bool validPointArea = test_valid_point_area(matrices, targetPoint);
+        bool validRadiusTest = test_valid_foreground_radius_percentage(matrices, targetPoint);
 
-        if (targetPoint.x != -1 && targetPoint.y != -1 && validPointArea)
+        if (targetPoint == segmentation::INVALID_POINT || !validPointArea || !validRadiusTest)
         {
-            bool existingPoint = false;
+            return;
+        }
+
+        bool existingPoint = false;
             
-            float depth = matrices.depth.at<float>(targetPoint);
+        float depth = matrices.depth.at<float>(targetPoint);
 
-            auto scalingMapper = get_scaling_mapper(matrices);
-            cv::Point3f worldPosition = scalingMapper.convert_depth_to_world(targetPoint.x,
-                                                                                   targetPoint.y, 
-                                                                                   depth);
+        auto scalingMapper = get_scaling_mapper(matrices);
+        cv::Point3f worldPosition = scalingMapper.convert_depth_to_world(targetPoint.x,
+                                                                         targetPoint.y, 
+                                                                         depth);
 
-            for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
+        for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
+        {
+            TrackedPoint& tracked = *iter;
+            if (tracked.trackingStatus != TrackingStatus::Dead)
             {
-                TrackedPoint& tracked = *iter;
-                if (tracked.trackingStatus != TrackingStatus::Dead)
+                float dist = cv::norm(tracked.worldPosition - worldPosition);
+                float maxDist = m_maxMatchDistDefault;
+                bool activeLost = tracked.pointType == TrackedPointType::ActivePoint && tracked.trackingStatus == TrackingStatus::Lost;
+                if (activeLost)
                 {
-                    float dist = cv::norm(tracked.worldPosition - worldPosition);
-                    float maxDist = m_maxMatchDistDefault;
-                    bool activeLost = tracked.pointType == TrackedPointType::ActivePoint && tracked.trackingStatus == TrackingStatus::Lost;
+                    maxDist = m_maxMatchDistLostActive;
+                }
+                if (dist < maxDist)
+                {
+                    tracked.inactiveFrameCount = 0;
                     if (activeLost)
                     {
-                        maxDist = m_maxMatchDistLostActive;
+                        //Recover a lost point -- move it to the recovery position
+                        tracked.position = targetPoint;
+                        tracked.worldPosition = worldPosition;
+                        tracked.worldDeltaPosition = cv::Point3f();
                     }
-                    if (dist < maxDist)
-                    {
-                        tracked.inactiveFrameCount = 0;
-                        if (activeLost)
-                        {
-                            //Recover a lost point -- move it to the recovery position
-                            tracked.position = targetPoint;
-                            tracked.worldPosition = worldPosition;
-                            tracked.worldDeltaPosition = cv::Point3f();
-                        }
-                        tracked.trackingStatus = TrackingStatus::Tracking;
-                        existingPoint = true;
-                        break;
-                    }
+                    tracked.trackingStatus = TrackingStatus::Tracking;
+                    existingPoint = true;
+                    break;
                 }
             }
-            if (!existingPoint)
-            {
-                TrackedPoint newPoint(targetPoint, worldPosition, m_nextTrackingId);
-                newPoint.pointType = TrackedPointType::CandidatePoint;
-                newPoint.trackingStatus = TrackingStatus::Tracking;
-                ++m_nextTrackingId;
-                m_trackedPoints.push_back(newPoint);
-            }
+        }
+        if (!existingPoint)
+        {
+            TrackedPoint newPoint(targetPoint, worldPosition, m_nextTrackingId);
+            newPoint.pointType = TrackedPointType::CandidatePoint;
+            newPoint.trackingStatus = TrackingStatus::Tracking;
+            ++m_nextTrackingId;
+            m_trackedPoints.push_back(newPoint);
         }
     }
 }}}

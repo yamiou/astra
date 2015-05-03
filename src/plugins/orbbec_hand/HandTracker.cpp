@@ -192,11 +192,11 @@ namespace sensekit { namespace plugins { namespace hand {
                                                                                                    seedPosition,
                                                                                                    foregroundRadius2,
                                                                                                    mapper);
-                printf("depth: %f area: %f fg1: %f fg2: %f edge: %f\n", depth,
-                                                                        area,
+                printf("depth: %f fg1: %f fg2: %f edge: %f area: %f\n", depth,
                                                                         percentForeground1,
                                                                         percentForeground2,
-                                                                        edgeDist);
+                                                                        edgeDist,
+                                                                        area);
             }
 
             //remove old points

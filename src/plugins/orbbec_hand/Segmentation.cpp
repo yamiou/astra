@@ -23,8 +23,6 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         { }
     };
 
-    static cv::Point INVALID_POINT(-1, -1);
-
     static void enqueue_neighbors(cv::Mat& matVisited,
                                  std::queue<PointTTL>& pointQueue,
                                  PointTTL pt)
@@ -201,17 +199,23 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         int width = depthMatrix.cols;
         int height = depthMatrix.rows;
 
-        for (int y = 0; y < height; y++)
+        int edgeRadius = 10;
+        int minX = edgeRadius - 1;
+        int maxX = width - edgeRadius;
+        int minY = edgeRadius - 1;
+        int maxY = height - edgeRadius;
+
+        for (int y = 0; y < height; ++y)
         {
             float* depthRow = depthMatrix.ptr<float>(y);
             float* basicScoreRow = basicScoreMatrix.ptr<float>(y);
             float* edgeDistanceRow = edgeDistanceMatrix.ptr<float>(y);
             float* layerScoreRow = layerScoreMatrix.ptr<float>(y);
 
-            for (int x = 0; x < width; x++)
+            for (int x = 0; x < width; ++x, ++depthRow, ++basicScoreRow, ++edgeDistanceRow, ++layerScoreRow)
             {
                 float depth = *depthRow;
-                if (depth != 0)
+                if (depth != 0 && x > minX && x < maxX && y > minY && y < maxY)
                 {
                     cv::Point3f worldPosition = mapper.convert_depth_to_world(x, y, depth);
 
@@ -242,10 +246,6 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 {
                     *layerScoreRow = 0;
                 }
-                ++depthRow;
-                ++basicScoreRow;
-                ++edgeDistanceRow;
-                ++layerScoreRow;
             }
         }
     }
@@ -288,6 +288,11 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             }
         }
 
+        if (maxLoc.x == -1 && maxLoc.y == -1)
+        {
+            return INVALID_POINT;
+        }
+
         return maxLoc;
     }
 
@@ -302,7 +307,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             lastPoint = point;
             point = track_point_from_seed(data);
             ++iterations;
-        } while (point != lastPoint && iterations < data.iterationMax && point.x != -1 && point.y != -1);
+        } while (point != lastPoint && iterations < data.iterationMax && point != INVALID_POINT);
 
         return point;
     }
@@ -349,8 +354,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 }
             }
         }
-        foregroundPosition.x = -1;
-        foregroundPosition.y = -1;
+        foregroundPosition = segmentation::INVALID_POINT;
         nextSearchStart.x = width;
         nextSearchStart.y = height;
         return false;

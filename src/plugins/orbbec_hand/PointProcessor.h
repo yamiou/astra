@@ -46,7 +46,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                            ScalingCoordinateMapper& scalingMapper,
                                            TrackedPoint& trackedPoint,
                                            const cv::Point& targetPoint);
-        bool is_valid_point_area(TrackingMatrices& matrices, const cv::Point& targetPoint);
+        bool test_valid_point_area(TrackingMatrices& matrices, const cv::Point& targetPoint);
+        bool test_valid_foreground_radius_percentage(TrackingMatrices& matrices, const cv::Point& targetPoint);
         void update_tracked_point_from_world_position(TrackedPoint& trackedPoint,
                                                       const cv::Point3f& newWorldPosition,
                                                       const float resizeFactor,
@@ -80,6 +81,10 @@ namespace sensekit { namespace plugins { namespace hand {
         float m_pointSmoothingFactor;
         float m_pointDeadBandSmoothingFactor;
         float m_pointSmoothingDeadZone;
+        float m_foregroundRadius1;
+        float m_foregroundRadius2;
+        float m_foregroundRadiusMaxPercent1;
+        float m_foregroundRadiusMaxPercent2;
 
         int m_nextTrackingId{ 0 };
         //TODO consider std::list<TrackedPoint>

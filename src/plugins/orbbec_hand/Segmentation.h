@@ -10,6 +10,8 @@ namespace sensekit { namespace plugins { namespace hand {
 
     namespace segmentation {
 
+        static cv::Point INVALID_POINT(-1, -1);
+
         bool find_next_velocity_seed_pixel(cv::Mat& foregroundMatrix,
                                         cv::Mat& searchedMatrix,
                                         cv::Point& foregroundPosition, 
