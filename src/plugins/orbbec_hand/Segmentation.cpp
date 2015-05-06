@@ -199,7 +199,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         int width = depthMatrix.cols;
         int height = depthMatrix.rows;
 
-        int edgeRadius = 10;
+        int edgeRadius = mapper.scale() * width / 32;
         int minX = edgeRadius - 1;
         int maxX = width - edgeRadius;
         int minY = edgeRadius - 1;
