@@ -4,7 +4,8 @@
 
 namespace sensekit { namespace plugins { namespace hand {
 
-    PointProcessor::PointProcessor() :
+    PointProcessor::PointProcessor(PluginLogger& pluginLogger) :
+        m_logger(pluginLogger),
         m_updateCycleBandwidthDepth(150),  //mm
         m_createCycleBandwidthDepth(150),   //mm
         m_maxMatchDistLostActive(500),  //mm
@@ -99,7 +100,7 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Point newTargetPoint = segmentation::converge_track_point_from_seed(updateTrackingData);
 
         validateAndUpdateTrackedPoint(matrices, scalingMapper, trackedPoint, newTargetPoint);
-
+        /*
         //lost a tracked point, try to guess the position using previous position delta for second chance to recover
 
         if (trackedPoint.trackingStatus != TrackingStatus::Tracking && cv::norm(trackedPoint.worldDeltaPosition) > 0)
@@ -131,9 +132,10 @@ namespace sensekit { namespace plugins { namespace hand {
 
             if (trackedPoint.trackingStatus == TrackingStatus::Tracking)
             {
-                //printf("Recovered point %d\n", trackedPoint.trackingId);
+                m_logger.trace("updateTrackedPoint 2nd chance recovered #%d",
+                               trackedPoint.trackingId);
             }
-        }
+        }*/
     }
 
     void PointProcessor::reset()
@@ -157,15 +159,38 @@ namespace sensekit { namespace plugins { namespace hand {
         return area;
     }
 
-    bool PointProcessor::test_valid_point_area(TrackingMatrices& matrices, const cv::Point& targetPoint)
+    bool PointProcessor::test_point_area(TrackingMatrices& matrices, 
+                                         const cv::Point& targetPoint, 
+                                         TrackingStatus status,
+                                         int trackingId)
     {
         float area = get_point_area(matrices, targetPoint);
 
         bool validPointArea = area > m_minArea && area < m_maxArea;
+
+        if (status == TrackingStatus::Tracking && !validPointArea)
+        {
+            m_logger.trace("test_point_area failed #%d: area %f not within [%f, %f]",
+                           trackingId,
+                           area,
+                           m_minArea,
+                           m_maxArea);
+        }
+        /*else if (status == TrackingStatus::NotTracking && validPointArea)
+        {
+            m_logger.trace("test_point_area passed: area %f within [%f, %f]",
+                           area,
+                           m_minArea,
+                           m_maxArea);
+        }*/
+
         return validPointArea;
     }
 
-    bool PointProcessor::test_valid_foreground_radius_percentage(TrackingMatrices& matrices, const cv::Point& targetPoint)
+    bool PointProcessor::test_foreground_radius_percentage(TrackingMatrices& matrices, 
+                                                           const cv::Point& targetPoint, 
+                                                           TrackingStatus status,
+                                                           int trackingId)
     {
         auto scalingMapper = get_scaling_mapper(matrices);
 
@@ -185,8 +210,26 @@ namespace sensekit { namespace plugins { namespace hand {
 
         bool passTest1 = percentForeground1 < m_foregroundRadiusMaxPercent1;
         bool passTest2 = percentForeground2 < m_foregroundRadiusMaxPercent2;
+        bool passed = passTest1 && passTest2;
 
-        return passTest1 && passTest2;
+        if (status == TrackingStatus::Tracking && !passed)
+        {
+            m_logger.trace("test_foreground_radius_percentage failed #%d: perc1 %f (max %f) perc2 %f (max %f)",
+                           trackingId,
+                           percentForeground1,
+                           m_foregroundRadiusMaxPercent1,
+                           percentForeground2,
+                           m_foregroundRadiusMaxPercent2);
+        }
+        /*else if (status == TrackingStatus::NotTracking && passed)
+        {
+            m_logger.trace("test_foreground_radius_percentage passed: perc1 %f (max %f) perc2 %f (max %f)",
+                           percentForeground1,
+                           m_foregroundRadiusMaxPercent1,
+                           percentForeground2,
+                           m_foregroundRadiusMaxPercent2);
+        }*/
+        return passed;
     }
 
     void PointProcessor::update_full_resolution_points(TrackingMatrices& matrices)
@@ -336,13 +379,11 @@ namespace sensekit { namespace plugins { namespace hand {
 
         cv::Point3f worldPosition = scalingMapper.convert_depth_to_world(newTargetPoint.x, newTargetPoint.y, depth);
 
-        auto dist = cv::norm(worldPosition - trackedPoint.worldPosition);
-        auto steadyDist = cv::norm(worldPosition - trackedPoint.steadyWorldPosition);
+        
+        bool validPointArea = test_point_area(matrices, newTargetPoint, trackedPoint.trackingStatus, trackedPoint.trackingId);
+        bool validRadiusTest = test_foreground_radius_percentage(matrices, newTargetPoint, trackedPoint.trackingStatus, trackedPoint.trackingId);
 
-        bool validPointArea = test_valid_point_area(matrices, newTargetPoint);
-        bool validRadiusTest = test_valid_foreground_radius_percentage(matrices, newTargetPoint);
-
-        if (dist < m_maxJumpDist && validPointArea && validRadiusTest)
+        if (validPointArea && validRadiusTest)
         {
             updatedPoint = true;
 
@@ -351,6 +392,9 @@ namespace sensekit { namespace plugins { namespace hand {
             trackedPoint.worldDeltaPosition = deltaPosition;
 
             trackedPoint.position = newTargetPoint;
+
+            auto steadyDist = cv::norm(worldPosition - trackedPoint.steadyWorldPosition);
+
             if (steadyDist > m_steadyDeadBandRadius)
             {
                 trackedPoint.steadyWorldPosition = worldPosition;
@@ -369,6 +413,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         assert(trackedPoint.trackingStatus != TrackingStatus::Dead);
 
+        auto oldStatus = trackedPoint.trackingStatus;
         if (updatedPoint)
         {
             trackedPoint.trackingStatus = TrackingStatus::Tracking;
@@ -376,6 +421,13 @@ namespace sensekit { namespace plugins { namespace hand {
         else
         {
             trackedPoint.trackingStatus = TrackingStatus::Lost;
+        }
+        if (trackedPoint.trackingStatus != oldStatus)
+        {
+            m_logger.trace("validateAndUpdateTrackedPoint: #%d status %s --> status %s", 
+                           trackedPoint.trackingId, 
+                           tracking_status_to_string(oldStatus).c_str(),
+                           tracking_status_to_string(trackedPoint.trackingStatus).c_str());
         }
     }
 
@@ -449,18 +501,23 @@ namespace sensekit { namespace plugins { namespace hand {
                                   TrackedPointType::CandidatePoint,
                                   m_iterationMaxInitial,
                                   m_maxSegmentationDist,
-                                  VELOCITY_POLICY_RESET_TTL,
+                                  VELOCITY_POLICY_IGNORE,
                                   m_edgeDistanceScoreFactor,
                                   m_targetEdgeDistance,
                                   m_pointInertiaFactor,
                                   m_pointInertiaRadius);
 
         cv::Point targetPoint = segmentation::converge_track_point_from_seed(trackingData);
+        
+        if (targetPoint == segmentation::INVALID_POINT)
+        {
+            return;
+        }
 
-        bool validPointArea = test_valid_point_area(matrices, targetPoint);
-        bool validRadiusTest = test_valid_foreground_radius_percentage(matrices, targetPoint);
+        bool validPointArea = test_point_area(matrices, targetPoint, TrackingStatus::NotTracking, -1);
+        bool validRadiusTest = test_foreground_radius_percentage(matrices, targetPoint, TrackingStatus::NotTracking, -1);
 
-        if (targetPoint == segmentation::INVALID_POINT || !validPointArea || !validRadiusTest)
+        if (!validPointArea || !validRadiusTest)
         {
             return;
         }
@@ -476,27 +533,30 @@ namespace sensekit { namespace plugins { namespace hand {
 
         for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
         {
-            TrackedPoint& tracked = *iter;
-            if (tracked.trackingStatus != TrackingStatus::Dead)
+            TrackedPoint& trackedPoint = *iter;
+            if (trackedPoint.trackingStatus != TrackingStatus::Dead)
             {
-                float dist = cv::norm(tracked.worldPosition - worldPosition);
+                float dist = cv::norm(trackedPoint.worldPosition - worldPosition);
                 float maxDist = m_maxMatchDistDefault;
-                bool activeLost = tracked.pointType == TrackedPointType::ActivePoint && tracked.trackingStatus == TrackingStatus::Lost;
-                if (activeLost)
+                bool lostPoint = trackedPoint.trackingStatus == TrackingStatus::Lost;
+                if (lostPoint && trackedPoint.pointType == TrackedPointType::ActivePoint)
                 {
                     maxDist = m_maxMatchDistLostActive;
                 }
                 if (dist < maxDist)
                 {
-                    tracked.inactiveFrameCount = 0;
-                    if (activeLost)
+                    trackedPoint.inactiveFrameCount = 0;
+                    if (lostPoint)
                     {
                         //Recover a lost point -- move it to the recovery position
-                        tracked.position = targetPoint;
-                        tracked.worldPosition = worldPosition;
-                        tracked.worldDeltaPosition = cv::Point3f();
+                        trackedPoint.position = targetPoint;
+                        trackedPoint.worldPosition = worldPosition;
+                        trackedPoint.worldDeltaPosition = cv::Point3f();
+
+                        m_logger.trace("createCycle: Recovered #%d",
+                                       trackedPoint.trackingId);
                     }
-                    tracked.trackingStatus = TrackingStatus::Tracking;
+                    trackedPoint.trackingStatus = TrackingStatus::Tracking;
                     existingPoint = true;
                     break;
                 }
@@ -504,6 +564,9 @@ namespace sensekit { namespace plugins { namespace hand {
         }
         if (!existingPoint)
         {
+            m_logger.trace("createCycle: Created new point #%d",
+                           m_nextTrackingId);
+
             TrackedPoint newPoint(targetPoint, worldPosition, m_nextTrackingId);
             newPoint.pointType = TrackedPointType::CandidatePoint;
             newPoint.trackingStatus = TrackingStatus::Tracking;

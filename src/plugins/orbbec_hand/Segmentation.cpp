@@ -65,6 +65,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
     {
         assert(matVisited.size() == data.matrices.depth.size());
 
+        const float minDepth = data.referenceDepth - data.bandwidthDepth;
         const float maxDepth = data.referenceDepth + data.bandwidthDepth;
         const float maxSegmentationDist = data.maxSegmentationDist;
         cv::Mat& depthMatrix = data.matrices.depth;
@@ -93,7 +94,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             searchedMatrix.at<char>(p) = PixelType::Searched;
 
             float depth = depthMatrix.at<float>(p);
-            bool pointInRange = depth != 0 && depth < maxDepth;
+            bool pointInRange = depth != 0 && depth > minDepth && depth < maxDepth;
 
             if (pointInRange)
             {
@@ -127,13 +128,14 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         //does the seed point start in range?
         //If not, it will search outward until it finds in range pixels
+        const float minDepth = data.referenceDepth - data.bandwidthDepth;
         const float maxDepth = data.referenceDepth + data.bandwidthDepth;
-            
+
         cv::Mat matVisited = cv::Mat::zeros(depthMatrix.size(), CV_8UC1);
 
         cv::Point seedPosition = data.seedPosition;
             
-        bool seedInRange = seedDepth != 0 && seedDepth < maxDepth;
+        bool seedInRange = seedDepth != 0 && seedDepth > minDepth && seedDepth < maxDepth;
         if (!seedInRange)
         {
             seedPosition = find_nearest_in_range_pixel(data, matVisited);
@@ -162,7 +164,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             }
 
             float depth = depthMatrix.at<float>(p);
-            bool pointOutOfRange = depth == 0 || depth > maxDepth;
+            bool pointOutOfRange = depth == 0 || depth < minDepth || depth > maxDepth;
 
             if (ttlRef <= 0 || pointOutOfRange)
             {

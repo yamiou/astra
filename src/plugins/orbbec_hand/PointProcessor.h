@@ -4,6 +4,7 @@
 #include <opencv2/core/affine.hpp>
 #include "TrackingData.h"
 #include "ScalingCoordinateMapper.h"
+#include <SenseKit/Plugins/PluginLogger.h>
 
 namespace sensekit { namespace plugins { namespace hand {
 
@@ -12,7 +13,7 @@ namespace sensekit { namespace plugins { namespace hand {
     class PointProcessor
     {
     public:
-        PointProcessor();
+        PointProcessor(PluginLogger& pluginLogger);
         virtual ~PointProcessor();
 
         void initialize_common_calculations(TrackingMatrices& matrices);
@@ -46,13 +47,20 @@ namespace sensekit { namespace plugins { namespace hand {
                                            ScalingCoordinateMapper& scalingMapper,
                                            TrackedPoint& trackedPoint,
                                            const cv::Point& targetPoint);
-        bool test_valid_point_area(TrackingMatrices& matrices, const cv::Point& targetPoint);
-        bool test_valid_foreground_radius_percentage(TrackingMatrices& matrices, const cv::Point& targetPoint);
+        bool test_point_area(TrackingMatrices& matrices,
+                             const cv::Point& targetPoint,
+                             TrackingStatus status,
+                             int trackingId);
+        bool test_foreground_radius_percentage(TrackingMatrices& matrices,
+                                               const cv::Point& targetPoint,
+                                               TrackingStatus status,
+                                               int trackingId);
         void update_tracked_point_from_world_position(TrackedPoint& trackedPoint,
                                                       const cv::Point3f& newWorldPosition,
                                                       const float resizeFactor,
                                                       const CoordinateMapper& fullSizeMapper);
 
+        PluginLogger& m_logger;
         float m_updateCycleBandwidthDepth;
         float m_createCycleBandwidthDepth;
         float m_maxMatchDistLostActive;

@@ -22,7 +22,8 @@ namespace sensekit { namespace plugins { namespace hand {
     public:
         HandTracker(PluginServiceProxy& pluginService,
                     Sensor& streamset,
-                    StreamDescription& depthDescription);
+                    StreamDescription& depthDescription,
+                    PluginLogger& pluginLogger);
         virtual ~HandTracker();
         virtual void on_frame_ready(StreamReader& reader, Frame& frame) override;
     private:
@@ -55,7 +56,8 @@ namespace sensekit { namespace plugins { namespace hand {
 
         StreamReader m_reader;
 
-        DepthUtility m_depthUtility;
+        DepthUtility m_depthUtility; 
+        PluginLogger& m_logger;
         std::unique_ptr<PointProcessor> m_pointProcessor;
 
         int m_width;

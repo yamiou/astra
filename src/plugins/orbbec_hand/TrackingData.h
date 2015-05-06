@@ -27,6 +27,23 @@ namespace sensekit { namespace plugins { namespace hand {
         Dead
     };
 
+    inline std::string tracking_status_to_string(TrackingStatus status)
+    {
+        switch (status)
+        {
+        case TrackingStatus::NotTracking:
+            return "NotTracking";
+        case TrackingStatus::Tracking:
+            return "Tracking";
+        case TrackingStatus::Lost:
+            return "Lost";
+        case TrackingStatus::Dead:
+            return "Dead";
+        default:
+            return "Unknown";
+        }
+    }
+
     enum SegmentationVelocityPolicy
     {
         VELOCITY_POLICY_IGNORE = 0,
