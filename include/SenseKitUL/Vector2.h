@@ -9,43 +9,92 @@ namespace sensekit
     template<typename TType>
     struct Vector2_;
 
+    template<typename T>
+    inline bool operator==(const Vector2_<T>& lhs, const Vector2_<T>& rhs)
+    {
+        return lhs.x == rhs.x && lhs.y == rhs.y;
+    }
+
+    template<typename T>
+    inline bool operator!=(const Vector2_<T>& lhs, const Vector2_<T>& rhs)
+    {
+        return !(lhs == rhs);
+    }
+
+    template<typename T>
+    inline Vector2_<T> operator+(const Vector2_<T>& lhs, const Vector2_<T>& rhs)
+    {
+        return Vector2_<T>(lhs.x + rhs.x, lhs.y + rhs.y);
+    }
+
+    template<typename T>
+    inline Vector2_<T> operator-(const Vector2_<T>& lhs, const Vector2_<T>& rhs)
+    {
+        return Vector2_<T>(lhs.x - rhs.x, lhs.y - rhs.y);
+    }
+
+    template<typename T>
+    inline Vector2_<T> operator*(const Vector2_<T>& lhs, const float& rhs)
+    {
+        return Vector2_<T>(lhs.x * rhs, lhs.y * rhs);
+    }
+
+    template<typename T>
+    inline Vector2_<T> operator*(const float& lhs, const Vector2_<T>& rhs)
+    {
+        return rhs * lhs;
+    }
+
+    template<typename T>
+    inline Vector2_<T> operator/(const Vector2_<T>& lhs, const float& rhs)
+    {
+        return Vector2_<T>(lhs.x / rhs, lhs.y / rhs);
+    }
+
     using Vector2i = Vector2_<int>;
     using Vector2f = Vector2_<float>;
 
-    template<typename TType>
+    template<typename T>
     struct Vector2_
     {
-        TType x;
-        TType y;
+        T x;
+        T y;
 
         Vector2_() :
             x(0), y(0)
         { }
 
-        Vector2_(TType x, TType y) :
+        Vector2_(T x, T y) :
             x(x), y(y)
         { }
 
         float length() const;
         float length_squared() const;
-        float dot(const Vector2_& v) const;
+        float dot(const Vector2_<T>& v) const;
 
-        friend inline bool operator==(const Vector2_& lhs, const Vector2_& rhs);
+        static const Vector2_<T> zero;
 
-        Vector2_& operator+=(const Vector2_& rhs);
-        Vector2_& operator-=(const Vector2_& rhs);
-        Vector2_& operator*=(const float& rhs);
-        Vector2_& operator/=(const float& rhs);
+        static Vector2_<T> normalize(Vector2_<T> v);
 
-        Vector2_ operator-();
+        bool is_zero() const { return *this == zero; }
 
-        friend Vector2_ operator+(const Vector2_& lhs, const Vector2_& rhs);
-        friend Vector2_ operator-(const Vector2_& lhs, const Vector2_& rhs);
+        friend bool operator==<>(const Vector2_<T>& lhs, const Vector2_<T>& rhs);
+        friend Vector2_<T> operator+<>(const Vector2_<T>& lhs, const Vector2_<T>& rhs);
+        friend Vector2_<T> operator-<>(const Vector2_<T>& lhs, const Vector2_<T>& rhs);
+        friend Vector2_<T> operator*<>(const Vector2_<T>& lhs, const float& rhs);
+        friend Vector2_<T> operator*<>(const float& lhs, const Vector2_& rhs);
+        friend Vector2_<T> operator/<>(const Vector2_<T>& lhs, const float& rhs);
 
-        friend Vector2_ operator*(const Vector2_& lhs, const float& rhs);
-        friend Vector2_ operator*(const float& lhs, const Vector2_& rhs);
-        friend Vector2_ operator/(const Vector2_& lhs, const float& rhs);
+        Vector2_<T> operator-();
+        Vector2_<T>& operator+=(const Vector2_<T>& rhs);
+        Vector2_<T>& operator-=(const Vector2_<T>& rhs);
+        Vector2_<T>& operator*=(const float& rhs);
+        Vector2_<T>& operator/=(const float& rhs);
+
     };
+
+    template<typename T>
+    const Vector2_<T> Vector2_<T>::zero = Vector2_<T>();
 
     inline Vector2i cvector_to_vector(const sensekit_vector2i_t& cvector)
     {
@@ -73,103 +122,77 @@ namespace sensekit
         return cvector;
     }
 
-    template<typename TType>
-    inline float Vector2_<TType>::length() const
+    template<typename T>
+    inline Vector2_<T> Vector2_<T>::normalize(Vector2_<T> v)
+    {
+        double length = sqrtf(v.x*v.x + v.y*v.y);
+        if (length < 1e-9)
+        {
+            return Vector2_<T>(0, 0);
+        }
+        else
+        {
+            return Vector2_<T>(v.x / length, v.y / length);
+        }
+    }
+
+    template<typename T>
+    inline float Vector2_<T>::length() const
     {
         return sqrtf(x * x + y * y);
     }
 
-    template<typename TType>
-    inline float Vector2_<TType>::length_squared() const
+    template<typename T>
+    inline float Vector2_<T>::length_squared() const
     {
         return x * x + y * y;
     }
 
-    template<typename TType>
-    inline float Vector2_<TType>::dot(const Vector2_& v) const
+    template<typename T>
+    inline float Vector2_<T>::dot(const Vector2_& v) const
     {
         return x * v.x + y * v.y;
     }
 
-    template<typename TType>
-    inline bool operator==(const Vector2_<TType>& lhs, const Vector2_<TType>& rhs)
-    {
-        return lhs.x == rhs.x && lhs.y == rhs.y;
-    }
-
-    template<typename TType>
-    inline bool operator!=(const Vector2_<TType>& lhs, const Vector2_<TType>& rhs)
-    {
-        return !(lhs == rhs);
-    }
-
-    template<typename TType>
-    inline Vector2_<TType>& Vector2_<TType>::operator+=(const Vector2_<TType>& rhs)
+    template<typename T>
+    inline Vector2_<T>& Vector2_<T>::operator+=(const Vector2_<T>& rhs)
     {
         this->x = this->x + rhs.x;
         this->y = this->y + rhs.y;
         return *this;
     }
 
-    template<typename TType>
-    inline Vector2_<TType>& Vector2_<TType>::operator-=(const Vector2_<TType>& rhs)
+    template<typename T>
+    inline Vector2_<T>& Vector2_<T>::operator-=(const Vector2_<T>& rhs)
     {
         this->x = this->x - rhs.x;
         this->y = this->y - rhs.y;
         return *this;
     }
 
-    template<typename TType>
-    inline Vector2_<TType>& Vector2_<TType>::operator*=(const float& rhs)
+    template<typename T>
+    inline Vector2_<T>& Vector2_<T>::operator*=(const float& rhs)
     {
         this->x = this->x * rhs;
         this->y = this->y * rhs;
         return *this;
     }
 
-    template<typename TType>
-    inline Vector2_<TType>& Vector2_<TType>::operator/=(const float& rhs)
+    template<typename T>
+    inline Vector2_<T>& Vector2_<T>::operator/=(const float& rhs)
     {
         this->x = this->x / rhs;
         this->y = this->y / rhs;
         return *this;
     }
 
-    template<typename TType>
-    inline Vector2_<TType> Vector2_<TType>::operator-()
+    template<typename T>
+    inline Vector2_<T> Vector2_<T>::operator-()
     {
         return Vector2_(-this->x, -this->y);
     }
 
-    template<typename TType>
-    inline Vector2_<TType> operator+(const Vector2_<TType>& lhs, const Vector2_<TType>& rhs)
-    {
-        return Vector2_<TType>(lhs.x + rhs.x, lhs.y + rhs.y);
-    }
 
-    template<typename TType>
-    inline Vector2_<TType> operator-(const Vector2_<TType>& lhs, const Vector2_<TType>& rhs)
-    {
-        return Vector2_<TType>(lhs.x - rhs.x, lhs.y - rhs.y);
-    }
-
-    template<typename TType>
-    inline Vector2_<TType> operator*(const Vector2_<TType>& lhs, const float& rhs)
-    {
-        return Vector2_<TType>(lhs.x * rhs, lhs.y * rhs);
-    }
-
-    template<typename TType>
-    inline Vector2_<TType> operator*(const float& lhs, const Vector2_<TType>& rhs)
-    {
-        return rhs * lhs;
-    }
-
-    template<typename TType>
-    inline Vector2_<TType> operator/(const Vector2_<TType>& lhs, const float& rhs)
-    {
-        return Vector2_<TType>(lhs.x / rhs, lhs.y / rhs);
-    }
 }
 
 #endif // VECTOR2_H
