@@ -101,42 +101,6 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Point newTargetPoint = segmentation::converge_track_point_from_seed(updateTrackingData);
 
         validateAndUpdateTrackedPoint(matrices, scalingMapper, trackedPoint, newTargetPoint);
-        /*
-        //lost a tracked point, try to guess the position using previous position delta for second chance to recover
-
-        if (trackedPoint.trackingStatus != TrackingStatus::Tracking && cv::norm(trackedPoint.worldDeltaPosition) > 0)
-        {
-            auto estimatedWorldPosition = trackedPoint.worldPosition + trackedPoint.worldDeltaPosition;
-
-            cv::Point3f estimatedPosition = scalingMapper.convert_world_to_depth(estimatedWorldPosition);
-
-            seedPosition.x = MAX(0, MIN(width - 1, static_cast<int>(estimatedPosition.x)));
-            seedPosition.y = MAX(0, MIN(height - 1, static_cast<int>(estimatedPosition.y)));
-            referenceDepth = estimatedPosition.z;
-
-            TrackingData recoverTrackingData(matrices,
-                                             seedPosition,
-                                             referenceDepth,
-                                             m_segmentationBandwidthDepthFar,
-                                             trackedPoint.pointType,
-                                             m_iterationMaxTracking,
-                                             m_maxSegmentationDist,
-                                             VELOCITY_POLICY_IGNORE,
-                                             m_edgeDistanceScoreFactor,
-                                             m_targetEdgeDistance,
-                                             m_pointInertiaFactor,
-                                             m_pointInertiaRadius);
-
-            newTargetPoint = segmentation::converge_track_point_from_seed(recoverTrackingData);
-
-            validateAndUpdateTrackedPoint(matrices, scalingMapper, trackedPoint, newTargetPoint);
-
-            if (trackedPoint.trackingStatus == TrackingStatus::Tracking)
-            {
-                m_logger.trace("updateTrackedPoint 2nd chance recovered #%d",
-                               trackedPoint.trackingId);
-            }
-        }*/
     }
 
     void PointProcessor::reset()
