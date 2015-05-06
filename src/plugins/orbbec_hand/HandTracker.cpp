@@ -179,18 +179,17 @@ namespace sensekit { namespace plugins { namespace hand {
                 float depth = matDepth.at<float>(seedPosition);
                 float edgeDist = m_layerEdgeDistance.at<float>(seedPosition);
 
-                float foregroundRadius1 = 100;
-                float foregroundRadius2 = 150;
+                float foregroundRadius1 = m_pointProcessor->foregroundRadius1();
+                float foregroundRadius2 = m_pointProcessor->foregroundRadius2();
+
                 auto mapper = get_scaling_mapper(createMatrices);
                 float percentForeground1 = segmentation::get_percent_foreground_along_circumference(matDepth,
                                                                                                    m_layerSegmentation,
-                                                                                                   m_matAreaSqrt,
                                                                                                    seedPosition,
                                                                                                    foregroundRadius1,
                                                                                                    mapper);
                 float percentForeground2 = segmentation::get_percent_foreground_along_circumference(matDepth,
                                                                                                    m_layerSegmentation,
-                                                                                                   m_matAreaSqrt,
                                                                                                    seedPosition,
                                                                                                    foregroundRadius2,
                                                                                                    mapper);
@@ -352,9 +351,6 @@ namespace sensekit { namespace plugins { namespace hand {
             int x = MAX(0, MIN(PROCESSING_SIZE_WIDTH, normPosition.x * PROCESSING_SIZE_WIDTH));
             int y = MAX(0, MIN(PROCESSING_SIZE_HEIGHT, normPosition.y * PROCESSING_SIZE_HEIGHT));
 
-            float foregroundRadius1 = 100;
-            float foregroundRadius2 = 150;
-            
             float resizeFactor = m_matDepthFullSize.cols / static_cast<float>(m_matDepth.cols);
             ScalingCoordinateMapper mapper(m_depthStream.coordinateMapper(), resizeFactor);
 
@@ -364,6 +360,9 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 mark_image_pixel(imageFrame, color, p);
             };
+
+            float foregroundRadius1 = m_pointProcessor->foregroundRadius1();
+            float foregroundRadius2 = m_pointProcessor->foregroundRadius2();
 
             segmentation::visit_circle_circumference(m_matDepth, cv::Point(x, y), foregroundRadius1, mapper, callback);
             segmentation::visit_circle_circumference(m_matDepth, cv::Point(x, y), foregroundRadius2, mapper, callback);

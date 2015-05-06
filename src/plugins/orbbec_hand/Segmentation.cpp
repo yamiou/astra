@@ -65,8 +65,8 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
     {
         assert(matVisited.size() == data.matrices.depth.size());
 
-        const float minDepth = data.referenceDepth - data.bandwidthDepth;
-        const float maxDepth = data.referenceDepth + data.bandwidthDepth;
+        const float minDepth = data.referenceDepth - data.bandwidthDepthNear;
+        const float maxDepth = data.referenceDepth + data.bandwidthDepthFar;
         const float maxSegmentationDist = data.maxSegmentationDist;
         cv::Mat& depthMatrix = data.matrices.depth;
         cv::Mat& searchedMatrix = data.matrices.foregroundSearched;
@@ -128,8 +128,8 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         //does the seed point start in range?
         //If not, it will search outward until it finds in range pixels
-        const float minDepth = data.referenceDepth - data.bandwidthDepth;
-        const float maxDepth = data.referenceDepth + data.bandwidthDepth;
+        const float minDepth = data.referenceDepth - data.bandwidthDepthNear;
+        const float maxDepth = data.referenceDepth + data.bandwidthDepthFar;
 
         cv::Mat matVisited = cv::Mat::zeros(depthMatrix.size(), CV_8UC1);
 
@@ -568,35 +568,34 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
     }
 
     void accumulate_foreground_at_position(cv::Mat& matSegmentation,
-                                           cv::Mat& matAreaSqrt,
                                            cv::Point p,
-                                           float& foregroundDistance)
+                                           int& foregroundCount,
+                                           int& totalCount)
     {
+        ++totalCount;
         if (matSegmentation.at<uint8_t>(p) == PixelType::Foreground)
         {
-            float areaSqrt = matAreaSqrt.at<float>(p);
-            foregroundDistance += areaSqrt;
+            ++foregroundCount;
         }
     }
 
     float get_percent_foreground_along_circumference(cv::Mat& matDepth,
                                                      cv::Mat& matSegmentation,
-                                                     cv::Mat& matAreaSqrt,
                                                      const cv::Point& center,
                                                      const float& radius,
                                                      const ScalingCoordinateMapper& mapper)
     {
-        float foregroundDistance = 0;
+        int foregroundCount = 0;
+        int totalCount = 0;
 
         auto callback = [&](cv::Point p)
         {
-            accumulate_foreground_at_position(matSegmentation, matAreaSqrt, p, foregroundDistance);
+            accumulate_foreground_at_position(matSegmentation, p, foregroundCount, totalCount);
         };
 
         visit_circle_circumference(matDepth, center, radius, mapper, callback);
 
-        float totalDistance = 2.0f * PI_F * radius;
-        float percentForeground = foregroundDistance / totalDistance;
+        float percentForeground = foregroundCount / static_cast<float>(totalCount);
 
         return percentForeground;
     }

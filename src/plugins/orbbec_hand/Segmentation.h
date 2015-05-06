@@ -50,7 +50,6 @@ namespace sensekit { namespace plugins { namespace hand {
 
         float get_percent_foreground_along_circumference(cv::Mat& matDepth,
                                                          cv::Mat& matSegmentation,
-                                                         cv::Mat& matAreaSqrt,
                                                          const cv::Point& center,
                                                          const float& radius,
                                                          const ScalingCoordinateMapper& mapper);

@@ -6,17 +6,17 @@ namespace sensekit { namespace plugins { namespace hand {
 
     PointProcessor::PointProcessor(PluginLogger& pluginLogger) :
         m_logger(pluginLogger),
-        m_updateCycleBandwidthDepth(150),  //mm
-        m_createCycleBandwidthDepth(150),   //mm
+        m_segmentationBandwidthDepthNear(500), //mm
+        m_segmentationBandwidthDepthFar(150),  //mm
         m_maxMatchDistLostActive(500),  //mm
         m_maxMatchDistDefault(200),     //mm
         m_iterationMaxInitial(1),
         m_iterationMaxTracking(1),
         m_iterationMaxRefinement(1),
-        m_minArea(0),                //mm^2
-        m_maxArea(25000),               //mm^2
+        m_minArea(0),                   //mm^2
+        m_maxArea(30000),               //mm^2
         m_areaBandwidth(250),           //mm
-        m_areaBandwidthDepth(100),      //mm
+        m_areaBandwidthDepth(150),      //mm
         m_maxSegmentationDist(250),     //mm
         m_steadyDeadBandRadius(150),    //mm
         m_maxJumpDist(250),             //mm
@@ -36,8 +36,8 @@ namespace sensekit { namespace plugins { namespace hand {
         m_pointSmoothingDeadZone(50),     //mm
         m_foregroundRadius1(100),
         m_foregroundRadius2(150),
-        m_foregroundRadiusMaxPercent1(.25),
-        m_foregroundRadiusMaxPercent2(.12)
+        m_foregroundRadiusMaxPercent1(.35),
+        m_foregroundRadiusMaxPercent2(.15)
     {}
 
     PointProcessor::~PointProcessor()
@@ -87,7 +87,8 @@ namespace sensekit { namespace plugins { namespace hand {
         TrackingData updateTrackingData(matrices,
                                         seedPosition,
                                         referenceDepth,
-                                        m_updateCycleBandwidthDepth,
+                                        m_segmentationBandwidthDepthNear,
+                                        m_segmentationBandwidthDepthFar,
                                         trackedPoint.pointType,
                                         m_iterationMaxTracking,
                                         m_maxSegmentationDist,
@@ -116,7 +117,7 @@ namespace sensekit { namespace plugins { namespace hand {
             TrackingData recoverTrackingData(matrices,
                                              seedPosition,
                                              referenceDepth,
-                                             m_createCycleBandwidthDepth,
+                                             m_segmentationBandwidthDepthFar,
                                              trackedPoint.pointType,
                                              m_iterationMaxTracking,
                                              m_maxSegmentationDist,
@@ -159,6 +160,28 @@ namespace sensekit { namespace plugins { namespace hand {
         return area;
     }
 
+    bool PointProcessor::test_point_in_range(TrackingMatrices& matrices,
+                                             const cv::Point& targetPoint,
+                                             TrackingStatus status,
+                                             int trackingId)
+    {
+        if (targetPoint == segmentation::INVALID_POINT ||
+            targetPoint.x < 0 || targetPoint.x >= matrices.depth.cols ||
+            targetPoint.y < 0 || targetPoint.y >= matrices.depth.rows)
+        {
+            if (status == TrackingStatus::Tracking)
+            {
+                m_logger.trace("test_point_in_range failed #%d: position: (%d, %d)",
+                               trackingId,
+                               targetPoint.x,
+                               targetPoint.y);
+            }
+            return false;
+        }
+
+        return true;
+    }
+
     bool PointProcessor::test_point_area(TrackingMatrices& matrices, 
                                          const cv::Point& targetPoint, 
                                          TrackingStatus status,
@@ -196,14 +219,12 @@ namespace sensekit { namespace plugins { namespace hand {
 
         float percentForeground1 = segmentation::get_percent_foreground_along_circumference(matrices.depth,
                                                                                             matrices.layerSegmentation,
-                                                                                            matrices.areaSqrt,
                                                                                             targetPoint,
                                                                                             m_foregroundRadius1,
                                                                                             scalingMapper);
 
         float percentForeground2 = segmentation::get_percent_foreground_along_circumference(matrices.depth,
                                                                                             matrices.layerSegmentation,
-                                                                                            matrices.areaSqrt,
                                                                                             targetPoint,
                                                                                             m_foregroundRadius2,
                                                                                             scalingMapper);
@@ -313,7 +334,8 @@ namespace sensekit { namespace plugins { namespace hand {
         TrackingData refinementTrackingData(matrices,
                                             roiPosition,
                                             referenceDepth,
-                                            m_updateCycleBandwidthDepth,
+                                            m_segmentationBandwidthDepthNear,
+                                            m_segmentationBandwidthDepthFar,
                                             TrackedPointType::ActivePoint,
                                             m_iterationMaxRefinement,
                                             m_maxSegmentationDist,
@@ -355,8 +377,8 @@ namespace sensekit { namespace plugins { namespace hand {
 
         trackedPoint.fullSizePosition = cv::Point(fullSizeDepthPosition.x, fullSizeDepthPosition.y);
 
-        trackedPoint.position.x = fullSizeDepthPosition.x / resizeFactor;
-        trackedPoint.position.y = fullSizeDepthPosition.y / resizeFactor;
+        //trackedPoint.position.x = fullSizeDepthPosition.x / resizeFactor;
+        //trackedPoint.position.y = fullSizeDepthPosition.y / resizeFactor;
 
         cv::Point3f deltaPosition = newWorldPosition - trackedPoint.fullSizeWorldPosition;
         trackedPoint.fullSizeWorldPosition = newWorldPosition;
@@ -369,23 +391,23 @@ namespace sensekit { namespace plugins { namespace hand {
                                                        const cv::Point& newTargetPoint)
     {
         bool updatedPoint = false;
+
+        bool validPointInRange = test_point_in_range(matrices, newTargetPoint, trackedPoint.trackingStatus, trackedPoint.trackingId);
+        bool validPointArea = false;
+        bool validRadiusTest = false;
         
-        if (newTargetPoint == segmentation::INVALID_POINT)
+        if (validPointInRange)
         {
-            return;
+            validPointArea = test_point_area(matrices, newTargetPoint, trackedPoint.trackingStatus, trackedPoint.trackingId);
+            validRadiusTest = test_foreground_radius_percentage(matrices, newTargetPoint, trackedPoint.trackingStatus, trackedPoint.trackingId);
         }
 
-        float depth = matrices.depth.at<float>(newTargetPoint);
-
-        cv::Point3f worldPosition = scalingMapper.convert_depth_to_world(newTargetPoint.x, newTargetPoint.y, depth);
-
-        
-        bool validPointArea = test_point_area(matrices, newTargetPoint, trackedPoint.trackingStatus, trackedPoint.trackingId);
-        bool validRadiusTest = test_foreground_radius_percentage(matrices, newTargetPoint, trackedPoint.trackingStatus, trackedPoint.trackingId);
-
-        if (validPointArea && validRadiusTest)
+        if (validPointInRange && validPointArea && validRadiusTest)
         {
             updatedPoint = true;
+            
+            float depth = matrices.depth.at<float>(newTargetPoint);
+            cv::Point3f worldPosition = scalingMapper.convert_depth_to_world(newTargetPoint.x, newTargetPoint.y, depth);
 
             cv::Point3f deltaPosition = worldPosition - trackedPoint.worldPosition;
             trackedPoint.worldPosition = worldPosition;
@@ -494,14 +516,16 @@ namespace sensekit { namespace plugins { namespace hand {
             //Cannot expect to properly segment when the seedPosition has zero depth
             return;
         }
+
         TrackingData trackingData(matrices,
                                   seedPosition,
                                   referenceDepth,
-                                  m_createCycleBandwidthDepth,
+                                  m_segmentationBandwidthDepthNear,
+                                  m_segmentationBandwidthDepthFar,
                                   TrackedPointType::CandidatePoint,
                                   m_iterationMaxInitial,
                                   m_maxSegmentationDist,
-                                  VELOCITY_POLICY_IGNORE,
+                                  VELOCITY_POLICY_RESET_TTL,
                                   m_edgeDistanceScoreFactor,
                                   m_targetEdgeDistance,
                                   m_pointInertiaFactor,
@@ -509,7 +533,9 @@ namespace sensekit { namespace plugins { namespace hand {
 
         cv::Point targetPoint = segmentation::converge_track_point_from_seed(trackingData);
         
-        if (targetPoint == segmentation::INVALID_POINT)
+        bool validPointInRange = test_point_in_range(matrices, targetPoint, TrackingStatus::NotTracking, -1);
+
+        if (!validPointInRange)
         {
             return;
         }
@@ -554,7 +580,7 @@ namespace sensekit { namespace plugins { namespace hand {
                         trackedPoint.worldDeltaPosition = cv::Point3f();
 
                         m_logger.trace("createCycle: Recovered #%d",
-                                       trackedPoint.trackingId);
+                                        trackedPoint.trackingId);
                     }
                     trackedPoint.trackingStatus = TrackingStatus::Tracking;
                     existingPoint = true;

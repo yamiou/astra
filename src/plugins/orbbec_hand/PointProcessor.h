@@ -30,9 +30,11 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void reset();
 
-        float get_trackingBandwidthDepth() { return m_updateCycleBandwidthDepth; }
+        float foregroundRadius1() const { return m_foregroundRadius1; }
+        float foregroundRadius2() const { return m_foregroundRadius2; }
 
         float get_point_area(TrackingMatrices& matrices, const cv::Point& point);
+        bool test_point_in_range(TrackingMatrices& matrices, const cv::Point& targetPoint, TrackingStatus status, int trackingId);
     private:
         cv::Point3f smooth_world_positions(const cv::Point3f& oldWorldPosition, const cv::Point3f& newWorldPosition);
 
@@ -61,8 +63,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                                       const CoordinateMapper& fullSizeMapper);
 
         PluginLogger& m_logger;
-        float m_updateCycleBandwidthDepth;
-        float m_createCycleBandwidthDepth;
+        float m_segmentationBandwidthDepthNear;
+        float m_segmentationBandwidthDepthFar;
         float m_maxMatchDistLostActive;
         float m_maxMatchDistDefault;
         int m_iterationMaxInitial;

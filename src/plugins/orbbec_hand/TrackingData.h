@@ -120,7 +120,8 @@ namespace sensekit { namespace plugins { namespace hand {
         TrackingMatrices& matrices;
         const cv::Point& seedPosition;
         const float referenceDepth;
-        const float bandwidthDepth;
+        const float bandwidthDepthNear;
+        const float bandwidthDepthFar;
         const TrackedPointType pointType;
         const int iterationMax;
         const float maxSegmentationDist;
@@ -133,7 +134,8 @@ namespace sensekit { namespace plugins { namespace hand {
         TrackingData(TrackingMatrices& matrices,
                      const cv::Point& seedPosition,
                      const float referenceDepth,
-                     const float bandwidthDepth,
+                     const float bandwidthDepthNear,
+                     const float bandwidthDepthFar,
                      const TrackedPointType pointType,
                      const int iterationMax,
                      const float maxSegmentationDist,
@@ -145,7 +147,8 @@ namespace sensekit { namespace plugins { namespace hand {
             : matrices(matrices),
               seedPosition(seedPosition),
               referenceDepth(referenceDepth),
-              bandwidthDepth(bandwidthDepth),
+              bandwidthDepthNear(bandwidthDepthNear),
+              bandwidthDepthFar(bandwidthDepthFar),
               pointType(pointType),
               iterationMax(iterationMax),
               maxSegmentationDist(maxSegmentationDist),
