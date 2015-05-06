@@ -51,7 +51,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                              const float farDepth);
 
         void thresholdVelocitySignal(cv::Mat& matVelocitySignal,
-                                     cv::Mat& matVelocity,
+                                     cv::Mat& matVelocityFiltered,
                                      const float velocityThresholdFactor);
 
         const float m_processingWidth;

@@ -9,9 +9,9 @@ namespace sensekit { namespace plugins { namespace hand {
         m_processingWidth(width),
         m_processingHeight(height),
         m_depthSmoothingFactor(0.05),
-        m_velocityThresholdFactor(0.01),
+        m_velocityThresholdFactor(0.02),
         m_maxDepthJumpPercent(0.1),
-        m_erodeSize(2),
+        m_erodeSize(1),
         m_maxVel(0),
         m_maxDepth(4000),
         m_farDepth(10000)
@@ -57,10 +57,6 @@ namespace sensekit { namespace plugins { namespace hand {
         //fill 0 depth pixels with the value from the previous frame
         fillZeroValues(matDepth, m_matDepthFilled, m_matDepthFilledMask, m_matDepthPrevious);
 
-        //current minus average, scaled by average = velocity as a percent change
-
-        m_matDepthVel = (m_matDepthFilled - m_matDepthAvg) / m_matDepthAvg;
-
         //accumulate current frame to average using smoothing factor
 
         cv::accumulateWeighted(m_matDepthFilled, m_matDepthAvg, m_depthSmoothingFactor);
@@ -73,10 +69,13 @@ namespace sensekit { namespace plugins { namespace hand {
                                  m_maxDepthJumpPercent,
                                  m_farDepth);
 
+        //current minus average, scaled by average = velocity as a percent change
+
+        m_matDepthVel = (m_matDepthFilled - m_matDepthAvg) / m_matDepthAvg;
+
         //erode to eliminate single pixel velocity artifacts
         m_matDepthVelErode = cv::abs(m_matDepthVel);
         cv::erode(m_matDepthVelErode, m_matDepthVelErode, m_rectElement);
-        cv::dilate(m_matDepthVelErode, m_matDepthVelErode, m_rectElement);
 
         thresholdVelocitySignal(matVelocitySignal,
                                 m_matDepthVelErode,
@@ -209,8 +208,8 @@ namespace sensekit { namespace plugins { namespace hand {
         }
     }
 
-    void DepthUtility::thresholdVelocitySignal(cv::Mat& matVelocitySignal, 
-                                               cv::Mat& matVelocity,
+    void DepthUtility::thresholdVelocitySignal(cv::Mat& matVelocitySignal,
+                                               cv::Mat& matVelocityFiltered,
                                                const float velocityThresholdFactor)
     {
         int width = matVelocitySignal.cols;
@@ -219,19 +218,19 @@ namespace sensekit { namespace plugins { namespace hand {
         m_maxVel *= 0.98;
         for (int y = 0; y < height; ++y)
         {
-            float* velRow = matVelocity.ptr<float>(y);
+            float* velFilteredRow = matVelocityFiltered.ptr<float>(y);
             uint8_t* velocitySignalRow = matVelocitySignal.ptr<uint8_t>(y);
 
-            for (int x = 0; x < width; ++x)
+            for (int x = 0; x < width; ++x, ++velFilteredRow, ++velocitySignalRow)
             {
-                //matVelocity is already abs(vel)
-                float vel = *velRow;
-                if (vel > m_maxVel)
+                //matVelocityFiltered is already abs(vel)
+                float velFiltered = abs(*velFilteredRow);
+                if (velFiltered > m_maxVel)
                 {
-                    m_maxVel = vel;
+                    m_maxVel = velFiltered;
                 }
 
-                if (vel > velocityThresholdFactor)
+                if (velFiltered > velocityThresholdFactor)
                 {
                     *velocitySignalRow = PixelType::Foreground;
                 }
@@ -239,12 +238,8 @@ namespace sensekit { namespace plugins { namespace hand {
                 {
                     *velocitySignalRow = PixelType::Background;
                 }
-
-                ++velRow;
-                ++velocitySignalRow;
             }
         }
         //printf("max vel: %f\n", m_maxVel);
     }
-
 }}}
