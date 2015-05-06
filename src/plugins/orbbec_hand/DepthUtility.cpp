@@ -64,10 +64,8 @@ namespace sensekit { namespace plugins { namespace hand {
         filterZeroValuesAndJumps(m_matDepthFilled,
                                  m_matDepthPrevious,
                                  m_matDepthAvg,
-                                 m_matDepthVel,
                                  m_matDepthFilledMask,
-                                 m_maxDepthJumpPercent,
-                                 m_farDepth);
+                                 m_maxDepthJumpPercent);
 
         //current minus average, scaled by average = velocity as a percent change
 
@@ -155,10 +153,8 @@ namespace sensekit { namespace plugins { namespace hand {
     void DepthUtility::filterZeroValuesAndJumps(cv::Mat& matDepth,
                                                 cv::Mat& matDepthPrevious,
                                                 cv::Mat& matDepthAvg,
-                                                cv::Mat& matDepthVel,
                                                 cv::Mat& matDepthFilledMask,
-                                                const float maxDepthJumpPercent,
-                                                const float farDepth)
+                                                const float maxDepthJumpPercent)
     {
         int width = matDepth.cols;
         int height = matDepth.rows;
@@ -168,7 +164,6 @@ namespace sensekit { namespace plugins { namespace hand {
             float* depthRow = matDepth.ptr<float>(y);
             float* prevDepthRow = matDepthPrevious.ptr<float>(y);
             float* avgRow = matDepthAvg.ptr<float>(y);
-            float* velRow = matDepthVel.ptr<float>(y);
             uint8_t* filledDepthMaskRow = matDepthFilledMask.ptr<uint8_t>(y);
 
             for (int x = 0; x < width; ++x)
@@ -196,7 +191,6 @@ namespace sensekit { namespace plugins { namespace hand {
                     //set the average to the current depth, and set velocity to zero
                     //this suppresses the velocity signal for edge jumping artifacts
                     avgRow[x] = depth;
-                    velRow[x] = 0;
                 }
 
                 *prevDepthRow = depth;
