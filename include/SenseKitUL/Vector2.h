@@ -6,7 +6,7 @@
 
 namespace sensekit
 {
-    template<typename TType>
+    template<typename T>
     struct Vector2_;
 
     template<typename T>

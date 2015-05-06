@@ -1,6 +1,7 @@
 set (_projname "SimpleDepthViewer-SFML")
 
 set (${_projname}_SOURCES
+  ../../common/LitDepthVisualizer.h
   main.cpp
   )
 

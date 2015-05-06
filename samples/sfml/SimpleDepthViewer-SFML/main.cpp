@@ -1,19 +1,28 @@
 #include <SFML/Graphics.hpp>
 #include <Sensekit/SenseKit.h>
 #include <SensekitUL/SenseKitUL.h>
+#include "../../common/LitDepthVisualizer.h"
 
 class DepthFrameListener : public sensekit::FrameReadyListener
 {
 public:
+    DepthFrameListener(sensekit::DepthStream& depthStream)
+        : m_visualizerPtr(new samples::common::LitDepthVisualizer(depthStream))
+    {
+        //    m_visualizerPtr->set_light_color(sensekit_rgb_pixel_t{255,0,0});
+    }
+
     void init_texture(int width, int height)
     {
         if (m_displayBuffer == nullptr || width != m_displayWidth || height != m_displayHeight)
         {
             m_displayWidth = width;
             m_displayHeight = height;
+
+            // texture is RGBA
             int byteLength = m_displayWidth * m_displayHeight * 4;
 
-            m_displayBuffer = BufferPtr( new uint8_t[byteLength] );
+            m_displayBuffer = BufferPtr(new uint8_t[byteLength]);
             memset(m_displayBuffer.get(), 0, byteLength);
 
             m_texture.create(m_displayWidth, m_displayHeight);
@@ -36,26 +45,6 @@ public:
         printf("FPS: %3.1f (%3.4Lf ms)\n", fps, m_frameDuration * 1000);
     }
 
-    void process_depth(const int16_t* depthPtr, int width, int height)
-    {
-        for(int y = 0; y < height; y++)
-        {
-            for(int x = 0; x < width; x++)
-            {
-                int index = (x + y * width);
-                int index4 = index * 4;
-
-                int16_t depth = depthPtr[index];
-                uint8_t value = depth % 255;
-
-                m_displayBuffer[index4] = value;
-                m_displayBuffer[index4 + 1] = value;
-                m_displayBuffer[index4 + 2] = value;
-                m_displayBuffer[index4 + 3] = 255;
-            }
-        }
-    }
-
     virtual void on_frame_ready(sensekit::StreamReader& reader,
                                 sensekit::Frame& frame) override
     {
@@ -65,7 +54,16 @@ public:
         int height = depthFrame.resolutionY();
 
         init_texture(width, height);
-        process_depth(depthFrame.data(), width, height);
+        m_visualizerPtr->update(depthFrame);
+        sensekit_rgb_pixel_t* vizBuffer = m_visualizerPtr->get_output();
+        for(int i = 0; i < width * height; i++)
+        {
+            int rgbaOffset = i *4;
+            m_displayBuffer[rgbaOffset] = vizBuffer[i].r;
+            m_displayBuffer[rgbaOffset + 1] = vizBuffer[i].b;
+            m_displayBuffer[rgbaOffset + 2] = vizBuffer[i].g;
+            m_displayBuffer[rgbaOffset + 3] = 255;
+        }
         m_texture.update(m_displayBuffer.get());
         check_fps();
     }
@@ -84,6 +82,9 @@ public:
 
 private:
     float m_scale{ 1 };
+
+    using VizPtr = std::unique_ptr<samples::common::LitDepthVisualizer>;
+    VizPtr m_visualizerPtr;
 
     long double m_frameDuration{ 0 };
     std::clock_t m_lastTimepoint { 0 };
@@ -105,9 +106,10 @@ int main(int argc, char** argv)
     sensekit::Sensor sensor;
     sensekit::StreamReader reader = sensor.create_reader();
 
-    DepthFrameListener listener;
+    auto ds = reader.stream<sensekit::DepthStream>();
+    ds.start();
 
-    reader.stream<sensekit::DepthStream>().start();
+    DepthFrameListener listener(ds);
 
     reader.addListener(listener);
 

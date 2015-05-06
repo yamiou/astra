@@ -129,7 +129,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         cv::Mat matVisited = cv::Mat::zeros(depthMatrix.size(), CV_8UC1);
 
         cv::Point seedPosition = data.seedPosition;
-            
+
         bool seedInRange = seedDepth != 0 && seedDepth > minDepth && seedDepth < maxDepth;
         if (!seedInRange)
         {
@@ -220,13 +220,13 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
                     if (activePoint && pointInertiaRadius > 0)
                     {
-                        float distFromSeedNorm = std::max(0.0, std::min(1.0, 
+                        float distFromSeedNorm = std::max(0.0, std::min(1.0,
                                                     cv::norm(worldPosition - seedWorldPosition) / pointInertiaRadius));
                         score += (1.0f - distFromSeedNorm) * pointInertiaFactor;
                     }
-                        
+
                     float edgeDistance = *edgeDistanceRow;
-                    float edgeScore = (targetEdgeDist - abs(targetEdgeDist - edgeDistance)) * edgeDistanceFactor;
+                    float edgeScore = (targetEdgeDist - std::abs(targetEdgeDist - edgeDistance)) * edgeDistanceFactor;
                     if (edgeScore > 0)
                     {
                         score += edgeScore;
@@ -256,7 +256,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         //data.matrices.matLayerSegmentation.setTo(cv::Scalar(0));
 
         segment_foreground(data);
-            
+
         calculate_edge_distance(data.matrices.layerSegmentation,
                                 data.matrices.areaSqrt,
                                 data.matrices.layerEdgeDistance);
@@ -279,7 +279,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             if (data.pointType == TrackedPointType::ActivePoint)
             {
                 cv::Mat scoreMask;
-                    
+
                 cv::inRange(data.matrices.layerScore, 1, INT_MAX, scoreMask);
                 cv::normalize(data.matrices.layerScore, data.matrices.debugScore, 0, 1, cv::NORM_MINMAX, -1, scoreMask);
             }
@@ -449,9 +449,9 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         return area;
     }
 
-    void calculate_segment_area(cv::Mat& depthMatrix, 
-                                cv::Mat& areaMatrix, 
-                                cv::Mat& areaSqrtMatrix, 
+    void calculate_segment_area(cv::Mat& depthMatrix,
+                                cv::Mat& areaMatrix,
+                                cv::Mat& areaSqrtMatrix,
                                 const ScalingCoordinateMapper& mapper)
     {
         int width = depthMatrix.cols;
@@ -494,7 +494,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         }
     }
 
-    void visit_callback_if_valid_position(int width, 
+    void visit_callback_if_valid_position(int width,
                                           int height,
                                           int x,
                                           int y,
