@@ -17,7 +17,7 @@ namespace sensekit { namespace plugins { namespace hand {
         m_maxArea(30000),               //mm^2
         m_areaBandwidth(250),           //mm
         m_areaBandwidthDepth(100),       //mm
-        m_maxSegmentationDist(250),     //mm
+        m_maxSegmentationDist(500),     //mm
         m_steadyDeadBandRadius(150),    //mm
         m_targetEdgeDistance(40),       //mm
         m_heightScoreFactor(0.5),
@@ -104,6 +104,48 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Point newTargetPoint = segmentation::converge_track_point_from_seed(updateTrackingData);
 
         validateAndUpdateTrackedPoint(matrices, scalingMapper, trackedPoint, newTargetPoint);
+
+        //lost a tracked point, try to guess the position using previous position delta for second chance to recover
+        
+        auto xyDelta = trackedPoint.worldDeltaPosition;
+        xyDelta.z = 0;
+        double xyDeltaNorm = cv::norm(xyDelta);
+        if (trackedPoint.trackingStatus != TrackingStatus::Tracking && newTargetPoint == segmentation::INVALID_POINT && xyDeltaNorm > 0)
+        {
+            auto movementDirection = xyDelta * (1.0f / xyDeltaNorm);
+            auto estimatedWorldPosition = trackedPoint.worldPosition + movementDirection * m_maxSegmentationDist;
+
+            cv::Point3f estimatedPosition = scalingMapper.convert_world_to_depth(estimatedWorldPosition);
+
+            seedPosition.x = MAX(0, MIN(width - 1, static_cast<int>(estimatedPosition.x)));
+            seedPosition.y = MAX(0, MIN(height - 1, static_cast<int>(estimatedPosition.y)));
+            referenceDepth = estimatedPosition.z;
+
+            TrackingData recoverTrackingData(matrices,
+                                             seedPosition,
+                                             referenceDepth,
+                                             trackedPoint.referenceAreaSqrt,
+                                             m_segmentationBandwidthDepthNear,
+                                             m_segmentationBandwidthDepthFar,
+                                             trackedPoint.pointType,
+                                             m_iterationMaxTracking,
+                                             m_maxSegmentationDist,
+                                             VELOCITY_POLICY_IGNORE,
+                                             m_edgeDistanceScoreFactor,
+                                             m_targetEdgeDistance,
+                                             m_pointInertiaFactor,
+                                             m_pointInertiaRadius);
+
+                newTargetPoint = segmentation::converge_track_point_from_seed(recoverTrackingData);
+
+                validateAndUpdateTrackedPoint(matrices, scalingMapper, trackedPoint, newTargetPoint);
+
+                if (trackedPoint.trackingStatus == TrackingStatus::Tracking)
+                {
+                    m_logger.trace("updateTrackedPoint 2nd chance recovered #%d",
+                                  trackedPoint.trackingId);
+                }
+            }
     }
 
     void PointProcessor::reset()
