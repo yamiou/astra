@@ -222,7 +222,7 @@ namespace sensekit { namespace plugins { namespace hand {
             for (int x = 0; x < width; ++x, ++velFilteredRow, ++velocitySignalRow)
             {
                 //matVelocityFiltered is already abs(vel)
-                float velFiltered = abs(*velFilteredRow);
+                float velFiltered = *velFilteredRow;
                 if (velFiltered > m_maxVel)
                 {
                     m_maxVel = velFiltered;
