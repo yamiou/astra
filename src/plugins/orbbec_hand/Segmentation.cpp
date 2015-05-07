@@ -70,7 +70,6 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         const float maxSegmentationDist = data.maxSegmentationDist;
         cv::Mat& depthMatrix = data.matrices.depth;
         cv::Mat& searchedMatrix = data.matrices.foregroundSearched;
-        bool isCandidatePoint = data.pointType == TrackedPointType::CandidatePoint;
         cv::Mat& areaSqrtMatrix = data.matrices.areaSqrt;
 
         std::queue<PointTTL> pointQueue;
@@ -101,11 +100,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 return p;
             }
 
-            if (isCandidatePoint)
-            {
-                //active points get infinite recovery distance when the seed is out of range
-                ttlRef -= areaSqrtMatrix.at<float>(p);
-            }
+            ttlRef -= areaSqrtMatrix.at<float>(p);
 
             enqueue_neighbors(matVisited, pointQueue, pt);
         }
