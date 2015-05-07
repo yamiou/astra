@@ -40,7 +40,7 @@ namespace sensekit { namespace plugins { namespace hand {
         m_foregroundRadiusMaxPercent2(.15),
         m_maxFailedTestsInProbation(5),
         m_probationFrameCount(30),
-        m_maxFailedTestsInProbationActivePoints(6)
+        m_maxFailedTestsInProbationActivePoints(3)
         {}
 
     PointProcessor::~PointProcessor()
@@ -370,6 +370,16 @@ namespace sensekit { namespace plugins { namespace hand {
         trackedPoint.fullSizeWorldDeltaPosition = deltaPosition;
     }
 
+    void PointProcessor::start_probation(TrackedPoint& trackedPoint)
+    {
+        if (!trackedPoint.isInProbation)
+        {
+            trackedPoint.isInProbation = true;
+            trackedPoint.probationFrameCount = 0;
+            trackedPoint.failedTestCount = 0;
+        }
+    }
+
     void PointProcessor::validateAndUpdateTrackedPoint(TrackingMatrices& matrices,
                                                        ScalingCoordinateMapper& scalingMapper,
                                                        TrackedPoint& trackedPoint,
@@ -404,12 +414,7 @@ namespace sensekit { namespace plugins { namespace hand {
         }
         else
         {
-            if (!trackedPoint.isInProbation)
-            {
-                trackedPoint.isInProbation = true;
-                trackedPoint.probationFrameCount = 0;
-                trackedPoint.failedTestCount = 0;
-            }
+            start_probation(trackedPoint);
             if (activeFailedTests || candidateFailedTests)
             {
                 ++trackedPoint.failedTestCount;
@@ -418,22 +423,25 @@ namespace sensekit { namespace plugins { namespace hand {
 
         if (trackedPoint.isInProbation)
         {
+            bool exitProbation = false;
             if (trackedPoint.pointType == TrackedPointType::ActivePoint)
             {
                 if (trackedPoint.failedTestCount >= m_maxFailedTestsInProbationActivePoints)
                 {
                     //gave the active point a few extra frames to recover
                     trackedPoint.trackingStatus = TrackingStatus::Lost;
+                    exitProbation = true;
                 }
             }
             else if (trackedPoint.failedTestCount >= m_maxFailedTestsInProbation)
             {
                 //too many failed tests, so long...
                 trackedPoint.trackingStatus = TrackingStatus::Dead;
+                exitProbation = true;
             }
 
             ++trackedPoint.probationFrameCount;
-            if (trackedPoint.probationFrameCount > m_probationFrameCount)
+            if (trackedPoint.probationFrameCount > m_probationFrameCount || exitProbation)
             {
                 //you're out of probation, but we're keeping an eye on you...
                 trackedPoint.isInProbation = false;
@@ -614,6 +622,9 @@ namespace sensekit { namespace plugins { namespace hand {
 
                         m_logger.trace("createCycle: Recovered #%d",
                                         trackedPoint.trackingId);
+                        
+                        //it could be faulty recovery, so start out in probation just like a new point
+                        start_probation(trackedPoint);
                     }
                     trackedPoint.trackingStatus = TrackingStatus::Tracking;
                     existingPoint = true;
@@ -631,6 +642,7 @@ namespace sensekit { namespace plugins { namespace hand {
             newPoint.trackingStatus = TrackingStatus::Tracking;
             ++m_nextTrackingId;
             m_trackedPoints.push_back(newPoint);
+            start_probation(newPoint);
         }
     }
 }}}

@@ -61,7 +61,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                       const cv::Point3f& newWorldPosition,
                                                       const float resizeFactor,
                                                       const CoordinateMapper& fullSizeMapper);
-
+        void start_probation(TrackedPoint& trackedPoint);
         PluginLogger& m_logger;
         float m_segmentationBandwidthDepthNear;
         float m_segmentationBandwidthDepthFar;
