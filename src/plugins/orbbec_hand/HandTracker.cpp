@@ -18,18 +18,20 @@ namespace sensekit { namespace plugins { namespace hand {
 
         HandTracker::HandTracker(PluginServiceProxy& pluginService,
                                  Sensor& streamset,
-                                 StreamDescription& depthDescription,
+                                 StreamDescription& depthDesc,
                                  PluginLogger& pluginLogger) :
             m_pluginService(pluginService),
             m_logger(pluginLogger),
-            m_pointProcessor(pluginLogger),
             m_depthUtility(PROCESSING_SIZE_WIDTH, PROCESSING_SIZE_HEIGHT),
-            m_reader(streamset.create_reader()),
-            m_depthStream(nullptr)
+            m_pointProcessor(pluginLogger),
+            m_reader(streamset.create_reader())
         {
             create_streams(pluginService, streamset);
 
-            subscribe_to_depth_stream(streamset, depthDescription);
+            m_depthStream = m_reader.stream<DepthStream>(depthDesc.get_subtype());
+            m_depthStream.start();
+
+            m_reader.addListener(*this);
         }
 
         HandTracker::~HandTracker()
@@ -47,14 +49,6 @@ namespace sensekit { namespace plugins { namespace hand {
                                                               PROCESSING_SIZE_WIDTH,
                                                               PROCESSING_SIZE_HEIGHT,
                                                               bytesPerPixel);
-        }
-
-        void HandTracker::subscribe_to_depth_stream(Sensor& streamset, StreamDescription& depthDescription)
-        {
-            m_depthStream = m_reader.stream<DepthStream>(depthDescription.get_subtype());
-            m_depthStream.start();
-
-            m_reader.addListener(*this);
         }
 
         void HandTracker::on_frame_ready(StreamReader& reader, Frame& frame)

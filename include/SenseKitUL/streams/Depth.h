@@ -73,6 +73,11 @@ namespace sensekit {
     class DepthStream : public DataStream
     {
     public:
+        DepthStream() :
+            m_depthStream(nullptr),
+            m_coordinateMapper(nullptr)
+        { }
+
         explicit DepthStream(sensekit_streamconnection_t connection)
             : DataStream(connection),
               m_depthStream(reinterpret_cast<sensekit_depthstream_t>(connection)),
