@@ -94,7 +94,7 @@ if (MSVC)
         PATTERN ".gitignore" EXCLUDE
         )
 
-    install(CODE "file(REMOVE_RECURSE ${PROJECT_BINARY_DIR}/temp/)")
+    install(CODE "file(REMOVE_RECURSE ${SAMPLES_BUILD_TEMP_DIR})")
 else()
     install(FILES ${PROJECT_SOURCE_DIR}/samples-aux/README.txt
       DESTINATION .
