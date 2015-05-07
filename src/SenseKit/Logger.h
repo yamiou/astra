@@ -16,6 +16,8 @@ namespace sensekit {
             : m_loggerName(loggerName)
         {
             el::Loggers::getLogger(loggerName);
+            el::Loggers::addFlag(el::LoggingFlag::HierarchicalLogging);
+            el::Loggers::setLoggingLevel(el::Level::Fatal);
         }
 
         Logger()
