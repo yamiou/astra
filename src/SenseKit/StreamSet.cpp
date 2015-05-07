@@ -4,6 +4,11 @@
 
 namespace sensekit {
 
+    StreamSet::StreamSet()
+    { }
+    StreamSet::~StreamSet()
+    { }
+
     StreamConnection* StreamSet::create_stream_connection(const sensekit_stream_desc_t& desc)
     {
         Stream* stream = find_stream_by_type_subtype_impl(desc.type, desc.subtype);

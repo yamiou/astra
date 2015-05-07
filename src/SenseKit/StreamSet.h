@@ -12,6 +12,8 @@ namespace sensekit {
     class StreamSet
     {
     public:
+        StreamSet();
+        ~StreamSet();
         StreamConnection* create_stream_connection(const sensekit_stream_desc_t& desc);
 
         bool destroy_stream_connection(StreamConnection* connection);

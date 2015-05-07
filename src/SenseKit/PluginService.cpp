@@ -21,24 +21,21 @@ namespace sensekit
     {
         //TODO: normally would create a new streamset
 
-        StreamSet* actualStreamSet = &m_context.get_rootSet();
-        streamSet = actualStreamSet->get_handle();
-
-        m_logger.info("creating streamset: %x", streamSet);
+        streamSet = m_context.get_rootSet().get_handle();
+        
+        m_logger.info("creating streamset: %x (placeholder)", streamSet);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
     sensekit_status_t PluginService::destroy_stream_set(sensekit_streamset_t& streamSet)
     {
-        StreamSet* actualStreamSet = StreamSet::get_ptr(streamSet);
-
         //TODO: if we were not hard coding the rootset in create_stream_set...
         //if streamset has direct child streams, return error
         //if streamset has child streamsets, reparent them to this streamset's parent (or null parent)
         //then delete the streamset
 
-        m_logger.info("destroying streamset: %x", streamSet);
+        m_logger.info("destroying streamset: %x (placeholder)", streamSet);
 
         streamSet = nullptr;
 
@@ -116,8 +113,8 @@ namespace sensekit
 
         //TODO refactor this mess
 
-        StreamSet* set = &m_context.get_rootSet();
-        sensekit_streamset_t setHandle = set->get_handle();
+        StreamSet& set = m_context.get_rootSet();
+        sensekit_streamset_t setHandle = set.get_handle();
 
         Stream* stream = Stream::get_ptr(streamHandle);
         const sensekit_stream_desc_t& desc = stream->get_description();
@@ -126,7 +123,7 @@ namespace sensekit
 
         m_streamRemovingSignal.raise(setHandle, streamHandle, desc);
 
-        set->destroy_stream(stream);
+        set.destroy_stream(stream);
 
         streamHandle = nullptr;
 
