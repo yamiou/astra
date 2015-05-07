@@ -74,6 +74,7 @@ namespace sensekit { namespace plugins { namespace hand {
         //erode to eliminate single pixel velocity artifacts
         m_matDepthVelErode = cv::abs(m_matDepthVel);
         cv::erode(m_matDepthVelErode, m_matDepthVelErode, m_rectElement);
+        cv::dilate(m_matDepthVelErode, m_matDepthVelErode, m_rectElement);
 
         thresholdVelocitySignal(matVelocitySignal,
                                 m_matDepthVelErode,
