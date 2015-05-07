@@ -169,7 +169,7 @@ namespace sensekit { namespace plugins { namespace hand {
             float* avgRow = matDepthAvg.ptr<float>(y);
             uint8_t* filledDepthMaskRow = matDepthFilledMask.ptr<uint8_t>(y);
 
-            for (int x = 0; x < width; ++x)
+            for (int x = 0; x < width; ++x, ++depthRow, ++prevDepthRow, ++filledDepthMaskRow)
             {
                 float depth = *depthRow;
                 float previousDepth = *prevDepthRow;
@@ -188,9 +188,8 @@ namespace sensekit { namespace plugins { namespace hand {
 
                 //suppress signal when a pixel jumps a long distance from near to far
                 bool isJumpingAway = (absDeltaPercent > maxDepthJumpPercent && movingAway);
-                bool isFarDepth = (depth == farDepth || previousDepth == farDepth);
-
-                if (isZeroDepth || isFilled || isJumpingAway || isFarDepth)
+                
+                if (isZeroDepth || isFilled || isJumpingAway)
                 {
                     //set the average to the current depth, and set velocity to zero
                     //this suppresses the velocity signal for edge jumping artifacts
@@ -198,10 +197,6 @@ namespace sensekit { namespace plugins { namespace hand {
                 }
 
                 *prevDepthRow = depth;
-
-                ++depthRow;
-                ++prevDepthRow;
-                ++filledDepthMaskRow;
             }
         }
     }
