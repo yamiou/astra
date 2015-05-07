@@ -22,17 +22,17 @@ namespace samples { namespace common {
             m_ambientColor = {30, 30, 30};
         }
 
-        void set_light_color(sensekit_rgb_pixel_t color)
+        void set_light_color(const sensekit_rgb_pixel_t& color)
         {
             m_lightColor = color;
         }
 
-        void set_light_direction(sensekit_vector3f_t direction)
+        void set_light_direction(const sensekit_vector3f_t& direction)
         {
             m_lightVector = cvector_to_vector(direction);
         }
 
-        void set_ambient_color(sensekit_rgb_pixel_t color)
+        void set_ambient_color(const sensekit_rgb_pixel_t& color)
         {
             m_ambientColor = color;
         }
