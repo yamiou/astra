@@ -17,9 +17,9 @@ namespace samples { namespace common {
         LitDepthVisualizer(DepthStream depthStream)
             : m_depthStream(depthStream)
         {
-            m_lightColor = {210,210,210};
-            m_lightVector = {0.44022, -0.17609, 0.88045};;
-            m_ambientColor = {30,30,30};
+            m_lightColor = {210, 210, 210};
+            m_lightVector = {0.44022f, -0.17609f, 0.88045f};
+            m_ambientColor = {30, 30, 30};
         }
 
         void set_light_color(sensekit_rgb_pixel_t color)
