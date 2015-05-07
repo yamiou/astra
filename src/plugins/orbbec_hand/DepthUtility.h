@@ -30,12 +30,10 @@ namespace sensekit { namespace plugins { namespace hand {
             Normal = 0,
             Filled = 1
         };
-        static void depthFrameToMat(DepthFrame& depthFrameSrc, 
-                                    const int width, 
-                                    const int height, 
-                                    const float maxDepth, 
-                                    cv::Mat& matTarget,
-                                    const float farDepth);
+        static void depthFrameToMat(DepthFrame& depthFrameSrc,
+                                    const int width,
+                                    const int height,
+                                    cv::Mat& matTarget);
 
         static void fillZeroValues(cv::Mat& matDepth,
                                    cv::Mat& matDepthFilled,
@@ -46,8 +44,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                              cv::Mat& depthPrev,
                                              cv::Mat& depthAvg,
                                              cv::Mat& matDepthFilledMask,
-                                             const float maxDepthJumpPercent,
-                                             const float farDepth);
+                                             const float maxDepthJumpPercent);
 
         void thresholdVelocitySignal(cv::Mat& matVelocitySignal,
                                      cv::Mat& matVelocityFiltered,
@@ -70,8 +67,6 @@ namespace sensekit { namespace plugins { namespace hand {
         float m_velocityThresholdFactor;
         float m_maxDepthJumpPercent;
         int m_erodeSize;
-        float m_maxDepth;
-        float m_farDepth;
         float m_maxVel{ 0 };
     };
 }}}

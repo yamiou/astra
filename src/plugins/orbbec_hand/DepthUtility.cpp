@@ -9,11 +9,9 @@ namespace sensekit { namespace plugins { namespace hand {
         m_processingWidth(width),
         m_processingHeight(height),
         m_depthSmoothingFactor(0.05),
-        m_velocityThresholdFactor(0.02),
+        m_velocityThresholdFactor(0.08),
         m_maxDepthJumpPercent(0.1),
-        m_erodeSize(1),
-        m_maxDepth(4000),
-        m_farDepth(10000)
+        m_erodeSize(1)
     {
         m_rectElement = cv::getStructuringElement(cv::MORPH_RECT,
                                                   cv::Size(m_erodeSize * 2 + 1, m_erodeSize * 2 + 1),
@@ -47,7 +45,7 @@ namespace sensekit { namespace plugins { namespace hand {
         matDepth.create(m_processingHeight, m_processingWidth, CV_32FC1);
         matVelocitySignal = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_8UC1);
 
-        depthFrameToMat(depthFrame, width, height, m_maxDepth, matDepthFullSize, m_farDepth);
+        depthFrameToMat(depthFrame, width, height, matDepthFullSize);
 
         //convert to the target processing size with nearest neighbor
 
@@ -64,8 +62,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                  m_matDepthPrevious,
                                  m_matDepthAvg,
                                  m_matDepthFilledMask,
-                                 m_maxDepthJumpPercent,
-                                 m_farDepth);
+                                 m_maxDepthJumpPercent);
 
         //current minus average, scaled by average = velocity as a percent change
 
@@ -84,9 +81,7 @@ namespace sensekit { namespace plugins { namespace hand {
     void DepthUtility::depthFrameToMat(DepthFrame& depthFrameSrc, 
                                        const int width, 
                                        const int height, 
-                                       const float maxDepth,
-                                       cv::Mat& matTarget,
-                                       const float farDepth)
+                                       cv::Mat& matTarget)
     {
         //ensure initialized
         matTarget.create(height, width, CV_32FC1);
@@ -99,10 +94,6 @@ namespace sensekit { namespace plugins { namespace hand {
             for (int x = 0; x < width; ++x)
             {
                 float depth = static_cast<float>(*depthData);
-                if (depth > maxDepth)
-                {
-                    depth = farDepth;
-                }
                 *row = depth;
                 ++row;
                 ++depthData;
@@ -155,8 +146,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                 cv::Mat& matDepthPrevious,
                                                 cv::Mat& matDepthAvg,
                                                 cv::Mat& matDepthFilledMask,
-                                                const float maxDepthJumpPercent,
-                                                const float farDepth)
+                                                const float maxDepthJumpPercent)
     {
         int width = matDepth.cols;
         int height = matDepth.rows;
@@ -232,6 +222,6 @@ namespace sensekit { namespace plugins { namespace hand {
                 }
             }
         }
-        //printf("max vel: %f\n", m_maxVel);
+        printf("max vel: %f\n", m_maxVel);
     }
 }}}
