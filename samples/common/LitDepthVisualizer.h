@@ -47,172 +47,39 @@ namespace samples { namespace common {
         sensekit_rgb_pixel_t* get_output() { return m_outputBuffer.get(); }
 
     private:
-        Vector3f* m_normalMap{nullptr};
-        Vector3f* m_blurNormalMap{nullptr};
-
+        using VectorMapPtr = std::unique_ptr<Vector3f[]>;
+        VectorMapPtr m_positionMap{nullptr};
+        VectorMapPtr m_normalMap{nullptr};
+        VectorMapPtr m_blurNormalMap{nullptr};
         size_t m_normalMapLength{0};
-        Vector3f m_lightVector;
 
+        Vector3f m_lightVector;
         unsigned int m_blurRadius{1};
         sensekit_rgb_pixel_t m_lightColor;
         sensekit_rgb_pixel_t m_ambientColor;
+
         size_t m_outputWidth;
         size_t m_outputHeight;
         size_t m_outputByteLength;
+
         using BufferPtr = std::unique_ptr<sensekit_rgb_pixel_t[]>;
         BufferPtr m_outputBuffer{nullptr};
-        sensekit::DepthStream  m_depthStream;
 
-        void init_buffer(size_t width, size_t height);
+        sensekit::DepthStream m_depthStream;
+
+        void prepare_buffer(size_t width, size_t height);
         void calculate_normals(DepthFrame& frame);
     };
 
-    void LitDepthVisualizer::calculate_normals(DepthFrame& frame)
+    void box_blur(const Vector3f* in,
+                  Vector3f* out,
+                  const size_t width,
+                  const size_t height,
+                  const int blurRadius = 1)
     {
-        const short* depthData;
-        size_t depthLength;
-
-        depthData = frame.data();
-        depthLength = frame.byteLength();
-        const CoordinateMapper& mapper = m_depthStream.coordinateMapper();
-
-        int depthWidth = frame.resolutionX();
-        int depthHeight = frame.resolutionY();
-
-        int numPixels = depthWidth * depthHeight;
-        if (m_normalMap == nullptr || m_normalMapLength != numPixels)
+        for (size_t y = blurRadius; y < height - blurRadius; y++)
         {
-            m_normalMap = new Vector3f[numPixels];
-            m_blurNormalMap = new Vector3f[numPixels];
-            memset(m_blurNormalMap, 0, sizeof(Vector3f)*numPixels);
-            m_normalMapLength = numPixels;
-        }
-
-        Vector3f* normMap = m_normalMap;
-
-        //top row
-        for (int x = 0; x < depthWidth; ++x)
-        {
-            *normMap = Vector3f();
-            ++normMap;
-        }
-
-        for (int y = 1; y < depthHeight - 1; ++y)
-        {
-            //first pixel at start of row
-            *normMap = Vector3f();
-            ++normMap;
-
-            for (int x = 1; x < depthWidth - 1; ++x)
-            {
-                int index = x + y * depthWidth;
-                int rightIndex = index + 1;
-                int leftIndex = index - 1;
-                int upIndex = index - depthWidth;
-                int downIndex = index + depthWidth;
-
-                int16_t depth = *(depthData + index);
-                int16_t depthLeft = *(depthData + leftIndex);
-                int16_t depthRight = *(depthData + rightIndex);
-                int16_t depthUp = *(depthData + upIndex);
-                int16_t depthDown = *(depthData + downIndex);
-
-                Vector3f normAvg;
-
-                if (depth != 0 && depthRight != 0 && depthDown != 0)
-                {
-                    float worldX1, worldY1, worldZ1;
-                    float worldX2, worldY2, worldZ2;
-                    float worldX3, worldY3, worldZ3;
-                    mapper.convert_depth_to_world(x, y, depth, &worldX1, &worldY1, &worldZ1);
-                    mapper.convert_depth_to_world(x + 1, y, depthRight, &worldX2, &worldY2, &worldZ2);
-                    mapper.convert_depth_to_world(x, y + 1, depthDown, &worldX3, &worldY3, &worldZ3);
-
-                    Vector3f v1 = Vector3f(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
-                    Vector3f v2 = Vector3f(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
-
-                    Vector3f norm = v2.cross(v1);
-                    normAvg.x += norm.x;
-                    normAvg.y += norm.y;
-                    normAvg.z += norm.z;
-                }
-
-                if (depth != 0 && depthRight != 0 && depthUp != 0)
-                {
-                    float worldX1, worldY1, worldZ1;
-                    float worldX2, worldY2, worldZ2;
-                    float worldX3, worldY3, worldZ3;
-                    mapper.convert_depth_to_world(x, y, depth, &worldX1, &worldY1, &worldZ1);
-                    mapper.convert_depth_to_world(x, y - 1, depthUp, &worldX2, &worldY2, &worldZ2);
-                    mapper.convert_depth_to_world(x + 1, y, depthRight, &worldX3, &worldY3, &worldZ3);
-
-                    Vector3f v1 = Vector3f(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
-                    Vector3f v2 = Vector3f(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
-
-                    Vector3f norm = v2.cross(v1);
-
-                    normAvg.x += norm.x;
-                    normAvg.y += norm.y;
-                    normAvg.z += norm.z;
-                }
-
-                if (depth != 0 && depthLeft != 0 && depthUp != 0)
-                {
-                    float worldX1, worldY1, worldZ1;
-                    float worldX2, worldY2, worldZ2;
-                    float worldX3, worldY3, worldZ3;
-                    mapper.convert_depth_to_world(x, y, depth, &worldX1, &worldY1, &worldZ1);
-                    mapper.convert_depth_to_world(x - 1, y, depthLeft, &worldX2, &worldY2, &worldZ2);
-                    mapper.convert_depth_to_world(x, y - 1, depthUp, &worldX3, &worldY3, &worldZ3);
-
-                    Vector3f v1 = Vector3f(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
-                    Vector3f v2 = Vector3f(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
-
-                    Vector3f norm = v2.cross(v1);
-
-                    normAvg.x += norm.x;
-                    normAvg.y += norm.y;
-                    normAvg.z += norm.z;
-                }
-
-                if (depth != 0 && depthLeft != 0 && depthDown != 0)
-                {
-                    float worldX1, worldY1, worldZ1;
-                    float worldX2, worldY2, worldZ2;
-                    float worldX3, worldY3, worldZ3;
-                    mapper.convert_depth_to_world(x, y, depth, &worldX1, &worldY1, &worldZ1);
-                    mapper.convert_depth_to_world(x, y + 1, depthDown, &worldX2, &worldY2, &worldZ2);
-                    mapper.convert_depth_to_world(x - 1, y, depthLeft, &worldX3, &worldY3, &worldZ3);
-
-                    Vector3f v1 = Vector3f(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
-                    Vector3f v2 = Vector3f(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
-
-                    Vector3f norm = v2.cross(v1);
-
-                    normAvg.x += norm.x;
-                    normAvg.y += norm.y;
-                    normAvg.z += norm.z;
-                }
-
-                *normMap = Vector3f::normalize(normAvg);
-                ++normMap;
-            }
-            //last pixel at end of row
-            *normMap = Vector3f();
-            ++normMap;
-        }
-        //bottom row
-        for (int x = 0; x < depthWidth; ++x)
-        {
-            *normMap = Vector3f();
-            ++normMap;
-        }
-
-        const int blurRadius = m_blurRadius;
-        //box blur
-        for (int y = blurRadius; y < depthHeight - blurRadius; y++)
-        {
-            for (int x = blurRadius; x < depthWidth - blurRadius; x++)
+            for (size_t x = blurRadius; x < width - blurRadius; x++)
             {
                 Vector3f normAvg;
 
@@ -220,21 +87,160 @@ namespace samples { namespace common {
                 {
                     for (int dx = -blurRadius; dx <= blurRadius; dx++)
                     {
-                        int index = x + dx + (y + dy) * depthWidth;
-                        Vector3f norm = *(m_normalMap + index);
+                        size_t index = x + dx + (y + dy) * width;
+                        Vector3f norm = in[index];
 
                         normAvg.x += norm.x;
                         normAvg.y += norm.y;
                         normAvg.z += norm.z;
                     }
                 }
-                int centerIndex = x + y*depthWidth;
-                *(m_blurNormalMap + centerIndex) = Vector3f::normalize(normAvg);
+
+                const size_t centerIndex = x + y * width;
+                out[centerIndex] = Vector3f::normalize(normAvg);
             }
         }
     }
 
-    void LitDepthVisualizer::init_buffer(size_t width, size_t height)
+    void LitDepthVisualizer::calculate_normals(DepthFrame& frame)
+    {
+        const short* depthData = frame.data();
+        const CoordinateMapper& mapper = m_depthStream.coordinateMapper();
+        const size_t depthLength = frame.byteLength();
+
+        const int depthWidth = frame.resolutionX();
+        const int depthHeight = frame.resolutionY();
+
+        const int numPixels = depthWidth * depthHeight;
+
+        if (m_normalMap == nullptr || m_normalMapLength != numPixels)
+        {
+            m_positionMap = std::make_unique<Vector3f[]>(numPixels);
+            m_normalMap = std::make_unique<Vector3f[]>(numPixels);
+            m_blurNormalMap = std::make_unique<Vector3f[]>(numPixels);
+
+            std::fill(m_blurNormalMap.get(), m_blurNormalMap.get() + numPixels, Vector3f::zero);
+
+            m_normalMapLength = numPixels;
+        }
+
+        Vector3f* positionMap = m_positionMap.get();
+
+        for (int y = 0; y < depthHeight; y++)
+        {
+            for(int x = 0; x < depthWidth; x++)
+            {
+                const size_t index = x + y * depthWidth;
+                const uint16_t depth = depthData[index];
+
+                if (depth == 0)
+                    continue;
+
+                positionMap[index] = mapper.convert_depth_to_world(Vector3f(x,y, depthData[index]));
+            }
+        }
+
+        Vector3f* normMap = m_normalMap.get();
+
+        //top row
+        for (int x = 0; x < depthWidth; ++x)
+        {
+            *normMap = Vector3f::zero;
+            ++normMap;
+        }
+
+        for (int y = 1; y < depthHeight - 1; ++y)
+        {
+            //first pixel at start of row
+            *normMap = Vector3f::zero;
+            ++normMap;
+
+            for (int x = 1; x < depthWidth - 1; ++x)
+            {
+                size_t index = x + y * depthWidth;
+                size_t rightIndex = index + 1;
+                size_t leftIndex = index - 1;
+                size_t upIndex = index - depthWidth;
+                size_t downIndex = index + depthWidth;
+
+                int16_t depth = depthData[index];
+                int16_t depthLeft = depthData[leftIndex];
+                int16_t depthRight = depthData[rightIndex];
+                int16_t depthUp = depthData[upIndex];
+                int16_t depthDown = depthData[downIndex];
+
+                Vector3f normAvg;
+
+                if (depth != 0)
+                {
+                    if (depthRight != 0 && depthDown != 0)
+                    {
+                        Vector3f v1 = positionMap[rightIndex] - positionMap[index];
+                        Vector3f v2 = positionMap[downIndex] - positionMap[index];
+
+                        Vector3f norm = v2.cross(v1);
+                        normAvg.x += norm.x;
+                        normAvg.y += norm.y;
+                        normAvg.z += norm.z;
+                    }
+
+                    if (depthRight != 0 && depthUp != 0)
+                    {
+                        Vector3f v1 = positionMap[upIndex] - positionMap[index];
+                        Vector3f v2 = positionMap[rightIndex] - positionMap[index];
+
+                        Vector3f norm = v2.cross(v1);
+
+                        normAvg.x += norm.x;
+                        normAvg.y += norm.y;
+                        normAvg.z += norm.z;
+                    }
+
+                    if (depthLeft != 0 && depthUp != 0)
+                    {
+                        Vector3f v1 = positionMap[leftIndex] - positionMap[index];
+                        Vector3f v2 = positionMap[upIndex] - positionMap[index];
+
+                        Vector3f norm = v2.cross(v1);
+
+                        normAvg.x += norm.x;
+                        normAvg.y += norm.y;
+                        normAvg.z += norm.z;
+                    }
+
+                    if (depthLeft != 0 && depthDown != 0)
+                    {
+                        Vector3f v1 = positionMap[downIndex] - positionMap[index];
+                        Vector3f v2 = positionMap[leftIndex] - positionMap[index];
+
+                        Vector3f norm = v2.cross(v1);
+
+                        normAvg.x += norm.x;
+                        normAvg.y += norm.y;
+                        normAvg.z += norm.z;
+                    }
+                }
+
+                *normMap = Vector3f::normalize(normAvg);
+                ++normMap;
+            }
+
+            //last pixel at end of row
+            *normMap = Vector3f::zero;
+            ++normMap;
+        }
+
+        //bottom row
+        for (int x = 0; x < depthWidth; ++x)
+        {
+            *normMap = Vector3f::zero;
+            ++normMap;
+        }
+
+        box_blur(m_normalMap.get(), m_blurNormalMap.get(), depthWidth, depthHeight, m_blurRadius);
+    }
+
+    void LitDepthVisualizer::prepare_buffer(size_t width, size_t height)
     {
         if (m_outputBuffer == nullptr || width != m_outputWidth || height != m_outputHeight)
         {
@@ -242,50 +248,49 @@ namespace samples { namespace common {
             m_outputHeight = height;
             m_outputBuffer = std::make_unique<sensekit_rgb_pixel_t[]>(m_outputWidth * m_outputHeight);
         }
+
+        std::fill(m_outputBuffer.get(), m_outputBuffer.get()+m_outputWidth*m_outputHeight, sensekit_rgb_pixel_t{0,0,0});
     }
 
     void LitDepthVisualizer::update(sensekit::DepthFrame& frame)
     {
         calculate_normals(frame);
 
-        int depthWidth = frame.resolutionX();
-        int depthHeight = frame.resolutionY();
+        const size_t depthWidth = frame.resolutionX();
+        const size_t depthHeight = frame.resolutionY();
 
-        init_buffer(depthWidth, depthHeight);
-        std::fill(m_outputBuffer.get(), m_outputBuffer.get()+m_outputWidth*m_outputHeight, sensekit_rgb_pixel_t{0,0,0});
+        prepare_buffer(depthWidth, depthHeight);
 
-        const short* pDepthRow;
-        size_t depthLength;
-
-        pDepthRow = frame.data();
-        depthLength = frame.byteLength();
-
+        const short* depthRowPtr = frame.data();
+        const size_t depthLength = frame.byteLength();
         const CoordinateMapper& mapper = m_depthStream.coordinateMapper();
 
-        sensekit_rgb_pixel_t* pTexRow = m_outputBuffer.get();
-        int rowSize = depthWidth;
+        sensekit_rgb_pixel_t* textureRowPtr = m_outputBuffer.get();
 
-        Vector3f* normMap = m_blurNormalMap;
-        bool showNormMap = normMap != nullptr;
+        const Vector3f* normMap = m_blurNormalMap.get();
+        const bool useNormalMap = normMap != nullptr;
 
         for (int y = 0; y < depthHeight; ++y)
         {
-            const short* pDepth = pDepthRow;
-            sensekit_rgb_pixel_t* pTex = pTexRow;
+            const short* depthPtr = depthRowPtr;
+            sensekit_rgb_pixel_t* texturePtr = textureRowPtr;
 
-            for (int x = 0; x < depthWidth; ++x, ++pDepth, ++normMap, ++pTex)
+            for (int x = 0; x < depthWidth; ++x, ++depthPtr, ++normMap, ++texturePtr)
             {
-                int16_t depth = *pDepth;
+                int16_t depth = *depthPtr;
 
                 Vector3f norm(1,0,0);
-                if (showNormMap)
+
+                if (useNormalMap)
                 {
                     norm = *normMap;
                 }
+
                 if (!norm.is_zero())
                 {
-                    float fadeFactor = 1 - 0.6*std::max(0.0f, std::min(1.0f, ((depth - 400) / 3200.0f)));
-                    float diffuseFactor = norm.dot(m_lightVector);
+                    const float fadeFactor = 1 - 0.6*std::max(0.0f, std::min(1.0f, ((depth - 400) / 3200.0f)));
+                    const float diffuseFactor = norm.dot(m_lightVector);
+
                     sensekit_rgb_pixel_t diffuseColor;
 
                     if (diffuseFactor > 0)
@@ -302,14 +307,14 @@ namespace samples { namespace common {
                         diffuseColor.b = 0;
                     }
 
-                    pTex->r = std::max(0, std::min(255, (int)(fadeFactor*(m_ambientColor.r + diffuseColor.r))));
-                    pTex->g = std::max(0, std::min(255, (int)(fadeFactor*(m_ambientColor.g + diffuseColor.g))));
-                    pTex->b = std::max(0, std::min(255, (int)(fadeFactor*(m_ambientColor.b + diffuseColor.b))));
+                    texturePtr->r = std::max(0, std::min(255, (int)(fadeFactor*(m_ambientColor.r + diffuseColor.r))));
+                    texturePtr->g = std::max(0, std::min(255, (int)(fadeFactor*(m_ambientColor.g + diffuseColor.g))));
+                    texturePtr->b = std::max(0, std::min(255, (int)(fadeFactor*(m_ambientColor.b + diffuseColor.b))));
                 }
             }
 
-            pDepthRow += rowSize;
-            pTexRow += m_outputWidth;
+            depthRowPtr += depthWidth;
+            textureRowPtr += m_outputWidth;
         }
     }
 }}
