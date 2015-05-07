@@ -22,12 +22,11 @@ namespace sensekit { namespace plugins { namespace hand {
                                  PluginLogger& pluginLogger) :
             m_pluginService(pluginService),
             m_logger(pluginLogger),
+            m_pointProcessor(pluginLogger),
             m_depthUtility(PROCESSING_SIZE_WIDTH, PROCESSING_SIZE_HEIGHT),
             m_reader(streamset.create_reader()),
             m_depthStream(nullptr)
         {
-            m_pointProcessor = std::make_unique<PointProcessor>(m_logger);
-
             create_streams(pluginService, streamset);
 
             subscribe_to_depth_stream(streamset, depthDescription);
@@ -133,14 +132,14 @@ namespace sensekit { namespace plugins { namespace hand {
                                             debugLayersEnabled,
                                             m_depthStream.coordinateMapper());
 
-            m_pointProcessor->initialize_common_calculations(updateMatrices);
+            m_pointProcessor.initialize_common_calculations(updateMatrices);
 
             //Update existing points first so that if we lose a point, we might recover it in the "add new" stage below
             //without having at least one frame of a lost point.
 
-            m_pointProcessor->updateTrackedPoints(updateMatrices);
+            m_pointProcessor.updateTrackedPoints(updateMatrices);
 
-            m_pointProcessor->removeDuplicatePoints();
+            m_pointProcessor.removeDuplicatePoints();
 
             TrackingMatrices createMatrices(matDepthFullSize,
                                             matDepth,
@@ -164,7 +163,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 cv::Point nextSearchStart(0, 0);
                 while (segmentation::find_next_velocity_seed_pixel(matVelocitySignal, m_createForegroundSearched, seedPosition, nextSearchStart))
                 {
-                    m_pointProcessor->updateTrackedPointOrCreateNewPointFromSeedPosition(createMatrices, seedPosition);
+                    m_pointProcessor.updateTrackedPointOrCreateNewPointFromSeedPosition(createMatrices, seedPosition);
                 }
             }
             else
@@ -173,14 +172,14 @@ namespace sensekit { namespace plugins { namespace hand {
                 int x = MAX(0, MIN(PROCESSING_SIZE_WIDTH, normPosition.x * PROCESSING_SIZE_WIDTH));
                 int y = MAX(0, MIN(PROCESSING_SIZE_HEIGHT, normPosition.y * PROCESSING_SIZE_HEIGHT));
                 cv::Point seedPosition(x, y);
-                m_pointProcessor->updateTrackedPointOrCreateNewPointFromSeedPosition(createMatrices, seedPosition);
+                m_pointProcessor.updateTrackedPointOrCreateNewPointFromSeedPosition(createMatrices, seedPosition);
 
-                float area = m_pointProcessor->get_point_area(createMatrices, seedPosition);
+                float area = m_pointProcessor.get_point_area(createMatrices, seedPosition);
                 float depth = matDepth.at<float>(seedPosition);
                 float edgeDist = m_layerEdgeDistance.at<float>(seedPosition);
 
-                float foregroundRadius1 = m_pointProcessor->foregroundRadius1();
-                float foregroundRadius2 = m_pointProcessor->foregroundRadius2();
+                float foregroundRadius1 = m_pointProcessor.foregroundRadius1();
+                float foregroundRadius2 = m_pointProcessor.foregroundRadius2();
 
                 auto mapper = get_scaling_mapper(createMatrices);
                 float percentForeground1 = segmentation::get_percent_foreground_along_circumference(matDepth,
@@ -201,7 +200,7 @@ namespace sensekit { namespace plugins { namespace hand {
             }
 
             //remove old points
-            m_pointProcessor->removeOldOrDeadPoints();
+            m_pointProcessor.removeOldOrDeadPoints();
 
             TrackingMatrices refinementMatrices(matDepthFullSize,
                                                 m_matDepthWindow,
@@ -218,7 +217,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                 false,
                                                 m_depthStream.coordinateMapper());
 
-            m_pointProcessor->update_full_resolution_points(refinementMatrices);
+            m_pointProcessor.update_full_resolution_points(refinementMatrices);
         }
 
         void HandTracker::generate_hand_frame(sensekit_frame_index_t frameIndex)
@@ -230,7 +229,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 handFrame->frame.handpoints = reinterpret_cast<sensekit_handpoint_t*>(&(handFrame->frame_data));
                 handFrame->frame.handCount = SENSEKIT_HANDS_MAX_HAND_COUNT;
 
-                update_hand_frame(m_pointProcessor->get_trackedPoints(), handFrame->frame);
+                update_hand_frame(m_pointProcessor.get_trackedPoints(), handFrame->frame);
 
                 m_handStream->end_write();
             }
@@ -361,8 +360,8 @@ namespace sensekit { namespace plugins { namespace hand {
                 mark_image_pixel(imageFrame, color, p);
             };
 
-            float foregroundRadius1 = m_pointProcessor->foregroundRadius1();
-            float foregroundRadius2 = m_pointProcessor->foregroundRadius2();
+            float foregroundRadius1 = m_pointProcessor.foregroundRadius1();
+            float foregroundRadius2 = m_pointProcessor.foregroundRadius2();
 
             segmentation::visit_circle_circumference(m_matDepth, cv::Point(x, y), foregroundRadius1, mapper, callback);
             segmentation::visit_circle_circumference(m_matDepth, cv::Point(x, y), foregroundRadius2, mapper, callback);

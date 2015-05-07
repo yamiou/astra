@@ -58,7 +58,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         DepthUtility m_depthUtility; 
         PluginLogger& m_logger;
-        std::unique_ptr<PointProcessor> m_pointProcessor;
+        PointProcessor m_pointProcessor;
 
         int m_width;
         int m_height;
