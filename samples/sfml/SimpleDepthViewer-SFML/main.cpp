@@ -2,6 +2,7 @@
 #include <Sensekit/SenseKit.h>
 #include <SensekitUL/SenseKitUL.h>
 #include "../../common/LitDepthVisualizer.h"
+#include <chrono>
 #include <iostream>
 #include <iomanip>
 
