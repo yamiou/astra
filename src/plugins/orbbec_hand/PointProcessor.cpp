@@ -19,7 +19,6 @@ namespace sensekit { namespace plugins { namespace hand {
         m_areaBandwidthDepth(100),       //mm
         m_maxSegmentationDist(250),     //mm
         m_steadyDeadBandRadius(150),    //mm
-        m_maxJumpDist(250),             //mm
         m_targetEdgeDistance(40),       //mm
         m_heightScoreFactor(0.5),
         m_depthScoreFactor(2.0),

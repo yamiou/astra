@@ -76,7 +76,6 @@ namespace sensekit { namespace plugins { namespace hand {
         float m_areaBandwidthDepth;
         float m_maxSegmentationDist;
         float m_steadyDeadBandRadius;
-        float m_maxJumpDist;
         float m_targetEdgeDistance;
         float m_heightScoreFactor;
         float m_depthScoreFactor;
