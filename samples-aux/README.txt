@@ -1,4 +1,4 @@
-SenseKit SDK v0.1.5 for Windows
+SenseKit SDK v0.1.6 for Windows
 Copyright (c) 2015 Orbbec
 
 ALPHA - NOT FOR PUBLIC DISTRIBUTION
@@ -7,6 +7,8 @@ josh@orbbec3d.com
 
 What's New
 ==========
+
+v0.1.6 2015/05/07 Further improvement in hand tracking. Should have fewer false positive hands and much easier to lock hand tracking: simply hold your hand up for a second. (If farther away, may need to move the hand a little bit.) Hand tracking colors have been updated to be green for tracking and red for lost points.
 
 v0.1.5 2015/04/28 Significant improvement in the hand tracker, now including full resolution depth refinement, hand point smoothing, and text id labels in the hand viewer apps. All of the hand tracker parameters have been tuned for better performance. Hand points now are near the center or upper-center of the hand. Note - to lock on to hands, the hand tracker currently requires your hand to move consistently for about two seconds. The easiest way is to move your hand forward and back a few times. Note - hand viewer samples now require Inconsolata.otf, which is included in the vs2013/thirdparty/copy_to_bin_dir/ directory.
 
@@ -73,8 +75,7 @@ Known issues
 plug in a sensor after the program starts and it should detect it and continue. 
 Repeated hotplugging (in and out) does not work though.
 
-2) The color sample may crash if the sensor has no color stream. 
-It may or may not work for sensors that do have a color stream.
+2) The color sample will only display a blank white window for sensors that do have a color stream.
 
 3) If a sample crashes or you stop debugging before it cleans itself up nicely, the sensor driver 
 may be put into a weird state. Before the next run you may need to replug the sensor or turn the sensor 

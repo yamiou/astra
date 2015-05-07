@@ -6,7 +6,7 @@ project (SenseKit)
 string (TIMESTAMP BUILD_DATE "%Y%m%dT%H%M%SZ" UTC)
 set (SenseKit_VERSION_MAJOR 0)
 set (SenseKit_VERSION_MINOR 1)
-set (SenseKit_VERSION_PATCH 5)
+set (SenseKit_VERSION_PATCH 6)
 set (SenseKit_VERSION_BUILD 0)
 
 if (NOT WIN32)
