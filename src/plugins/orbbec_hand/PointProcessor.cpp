@@ -90,6 +90,7 @@ namespace sensekit { namespace plugins { namespace hand {
         TrackingData updateTrackingData(matrices,
                                         seedPosition,
                                         referenceDepth,
+                                        trackedPoint.referenceAreaSqrt,
                                         m_segmentationBandwidthDepthNear,
                                         m_segmentationBandwidthDepthFar,
                                         trackedPoint.pointType,
@@ -265,6 +266,12 @@ namespace sensekit { namespace plugins { namespace hand {
     {
         assert(trackedPoint.pointType == TrackedPointType::ActivePoint);
 
+        float referenceDepth = trackedPoint.worldPosition.z;
+        if (referenceDepth == 0)
+        {
+            return trackedPoint.fullSizePosition;
+        }
+
         int fullWidth = matrices.depthFullSize.cols;
         int fullHeight = matrices.depthFullSize.rows;
         int processingWidth = matrices.depth.cols;
@@ -296,11 +303,12 @@ namespace sensekit { namespace plugins { namespace hand {
 
         cv::Point roiPosition(fullSizeX - windowLeft, fullSizeY - windowTop);
 
-        float referenceDepth = trackedPoint.worldPosition.z;
+        float referenceAreaSqrt = matrices.areaSqrt.at<float>(roiPosition);
 
         TrackingData refinementTrackingData(matrices,
                                             roiPosition,
                                             referenceDepth,
+                                            referenceAreaSqrt,
                                             m_segmentationBandwidthDepthNear,
                                             m_segmentationBandwidthDepthFar,
                                             TrackedPointType::ActivePoint,
@@ -434,6 +442,7 @@ namespace sensekit { namespace plugins { namespace hand {
             trackedPoint.worldDeltaPosition = deltaPosition;
 
             trackedPoint.position = newTargetPoint;
+            trackedPoint.referenceAreaSqrt = matrices.areaSqrt.at<float>(trackedPoint.position);
 
             auto steadyDist = cv::norm(worldPosition - trackedPoint.steadyWorldPosition);
 
@@ -526,22 +535,24 @@ namespace sensekit { namespace plugins { namespace hand {
             //Cannot expect to properly segment when the seedPosition has zero depth
             return;
         }
+        float referenceAreaSqrt = matrices.areaSqrt.at<float>(seedPosition);
 
-        TrackingData trackingData(matrices,
-                                  seedPosition,
-                                  referenceDepth,
-                                  m_segmentationBandwidthDepthNear,
-                                  m_segmentationBandwidthDepthFar,
-                                  TrackedPointType::CandidatePoint,
-                                  m_iterationMaxInitial,
-                                  m_maxSegmentationDist,
-                                  VELOCITY_POLICY_RESET_TTL,
-                                  m_edgeDistanceScoreFactor,
-                                  m_targetEdgeDistance,
-                                  m_pointInertiaFactor,
-                                  m_pointInertiaRadius);
+        TrackingData createTrackingData(matrices,
+                                        seedPosition,
+                                        referenceDepth,
+                                        referenceAreaSqrt,
+                                        m_segmentationBandwidthDepthNear,
+                                        m_segmentationBandwidthDepthFar,
+                                        TrackedPointType::CandidatePoint,
+                                        m_iterationMaxInitial,
+                                        m_maxSegmentationDist,
+                                        VELOCITY_POLICY_RESET_TTL,
+                                        m_edgeDistanceScoreFactor,
+                                        m_targetEdgeDistance,
+                                        m_pointInertiaFactor,
+                                        m_pointInertiaRadius);
 
-        cv::Point targetPoint = segmentation::converge_track_point_from_seed(trackingData);
+        cv::Point targetPoint = segmentation::converge_track_point_from_seed(createTrackingData);
         
         bool validPointInRange = test_point_in_range(matrices, targetPoint, TrackingStatus::NotTracking, -1);
 
@@ -586,6 +597,8 @@ namespace sensekit { namespace plugins { namespace hand {
                     {
                         //Recover a lost point -- move it to the recovery position
                         trackedPoint.position = targetPoint;
+                        trackedPoint.referenceAreaSqrt = matrices.areaSqrt.at<float>(trackedPoint.position);
+
                         trackedPoint.worldPosition = worldPosition;
                         trackedPoint.worldDeltaPosition = cv::Point3f();
 

@@ -24,6 +24,7 @@ namespace sensekit { namespace plugins { namespace hand {
         int probationFrameCount;
         TrackedPointType pointType;
         TrackingStatus trackingStatus;
+        float referenceAreaSqrt;
 
         TrackedPoint(cv::Point position, cv::Point3f worldPosition, int trackingId) :
             position(position),
@@ -40,7 +41,8 @@ namespace sensekit { namespace plugins { namespace hand {
             isInProbation(true),
             probationFrameCount(0),
             pointType(TrackedPointType::CandidatePoint),
-            trackingStatus(TrackingStatus::NotTracking)
+            trackingStatus(TrackingStatus::NotTracking),
+            referenceAreaSqrt(0)
         { }
     };
 }}}

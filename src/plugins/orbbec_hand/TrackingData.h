@@ -121,6 +121,7 @@ namespace sensekit { namespace plugins { namespace hand {
         TrackingMatrices& matrices;
         const cv::Point& seedPosition;
         const float referenceDepth;
+        const float referenceAreaSqrt;
         const float bandwidthDepthNear;
         const float bandwidthDepthFar;
         const TrackedPointType pointType;
@@ -135,6 +136,7 @@ namespace sensekit { namespace plugins { namespace hand {
         TrackingData(TrackingMatrices& matrices,
                      const cv::Point& seedPosition,
                      const float referenceDepth,
+                     const float referenceAreaSqrt,
                      const float bandwidthDepthNear,
                      const float bandwidthDepthFar,
                      const TrackedPointType pointType,
@@ -148,6 +150,7 @@ namespace sensekit { namespace plugins { namespace hand {
             : matrices(matrices),
               seedPosition(seedPosition),
               referenceDepth(referenceDepth),
+              referenceAreaSqrt(referenceAreaSqrt),
               bandwidthDepthNear(bandwidthDepthNear),
               bandwidthDepthFar(bandwidthDepthFar),
               pointType(pointType),

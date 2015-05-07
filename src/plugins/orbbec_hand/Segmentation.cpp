@@ -68,10 +68,10 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         const float minDepth = data.referenceDepth - data.bandwidthDepthNear;
         const float maxDepth = data.referenceDepth + data.bandwidthDepthFar;
         const float maxSegmentationDist = data.maxSegmentationDist;
+        const float referenceAreaSqrt = data.referenceAreaSqrt;
         cv::Mat& depthMatrix = data.matrices.depth;
         cv::Mat& searchedMatrix = data.matrices.foregroundSearched;
-        cv::Mat& areaSqrtMatrix = data.matrices.areaSqrt;
-
+        
         std::queue<PointTTL> pointQueue;
 
         pointQueue.push(PointTTL(data.seedPosition, maxSegmentationDist));
@@ -100,7 +100,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 return p;
             }
 
-            ttlRef -= areaSqrtMatrix.at<float>(p);
+            ttlRef -= referenceAreaSqrt;
 
             enqueue_neighbors(matVisited, pointQueue, pt);
         }
@@ -113,9 +113,9 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         const float& maxSegmentationDist = data.maxSegmentationDist;
         const SegmentationVelocityPolicy& velocitySignalPolicy = data.velocityPolicy;
         const float seedDepth = data.matrices.depth.at<float>(data.seedPosition);
+        const float referenceAreaSqrt = data.referenceAreaSqrt;
         cv::Mat& depthMatrix = data.matrices.depth;
         cv::Mat& velocitySignalMatrix = data.matrices.velocitySignal;
-        cv::Mat& areaSqrtMatrix = data.matrices.areaSqrt;
         cv::Mat& segmentationMatrix = data.matrices.layerSegmentation;
         cv::Mat& searchedMatrix = data.matrices.foregroundSearched;
 
@@ -169,7 +169,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             searchedMatrix.at<char>(p) = PixelType::Searched;
             segmentationMatrix.at<char>(p) = PixelType::Foreground;
 
-            ttlRef -= areaSqrtMatrix.at<float>(p);
+            ttlRef -= referenceAreaSqrt;
 
             enqueue_neighbors(matVisited, pointQueue, pt);
         }
