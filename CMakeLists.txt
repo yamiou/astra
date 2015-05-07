@@ -63,10 +63,6 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
   PATTERN ".gitignore" EXCLUDE
   )
 
-install(FILES ${PROJECT_SOURCE_DIR}/samples-aux/README.txt
-  DESTINATION .
-  )
-
 if (MSVC)
 
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013
@@ -77,6 +73,15 @@ if (MSVC)
 
     set(SAMPLES_SOURCE_DIR "${PROJECT_BINARY_DIR}/sdk/samples")
     set(SAMPLES_BUILD_TEMP_DIR "${PROJECT_BINARY_DIR}/temp/vs2013/")
+
+    configure_file("${PROJECT_SOURCE_DIR}/samples-aux/README.txt"
+                "${PROJECT_BINARY_DIR}/temp/README.txt"
+                @ONLY
+                NEWLINE_STYLE CRLF)
+
+    install(FILES ${PROJECT_BINARY_DIR}/temp/README.txt
+    DESTINATION .
+    )
 
     configure_file("${PROJECT_SOURCE_DIR}/InstallVS.txt.in"
                    "${PROJECT_SOURCE_DIR}/InstallVS.txt"
@@ -89,8 +94,11 @@ if (MSVC)
         PATTERN ".gitignore" EXCLUDE
         )
 
-    install(CODE "file(REMOVE_RECURSE ${SAMPLES_BUILD_TEMP_DIR})")
-
+    install(CODE "file(REMOVE_RECURSE ${PROJECT_BINARY_DIR}/temp/)")
+else()
+    install(FILES ${PROJECT_SOURCE_DIR}/samples-aux/README.txt
+      DESTINATION .
+      )
 endif()
 
 set(CPACK_PACKAGE_NAME "SenseKitSDK")
