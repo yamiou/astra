@@ -27,7 +27,7 @@ namespace sensekit { namespace plugins { namespace hand {
         m_pointInertiaFactor(50.0),
         m_pointInertiaRadius(60),       //mm
         m_maxInactiveFramesToBeConsideredActive(10),
-        m_minActiveFramesToLockTracking(60),
+        m_minActiveFramesToLockTracking(30),
         m_maxInactiveFramesForCandidatePoints(60),
         m_maxInactiveFramesForLostPoints(240),
         m_maxInactiveFramesForActivePoints(480),
@@ -423,7 +423,8 @@ namespace sensekit { namespace plugins { namespace hand {
             }
         }
 
-        if (passSomeTests && trackedPoint.trackingStatus == TrackingStatus::Tracking)
+        //if (passSomeTests && trackedPoint.trackingStatus == TrackingStatus::Tracking)
+        if (passAllTests)
         {
             float depth = matrices.depth.at<float>(newTargetPoint);
             cv::Point3f worldPosition = scalingMapper.convert_depth_to_world(newTargetPoint.x, newTargetPoint.y, depth);
