@@ -110,7 +110,7 @@ namespace sensekit { namespace plugins { namespace hand {
             m_refineForegroundSearched = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_debugUpdateScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_debugCreateScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-            m_matDepthWindow = cv::Mat::zeros(m_matDepth.size(), CV_32FC1);
+            m_matDepthWindow = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_refineSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_refineScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_refineEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);

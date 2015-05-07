@@ -12,7 +12,6 @@ namespace sensekit { namespace plugins { namespace hand {
         m_velocityThresholdFactor(0.02),
         m_maxDepthJumpPercent(0.1),
         m_erodeSize(1),
-        m_maxVel(0),
         m_maxDepth(4000),
         m_farDepth(10000)
     {

@@ -70,9 +70,9 @@ namespace sensekit { namespace plugins { namespace hand {
         float m_velocityThresholdFactor;
         float m_maxDepthJumpPercent;
         int m_erodeSize;
-        float m_maxVel;
         float m_maxDepth;
         float m_farDepth;
+        float m_maxVel{ 0 };
     };
 }}}
 
