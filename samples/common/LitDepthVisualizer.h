@@ -16,7 +16,11 @@ namespace samples { namespace common {
     public:
         LitDepthVisualizer(DepthStream depthStream)
             : m_depthStream(depthStream)
-        {}
+        {
+            m_lightColor = {210,210,210};
+            m_lightVector = {0.44022, -0.17609, 0.88045};;
+            m_ambientColor = {30,30,30};
+        }
 
         void set_light_color(sensekit_rgb_pixel_t color)
         {
@@ -47,11 +51,11 @@ namespace samples { namespace common {
         Vector3f* m_blurNormalMap{nullptr};
 
         size_t m_normalMapLength{0};
-        Vector3f m_lightVector{0.44022, -0.17609, 0.88045};
+        Vector3f m_lightVector;
 
         unsigned int m_blurRadius{1};
-        sensekit_rgb_pixel_t m_lightColor{210,210,210};
-        sensekit_rgb_pixel_t m_ambientColor{30,30,30};
+        sensekit_rgb_pixel_t m_lightColor;
+        sensekit_rgb_pixel_t m_ambientColor;
         size_t m_outputWidth;
         size_t m_outputHeight;
         size_t m_outputByteLength;
