@@ -1,5 +1,6 @@
 #include "StreamBackend.h"
 #include "StreamBin.h"
+#include <algorithm>
 
 namespace sensekit {
 

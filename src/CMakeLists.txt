@@ -23,13 +23,19 @@ add_custom_target(${_projname} ALL
 add_dependencies(SenseKit ${_projname})
 add_dependencies(SenseKitUL ${_projname})
 add_dependencies(SenseKitAPI ${_projname})
-add_dependencies(dummy_plugin ${_projname})
 add_dependencies(openni_sensor ${_projname})
-add_dependencies(orbbec_hand ${_projname})
+
+if (NOT ANDROID)
+  add_dependencies(dummy_plugin ${_projname})
+  add_dependencies(orbbec_hand ${_projname})
+endif()
 
 add_dependencies(${SDK_DEPENDENT_TARGET} SenseKit)
 add_dependencies(${SDK_DEPENDENT_TARGET} SenseKitUL)
 add_dependencies(${SDK_DEPENDENT_TARGET} SenseKitAPI)
-add_dependencies(${SDK_DEPENDENT_TARGET} dummy_plugin)
 add_dependencies(${SDK_DEPENDENT_TARGET} openni_sensor)
-add_dependencies(${SDK_DEPENDENT_TARGET} orbbec_hand)
+
+if (NOT ANDROID)
+  add_dependencies(${SDK_DEPENDENT_TARGET} dummy_plugin)
+  add_dependencies(${SDK_DEPENDENT_TARGET} orbbec_hand)
+endif()
