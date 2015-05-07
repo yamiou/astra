@@ -37,8 +37,11 @@ namespace sensekit { namespace plugins { namespace hand {
         m_foregroundRadius1(100),
         m_foregroundRadius2(150),
         m_foregroundRadiusMaxPercent1(.35),
-        m_foregroundRadiusMaxPercent2(.15)
-    {}
+        m_foregroundRadiusMaxPercent2(.15),
+        m_maxFailedTestsInProbation(5),
+        m_probationFrameCount(30),
+        m_maxFailedTestsInProbationActivePoints(2)
+        {}
 
     PointProcessor::~PointProcessor()
     {}
@@ -354,7 +357,9 @@ namespace sensekit { namespace plugins { namespace hand {
                                                        TrackedPoint& trackedPoint,
                                                        const cv::Point& newTargetPoint)
     {
-        bool updatedPoint = false;
+        assert(trackedPoint.trackingStatus != TrackingStatus::Dead);
+
+        auto oldStatus = trackedPoint.trackingStatus;
 
         bool validPointInRange = test_point_in_range(matrices, newTargetPoint, trackedPoint.trackingStatus, trackedPoint.trackingId);
         bool validPointArea = false;
@@ -366,10 +371,60 @@ namespace sensekit { namespace plugins { namespace hand {
             validRadiusTest = test_foreground_radius_percentage(matrices, newTargetPoint, trackedPoint.trackingStatus, trackedPoint.trackingId);
         }
 
-        if (validPointInRange && validPointArea && validRadiusTest)
+        bool passAllTests = validPointInRange && validPointArea && validRadiusTest;
+        bool passSomeTests = validPointInRange && (validPointArea || validRadiusTest);
+        bool activeFailedTests = trackedPoint.pointType == TrackedPointType::ActivePoint && !passSomeTests;
+        bool candidateFailedTests = trackedPoint.pointType == TrackedPointType::CandidatePoint && !passAllTests;
+
+        if (passAllTests)
         {
-            updatedPoint = true;
-            
+            trackedPoint.trackingStatus = TrackingStatus::Tracking;
+            if (trackedPoint.pointType == TrackedPointType::ActivePoint)
+            {
+                trackedPoint.failedTestCount = 0;
+            }
+        }
+        else
+        {
+            if (!trackedPoint.isInProbation)
+            {
+                trackedPoint.isInProbation = true;
+                trackedPoint.probationFrameCount = 0;
+                trackedPoint.failedTestCount = 0;
+            }
+            if (activeFailedTests || candidateFailedTests)
+            {
+                ++trackedPoint.failedTestCount;
+            }
+        }
+
+        if (trackedPoint.isInProbation)
+        {
+            if (trackedPoint.pointType == TrackedPointType::ActivePoint)
+            {
+                if (trackedPoint.failedTestCount >= m_maxFailedTestsInProbationActivePoints)
+                {
+                    //gave the active point a few extra frames to recover
+                    trackedPoint.trackingStatus = TrackingStatus::Lost;
+                }
+            }
+            else if (trackedPoint.failedTestCount >= m_maxFailedTestsInProbation)
+            {
+                //too many failed tests, so long...
+                trackedPoint.trackingStatus = TrackingStatus::Dead;
+            }
+
+            ++trackedPoint.probationFrameCount;
+            if (trackedPoint.probationFrameCount > m_probationFrameCount)
+            {
+                //you're out of probation, but we're keeping an eye on you...
+                trackedPoint.isInProbation = false;
+                trackedPoint.failedTestCount = 0;
+            }
+        }
+
+        if (passSomeTests && trackedPoint.trackingStatus == TrackingStatus::Tracking)
+        {
             float depth = matrices.depth.at<float>(newTargetPoint);
             cv::Point3f worldPosition = scalingMapper.convert_depth_to_world(newTargetPoint.x, newTargetPoint.y, depth);
 
@@ -389,25 +444,15 @@ namespace sensekit { namespace plugins { namespace hand {
 
             if (trackedPoint.inactiveFrameCount < m_maxInactiveFramesToBeConsideredActive)
             {
-                trackedPoint.activeFrameCount++;
-                if (trackedPoint.activeFrameCount > m_minActiveFramesToLockTracking)
+                ++trackedPoint.activeFrameCount;
+                if (trackedPoint.activeFrameCount > m_minActiveFramesToLockTracking && 
+                    !trackedPoint.isInProbation)
                 {
                     trackedPoint.pointType = TrackedPointType::ActivePoint;
                 }
             }
         }
 
-        assert(trackedPoint.trackingStatus != TrackingStatus::Dead);
-
-        auto oldStatus = trackedPoint.trackingStatus;
-        if (updatedPoint)
-        {
-            trackedPoint.trackingStatus = TrackingStatus::Tracking;
-        }
-        else
-        {
-            trackedPoint.trackingStatus = TrackingStatus::Lost;
-        }
         if (trackedPoint.trackingStatus != oldStatus)
         {
             m_logger.trace("validateAndUpdateTrackedPoint: #%d status %s --> status %s", 
