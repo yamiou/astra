@@ -7,7 +7,7 @@ namespace sensekit { namespace plugins { namespace hand {
     PointProcessor::PointProcessor(PluginLogger& pluginLogger) :
         m_logger(pluginLogger),
         m_segmentationBandwidthDepthNear(500), //mm
-        m_segmentationBandwidthDepthFar(150),  //mm
+        m_segmentationBandwidthDepthFar(100),  //mm
         m_maxMatchDistLostActive(500),  //mm
         m_maxMatchDistDefault(200),     //mm
         m_iterationMaxInitial(1),
@@ -16,7 +16,7 @@ namespace sensekit { namespace plugins { namespace hand {
         m_minArea(0),                   //mm^2
         m_maxArea(30000),               //mm^2
         m_areaBandwidth(250),           //mm
-        m_areaBandwidthDepth(150),      //mm
+        m_areaBandwidthDepth(100),       //mm
         m_maxSegmentationDist(250),     //mm
         m_steadyDeadBandRadius(150),    //mm
         m_maxJumpDist(250),             //mm
