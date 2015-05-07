@@ -85,7 +85,8 @@ namespace sensekit { namespace plugins { namespace hand {
         }
         void overlayMask(const cv::Mat& matMask,
                          _sensekit_imageframe& imageFrame,
-                         const RGBPixel& maskColor)
+                         const RGBPixel& maskColor,
+                         const PixelType targetValue)
         {
             assert(matMask.cols == imageFrame.metadata.width);
             assert(matMask.rows == imageFrame.metadata.height);
@@ -103,7 +104,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 {
                     uint8_t maskValue = *maskRow;
                     
-                    if (maskValue != PixelType::Background)
+                    if (maskValue == targetValue)
                     {
                         *colorData = maskColor;
                     }

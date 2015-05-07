@@ -91,7 +91,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 continue;
             }
 
-            searchedMatrix.at<char>(p) = PixelType::Searched;
+            searchedMatrix.at<char>(p) = PixelType::SearchedFromOutOfRange;
 
             float depth = depthMatrix.at<float>(p);
             bool pointInRange = depth != 0 && depth > minDepth && depth < maxDepth;

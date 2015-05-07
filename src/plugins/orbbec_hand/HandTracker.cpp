@@ -374,6 +374,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
             RGBPixel foregroundColor(0, 0, 255);
             RGBPixel searchedColor(128, 255, 0);
+            RGBPixel searchedColor2(0, 128, 255);
 
             DebugHandViewType view = m_debugImageStream->view_type();
 
@@ -440,14 +441,16 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 if (view == DEBUG_HAND_VIEW_CREATE_SEARCHED)
                 {
-                    m_debugVisualizer.overlayMask(m_createForegroundSearched, colorFrame, searchedColor);
+                    m_debugVisualizer.overlayMask(m_createForegroundSearched, colorFrame, searchedColor, PixelType::Searched);
+                    m_debugVisualizer.overlayMask(m_createForegroundSearched, colorFrame, searchedColor2, PixelType::SearchedFromOutOfRange);
                 }
                 else if (view == DEBUG_HAND_VIEW_UPDATE_SEARCHED)
                 {
-                    m_debugVisualizer.overlayMask(m_updateForegroundSearched, colorFrame, searchedColor);
+                    m_debugVisualizer.overlayMask(m_updateForegroundSearched, colorFrame, searchedColor, PixelType::Searched);
+                    m_debugVisualizer.overlayMask(m_updateForegroundSearched, colorFrame, searchedColor2, PixelType::SearchedFromOutOfRange);
                 }
 
-                m_debugVisualizer.overlayMask(m_matVelocitySignal, colorFrame, foregroundColor);
+                m_debugVisualizer.overlayMask(m_matVelocitySignal, colorFrame, foregroundColor, PixelType::Foreground);
             }
 
             if (m_debugImageStream->use_mouse_probe())
