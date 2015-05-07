@@ -40,7 +40,7 @@ namespace sensekit { namespace plugins { namespace hand {
         m_foregroundRadiusMaxPercent2(.15),
         m_maxFailedTestsInProbation(5),
         m_probationFrameCount(30),
-        m_maxFailedTestsInProbationActivePoints(2)
+        m_maxFailedTestsInProbationActivePoints(6)
         {}
 
     PointProcessor::~PointProcessor()
