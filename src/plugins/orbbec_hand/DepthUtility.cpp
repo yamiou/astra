@@ -65,7 +65,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                  m_matDepthPrevious,
                                  m_matDepthAvg,
                                  m_matDepthFilledMask,
-                                 m_maxDepthJumpPercent);
+                                 m_maxDepthJumpPercent,
+                                 m_farDepth);
 
         //current minus average, scaled by average = velocity as a percent change
 
@@ -155,7 +156,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                                 cv::Mat& matDepthPrevious,
                                                 cv::Mat& matDepthAvg,
                                                 cv::Mat& matDepthFilledMask,
-                                                const float maxDepthJumpPercent)
+                                                const float maxDepthJumpPercent,
+                                                const float farDepth)
     {
         int width = matDepth.cols;
         int height = matDepth.rows;
@@ -186,8 +188,9 @@ namespace sensekit { namespace plugins { namespace hand {
 
                 //suppress signal when a pixel jumps a long distance from near to far
                 bool isJumpingAway = (absDeltaPercent > maxDepthJumpPercent && movingAway);
+                bool isFarDepth = (depth == farDepth || previousDepth == farDepth);
 
-                if (isZeroDepth || isFilled || isJumpingAway)
+                if (isZeroDepth || isFilled || isJumpingAway || isFarDepth)
                 {
                     //set the average to the current depth, and set velocity to zero
                     //this suppresses the velocity signal for edge jumping artifacts

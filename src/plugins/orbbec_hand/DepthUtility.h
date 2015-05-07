@@ -46,7 +46,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                              cv::Mat& depthPrev,
                                              cv::Mat& depthAvg,
                                              cv::Mat& matDepthFilledMask,
-                                             const float maxDepthJumpPercent);
+                                             const float maxDepthJumpPercent,
+                                             const float farDepth);
 
         void thresholdVelocitySignal(cv::Mat& matVelocitySignal,
                                      cv::Mat& matVelocityFiltered,
