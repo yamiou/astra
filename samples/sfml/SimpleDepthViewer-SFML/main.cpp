@@ -2,6 +2,8 @@
 #include <Sensekit/SenseKit.h>
 #include <SensekitUL/SenseKitUL.h>
 #include "../../common/LitDepthVisualizer.h"
+#include <iostream>
+#include <iomanip>
 
 class DepthFrameListener : public sensekit::FrameReadyListener
 {
@@ -9,7 +11,7 @@ public:
     DepthFrameListener(sensekit::DepthStream& depthStream)
         : m_visualizerPtr(new samples::common::LitDepthVisualizer(depthStream))
     {
-        //    m_visualizerPtr->set_light_color(sensekit_rgb_pixel_t{255,0,0});
+        m_lastTimepoint = clock_type::now();
     }
 
     void init_texture(int width, int height)
@@ -19,7 +21,7 @@ public:
             m_displayWidth = width;
             m_displayHeight = height;
 
-            // texture is RGBA
+            // texture is REBA
             int byteLength = m_displayWidth * m_displayHeight * 4;
 
             m_displayBuffer = BufferPtr(new uint8_t[byteLength]);
@@ -33,16 +35,24 @@ public:
 
     void check_fps()
     {
-        double fpsFactor = 0.02;
+        const double frameWeight = 0.2;
 
-        std::clock_t newTimepoint= std::clock();
-        long double frameDuration = (newTimepoint - m_lastTimepoint) / static_cast<long double>(CLOCKS_PER_SEC);
+        auto newTimepoint = clock_type::now();
+        auto frameDuration = std::chrono::duration_cast<duration_type>(newTimepoint - m_lastTimepoint);
 
-        m_frameDuration = frameDuration * fpsFactor + m_frameDuration * (1 - fpsFactor);
+        m_frameDuration = frameDuration * frameWeight + m_frameDuration * (1 - frameWeight);
         m_lastTimepoint = newTimepoint;
-        double fps = 1.0 / m_frameDuration;
 
-        printf("FPS: %3.1f (%3.4Lf ms)\n", fps, m_frameDuration * 1000);
+        double fps = 1.0 / m_frameDuration.count();
+
+        auto precision = std::cout.precision();
+        std::cout << std::fixed
+                  << std::setprecision(1)
+                  << fps << " fps ("
+                  << std::setprecision(2)
+                  << frameDuration.count() * 1000 << " ms)"
+                  << std::setprecision(precision)
+                  << std::endl;
     }
 
     virtual void on_frame_ready(sensekit::StreamReader& reader,
@@ -86,8 +96,11 @@ private:
     using VizPtr = std::unique_ptr<samples::common::LitDepthVisualizer>;
     VizPtr m_visualizerPtr;
 
-    long double m_frameDuration{ 0 };
-    std::clock_t m_lastTimepoint { 0 };
+    using duration_type = std::chrono::duration<double>;
+    duration_type m_frameDuration;
+
+    using clock_type = std::chrono::system_clock;
+    std::chrono::time_point<clock_type> m_lastTimepoint;
     sf::Texture m_texture;
     sf::Sprite m_sprite;
 
