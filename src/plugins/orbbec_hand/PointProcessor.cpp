@@ -237,17 +237,10 @@ namespace sensekit { namespace plugins { namespace hand {
             if (trackedPoint.trackingStatus == TrackingStatus::Tracking &&
                 trackedPoint.pointType == TrackedPointType::ActivePoint)
             {
-                cv::Point refinedPosition = get_refined_high_res_position(matrices, trackedPoint);
+                cv::Point3f refinedWorldPosition = get_refined_high_res_position(matrices, trackedPoint);
 
-                float refinedDepth = matrices.depthFullSize.at<float>(trackedPoint.fullSizePosition);
-
-                cv::Point3f worldPosition = cv_convert_depth_to_world(matrices.fullSizeMapper,
-                                                                      refinedPosition.x,
-                                                                      refinedPosition.y,
-                                                                      refinedDepth);
-
-                cv::Point3f smoothedWorldPosition = smooth_world_positions(trackedPoint.fullSizeWorldPosition, worldPosition);
-
+                cv::Point3f smoothedWorldPosition = smooth_world_positions(trackedPoint.fullSizeWorldPosition, refinedWorldPosition);
+                
                 update_tracked_point_from_world_position(trackedPoint,
                                                          smoothedWorldPosition,
                                                          resizeFactor,
@@ -261,7 +254,7 @@ namespace sensekit { namespace plugins { namespace hand {
         }
     }
 
-    cv::Point PointProcessor::get_refined_high_res_position(TrackingMatrices& matrices, 
+    cv::Point3f PointProcessor::get_refined_high_res_position(TrackingMatrices& matrices, 
                                                             const TrackedPoint& trackedPoint)
     {
         assert(trackedPoint.pointType == TrackedPointType::ActivePoint);
@@ -269,7 +262,7 @@ namespace sensekit { namespace plugins { namespace hand {
         float referenceDepth = trackedPoint.worldPosition.z;
         if (referenceDepth == 0)
         {
-            return trackedPoint.fullSizePosition;
+            return trackedPoint.worldPosition;
         }
 
         int fullWidth = matrices.depthFullSize.cols;
@@ -322,10 +315,27 @@ namespace sensekit { namespace plugins { namespace hand {
 
         cv::Point targetPoint = segmentation::converge_track_point_from_seed(refinementTrackingData);
 
+        if (targetPoint == segmentation::INVALID_POINT)
+        {
+            return trackedPoint.worldPosition;
+        }
+
         int refinedFullSizeX = targetPoint.x + windowLeft;
         int refinedFullSizeY = targetPoint.y + windowTop;
         
-        return cv::Point(refinedFullSizeX, refinedFullSizeY);
+        float refinedDepth = matrices.depthFullSize.at<float>(refinedFullSizeY, refinedFullSizeX);
+
+        if (refinedDepth == 0)
+        {
+            refinedDepth = trackedPoint.worldPosition.z;
+        }
+
+        cv::Point3f refinedWorldPosition = cv_convert_depth_to_world(matrices.fullSizeMapper,
+                                                                     refinedFullSizeX,
+                                                                     refinedFullSizeY,
+                                                                     refinedDepth);
+
+        return refinedWorldPosition;
     }
 
     cv::Point3f PointProcessor::smooth_world_positions(const cv::Point3f& oldWorldPosition, 

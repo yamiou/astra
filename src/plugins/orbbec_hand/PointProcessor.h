@@ -42,8 +42,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                 ScalingCoordinateMapper& scalingMapper,
                                 TrackedPoint& trackedPoint);
 
-        cv::Point get_refined_high_res_position(TrackingMatrices& matrices,
-                                                const TrackedPoint& trackedPoint);
+        cv::Point3f get_refined_high_res_position(TrackingMatrices& matrices,
+                                                  const TrackedPoint& trackedPoint);
 
         void validateAndUpdateTrackedPoint(TrackingMatrices& matrices,
                                            ScalingCoordinateMapper& scalingMapper,
