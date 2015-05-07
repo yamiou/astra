@@ -21,7 +21,7 @@ public:
             m_displayWidth = width;
             m_displayHeight = height;
 
-            // texture is REBA
+            // texture is RGBA
             int byteLength = m_displayWidth * m_displayHeight * 4;
 
             m_displayBuffer = BufferPtr(new uint8_t[byteLength]);
