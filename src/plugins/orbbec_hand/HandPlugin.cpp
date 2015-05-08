@@ -7,12 +7,10 @@ namespace sensekit { namespace plugins { namespace hand {
 
     HandPlugin::HandPlugin(PluginServiceProxy* pluginProxy)
         : PluginBase(pluginProxy)
-    {
-        
-    }
+    { }
 
     HandPlugin::~HandPlugin()
-    {}
+    { }
 
     void HandPlugin::on_initialize()
     {

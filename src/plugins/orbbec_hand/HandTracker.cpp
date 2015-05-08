@@ -35,8 +35,7 @@ namespace sensekit { namespace plugins { namespace hand {
         }
 
         HandTracker::~HandTracker()
-        {
-        }
+        { }
 
         void HandTracker::create_streams(PluginServiceProxy& pluginService, Sensor streamset)
         {
@@ -239,7 +238,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
                 sensekit_image_metadata_t metadata;
 
-                metadata.width = m_processingSizeHeight;
+                metadata.width = m_processingSizeWidth;
                 metadata.height = m_processingSizeHeight;
                 metadata.bytesPerPixel = 3;
 

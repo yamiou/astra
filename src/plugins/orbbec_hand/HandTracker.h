@@ -51,6 +51,9 @@ namespace sensekit { namespace plugins { namespace hand {
         DepthUtility m_depthUtility;
         PointProcessor m_pointProcessor;
         StreamReader m_reader;
+        float m_processingSizeWidth;
+        float m_processingSizeHeight;
+
         DepthStream m_depthStream;
 
         using ColorStreamPtr = std::unique_ptr <DebugHandStream> ;
@@ -88,9 +91,6 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat m_refineEdgeDistance;
 
         DebugVisualizer m_debugVisualizer;
-
-        float m_processingSizeWidth;
-        float m_processingSizeHeight;
     };
 
 }}}
