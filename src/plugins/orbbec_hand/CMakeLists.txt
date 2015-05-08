@@ -24,6 +24,7 @@ set(${_projname}_SOURCES
   HandPlugin.h
   HandSettings.h
   constants.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../SenseKit/vendor/cpptoml.h
 )
 
 find_package( OpenCV REQUIRED core imgproc)
