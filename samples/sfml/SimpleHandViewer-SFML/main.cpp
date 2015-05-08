@@ -333,7 +333,7 @@ private:
 
     int m_depthWidth { 0 };
     int m_depthHeight { 0 };
-    int m_maxTraceLength{ 60 };
+    int m_maxTraceLength{ 15 };
 };
 
 int main(int argc, char** argv)
