@@ -4,10 +4,49 @@
 #include "../../common/LitDepthVisualizer.h"
 #include <sstream>
 #include <iomanip>
+#include <deque>
+#include <unordered_map>
+
+class sfLine : public sf::Drawable
+{
+public:
+    sfLine(const sf::Vector2f& point1, const sf::Vector2f& point2, sf::Color color, float thickness) :
+        color(color), 
+        thickness(thickness)
+    {
+        sf::Vector2f direction = point2 - point1;
+        sf::Vector2f unitDirection = direction / std::sqrt(direction.x*direction.x + direction.y*direction.y);
+        sf::Vector2f unitPerpendicular(-unitDirection.y, unitDirection.x);
+
+        sf::Vector2f offset = (thickness / 2.f)*unitPerpendicular;
+
+        vertices[0].position = point1 + offset;
+        vertices[1].position = point2 + offset;
+        vertices[2].position = point2 - offset;
+        vertices[3].position = point1 - offset;
+
+        for (int i = 0; i<4; ++i)
+            vertices[i].color = color;
+    }
+
+    void draw(sf::RenderTarget &target, sf::RenderStates states) const
+    {
+        target.draw(vertices, 4, sf::Quads);
+    }
+
+
+private:
+    sf::Vertex vertices[4];
+    float thickness;
+    sf::Color color;
+};
 
 class HandFrameListener : public sensekit::FrameReadyListener
 {
 public:
+    using PointList = std::deque < sensekit::Vector2i >;
+    using PointMap = std::unordered_map < int, PointList >;
+
     HandFrameListener(sensekit::DepthStream& depthStream)
         : m_visualizerPtr(new samples::common::LitDepthVisualizer(depthStream))
     {
@@ -72,11 +111,61 @@ public:
         m_texture.update(m_displayBuffer.get());
     }
 
+    void updateHandTrace(int trackingId, const sensekit::Vector2i& position)
+    {
+        auto it = m_pointMap.find(trackingId);
+        if (it == m_pointMap.end())
+        {
+            PointList list;
+            for (int i = 0; i < m_maxTraceLength; i++)
+            {
+                list.push_back(position);
+            }
+            m_pointMap.insert(std::make_pair(trackingId, list));
+        }
+        else
+        {
+            PointList& list = it->second;
+            while (list.size() < m_maxTraceLength)
+            {
+                list.push_back(position);
+            }
+        }
+    }
+
+    void shortenHandTraces()
+    {
+        auto it = m_pointMap.begin();
+
+        while (it != m_pointMap.end())
+        {
+            PointList& list = it->second;
+            if (list.size() > 1)
+            {
+                list.pop_front();
+                ++it;
+            }
+            else
+            {
+                it = m_pointMap.erase(it);
+            }
+        }
+    }
+
     void processHandFrame(sensekit::Frame& frame)
     {
         sensekit::HandFrame handFrame = frame.get<sensekit::HandFrame>();
 
         m_handPoints = handFrame.handpoints();
+
+        shortenHandTraces();
+        for (auto handPoint : m_handPoints)
+        {
+            if (handPoint.status() == HAND_STATUS_TRACKING)
+            {
+                updateHandTrace(handPoint.trackingId(), handPoint.depthPosition());
+            }
+        }
     }
 
     virtual void on_frame_ready(sensekit::StreamReader& reader,
@@ -143,6 +232,32 @@ public:
         drawShadowText(window, label, sf::Color::White, x, y + radius + 10);
     }
 
+    void drawHandTrace(sf::RenderWindow& window, const PointList& pointList, const sf::Color& color, const float depthScale)
+    {
+        if (pointList.size() < 2)
+        {
+            return;
+        }
+
+        float thickness = 4;
+        auto it = pointList.begin();
+        
+        sensekit::Vector2i lastPoint = *it;
+        while (it != pointList.end())
+        {
+            sensekit::Vector2i currentPoint = *it;
+            ++it;
+
+            sf::Vector2f p1((lastPoint.x + 0.5) * depthScale,
+                            (lastPoint.y + 0.5) * depthScale);
+            sf::Vector2f p2((currentPoint.x + 0.5) * depthScale,
+                            (currentPoint.y + 0.5) * depthScale);
+            lastPoint = currentPoint;
+            sfLine line(p1, p2, color, thickness);
+            window.draw(line);
+        }
+    }
+
     void drawHandPoints(sf::RenderWindow& window, float depthScale)
     {
         float radius = 16;
@@ -167,6 +282,7 @@ public:
 
             float circleX = (p.x + 0.5) * depthScale;
             float circleY = (p.y + 0.5) * depthScale;
+
             drawCircle(window, radius, circleX, circleY, color);
 
             drawHandLabel(window, radius, circleX, circleY, handPoint);
@@ -174,6 +290,13 @@ public:
             {
                 drawHandPosition(window, radius, circleX, circleY, handPoint);
             }
+        }
+
+        sf::Color lineColor(0, 0, 255);
+        for (auto it : m_pointMap)
+        {
+            PointList& list = it.second;
+            drawHandTrace(window, list, lineColor, depthScale);
         }
     }
 
@@ -206,8 +329,11 @@ private:
 
     std::vector<sensekit::HandPoint> m_handPoints;
 
+    PointMap m_pointMap;
+
     int m_depthWidth { 0 };
     int m_depthHeight { 0 };
+    int m_maxTraceLength{ 60 };
 };
 
 int main(int argc, char** argv)
