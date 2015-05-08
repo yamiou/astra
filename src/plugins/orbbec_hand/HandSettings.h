@@ -6,9 +6,10 @@ namespace sensekit { namespace plugins { namespace hand {
     struct HandSettings
     {
         float depthSmoothingFactor{0.05};
-        float velocityThresholdFactor{0.08};
+        float velocityThresholdFactor{0.005};
         float maxDepthJumpPercent{0.1};
         int erodeSize{1};
+        float depthAdjustmentFactor{0.0025};
 
         int processingSizeWidth{160};
         int processingSizeHeight{120};

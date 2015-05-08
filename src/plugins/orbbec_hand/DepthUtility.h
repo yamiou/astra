@@ -46,10 +46,17 @@ namespace sensekit { namespace plugins { namespace hand {
                                              cv::Mat& depthAvg,
                                              cv::Mat& matDepthFilledMask,
                                              const float maxDepthJumpPercent);
-
-        void thresholdVelocitySignal(cv::Mat& matVelocitySignal,
-                                     cv::Mat& matVelocityFiltered,
+        void thresholdVelocitySignal(cv::Mat& matVelocityFiltered,
+                                     cv::Mat& matVelocitySignal,
                                      const float velocityThresholdFactor);
+
+        void adjust_velocities_for_depth(cv::Mat& matDepth,
+                                         cv::Mat& matVelocityFiltered);
+
+        int depth_to_chunk_index(float depth);
+
+        void analyze_velocities(cv::Mat& matDepth,
+                                cv::Mat& matVelocityFiltered);
 
         const float m_processingWidth;
         const float m_processingHeight;
@@ -68,7 +75,14 @@ namespace sensekit { namespace plugins { namespace hand {
         float m_velocityThresholdFactor;
         float m_maxDepthJumpPercent;
         int m_erodeSize;
-        float m_maxVel{ 0 };
+        float m_depthAdjustmentFactor;
+
+        static const int NUM_DEPTH_VEL_CHUNKS = 8;
+        const float MIN_CHUNK_DEPTH = 0;
+        const float MAX_CHUNK_DEPTH = 8000;
+        float m_velErodeFactor{ 0.98 };
+        float m_maxVel[NUM_DEPTH_VEL_CHUNKS];
+        float m_depthCount[NUM_DEPTH_VEL_CHUNKS];
     };
 }}}
 

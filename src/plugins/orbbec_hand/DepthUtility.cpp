@@ -11,7 +11,8 @@ namespace sensekit { namespace plugins { namespace hand {
         m_depthSmoothingFactor(settings.depthSmoothingFactor),
         m_velocityThresholdFactor(settings.velocityThresholdFactor),
         m_maxDepthJumpPercent(settings.maxDepthJumpPercent),
-        m_erodeSize(settings.erodeSize)
+        m_erodeSize(settings.erodeSize),
+        m_depthAdjustmentFactor(settings.depthAdjustmentFactor)
     {
         m_rectElement = cv::getStructuringElement(cv::MORPH_RECT,
                                                   cv::Size(m_erodeSize * 2 + 1, m_erodeSize * 2 + 1),
@@ -32,6 +33,11 @@ namespace sensekit { namespace plugins { namespace hand {
         m_matDepthAvg = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_32FC1);
         m_matDepthVel.create(m_processingHeight, m_processingWidth, CV_32FC1);
         m_matDepthVelErode.create(m_processingHeight, m_processingWidth, CV_32FC1);
+
+        for (int i = 0; i < NUM_DEPTH_VEL_CHUNKS; i++)
+        {
+            m_maxVel[i] = 0;
+        }
     }
 
     void DepthUtility::processDepthToVelocitySignal(DepthFrame& depthFrame,
@@ -68,14 +74,18 @@ namespace sensekit { namespace plugins { namespace hand {
 
         m_matDepthVel = (m_matDepthFilled - m_matDepthAvg) / m_matDepthAvg;
 
+        adjust_velocities_for_depth(matDepth, m_matDepthVel);
+
         //erode to eliminate single pixel velocity artifacts
         m_matDepthVelErode = cv::abs(m_matDepthVel);
         cv::erode(m_matDepthVelErode, m_matDepthVelErode, m_rectElement);
         cv::dilate(m_matDepthVelErode, m_matDepthVelErode, m_rectElement);
 
-        thresholdVelocitySignal(matVelocitySignal,
-                                m_matDepthVelErode,
+        thresholdVelocitySignal(m_matDepthVelErode,
+                                matVelocitySignal,
                                 m_velocityThresholdFactor);
+
+        //analyze_velocities(matDepth, m_matDepthVelErode);
     }
 
     void DepthUtility::depthFrameToMat(DepthFrame& depthFrameSrc, 
@@ -190,14 +200,13 @@ namespace sensekit { namespace plugins { namespace hand {
         }
     }
 
-    void DepthUtility::thresholdVelocitySignal(cv::Mat& matVelocitySignal,
-                                               cv::Mat& matVelocityFiltered,
+    void DepthUtility::thresholdVelocitySignal(cv::Mat& matVelocityFiltered,
+                                               cv::Mat& matVelocitySignal,
                                                const float velocityThresholdFactor)
     {
         int width = matVelocitySignal.cols;
         int height = matVelocitySignal.rows;
 
-        m_maxVel *= 0.98;
         for (int y = 0; y < height; ++y)
         {
             float* velFilteredRow = matVelocityFiltered.ptr<float>(y);
@@ -207,10 +216,6 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 //matVelocityFiltered is already abs(vel)
                 float velFiltered = *velFilteredRow;
-                if (velFiltered > m_maxVel)
-                {
-                    m_maxVel = velFiltered;
-                }
 
                 if (velFiltered > velocityThresholdFactor)
                 {
@@ -222,6 +227,104 @@ namespace sensekit { namespace plugins { namespace hand {
                 }
             }
         }
-        printf("max vel: %f\n", m_maxVel);
+    }
+
+    void DepthUtility::adjust_velocities_for_depth(cv::Mat& matDepth, cv::Mat& matVelocityFiltered)
+    {
+        if (m_depthAdjustmentFactor == 0)
+        {
+            return;
+        }
+
+        int width = matDepth.cols;
+        int height = matDepth.rows;
+
+        for (int y = 0; y < height; ++y)
+        {
+            float* depthRow = matDepth.ptr<float>(y);
+            float* velFilteredRow = matVelocityFiltered.ptr<float>(y);
+
+            for (int x = 0; x < width; ++x, ++depthRow, ++velFilteredRow)
+            {
+                float depth = *depthRow;
+                if (depth != 0)
+                {
+                    float& velFiltered = *velFilteredRow;
+                    velFiltered /= depth * m_depthAdjustmentFactor;
+                }
+            }
+        }
+    }
+
+    int DepthUtility::depth_to_chunk_index(float depth)
+    {
+        if (depth == 0 || depth < MIN_CHUNK_DEPTH || depth > MAX_CHUNK_DEPTH)
+        {
+            return -1;
+        }
+        const float chunkRange = MAX_CHUNK_DEPTH - MIN_CHUNK_DEPTH;
+        const float normDepth = (depth - MIN_CHUNK_DEPTH) / chunkRange;
+
+        return std::min(NUM_DEPTH_VEL_CHUNKS - 1, static_cast<int>(NUM_DEPTH_VEL_CHUNKS * normDepth));
+    }
+
+    void DepthUtility::analyze_velocities(cv::Mat& matDepth, cv::Mat& matVelocityFiltered)
+    {
+        int width = matDepth.cols;
+        int height = matDepth.rows;
+
+        for (int i = 0; i < NUM_DEPTH_VEL_CHUNKS; i++)
+        {
+            m_maxVel[i] *= m_velErodeFactor;
+            m_depthCount[i] = 0;
+        }
+
+        for (int y = 0; y < height; ++y)
+        {
+            float* depthRow = matDepth.ptr<float>(y);
+            float* velFilteredRow = matVelocityFiltered.ptr<float>(y);
+
+            for (int x = 0; x < width; ++x, ++depthRow, ++velFilteredRow)
+            {
+                //matVelocityFiltered is already abs(vel)
+                
+                float depth = *depthRow;
+                int chunkIndex = depth_to_chunk_index(depth);
+                if (chunkIndex >= 0 && depth != 0)
+                {
+                    ++m_depthCount[chunkIndex];
+
+                    float& maxVel = m_maxVel[chunkIndex];
+                    float velFiltered = *velFilteredRow;
+
+                    if (velFiltered > maxVel)
+                    {
+                        maxVel = velFiltered;
+                    }
+                }
+            }
+        }
+
+        const float chunkRange = MAX_CHUNK_DEPTH - MIN_CHUNK_DEPTH;
+        const float chunk_size = chunkRange / NUM_DEPTH_VEL_CHUNKS;
+        
+        for (int i = 0; i < NUM_DEPTH_VEL_CHUNKS; i++)
+        {
+            float maxVel = m_maxVel[i];
+            int count = m_depthCount[i];
+            float startDepth = (MIN_CHUNK_DEPTH + i * chunk_size) / 1000.0f;
+            float ratio = 0;
+            if (startDepth > 0)
+            {
+                ratio = maxVel / startDepth;
+            }
+
+            printf("[%.1fm %d,%f,%f] ", startDepth, count, maxVel, ratio);
+            if (i % 3 == 2)
+            {
+                printf("\n");
+            }
+        }
+        printf("[%.1fm]\n\n", static_cast<int>(MAX_CHUNK_DEPTH)/1000.0f);
     }
 }}}
