@@ -319,6 +319,14 @@ namespace sensekit { namespace plugins { namespace hand {
         int windowLeft = MAX(0, MIN(fullWidth - processingWidth, fullSizeX - processingWidth / 2));
         int windowTop = MAX(0, MIN(fullHeight - processingHeight, fullSizeY - processingHeight / 2));
 
+        cv::Point roiPosition(fullSizeX - windowLeft, fullSizeY - windowTop);
+
+        float referenceAreaSqrt = matrices.areaSqrt.at<float>(roiPosition);
+        if (referenceAreaSqrt == 0)
+        {
+            return trackedPoint.worldPosition;
+        }
+
         //Create a window into the full size data
         cv::Mat roi = matrices.depthFullSize(cv::Rect(windowLeft, windowTop, processingWidth, processingHeight));
         //copyTo for now so .at works with local coords in functions that use it
@@ -337,10 +345,6 @@ namespace sensekit { namespace plugins { namespace hand {
                                              matrices.area,
                                              matrices.areaSqrt,
                                              roiMapper);
-
-        cv::Point roiPosition(fullSizeX - windowLeft, fullSizeY - windowTop);
-
-        float referenceAreaSqrt = matrices.areaSqrt.at<float>(roiPosition);
 
         TrackingData refinementTrackingData(matrices,
                                             roiPosition,
@@ -592,12 +596,12 @@ namespace sensekit { namespace plugins { namespace hand {
                                                                             const cv::Point& seedPosition)
     {
         float referenceDepth = matrices.depth.at<float>(seedPosition);
-        if (referenceDepth == 0 || seedPosition == segmentation::INVALID_POINT)
+        float referenceAreaSqrt = matrices.areaSqrt.at<float>(seedPosition);
+        if (referenceDepth == 0 || referenceAreaSqrt == 0 || seedPosition == segmentation::INVALID_POINT)
         {
             //Cannot expect to properly segment when the seedPosition has zero depth
             return;
         }
-        float referenceAreaSqrt = matrices.areaSqrt.at<float>(seedPosition);
 
         TrackingData createTrackingData(matrices,
                                         seedPosition,
