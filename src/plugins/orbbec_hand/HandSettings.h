@@ -48,6 +48,7 @@ namespace sensekit { namespace plugins { namespace hand {
         int maxFailedTestsInProbation{5};
         int probationFrameCount{30};
         int maxFailedTestsInProbationActivePoints{3};
+        float secondChanceMinDistance{100};
     };
 }}}
 

@@ -39,7 +39,8 @@ namespace sensekit { namespace plugins { namespace hand {
         m_foregroundRadiusMaxPercent2(settings.foregroundRadiusMaxPercent2),
         m_maxFailedTestsInProbation(settings.maxFailedTestsInProbation),
         m_probationFrameCount(settings.probationFrameCount),
-        m_maxFailedTestsInProbationActivePoints(settings.maxFailedTestsInProbationActivePoints)
+        m_maxFailedTestsInProbationActivePoints(settings.maxFailedTestsInProbationActivePoints),
+        m_secondChanceMinDistance(settings.secondChanceMinDistance)
         {}
 
     PointProcessor::~PointProcessor()
@@ -110,7 +111,9 @@ namespace sensekit { namespace plugins { namespace hand {
         auto xyDelta = trackedPoint.worldDeltaPosition;
         xyDelta.z = 0;
         double xyDeltaNorm = cv::norm(xyDelta);
-        if (trackedPoint.trackingStatus != TrackingStatus::Tracking && newTargetPoint == segmentation::INVALID_POINT && xyDeltaNorm > 0)
+        if (trackedPoint.trackingStatus != TrackingStatus::Tracking && 
+            newTargetPoint == segmentation::INVALID_POINT && 
+            xyDeltaNorm > m_secondChanceMinDistance)
         {
             auto movementDirection = xyDelta * (1.0f / xyDeltaNorm);
             auto estimatedWorldPosition = trackedPoint.worldPosition + movementDirection * m_maxSegmentationDist;

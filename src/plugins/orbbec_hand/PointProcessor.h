@@ -98,6 +98,7 @@ namespace sensekit { namespace plugins { namespace hand {
         int m_maxFailedTestsInProbation;
         int m_probationFrameCount;
         int m_maxFailedTestsInProbationActivePoints;
+        float m_secondChanceMinDistance;
 
         int m_nextTrackingId{ 0 };
         //TODO consider std::list<TrackedPoint>
