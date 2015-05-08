@@ -433,7 +433,10 @@ namespace sensekit { namespace plugins { namespace hand {
                                                        TrackedPoint& trackedPoint,
                                                        const cv::Point& newTargetPoint)
     {
-        assert(trackedPoint.trackingStatus != TrackingStatus::Dead);
+        if(trackedPoint.trackingStatus == TrackingStatus::Dead)
+        {
+            return;
+        }
 
         auto oldStatus = trackedPoint.trackingStatus;
 
