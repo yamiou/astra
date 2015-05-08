@@ -83,17 +83,15 @@ public:
     {
         if (m_displayBuffer != nullptr)
         {
-            m_scale = window.getView().getSize().x / m_displayWidth;
+            float depthScale = window.getView().getSize().x / m_displayWidth;
 
-            m_sprite.setScale(m_scale, m_scale);
+            m_sprite.setScale(depthScale, depthScale);
 
             window.draw(m_sprite);
         }
     }
 
 private:
-    float m_scale{ 1 };
-
     using VizPtr = std::unique_ptr<samples::common::LitDepthVisualizer>;
     VizPtr m_visualizerPtr;
 
