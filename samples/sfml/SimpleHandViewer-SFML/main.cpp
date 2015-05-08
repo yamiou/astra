@@ -1,13 +1,15 @@
 #include <SFML/Graphics.hpp>
 #include <Sensekit/SenseKit.h>
 #include <SensekitUL/SenseKitUL.h>
+#include "../../common/LitDepthVisualizer.h"
 #include <sstream>
 #include <iomanip>
 
 class HandFrameListener : public sensekit::FrameReadyListener
 {
 public:
-    HandFrameListener()
+    HandFrameListener(sensekit::DepthStream& depthStream)
+        : m_visualizerPtr(new samples::common::LitDepthVisualizer(depthStream))
     {
         m_font.loadFromFile("Inconsolata.otf");
     }
@@ -55,27 +57,16 @@ public:
 
         init_texture(width, height);
 
-        const int16_t* depthPtr = depthFrame.data();
-        for(int y = 0; y < height; y++)
+        m_visualizerPtr->update(depthFrame);
+        sensekit_rgb_pixel_t* vizBuffer = m_visualizerPtr->get_output();
+
+        for (int i = 0; i < width * height; i++)
         {
-            for(int x = 0; x < width; x++)
-            {
-                int index = (x + y * width);
-                int index4 = index * 4;
-
-                int16_t depth = depthPtr[index];
-                float normDepth = std::min(1.0f,std::max(0.0f,(depth - 400.0f) / 5600.0f));
-                uint8_t value = 255*(1-normDepth);
-                if (depth == 0)
-                {
-                    value = 0;
-                }
-
-                m_displayBuffer[index4] = value;
-                m_displayBuffer[index4 + 1] = value;
-                m_displayBuffer[index4 + 2] = value;
-                m_displayBuffer[index4 + 3] = 255;
-            }
+            int rgbaOffset = i * 4;
+            m_displayBuffer[rgbaOffset] = vizBuffer[i].r;
+            m_displayBuffer[rgbaOffset + 1] = vizBuffer[i].b;
+            m_displayBuffer[rgbaOffset + 2] = vizBuffer[i].g;
+            m_displayBuffer[rgbaOffset + 3] = 255;
         }
 
         m_texture.update(m_displayBuffer.get());
@@ -201,6 +192,9 @@ public:
     }
 
 private:
+    using VizPtr = std::unique_ptr<samples::common::LitDepthVisualizer>;
+    VizPtr m_visualizerPtr;
+
     long double m_frameDuration{ 0 };
     std::clock_t m_lastTimepoint { 0 };
     sf::Texture m_texture;
@@ -225,10 +219,12 @@ int main(int argc, char** argv)
     sensekit::Sensor sensor;
     sensekit::StreamReader reader = sensor.create_reader();
 
-    HandFrameListener listener;
-
-    reader.stream<sensekit::DepthStream>().start();
+    auto ds = reader.stream<sensekit::DepthStream>();
+    ds.start();
     reader.stream<sensekit::HandStream>().start();
+
+    HandFrameListener listener(ds);
+
     reader.addListener(listener);
 
     while (window.isOpen())
