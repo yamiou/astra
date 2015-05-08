@@ -257,6 +257,11 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         segment_foreground(data);
 
+        if (data.matrices.layerSegmentation.empty())
+        {
+            return INVALID_POINT;
+        }
+
         calculate_edge_distance(data.matrices.layerSegmentation,
                                 data.matrices.areaSqrt,
                                 data.matrices.layerEdgeDistance);
