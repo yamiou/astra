@@ -7,7 +7,9 @@ namespace sensekit { namespace plugins { namespace hand {
 
     HandPlugin::HandPlugin(PluginServiceProxy* pluginProxy)
         : PluginBase(pluginProxy)
-    {}
+    {
+        
+    }
 
     HandPlugin::~HandPlugin()
     {}
@@ -51,7 +53,8 @@ namespace sensekit { namespace plugins { namespace hand {
         {
             Sensor sensor(setHandle);
             StreamDescription depthDescription = streamDesc;
-            HandTracker* tracker = new HandTracker(get_pluginService(), sensor, depthDescription, get_logger());
+
+            HandTracker* tracker = new HandTracker(get_pluginService(), sensor, depthDescription, get_logger(), m_settings);
             m_streamTrackerMap[streamHandle] = tracker;
         }
     }
@@ -69,5 +72,4 @@ namespace sensekit { namespace plugins { namespace hand {
             m_streamTrackerMap.erase(it);
         }
     }
-
 }}}

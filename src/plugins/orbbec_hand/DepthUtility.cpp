@@ -5,13 +5,13 @@
 
 namespace sensekit { namespace plugins { namespace hand {
 
-    DepthUtility::DepthUtility(int width, int height) :
-        m_processingWidth(width),
-        m_processingHeight(height),
-        m_depthSmoothingFactor(0.05),
-        m_velocityThresholdFactor(0.08),
-        m_maxDepthJumpPercent(0.1),
-        m_erodeSize(1)
+    DepthUtility::DepthUtility(HandSettings& settings) :
+        m_processingWidth(settings.processingSizeWidth),
+        m_processingHeight(settings.processingSizeHeight),
+        m_depthSmoothingFactor(settings.depthSmoothingFactor),
+        m_velocityThresholdFactor(settings.velocityThresholdFactor),
+        m_maxDepthJumpPercent(settings.maxDepthJumpPercent),
+        m_erodeSize(settings.erodeSize)
     {
         m_rectElement = cv::getStructuringElement(cv::MORPH_RECT,
                                                   cv::Size(m_erodeSize * 2 + 1, m_erodeSize * 2 + 1),

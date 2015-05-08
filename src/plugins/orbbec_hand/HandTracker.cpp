@@ -13,18 +13,18 @@ namespace sensekit { namespace plugins { namespace hand {
 
         using namespace std;
 
-        const int PROCESSING_SIZE_WIDTH = 160;
-        const int PROCESSING_SIZE_HEIGHT = 120;
-
         HandTracker::HandTracker(PluginServiceProxy& pluginService,
                                  Sensor& streamset,
                                  StreamDescription& depthDesc,
-                                 PluginLogger& pluginLogger) :
+                                 PluginLogger& pluginLogger,
+                                 HandSettings& settings) :
             m_pluginService(pluginService),
             m_logger(pluginLogger),
-            m_depthUtility(PROCESSING_SIZE_WIDTH, PROCESSING_SIZE_HEIGHT),
-            m_pointProcessor(pluginLogger),
-            m_reader(streamset.create_reader())
+            m_depthUtility(settings),
+            m_pointProcessor(pluginLogger, settings),
+            m_reader(streamset.create_reader()),
+            m_processingSizeWidth(settings.processingSizeWidth),
+            m_processingSizeHeight(settings.processingSizeHeight)
         {
             create_streams(pluginService, streamset);
 
@@ -46,8 +46,8 @@ namespace sensekit { namespace plugins { namespace hand {
 
             m_debugImageStream = make_unique<DebugHandStream>(pluginService,
                                                               streamset,
-                                                              PROCESSING_SIZE_WIDTH,
-                                                              PROCESSING_SIZE_HEIGHT,
+                                                              m_processingSizeWidth,
+                                                              m_processingSizeHeight,
                                                               bytesPerPixel);
         }
 
@@ -163,8 +163,8 @@ namespace sensekit { namespace plugins { namespace hand {
             else
             {
                 auto normPosition = m_debugImageStream->mouse_norm_position();
-                int x = MAX(0, MIN(PROCESSING_SIZE_WIDTH, normPosition.x * PROCESSING_SIZE_WIDTH));
-                int y = MAX(0, MIN(PROCESSING_SIZE_HEIGHT, normPosition.y * PROCESSING_SIZE_HEIGHT));
+                int x = MAX(0, MIN(m_processingSizeWidth, normPosition.x * m_processingSizeWidth));
+                int y = MAX(0, MIN(m_processingSizeHeight, normPosition.y * m_processingSizeHeight));
                 cv::Point seedPosition(x, y);
                 m_pointProcessor.updateTrackedPointOrCreateNewPointFromSeedPosition(createMatrices, seedPosition);
 
@@ -239,8 +239,8 @@ namespace sensekit { namespace plugins { namespace hand {
 
                 sensekit_image_metadata_t metadata;
 
-                metadata.width = PROCESSING_SIZE_WIDTH;
-                metadata.height = PROCESSING_SIZE_HEIGHT;
+                metadata.width = m_processingSizeHeight;
+                metadata.height = m_processingSizeHeight;
                 metadata.bytesPerPixel = 3;
 
                 debugImageFrame->frame.metadata = metadata;
@@ -341,8 +341,8 @@ namespace sensekit { namespace plugins { namespace hand {
         void HandTracker::overlay_circle(_sensekit_imageframe& imageFrame)
         {
             auto normPosition = m_debugImageStream->mouse_norm_position();
-            int x = MAX(0, MIN(PROCESSING_SIZE_WIDTH, normPosition.x * PROCESSING_SIZE_WIDTH));
-            int y = MAX(0, MIN(PROCESSING_SIZE_HEIGHT, normPosition.y * PROCESSING_SIZE_HEIGHT));
+            int x = MAX(0, MIN(m_processingSizeWidth, normPosition.x * m_processingSizeWidth));
+            int y = MAX(0, MIN(m_processingSizeHeight, normPosition.y * m_processingSizeHeight));
 
             float resizeFactor = m_matDepthFullSize.cols / static_cast<float>(m_matDepth.cols);
             ScalingCoordinateMapper mapper(m_depthStream.coordinateMapper(), resizeFactor);

@@ -5,6 +5,7 @@
 #include "TrackingData.h"
 #include "ScalingCoordinateMapper.h"
 #include <SenseKit/Plugins/PluginLogger.h>
+#include "HandSettings.h"
 
 namespace sensekit { namespace plugins { namespace hand {
 
@@ -13,7 +14,7 @@ namespace sensekit { namespace plugins { namespace hand {
     class PointProcessor
     {
     public:
-        PointProcessor(PluginLogger& pluginLogger);
+        PointProcessor(PluginLogger& pluginLogger, HandSettings& settings);
         virtual ~PointProcessor();
 
         void initialize_common_calculations(TrackingMatrices& matrices);

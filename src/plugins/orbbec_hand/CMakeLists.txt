@@ -20,6 +20,7 @@ set(${_projname}_SOURCES
   ScalingCoordinateMapper.cpp
   HandPlugin.cpp
   HandPlugin.h
+  HandSettings.h
 )
 
 find_package( OpenCV REQUIRED core imgproc)

@@ -4,42 +4,42 @@
 
 namespace sensekit { namespace plugins { namespace hand {
 
-    PointProcessor::PointProcessor(PluginLogger& pluginLogger) :
+    PointProcessor::PointProcessor(PluginLogger& pluginLogger, HandSettings& settings) :
         m_logger(pluginLogger),
-        m_segmentationBandwidthDepthNear(500), //mm
-        m_segmentationBandwidthDepthFar(100),  //mm
-        m_maxMatchDistLostActive(500),  //mm
-        m_maxMatchDistDefault(200),     //mm
-        m_iterationMaxInitial(1),
-        m_iterationMaxTracking(1),
-        m_iterationMaxRefinement(1),
-        m_minArea(0),                   //mm^2
-        m_maxArea(30000),               //mm^2
-        m_areaBandwidth(250),           //mm
-        m_areaBandwidthDepth(100),      //mm
-        m_maxSegmentationDist(500),     //mm
-        m_steadyDeadBandRadius(150),    //mm
-        m_targetEdgeDistance(40),       //mm
-        m_heightScoreFactor(0.5),
-        m_depthScoreFactor(2.0),
-        m_edgeDistanceScoreFactor(4.0),
-        m_pointInertiaFactor(50.0),
-        m_pointInertiaRadius(60),       //mm
-        m_maxInactiveFramesToBeConsideredActive(10),
-        m_minActiveFramesToLockTracking(30),
-        m_maxInactiveFramesForCandidatePoints(60),
-        m_maxInactiveFramesForLostPoints(240),
-        m_maxInactiveFramesForActivePoints(480),
-        m_pointSmoothingFactor(0.75),
-        m_pointDeadBandSmoothingFactor(0.05),
-        m_pointSmoothingDeadZone(50),     //mm
-        m_foregroundRadius1(100),
-        m_foregroundRadius2(150),
-        m_foregroundRadiusMaxPercent1(.35),
-        m_foregroundRadiusMaxPercent2(.15),
-        m_maxFailedTestsInProbation(5),
-        m_probationFrameCount(30),
-        m_maxFailedTestsInProbationActivePoints(3)
+        m_segmentationBandwidthDepthNear(settings.segmentationBandwidthDepthNear), //mm
+        m_segmentationBandwidthDepthFar(settings.segmentationBandwidthDepthFar),  //mm
+        m_maxMatchDistLostActive(settings.maxMatchDistLostActive),  //mm
+        m_maxMatchDistDefault(settings.maxMatchDistDefault),     //mm
+        m_iterationMaxInitial(settings.iterationMaxInitial),
+        m_iterationMaxTracking(settings.iterationMaxTracking),
+        m_iterationMaxRefinement(settings.iterationMaxRefinement),
+        m_minArea(settings.minArea),                   //mm^2
+        m_maxArea(settings.maxArea),               //mm^2
+        m_areaBandwidth(settings.areaBandwidth),           //mm
+        m_areaBandwidthDepth(settings.areaBandwidthDepth),      //mm
+        m_maxSegmentationDist(settings.maxSegmentationDist),     //mm
+        m_steadyDeadBandRadius(settings.steadyDeadBandRadius),    //mm
+        m_targetEdgeDistance(settings.targetEdgeDistance),       //mm
+        m_heightScoreFactor(settings.heightScoreFactor),
+        m_depthScoreFactor(settings.depthScoreFactor),
+        m_edgeDistanceScoreFactor(settings.edgeDistanceScoreFactor),
+        m_pointInertiaFactor(settings.pointInertiaFactor),
+        m_pointInertiaRadius(settings.pointInertiaRadius),       //mm
+        m_maxInactiveFramesToBeConsideredActive(settings.maxInactiveFramesToBeConsideredActive),
+        m_minActiveFramesToLockTracking(settings.minActiveFramesToLockTracking),
+        m_maxInactiveFramesForCandidatePoints(settings.maxInactiveFramesForCandidatePoints),
+        m_maxInactiveFramesForLostPoints(settings.maxInactiveFramesForLostPoints),
+        m_maxInactiveFramesForActivePoints(settings.maxInactiveFramesForActivePoints),
+        m_pointSmoothingFactor(settings.pointSmoothingFactor),
+        m_pointDeadBandSmoothingFactor(settings.pointDeadBandSmoothingFactor),
+        m_pointSmoothingDeadZone(settings.pointSmoothingDeadZone),     //mm
+        m_foregroundRadius1(settings.foregroundRadius1),
+        m_foregroundRadius2(settings.foregroundRadius2),
+        m_foregroundRadiusMaxPercent1(settings.foregroundRadiusMaxPercent1),
+        m_foregroundRadiusMaxPercent2(settings.foregroundRadiusMaxPercent2),
+        m_maxFailedTestsInProbation(settings.maxFailedTestsInProbation),
+        m_probationFrameCount(settings.probationFrameCount),
+        m_maxFailedTestsInProbationActivePoints(settings.maxFailedTestsInProbationActivePoints)
         {}
 
     PointProcessor::~PointProcessor()

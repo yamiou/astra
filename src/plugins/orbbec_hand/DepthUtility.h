@@ -3,13 +3,14 @@
 
 #include <opencv2/opencv.hpp>
 #include <SenseKitUL/SenseKitUL.h>
+#include "HandSettings.h"
 
 namespace sensekit { namespace plugins { namespace hand {
 
     class DepthUtility
     {
     public:
-        DepthUtility(int width, int height);
+        DepthUtility(HandSettings& settings);
         virtual ~DepthUtility();
 
         void processDepthToVelocitySignal(DepthFrame& depthFrame,

@@ -14,6 +14,7 @@
 #include "DebugHandStream.h"
 #include "DebugVisualizer.h"
 #include <memory>
+#include "HandSettings.h"
 
 namespace sensekit { namespace plugins { namespace hand {
 
@@ -23,7 +24,8 @@ namespace sensekit { namespace plugins { namespace hand {
         HandTracker(PluginServiceProxy& pluginService,
                     Sensor& streamset,
                     StreamDescription& depthDesc,
-                    PluginLogger& pluginLogger);
+                    PluginLogger& pluginLogger,
+                    HandSettings& settings);
         virtual ~HandTracker();
         virtual void on_frame_ready(StreamReader& reader, Frame& frame) override;
     private:
@@ -86,6 +88,9 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat m_refineEdgeDistance;
 
         DebugVisualizer m_debugVisualizer;
+
+        float m_processingSizeWidth;
+        float m_processingSizeHeight;
     };
 
 }}}

@@ -5,6 +5,8 @@
 #include <SenseKitUL/SenseKitUL.h>
 #include <unordered_map>
 #include "handtracker.h"
+#include "HandSettings.h"
+
 
 namespace sensekit { namespace plugins { namespace hand {
 
@@ -65,6 +67,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                                      StreamHandleEqualTo>;
 
         StreamTrackerMap m_streamTrackerMap;
+
+        HandSettings m_settings;
     };
 }}}
 
