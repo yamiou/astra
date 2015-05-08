@@ -449,7 +449,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         bool passAllTests = validPointInRange && validPointArea && validRadiusTest;
         bool passSomeTests = validPointInRange && (validPointArea || validRadiusTest);
-        bool activeFailedTests = trackedPoint.pointType == TrackedPointType::ActivePoint && !passSomeTests;
+        bool activeFailedTests = trackedPoint.pointType == TrackedPointType::ActivePoint && !passAllTests;
         bool candidateFailedTests = trackedPoint.pointType == TrackedPointType::CandidatePoint && !passAllTests;
 
         if (passAllTests)

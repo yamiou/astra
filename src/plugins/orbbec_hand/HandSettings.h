@@ -25,11 +25,11 @@ namespace sensekit { namespace plugins { namespace hand {
         float maxArea{30000};
         float areaBandwidth{250};
         float areaBandwidthDepth{100};
-        float maxSegmentationDist{500};
+        float maxSegmentationDist{250};
         float steadyDeadBandRadius{75};
         float targetEdgeDistance{40};
         float heightScoreFactor{0.5};
-        float depthScoreFactor{2.0};
+        float depthScoreFactor{1.0};
         float edgeDistanceScoreFactor{4.0};
         float pointInertiaFactor{50.0};
         float pointInertiaRadius{60};
