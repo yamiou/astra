@@ -20,6 +20,9 @@ namespace sensekit {
         StreamConnection(Stream* stream);
         ~StreamConnection();
 
+        StreamConnection& operator=(const StreamConnection& rhs) = delete;
+        StreamConnection(const StreamConnection& connection) = delete;
+
         void start();
         void stop();
         sensekit_frame_ref_t* lock();

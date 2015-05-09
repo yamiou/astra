@@ -44,8 +44,10 @@ namespace sensekit {
     {
     public:
         explicit StreamReader(StreamSet& streamSet);
-
         ~StreamReader();
+
+        StreamReader& operator=(const StreamReader& rhs) = delete;
+        StreamReader(const StreamReader& reader) = delete;
 
         StreamSet& get_streamSet() const { return m_streamSet; }
 

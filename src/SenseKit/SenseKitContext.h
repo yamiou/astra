@@ -40,6 +40,9 @@ namespace sensekit {
         SenseKitContext();
         ~SenseKitContext();
 
+        SenseKitContext& operator=(const SenseKitContext& rhs) = delete;
+        SenseKitContext(const SenseKitContext& context) = delete;
+
         sensekit_status_t initialize();
 
         sensekit_status_t terminate();

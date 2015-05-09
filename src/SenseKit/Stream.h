@@ -22,6 +22,9 @@ namespace sensekit {
             m_connections.clear();
         }
 
+        Stream& operator=(const Stream& stream) = delete;
+        Stream(const Stream& stream) = delete;
+
         StreamConnection* create_connection();
         void destroy_connection(StreamConnection* connection);
 

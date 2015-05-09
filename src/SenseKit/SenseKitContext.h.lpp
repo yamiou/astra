@@ -40,6 +40,9 @@ namespace sensekit {
         SenseKitContext();
         ~SenseKitContext();
 
+        SenseKitContext& operator=(const SenseKitContext& rhs) = delete;
+        SenseKitContext(const SenseKitContext& context) = delete;
+
 ^^^BEGINREPLACE:stream^^^
         ^RETURN^ ^FUNC^(^PARAMS:ref^);
 

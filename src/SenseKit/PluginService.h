@@ -25,6 +25,9 @@ namespace sensekit
               m_logger("PluginService")
             {}
 
+        PluginService(const PluginService& service) = delete;
+        PluginService& operator=(const PluginService& rhs) = delete;
+
         PluginServiceProxyBase* create_proxy();
 
         sensekit_status_t register_stream_added_callback(stream_added_callback_t callback,

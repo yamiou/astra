@@ -14,6 +14,10 @@ namespace sensekit {
     public:
         StreamSet();
         ~StreamSet();
+
+        StreamSet& operator=(const StreamSet& rhs) = delete;
+        StreamSet(const StreamSet& streamSet) = delete;
+
         StreamConnection* create_stream_connection(const sensekit_stream_desc_t& desc);
 
         bool destroy_stream_connection(StreamConnection* connection);

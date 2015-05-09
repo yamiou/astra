@@ -18,6 +18,9 @@ namespace sensekit {
         StreamBin(size_t bufferSizeInBytes);
         ~StreamBin();
 
+        StreamBin(const StreamBin& bin) = delete;
+        StreamBin& operator=(const StreamBin& rhs) = delete;
+
         //exposed to plugins
         sensekit_frame_t* get_backBuffer()
             {
