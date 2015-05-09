@@ -10,8 +10,7 @@ namespace sensekit {
     StreamReader::StreamReader(StreamSet& streamSet) :
         m_streamSet(streamSet),
         m_scFrameReadyCallback(nullptr)
-    {
-    }
+    {}
 
     StreamReader::~StreamReader()
     {
@@ -116,11 +115,11 @@ namespace sensekit {
         callbackId = 0;
     }
 
-    StreamReader::blockresult StreamReader::block_until_frame_ready_or_timeout(int timeoutMillis)
+    StreamReader::block_result StreamReader::block_until_frame_ready_or_timeout(int timeoutMillis)
     {
         if (m_isFrameReadyForLock)
         {
-            return blockresult::BLOCKRESULT_FRAMEREADY;
+            return block_result::FRAMEREADY;
         }
 
         long long milliseconds = 0;
@@ -134,7 +133,7 @@ namespace sensekit {
                 sensekit_temp_update();
                 if (m_isFrameReadyForLock)
                 {
-                    return blockresult::BLOCKRESULT_FRAMEREADY;
+                    return block_result::FRAMEREADY;
                 }
 
                 end = std::chrono::steady_clock::now();
@@ -143,7 +142,7 @@ namespace sensekit {
             } while (forever || milliseconds < timeoutMillis);
         }
 
-        return m_isFrameReadyForLock ? blockresult::BLOCKRESULT_FRAMEREADY : blockresult::BLOCKRESULT_TIMEOUT;
+        return m_isFrameReadyForLock ? block_result::FRAMEREADY : block_result::TIMEOUT;
     }
 
     sensekit_status_t StreamReader::lock(int timeoutMillis)
@@ -151,11 +150,11 @@ namespace sensekit {
         if (m_locked)
             return SENSEKIT_STATUS_SUCCESS;
 
-        StreamReader::blockresult result = block_until_frame_ready_or_timeout(timeoutMillis);
+        StreamReader::block_result result = block_until_frame_ready_or_timeout(timeoutMillis);
 
         m_isFrameReadyForLock = false;
 
-        if (result == blockresult::BLOCKRESULT_TIMEOUT)
+        if (result == block_result::TIMEOUT)
         {
             return SENSEKIT_STATUS_TIMEOUT;
         }

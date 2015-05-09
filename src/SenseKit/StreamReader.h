@@ -43,7 +43,7 @@ namespace sensekit {
     class StreamReader
     {
     public:
-        explicit StreamReader(StreamSet& streamSet);
+        StreamReader(StreamSet& streamSet);
         ~StreamReader();
 
         StreamReader& operator=(const StreamReader& rhs) = delete;
@@ -63,17 +63,18 @@ namespace sensekit {
         void unlock();
 
         sensekit_reader_t get_handle() { return reinterpret_cast<sensekit_reader_t>(this); }
+
         static StreamReader* get_ptr(sensekit_reader_t reader) { return reinterpret_cast<StreamReader*>(reader); }
         static StreamReader* from_frame(sensekit_reader_frame_t frame) { return reinterpret_cast<StreamReader*>(frame); }
 
     private:
-        enum class blockresult
+        enum class block_result
         {
-            BLOCKRESULT_TIMEOUT = 0,
-            BLOCKRESULT_FRAMEREADY = 1
+            TIMEOUT,
+            FRAMEREADY
         };
 
-        blockresult block_until_frame_ready_or_timeout(int timeoutMillis);
+        block_result block_until_frame_ready_or_timeout(int timeoutMillis);
         void check_for_all_frames_ready();
         void raise_frame_ready();
         void lock_private();
@@ -88,8 +89,8 @@ namespace sensekit {
                                                  StreamDescEqualTo>;
 
         bool m_locked{false};
-        bool m_isFrameReadyForLock{ false };
-        sensekit_frame_index_t m_lastFrameIndex{ -1 };
+        bool m_isFrameReadyForLock{false};
+        sensekit_frame_index_t m_lastFrameIndex{-1};
         sensekit_reader_frame_t* m_currentFrame{nullptr};
         StreamSet& m_streamSet;
         ConnectionMap m_streamMap;
