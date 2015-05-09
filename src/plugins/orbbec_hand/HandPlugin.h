@@ -7,7 +7,6 @@
 #include "handtracker.h"
 #include "HandSettings.h"
 
-
 namespace sensekit { namespace plugins { namespace hand {
 
     class StreamHandleHash
@@ -58,6 +57,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                      sensekit_stream_t streamHandle,
                                      sensekit_stream_desc_t desc);
 
+
         sensekit_callback_id_t m_streamAddedCallbackId;
         sensekit_callback_id_t m_streamRemovingCallbackId;
 
@@ -69,6 +69,7 @@ namespace sensekit { namespace plugins { namespace hand {
         StreamTrackerMap m_streamTrackerMap;
 
         HandSettings m_settings;
+        SettingsParser m_settingsParser;
     };
 }}}
 

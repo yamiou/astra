@@ -7,7 +7,9 @@ namespace sensekit { namespace plugins { namespace hand {
 
     HandPlugin::HandPlugin(PluginServiceProxy* pluginProxy)
         : PluginBase(pluginProxy)
-    { }
+    { 
+        m_settingsParser.parse("plugins/orbbec_hand.ini", m_settings);
+    }
 
     HandPlugin::~HandPlugin()
     { }
