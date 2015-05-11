@@ -22,11 +22,12 @@ namespace sensekit { namespace plugins { namespace hand {
         m_numWaveInflections(0),
         m_isWaveGesture(false),
         m_framesSinceInflection(0),
+        m_recentDeltaHeading(),
         /* settings below */
         m_maxSteadyDelta(5),
         m_minSteadyFrames(15),
         m_minHeadingDist(75),
-        m_deltaHeadingFactor(0.25),
+        m_deltaHeadingFactor(0.5),
         m_minHeadingDiffForInflection(135),
         m_maxHeadingDiffForContinuation(45),
         m_minWaveInflectionsForGesture(2),
@@ -55,6 +56,16 @@ namespace sensekit { namespace plugins { namespace hand {
         m_avgDeltaHeadingValid = false;
         m_isTrackingHeading = false;
         m_numWaveInflections = 0;
+        m_recentDeltaHeading = cv::Point3f();
+    }
+
+    void TrajectoryAnalyzer::set_for_next_inflection()
+    {
+        m_lastAccumulatedDeltaHeading = m_accumulatedDeltaHeading;
+        m_isInflecting = false;
+        m_avgDeltaHeadingValid = false;
+        m_lastAvgDeltaHeadingValid = true;
+        m_isTrackingHeading = false;
     }
 
     void TrajectoryAnalyzer::update(TrackedPoint& point)
@@ -90,13 +101,13 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 m_accumulatedDeltaHeading += deltaPositionNullY;
 
-                
+                m_recentDeltaHeading = deltaPositionNullY * (1 - m_deltaHeadingFactor) + deltaPositionNullY * m_deltaHeadingFactor;
 
                 m_avgDeltaHeadingValid = is_valid_heading_dist(point.fullSizeWorldPosition);
                 
                 float headingDist = cv::norm(point.fullSizeWorldPosition - m_headingTrackStart);
-
-                m_logger.trace("Point #%d dist %f v1: %d v2: %d", m_trackingId, headingDist, m_avgDeltaHeadingValid, m_lastAvgDeltaHeadingValid);
+                
+                m_logger.trace("#%d dist %f v1: %d v2: %d", m_trackingId, headingDist, m_avgDeltaHeadingValid, m_lastAvgDeltaHeadingValid);
 
                 if (m_avgDeltaHeadingValid && m_lastAvgDeltaHeadingValid)
                 {
@@ -120,32 +131,27 @@ namespace sensekit { namespace plugins { namespace hand {
                             }
                         }
                     }
-                    else if (degreeDifference < m_maxHeadingDiffForContinuation)
-                    {
-                        m_isInflecting = false;
-                    }
-                    else
+                    else if (degreeDifference > m_maxHeadingDiffForContinuation)
                     {
                         reset_wave();
+                    }
+                }
+                if (m_avgDeltaHeadingValid)
+                {
+                    float recentDegreeDifference = get_degree_difference(m_accumulatedDeltaHeading, m_recentDeltaHeading);
+
+                    if (recentDegreeDifference > m_minHeadingDiffForInflection)
+                    {
+                        set_for_next_inflection();
                     }
                 }
             }
         }
         else if (m_avgDeltaHeadingValid)
         {
-            m_lastAccumulatedDeltaHeading = m_accumulatedDeltaHeading;
-            m_isInflecting = false;
-            m_avgDeltaHeadingValid = false;
-            m_lastAvgDeltaHeadingValid = true;
-            m_isTrackingHeading = false;
+            set_for_next_inflection();
         }
 
-        m_worldDelta *= .98;
-        if (delta > m_worldDelta)
-        {
-            m_worldDelta = delta;
-        }
-        
         if (delta < m_maxSteadyDelta)
         {
             ++m_numSteadyFrames;

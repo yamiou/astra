@@ -15,6 +15,7 @@ namespace sensekit { namespace plugins { namespace hand {
         void update(TrackedPoint& point);
 
         void reset_wave();
+        void set_for_next_inflection();
         void reset_steady();
 
         bool pointSteady() const { return m_pointSteady; }
@@ -45,11 +46,11 @@ namespace sensekit { namespace plugins { namespace hand {
         int m_numWaveInflections;
         bool m_isWaveGesture;
         int m_framesSinceInflection;
+        cv::Point3f m_recentDeltaHeading;
         
         float m_maxSteadyDelta;
         int m_minSteadyFrames;
         int m_minHeadingDist;
-        float m_worldDelta{0};
         float m_deltaHeadingFactor;
         float m_minHeadingDiffForInflection;
         float m_maxHeadingDiffForContinuation;
