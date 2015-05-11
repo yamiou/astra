@@ -1,13 +1,15 @@
 #include "TrajectoryAnalyzer.h"
 #include "constants.h"
+#include <SenseKit/Plugins/PluginLogger.h>
 
 namespace sensekit { namespace plugins { namespace hand {
 
     using namespace std;
 
 
-    TrajectoryAnalyzer::TrajectoryAnalyzer(int trackingId, HandSettings& settings) :
+    TrajectoryAnalyzer::TrajectoryAnalyzer(int trackingId, PluginLogger& pluginLogger, HandSettings& settings) :
         m_trackingId(trackingId),
+        m_logger(pluginLogger),
         m_pointSteady(false),
         m_numSteadyFrames(0),
         m_avgDeltaHeading(),
@@ -44,8 +46,8 @@ namespace sensekit { namespace plugins { namespace hand {
 
     void TrajectoryAnalyzer::reset_wave()
     {
-        printf("#%d reset wave\n", m_trackingId);
-
+        m_logger.trace("Reset wave gesture for point #%d", m_trackingId);
+        
         m_isWaveGesture = false;
         m_isInflecting = false;
         m_lastAvgDeltaHeading = cv::Point3f();
@@ -101,10 +103,10 @@ namespace sensekit { namespace plugins { namespace hand {
                             ++m_numWaveInflections;
                             if (!m_isWaveGesture)
                             {
-                                printf("#%d wave#: %d\n", m_trackingId, m_numWaveInflections);
+                                m_logger.trace("Wave count %d for point #%d", m_numWaveInflections, m_trackingId);
                                 if (m_numWaveInflections == m_minWaveInflectionsForGesture)
                                 {
-                                    printf("#%d WAVE GESTURE\n", m_trackingId);
+                                    m_logger.trace("Wave gesture detected for point #%d", m_trackingId);
                                     m_isWaveGesture = true;
                                 }
                             }
@@ -143,7 +145,8 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 m_pointSteady = true;
 
-                printf("#%d STEADY GESTURE\n", m_trackingId);
+                m_logger.trace("Steady gesture detected for point #%d", m_trackingId);
+
                 if (m_isWaveGesture)
                 {
                     reset_wave();

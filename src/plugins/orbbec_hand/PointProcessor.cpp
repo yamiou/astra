@@ -310,7 +310,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
             if (it == m_trajectories.end())
             {
-                TrajectoryAnalyzer analyzer(trackingId, m_settings);
+                TrajectoryAnalyzer analyzer(trackingId, m_logger, m_settings);
                 analyzer.update(trackedPoint);
                 m_trajectories.insert(std::make_pair(trackingId, analyzer));
             }

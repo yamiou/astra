@@ -3,13 +3,14 @@
 
 #include "TrackedPoint.h"
 #include "HandSettings.h"
+#include <SenseKit/Plugins/PluginLogger.h>
 
 namespace sensekit { namespace plugins { namespace hand {
 
     class TrajectoryAnalyzer
     {
     public:
-        TrajectoryAnalyzer(int trackingId, HandSettings& settings);
+        TrajectoryAnalyzer(int trackingId, PluginLogger& pluginLogger, HandSettings& settings);
         ~TrajectoryAnalyzer();
         void update(TrackedPoint& point);
 
@@ -29,6 +30,8 @@ namespace sensekit { namespace plugins { namespace hand {
         float get_degree_difference(cv::Point3f& v1, cv::Point3f& v2);
         
         int m_trackingId;
+        PluginLogger& m_logger;
+
 
         bool m_pointSteady;
         int m_numSteadyFrames;
