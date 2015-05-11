@@ -68,6 +68,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                       const CoordinateMapper& fullSizeMapper);
         void start_probation(TrackedPoint& trackedPoint);
         void end_probation(TrackedPoint& trackedPoint);
+        void update_tracked_point_data(TrackingMatrices& matrices, ScalingCoordinateMapper& scalingMapper, TrackedPoint& trackedPoint, const cv::Point& newTargetPoint);
         HandSettings& m_settings;
         PluginLogger& m_logger;
         float m_segmentationBandwidthDepthNear;

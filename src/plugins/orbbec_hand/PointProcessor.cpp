@@ -453,6 +453,7 @@ namespace sensekit { namespace plugins { namespace hand {
             trackedPoint.isInProbation = true;
             trackedPoint.probationFrameCount = 0;
             trackedPoint.failedTestCount = 0;
+            trackedPoint.failedInRangeTestCount = 0;
         }
     }
 
@@ -460,6 +461,28 @@ namespace sensekit { namespace plugins { namespace hand {
     {
         trackedPoint.isInProbation = false;
         trackedPoint.failedTestCount = 0;
+        trackedPoint.failedInRangeTestCount = 0;
+    }
+
+    void PointProcessor::update_tracked_point_data(TrackingMatrices& matrices, ScalingCoordinateMapper& scalingMapper, TrackedPoint& trackedPoint, const cv::Point& newTargetPoint)
+    {
+        float depth = matrices.depth.at<float>(newTargetPoint);
+        cv::Point3f worldPosition = scalingMapper.convert_depth_to_world(newTargetPoint.x, newTargetPoint.y, depth);
+
+        cv::Point3f deltaPosition = worldPosition - trackedPoint.worldPosition;
+        trackedPoint.worldPosition = worldPosition;
+        trackedPoint.worldDeltaPosition = deltaPosition;
+
+        trackedPoint.position = newTargetPoint;
+        trackedPoint.referenceAreaSqrt = matrices.areaSqrt.at<float>(trackedPoint.position);
+
+        auto steadyDist = cv::norm(worldPosition - trackedPoint.steadyWorldPosition);
+
+        if (steadyDist > m_steadyDeadBandRadius)
+        {
+            trackedPoint.steadyWorldPosition = worldPosition;
+            trackedPoint.inactiveFrameCount = 0;
+        }
     }
 
     void PointProcessor::validateAndUpdateTrackedPoint(TrackingMatrices& matrices,
@@ -485,23 +508,26 @@ namespace sensekit { namespace plugins { namespace hand {
         }
 
         bool passAllTests = validPointInRange && validPointArea && validRadiusTest;
-        bool activeFailedTests = trackedPoint.pointType == TrackedPointType::ActivePoint && !passAllTests;
-        bool candidateFailedTests = trackedPoint.pointType == TrackedPointType::CandidatePoint && !passAllTests;
-
+        
         if (passAllTests)
         {
             trackedPoint.trackingStatus = TrackingStatus::Tracking;
             if (trackedPoint.pointType == TrackedPointType::ActivePoint)
             {
                 trackedPoint.failedTestCount = 0;
+                trackedPoint.failedInRangeTestCount = 0;
             }
         }
         else
         {
             start_probation(trackedPoint);
-            if (activeFailedTests || candidateFailedTests)
+            if (!passAllTests)
             {
                 ++trackedPoint.failedTestCount;
+            }
+            if (!validPointInRange)
+            {
+                ++trackedPoint.failedInRangeTestCount;
             }
         }
 
@@ -510,15 +536,29 @@ namespace sensekit { namespace plugins { namespace hand {
             bool exitProbation = false;
             if (trackedPoint.pointType == TrackedPointType::ActivePoint)
             {
-                if (trackedPoint.failedTestCount >= m_maxFailedTestsInProbationActivePoints)
+                if (trackedPoint.failedInRangeTestCount >= m_maxFailedTestsInProbationActivePoints)
                 {
+                    //failed because of out of range points, perhaps certain artifacts like finger pointed at camera
+                    //go to Lost status for a short time
+
+                    //failed N consecutive tests within the probation period
                     //gave the active point a few extra frames to recover
                     trackedPoint.trackingStatus = TrackingStatus::Lost;
+                    exitProbation = true;
+                }
+                else if (trackedPoint.failedTestCount >= m_maxFailedTestsInProbationActivePoints)
+                {
+                    //had valid in range points but must have failed the real tests
+
+                    //failed N consecutive tests within the probation period
+                    //gave the active point a few extra frames to recover
+                    trackedPoint.trackingStatus = TrackingStatus::Dead;
                     exitProbation = true;
                 }
             }
             else if (trackedPoint.failedTestCount >= m_maxFailedTestsInProbation)
             {
+                //failed N tests total (non-consecutive) within the probation period
                 //too many failed tests, so long...
                 trackedPoint.trackingStatus = TrackingStatus::Dead;
                 exitProbation = true;
@@ -534,23 +574,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         if (passAllTests)
         {
-            float depth = matrices.depth.at<float>(newTargetPoint);
-            cv::Point3f worldPosition = scalingMapper.convert_depth_to_world(newTargetPoint.x, newTargetPoint.y, depth);
-
-            cv::Point3f deltaPosition = worldPosition - trackedPoint.worldPosition;
-            trackedPoint.worldPosition = worldPosition;
-            trackedPoint.worldDeltaPosition = deltaPosition;
-
-            trackedPoint.position = newTargetPoint;
-            trackedPoint.referenceAreaSqrt = matrices.areaSqrt.at<float>(trackedPoint.position);
-
-            auto steadyDist = cv::norm(worldPosition - trackedPoint.steadyWorldPosition);
-
-            if (steadyDist > m_steadyDeadBandRadius)
-            {
-                trackedPoint.steadyWorldPosition = worldPosition;
-                trackedPoint.inactiveFrameCount = 0;
-            }
+            update_tracked_point_data(matrices, scalingMapper, trackedPoint, newTargetPoint);
         }
 
         if (trackedPoint.trackingStatus != oldStatus)

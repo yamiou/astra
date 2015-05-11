@@ -34,7 +34,7 @@ namespace sensekit { namespace plugins { namespace hand {
         float pointInertiaFactor{50.0};
         float pointInertiaRadius{60};
         int maxInactiveFramesForCandidatePoints{60};
-        int maxInactiveFramesForLostPoints{240};
+        int maxInactiveFramesForLostPoints{15};
         int maxInactiveFramesForActivePoints{480};
         float pointSmoothingFactor{0.75};
         float pointDeadBandSmoothingFactor{0.05};
