@@ -12,8 +12,8 @@ namespace sensekit { namespace plugins { namespace hand {
         m_logger(pluginLogger),
         m_pointSteady(false),
         m_numSteadyFrames(0),
-        m_avgDeltaHeading(),
-        m_lastAvgDeltaHeading(),
+        m_accumulatedDeltaHeading(),
+        m_lastAccumulatedDeltaHeading(),
         m_avgDeltaHeadingValid(false),
         m_lastAvgDeltaHeadingValid(false),
         m_isTrackingHeading(false),
@@ -46,11 +46,11 @@ namespace sensekit { namespace plugins { namespace hand {
 
     void TrajectoryAnalyzer::reset_wave()
     {
-        m_logger.trace("Reset wave gesture for point #%d", m_trackingId);
+        m_logger.info("Reset wave gesture for point #%d", m_trackingId);
         
         m_isWaveGesture = false;
         m_isInflecting = false;
-        m_lastAvgDeltaHeading = cv::Point3f();
+        m_lastAccumulatedDeltaHeading = cv::Point3f();
         m_lastAvgDeltaHeadingValid = false;
         m_avgDeltaHeadingValid = false;
         m_isTrackingHeading = false;
@@ -66,6 +66,8 @@ namespace sensekit { namespace plugins { namespace hand {
         ++m_framesSinceInflection;
         if (m_framesSinceInflection == m_maxFramesBetweenInflections)
         {
+            m_logger.info("Wave gesture timed out for point #%d", m_trackingId);
+
             reset_wave();
         }
 
@@ -82,17 +84,23 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 m_isTrackingHeading = true;
                 m_headingTrackStart = point.fullSizeWorldPosition;
-                m_avgDeltaHeading = deltaPositionNullY;
+                m_accumulatedDeltaHeading = deltaPositionNullY;
             }
             else
             {
-                m_avgDeltaHeading += deltaPositionNullY;
+                m_accumulatedDeltaHeading += deltaPositionNullY;
+
+                
 
                 m_avgDeltaHeadingValid = is_valid_heading_dist(point.fullSizeWorldPosition);
                 
+                float headingDist = cv::norm(point.fullSizeWorldPosition - m_headingTrackStart);
+
+                m_logger.trace("Point #%d dist %f v1: %d v2: %d", m_trackingId, headingDist, m_avgDeltaHeadingValid, m_lastAvgDeltaHeadingValid);
+
                 if (m_avgDeltaHeadingValid && m_lastAvgDeltaHeadingValid)
                 {
-                    float degreeDifference = get_degree_difference(m_avgDeltaHeading, m_lastAvgDeltaHeading);
+                    float degreeDifference = get_degree_difference(m_accumulatedDeltaHeading, m_lastAccumulatedDeltaHeading);
 
                     if (degreeDifference > m_minHeadingDiffForInflection)
                     {
@@ -103,10 +111,10 @@ namespace sensekit { namespace plugins { namespace hand {
                             ++m_numWaveInflections;
                             if (!m_isWaveGesture)
                             {
-                                m_logger.trace("Wave count %d for point #%d", m_numWaveInflections, m_trackingId);
+                                m_logger.info("Wave count %d for point #%d", m_numWaveInflections, m_trackingId);
                                 if (m_numWaveInflections == m_minWaveInflectionsForGesture)
                                 {
-                                    m_logger.trace("Wave gesture detected for point #%d", m_trackingId);
+                                    m_logger.info("Wave gesture detected for point #%d", m_trackingId);
                                     m_isWaveGesture = true;
                                 }
                             }
@@ -125,7 +133,7 @@ namespace sensekit { namespace plugins { namespace hand {
         }
         else if (m_avgDeltaHeadingValid)
         {
-            m_lastAvgDeltaHeading = m_avgDeltaHeading;
+            m_lastAccumulatedDeltaHeading = m_accumulatedDeltaHeading;
             m_isInflecting = false;
             m_avgDeltaHeadingValid = false;
             m_lastAvgDeltaHeadingValid = true;
@@ -145,7 +153,7 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 m_pointSteady = true;
 
-                m_logger.trace("Steady gesture detected for point #%d", m_trackingId);
+                m_logger.info("Steady gesture detected for point #%d", m_trackingId);
 
                 if (m_isWaveGesture)
                 {

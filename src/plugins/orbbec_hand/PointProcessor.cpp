@@ -318,6 +318,12 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 TrajectoryAnalyzer& analyzer = it->second;
                 analyzer.update(trackedPoint);
+
+                if (analyzer.isWaveGesture())
+                {
+                    end_probation(trackedPoint);
+                    trackedPoint.pointType = TrackedPointType::ActivePoint;
+                }
             }
         }
     }
@@ -452,6 +458,12 @@ namespace sensekit { namespace plugins { namespace hand {
         }
     }
 
+    void PointProcessor::end_probation(TrackedPoint& trackedPoint)
+    {
+        trackedPoint.isInProbation = false;
+        trackedPoint.failedTestCount = 0;
+    }
+
     void PointProcessor::validateAndUpdateTrackedPoint(TrackingMatrices& matrices,
                                                        ScalingCoordinateMapper& scalingMapper,
                                                        TrackedPoint& trackedPoint,
@@ -519,8 +531,7 @@ namespace sensekit { namespace plugins { namespace hand {
             if (trackedPoint.probationFrameCount > m_probationFrameCount || exitProbation)
             {
                 //you're out of probation, but we're keeping an eye on you...
-                trackedPoint.isInProbation = false;
-                trackedPoint.failedTestCount = 0;
+                end_probation(trackedPoint);
             }
         }
 
@@ -551,7 +562,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 if (trackedPoint.activeFrameCount > m_minActiveFramesToLockTracking && 
                     !trackedPoint.isInProbation)
                 {
-                    trackedPoint.pointType = TrackedPointType::ActivePoint;
+                    //trackedPoint.pointType = TrackedPointType::ActivePoint;
                 }
             }
         }

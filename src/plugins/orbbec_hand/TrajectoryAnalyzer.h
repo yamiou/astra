@@ -35,8 +35,8 @@ namespace sensekit { namespace plugins { namespace hand {
 
         bool m_pointSteady;
         int m_numSteadyFrames;
-        cv::Point3f m_avgDeltaHeading;
-        cv::Point3f m_lastAvgDeltaHeading;
+        cv::Point3f m_accumulatedDeltaHeading;
+        cv::Point3f m_lastAccumulatedDeltaHeading;
         bool m_avgDeltaHeadingValid;
         bool m_lastAvgDeltaHeadingValid;
         bool m_isTrackingHeading;
