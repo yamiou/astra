@@ -6,6 +6,8 @@
 #include "ScalingCoordinateMapper.h"
 #include <SenseKit/Plugins/PluginLogger.h>
 #include "HandSettings.h"
+#include <unordered_map>
+#include "TrajectoryAnalyzer.h"
 
 namespace sensekit { namespace plugins { namespace hand {
 
@@ -26,6 +28,8 @@ namespace sensekit { namespace plugins { namespace hand {
         void removeOldOrDeadPoints();
         
         void update_full_resolution_points(TrackingMatrices& matrices);
+
+        void update_trajectories();
 
         std::vector<TrackedPoint>& get_trackedPoints() { return m_trackedPoints; }
 
@@ -63,6 +67,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                       const float resizeFactor,
                                                       const CoordinateMapper& fullSizeMapper);
         void start_probation(TrackedPoint& trackedPoint);
+        HandSettings& m_settings;
         PluginLogger& m_logger;
         float m_segmentationBandwidthDepthNear;
         float m_segmentationBandwidthDepthFar;
@@ -104,6 +109,7 @@ namespace sensekit { namespace plugins { namespace hand {
         //TODO consider std::list<TrackedPoint>
         std::vector<TrackedPoint> m_trackedPoints;
 
+        std::unordered_map<int, TrajectoryAnalyzer> m_trajectories;
     };
 
 }}}

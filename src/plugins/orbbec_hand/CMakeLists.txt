@@ -5,6 +5,8 @@ set(${_projname}_SOURCES
   HandTracker.h
   HandStream.h
   HandStream.cpp
+  TrajectoryAnalyzer.h
+  TrajectoryAnalyzer.cpp
   DebugHandStream.h
   DebugHandStream.cpp
   DebugVisualizer.h
@@ -21,6 +23,7 @@ set(${_projname}_SOURCES
   HandPlugin.cpp
   HandPlugin.h
   HandSettings.h
+  constants.h
 )
 
 find_package( OpenCV REQUIRED core imgproc)

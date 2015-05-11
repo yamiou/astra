@@ -211,6 +211,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                                 m_depthStream.coordinateMapper());
 
             m_pointProcessor.update_full_resolution_points(refinementMatrices);
+
+            m_pointProcessor.update_trajectories();
         }
 
         void HandTracker::generate_hand_frame(sensekit_frame_index_t frameIndex)

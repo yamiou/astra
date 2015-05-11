@@ -4,9 +4,7 @@
 #include <cmath>
 #include <opencv2/opencv.hpp>
 #include "Segmentation.h"
-
-const double PI = 3.141592653589793238463;
-const float  PI_F = 3.14159265358979f;
+#include "constants.h"
 
 #define MAX_DEPTH 10000
 

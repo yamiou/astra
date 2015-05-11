@@ -5,6 +5,7 @@
 namespace sensekit { namespace plugins { namespace hand {
 
     PointProcessor::PointProcessor(PluginLogger& pluginLogger, HandSettings& settings) :
+        m_settings(settings),
         m_logger(pluginLogger),
         m_segmentationBandwidthDepthNear(settings.segmentationBandwidthDepthNear), //mm
         m_segmentationBandwidthDepthFar(settings.segmentationBandwidthDepthFar),  //mm
@@ -298,6 +299,29 @@ namespace sensekit { namespace plugins { namespace hand {
         }
     }
 
+    void PointProcessor::update_trajectories()
+    {
+        for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
+        {
+            //TODO take this and make it a method on TrackedPoint
+            TrackedPoint& trackedPoint = *iter;
+            int trackingId = trackedPoint.trackingId;
+            auto it = m_trajectories.find(trackingId);
+
+            if (it == m_trajectories.end())
+            {
+                TrajectoryAnalyzer analyzer(trackingId, m_settings);
+                analyzer.update(trackedPoint);
+                m_trajectories.insert(std::make_pair(trackingId, analyzer));
+            }
+            else
+            {
+                TrajectoryAnalyzer& analyzer = it->second;
+                analyzer.update(trackedPoint);
+            }
+        }
+    }
+
     cv::Point3f PointProcessor::get_refined_high_res_position(TrackingMatrices& matrices, 
                                                             const TrackedPoint& trackedPoint)
     {
@@ -586,6 +610,8 @@ namespace sensekit { namespace plugins { namespace hand {
             //if inactive for more than a certain number of frames, or dead, remove point
             if (tracked.inactiveFrameCount > max || tracked.trackingStatus == TrackingStatus::Dead)
             {
+                m_trajectories.erase(tracked.trackingId);
+
                 iter = m_trackedPoints.erase(iter);
             }
             else
