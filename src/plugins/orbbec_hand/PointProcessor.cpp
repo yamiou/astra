@@ -26,8 +26,6 @@ namespace sensekit { namespace plugins { namespace hand {
         m_edgeDistanceScoreFactor(settings.edgeDistanceScoreFactor),
         m_pointInertiaFactor(settings.pointInertiaFactor),
         m_pointInertiaRadius(settings.pointInertiaRadius),       //mm
-        m_maxInactiveFramesToBeConsideredActive(settings.maxInactiveFramesToBeConsideredActive),
-        m_minActiveFramesToLockTracking(settings.minActiveFramesToLockTracking),
         m_maxInactiveFramesForCandidatePoints(settings.maxInactiveFramesForCandidatePoints),
         m_maxInactiveFramesForLostPoints(settings.maxInactiveFramesForLostPoints),
         m_maxInactiveFramesForActivePoints(settings.maxInactiveFramesForActivePoints),
@@ -487,7 +485,6 @@ namespace sensekit { namespace plugins { namespace hand {
         }
 
         bool passAllTests = validPointInRange && validPointArea && validRadiusTest;
-        bool passSomeTests = validPointInRange && (validPointArea || validRadiusTest);
         bool activeFailedTests = trackedPoint.pointType == TrackedPointType::ActivePoint && !passAllTests;
         bool candidateFailedTests = trackedPoint.pointType == TrackedPointType::CandidatePoint && !passAllTests;
 
@@ -535,7 +532,6 @@ namespace sensekit { namespace plugins { namespace hand {
             }
         }
 
-        //if (passSomeTests && trackedPoint.trackingStatus == TrackingStatus::Tracking)
         if (passAllTests)
         {
             float depth = matrices.depth.at<float>(newTargetPoint);
@@ -554,16 +550,6 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 trackedPoint.steadyWorldPosition = worldPosition;
                 trackedPoint.inactiveFrameCount = 0;
-            }
-
-            if (trackedPoint.inactiveFrameCount < m_maxInactiveFramesToBeConsideredActive)
-            {
-                ++trackedPoint.activeFrameCount;
-                if (trackedPoint.activeFrameCount > m_minActiveFramesToLockTracking && 
-                    !trackedPoint.isInProbation)
-                {
-                    //trackedPoint.pointType = TrackedPointType::ActivePoint;
-                }
             }
         }
 
@@ -587,7 +573,6 @@ namespace sensekit { namespace plugins { namespace hand {
                 bool bothNotDead = tracked.trackingStatus != TrackingStatus::Dead && otherTracked.trackingStatus != TrackingStatus::Dead;
                 if (tracked.trackingId != otherTracked.trackingId && bothNotDead && tracked.position == otherTracked.position)
                 {
-                    tracked.activeFrameCount = MAX(tracked.activeFrameCount, otherTracked.activeFrameCount);
                     tracked.inactiveFrameCount = MIN(tracked.inactiveFrameCount, otherTracked.inactiveFrameCount);
                     if (otherTracked.pointType == TrackedPointType::ActivePoint && tracked.pointType != TrackedPointType::ActivePoint)
                     {

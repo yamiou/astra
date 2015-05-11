@@ -89,8 +89,6 @@ namespace sensekit { namespace plugins { namespace hand {
         float m_edgeDistanceScoreFactor;
         float m_pointInertiaFactor;
         float m_pointInertiaRadius;
-        int m_maxInactiveFramesToBeConsideredActive;
-        int m_minActiveFramesToLockTracking;
         int m_maxInactiveFramesForCandidatePoints;
         int m_maxInactiveFramesForLostPoints;
         int m_maxInactiveFramesForActivePoints;

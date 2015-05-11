@@ -18,7 +18,6 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Point3f steadyWorldPosition;
         int trackingId;
         int inactiveFrameCount;
-        int activeFrameCount;
         int failedTestCount;
         bool isInProbation;
         int probationFrameCount;
@@ -36,7 +35,6 @@ namespace sensekit { namespace plugins { namespace hand {
             steadyWorldPosition(worldPosition),
             trackingId(trackingId),
             inactiveFrameCount(0),
-            activeFrameCount(0),
             failedTestCount(0),
             isInProbation(true),
             probationFrameCount(0),
