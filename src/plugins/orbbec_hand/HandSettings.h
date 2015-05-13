@@ -32,29 +32,29 @@ namespace sensekit { namespace plugins { namespace hand {
 
         float segmentationBandwidthDepthNear{ 500 };
         float segmentationBandwidthDepthFar{ 100 };
-        float maxMatchDistLostActive{ 500 };
-        float maxMatchDistDefault{ 200 };
+        float maxMatchDistLostActive{ 500 }; //mm
+        float maxMatchDistDefault{ 200 }; //mm
         int iterationMaxInitial{ 1 };
         int iterationMaxTracking{ 1 };
         int iterationMaxRefinement{ 1 };
-        float minArea{ 0 };
-        float maxArea{ 30000 };
-        float areaBandwidth{ 250 };
-        float areaBandwidthDepth{ 100 };
-        float maxSegmentationDist{ 250 };
-        float steadyDeadBandRadius{ 75 };
-        float targetEdgeDistance{ 40 };
+        float minArea{ 0 }; //mm^2
+        float maxArea{ 30000 }; //mm^2
+        float areaBandwidth{ 250 }; //mm
+        float areaBandwidthDepth{ 100 }; //mm
+        float maxSegmentationDist{ 250 }; //mm
+        float steadyDeadBandRadius{ 75 }; //mm
+        float targetEdgeDistance{ 40 }; //mm
         float heightScoreFactor{ 0.5 };
         float depthScoreFactor{ 1.0 };
         float edgeDistanceScoreFactor{ 4.0 };
         float pointInertiaFactor{ 50.0 };
-        float pointInertiaRadius{ 60 };
+        float pointInertiaRadius{ 60 }; //mm
         int maxInactiveFramesForCandidatePoints{ 60 };
         int maxInactiveFramesForLostPoints{ 15 };
         int maxInactiveFramesForActivePoints{ 480 };
         float pointSmoothingFactor{ 0.75 };
         float pointDeadBandSmoothingFactor{ 0.05 };
-        float pointSmoothingDeadZone{ 50 };
+        float pointSmoothingDeadZone{ 50 }; //mm
         float foregroundRadius1{ 100 };
         float foregroundRadius2{ 150 };
         float foregroundRadiusMaxPercent1{ 0.35 };
