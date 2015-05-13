@@ -69,7 +69,6 @@ namespace sensekit { namespace plugins { namespace hand {
         StreamTrackerMap m_streamTrackerMap;
 
         HandSettings m_settings;
-        SettingsParser m_settingsParser;
     };
 }}}
 

@@ -1,3 +1,4 @@
+#include "SettingsParser.h"
 #include "HandPlugin.h"
 #include "HandTracker.h"
 
@@ -8,7 +9,7 @@ namespace sensekit { namespace plugins { namespace hand {
     HandPlugin::HandPlugin(PluginServiceProxy* pluginProxy)
         : PluginBase(pluginProxy)
     { 
-        m_settingsParser.parse("plugins/orbbec_hand.ini", m_settings);
+        m_settings = parse_settings("plugins/orbbec_hand.toml");
     }
 
     HandPlugin::~HandPlugin()

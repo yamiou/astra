@@ -23,9 +23,10 @@ set(${_projname}_SOURCES
   HandPlugin.cpp
   HandPlugin.h
   HandSettings.h
+  SettingsParser.h
   constants.h
   ${CMAKE_CURRENT_SOURCE_DIR}/../../SenseKit/vendor/cpptoml.h
-  orbbec_hand.ini
+  orbbec_hand.toml
 )
 
 find_package( OpenCV REQUIRED core imgproc)
@@ -40,13 +41,6 @@ set_target_properties(${_projname} PROPERTIES FOLDER "plugins")
 target_link_libraries(${_projname} SenseKitAPI SenseKitUL ${OpenCV_LIBS})
 
 include_directories(${_projname} ${OpenCV_INCLUDE_DIRS})
-
-add_custom_command(
-     OUTPUT bin/Plugins/orbbec_hand.ini
-     COMMAND ${CMAKE_COMMAND}
-     -E copy ${_projname}_SOURCES/orbbec_hand.ini bin/Plugins/orbbec_hand.ini
-     DEPENDS ${_projname}_SOURCES/orbbec_hand.ini
-   )
 
 install(TARGETS ${_projname}
         RUNTIME DESTINATION bin/Plugins/

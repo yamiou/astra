@@ -3,18 +3,18 @@
 # NOTE: Settings with a "#float" must include a decimal
 #       due to a limitation with the cpptoml library
 
-#[handtracker]
+[handtracker]
 processingSizeWidth = 160
 processingSizeHeight = 120
 
-#[depthutility]
+[depthutility]
 depthSmoothingFactor = 0.05 #float
 velocityThresholdFactor = 0.005 #float
 maxDepthJumpPercent = 0.1 #float
 erodeSize = 1
 depthAdjustmentFactor = 0.0025 #float
 
-#[pointprocessor]
+[pointprocessor]
 segmentationBandwidthDepthNear = 500.0 #mm #float
 segmentationBandwidthDepthFar = 100.0 #mm #float
 maxMatchDistLostActive = 500.0 #mm #float
