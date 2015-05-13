@@ -71,6 +71,8 @@ namespace sensekit { namespace plugins { namespace hand {
         DepthUtilitySettings depthUtilitySettings;
         PointProcessorSettings pointProcessorSettings;
     };
+
+    HandSettings parse_settings(std::string path);
 }}}
 
 #endif // HANDSETTINGS_H

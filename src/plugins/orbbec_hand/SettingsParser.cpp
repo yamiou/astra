@@ -1,7 +1,17 @@
 #include "../../SenseKit/vendor/cpptoml.h"
-#include "SettingsParser.h"
+#include "HandSettings.h"
 
 namespace sensekit { namespace plugins { namespace hand {
+
+    template<typename T>
+    T get_from_table(cpptoml::table& t, std::string key, T defaultValue)
+    {
+        if (t.contains_qualified(key))
+        {
+            return t.get_qualified(key)->as<T>()->get();
+        }
+        return defaultValue;
+    }
 
     float get_float_from_table(cpptoml::table& t, std::string key, float defaultValue)
     {
