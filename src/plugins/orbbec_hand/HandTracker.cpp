@@ -20,8 +20,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                  HandSettings& settings) :
             m_pluginService(pluginService),
             m_logger(pluginLogger),
-            m_depthUtility(settings),
-            m_pointProcessor(pluginLogger, settings),
+            m_depthUtility(settings.processingSizeWidth, settings.processingSizeHeight, settings.depthUtilitySettings),
+            m_pointProcessor(pluginLogger, settings.pointProcessorSettings),
             m_reader(streamset.create_reader()),
             m_processingSizeWidth(settings.processingSizeWidth),
             m_processingSizeHeight(settings.processingSizeHeight)

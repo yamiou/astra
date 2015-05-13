@@ -10,7 +10,7 @@ namespace sensekit { namespace plugins { namespace hand {
     class DepthUtility
     {
     public:
-        DepthUtility(HandSettings& settings);
+        DepthUtility(float width, float height, DepthUtilitySettings& settings);
         virtual ~DepthUtility();
 
         void processDepthToVelocitySignal(DepthFrame& depthFrame,

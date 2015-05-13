@@ -16,7 +16,7 @@ namespace sensekit { namespace plugins { namespace hand {
     class PointProcessor
     {
     public:
-        PointProcessor(PluginLogger& pluginLogger, HandSettings& settings);
+        PointProcessor(PluginLogger& pluginLogger, PointProcessorSettings& settings);
         virtual ~PointProcessor();
 
         void initialize_common_calculations(TrackingMatrices& matrices);
@@ -69,7 +69,7 @@ namespace sensekit { namespace plugins { namespace hand {
         void start_probation(TrackedPoint& trackedPoint);
         void end_probation(TrackedPoint& trackedPoint);
         void update_tracked_point_data(TrackingMatrices& matrices, ScalingCoordinateMapper& scalingMapper, TrackedPoint& trackedPoint, const cv::Point& newTargetPoint);
-        HandSettings& m_settings;
+        PointProcessorSettings& m_settings;
         PluginLogger& m_logger;
         float m_segmentationBandwidthDepthNear;
         float m_segmentationBandwidthDepthFar;

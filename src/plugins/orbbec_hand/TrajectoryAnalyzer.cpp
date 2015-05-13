@@ -7,7 +7,7 @@ namespace sensekit { namespace plugins { namespace hand {
     using namespace std;
 
 
-    TrajectoryAnalyzer::TrajectoryAnalyzer(int trackingId, PluginLogger& pluginLogger, HandSettings& settings) :
+    TrajectoryAnalyzer::TrajectoryAnalyzer(int trackingId, PluginLogger& pluginLogger, TrajectoryAnalyzerSettings& settings) :
         m_trackingId(trackingId),
         m_logger(pluginLogger),
         m_pointSteady(false),
@@ -24,14 +24,14 @@ namespace sensekit { namespace plugins { namespace hand {
         m_framesSinceInflection(0),
         m_recentDeltaHeading(),
         /* settings below */
-        m_maxSteadyDelta(5),
-        m_minSteadyFrames(15),
-        m_minHeadingDist(75),
-        m_deltaHeadingFactor(0.5),
-        m_minHeadingDiffForInflection(135),
-        m_maxHeadingDiffForContinuation(45),
-        m_minWaveInflectionsForGesture(2),
-        m_maxFramesBetweenInflections(90)
+        m_maxSteadyDelta(settings.maxSteadyDelta),
+        m_minSteadyFrames(settings.minSteadyFrames),
+        m_minHeadingDist(settings.minHeadingDist),
+        m_deltaHeadingFactor(settings.deltaHeadingFactor),
+        m_minHeadingDiffForInflection(settings.minHeadingDiffForInflection),
+        m_maxHeadingDiffForContinuation(settings.maxHeadingDiffForContinuation),
+        m_minWaveInflectionsForGesture(settings.minWaveInflectionsForGesture),
+        m_maxFramesBetweenInflections(settings.maxFramesBetweenInflections)
     {
     }
 

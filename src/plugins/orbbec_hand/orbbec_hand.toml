@@ -50,3 +50,13 @@ maxFailedTestsInProbation = 5
 probationFrameCount = 30
 maxFailedTestsInProbationActivePoints = 3
 secondChanceMinDistance = 100.0 #float
+
+[trajectoryanalyzer]
+maxSteadyDelta = 5.0 #float
+minSteadyFrames = 15
+minHeadingDist = 75
+deltaHeadingFactor = 0.5 #float
+minHeadingDiffForInflection = 135.0 #float
+maxHeadingDiffForContinuation = 45.0 #float
+minWaveInflectionsForGesture = 2
+maxFramesBetweenInflections = 90

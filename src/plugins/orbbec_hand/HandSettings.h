@@ -3,16 +3,30 @@
 
 namespace sensekit { namespace plugins { namespace hand {
 
-    struct HandSettings
+    struct DepthUtilitySettings
     {
         float depthSmoothingFactor{ 0.05 };
         float velocityThresholdFactor{ 0.005 };
         float maxDepthJumpPercent{ 0.1 };
         int erodeSize{ 1 };
         float depthAdjustmentFactor{ 0.0025 };
+    };
 
-        int processingSizeWidth{ 160 };
-        int processingSizeHeight{ 120 };
+    struct TrajectoryAnalyzerSettings
+    {
+        float maxSteadyDelta{ 5 };
+        int minSteadyFrames{ 15 };
+        int minHeadingDist{ 75 };
+        float deltaHeadingFactor{ 0.5 };
+        float minHeadingDiffForInflection{ 135 };
+        float maxHeadingDiffForContinuation{ 45 };
+        int minWaveInflectionsForGesture{ 2 };
+        int maxFramesBetweenInflections{ 90 };
+    };
+
+    struct PointProcessorSettings
+    {
+        TrajectoryAnalyzerSettings trajectoryAnalyzerSettings;
 
         float segmentationBandwidthDepthNear{ 500 };
         float segmentationBandwidthDepthFar{ 100 };
@@ -47,6 +61,15 @@ namespace sensekit { namespace plugins { namespace hand {
         int probationFrameCount{ 30 };
         int maxFailedTestsInProbationActivePoints{ 3 };
         float secondChanceMinDistance{ 100 };
+    };
+
+    struct HandSettings
+    {
+        int processingSizeWidth{ 160 };
+        int processingSizeHeight{ 120 };
+
+        DepthUtilitySettings depthUtilitySettings;
+        PointProcessorSettings pointProcessorSettings;
     };
 }}}
 

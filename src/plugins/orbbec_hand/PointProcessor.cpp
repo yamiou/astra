@@ -4,7 +4,7 @@
 
 namespace sensekit { namespace plugins { namespace hand {
 
-    PointProcessor::PointProcessor(PluginLogger& pluginLogger, HandSettings& settings) :
+    PointProcessor::PointProcessor(PluginLogger& pluginLogger, PointProcessorSettings& settings) :
         m_settings(settings),
         m_logger(pluginLogger),
         m_segmentationBandwidthDepthNear(settings.segmentationBandwidthDepthNear), //mm
@@ -308,7 +308,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
             if (it == m_trajectories.end())
             {
-                TrajectoryAnalyzer analyzer(trackingId, m_logger, m_settings);
+                TrajectoryAnalyzer analyzer(trackingId, m_logger, m_settings.trajectoryAnalyzerSettings);
                 analyzer.update(trackedPoint);
                 m_trajectories.insert(std::make_pair(trackingId, analyzer));
             }

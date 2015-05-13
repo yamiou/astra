@@ -10,7 +10,7 @@ namespace sensekit { namespace plugins { namespace hand {
     class TrajectoryAnalyzer
     {
     public:
-        TrajectoryAnalyzer(int trackingId, PluginLogger& pluginLogger, HandSettings& settings);
+        TrajectoryAnalyzer(int trackingId, PluginLogger& pluginLogger, TrajectoryAnalyzerSettings& settings);
         ~TrajectoryAnalyzer();
         void update(TrackedPoint& point);
 

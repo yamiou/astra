@@ -5,9 +5,9 @@
 
 namespace sensekit { namespace plugins { namespace hand {
 
-    DepthUtility::DepthUtility(HandSettings& settings) :
-        m_processingWidth(settings.processingSizeWidth),
-        m_processingHeight(settings.processingSizeHeight),
+    DepthUtility::DepthUtility(float width, float height, DepthUtilitySettings& settings) :
+        m_processingWidth(width),
+        m_processingHeight(height),
         m_depthSmoothingFactor(settings.depthSmoothingFactor),
         m_velocityThresholdFactor(settings.velocityThresholdFactor),
         m_maxDepthJumpPercent(settings.maxDepthJumpPercent),
