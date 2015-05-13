@@ -1,6 +1,8 @@
 #ifndef HANDSETTINGS_H
 #define HANDSETTINGS_H
 
+#include <string>
+
 namespace sensekit { namespace plugins { namespace hand {
 
     struct DepthUtilitySettings

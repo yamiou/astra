@@ -1,4 +1,4 @@
-#include "SettingsParser.h"
+#include "HandSettings.h"
 #include "HandPlugin.h"
 #include "HandTracker.h"
 
