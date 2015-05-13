@@ -47,4 +47,10 @@ install(TARGETS ${_projname}
         LIBRARY DESTINATION bin/Plugins/
         )
 
+add_custom_target(copyoutput ALL
+	#orbbec_hand.toml
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+		"${CMAKE_SOURCE_DIR}/src/plugins/orbbec_hand/orbbec_hand.toml"
+		"$<TARGET_FILE_DIR:SenseKit>/Plugins")
+
 install_pdb(${_projname} bin/Plugins/)
