@@ -24,6 +24,7 @@ set(${_projname}_SOURCES
   HandPlugin.h
   HandSettings.h
   SettingsParser.h
+  SettingsParser.cpp
   constants.h
   ${CMAKE_CURRENT_SOURCE_DIR}/../../SenseKit/vendor/cpptoml.h
   orbbec_hand.toml
