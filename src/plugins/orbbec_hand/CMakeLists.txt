@@ -25,7 +25,7 @@ set(${_projname}_SOURCES
   HandSettings.h
   SettingsParser.cpp
   constants.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../SenseKit/vendor/cpptoml.h
+  ../../SenseKit/vendor/cpptoml.h
   orbbec_hand.toml
 )
 
@@ -47,11 +47,11 @@ install(TARGETS ${_projname}
         LIBRARY DESTINATION bin/Plugins/
         )
 
-add_custom_target(copyoutput ALL
+add_custom_target(copytoml ALL
 	#orbbec_hand.toml
 	COMMAND ${CMAKE_COMMAND} -E copy_if_different
 		"${PROJECT_SOURCE_DIR}/src/plugins/orbbec_hand/orbbec_hand.toml"
-		"$<TARGET_FILE_DIR:SenseKit>/Plugins")
+		"$<TARGET_FILE_DIR:${_projname}>/")
 
 install(FILES ${PROJECT_SOURCE_DIR}/src/plugins/orbbec_hand/orbbec_hand.toml
 		DESTINATION bin/Plugins/
