@@ -1,4 +1,4 @@
-SenseKit SDK v0.1.7 for Windows
+SenseKit SDK v0.1.8 for Windows
 Copyright (c) 2015 Orbbec
 
 ALPHA - NOT FOR PUBLIC DISTRIBUTION
@@ -7,6 +7,8 @@ josh@orbbec3d.com
 
 What's New
 ==========
+
+v0.1.8 2015/05/13 Added orbbec_hand.toml which contains every configurable setting for the hand tracker. This file can be found in the Plugins folder along with orbbec_hand.dll. Adjusted pointSmoothingFactor for better hand trajectories.
 
 v0.1.7 2015/05/11 The hand tracker now uses a wave focus gesture and the recovery of points has been modified so that the system stops tracking points that go out of range or fail certain tests much quicker than before. Hand tracker also has much improved model for filtering background noise. Integrated a more optimized LitDepthVisualizer into SimpleDepthViewer-SFML and SimpleHandViewer-SFML. SimpleHandViewer-SFML now has hand traces. Refactored all HandTracker settings in preparation for reading settings from disk. (Loading from disk didn't make this release.) Fixed a bug that caused some samples to crash on exit. Fixed other possible internal bugs.
 
