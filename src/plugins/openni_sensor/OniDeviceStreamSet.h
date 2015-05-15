@@ -19,9 +19,18 @@ namespace sensekit { namespace plugins {
             OniDeviceStreamSet(PluginServiceProxy& pluginService,
                                const openni::DeviceInfo* info)
                 : m_pluginService(pluginService),
-                  m_logger(pluginService)
+                  m_logger(pluginService, "OniDeviceStreamSet")
                 {
-                    m_oniDevice.open(info->getUri());
+                    m_logger.info("opening device: %s", info->getUri());
+                    openni::Status rc =  m_oniDevice.open(info->getUri());
+
+                    if (rc != openni::STATUS_OK)
+                    {
+                        m_logger.warn("failed to open device: %s", openni::OpenNI::getExtendedError());
+                        return;
+                    }
+
+                    m_logger.warn("opened device: %s", info->getUri());
 
                     m_uri = info->getUri();
                     m_pluginService.create_stream_set(m_streamSetHandle);

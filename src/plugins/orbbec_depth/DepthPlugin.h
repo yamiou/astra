@@ -15,7 +15,7 @@ namespace sensekit { namespace plugins { namespace depth {
         static const size_t MAX_SKELETONS = 5;
 
         DepthPlugin(PluginServiceProxy* pluginProxy)
-            : PluginBase(pluginProxy)
+            : PluginBase(pluginProxy, "orbbec_depth")
         {
             register_for_stream_events();
         }

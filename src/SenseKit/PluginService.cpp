@@ -22,7 +22,7 @@ namespace sensekit
         //TODO: normally would create a new streamset
 
         streamSet = m_context.get_rootSet().get_handle();
-        
+
         m_logger.info("creating streamset: %x (placeholder)", streamSet);
 
         return SENSEKIT_STATUS_SUCCESS;
@@ -231,11 +231,12 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::log(sensekit_log_severity_t logLevel,
+    sensekit_status_t PluginService::log(const char* channel,
+                                         sensekit_log_severity_t logLevel,
                                          const char* format,
                                          va_list args)
     {
-        m_logger.log_vargs(logLevel, format, args);
+        Logger::log_vargs(channel, logLevel, format, args);
         return SENSEKIT_STATUS_SUCCESS;
     }
 }

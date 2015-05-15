@@ -74,6 +74,10 @@ source_group(templates FILES ${${_projname}_SOURCES_GEN})
 
 add_definitions(-DSENSEKIT_BUILD)
 
+if (ANDROID)
+  add_definitions(-DSENSEKIT_ANDROID)
+endif()
+
 add_library(${_projname} SHARED ${${_projname}_SOURCES} ${${_projname}_SOURCES_GEN})
 
 include_directories(${PROJECT_SOURCE_DIR}/src/SenseKitAPI)

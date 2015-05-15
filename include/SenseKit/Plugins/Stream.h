@@ -19,7 +19,7 @@ namespace sensekit { namespace plugins {
             m_pluginService(pluginService),
             m_streamSet(streamSet),
             m_description(description),
-            m_logger(pluginService)
+            m_logger(pluginService, "PluginStream")
         {
             create_stream(description);
         }

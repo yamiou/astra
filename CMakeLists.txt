@@ -2,6 +2,10 @@ cmake_minimum_required (VERSION 3.2)
 
 project (SenseKit)
 
+if (ANDROID)
+  set(SENSEKIT_ANDROID TRUE)
+endif()
+
 # Version
 string (TIMESTAMP BUILD_DATE "%Y%m%dT%H%M%SZ" UTC)
 set (SenseKit_VERSION_MAJOR 0)
@@ -9,18 +13,29 @@ set (SenseKit_VERSION_MINOR 1)
 set (SenseKit_VERSION_PATCH 8)
 set (SenseKit_VERSION_BUILD 0)
 
-if (NOT WIN32)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+  set(SENSEKIT_CLANG ON)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  set(SENSEKIT_GCC ON)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+  set(SENSEKIT_INTELC ON)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  set(SENSEKIT_MSVC ON)
 endif()
 
-if (ANDROID)
-  set(ANDROID_CXX_FLAGS "${ANDROID_CXX_FLAGS} -std=c++14")
+if(SENSEKIT_GCC OR SENSEKIT_CLANG)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+
+  if(SENSEKIT_ANDROID)
+    set(ANDROID_CXX_FLAGS "${ANDROID_CXX_FLAGS} -std=c++14")
+  endif()
+
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-if (ANDROID)
+if(SENSEKIT_ANDROID)
   find_host_package(CLISP REQUIRED)
 else()
   find_package(CLISP REQUIRED)
@@ -48,7 +63,7 @@ add_custom_target(${SDK_DEPENDENT_TARGET})
 
 add_subdirectory(src)
 
-if (NOT ANDROID)
+if (NOT SENSEKIT_ANDROID)
   add_subdirectory(samples)
 endif()
 
@@ -58,7 +73,6 @@ MESSAGE("CMAKE_INSTALL_PREFIX : ${CMAKE_INSTALL_PREFIX}")
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include
   DESTINATION .
   FILES_MATCHING PATTERN "*.h"
-  #  PATTERN "include/SenseKit/Plugins" EXCLUDE
   PATTERN "include/SenseKitUL/Plugins" EXCLUDE
   )
 
@@ -75,7 +89,6 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
   )
 
 if (MSVC)
-
   install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013
     DESTINATION samples
     PATTERN "build" EXCLUDE
@@ -126,4 +139,5 @@ if (WIN32)
 else()
   set(CPACK_GENERATOR "ZIP;TGZ")
 endif()
+
 INCLUDE(CPack)

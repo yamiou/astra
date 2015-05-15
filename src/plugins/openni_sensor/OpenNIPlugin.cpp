@@ -15,10 +15,10 @@ namespace sensekit
             openni::Version version = openni::OpenNI::getVersion();
 
             get_logger().info("Initializing OpenNI v%d.%d.%d.%d",
-                 version.major,
-                 version.minor,
-                 version.maintenance,
-                 version.build);
+                              version.major,
+                              version.minor,
+                              version.maintenance,
+                              version.build);
 
             ::openni::Status rc = ::openni::STATUS_OK;
 
@@ -26,6 +26,21 @@ namespace sensekit
             ::openni::OpenNI::addDeviceDisconnectedListener(this);
 
             rc = ::openni::OpenNI::initialize();
+
+            bool successful = rc == openni::STATUS_OK;
+
+            if (!successful)
+            {
+                get_logger().warn("Failed to initialize OpenNI: %s", openni::OpenNI::getExtendedError());
+            }
+            else
+            {
+                get_logger().info("Initialized OpenNI v%d.%d.%d.%d",
+                                  version.major,
+                                  version.minor,
+                                  version.maintenance,
+                                  version.build);
+            }
         }
 
         void OpenNIPlugin::onDeviceConnected(const ::openni::DeviceInfo* info)

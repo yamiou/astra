@@ -42,11 +42,6 @@ namespace sensekit {
             sensekit_stream_stop(m_connection);
         }
 
-        const StreamDescription& get_description()
-        {
-            return static_cast<const StreamDescription&>(m_description);
-        }
-
     private:
         sensekit_streamconnection_t m_connection{nullptr};
         sensekit_stream_desc_t m_description;

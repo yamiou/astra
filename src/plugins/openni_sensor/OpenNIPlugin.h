@@ -23,7 +23,7 @@ namespace sensekit
         {
         public:
             OpenNIPlugin(PluginServiceProxy* pluginService)
-                : PluginBase(pluginService)
+                : PluginBase(pluginService, "openni_sensor")
                 {
                     init_openni();
                 }

@@ -17,7 +17,16 @@ namespace sensekit {
     SenseKitContext::SenseKitContext()
         : m_pluginService(*this),
           m_logger("Context")
-    {}
+    {
+        el::Loggers::addFlag(el::LoggingFlag::HierarchicalLogging);
+        el::Loggers::addFlag(el::LoggingFlag::CreateLoggerAutomatically);
+        el::Loggers::setLoggingLevel(el::Level::Fatal);
+
+#if __ANDROID__
+        el::Loggers::reconfigureAllLoggers(el::ConfigurationType::Filename,
+                                           "/data/data/com.orbbec.sample/files/sensekit.log");
+#endif
+    }
 
     SenseKitContext::~SenseKitContext()
     {}
@@ -36,7 +45,12 @@ namespace sensekit {
         //TODO: OMG ERROR HANDLING
         LibHandle libHandle = nullptr;
 
+#if !__ANDROID__
         std::vector<std::string> libs = get_libs();
+#else
+        std::vector<std::string> libs = {"libopenni_sensor.so"};
+#endif
+
         if (libs.size() == 0)
         {
             m_logger.warn("SenseKit found no plugins. Is there a Plugins folder? Is the working directory correct?");
@@ -44,7 +58,14 @@ namespace sensekit {
 
         for(auto lib : libs)
         {
-            os_load_library((PLUGIN_DIRECTORY + lib).c_str(), libHandle);
+
+#if !__ANDROID__
+            std::string path = PLUGIN_DIRECTORY + lib;
+#else
+            std::string path = lib;
+#endif
+
+            os_load_library(path.c_str(), libHandle);
 
             PluginFuncs pluginFuncs;
             os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_initialize), (FarProc&)pluginFuncs.initialize);

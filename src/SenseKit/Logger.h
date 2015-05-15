@@ -16,8 +16,6 @@ namespace sensekit {
             : m_loggerName(loggerName)
         {
             el::Loggers::getLogger(loggerName);
-            el::Loggers::addFlag(el::LoggingFlag::HierarchicalLogging);
-            el::Loggers::setLoggingLevel(el::Level::Fatal);
         }
 
         Logger()
@@ -28,13 +26,12 @@ namespace sensekit {
         {
             va_list args;
             va_start(args, format);
-            log(logLevel, format, args);
+            log_vargs(logLevel, format, args);
             va_end(args);
         }
 
-        void log_vargs(sensekit_log_severity_t logLevel, const char* format, va_list args)
+        static void log_vargs(const char* channel, sensekit_log_severity_t logLevel, const char* format, va_list args)
         {
-
 #ifdef _WIN32
             int len = _vscprintf(format, args);
 #else
@@ -46,7 +43,60 @@ namespace sensekit {
             std::unique_ptr<char[]> buffer(new char[len + 1]);
             vsnprintf(buffer.get(), len + 1, format, args);
 
-            log_internal(logLevel, buffer.get());
+            dispatch_log(channel, logLevel, buffer.get());
+        }
+
+        void log_vargs(sensekit_log_severity_t logLevel, const char* format, va_list args)
+        {
+            Logger::log_vargs(m_loggerName.c_str(), logLevel, format, args);
+        }
+
+        static void trace(const char* channel, const char* format, ...)
+        {
+            va_list args;
+            va_start(args, format);
+            Logger::log_vargs(channel, sensekit_log_severity_t::TRACE, format, args);
+            va_end(args);
+        }
+
+        static void info(const char* channel, const char* format, ...)
+        {
+            va_list args;
+            va_start(args, format);
+            Logger::log_vargs(channel, sensekit_log_severity_t::INFO, format, args);
+            va_end(args);
+        }
+
+        static void debug(const char* channel, const char* format, ...)
+        {
+            va_list args;
+            va_start(args, format);
+            Logger::log_vargs(channel, sensekit_log_severity_t::DEBUG, format, args);
+            va_end(args);
+        }
+
+        static void warn(const char* channel, const char* format, ...)
+        {
+            va_list args;
+            va_start(args, format);
+            Logger::log_vargs(channel, sensekit_log_severity_t::WARN, format, args);
+            va_end(args);
+        }
+
+        static void error(const char* channel, const char* format, ...)
+        {
+            va_list args;
+            va_start(args, format);
+            Logger::log_vargs(channel, sensekit_log_severity_t::ERROR, format, args);
+            va_end(args);
+        }
+
+        static void fatal(const char* channel, const char* format, ...)
+        {
+            va_list args;
+            va_start(args, format);
+            Logger::log_vargs(channel, sensekit_log_severity_t::FATAL, format, args);
+            va_end(args);
         }
 
         inline void trace(const char* format, ...)
@@ -97,28 +147,36 @@ namespace sensekit {
             va_end(args);
         }
 
+        static void log(const char* channel, sensekit_log_severity_t logLevel, const char* format, ...)
+        {
+            va_list args;
+            va_start(args, format);
+            Logger::log_vargs(channel, logLevel, format, args);
+            va_end(args);
+        }
+
     private:
-        void log_internal(sensekit_log_severity_t logLevel, const char* message)
+        static void dispatch_log(const char* channel, sensekit_log_severity_t logLevel, const char* message)
         {
             switch(logLevel)
             {
             case TRACE:
-                CLOG(TRACE, m_loggerName.c_str()) << message;
+                CLOG(TRACE, channel) << message;
                 break;
             case DEBUG:
-                CLOG(DEBUG, m_loggerName.c_str()) << message;
+                CLOG(DEBUG, channel) << message;
                 break;
             case INFO:
-                CLOG(INFO, m_loggerName.c_str()) << message;
+                CLOG(INFO, channel) << message;
                 break;
             case WARN:
-                CLOG(WARNING, m_loggerName.c_str()) << message;
+                CLOG(WARNING, channel) << message;
                 break;
             case ERROR:
-                CLOG(ERROR, m_loggerName.c_str()) << message;
+                CLOG(ERROR, channel) << message;
                 break;
             case FATAL:
-                CLOG(FATAL, m_loggerName.c_str()) << message;
+                CLOG(FATAL, channel) << message;
                 break;
             }
         }

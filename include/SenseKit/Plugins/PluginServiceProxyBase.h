@@ -70,6 +70,7 @@ struct PluginServiceProxyBase
                                            sensekit_parameter_data_t*);
 
     sensekit_status_t (*log)(void*,
+                             const char*,
                              sensekit_log_severity_t,
                              const char*,
                              va_list);

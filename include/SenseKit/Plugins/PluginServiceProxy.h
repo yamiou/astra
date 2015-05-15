@@ -99,11 +99,12 @@ namespace sensekit {
         return PluginServiceProxyBase::get_parameter_bin(pluginService, byteSize, binHandle, parameterData);
     }
 
-    sensekit_status_t log(sensekit_log_severity_t logLevel,
+    sensekit_status_t log(const char* channel,
+                          sensekit_log_severity_t logLevel,
                           const char* format,
                           va_list args)
     {
-        return PluginServiceProxyBase::log(pluginService, logLevel, format, args);
+        return PluginServiceProxyBase::log(pluginService, channel, logLevel, format, args);
     }
     };
 }

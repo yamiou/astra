@@ -61,7 +61,8 @@ namespace sensekit
         sensekit_status_t get_parameter_bin(size_t byteSize,
                                             sensekit_parameter_bin_t& binHandle,
                                             sensekit_parameter_data_t& parameterData);
-        sensekit_status_t log(sensekit_log_severity_t logLevel,
+        sensekit_status_t log(const char* channel,
+                              sensekit_log_severity_t logLevel,
                               const char* format,
                               va_list args);
 

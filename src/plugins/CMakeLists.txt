@@ -17,7 +17,7 @@ endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
 
 add_subdirectory(openni_sensor)
 
-if (NOT ANDROID)
+if (NOT SENSEKIT_ANDROID)
   add_subdirectory(orbbec_hand)
   add_subdirectory(orbbec_depth)
   add_subdirectory(dummy)

@@ -11,9 +11,9 @@ namespace sensekit {
     class PluginBase
     {
     public:
-        PluginBase(PluginServiceProxy* pluginService)
+        PluginBase(PluginServiceProxy* pluginService, const char* pluginName)
             :  m_pluginService(pluginService),
-               m_logger(*pluginService)
+               m_logger(*pluginService, pluginName)
         {
             assert(pluginService != nullptr);
         }

@@ -56,7 +56,9 @@ namespace sensekit { namespace plugins {
               m_numComponentPerPixel(numComponentPerPixel),
               m_bytesPerPixel(sizeof(block_type) * numComponentPerPixel)
         {
+            get_logger().info("creating oni stream of type: %d", desc.get_type());
             m_oniStream.create(m_oniDevice, oniSensorType);
+            get_logger().info("created oni stream of type: %d", desc.get_type());
             m_oniVideoMode = m_oniStream.getVideoMode();
             m_bufferLength =
                 m_oniVideoMode.getResolutionX() *
@@ -79,6 +81,7 @@ namespace sensekit { namespace plugins {
         {
             get_logger().info("starting oni stream of type: %d", get_description().get_type());
             m_oniStream.start();
+            get_logger().info("started oni stream of type: %d", get_description().get_type());
         }
 
         virtual void stop() override final

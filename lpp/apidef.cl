@@ -186,7 +186,8 @@
 (add-func       :funcset "plugin"
                 :returntype "sensekit_status_t"
                 :funcname "log"
-                :params (list (make-param :type "sensekit_log_severity_t" :name "logLevel")
+                :params (list (make-param :type "const char*" :name "channel")
+                              (make-param :type "sensekit_log_severity_t" :name "logLevel")
                               (make-param :type "const char*" :name "format")
                               (make-param :type "va_list" :name "args")))
 

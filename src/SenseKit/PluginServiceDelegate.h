@@ -114,11 +114,12 @@ namespace sensekit {
         }
 
         static sensekit_status_t log(void* pluginService,
+                                     const char* channel,
                                      sensekit_log_severity_t logLevel,
                                      const char* format,
                                      va_list args)
         {
-            return static_cast<PluginService*>(pluginService)->log(logLevel, format, args);
+            return static_cast<PluginService*>(pluginService)->log(channel, logLevel, format, args);
         }
     };
 }
