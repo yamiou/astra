@@ -4,6 +4,7 @@
 
 #include <SenseKit/sensekit_types.h>
 #include <atomic>
+#include <memory>
 #include "PluginService.h"
 #include "StreamSet.h"
 #include "StreamReader.h"
@@ -123,10 +124,14 @@ namespace sensekit {
     private:
         bool m_initialized{false};
 
-        Logger m_logger;
+        using LoggerPtr = std::unique_ptr<Logger>;
+        LoggerPtr m_logger;
+
         StreamSet m_rootSet;
 
-        PluginService m_pluginService;
+        using PluginServicePtr = std::unique_ptr<PluginService>;
+        PluginServicePtr m_pluginService;
+
         PluginServiceProxyBase* m_pluginServiceProxy;
         StreamServiceProxyBase* m_streamServiceProxy;
 

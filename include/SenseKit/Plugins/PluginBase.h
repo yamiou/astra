@@ -126,8 +126,6 @@ namespace sensekit {
         g_plugin = nullptr;                                                              \
     }                                                                                    \
                                                                                          \
-    SENSEKIT_END_DECLS                                                                   \
-                                                                                         \
-    struct missing_semicolon ## __LINE__ {}
+    SENSEKIT_END_DECLS
 
 #endif /* PLUGINBASE_H */

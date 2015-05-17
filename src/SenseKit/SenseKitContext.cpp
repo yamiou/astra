@@ -15,18 +15,7 @@ INITIALIZE_LOGGING
 namespace sensekit {
 
     SenseKitContext::SenseKitContext()
-        : m_pluginService(*this),
-          m_logger("Context")
-    {
-        el::Loggers::addFlag(el::LoggingFlag::HierarchicalLogging);
-        el::Loggers::addFlag(el::LoggingFlag::CreateLoggerAutomatically);
-        el::Loggers::setLoggingLevel(el::Level::Fatal);
-
-#if __ANDROID__
-        el::Loggers::reconfigureAllLoggers(el::ConfigurationType::Filename,
-                                           "/data/data/com.orbbec.sample/files/sensekit.log");
-#endif
-    }
+    {}
 
     SenseKitContext::~SenseKitContext()
     {}
@@ -36,8 +25,20 @@ namespace sensekit {
         if (m_initialized)
             return SENSEKIT_STATUS_SUCCESS;
 
-        m_logger.warn("Hold on to yer butts");
-        m_pluginServiceProxy = m_pluginService.create_proxy();
+        el::Loggers::addFlag(el::LoggingFlag::HierarchicalLogging);
+        el::Loggers::addFlag(el::LoggingFlag::CreateLoggerAutomatically);
+        el::Loggers::setLoggingLevel(el::Level::Fatal);
+
+#if __ANDROID__
+        el::Loggers::reconfigureAllLoggers(el::ConfigurationType::Filename,
+                                           "/data/data/com.orbbec.sample/files/sensekit.log");
+#endif
+
+        m_pluginService = std::make_unique<PluginService>(*this);
+        m_logger = std::make_unique<Logger>("Context");
+
+        m_logger->warn("Hold on to yer butts");
+        m_pluginServiceProxy = m_pluginService->create_proxy();
         m_streamServiceProxy = create_stream_proxy(this);
 
         sensekit_api_set_proxy(get_streamServiceProxy());
@@ -53,7 +54,7 @@ namespace sensekit {
 
         if (libs.size() == 0)
         {
-            m_logger.warn("SenseKit found no plugins. Is there a Plugins folder? Is the working directory correct?");
+            m_logger->warn("SenseKit found no plugins. Is there a Plugins folder? Is the working directory correct?");
         }
 
         for(auto lib : libs)

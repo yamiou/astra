@@ -6,10 +6,12 @@ EXPORT_PLUGIN(sensekit::plugins::hand::HandPlugin);
 
 namespace sensekit { namespace plugins { namespace hand {
 
+    const char HANDPLUGIN_CONFIG_FILE[] = "plugins/orbbec_hand.toml";
+
     HandPlugin::HandPlugin(PluginServiceProxy* pluginProxy)
         : PluginBase(pluginProxy, "orbbec_hand")
     {
-        m_settings = parse_settings("plugins/orbbec_hand.toml");
+        m_settings = parse_settings(HANDPLUGIN_CONFIG_FILE);
     }
 
     HandPlugin::~HandPlugin()
