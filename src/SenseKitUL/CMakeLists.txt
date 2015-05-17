@@ -44,7 +44,7 @@ target_link_libraries(${_projname} SenseKitAPI)
 
 install(TARGETS ${_projname}
         RUNTIME DESTINATION bin/
-        LIBRARY DESTINATION bin/
+        LIBRARY DESTINATION lib/
         ARCHIVE DESTINATION lib/
         )
 

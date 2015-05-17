@@ -88,7 +88,7 @@ add_subdirectory(Core/tests)
 
 install(TARGETS ${_projname}
         RUNTIME DESTINATION bin/
-        LIBRARY DESTINATION bin/
+        LIBRARY DESTINATION lib/
         ARCHIVE DESTINATION lib/
         )
 

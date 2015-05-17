@@ -16,7 +16,7 @@ include_directories(${_projname})
 
 install(TARGETS ${_projname}
   RUNTIME DESTINATION bin/Plugins/
-  LIBRARY DESTINATION bin/Plugins/
+  LIBRARY DESTINATION lib/Plugins/
   )
 
 install_pdb(${_projname} bin/Plugins/)

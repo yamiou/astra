@@ -32,7 +32,7 @@ target_link_libraries(${_projname} SenseKitAPI ${OpenNI2_LIBRARY})
 
 install(TARGETS ${_projname}
   RUNTIME DESTINATION bin/Plugins/
-  LIBRARY DESTINATION bin/Plugins/
+  LIBRARY DESTINATION lib/Plugins/
   )
 
 install_pdb(${_projname} bin/Plugins/)

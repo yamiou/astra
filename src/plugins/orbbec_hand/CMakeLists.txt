@@ -44,7 +44,7 @@ include_directories(${_projname} ${OpenCV_INCLUDE_DIRS})
 
 install(TARGETS ${_projname}
         RUNTIME DESTINATION bin/Plugins/
-        LIBRARY DESTINATION bin/Plugins/
+        LIBRARY DESTINATION lib/Plugins/
         )
 
 add_custom_target(copytoml ALL

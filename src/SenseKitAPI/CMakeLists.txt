@@ -18,7 +18,7 @@ add_library(${_projname} SHARED ${${_projname}_SOURCES} ${${_projname}_SOURCES_G
 
 install(TARGETS ${_projname}
         RUNTIME DESTINATION bin/
-        LIBRARY DESTINATION bin/
+        LIBRARY DESTINATION lib/
         ARCHIVE DESTINATION lib/
         )
 
