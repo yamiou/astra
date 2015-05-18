@@ -14,25 +14,32 @@ INITIALIZE_LOGGING
 
 namespace sensekit {
 
-    SenseKitContext::SenseKitContext()
-    {}
-
-    SenseKitContext::~SenseKitContext()
-    {}
-
     sensekit_status_t SenseKitContext::initialize()
     {
         if (m_initialized)
             return SENSEKIT_STATUS_SUCCESS;
 
-        el::Loggers::addFlag(el::LoggingFlag::HierarchicalLogging);
         el::Loggers::addFlag(el::LoggingFlag::CreateLoggerAutomatically);
-        el::Loggers::setLoggingLevel(el::Level::Fatal);
+
+        el::Configurations defaultConf;
+
+        defaultConf.setToDefault();
+        defaultConf.setGlobally(el::ConfigurationType::Enabled, "true");
+        defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "true");
+        defaultConf.setGlobally(el::ConfigurationType::ToFile, "true");
 
 #if __ANDROID__
-        el::Loggers::reconfigureAllLoggers(el::ConfigurationType::Filename,
-                                           "/data/data/com.orbbec.sample/files/sensekit.log");
+        //FIXME: get current android application path
+        defaultConf.setGlobally(el::ConfigurationType::Filename,
+                                "/data/data/com.orbbec.sample/files/sensekit.log");
+#else
+        el::Loggers::addFlag(el::LoggingFlag::ColoredTerminalOutput);
+        defaultConf.setGlobally(el::ConfigurationType::Filename,
+                                "logs/sensekit.log");
 #endif
+        el::Loggers::setDefaultConfigurations(defaultConf, true);
+
+        defaultConf.clear();
 
         m_pluginService = std::make_unique<PluginService>(*this);
         m_logger = std::make_unique<Logger>("Context");

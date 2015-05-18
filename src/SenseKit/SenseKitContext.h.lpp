@@ -38,9 +38,7 @@ namespace sensekit {
     class SenseKitContext
     {
     public:
-        SenseKitContext();
-        ~SenseKitContext();
-
+        SenseKitContext() = default;
         SenseKitContext& operator=(const SenseKitContext& rhs) = delete;
         SenseKitContext(const SenseKitContext& context) = delete;
 

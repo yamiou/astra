@@ -2,7 +2,7 @@
 #define LOGGER_H
 
 #include <SenseKit/sensekit_types.h>
-#include "vendor/easylogging++.h"
+#include "Logging.h"
 #include <cstdarg>
 #include <memory>
 #include <cstdio>
