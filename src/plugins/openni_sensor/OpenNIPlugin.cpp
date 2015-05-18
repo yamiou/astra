@@ -4,7 +4,7 @@
 #include "OniDepthStream.h"
 #include "OniColorStream.h"
 
-EXPORT_PLUGIN(sensekit::plugins::OpenNIPlugin);
+EXPORT_PLUGIN(sensekit::plugins::OpenNIPlugin)
 
 namespace sensekit
 {
@@ -45,15 +45,17 @@ namespace sensekit
 
         void OpenNIPlugin::onDeviceConnected(const ::openni::DeviceInfo* info)
         {
-            get_logger().info("device connected, opening device");
+            get_logger().info("device connected: %s", info->getUri());
+
             OniDeviceStreamSet* set = new OniDeviceStreamSet(get_pluginService(), info);
+            set->open();
 
             m_sets.push_back(SetPtr(set));
         }
 
         void OpenNIPlugin::onDeviceDisconnected(const ::openni::DeviceInfo* info)
         {
-            get_logger().info("device disconnected");
+            get_logger().info("device disconnected: %s", info->getUri());
             auto it = std::find_if(m_sets.begin(), m_sets.end(),
                                    [&info] (SetPtr& setPtr)
                                    -> bool
@@ -68,7 +70,7 @@ namespace sensekit
         {
             m_sets.clear();
             get_logger().info("shutting down openni");
-            ::openni::OpenNI::shutdown();
+            openni::OpenNI::shutdown();
         }
 
 

@@ -30,10 +30,12 @@ namespace sensekit { namespace plugins {
                      streamSet,
                      desc) { }
 
-        virtual void read_frame() = 0;
-        virtual ::openni::VideoStream* get_oni_stream() = 0;
-        virtual void start() = 0;
-        virtual void stop() = 0;
+        virtual sensekit_status_t read_frame() = 0;
+        virtual sensekit_status_t open() = 0;
+        virtual sensekit_status_t close() = 0;
+        virtual openni::VideoStream* get_oni_stream() = 0;
+        virtual sensekit_status_t start() = 0;
+        virtual sensekit_status_t stop() = 0;
     };
 
     template<typename TFrameWrapper, typename TBufferBlockType>
@@ -46,20 +48,40 @@ namespace sensekit { namespace plugins {
         OniDeviceStream(PluginServiceProxy& pluginService,
                         Sensor streamSet,
                         StreamDescription desc,
-                        ::openni::Device& oniDevice,
-                        ::openni::SensorType oniSensorType,
+                        openni::Device& oniDevice,
+                        openni::SensorType oniSensorType,
                         size_t numComponentPerPixel)
             : OniDeviceStreamBase(pluginService,
                                   streamSet,
                                   desc),
               m_oniDevice(oniDevice),
+              m_oniSensorType(oniSensorType),
               m_numComponentPerPixel(numComponentPerPixel),
               m_bytesPerPixel(sizeof(block_type) * numComponentPerPixel)
+        {}
+
+        virtual ~OniDeviceStream()
         {
-            get_logger().info("creating oni stream of type: %d", desc.get_type());
-            m_oniStream.create(m_oniDevice, oniSensorType);
-            get_logger().info("created oni stream of type: %d", desc.get_type());
+            close();
+        }
+
+        virtual sensekit_status_t open() override final
+        {
+            if (m_isOpen)
+                return SENSEKIT_STATUS_SUCCESS;
+
+            get_logger().info("creating oni stream of type: %d", get_description().get_type());
+            openni::Status rc = m_oniStream.create(m_oniDevice, m_oniSensorType);
+
+            if (rc != openni::STATUS_OK)
+            {
+                return SENSEKIT_STATUS_DEVICE_ERROR;
+            }
+
+            get_logger().info("created oni stream of type: %d", get_description().get_type());
+
             m_oniVideoMode = m_oniStream.getVideoMode();
+
             m_bufferLength =
                 m_oniVideoMode.getResolutionX() *
                 m_oniVideoMode.getResolutionY() *
@@ -68,32 +90,54 @@ namespace sensekit { namespace plugins {
             m_bin = std::make_unique<StreamBin<wrapper_type> >(get_pluginService(),
                                                                get_handle(),
                                                                m_bufferLength);
+            m_isOpen = true;
+
+            return SENSEKIT_STATUS_SUCCESS;
         }
 
-        virtual ~OniDeviceStream()
+        virtual sensekit_status_t close() override final
         {
+            if (!m_isOpen)
+                return SENSEKIT_STATUS_SUCCESS;
+
             stop();
+
             get_logger().info("destroying oni stream of type: %d", get_description().get_type());
             m_oniStream.destroy();
+
+            m_isOpen = false;
+
+            return SENSEKIT_STATUS_SUCCESS;
         }
 
-        virtual void start() override final
+        virtual sensekit_status_t start() override final
         {
+            if (!m_isOpen || m_isStreaming)
+                return SENSEKIT_STATUS_SUCCESS;
+
             get_logger().info("starting oni stream of type: %d", get_description().get_type());
             m_oniStream.start();
             get_logger().info("started oni stream of type: %d", get_description().get_type());
+
+            m_isStreaming = true;
+
+            return SENSEKIT_STATUS_SUCCESS;
         }
 
-        virtual void stop() override final
+        virtual sensekit_status_t stop() override final
         {
+            if (!m_isOpen || !m_isStreaming)
+                return SENSEKIT_STATUS_SUCCESS;
+
             get_logger().info("stopping oni stream of type: %d", get_description().get_type());
             m_oniStream.stop();
+
+            m_isStreaming = false;
+
+            return SENSEKIT_STATUS_SUCCESS;
         }
 
-        virtual void on_connection_added(sensekit_streamconnection_t connection) override;
-
-        virtual void on_connection_removed(sensekit_bin_t bin,
-                                           sensekit_streamconnection_t connection) override;
+        inline bool is_streaming() const { return m_isOpen && m_isStreaming; }
 
         virtual void on_get_parameter(sensekit_streamconnection_t connection,
                                       sensekit_parameter_id id,
@@ -148,17 +192,24 @@ namespace sensekit { namespace plugins {
             wrapper->frame.metadata = metadata;
         }
 
-        virtual void read_frame() override;
+        virtual sensekit_status_t read_frame() override;
 
-        virtual ::openni::VideoStream* get_oni_stream() override { return &m_oniStream; }
+        virtual openni::VideoStream* get_oni_stream() override { return &m_oniStream; }
 
+        void on_connection_added(sensekit_streamconnection_t connection);
+        void on_connection_removed(sensekit_bin_t bin,
+                                   sensekit_streamconnection_t connection);
 
     protected:
-        ::openni::Device& m_oniDevice;
-        ::openni::VideoStream m_oniStream;
-        ::openni::VideoMode m_oniVideoMode;
+        openni::SensorType m_oniSensorType;
+        openni::Device& m_oniDevice;
+        openni::VideoStream m_oniStream;
+        openni::VideoMode m_oniVideoMode;
 
     private:
+        bool m_isOpen{false};
+        bool m_isStreaming{false};
+
         std::unique_ptr<StreamBin<wrapper_type> > m_bin;
 
         size_t m_bufferLength{0};
@@ -166,7 +217,6 @@ namespace sensekit { namespace plugins {
         size_t m_numComponentPerPixel{0};
         sensekit_stream_t m_streamHandle{nullptr};
         sensekit_frame_index_t m_frameIndex{0};
-
     };
 
     template<typename TFrameWrapper, typename TBufferBlockType>
@@ -190,8 +240,10 @@ namespace sensekit { namespace plugins {
     }
 
     template<typename TFrameWrapper, typename TBufferBlockType>
-    void OniDeviceStream<TFrameWrapper, TBufferBlockType>::read_frame()
+    sensekit_status_t OniDeviceStream<TFrameWrapper, TBufferBlockType>::read_frame()
     {
+        if (!is_streaming()) return SENSEKIT_STATUS_SUCCESS;
+
         openni::VideoFrameRef ref;
         if (m_oniStream.readFrame(&ref) == ::openni::STATUS_OK)
         {
@@ -212,6 +264,8 @@ namespace sensekit { namespace plugins {
 
             ++m_frameIndex;
         }
+
+        return SENSEKIT_STATUS_SUCCESS;
     }
 }}
 
