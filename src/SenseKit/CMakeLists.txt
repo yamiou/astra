@@ -41,13 +41,17 @@ set(${_projname}_SOURCES
   StreamSet.cpp
   StreamSet.h
   Logger.h
+  Logger.cpp
   Logging.h
+  Logging.cpp
   StreamConnection.h
   StreamConnection.cpp
   StreamBin.h
   StreamBin.cpp
   StreamReader.h
   StreamReader.cpp
+  Core/OSProcesses.h
+  Core/OSProcesses.cpp
   Core/shared_library.h
   Core/shared_library_linux.cpp
   Core/shared_library_windows.cpp

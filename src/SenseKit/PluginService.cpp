@@ -35,7 +35,7 @@ namespace sensekit
         //if streamset has child streamsets, reparent them to this streamset's parent (or null parent)
         //then delete the streamset
 
-        m_logger.info("destroying streamset: %x (placeholder)", streamSet);
+        m_logger.info("destroying streamset: %x (mock)", streamSet);
 
         streamSet = nullptr;
 
@@ -236,7 +236,7 @@ namespace sensekit
                                          const char* format,
                                          va_list args)
     {
-        Logger::log_vargs(channel, logLevel, format, args);
+        sensekit::log_vargs(channel, logLevel, format, args);
         return SENSEKIT_STATUS_SUCCESS;
     }
 }

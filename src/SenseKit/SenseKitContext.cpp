@@ -9,8 +9,7 @@
 #include "StreamServiceDelegate.h"
 #include "CreateStreamProxy.h"
 #include "Logging.h"
-
-INITIALIZE_LOGGING
+#include "Core/OSProcesses.h"
 
 namespace sensekit {
 
@@ -19,38 +18,24 @@ namespace sensekit {
         if (m_initialized)
             return SENSEKIT_STATUS_SUCCESS;
 
-        el::Loggers::addFlag(el::LoggingFlag::CreateLoggerAutomatically);
-
-        el::Configurations defaultConf;
-
-        defaultConf.setToDefault();
-        defaultConf.setGlobally(el::ConfigurationType::Enabled, "true");
-        defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "true");
-        defaultConf.setGlobally(el::ConfigurationType::ToFile, "true");
-
 #if __ANDROID__
-        //FIXME: get current android application path
-        defaultConf.setGlobally(el::ConfigurationType::Filename,
-                                "/data/data/com.orbbec.sample/files/sensekit.log");
+        std::string logPath = get_application_filepath() + "sensekit.log";
 #else
-        el::Loggers::addFlag(el::LoggingFlag::ColoredTerminalOutput);
-        defaultConf.setGlobally(el::ConfigurationType::Filename,
-                                "logs/sensekit.log");
+        std::string logPath = "logs/sensekit.log";
 #endif
-        el::Loggers::setDefaultConfigurations(defaultConf, true);
-
-        defaultConf.clear();
+        initialize_logging(logPath.c_str());
 
         m_pluginService = std::make_unique<PluginService>(*this);
         m_logger = std::make_unique<Logger>("Context");
 
         m_logger->warn("Hold on to yer butts");
+        m_logger->info("logger file: %s", logPath.c_str());
         m_pluginServiceProxy = m_pluginService->create_proxy();
         m_streamServiceProxy = create_stream_proxy(this);
 
         sensekit_api_set_proxy(get_streamServiceProxy());
 
-        //TODO: OMG ERROR HANDLING
+//TODO: OMG ERROR HANDLING
         LibHandle libHandle = nullptr;
 
 #if !__ANDROID__
