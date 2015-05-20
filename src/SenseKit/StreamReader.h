@@ -52,7 +52,7 @@ namespace sensekit {
         StreamSet& get_streamSet() const { return m_streamSet; }
 
         StreamConnection* get_stream(sensekit_stream_desc_t& desc);
-        sensekit_frame_ref_t* get_subframe(sensekit_stream_desc_t& desc);
+        sensekit_frame_t* get_subframe(sensekit_stream_desc_t& desc);
 
         sensekit_callback_id_t register_frame_ready_callback(sensekit_frame_ready_callback_t callback, void* clientTag);
         void unregister_frame_ready_callback(sensekit_callback_id_t& callbackId);

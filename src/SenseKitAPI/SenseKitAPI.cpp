@@ -111,9 +111,9 @@ SENSEKIT_API sensekit_status_t sensekit_reader_unregister_frame_ready_callback(s
 SENSEKIT_API sensekit_status_t sensekit_reader_get_frame(sensekit_reader_frame_t frame,
                                                          sensekit_stream_type_t type,
                                                          sensekit_stream_subtype_t subtype,
-                                                         sensekit_frame_ref_t** frameRef)
+                                                         sensekit_frame_t** subFrame)
 {
-    return get_api_proxy()->reader_get_frame(frame, type, subtype, frameRef);
+    return get_api_proxy()->reader_get_frame(frame, type, subtype, subFrame);
 }
 
 SENSEKIT_API sensekit_status_t sensekit_stream_set_parameter(sensekit_streamconnection_t connection,

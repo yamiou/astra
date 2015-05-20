@@ -42,7 +42,7 @@ typedef struct _sensekit_skeleton {
 } sensekit_skeleton_t;
 
 struct _sensekit_skeletonframe {
-    sensekit_frame_ref_t* frameRef;
+    sensekit_frame_t* frame;
     size_t skeletonCount;
     sensekit_skeleton_t* skeletons;
 };

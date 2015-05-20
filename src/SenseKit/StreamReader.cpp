@@ -90,7 +90,7 @@ namespace sensekit {
         }
     }
 
-    sensekit_frame_ref_t* StreamReader::get_subframe(sensekit_stream_desc_t& desc)
+    sensekit_frame_t* StreamReader::get_subframe(sensekit_stream_desc_t& desc)
     {
         if (!m_locked)
             return nullptr;

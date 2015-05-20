@@ -66,7 +66,7 @@ struct StreamServiceProxyBase
                                           sensekit_reader_frame_t,
                                           sensekit_stream_type_t,
                                           sensekit_stream_subtype_t,
-                                          sensekit_frame_ref_t**);
+                                          sensekit_frame_t**);
 
     sensekit_status_t (*stream_set_parameter)(void*,
                                               sensekit_streamconnection_t,

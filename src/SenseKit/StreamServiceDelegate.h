@@ -115,9 +115,9 @@ namespace sensekit {
                                                   sensekit_reader_frame_t frame,
                                                   sensekit_stream_type_t type,
                                                   sensekit_stream_subtype_t subtype,
-                                                  sensekit_frame_ref_t** frameRef)
+                                                  sensekit_frame_t** subFrame)
         {
-            return static_cast<SenseKitContext*>(streamService)->reader_get_frame(frame, type, subtype, *frameRef);
+            return static_cast<SenseKitContext*>(streamService)->reader_get_frame(frame, type, subtype, *subFrame);
         }
 
         static sensekit_status_t stream_set_parameter(void* streamService,

@@ -46,25 +46,23 @@ namespace sensekit {
         return m_stream->get_description();
     }
 
-    sensekit_frame_ref_t* StreamConnection::lock()
+    sensekit_frame_t* StreamConnection::lock()
     {
         if (m_locked)
-            return &m_currentFrame;
+            return m_currentFrame;
 
         if (m_bin != nullptr)
         {
-            m_currentFrame.frame = m_bin->lock_front_buffer();
+            m_currentFrame = m_bin->lock_front_buffer();
         }
         else
         {
-            m_currentFrame.frame = nullptr;
+            m_currentFrame = nullptr;
         }
-
-        m_currentFrame.streamConnection = &m_connection;
 
         m_locked = true;
 
-        return &m_currentFrame;
+        return m_currentFrame;
     }
 
     void StreamConnection::unlock()

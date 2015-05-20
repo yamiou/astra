@@ -10,13 +10,13 @@
 // http://stackoverflow.com/questions/3350852/how-to-correctly-fix-zero-sized-array-in-struct-union-warning-c4200-without
 
 struct _sensekit_imageframe {
-    sensekit_frame_ref_t* frameRef;
+    sensekit_frame_t* frame;
     sensekit_image_metadata_t metadata;
     void* data;
 };
 
 struct _sensekit_handframe {
-    sensekit_frame_ref_t* frameRef;
+    sensekit_frame_t* frame;
     size_t handCount;
     sensekit_handpoint_t* handpoints;
 };

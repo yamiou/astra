@@ -25,7 +25,7 @@ namespace sensekit {
 
         void start();
         void stop();
-        sensekit_frame_ref_t* lock();
+        sensekit_frame_t* lock();
         void unlock();
 
         void set_bin(StreamBin* bin);
@@ -70,7 +70,7 @@ namespace sensekit {
         void clear_pending_parameter_result();
 
         _sensekit_streamconnection m_connection;
-        sensekit_frame_ref_t m_currentFrame;
+        sensekit_frame_t* m_currentFrame{nullptr};
 
         bool m_locked{false};
         bool m_started{false};
@@ -78,7 +78,7 @@ namespace sensekit {
         Stream* m_stream{nullptr};
         StreamBin* m_bin{nullptr};
         sensekit_stream_t m_handle{nullptr};
-        ParameterBin* m_pendingParameterResult{ nullptr };
+        ParameterBin* m_pendingParameterResult{nullptr};
 
         FrontBufferReadyCallback m_binFrontBufferReadyCallback;
         sensekit_callback_id_t m_binFrontBufferReadyCallbackId;

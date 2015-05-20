@@ -27,7 +27,6 @@ typedef struct _sensekit_streamconnection_handle* sensekit_streamconnection_hand
 
 typedef struct _sensekit_streamconnection* sensekit_streamconnection_t;
 
-typedef struct _sensekit_frame_ref sensekit_frame_ref_t;
 typedef struct _sensekit_frame sensekit_frame_t;
 
 typedef struct _sensekit_reader* sensekit_reader_t;

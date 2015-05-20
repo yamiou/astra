@@ -306,14 +306,14 @@
 ;; SENSEKIT_API sensekit_status_t sensekit_reader_get_frame(sensekit_reader_frame_t frame,
 ;;                                                          sensekit_stream_type_t type,
 ;;                                                          sensekit_stream_subtype_t subtype,
-;;                                                          sensekit_frame_ref_t** frameRef);
+;;                                                          sensekit_frame_t** frame);
 (add-func       :funcset "stream"
                 :returntype "sensekit_status_t"
                 :funcname "reader_get_frame"
                 :params (list (make-param :type "sensekit_reader_frame_t" :name "frame")
                               (make-param :type "sensekit_stream_type_t" :name "type")
                               (make-param :type "sensekit_stream_subtype_t" :name "subtype")
-                              (make-param :type "sensekit_frame_ref_t**" :name "frameRef" :deref T)))
+                              (make-param :type "sensekit_frame_t**" :name "subFrame" :deref T)))
 
 ;; SENSEKIT_API sensekit_status_t sensekit_stream_set_parameter(sensekit_streamconnection_t connection,
 ;;                                                              sensekit_parameter_id parameterId,
