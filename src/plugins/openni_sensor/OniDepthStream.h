@@ -24,6 +24,10 @@ namespace sensekit { namespace plugins {
                               oniDevice,
                               ::openni::SENSOR_DEPTH,
                               1)
+        {}
+
+    private:
+        virtual void on_open() override
         {
             refresh_conversion_cache(m_oniStream.getHorizontalFieldOfView(),
                                      m_oniStream.getVerticalFieldOfView(),
@@ -31,7 +35,6 @@ namespace sensekit { namespace plugins {
                                      m_oniVideoMode.getResolutionY());
         }
 
-    private:
         void refresh_conversion_cache(float horizontalFov,
                                       float verticalFov,
                                       int resolutionX,

@@ -90,10 +90,15 @@ namespace sensekit { namespace plugins {
             m_bin = std::make_unique<StreamBin<wrapper_type> >(get_pluginService(),
                                                                get_handle(),
                                                                m_bufferLength);
+
+            on_open();
+
             m_isOpen = true;
 
             return SENSEKIT_STATUS_SUCCESS;
         }
+
+
 
         virtual sensekit_status_t close() override final
         {
@@ -101,6 +106,8 @@ namespace sensekit { namespace plugins {
                 return SENSEKIT_STATUS_SUCCESS;
 
             stop();
+
+            on_close();
 
             get_logger().info("destroying oni stream of type: %d", get_description().get_type());
             m_oniStream.destroy();
@@ -207,6 +214,9 @@ namespace sensekit { namespace plugins {
         openni::VideoMode m_oniVideoMode;
 
     private:
+        virtual void on_open() {}
+        virtual void on_close() {}
+
         bool m_isOpen{false};
         bool m_isStreaming{false};
 
