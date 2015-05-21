@@ -22,9 +22,4 @@ struct _sensekit_frame {
     void* data;
 };
 
-struct _sensekit_frame_ref {
-    sensekit_streamconnection_t streamConnection;
-    sensekit_frame_t* frame;
-};
-
 #endif /* PLUGIN_CAPI_H */
