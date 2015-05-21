@@ -112,7 +112,7 @@ namespace sensekit { namespace plugins {
             get_logger().info("destroying oni stream of type: %d", get_description().get_type());
             m_oniStream.destroy();
 
-            m_isOpen = false;
+            m_isOpen = m_isStreaming = false;
 
             return SENSEKIT_STATUS_SUCCESS;
         }
@@ -138,6 +138,7 @@ namespace sensekit { namespace plugins {
 
             get_logger().info("stopping oni stream of type: %d", get_description().get_type());
             m_oniStream.stop();
+            get_logger().info("stopped oni stream of type: %d", get_description().get_type());
 
             m_isStreaming = false;
 
@@ -220,11 +221,13 @@ namespace sensekit { namespace plugins {
         bool m_isOpen{false};
         bool m_isStreaming{false};
 
-        std::unique_ptr<StreamBin<wrapper_type> > m_bin;
+        using BinType = StreamBin<wrapper_type>;
+        std::unique_ptr<BinType> m_bin;
 
         size_t m_bufferLength{0};
         size_t m_bytesPerPixel{0};
         size_t m_numComponentPerPixel{0};
+
         sensekit_stream_t m_streamHandle{nullptr};
         sensekit_frame_index_t m_frameIndex{0};
     };
