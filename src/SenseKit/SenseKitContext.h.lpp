@@ -5,35 +5,15 @@
 #include <SenseKit/sensekit_types.h>
 #include <atomic>
 #include <memory>
-#include "PluginService.h"
+#include "PluginManager.h"
 #include "StreamSet.h"
 #include "StreamReader.h"
 #include "Core/shared_library.h"
 #include "Logger.h"
 
 struct StreamServiceProxyBase;
-struct PluginServiceProxyBase;
 
 namespace sensekit {
-
-    using initialize_fn = void(*)(PluginServiceProxyBase*);
-    using terminate_fn = void(*)();
-    using update_fn = void(*)();
-
-    struct PluginFuncs
-    {
-        initialize_fn initialize{nullptr};
-        terminate_fn terminate{nullptr};
-        update_fn update{nullptr};
-        LibHandle libHandle{nullptr};
-
-        bool is_valid()
-            {
-                return initialize != nullptr &&
-                    terminate != nullptr &&
-                    update != nullptr;
-            }
-    };
 
     class SenseKitContext
     {
@@ -61,14 +41,10 @@ namespace sensekit {
 
         StreamSet m_rootSet;
 
-        using PluginServicePtr = std::unique_ptr<PluginService>;
-        PluginServicePtr m_pluginService;
-
-        PluginServiceProxyBase* m_pluginServiceProxy;
         StreamServiceProxyBase* m_streamServiceProxy;
 
-        using PluginList = std::vector<PluginFuncs>;
-        PluginList m_pluginList;
+        using PluginManagerPtr = std::unique_ptr<PluginManager>;
+        PluginManagerPtr m_pluginManager;
 
         using ReaderPtr = std::unique_ptr<StreamReader>;
         using ReaderList = std::vector<ReaderPtr>;

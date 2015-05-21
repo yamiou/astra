@@ -2,8 +2,6 @@
 #include <SenseKit/sensekit_capi.h>
 #include <SenseKit/Plugins/plugin_capi.h>
 #include <SenseKitAPI.h>
-#include "Core/shared_library.h"
-#include "Core/libs.h"
 #include "StreamReader.h"
 #include "StreamConnection.h"
 #include "StreamServiceDelegate.h"
@@ -12,6 +10,8 @@
 #include "Core/OSProcesses.h"
 
 namespace sensekit {
+
+    const char PLUGIN_DIRECTORY[] = "./Plugins/";
 
     sensekit_status_t SenseKitContext::initialize()
     {
@@ -25,56 +25,25 @@ namespace sensekit {
 #endif
         initialize_logging(logPath.c_str());
 
-        m_pluginService = std::make_unique<PluginService>(*this);
         m_logger = std::make_unique<Logger>("Context");
 
         m_logger->warn("Hold on to yer butts");
         m_logger->info("logger file: %s", logPath.c_str());
-        m_pluginServiceProxy = m_pluginService->create_proxy();
-        m_streamServiceProxy = create_stream_proxy(this);
 
+        m_streamServiceProxy = create_stream_proxy(this);
         sensekit_api_set_proxy(get_streamServiceProxy());
 
-//TODO: OMG ERROR HANDLING
-        LibHandle libHandle = nullptr;
+        m_pluginManager = std::make_unique<PluginManager>(*this);
 
 #if !__ANDROID__
-        std::vector<std::string> libs = get_libs();
+        m_pluginManager->load_plugins(PLUGIN_DIRECTORY);
 #else
-        std::vector<std::string> libs = {"libopenni_sensor.so"};
+        m_pluginManager->load_plugin("libopenni_sensor.so");
 #endif
 
-        if (libs.size() == 0)
+        if (m_pluginManager->plugin_count() == 0)
         {
             m_logger->warn("SenseKit found no plugins. Is there a Plugins folder? Is the working directory correct?");
-        }
-
-        for(auto lib : libs)
-        {
-
-#if !__ANDROID__
-            std::string path = PLUGIN_DIRECTORY + lib;
-#else
-            std::string path = lib;
-#endif
-
-            os_load_library(path.c_str(), libHandle);
-
-            PluginFuncs pluginFuncs;
-            os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_initialize), (FarProc&)pluginFuncs.initialize);
-            os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_terminate), (FarProc&)pluginFuncs.terminate);
-            os_get_proc_address(libHandle, SK_STRINGIFY(sensekit_plugin_update), (FarProc&)pluginFuncs.update);
-            pluginFuncs.libHandle = libHandle;
-
-            if (pluginFuncs.is_valid())
-            {
-                pluginFuncs.initialize(m_pluginServiceProxy);
-                m_pluginList.push_back(pluginFuncs);
-            }
-            else
-            {
-                os_free_library(libHandle);
-            }
         }
 
         m_initialized = true;
@@ -87,14 +56,7 @@ namespace sensekit {
         if (!m_initialized)
             return SENSEKIT_STATUS_SUCCESS;
 
-        for(auto pluginFuncs : m_pluginList)
-        {
-            pluginFuncs.terminate();
-            os_free_library(pluginFuncs.libHandle);
-        }
-
-        if (m_pluginServiceProxy)
-            delete m_pluginServiceProxy;
+        m_pluginManager.reset();
 
         if (m_streamServiceProxy)
             delete m_streamServiceProxy;
@@ -110,6 +72,7 @@ namespace sensekit {
 
         return SENSEKIT_STATUS_SUCCESS;
     }
+
 
     sensekit_status_t SenseKitContext::streamset_close(sensekit_streamset_t& streamSet)
     {
@@ -303,11 +266,7 @@ namespace sensekit {
 
     sensekit_status_t SenseKitContext::temp_update()
     {
-        for(auto plinfo : m_pluginList)
-        {
-            if (plinfo.update)
-                plinfo.update();
-        }
+        m_pluginManager->update();
 
         return SENSEKIT_STATUS_SUCCESS;
     }
