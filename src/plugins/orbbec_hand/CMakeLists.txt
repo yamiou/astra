@@ -41,6 +41,11 @@ set_target_properties(${_projname} PROPERTIES FOLDER "plugins")
 target_link_libraries(${_projname} SenseKitAPI SenseKitUL ${OpenCV_LIBS})
 
 include_directories(${_projname} ${OpenCV_INCLUDE_DIRS})
+if (ANDROID)
+    #so the compiler will find cmake2 includes.
+    #The ndk compiler apparently rejects /usr/include as an path (from OpenCV_INCLUDE_DIRS)
+    include_directories(${_projname} "/usr/local/include")
+endif()
 
 install(TARGETS ${_projname}
         RUNTIME DESTINATION bin/Plugins/
