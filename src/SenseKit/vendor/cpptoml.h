@@ -27,6 +27,18 @@
 #include <map>
 #include <vector>
 
+#ifdef __ANDROID__
+namespace std {
+template <typename T>
+std::string to_string(T value)
+{
+    std::ostringstream os ;
+    os << value ;
+    return os.str() ;
+}
+}
+#endif
+
 namespace cpptoml
 {
 
@@ -35,9 +47,9 @@ namespace cpptoml
     // a std::map will ensure that entries a sorted, albeit at a slight
     // performance penalty relative to the (default) unordered_map
     using string_to_base_map = std::map<std::string, std::shared_ptr<base>>;
-#else 
+#else
     // by default an unordered_map is used for best performance as the
-    // toml specification does not require entries to be sorted 
+    // toml specification does not require entries to be sorted
     using string_to_base_map = std::unordered_map<std::string, std::shared_ptr<base>>;
 #endif
 
