@@ -7,6 +7,7 @@
 #include "PluginService.h"
 #include "Core/shared_library.h"
 #include <SenseKit/Plugins/PluginServiceProxyBase.h>
+#include "Logger.h"
 
 namespace sensekit {
 
@@ -47,6 +48,7 @@ namespace sensekit {
         void try_load_plugin(const std::string& path);
 
         SenseKitContext& m_context;
+        Logger m_logger;
 
         using PluginList = std::vector<PluginFuncs>;
         PluginList m_pluginList;

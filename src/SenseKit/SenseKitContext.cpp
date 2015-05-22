@@ -32,6 +32,7 @@ namespace sensekit {
 
         m_streamServiceProxy = create_stream_proxy(this);
         sensekit_api_set_proxy(get_streamServiceProxy());
+        m_logger->trace("API Proxy set");
 
         m_pluginManager = std::make_unique<PluginManager>(*this);
 

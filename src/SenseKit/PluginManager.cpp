@@ -5,19 +5,23 @@ namespace sensekit {
 
     PluginManager::PluginManager(SenseKitContext& context)
         : m_context(context),
-          m_pluginService(std::make_unique<PluginService>(context))
+          m_pluginService(std::make_unique<PluginService>(context)),
+          m_logger("PluginManager")
     {
+        m_logger.trace("ctor");
         m_pluginServiceProxy = m_pluginService->create_proxy();
     }
 
     PluginManager::~PluginManager()
     {
+        m_logger.trace("dtor");
         unload_all_plugins();
         delete m_pluginServiceProxy;
     }
 
     void PluginManager::load_plugins(std::string searchPath)
     {
+        m_logger.trace("load plugins");
         std::vector<std::string> pluginFiles = find_libraries(searchPath);
         for(auto pluginPath : pluginFiles)
         {
@@ -78,6 +82,7 @@ namespace sensekit {
     void PluginManager::try_load_plugin(const std::string& path)
     {
         LibHandle libHandle = nullptr;
+        m_logger.trace("try_load_plugin %s", path.c_str());
 
         os_load_library(path.c_str(), libHandle);
 
@@ -89,11 +94,15 @@ namespace sensekit {
 
         if (pluginFuncs.is_valid())
         {
+            m_logger.trace("try_load_plugin valid plugin");
             pluginFuncs.initialize(m_pluginServiceProxy);
+            m_logger.trace("try_load_plugin initialized plugin");
             m_pluginList.push_back(pluginFuncs);
         }
         else
         {
+            m_logger.trace("try_load_plugin invalid lib: init: %s, term: %s, update: %s", pluginFuncs.initialize, pluginFuncs.terminate, pluginFuncs.update);
+
             os_free_library(libHandle);
         }
     }
