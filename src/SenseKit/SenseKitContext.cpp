@@ -343,4 +343,10 @@ namespace sensekit {
 
         return SENSEKIT_STATUS_SUCCESS;
     }
+
+    sensekit_status_t SenseKitContext::notify_host_event(sensekit_event_id id, const void* data, size_t dataSize)
+    {
+        m_pluginManager->notify_host_event(id, data, dataSize);
+        return SENSEKIT_STATUS_SUCCESS;
+    }
 }

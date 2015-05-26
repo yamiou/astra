@@ -14,4 +14,15 @@ SENSEKIT_API ^RETURN^ sensekit_^FUNC^(^PARAMS^)
 }
 
 ^^^ENDREPLACE^^^
+
+void sensekit_notify_device_available(const char* deviceUri)
+{
+    g_Context.notify_device_available(deviceUri);
+}
+
+void sensekit_notify_device_unavailable(const char* deviceUri)
+{
+    g_Context.notify_device_unavailable(deviceUri);
+}
+
 SENSEKIT_END_DECLS

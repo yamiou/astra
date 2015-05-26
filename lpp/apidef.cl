@@ -82,6 +82,20 @@
                               (make-param :type "void*" :name "clientTag")
                               (make-param :type "sensekit_callback_id_t*" :name "callbackId" :deref T)))
 
+;; sensekit_status_t register_host_event_callback(host_event_callback_t callback, void* clientTag, sensekit_callback_id_t* callbackId)
+(add-func       :funcset "plugin"
+                :returntype "sensekit_status_t"
+                :funcname "register_host_event_callback"
+                :params (list (make-param :type "host_event_callback_t" :name "callback")
+                              (make-param :type "void*" :name "clientTag")
+                              (make-param :type "sensekit_callback_id_t*" :name "callbackId" :deref T)))
+
+;; sensekit_status_t unregister_host_event_callback(sensekit_callback_id_t callbackId)
+(add-func       :funcset "plugin"
+                :returntype "sensekit_status_t"
+                :funcname "unregister_host_event_callback"
+                :params (list (make-param :type "sensekit_callback_id_t" :name "callback")))
+
 ;; sensekit_status_t unregister_stream_added_callback(sensekit_callback_id_t callbackId)
 (add-func       :funcset "plugin"
                 :returntype "sensekit_status_t"

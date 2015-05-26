@@ -8,13 +8,11 @@ namespace sensekit {
           m_pluginService(std::make_unique<PluginService>(context)),
           m_logger("PluginManager")
     {
-        m_logger.trace("ctor");
         m_pluginServiceProxy = m_pluginService->create_proxy();
     }
 
     PluginManager::~PluginManager()
     {
-        m_logger.trace("dtor");
         unload_all_plugins();
         delete m_pluginServiceProxy;
     }
@@ -127,5 +125,10 @@ namespace sensekit {
         }
 
         m_pluginList.clear();
+    }
+
+    void PluginManager::notify_host_event(sensekit_event_id id, const void* data, size_t dataSize)
+    {
+        m_pluginService->notify_host_event(id, data, dataSize);
     }
 }

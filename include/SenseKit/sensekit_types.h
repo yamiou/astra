@@ -66,4 +66,6 @@ typedef enum {
     TRACE
 } sensekit_log_severity_t;
 
+typedef uint32_t sensekit_event_id;
+
 #endif /* SENSEKIT_TYPES_H */

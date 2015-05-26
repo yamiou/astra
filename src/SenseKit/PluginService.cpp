@@ -17,6 +17,11 @@ namespace sensekit
         return create_plugin_proxy(this);
     }
 
+    void PluginService::notify_host_event(sensekit_event_id id, const void* data, size_t dataSize)
+    {
+        m_hostEventSignal.raise(id, data, dataSize);
+    }
+
     sensekit_status_t PluginService::create_stream_set(sensekit_streamset_t& streamSet)
     {
         //TODO: normally would create a new streamset
@@ -237,6 +242,30 @@ namespace sensekit
                                          va_list args)
     {
         sensekit::log_vargs(channel, logLevel, format, args);
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t PluginService::register_host_event_callback(host_event_callback_t callback,
+                                                                  void* clientTag,
+                                                                  CallbackId& callbackId)
+    {
+        auto thunk = [clientTag, callback](sensekit_event_id id, const void* data, size_t dataSize)
+            {
+                callback(clientTag, id, data, dataSize);
+            };
+
+        callbackId = m_hostEventSignal += thunk;
+
+        //m_context.raise_existing_device_unavailable(callback, clientTag);
+
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+
+    sensekit_status_t PluginService::unregister_host_event_callback(CallbackId callbackId)
+    {
+        m_hostEventSignal -= callbackId;
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 }

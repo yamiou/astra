@@ -20,6 +20,14 @@ struct PluginServiceProxyBase
                                                            void*,
                                                            sensekit_callback_id_t*);
 
+    sensekit_status_t (*register_host_event_callback)(void*,
+                                                      host_event_callback_t,
+                                                      void*,
+                                                      sensekit_callback_id_t*);
+
+    sensekit_status_t (*unregister_host_event_callback)(void*,
+                                                        sensekit_callback_id_t);
+
     sensekit_status_t (*unregister_stream_added_callback)(void*,
                                                           sensekit_callback_id_t);
 

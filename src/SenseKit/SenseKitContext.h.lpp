@@ -33,6 +33,8 @@ namespace sensekit {
 
         StreamServiceProxyBase* get_streamServiceProxy() { return m_streamServiceProxy; }
 
+        sensekit_status_t notify_host_event(sensekit_event_id id, const void* data, size_t dataSize);
+
     private:
         bool m_initialized{false};
 

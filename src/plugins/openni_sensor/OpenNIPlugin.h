@@ -2,7 +2,6 @@
 #define OPENNIPLUGIN_H
 
 #include <SenseKit/SenseKit.h>
-#define ORBBEC_LOGGING
 #include <SenseKit/Plugins/PluginKit.h>
 #include "OniDeviceStream.h"
 #include "OniDeviceStreamSet.h"
@@ -25,6 +24,7 @@ namespace sensekit
             OpenNIPlugin(PluginServiceProxy* pluginService)
                 : PluginBase(pluginService, "openni_sensor")
                 {
+                    register_for_host_events();
                     init_openni();
                 }
 
@@ -35,6 +35,8 @@ namespace sensekit
             OpenNIPlugin& operator=(const OpenNIPlugin&) = delete;
 
         private:
+            virtual void on_host_event(sensekit_event_id id, const void* data, size_t dataSize) override;
+
             void init_openni();
 
             virtual void onDeviceConnected(const ::openni::DeviceInfo* info) override;

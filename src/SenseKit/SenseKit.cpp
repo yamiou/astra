@@ -2,6 +2,7 @@
 #include "SenseKitContext.h"
 #include <SenseKit/Plugins/StreamServiceProxyBase.h>
 #include <SenseKitAPI.h>
+#include <SenseKit/host_events.h>
 
 static sensekit::SenseKitContext g_Context;
 
@@ -138,6 +139,21 @@ SENSEKIT_API sensekit_status_t sensekit_stream_invoke(sensekit_streamconnection_
 SENSEKIT_API sensekit_status_t sensekit_temp_update()
 {
     return g_Context.temp_update();
+}
+
+SENSEKIT_API sensekit_status_t sensekit_notify_host_event(sensekit_event_id id, const void* data, size_t dataSize)
+{
+    return g_Context.notify_host_event(id, data, dataSize);
+}
+
+SENSEKIT_API sensekit_status_t sensekit_notify_resource_available(const char* resourceURI)
+{
+    return sensekit_notify_host_event(SENSEKIT_EVENT_RESOURCE_AVAILABLE, resourceURI, strlen(resourceURI));
+}
+
+SENSEKIT_API sensekit_status_t sensekit_notify_resource_unavailable(const char* resourceURI)
+{
+    return sensekit_notify_host_event(SENSEKIT_EVENT_RESOURCE_UNAVAILABLE, resourceURI, strlen(resourceURI));
 }
 
 SENSEKIT_END_DECLS

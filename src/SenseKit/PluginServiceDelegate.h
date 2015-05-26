@@ -28,6 +28,20 @@ namespace sensekit {
             return static_cast<PluginService*>(pluginService)->register_stream_removing_callback(callback, clientTag, *callbackId);
         }
 
+        static sensekit_status_t register_host_event_callback(void* pluginService,
+                                                              host_event_callback_t callback,
+                                                              void* clientTag,
+                                                              sensekit_callback_id_t* callbackId)
+        {
+            return static_cast<PluginService*>(pluginService)->register_host_event_callback(callback, clientTag, *callbackId);
+        }
+
+        static sensekit_status_t unregister_host_event_callback(void* pluginService,
+                                                                sensekit_callback_id_t callback)
+        {
+            return static_cast<PluginService*>(pluginService)->unregister_host_event_callback(callback);
+        }
+
         static sensekit_status_t unregister_stream_added_callback(void* pluginService,
                                                                   sensekit_callback_id_t callback)
         {

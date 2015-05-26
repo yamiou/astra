@@ -43,6 +43,7 @@ namespace sensekit {
         void unload_all_plugins();
         size_t plugin_count() const { return m_pluginList.size(); }
 
+        void notify_host_event(sensekit_event_id id, const void* data, size_t dataSize);
     private:
         std::vector<std::string> find_libraries(const std::string& pluginsPath);
         void try_load_plugin(const std::string& path);

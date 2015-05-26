@@ -26,6 +26,18 @@ namespace sensekit {
         return PluginServiceProxyBase::register_stream_removing_callback(pluginService, callback, clientTag, callbackId);
     }
 
+    sensekit_status_t register_host_event_callback(host_event_callback_t callback,
+                                                   void* clientTag,
+                                                   sensekit_callback_id_t* callbackId)
+    {
+        return PluginServiceProxyBase::register_host_event_callback(pluginService, callback, clientTag, callbackId);
+    }
+
+    sensekit_status_t unregister_host_event_callback(sensekit_callback_id_t callback)
+    {
+        return PluginServiceProxyBase::unregister_host_event_callback(pluginService, callback);
+    }
+
     sensekit_status_t unregister_stream_added_callback(sensekit_callback_id_t callback)
     {
         return PluginServiceProxyBase::unregister_stream_added_callback(pluginService, callback);

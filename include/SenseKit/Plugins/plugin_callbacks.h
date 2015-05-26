@@ -42,6 +42,11 @@ typedef void(*stream_removing_callback_t)(void*,
                                           sensekit_stream_t,
                                           sensekit_stream_desc_t);
 
+typedef void(*host_event_callback_t)(void*,
+                                     sensekit_event_id,
+                                     const void*,
+                                     size_t);
+
 struct stream_callbacks_t {
     void* context;
     set_parameter_callback_t set_parameter_callback;

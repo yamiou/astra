@@ -29,6 +29,7 @@ namespace sensekit
         PluginService& operator=(const PluginService& rhs) = delete;
 
         PluginServiceProxyBase* create_proxy();
+        void notify_host_event(sensekit_event_id id, const void* data, size_t dataSize);
 
 ^^^BEGINREPLACE:plugin^^^
         ^RETURN^ ^FUNC^(^PARAMS:ref^);
@@ -38,6 +39,7 @@ namespace sensekit
         SenseKitContext& m_context;
         Signal<sensekit_streamset_t, sensekit_stream_t, sensekit_stream_desc_t> m_streamAddedSignal;
         Signal<sensekit_streamset_t, sensekit_stream_t, sensekit_stream_desc_t> m_streamRemovingSignal;
+        Signal<sensekit_event_id, const void*, size_t> m_hostEventSignal;
 
         Logger m_logger;
     };

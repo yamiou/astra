@@ -13,6 +13,8 @@ PluginServiceProxyBase* create_plugin_proxy(PluginService* service)
 
         proxy->register_stream_added_callback = &PluginServiceDelegate::register_stream_added_callback;
         proxy->register_stream_removing_callback = &PluginServiceDelegate::register_stream_removing_callback;
+        proxy->register_host_event_callback = &PluginServiceDelegate::register_host_event_callback;
+        proxy->unregister_host_event_callback = &PluginServiceDelegate::unregister_host_event_callback;
         proxy->unregister_stream_added_callback = &PluginServiceDelegate::unregister_stream_added_callback;
         proxy->unregister_stream_removing_callback = &PluginServiceDelegate::unregister_stream_removing_callback;
         proxy->create_stream_set = &PluginServiceDelegate::create_stream_set;

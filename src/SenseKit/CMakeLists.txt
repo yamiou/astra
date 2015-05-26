@@ -11,6 +11,7 @@ set(${_projname}_SOURCES
   ../../include/SenseKit/sensekit_capi.h
   ../../include/SenseKit/sensekit_defines.h
   ../../include/SenseKit/sensekit_types.h
+  ../../include/SenseKit/host_events.h
   ../../include/SenseKit/Plugins/PluginKit.h
   ../../include/SenseKit/Plugins/plugin_capi.h
   ../../include/SenseKit/Plugins/plugin_callbacks.h

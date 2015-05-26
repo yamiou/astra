@@ -43,6 +43,15 @@ namespace sensekit
             }
         }
 
+        void OpenNIPlugin::on_host_event(sensekit_event_id id, const void* data, size_t dataSize)
+        {
+            switch (id)
+            {
+            case SENSEKIT_EVENT_RESOURCE_AVAILABLE:
+                get_logger().info("test: %s", data);
+            }
+        }
+
         void OpenNIPlugin::onDeviceConnected(const ::openni::DeviceInfo* info)
         {
             get_logger().info("device connected: %s", info->getUri());
