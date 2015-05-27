@@ -28,7 +28,9 @@
 #include <vector>
 
 #ifdef __ANDROID__
+
 namespace std {
+
     template <typename T>
     std::string to_string(T value)
     {
@@ -53,6 +55,7 @@ namespace std {
         return value;
     }
 }
+
 #endif
 
 namespace cpptoml
@@ -300,6 +303,20 @@ inline std::shared_ptr<value<T>> base::as()
 {
     if (auto v = std::dynamic_pointer_cast<value<T>>(shared_from_this()))
         return v;
+    return nullptr;
+}
+
+// special case value<double> to allow getting an integer parameter as a
+// double value
+template <>
+inline std::shared_ptr<value<double>> base::as()
+{
+    if (auto v = std::dynamic_pointer_cast<value<double>>(shared_from_this()))
+        return v;
+
+    if (auto v = std::dynamic_pointer_cast<value<int64_t>>(shared_from_this()))
+        return std::make_shared<value<double>>(v->get());
+
     return nullptr;
 }
 

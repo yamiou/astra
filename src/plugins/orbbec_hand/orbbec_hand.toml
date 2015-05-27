@@ -1,8 +1,5 @@
 # orbbec_hand Plugin Settings
 
-# NOTE: Settings with a "#float" must include a decimal
-#       due to a limitation with the cpptoml library
-
 [handtracker]
 processingSizeWidth = 160
 processingSizeHeight = 120
