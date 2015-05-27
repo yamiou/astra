@@ -22,7 +22,7 @@ namespace sensekit {
         template<typename T>
         T get(sensekit_stream_subtype_t subtype)
         {
-            return T(m_frameRef->get_frame(), subtype);
+            return T::template acquire<T>(m_frameRef->get_frame(), subtype);
         }
 
         bool is_valid()

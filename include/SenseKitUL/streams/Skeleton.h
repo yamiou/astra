@@ -78,11 +78,26 @@ namespace sensekit {
     class SkeletonFrame
     {
     public:
-        SkeletonFrame(sensekit_reader_frame_t readerFrame, sensekit_stream_subtype_t subtype)
+        template<typename TFrameType>
+        static TFrameType acquire(sensekit_reader_frame_t readerFrame,
+                                  sensekit_stream_subtype_t subtype)
         {
             if (readerFrame != nullptr)
             {
-                sensekit_frame_get_skeletonframe(readerFrame, &m_skeletonFrame);
+                sensekit_skeletonframe_t skeletonFrame;
+                sensekit_frame_get_skeletonframe(readerFrame, &skeletonFrame);
+                return TFrameType(skeletonFrame);
+            }
+
+            return TFrameType(nullptr);
+        }
+
+        SkeletonFrame(sensekit_skeletonframe_t skeletonFrame)
+        {
+            m_skeletonFrame = skeletonFrame;
+
+            if (m_skeletonFrame)
+            {
                 sensekit_skeletonframe_get_frameindex(m_skeletonFrame, &m_frameIndex);
 
                 size_t maxSkeletonCount;
@@ -93,6 +108,7 @@ namespace sensekit {
         }
 
         bool is_valid() { return m_skeletonFrame != nullptr; }
+        sensekit_skeletonframe_t handle() { return m_skeletonFrame; }
 
         size_t skeleton_count()
         {

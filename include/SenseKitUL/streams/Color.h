@@ -42,20 +42,20 @@ namespace sensekit {
         sensekit_colorstream_t m_colorStream;
     };
 
-    class ColorFrame : public ImageFrame<RGBPixel>
+    class ColorFrame : public ImageFrame<RGBPixel, SENSEKIT_STREAM_COLOR>
     {
     public:
-        ColorFrame(sensekit_reader_frame_t readerFrame, sensekit_stream_subtype_t subtype)
-            : ImageFrame(readerFrame, SENSEKIT_STREAM_COLOR, subtype)
-        { }
+        ColorFrame(sensekit_imageframe_t frame)
+            : ImageFrame(frame)
+        {}
     };
 
-    class ColorFrameRaw : public ImageFrame<uint8_t>
+    class ColorFrameRaw : public ImageFrame<uint8_t, SENSEKIT_STREAM_COLOR>
     {
     public:
-        ColorFrameRaw(sensekit_reader_frame_t readerFrame, sensekit_stream_subtype_t subtype)
-            : ImageFrame(readerFrame, SENSEKIT_STREAM_COLOR, subtype)
-        { }
+        ColorFrameRaw(sensekit_imageframe_t frame)
+            : ImageFrame(frame)
+        {}
     };
 }
 

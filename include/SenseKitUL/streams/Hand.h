@@ -62,11 +62,25 @@ namespace sensekit {
     class HandFrame
     {
     public:
-        HandFrame(sensekit_reader_frame_t readerFrame, sensekit_stream_subtype_t subtype)
+        template<typename TFrameType>
+        static TFrameType acquire(sensekit_reader_frame_t readerFrame,
+                                  sensekit_stream_subtype_t subtype)
         {
             if (readerFrame != nullptr)
             {
-                sensekit_frame_get_handframe_with_subtype(readerFrame, subtype, &m_handFrame);
+                sensekit_handframe_t handFrame;
+                sensekit_frame_get_handframe_with_subtype(readerFrame, subtype, &handFrame);
+                return TFrameType(handFrame);
+            }
+
+            return TFrameType(nullptr);
+        }
+
+        HandFrame(sensekit_handframe_t handFrame)
+        {
+            m_handFrame = handFrame;
+            if (m_handFrame)
+            {
                 sensekit_handframe_get_frameindex(m_handFrame, &m_frameIndex);
 
                 size_t maxHandCount;
@@ -77,6 +91,7 @@ namespace sensekit {
         }
 
         bool is_valid() { return m_handFrame != nullptr; }
+        sensekit_handframe_t handle() { return m_handFrame; }
 
         size_t handpoint_count()
         {

@@ -45,12 +45,12 @@ namespace sensekit {
         sensekit_debug_handstream_t m_debugHandStream;
     };
 
-    class DebugHandFrame : public ImageFrame<RGBPixel>
+    class DebugHandFrame : public ImageFrame<RGBPixel, SENSEKIT_STREAM_DEBUG_HAND>
     {
     public:
-        DebugHandFrame(sensekit_reader_frame_t readerFrame, sensekit_stream_subtype_t subtype)
-            : ImageFrame(readerFrame, SENSEKIT_STREAM_DEBUG_HAND, subtype)
-        { }
+        DebugHandFrame(sensekit_imageframe_t frame)
+            : ImageFrame(frame)
+        {}
     };
 }
 

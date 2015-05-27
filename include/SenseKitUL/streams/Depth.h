@@ -109,13 +109,12 @@ namespace sensekit {
         CoordinateMapper m_coordinateMapper;
     };
 
-    class DepthFrame : public ImageFrame<int16_t>
+    class DepthFrame : public ImageFrame<int16_t, SENSEKIT_STREAM_DEPTH>
     {
     public:
-        DepthFrame(sensekit_reader_frame_t readerFrame,
-                   sensekit_stream_subtype_t subtype)
-            : ImageFrame(readerFrame, SENSEKIT_STREAM_DEPTH, subtype)
-        { }
+        DepthFrame(sensekit_imageframe_t frame)
+            : ImageFrame(frame)
+        {}
 
     };
 }
