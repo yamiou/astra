@@ -35,7 +35,7 @@ if (ANDROID)
   endif()
   set(OpenCV_DIR "${OpenCV_ANDROID_SDK_ROOT}/sdk/native/jni")
   find_package(OpenCV REQUIRED core imgproc NO_DEFAULT_PATH)
-elseif()
+else()
   find_package(OpenCV REQUIRED core imgproc)
 endif()
 
