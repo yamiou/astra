@@ -24,10 +24,10 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 endif()
 
 if(SENSEKIT_GCC OR SENSEKIT_CLANG)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -pedantic")
 
   if(SENSEKIT_ANDROID)
-    set(ANDROID_CXX_FLAGS "${ANDROID_CXX_FLAGS} -std=c++14")
+    set(ANDROID_CXX_FLAGS "${ANDROID_CXX_FLAGS} -std=c++14 -Wall -pedantic")
   endif()
 
 endif()
