@@ -93,6 +93,7 @@ if (MSVC)
     DESTINATION samples
     PATTERN "build" EXCLUDE
     PATTERN ".gitignore" EXCLUDE
+    PATTERN "thirdparty/.git" EXCLUDE
     )
 
   set(SAMPLES_SOURCE_DIR "${PROJECT_BINARY_DIR}/sdk/samples")
