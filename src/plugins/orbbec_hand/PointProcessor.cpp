@@ -106,12 +106,12 @@ namespace sensekit { namespace plugins { namespace hand {
         validateAndUpdateTrackedPoint(matrices, scalingMapper, trackedPoint, newTargetPoint);
 
         //lost a tracked point, try to guess the position using previous position delta for second chance to recover
-        
+
         auto xyDelta = trackedPoint.worldDeltaPosition;
         xyDelta.z = 0;
         double xyDeltaNorm = cv::norm(xyDelta);
-        if (trackedPoint.trackingStatus != TrackingStatus::Tracking && 
-            newTargetPoint == segmentation::INVALID_POINT && 
+        if (trackedPoint.trackingStatus != TrackingStatus::Tracking &&
+            newTargetPoint == segmentation::INVALID_POINT &&
             xyDeltaNorm > m_secondChanceMinDistance)
         {
             auto movementDirection = xyDelta * (1.0f / xyDeltaNorm);
@@ -193,8 +193,8 @@ namespace sensekit { namespace plugins { namespace hand {
         return true;
     }
 
-    bool PointProcessor::test_point_area(TrackingMatrices& matrices, 
-                                         const cv::Point& targetPoint, 
+    bool PointProcessor::test_point_area(TrackingMatrices& matrices,
+                                         const cv::Point& targetPoint,
                                          TrackingStatus status,
                                          int trackingId)
     {
@@ -221,8 +221,8 @@ namespace sensekit { namespace plugins { namespace hand {
         return validPointArea;
     }
 
-    bool PointProcessor::test_foreground_radius_percentage(TrackingMatrices& matrices, 
-                                                           const cv::Point& targetPoint, 
+    bool PointProcessor::test_foreground_radius_percentage(TrackingMatrices& matrices,
+                                                           const cv::Point& targetPoint,
                                                            TrackingStatus status,
                                                            int trackingId)
     {
@@ -277,13 +277,16 @@ namespace sensekit { namespace plugins { namespace hand {
             trackedPoint.fullSizePosition.x = (trackedPoint.position.x + 0.5) * resizeFactor;
             trackedPoint.fullSizePosition.y = (trackedPoint.position.y + 0.5) * resizeFactor;
 
-            if (trackedPoint.trackingStatus == TrackingStatus::Tracking &&
+            bool resizeNeeded = matrices.depthFullSize.cols != matrices.depth.cols;
+
+            if (resizeNeeded &&
+                trackedPoint.trackingStatus == TrackingStatus::Tracking &&
                 trackedPoint.pointType == TrackedPointType::ActivePoint)
             {
                 cv::Point3f refinedWorldPosition = get_refined_high_res_position(matrices, trackedPoint);
 
                 cv::Point3f smoothedWorldPosition = smooth_world_positions(trackedPoint.fullSizeWorldPosition, refinedWorldPosition);
-                
+
                 update_tracked_point_from_world_position(trackedPoint,
                                                          smoothedWorldPosition,
                                                          resizeFactor,
@@ -326,7 +329,7 @@ namespace sensekit { namespace plugins { namespace hand {
         }
     }
 
-    cv::Point3f PointProcessor::get_refined_high_res_position(TrackingMatrices& matrices, 
+    cv::Point3f PointProcessor::get_refined_high_res_position(TrackingMatrices& matrices,
                                                             const TrackedPoint& trackedPoint)
     {
         assert(trackedPoint.pointType == TrackedPointType::ActivePoint);
@@ -341,7 +344,7 @@ namespace sensekit { namespace plugins { namespace hand {
         int fullHeight = matrices.depthFullSize.rows;
         int processingWidth = matrices.depth.cols;
         int processingHeight = matrices.depth.rows;
-        
+
         int fullSizeX = trackedPoint.fullSizePosition.x;
         int fullSizeY = trackedPoint.fullSizePosition.y;
         int windowLeft = MAX(0, MIN(fullWidth - processingWidth, fullSizeX - processingWidth / 2));
@@ -398,7 +401,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         int refinedFullSizeX = targetPoint.x + windowLeft;
         int refinedFullSizeY = targetPoint.y + windowTop;
-        
+
         float refinedDepth = matrices.depthFullSize.at<float>(refinedFullSizeY, refinedFullSizeX);
 
         if (refinedDepth == 0)
@@ -414,7 +417,7 @@ namespace sensekit { namespace plugins { namespace hand {
         return refinedWorldPosition;
     }
 
-    cv::Point3f PointProcessor::smooth_world_positions(const cv::Point3f& oldWorldPosition, 
+    cv::Point3f PointProcessor::smooth_world_positions(const cv::Point3f& oldWorldPosition,
                                                        const cv::Point3f& newWorldPosition)
     {
         float smoothingFactor = m_pointSmoothingFactor;
@@ -429,8 +432,8 @@ namespace sensekit { namespace plugins { namespace hand {
         return oldWorldPosition * (1 - smoothingFactor) + newWorldPosition * smoothingFactor;
     }
 
-    void PointProcessor::update_tracked_point_from_world_position(TrackedPoint& trackedPoint, 
-                                                                  const cv::Point3f& newWorldPosition, 
+    void PointProcessor::update_tracked_point_from_world_position(TrackedPoint& trackedPoint,
+                                                                  const cv::Point3f& newWorldPosition,
                                                                   const float resizeFactor,
                                                                   const CoordinateMapper& fullSizeMapper)
     {
@@ -500,7 +503,7 @@ namespace sensekit { namespace plugins { namespace hand {
         bool validPointInRange = test_point_in_range(matrices, newTargetPoint, trackedPoint.trackingStatus, trackedPoint.trackingId);
         bool validPointArea = false;
         bool validRadiusTest = false;
-        
+
         if (validPointInRange)
         {
             validPointArea = test_point_area(matrices, newTargetPoint, trackedPoint.trackingStatus, trackedPoint.trackingId);
@@ -508,7 +511,7 @@ namespace sensekit { namespace plugins { namespace hand {
         }
 
         bool passAllTests = validPointInRange && validPointArea && validRadiusTest;
-        
+
         if (passAllTests)
         {
             trackedPoint.trackingStatus = TrackingStatus::Tracking;
@@ -579,8 +582,8 @@ namespace sensekit { namespace plugins { namespace hand {
 
         if (trackedPoint.trackingStatus != oldStatus)
         {
-            m_logger.trace("validateAndUpdateTrackedPoint: #%d status %s --> status %s", 
-                           trackedPoint.trackingId, 
+            m_logger.trace("validateAndUpdateTrackedPoint: #%d status %s --> status %s",
+                           trackedPoint.trackingId,
                            tracking_status_to_string(oldStatus).c_str(),
                            tracking_status_to_string(trackedPoint.trackingStatus).c_str());
         }
@@ -668,7 +671,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                         m_pointInertiaRadius);
 
         cv::Point targetPoint = segmentation::converge_track_point_from_seed(createTrackingData);
-        
+
         bool validPointInRange = test_point_in_range(matrices, targetPoint, TrackingStatus::NotTracking, -1);
 
         if (!validPointInRange)
@@ -685,12 +688,12 @@ namespace sensekit { namespace plugins { namespace hand {
         }
 
         bool existingPoint = false;
-            
+
         float depth = matrices.depth.at<float>(targetPoint);
 
         auto scalingMapper = get_scaling_mapper(matrices);
         cv::Point3f worldPosition = scalingMapper.convert_depth_to_world(targetPoint.x,
-                                                                         targetPoint.y, 
+                                                                         targetPoint.y,
                                                                          depth);
 
         for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
@@ -719,7 +722,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
                         m_logger.trace("createCycle: Recovered #%d",
                                         trackedPoint.trackingId);
-                        
+
                         //it could be faulty recovery, so start out in probation just like a new point
                         start_probation(trackedPoint);
                     }

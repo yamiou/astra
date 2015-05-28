@@ -48,14 +48,21 @@ namespace sensekit { namespace plugins { namespace hand {
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
 
-        matDepth.create(m_processingHeight, m_processingWidth, CV_32FC1);
-        matVelocitySignal = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_8UC1);
-
         depthFrameToMat(depthFrame, width, height, matDepthFullSize);
 
-        //convert to the target processing size with nearest neighbor
+        if (width == m_processingWidth && height == m_processingHeight)
+        {
+            //target size is original size, just use the same data
+            matDepth = matDepthFullSize;
+        }
+        else
+        {
+            matDepth.create(m_processingHeight, m_processingWidth, CV_32FC1);
+            //convert to the target processing size with nearest neighbor
+            cv::resize(matDepthFullSize, matDepth, matDepth.size(), 0, 0, CV_INTER_NN);
+        }
 
-        cv::resize(matDepthFullSize, matDepth, matDepth.size(), 0, 0, CV_INTER_NN);
+        matVelocitySignal = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_8UC1);
 
         //fill 0 depth pixels with the value from the previous frame
         fillZeroValues(matDepth, m_matDepthFilled, m_matDepthFilledMask, m_matDepthPrevious);
