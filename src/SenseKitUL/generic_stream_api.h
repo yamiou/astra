@@ -4,7 +4,7 @@
 #include <SenseKit/sensekit_capi.h>
 #include <SenseKit/Plugins/plugin_capi.h>
 #include <cassert>
-#include <string.h>
+#include <cstring>
 
 template<typename TFrameWrapperType, typename TFrameType>
 sensekit_status_t sensekit_generic_frame_get(sensekit_reader_frame_t readerFrame,
