@@ -266,6 +266,7 @@ namespace sensekit { namespace plugins {
 
             wrapper_type* wrapper = m_bin->begin_write(m_frameIndex);
 
+            wrapper->frame.frame = nullptr;
             wrapper->frame.data =
                 reinterpret_cast<block_type*>(&(wrapper->frame_data));
 
