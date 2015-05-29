@@ -8,6 +8,7 @@
 #include <SenseKitUL/streams/hand_types.h>
 #include <SenseKitUL/skul_ctypes.h>
 #include <SenseKit/Plugins/PluginKit.h>
+#include <Shiny.h>
 
 namespace sensekit { namespace plugins { namespace hand {
 
@@ -53,6 +54,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void HandTracker::on_frame_ready(StreamReader& reader, Frame& frame)
         {
+            PROFILE_FUNC();
             if (m_handStream->has_connections() ||
                 m_debugImageStream->has_connections())
             {
@@ -70,6 +72,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void HandTracker::update_tracking(DepthFrame& depthFrame)
         {
+            PROFILE_FUNC();
             m_depthUtility.processDepthToVelocitySignal(depthFrame, m_matDepth, m_matDepthFullSize, m_matVelocitySignal);
 
             track_points(m_matDepth, m_matDepthFullSize, m_matVelocitySignal);
@@ -92,6 +95,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                        cv::Mat& matDepthFullSize,
                                        cv::Mat& matVelocitySignal)
         {
+            PROFILE_FUNC();
             m_layerSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_layerScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_layerEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
@@ -218,6 +222,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void HandTracker::generate_hand_frame(sensekit_frame_index_t frameIndex)
         {
+            PROFILE_FUNC();
             sensekit_handframe_wrapper_t* handFrame = m_handStream->begin_write(frameIndex);
 
             if (handFrame != nullptr)
@@ -233,6 +238,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void HandTracker::generate_hand_debug_image_frame(sensekit_frame_index_t frameIndex)
         {
+            PROFILE_FUNC();
             sensekit_imageframe_wrapper_t* debugImageFrame = m_debugImageStream->begin_write(frameIndex);
 
             if (debugImageFrame != nullptr)

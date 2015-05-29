@@ -61,6 +61,7 @@ set(SAMPLE_DIR_FOLDER "samples/")
 set (SDK_DEPENDENT_TARGET "SDK_dependent")
 add_custom_target(${SDK_DEPENDENT_TARGET})
 
+set(SHINY_INCLUDE "${PROJECT_SOURCE_DIR}/vendor/shinyprofiler/include")
 add_subdirectory(vendor)
 add_subdirectory(src)
 
