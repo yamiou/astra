@@ -2,6 +2,7 @@
 #include <SenseKitUL/SenseKitUL.h>
 #include "TrackingData.h"
 #include <cmath>
+#include <Shiny.h>
 
 namespace sensekit { namespace plugins { namespace hand {
 
@@ -14,6 +15,7 @@ namespace sensekit { namespace plugins { namespace hand {
         m_erodeSize(settings.erodeSize),
         m_depthAdjustmentFactor(settings.depthAdjustmentFactor)
     {
+        PROFILE_FUNC();
         m_rectElement = cv::getStructuringElement(cv::MORPH_RECT,
                                                   cv::Size(m_erodeSize * 2 + 1, m_erodeSize * 2 + 1),
                                                   cv::Point(m_erodeSize, m_erodeSize));
@@ -23,10 +25,12 @@ namespace sensekit { namespace plugins { namespace hand {
 
     DepthUtility::~DepthUtility()
     {
+        PROFILE_FUNC();
     }
 
     void DepthUtility::reset()
     {
+        PROFILE_FUNC();
         m_matDepthFilled = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_32FC1);
         m_matDepthFilledMask = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_8UC1);
         m_matDepthPrevious = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_32FC1);
@@ -45,6 +49,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                     cv::Mat& matDepthFullSize,
                                                     cv::Mat& matVelocitySignal)
     {
+        PROFILE_FUNC();
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
 
@@ -100,6 +105,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                        const int height,
                                        cv::Mat& matTarget)
     {
+        PROFILE_FUNC();
         //ensure initialized
         matTarget.create(height, width, CV_32FC1);
 
@@ -123,6 +129,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                       cv::Mat& matDepthFilledMask,
                                       cv::Mat& matDepthPrevious)
     {
+        PROFILE_FUNC();
         int width = matDepth.cols;
         int height = matDepth.rows;
 
@@ -163,6 +170,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                 cv::Mat& matDepthFilledMask,
                                                 const float maxDepthJumpPercent)
     {
+        PROFILE_FUNC();
         int width = matDepth.cols;
         int height = matDepth.rows;
 
@@ -209,6 +217,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                cv::Mat& matVelocitySignal,
                                                const float velocityThresholdFactor)
     {
+        PROFILE_FUNC();
         int width = matVelocitySignal.cols;
         int height = matVelocitySignal.rows;
 
@@ -236,6 +245,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
     void DepthUtility::adjust_velocities_for_depth(cv::Mat& matDepth, cv::Mat& matVelocityFiltered)
     {
+        PROFILE_FUNC();
         if (m_depthAdjustmentFactor == 0)
         {
             return;
@@ -263,6 +273,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
     int DepthUtility::depth_to_chunk_index(float depth)
     {
+        PROFILE_FUNC();
         if (depth == 0 || depth < MIN_CHUNK_DEPTH || depth > MAX_CHUNK_DEPTH)
         {
             return -1;
@@ -275,6 +286,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
     void DepthUtility::analyze_velocities(cv::Mat& matDepth, cv::Mat& matVelocityFiltered)
     {
+        PROFILE_FUNC();
         int width = matDepth.cols;
         int height = matDepth.rows;
 

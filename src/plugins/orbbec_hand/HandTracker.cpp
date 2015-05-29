@@ -27,6 +27,7 @@ namespace sensekit { namespace plugins { namespace hand {
             m_processingSizeWidth(settings.processingSizeWidth),
             m_processingSizeHeight(settings.processingSizeHeight)
         {
+            PROFILE_FUNC();
             create_streams(m_pluginService, streamset);
 
             m_depthStream = m_reader.stream<DepthStream>(depthDesc.get_subtype());
@@ -36,10 +37,13 @@ namespace sensekit { namespace plugins { namespace hand {
         }
 
         HandTracker::~HandTracker()
-        { }
+        {
+            PROFILE_FUNC();
+        }
 
         void HandTracker::create_streams(PluginServiceProxy& pluginService, Sensor streamset)
         {
+            PROFILE_FUNC();
             m_logger.info("creating hand streams");
             m_handStream = make_unique<HandStream>(pluginService, streamset, SENSEKIT_HANDS_MAX_HAND_COUNT);
 
@@ -66,6 +70,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void HandTracker::reset()
         {
+            PROFILE_FUNC();
             m_depthUtility.reset();
             m_pointProcessor.reset();
         }
@@ -260,6 +265,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void HandTracker::update_hand_frame(vector<TrackedPoint>& internalTrackedPoints, _sensekit_handframe& frame)
         {
+            PROFILE_FUNC();
             int handIndex = 0;
             int maxHandCount = frame.handCount;
 
@@ -301,6 +307,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void HandTracker::copy_position(cv::Point3f& source, sensekit_vector3f_t& target)
         {
+            PROFILE_FUNC();
             target.x = source.x;
             target.y = source.y;
             target.z = source.z;
@@ -308,6 +315,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         sensekit_handstatus_t HandTracker::convert_hand_status(TrackingStatus status, TrackedPointType type)
         {
+            PROFILE_FUNC();
             if (type == TrackedPointType::CandidatePoint)
             {
                 return HAND_STATUS_CANDIDATE;
@@ -330,6 +338,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void HandTracker::reset_hand_point(sensekit_handpoint_t& point)
         {
+            PROFILE_FUNC();
             point.trackingId = -1;
             point.status = HAND_STATUS_NOTTRACKING;
             point.depthPosition = sensekit_vector2i_t();
@@ -341,6 +350,7 @@ namespace sensekit { namespace plugins { namespace hand {
                               RGBPixel color,
                               cv::Point p)
         {
+            PROFILE_FUNC();
             RGBPixel* colorData = static_cast<RGBPixel*>(imageFrame.data);
             int index = p.x + p.y * imageFrame.metadata.width;
             colorData[index] = color;
@@ -348,6 +358,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void HandTracker::overlay_circle(_sensekit_imageframe& imageFrame)
         {
+            PROFILE_FUNC();
             auto normPosition = m_debugImageStream->mouse_norm_position();
             int x = MAX(0, MIN(m_processingSizeWidth, normPosition.x * m_processingSizeWidth));
             int y = MAX(0, MIN(m_processingSizeHeight, normPosition.y * m_processingSizeHeight));
@@ -371,6 +382,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void HandTracker::update_debug_image_frame(_sensekit_imageframe& colorFrame)
         {
+            PROFILE_FUNC();
             float m_maxVelocity = 0.1;
 
             RGBPixel foregroundColor(0, 0, 255);

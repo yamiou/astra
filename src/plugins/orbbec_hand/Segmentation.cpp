@@ -5,6 +5,7 @@
 #include <opencv2/opencv.hpp>
 #include "Segmentation.h"
 #include "constants.h"
+#include <Shiny.h>
 
 #define MAX_DEPTH 10000
 
@@ -25,6 +26,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                  std::queue<PointTTL>& pointQueue,
                                  PointTTL pt)
     {
+        PROFILE_FUNC();
         const cv::Point& p = pt.point;
         float& ttlRef = pt.ttl;
 
@@ -61,6 +63,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
     static cv::Point find_nearest_in_range_pixel(TrackingData& data,
                                                 cv::Mat& matVisited)
     {
+        PROFILE_FUNC();
         assert(matVisited.size() == data.matrices.depth.size());
 
         const float minDepth = data.referenceDepth - data.bandwidthDepthNear;
@@ -69,7 +72,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         const float referenceAreaSqrt = data.referenceAreaSqrt;
         cv::Mat& depthMatrix = data.matrices.depth;
         cv::Mat& searchedMatrix = data.matrices.foregroundSearched;
-        
+
         std::queue<PointTTL> pointQueue;
 
         pointQueue.push(PointTTL(data.seedPosition, maxSegmentationDist));
@@ -108,6 +111,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
     static void segment_foreground(TrackingData& data)
     {
+        PROFILE_FUNC();
         const float& maxSegmentationDist = data.maxSegmentationDist;
         const SegmentationVelocityPolicy& velocitySignalPolicy = data.velocityPolicy;
         const float seedDepth = data.matrices.depth.at<float>(data.seedPosition);
@@ -175,6 +179,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
     void calculate_layer_score(TrackingData& data)
     {
+        PROFILE_FUNC();
         cv::Mat& depthMatrix = data.matrices.depth;
         cv::Mat& basicScoreMatrix = data.matrices.basicScore;
         cv::Mat& edgeDistanceMatrix = data.matrices.layerEdgeDistance;
@@ -247,6 +252,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
     static cv::Point track_point_from_seed(TrackingData& data)
     {
+        PROFILE_FUNC();
         cv::Size size = data.matrices.depth.size();
         data.matrices.layerSegmentation = cv::Mat::zeros(size, CV_8UC1);
         data.matrices.layerEdgeDistance = cv::Mat::zeros(size, CV_32FC1);
@@ -298,6 +304,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
     cv::Point converge_track_point_from_seed(TrackingData& data)
     {
+        PROFILE_FUNC();
         cv::Point point = data.seedPosition;
         cv::Point lastPoint = data.seedPosition;
         int iterations = 0;
@@ -317,6 +324,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                         cv::Point& foregroundPosition,
                                         cv::Point& nextSearchStart)
     {
+        PROFILE_FUNC();
         assert(velocitySignalMatrix.cols == searchedMatrix.cols);
         assert(velocitySignalMatrix.rows == searchedMatrix.rows);
         int width = velocitySignalMatrix.cols;
@@ -366,6 +374,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                 const float depthFactor,
                                 const ScalingCoordinateMapper& mapper)
     {
+        PROFILE_FUNC();
         scoreMatrix = cv::Mat::zeros(depthMatrix.size(), CV_32FC1);
 
         int width = depthMatrix.cols;
@@ -403,6 +412,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                  cv::Mat& areaSqrtMatrix,
                                  cv::Mat& edgeDistanceMatrix)
     {
+        PROFILE_FUNC();
         cv::Mat eroded;
         cv::Mat crossElement = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
 
@@ -441,6 +451,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                 cv::Point3f& p3,
                                 const ScalingCoordinateMapper& mapper)
     {
+        PROFILE_FUNC();
         cv::Point3f world1 = mapper.convert_depth_to_world(p1);
         cv::Point3f world2 = mapper.convert_depth_to_world(p2);
         cv::Point3f world3 = mapper.convert_depth_to_world(p3);
@@ -457,6 +468,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                 cv::Mat& areaSqrtMatrix,
                                 const ScalingCoordinateMapper& mapper)
     {
+        PROFILE_FUNC();
         int width = depthMatrix.cols;
         int height = depthMatrix.rows;
 
@@ -503,6 +515,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                           int y,
                                           std::function<void(cv::Point)> callback)
     {
+        PROFILE_FUNC();
         if (x >= 0 && x < width &&
             y >= 0 && y < height)
         {
@@ -516,6 +529,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                     const ScalingCoordinateMapper& mapper,
                                     std::function<void(cv::Point)> callback)
     {
+        PROFILE_FUNC();
         int width = matDepth.cols;
         int height = matDepth.rows;
         if (center.x < 0 || center.x >= width ||
@@ -570,6 +584,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                            int& foregroundCount,
                                            int& totalCount)
     {
+        PROFILE_FUNC();
         ++totalCount;
         if (matSegmentation.at<uint8_t>(p) == PixelType::Foreground)
         {
@@ -583,6 +598,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                                      const float& radius,
                                                      const ScalingCoordinateMapper& mapper)
     {
+        PROFILE_FUNC();
         int foregroundCount = 0;
         int totalCount = 0;
 
@@ -606,6 +622,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                   const float bandwidthDepth,
                                   const ScalingCoordinateMapper& mapper)
     {
+        PROFILE_FUNC();
         if (center.x < 0 || center.y < 0 ||
             center.x >= matDepth.cols || center.y >= matDepth.rows)
         {

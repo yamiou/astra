@@ -6,7 +6,6 @@
 #include <unordered_map>
 #include "handtracker.h"
 #include "HandSettings.h"
-#include <Shiny.h>
 
 namespace sensekit { namespace plugins { namespace hand {
 
@@ -35,9 +34,7 @@ namespace sensekit { namespace plugins { namespace hand {
         HandPlugin(PluginServiceProxy* pluginProxy);
         virtual ~HandPlugin();
 
-        virtual void temp_update() override {
-            
-        }
+        virtual void temp_update() override { }
 
     protected:
         virtual void on_initialize() override;

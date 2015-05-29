@@ -1,6 +1,7 @@
 #include "HandSettings.h"
 #include "HandPlugin.h"
 #include "HandTracker.h"
+#include <Shiny.h>
 
 EXPORT_PLUGIN(sensekit::plugins::hand::HandPlugin);
 

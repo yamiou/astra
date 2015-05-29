@@ -1,6 +1,7 @@
 #include "TrackedPoint.h"
 #include "PointProcessor.h"
 #include "Segmentation.h"
+#include <Shiny.h>
 
 namespace sensekit { namespace plugins { namespace hand {
 
@@ -40,13 +41,18 @@ namespace sensekit { namespace plugins { namespace hand {
         m_probationFrameCount(settings.probationFrameCount),
         m_maxFailedTestsInProbationActivePoints(settings.maxFailedTestsInProbationActivePoints),
         m_secondChanceMinDistance(settings.secondChanceMinDistance)
-        {}
+    {
+        PROFILE_FUNC();
+    }
 
     PointProcessor::~PointProcessor()
-    {}
+    {
+        PROFILE_FUNC();
+    }
 
     void PointProcessor::initialize_common_calculations(TrackingMatrices& matrices)
     {
+        PROFILE_FUNC();
         auto scalingMapper = get_scaling_mapper(matrices);
 
         segmentation::calculate_basic_score(matrices.depth,
@@ -64,6 +70,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
     void PointProcessor::updateTrackedPoints(TrackingMatrices& matrices)
     {
+        PROFILE_FUNC();
         auto scalingMapper = get_scaling_mapper(matrices);
 
         for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
@@ -78,6 +85,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                             ScalingCoordinateMapper& scalingMapper,
                                             TrackedPoint& trackedPoint)
     {
+        PROFILE_FUNC();
         const float width = matrices.depth.cols;
         const float height = matrices.depth.rows;
 
@@ -152,12 +160,14 @@ namespace sensekit { namespace plugins { namespace hand {
 
     void PointProcessor::reset()
     {
+        PROFILE_FUNC();
         m_trackedPoints.clear();
         m_nextTrackingId = 0;
     }
 
     float PointProcessor::get_point_area(TrackingMatrices& matrices, const cv::Point& point)
     {
+        PROFILE_FUNC();
         auto scalingMapper = get_scaling_mapper(matrices);
 
         float area = segmentation::count_neighborhood_area(matrices.layerSegmentation,
@@ -176,6 +186,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                              TrackingStatus status,
                                              int trackingId)
     {
+        PROFILE_FUNC();
         if (targetPoint == segmentation::INVALID_POINT ||
             targetPoint.x < 0 || targetPoint.x >= matrices.depth.cols ||
             targetPoint.y < 0 || targetPoint.y >= matrices.depth.rows)
@@ -198,6 +209,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                          TrackingStatus status,
                                          int trackingId)
     {
+        PROFILE_FUNC();
         float area = get_point_area(matrices, targetPoint);
 
         bool validPointArea = area > m_minArea && area < m_maxArea;
@@ -226,6 +238,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                            TrackingStatus status,
                                                            int trackingId)
     {
+        PROFILE_FUNC();
         auto scalingMapper = get_scaling_mapper(matrices);
 
         float percentForeground1 = segmentation::get_percent_foreground_along_circumference(matrices.depth,
@@ -266,6 +279,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
     void PointProcessor::update_full_resolution_points(TrackingMatrices& matrices)
     {
+        PROFILE_FUNC();
         for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
         {
             //TODO take this and make it a method on TrackedPoint
@@ -302,6 +316,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
     void PointProcessor::update_trajectories()
     {
+        PROFILE_FUNC();
         for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
         {
             //TODO take this and make it a method on TrackedPoint
@@ -332,6 +347,7 @@ namespace sensekit { namespace plugins { namespace hand {
     cv::Point3f PointProcessor::get_refined_high_res_position(TrackingMatrices& matrices,
                                                             const TrackedPoint& trackedPoint)
     {
+        PROFILE_FUNC();
         assert(trackedPoint.pointType == TrackedPointType::ActivePoint);
 
         float referenceDepth = trackedPoint.worldPosition.z;
@@ -420,6 +436,7 @@ namespace sensekit { namespace plugins { namespace hand {
     cv::Point3f PointProcessor::smooth_world_positions(const cv::Point3f& oldWorldPosition,
                                                        const cv::Point3f& newWorldPosition)
     {
+        PROFILE_FUNC();
         float smoothingFactor = m_pointSmoothingFactor;
 
         float delta = cv::norm(newWorldPosition - oldWorldPosition);
@@ -437,6 +454,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                                   const float resizeFactor,
                                                                   const CoordinateMapper& fullSizeMapper)
     {
+        PROFILE_FUNC();
         cv::Point3f fullSizeDepthPosition = cv_convert_world_to_depth(fullSizeMapper, newWorldPosition);
 
         trackedPoint.fullSizePosition = cv::Point(fullSizeDepthPosition.x, fullSizeDepthPosition.y);
@@ -451,6 +469,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
     void PointProcessor::start_probation(TrackedPoint& trackedPoint)
     {
+        PROFILE_FUNC();
         if (!trackedPoint.isInProbation)
         {
             trackedPoint.isInProbation = true;
@@ -462,6 +481,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
     void PointProcessor::end_probation(TrackedPoint& trackedPoint)
     {
+        PROFILE_FUNC();
         trackedPoint.isInProbation = false;
         trackedPoint.failedTestCount = 0;
         trackedPoint.failedInRangeTestCount = 0;
@@ -469,6 +489,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
     void PointProcessor::update_tracked_point_data(TrackingMatrices& matrices, ScalingCoordinateMapper& scalingMapper, TrackedPoint& trackedPoint, const cv::Point& newTargetPoint)
     {
+        PROFILE_FUNC();
         float depth = matrices.depth.at<float>(newTargetPoint);
         cv::Point3f worldPosition = scalingMapper.convert_depth_to_world(newTargetPoint.x, newTargetPoint.y, depth);
 
@@ -493,6 +514,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                        TrackedPoint& trackedPoint,
                                                        const cv::Point& newTargetPoint)
     {
+        PROFILE_FUNC();
         if(trackedPoint.trackingStatus == TrackingStatus::Dead)
         {
             return;
@@ -591,6 +613,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
     void PointProcessor::removeDuplicatePoints()
     {
+        PROFILE_FUNC();
         for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
         {
             TrackedPoint& tracked = *iter;
@@ -614,6 +637,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
     void PointProcessor::removeOldOrDeadPoints()
     {
+        PROFILE_FUNC();
         for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end();)
         {
             TrackedPoint& tracked = *iter;
@@ -647,6 +671,7 @@ namespace sensekit { namespace plugins { namespace hand {
     void PointProcessor::updateTrackedPointOrCreateNewPointFromSeedPosition(TrackingMatrices& matrices,
                                                                             const cv::Point& seedPosition)
     {
+        PROFILE_FUNC();
         float referenceDepth = matrices.depth.at<float>(seedPosition);
         float referenceAreaSqrt = matrices.areaSqrt.at<float>(seedPosition);
         if (referenceDepth == 0 || referenceAreaSqrt == 0 || seedPosition == segmentation::INVALID_POINT)
