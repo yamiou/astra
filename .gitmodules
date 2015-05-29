@@ -1,3 +1,6 @@
 [submodule "samples-aux/vs2013/thirdparty"]
 	path = samples-aux/vs2013/thirdparty
 	url = git@bitbucket.org:orbicsoft/sdk-win-thirdparty-bin.git
+[submodule "vendor/shinyprofiler"]
+	path = vendor/shinyprofiler
+	url = git@bitbucket.org:orbicsoft/shinyprofiler.git
