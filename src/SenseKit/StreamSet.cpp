@@ -4,9 +4,11 @@
 
 namespace sensekit {
 
-    StreamSet::StreamSet() :
-      m_logger("StreamSet")
+    StreamSet::StreamSet(std::string uri)
+        : m_logger("StreamSet"),
+          m_uri(uri)
     { }
+
     StreamSet::~StreamSet()
     { }
 
@@ -74,6 +76,15 @@ namespace sensekit {
         m_streamCollection.insert(stream);
 
         return stream;
+    }
+
+    StreamSetConnection* StreamSet::add_new_connection()
+    {
+        StreamSetConnectionPtr ptr = std::make_unique<StreamSetConnection>(this);
+        StreamSetConnection* conn = ptr.get();
+        m_connections.push_back(std::move(ptr));
+
+        return conn;
     }
 
     void StreamSet::destroy_stream(Stream* stream)

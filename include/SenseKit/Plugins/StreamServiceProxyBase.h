@@ -14,16 +14,16 @@ struct StreamServiceProxyBase
 
     sensekit_status_t (*streamset_open)(void*,
                                         const char*,
-                                        sensekit_streamset_t*);
+                                        sensekit_streamsetconnection_t*);
 
     sensekit_status_t (*streamset_close)(void*,
-                                         sensekit_streamset_t*);
+                                         sensekit_streamsetconnection_t*);
 
     char* (*get_status_string)(void*,
                                sensekit_status_t);
 
     sensekit_status_t (*reader_create)(void*,
-                                       sensekit_streamset_t,
+                                       sensekit_streamsetconnection_t,
                                        sensekit_reader_t*);
 
     sensekit_status_t (*reader_destroy)(void*,

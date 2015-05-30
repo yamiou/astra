@@ -15,7 +15,7 @@ namespace sensekit { namespace plugins {
     {
     public:
         OniDepthStream(PluginServiceProxy& pluginService,
-                       Sensor streamSet,
+                       sensekit_streamset_t streamSet,
                        ::openni::Device& oniDevice)
             : OniDeviceStream(pluginService,
                               streamSet,

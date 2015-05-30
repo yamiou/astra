@@ -11,7 +11,7 @@ namespace sensekit { namespace plugins { namespace xs {
     {
     public:
         PointProcessor(PluginServiceProxy& pluginService,
-                       Sensor streamset,
+                       sensekit_streamset_t streamset,
                        StreamDescription& depthDesc,
                        PluginLogger& pluginLogger);
         virtual ~PointProcessor();
@@ -25,7 +25,8 @@ namespace sensekit { namespace plugins { namespace xs {
                                    Vector3f* p_points);
 
         PluginServiceProxy& m_pluginService;
-        Sensor m_streamset;
+        Sensor m_sensor;
+        sensekit_streamset_t m_streamSet;
         PluginLogger& m_logger;
         StreamReader m_reader;
         DepthStream m_depthStream;

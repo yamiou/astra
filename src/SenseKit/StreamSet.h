@@ -3,21 +3,25 @@
 
 #include "Stream.h"
 #include "Logger.h"
+#include "StreamSetConnection.h"
 
 #include <unordered_set>
 #include <vector>
 #include <memory>
+#include <string>
 
 namespace sensekit {
 
     class StreamSet
     {
     public:
-        StreamSet();
+        StreamSet(std::string uri);
         ~StreamSet();
 
         StreamSet& operator=(const StreamSet& rhs) = delete;
         StreamSet(const StreamSet& streamSet) = delete;
+
+        StreamSetConnection* add_new_connection();
 
         StreamConnection* create_stream_connection(const sensekit_stream_desc_t& desc);
 
@@ -35,6 +39,8 @@ namespace sensekit {
         sensekit_stream_t find_stream_by_type_subtype(sensekit_stream_type_t type,
                                                       sensekit_stream_subtype_t subtype) const;
 
+        std::string get_uri() { return m_uri; }
+
         sensekit_streamset_t get_handle()
             { return reinterpret_cast<sensekit_streamset_t>(this); }
 
@@ -51,6 +57,11 @@ namespace sensekit {
         StreamCollection m_streamCollection;
 
         Logger m_logger;
+        std::string m_uri;
+
+        using StreamSetConnectionPtr = std::unique_ptr<StreamSetConnection>;
+        using StreamSetConnectionList = std::vector<StreamSetConnectionPtr>;
+        StreamSetConnectionList m_connections;
     };
 }
 

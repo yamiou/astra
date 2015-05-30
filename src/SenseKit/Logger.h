@@ -26,6 +26,7 @@ namespace sensekit {
         std::string m_loggerName;
     };
 
+    void log_nyan(Logger& logger);
     void log(const char* channel, sensekit_log_severity_t logLevel, const char* format, ...);
     void log_vargs(const char* channel, sensekit_log_severity_t logLevel, const char* format, va_list args);
     void trace(const char* channel, const char* format, ...);

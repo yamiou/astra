@@ -13,7 +13,7 @@ namespace sensekit { namespace plugins { namespace skeleton {
             return; // if new stream is not depth, we don't care.
 
         m_skeletonTrackers.push_back(std::make_unique<SkeletonTracker>(get_pluginService(),
-                                                                     Sensor(setHandle),
+                                                                     setHandle,
                                                                      streamHandle));
     }
 

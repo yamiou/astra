@@ -52,12 +52,15 @@ namespace sensekit { namespace plugins { namespace hand {
         {
             PROFILE_FUNC();
             m_logger.info("creating hand streams");
-            m_handStream = make_unique<HandStream>(pluginService, streamset, SENSEKIT_HANDS_MAX_HAND_COUNT);
+            sensekit_streamset_t set;
+
+            pluginService.get_streamset_from_streamsetconnection(streamset.get_handle(), set);
+            m_handStream = make_unique<HandStream>(pluginService, set, SENSEKIT_HANDS_MAX_HAND_COUNT);
 
             const int bytesPerPixel = 3;
 
             m_debugImageStream = make_unique<DebugHandStream>(pluginService,
-                                                              streamset,
+                                                              set,
                                                               m_processingSizeWidth,
                                                               m_processingSizeHeight,
                                                               bytesPerPixel);

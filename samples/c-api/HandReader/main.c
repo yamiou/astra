@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
 
     sensekit_initialize();
 
-    sensekit_streamset_t sensor;
+    sensekit_streamsetconnection_t sensor;
 
     sensekit_streamset_open("localhost/device0", &sensor);
 

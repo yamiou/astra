@@ -16,19 +16,22 @@ namespace sensekit { namespace plugins { namespace skeleton {
         static const size_t MAX_SKELETONS;
 
         SkeletonTracker(PluginServiceProxy& pluginService,
-                        Sensor streamSet,
+                        sensekit_streamset_t streamSet,
                         sensekit_stream_t sourceStream)
             : m_sourceStreamHandle(sourceStream),
-              m_reader(streamSet.create_reader()),
-              m_pluginService(pluginService),
-              m_sensor(streamSet)
+              m_pluginService(pluginService)
         {
+            sensekit_streamsetconnection_t conn;
+            pluginService.connect_to_streamset(streamSet, conn);
+
+            m_sensor = Sensor(conn);
+            m_reader = m_sensor.create_reader();
             m_depthStream = m_reader.stream<sensekit::DepthStream>();
             m_depthStream.start();
 
             m_reader.addListener(*this);
             m_skeletonStream = std::make_unique<SkeletonStream>(m_pluginService,
-                                                                m_sensor,
+                                                                streamSet,
                                                                 m_sourceStreamHandle,
                                                                 SkeletonTracker::MAX_SKELETONS);
         }

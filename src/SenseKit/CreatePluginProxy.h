@@ -19,6 +19,8 @@ PluginServiceProxyBase* create_plugin_proxy(PluginService* service)
         proxy->unregister_stream_removing_callback = &PluginServiceDelegate::unregister_stream_removing_callback;
         proxy->create_stream_set = &PluginServiceDelegate::create_stream_set;
         proxy->destroy_stream_set = &PluginServiceDelegate::destroy_stream_set;
+        proxy->connect_to_streamset = &PluginServiceDelegate::connect_to_streamset;
+        proxy->get_streamset_from_streamsetconnection = &PluginServiceDelegate::get_streamset_from_streamsetconnection;
         proxy->create_stream = &PluginServiceDelegate::create_stream;
         proxy->destroy_stream = &PluginServiceDelegate::destroy_stream;
         proxy->create_stream_bin = &PluginServiceDelegate::create_stream_bin;

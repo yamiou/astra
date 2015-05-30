@@ -5,6 +5,7 @@
 #include "OniColorStream.h"
 #include <Shiny.h>
 #include <cstdio>
+#include <sstream>
 
 EXPORT_PLUGIN(sensekit::plugins::OpenNIPlugin)
 
@@ -102,10 +103,15 @@ namespace sensekit
             if (device)
                 return device;
 
-            SetPtr setPtr = std::make_unique<OniDeviceStreamSet>(get_pluginService(), oniUri);
-            setPtr->open();
+            std::stringstream sstream;
+            sstream << "device/sensor" << m_sets.size();
 
+            SetPtr setPtr(new OniDeviceStreamSet(sstream.str(),
+                                                 get_pluginService(),
+                                                 oniUri));
+            setPtr->open();
             device = setPtr.get();
+
             m_sets.push_back(std::move(setPtr));
 
             return device;

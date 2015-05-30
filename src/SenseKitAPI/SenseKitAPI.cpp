@@ -33,12 +33,12 @@ SENSEKIT_API sensekit_status_t sensekit_terminate()
 }
 
 SENSEKIT_API sensekit_status_t sensekit_streamset_open(const char* connectionString,
-                                                       sensekit_streamset_t* streamSet)
+                                                       sensekit_streamsetconnection_t* streamSet)
 {
     return get_api_proxy()->streamset_open(connectionString, streamSet);
 }
 
-SENSEKIT_API sensekit_status_t sensekit_streamset_close(sensekit_streamset_t* streamSet)
+SENSEKIT_API sensekit_status_t sensekit_streamset_close(sensekit_streamsetconnection_t* streamSet)
 {
     return get_api_proxy()->streamset_close(streamSet);
 }
@@ -48,7 +48,7 @@ SENSEKIT_API char* sensekit_get_status_string(sensekit_status_t status)
     return get_api_proxy()->get_status_string(status);
 }
 
-SENSEKIT_API sensekit_status_t sensekit_reader_create(sensekit_streamset_t streamSet,
+SENSEKIT_API sensekit_status_t sensekit_reader_create(sensekit_streamsetconnection_t streamSet,
                                                       sensekit_reader_t* reader)
 {
     return get_api_proxy()->reader_create(streamSet, reader);

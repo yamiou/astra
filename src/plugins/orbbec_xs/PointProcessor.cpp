@@ -4,16 +4,21 @@
 namespace sensekit { namespace plugins { namespace xs {
 
     PointProcessor::PointProcessor(PluginServiceProxy& pluginService,
-                   Sensor streamset,
+                   sensekit_streamset_t streamset,
                    StreamDescription& depthDesc,
                    PluginLogger& pluginLogger) :
        m_pluginService(pluginService),
-       m_streamset(streamset),
-       m_logger(pluginLogger),
-       m_reader(streamset.create_reader())
+       m_streamSet(streamset),
+       m_logger(pluginLogger)
     {
         PROFILE_FUNC();
         m_logger.info("PointProcessor ctor");
+
+        sensekit_streamsetconnection_t conn;
+        pluginService.connect_to_streamset(streamset, conn);
+
+        m_sensor = Sensor(conn);
+        m_reader = m_sensor.create_reader();
 
         m_depthStream = m_reader.stream<DepthStream>(depthDesc.get_subtype());
         m_depthStream.start();
@@ -54,7 +59,7 @@ namespace sensekit { namespace plugins { namespace xs {
 
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
-        m_pointStream = std::make_unique<PointStream>(m_pluginService, m_streamset, width, height);
+        m_pointStream = std::make_unique<PointStream>(m_pluginService, m_streamSet, width, height);
 
         m_depthConversionCache = m_depthStream.depth_to_world_data();
     }

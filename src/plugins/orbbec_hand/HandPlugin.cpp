@@ -60,10 +60,18 @@ namespace sensekit { namespace plugins { namespace hand {
         if (streamDesc.type == SENSEKIT_STREAM_DEPTH &&
             m_streamTrackerMap.find(streamHandle) == m_streamTrackerMap.end())
         {
-            Sensor sensor(setHandle);
+            sensekit_streamsetconnection_t conn;
+            get_pluginService().connect_to_streamset(setHandle, conn);
+
+            Sensor sensor(conn);
             StreamDescription depthDescription = streamDesc;
 
-            HandTracker* tracker = new HandTracker(get_pluginService(), sensor, depthDescription, get_logger(), m_settings);
+            HandTracker* tracker = new HandTracker(get_pluginService(),
+                                                   sensor,
+                                                   depthDescription,
+                                                   get_logger(),
+                                                   m_settings);
+
             m_streamTrackerMap[streamHandle] = tracker;
         }
     }

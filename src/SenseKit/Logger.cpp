@@ -6,6 +6,24 @@
 
 namespace sensekit {
 
+    void log_nyan(Logger& logger)
+    {
+        logger.info("+      o     +              o");
+        logger.info("    +             o      +       +");
+        logger.info("o          +");
+        logger.info("    o  +           +        +");
+        logger.info("+        o     o       +        o");
+        logger.info("-_-_-_-_-_-_-_,------,      o");
+        logger.info("_-_-_-_-_-_-_-|   /\\_/\\");
+        logger.info("-_-_-_-_-_-_-~|__( ^ .^)  +     +");
+        logger.info("_-_-_-_-_-_-_-\"\"  \"\"");
+        logger.info("+      o         o   +       o");
+        logger.info("    +         +");
+        logger.info("o        o         o      o     +");
+        logger.info("    o           +");
+        logger.info("+      +     o        o      +");
+    }
+
     static void dispatch_log(const char* channel, sensekit_log_severity_t logLevel, const char* message)
     {
         switch(logLevel)

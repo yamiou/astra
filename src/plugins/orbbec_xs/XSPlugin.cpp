@@ -7,8 +7,8 @@ EXPORT_PLUGIN(sensekit::plugins::xs::XSPlugin);
 namespace sensekit { namespace plugins { namespace xs {
 
     void XSPlugin::on_stream_added(sensekit_streamset_t setHandle,
-                                      sensekit_stream_t streamHandle,
-                                      sensekit_stream_desc_t streamDesc)
+                                   sensekit_stream_t streamHandle,
+                                   sensekit_stream_desc_t streamDesc)
     {
         PROFILE_FUNC();
         get_logger().info("XS on stream added: %d,%d", streamDesc.type, streamDesc.subtype);
@@ -17,20 +17,20 @@ namespace sensekit { namespace plugins { namespace xs {
         {
             get_logger().info("XS creating point processor");
 
-            Sensor sensor(setHandle);
             StreamDescription depthDescription = streamDesc;
 
             auto pointProcessorPtr = std::make_unique<PointProcessor>(get_pluginService(),
-                                                                      sensor,
+                                                                      setHandle,
                                                                       depthDescription,
                                                                       get_logger());
+
             m_pointProcessorMap[streamHandle] = std::move(pointProcessorPtr);
         }
     }
 
     void XSPlugin::on_stream_removed(sensekit_streamset_t setHandle,
-                                        sensekit_stream_t streamHandle,
-                                        sensekit_stream_desc_t streamDesc)
+                                     sensekit_stream_t streamHandle,
+                                     sensekit_stream_desc_t streamDesc)
     {
         PROFILE_FUNC();
         get_logger().info("XS on stream removed: %d,%d", streamDesc.type, streamDesc.subtype);

@@ -25,6 +25,7 @@ typedef struct {
 typedef struct _sensekit_streamset* sensekit_streamset_t;
 typedef struct _sensekit_streamconnection_handle* sensekit_streamconnection_handle_t;
 
+typedef struct _sensekit_streamsetconnection* sensekit_streamsetconnection_t;
 typedef struct _sensekit_streamconnection* sensekit_streamconnection_t;
 
 typedef struct _sensekit_frame sensekit_frame_t;

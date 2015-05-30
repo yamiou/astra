@@ -17,20 +17,26 @@ namespace sensekit { namespace plugins { namespace depth {
     public:
 
         StylizedDepthStream(PluginServiceProxy& pluginService,
-                            Sensor streamSet,
+                            sensekit_streamset_t streamSet,
                             sensekit_stream_t sourceStream)
             : SingleBinStream(pluginService,
-                             streamSet,
-                             StreamDescription(SENSEKIT_STREAM_STYLIZED_DEPTH,
-                                               DEFAULT_SUBTYPE), 0),
-              m_reader(streamSet.create_reader()),
-              m_sensor(streamSet)
+                              streamSet,
+                              StreamDescription(SENSEKIT_STREAM_STYLIZED_DEPTH,
+                                                DEFAULT_SUBTYPE), 0),
+              m_sourceStream(sourceStream)
         {
+            sensekit_streamsetconnection_t conn = nullptr;
+            pluginService.connect_to_streamset(streamSet, conn);
+            m_sensor = Sensor(conn);
+            m_reader = m_sensor.create_reader();
+
             m_depthStream = m_reader.stream<sensekit::DepthStream>();
             m_depthStream.start();
 
             m_reader.addListener(*this);
         }
+
+        sensekit_stream_t get_source_stream() { return m_sourceStream; }
 
         virtual void on_frame_ready(sensekit::StreamReader& reader, sensekit::Frame& frame) override
         {
@@ -40,8 +46,8 @@ namespace sensekit { namespace plugins { namespace depth {
         virtual void on_connection_added(sensekit_streamconnection_t connection)
         {
             /*
-               if !bin create default bin
-               link connection to bin
+              if !bin create default bin
+              link connection to bin
             */
         }
 
@@ -65,6 +71,7 @@ namespace sensekit { namespace plugins { namespace depth {
 
     private:
         DepthStream m_depthStream{nullptr};
+        sensekit_stream_t m_sourceStream{nullptr};
         StreamReader m_reader;
         Sensor m_sensor;
     };

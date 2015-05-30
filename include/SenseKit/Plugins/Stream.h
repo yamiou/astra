@@ -34,7 +34,7 @@ namespace sensekit { namespace plugins {
     {
     public:
         Stream(PluginServiceProxy& pluginService,
-               Sensor streamSet,
+               sensekit_streamset_t streamSet,
                StreamDescription description) :
             m_logger(pluginService, "PluginStream"),
             m_pluginService(pluginService),
@@ -111,16 +111,17 @@ namespace sensekit { namespace plugins {
 
             sensekit_stream_desc_t desc = description.get_desc_t();
 
-            m_pluginService.create_stream(m_streamSet.get_handle(),
+            m_pluginService.create_stream(m_streamSet,
                                           desc,
                                           pluginCallbacks,
                                           &m_streamHandle);
         }
 
         PluginServiceProxy& m_pluginService;
-        Sensor m_streamSet;
+        sensekit_streamset_t m_streamSet{nullptr};
         StreamDescription m_description;
         sensekit_stream_t m_streamHandle{nullptr};
+
         bool m_inhibitCallbacks;
         std::unordered_set<sensekit_streamconnection_t> m_savedConnections;
     };

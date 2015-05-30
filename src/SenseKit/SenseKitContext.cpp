@@ -29,9 +29,8 @@ namespace sensekit {
         m_logger = std::make_unique<Logger>("Context");
 
         m_logger->warn("Hold on to yer butts");
+        log_nyan(*m_logger.get());
         m_logger->info("logger file: %s", logPath.c_str());
-
-        m_rootSet = std::make_unique<StreamSet>();
 
         m_streamServiceProxy = create_stream_proxy(this);
         sensekit_api_set_proxy(get_streamServiceProxy());
@@ -69,18 +68,26 @@ namespace sensekit {
 
         m_initialized = false;
 
+        m_logger->info("SenseKit terminated.");
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t SenseKitContext::streamset_open(const char* uri, sensekit_streamset_t& streamSet)
+    sensekit_status_t SenseKitContext::streamset_open(const char* uri, sensekit_streamsetconnection_t& streamSet)
     {
-        streamSet = get_rootSet().get_handle();
+        m_logger->info("client opening streamset: %s", uri);
+
+        streamSet = nullptr;
+        StreamSet& set = m_setCatalog.get_or_add(uri);
+
+        StreamSetConnection* conn = set.add_new_connection();
+        streamSet = conn->get_handle();
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
 
-    sensekit_status_t SenseKitContext::streamset_close(sensekit_streamset_t& streamSet)
+    sensekit_status_t SenseKitContext::streamset_close(sensekit_streamsetconnection_t& streamSet)
     {
         streamSet = nullptr;
 
@@ -93,13 +100,13 @@ namespace sensekit {
         return nullptr;
     }
 
-    sensekit_status_t SenseKitContext::reader_create(sensekit_streamset_t streamSet,
+    sensekit_status_t SenseKitContext::reader_create(sensekit_streamsetconnection_t streamSet,
                                                      sensekit_reader_t& reader)
     {
         assert(streamSet != nullptr);
 
-        StreamSet* actualSet = StreamSet::get_ptr(streamSet);
-        ReaderPtr actualReader(new StreamReader(*actualSet));
+        StreamSetConnection* actualConnection = StreamSetConnection::get_ptr(streamSet);
+        ReaderPtr actualReader(new StreamReader(*actualConnection->get_streamSet()));
 
         reader = actualReader->get_handle();
 
@@ -283,16 +290,16 @@ namespace sensekit {
 
     void SenseKitContext::raise_existing_streams_added(stream_added_callback_t callback, void* clientTag)
     {
-        //TODO loop for all created rootsets
-        StreamSet& set = get_rootSet();
-        auto setHandle = set.get_handle();
-
-        std::function<void(Stream*)> visitor = [setHandle, callback, clientTag](Stream* stream)
+        m_setCatalog.visit_sets(
+            [&callback, &clientTag] (StreamSet* set)
             {
-                callback(clientTag, setHandle, stream->get_handle(), stream->get_description());
-            };
-
-        set.visit_streams(visitor);
+                sensekit_streamset_t setHandle = set->get_handle();
+                set->visit_streams(
+                    [&setHandle, &callback, &clientTag] (Stream* stream)
+                    {
+                        callback(clientTag, setHandle, stream->get_handle(), stream->get_description());
+                    });
+            });
     }
 
     sensekit_status_t SenseKitContext::stream_set_parameter(sensekit_streamconnection_t connection,

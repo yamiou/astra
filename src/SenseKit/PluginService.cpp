@@ -22,25 +22,22 @@ namespace sensekit
         m_hostEventSignal.raise(id, data, dataSize);
     }
 
-    sensekit_status_t PluginService::create_stream_set(sensekit_streamset_t& streamSet)
+    sensekit_status_t PluginService::create_stream_set(const char* streamUri, sensekit_streamset_t& streamSet)
     {
-        //TODO: normally would create a new streamset
+        StreamSet& set = m_context.get_setCatalog().get_or_add(streamUri);
+        streamSet = set.get_handle();
 
-        streamSet = m_context.get_rootSet().get_handle();
-
-        m_logger.info("creating streamset: %x (placeholder)", streamSet);
+        m_logger.info("creating streamset: %s %x", streamUri, streamSet);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
     sensekit_status_t PluginService::destroy_stream_set(sensekit_streamset_t& streamSet)
     {
-        //TODO: if we were not hard coding the rootset in create_stream_set...
-        //if streamset has direct child streams, return error
-        //if streamset has child streamsets, reparent them to this streamset's parent (or null parent)
-        //then delete the streamset
+        StreamSet* actualSet = StreamSet::get_ptr(streamSet);
 
-        m_logger.info("destroying streamset: %x (mock)", streamSet);
+        m_logger.info("destroying streamset: %s %x", actualSet->get_uri().c_str(), streamSet);
+        m_context.get_setCatalog().destroy_set(actualSet);
 
         streamSet = nullptr;
 
@@ -101,7 +98,8 @@ namespace sensekit
                                                    sensekit_stream_t& handle)
     {
         // TODO add to specific stream set
-        Stream* stream = m_context.get_rootSet().create_stream(desc, pluginCallbacks);
+        StreamSet* set = StreamSet::get_ptr(setHandle);
+        Stream* stream = set->create_stream(desc, pluginCallbacks);
         handle = stream->get_handle();
 
         m_logger.info("created stream -- handle %x type: %d", handle, desc.type);
@@ -116,21 +114,45 @@ namespace sensekit
         if (streamHandle == nullptr)
             return SENSEKIT_STATUS_INVALID_PARAMETER;
 
-        //TODO refactor this mess
-
-        StreamSet& set = m_context.get_rootSet();
-        sensekit_streamset_t setHandle = set.get_handle();
-
         Stream* stream = Stream::get_ptr(streamHandle);
+
+        assert(stream != nullptr);
+
+        StreamSet* set =
+            m_context.get_setCatalog().find_streamset_for_stream(stream);
+
+        assert(set != nullptr);
+
         const sensekit_stream_desc_t& desc = stream->get_description();
 
         m_logger.info("destroying stream -- handle: %x type: %d", stream->get_handle(), desc.type);
 
-        m_streamRemovingSignal.raise(setHandle, streamHandle, desc);
+        m_streamRemovingSignal.raise(set->get_handle(), streamHandle, desc);
 
-        set.destroy_stream(stream);
+        set->destroy_stream(stream);
 
         streamHandle = nullptr;
+
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t PluginService::connect_to_streamset(sensekit_streamset_t setHandle,
+                                                          sensekit_streamsetconnection_t& conn)
+    {
+        StreamSet* actualSet = StreamSet::get_ptr(setHandle);
+        m_logger.info("connecting to streamset: %s", actualSet->get_uri().c_str());
+
+        StreamSetConnection* connection = actualSet->add_new_connection();
+        conn = connection->get_handle();
+
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t PluginService::get_streamset_from_streamsetconnection(sensekit_streamsetconnection_t connection,
+                                                                            sensekit_streamset_t& setHandle)
+    {
+        StreamSetConnection* actualConnection = StreamSetConnection::get_ptr(connection);
+        setHandle = actualConnection->get_streamSet()->get_handle();
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -260,7 +282,6 @@ namespace sensekit
 
         return SENSEKIT_STATUS_SUCCESS;
     }
-
 
     sensekit_status_t PluginService::unregister_host_event_callback(CallbackId callbackId)
     {

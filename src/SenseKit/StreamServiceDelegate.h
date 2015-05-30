@@ -24,13 +24,13 @@ namespace sensekit {
 
         static sensekit_status_t streamset_open(void* streamService,
                                                 const char* connectionString,
-                                                sensekit_streamset_t* streamSet)
+                                                sensekit_streamsetconnection_t* streamSet)
         {
             return static_cast<SenseKitContext*>(streamService)->streamset_open(connectionString, *streamSet);
         }
 
         static sensekit_status_t streamset_close(void* streamService,
-                                                 sensekit_streamset_t* streamSet)
+                                                 sensekit_streamsetconnection_t* streamSet)
         {
             return static_cast<SenseKitContext*>(streamService)->streamset_close(*streamSet);
         }
@@ -42,7 +42,7 @@ namespace sensekit {
         }
 
         static sensekit_status_t reader_create(void* streamService,
-                                               sensekit_streamset_t streamSet,
+                                               sensekit_streamsetconnection_t streamSet,
                                                sensekit_reader_t* reader)
         {
             return static_cast<SenseKitContext*>(streamService)->reader_create(streamSet, *reader);

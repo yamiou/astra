@@ -5,11 +5,15 @@
 #include <SenseKit/sensekit_types.h>
 #include <atomic>
 #include <memory>
+#include <unordered_map>
+#include <string>
+
 #include "PluginManager.h"
 #include "StreamSet.h"
 #include "StreamReader.h"
 #include "Core/shared_library.h"
 #include "Logger.h"
+#include "StreamSetCatalog.h"
 
 struct StreamServiceProxyBase;
 
@@ -27,13 +31,13 @@ namespace sensekit {
         sensekit_status_t terminate();
 
         sensekit_status_t streamset_open(const char* connectionString,
-                                         sensekit_streamset_t& streamSet);
+                                         sensekit_streamsetconnection_t& streamSet);
 
-        sensekit_status_t streamset_close(sensekit_streamset_t& streamSet);
+        sensekit_status_t streamset_close(sensekit_streamsetconnection_t& streamSet);
 
         char* get_status_string(sensekit_status_t status);
 
-        sensekit_status_t reader_create(sensekit_streamset_t streamSet,
+        sensekit_status_t reader_create(sensekit_streamsetconnection_t streamSet,
                                         sensekit_reader_t& reader);
 
         sensekit_status_t reader_destroy(sensekit_reader_t& reader);
@@ -95,20 +99,19 @@ namespace sensekit {
 
         void raise_existing_streams_added(stream_added_callback_t callback, void* clientTag);
 
-        StreamSet& get_rootSet() { return *m_rootSet; }
-
         StreamServiceProxyBase* get_streamServiceProxy() { return m_streamServiceProxy; }
 
         sensekit_status_t notify_host_event(sensekit_event_id id, const void* data, size_t dataSize);
+
+        StreamSet& create_stream(const char* streamUri);
+
+        StreamSetCatalog& get_setCatalog() { return m_setCatalog; }
 
     private:
         bool m_initialized{false};
 
         using LoggerPtr = std::unique_ptr<Logger>;
         LoggerPtr m_logger;
-
-        using StreamSetPtr = std::unique_ptr<StreamSet>;
-        StreamSetPtr m_rootSet;
 
         StreamServiceProxyBase* m_streamServiceProxy;
 
@@ -119,6 +122,7 @@ namespace sensekit {
         using ReaderList = std::vector<ReaderPtr>;
 
         ReaderList m_readers;
+        StreamSetCatalog m_setCatalog;
     };
 }
 

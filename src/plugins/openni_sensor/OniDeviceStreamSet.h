@@ -16,7 +16,7 @@ namespace sensekit { namespace plugins {
     class OniDeviceStreamSet
     {
     public:
-        OniDeviceStreamSet(PluginServiceProxy& pluginService, const char* uri);
+        OniDeviceStreamSet(std::string name, PluginServiceProxy& pluginService, const char* uri);
         ~OniDeviceStreamSet();
 
         sensekit_status_t open();

@@ -15,7 +15,7 @@ namespace sensekit { namespace plugins { namespace hand {
     {
     public:
         HandStream(PluginServiceProxy& pluginService,
-                   Sensor& streamSet,
+                   sensekit_streamset_t streamSet,
                    size_t maxHandCount)
             : SingleBinStream(pluginService,
                               streamSet,

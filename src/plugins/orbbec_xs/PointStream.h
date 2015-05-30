@@ -15,7 +15,7 @@ namespace sensekit { namespace plugins { namespace xs {
     {
     public:
         PointStream(PluginServiceProxy& pluginService,
-                    Sensor& streamSet,
+                    sensekit_streamset_t streamSet,
                     uint32_t width,
                     uint32_t height)
             : SingleBinStream(pluginService,

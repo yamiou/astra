@@ -3,22 +3,23 @@
 
 namespace sensekit { namespace plugins {
 
-    OniDeviceStreamSet::OniDeviceStreamSet(PluginServiceProxy& pluginService,
+    OniDeviceStreamSet::OniDeviceStreamSet(std::string name,
+                                           PluginServiceProxy& pluginService,
                                            const char* uri)
         : m_logger(pluginService, "OniDeviceStreamSet"),
           m_pluginService(pluginService),
           m_uri(uri)
     {
         PROFILE_FUNC();
-        m_pluginService.create_stream_set(m_streamSetHandle);
-        m_sensor = std::make_unique<Sensor>(m_streamSetHandle);
+        m_uri = uri;
+        m_pluginService.create_stream_set(name.c_str(), m_streamSetHandle);
     }
 
     OniDeviceStreamSet::~OniDeviceStreamSet()
     {
         PROFILE_FUNC();
-        m_pluginService.destroy_stream_set(m_streamSetHandle);
         close();
+        m_pluginService.destroy_stream_set(m_streamSetHandle);
     }
 
     sensekit_status_t OniDeviceStreamSet::open()
@@ -36,7 +37,7 @@ namespace sensekit { namespace plugins {
             return SENSEKIT_STATUS_DEVICE_ERROR;
         }
 
-        m_logger.warn("opened device: %s", m_uri.c_str());
+        m_logger.info("opened device: %s", m_uri.c_str());
 
         open_sensor_streams();
 
@@ -95,7 +96,7 @@ namespace sensekit { namespace plugins {
         if (enableColor && m_oniDevice.hasSensor(openni::SENSOR_COLOR))
         {
             OniColorStream* stream = new OniColorStream(m_pluginService,
-                                                        *m_sensor,
+                                                        m_streamSetHandle,
                                                         m_oniDevice);
 
             sensekit_status_t rc = SENSEKIT_STATUS_SUCCESS;
@@ -118,7 +119,7 @@ namespace sensekit { namespace plugins {
         if (m_oniDevice.hasSensor(openni::SENSOR_DEPTH))
         {
             OniDepthStream* stream = new OniDepthStream(m_pluginService,
-                                                        *m_sensor,
+                                                        m_streamSetHandle,
                                                         m_oniDevice);
 
             sensekit_status_t rc = SENSEKIT_STATUS_SUCCESS;

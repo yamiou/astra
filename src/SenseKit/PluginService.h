@@ -43,8 +43,13 @@ namespace sensekit
         sensekit_status_t unregister_host_event_callback(sensekit_callback_id_t callback);
         sensekit_status_t unregister_stream_added_callback(sensekit_callback_id_t callback);
         sensekit_status_t unregister_stream_removing_callback(sensekit_callback_id_t callback);
-        sensekit_status_t create_stream_set(sensekit_streamset_t& setHandle);
+        sensekit_status_t create_stream_set(const char* setUri,
+                                            sensekit_streamset_t& setHandle);
         sensekit_status_t destroy_stream_set(sensekit_streamset_t& setHandle);
+        sensekit_status_t connect_to_streamset(sensekit_streamset_t setHandle,
+                                               sensekit_streamsetconnection_t& conn);
+        sensekit_status_t get_streamset_from_streamsetconnection(sensekit_streamsetconnection_t connection,
+                                                                 sensekit_streamset_t& setHandle);
         sensekit_status_t create_stream(sensekit_streamset_t setHandle,
                                         sensekit_stream_desc_t desc,
                                         stream_callbacks_t pluginCallbacks,

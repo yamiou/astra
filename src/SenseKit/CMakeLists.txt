@@ -41,6 +41,8 @@ set(${_projname}_SOURCES
   PluginManager.cpp
   ParameterBin.h
   StreamServiceDelegate.h
+  StreamSetCatalog.h
+  StreamSetCatalog.cpp
   StreamSet.cpp
   StreamSet.h
   Logger.h

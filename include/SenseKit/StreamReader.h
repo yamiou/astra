@@ -61,7 +61,6 @@ namespace sensekit {
         }
 
     private:
-
         class ReaderRef;
         using ReaderRefPtr = std::shared_ptr<ReaderRef>;
 
