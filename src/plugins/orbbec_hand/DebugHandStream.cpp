@@ -85,7 +85,7 @@ namespace sensekit { namespace plugins { namespace hand {
             sensekit_vector2f_t newMousePosition;
             memcpy(&newMousePosition, inData, sizeof(sensekit_vector2f_t));
 
-            m_mouseNormPosition = reinterpret_cast<const Vector2f&>(newMousePosition);
+            m_mouseNormPosition = *reinterpret_cast<const Vector2f*>(&newMousePosition);
         }
     }
 }}}
