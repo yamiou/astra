@@ -29,7 +29,7 @@ namespace samples { namespace common {
 
         void set_light_direction(const sensekit_vector3f_t& direction)
         {
-            m_lightVector = cvector_to_vector(direction);
+            m_lightVector = reinterpret_cast<const Vector3f&>(direction);
         }
 
         void set_ambient_color(const sensekit_rgb_pixel_t& color)
@@ -117,7 +117,7 @@ namespace samples { namespace common {
             m_normalMap = std::make_unique<Vector3f[]>(numPixels);
             m_blurNormalMap = std::make_unique<Vector3f[]>(numPixels);
 
-            std::fill(m_blurNormalMap.get(), m_blurNormalMap.get() + numPixels, Vector3f::zero);
+            std::fill(m_blurNormalMap.get(), m_blurNormalMap.get() + numPixels, Vector3f::zero());
 
             m_normalMapLength = numPixels;
         }
@@ -143,14 +143,14 @@ namespace samples { namespace common {
         //top row
         for (int x = 0; x < depthWidth; ++x)
         {
-            *normMap = Vector3f::zero;
+            *normMap = Vector3f::zero();
             ++normMap;
         }
 
         for (int y = 1; y < depthHeight - 1; ++y)
         {
             //first pixel at start of row
-            *normMap = Vector3f::zero;
+            *normMap = Vector3f::zero();
             ++normMap;
 
             for (int x = 1; x < depthWidth - 1; ++x)
@@ -224,14 +224,14 @@ namespace samples { namespace common {
             }
 
             //last pixel at end of row
-            *normMap = Vector3f::zero;
+            *normMap = Vector3f::zero();
             ++normMap;
         }
 
         //bottom row
         for (int x = 0; x < depthWidth; ++x)
         {
-            *normMap = Vector3f::zero;
+            *normMap = Vector3f::zero();
             ++normMap;
         }
 

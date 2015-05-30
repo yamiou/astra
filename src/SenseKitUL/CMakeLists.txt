@@ -4,8 +4,10 @@ set(${_projname}_SOURCES
   ../../include/SenseKitUL/SenseKitUL.h
   ../../include/SenseKitUL/skul_capi.h
   ../../include/SenseKitUL/Vector.h
-  ../../include/SenseKitUL/Vector2.h
-  ../../include/SenseKitUL/Vector3.h
+  ../../include/SenseKitUL/Vector2f.h
+  ../../include/SenseKitUL/Vector2i.h
+  ../../include/SenseKitUL/Vector3f.h
+  ../../include/SenseKitUL/Vector3i.h
   ../../include/SenseKitUL/skul_ctypes.h
   ../../include/SenseKitUL/streams/Image.h
   ../../include/SenseKitUL/streams/image_capi.h
@@ -45,9 +47,9 @@ target_link_libraries(${_projname} SenseKitAPI Shiny)
 include_directories(${_projname} ${SHINY_INCLUDE})
 
 install(TARGETS ${_projname}
-        RUNTIME DESTINATION bin/
-        LIBRARY DESTINATION lib/
-        ARCHIVE DESTINATION lib/
-        )
+  RUNTIME DESTINATION bin/
+  LIBRARY DESTINATION lib/
+  ARCHIVE DESTINATION lib/
+  )
 
 install_pdb(${_projname} bin/)

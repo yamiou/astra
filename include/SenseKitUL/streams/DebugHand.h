@@ -31,7 +31,7 @@ namespace sensekit {
 
         void set_mouse_position(Vector2f position)
         {
-            sensekit_debug_handstream_set_mouse_position(m_debugHandStream, vector_to_cvector(position));
+            sensekit_debug_handstream_set_mouse_position(m_debugHandStream, position);
         }
 
         DebugHandViewType get_view_type()
