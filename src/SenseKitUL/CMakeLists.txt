@@ -40,7 +40,9 @@ add_library(${_projname} SHARED ${${_projname}_SOURCES})
 
 add_definitions(-DSENSEKIT_BUILD_EX)
 
-target_link_libraries(${_projname} SenseKitAPI)
+target_link_libraries(${_projname} SenseKitAPI Shiny)
+
+include_directories(${_projname} ${SHINY_INCLUDE})
 
 install(TARGETS ${_projname}
         RUNTIME DESTINATION bin/

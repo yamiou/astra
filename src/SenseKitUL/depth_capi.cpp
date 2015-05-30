@@ -8,6 +8,7 @@
 #include <SenseKitUL/streams/image_capi.h>
 #include <SenseKitUL/streams/image_parameters.h>
 #include <unordered_map>
+#include <Shiny.h>
 
 using ConversionMap = std::unordered_map <sensekit_depthstream_t, conversion_cache_t>;
 
@@ -15,6 +16,7 @@ ConversionMap g_sensekit_conversion_map;
 
 conversion_cache_t sensekit_depth_fetch_conversion_cache(sensekit_depthstream_t depthStream)
 {
+    PROFILE_FUNC();
     auto it = g_sensekit_conversion_map.find(depthStream);
 
     if (it != g_sensekit_conversion_map.end())
@@ -23,12 +25,14 @@ conversion_cache_t sensekit_depth_fetch_conversion_cache(sensekit_depthstream_t 
     }
     else
     {
+        PROFILE_BEGIN(depth_cache_get);
         conversion_cache_t conversionCache;
         sensekit_stream_get_parameter_fixed(depthStream,
                                             SENSEKIT_PARAMETER_DEPTH_CONVERSION_CACHE,
                                             sizeof(conversion_cache_t),
                                             reinterpret_cast<sensekit_parameter_data_t*>(&conversionCache));
         g_sensekit_conversion_map.insert(std::make_pair(depthStream, conversionCache));
+        PROFILE_END();
         return conversionCache;
     }
 }
@@ -39,14 +43,18 @@ SENSEKIT_API_EX sensekit_status_t sensekit_convert_depth_to_world(sensekit_depth
                                                                   float depthX, float depthY, float depthZ,
                                                                   float* pWorldX, float* pWorldY, float* pWorldZ)
 {
+    PROFILE_FUNC();
     conversion_cache_t conversionCache = sensekit_depth_fetch_conversion_cache(depthStream);
 
+    PROFILE_BEGIN(depth_to_world_math);
     float normalizedX = depthX / conversionCache.resolutionX - .5f;
     float normalizedY = .5f - depthY / conversionCache.resolutionY;
 
     *pWorldX = normalizedX * depthZ * conversionCache.xzFactor;
     *pWorldY = normalizedY * depthZ * conversionCache.yzFactor;
     *pWorldZ = depthZ;
+
+    PROFILE_END();
 
     return SENSEKIT_STATUS_SUCCESS;
 }
@@ -55,6 +63,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_convert_world_to_depth(sensekit_depth
                                                                   float worldX, float worldY, float worldZ,
                                                                   float* pDepthX, float* pDepthY, float* pDepthZ)
 {
+    PROFILE_FUNC();
     conversion_cache_t conversionCache = sensekit_depth_fetch_conversion_cache(depthStream);
 
     *pDepthX = conversionCache.coeffX * worldX / worldZ + conversionCache.halfResX;
