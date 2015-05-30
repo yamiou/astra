@@ -3,6 +3,7 @@
 
 #include <opencv2/core/core.hpp>
 #include <SenseKitUL/streams/Depth.h>
+#include <Shiny.h>
 
 namespace sensekit { namespace plugins { namespace hand {
 
@@ -43,17 +44,29 @@ namespace sensekit { namespace plugins { namespace hand {
         { }
 
         float scale() const { return m_scale; }
-        
+
         inline cv::Point3f convert_depth_to_world(int depthX, int depthY, float depthZ) const
         {
+            PROFILE_FUNC();
             depthX = (depthX + m_offsetX) * m_scale;
             depthY = (depthY + m_offsetY) * m_scale;
 
             return cv_convert_depth_to_world(m_mapper, depthX, depthY, depthZ);
         }
 
+        inline void convert_depth_to_world(int depthX, int depthY, float depthZ,
+                                           float& worldX, float& worldY, float& worldZ) const
+        {
+            PROFILE_FUNC();
+            depthX = (depthX + m_offsetX) * m_scale;
+            depthY = (depthY + m_offsetY) * m_scale;
+
+            m_mapper.convert_depth_to_world(depthX, depthY, depthZ, &worldX, &worldY, &worldZ);
+        }
+
         inline cv::Point3f convert_depth_to_world(float depthX, float depthY, float depthZ) const
         {
+            PROFILE_FUNC();
             depthX = (depthX + m_offsetX) * m_scale;
             depthY = (depthY + m_offsetY) * m_scale;
 
@@ -62,11 +75,13 @@ namespace sensekit { namespace plugins { namespace hand {
 
         inline cv::Point3f convert_depth_to_world(cv::Point3f depthPosition) const
         {
+            PROFILE_FUNC();
             return convert_depth_to_world(depthPosition.x, depthPosition.y, depthPosition.z);
         }
 
         inline cv::Point3f convert_world_to_depth(cv::Point3f worldPosition) const
         {
+            PROFILE_FUNC();
             cv::Point3f depth = cv_convert_world_to_depth(m_mapper, worldPosition);
 
             depth.x = (depth.x / m_scale) - m_offsetX;

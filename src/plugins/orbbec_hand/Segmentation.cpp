@@ -66,8 +66,8 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         PROFILE_FUNC();
         assert(matVisited.size() == data.matrices.depth.size());
 
-        const float minDepth = data.referenceDepth - data.bandwidthDepthNear;
-        const float maxDepth = data.referenceDepth + data.bandwidthDepthFar;
+        const float minDepth = data.referenceWorldPosition.z - data.bandwidthDepthNear;
+        const float maxDepth = data.referenceWorldPosition.z + data.bandwidthDepthFar;
         const float maxSegmentationDist = data.maxSegmentationDist;
         const float referenceAreaSqrt = data.referenceAreaSqrt;
         cv::Mat& depthMatrix = data.matrices.depth;
@@ -125,8 +125,8 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         //does the seed point start in range?
         //If not, it will search outward until it finds in range pixels
-        const float minDepth = data.referenceDepth - data.bandwidthDepthNear;
-        const float maxDepth = data.referenceDepth + data.bandwidthDepthFar;
+        const float minDepth = data.referenceWorldPosition.z - data.bandwidthDepthNear;
+        const float maxDepth = data.referenceWorldPosition.z + data.bandwidthDepthFar;
 
         cv::Mat matVisited = cv::Mat::zeros(depthMatrix.size(), CV_8UC1);
 
@@ -188,12 +188,13 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         cv::Mat& layerScoreMatrix = data.matrices.layerScore;
         const float pointInertiaFactor = data.pointInertiaFactor;
         const float pointInertiaRadius = data.pointInertiaRadius;
+        sensekit::Vector3f* worldPoints = data.matrices.worldPoints;
 
         ScalingCoordinateMapper mapper = get_scaling_mapper(data.matrices);
 
-        cv::Point3f seedWorldPosition = mapper.convert_depth_to_world(data.seedPosition.x,
-                                                                        data.seedPosition.y,
-                                                                        data.referenceDepth);
+        auto seedWorldPosition = sensekit::Vector3f(data.referenceWorldPosition.x,
+                                                    data.referenceWorldPosition.y,
+                                                    data.referenceWorldPosition.z);
         bool activePoint = data.pointType == TrackedPointType::ActivePoint;
 
         int width = depthMatrix.cols;
@@ -205,26 +206,28 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         int minY = edgeRadius - 1;
         int maxY = height - edgeRadius;
 
-        for (int y = 0; y < height; ++y)
+        for (int y = 0; y < height; y++)
         {
             float* depthRow = depthMatrix.ptr<float>(y);
             float* basicScoreRow = basicScoreMatrix.ptr<float>(y);
             float* edgeDistanceRow = edgeDistanceMatrix.ptr<float>(y);
             float* layerScoreRow = layerScoreMatrix.ptr<float>(y);
 
-            for (int x = 0; x < width; ++x, ++depthRow, ++basicScoreRow, ++edgeDistanceRow, ++layerScoreRow)
+            for (int x = 0; x < width; ++x, ++depthRow, ++worldPoints, ++basicScoreRow, ++edgeDistanceRow, ++layerScoreRow)
             {
                 float depth = *depthRow;
                 if (depth != 0 && x > minX && x < maxX && y > minY && y < maxY)
                 {
-                    cv::Point3f worldPosition = mapper.convert_depth_to_world(x, y, depth);
+                    sensekit::Vector3f worldPosition = *worldPoints;
 
                     float score = *basicScoreRow;
 
                     if (activePoint && pointInertiaRadius > 0)
                     {
-                        float distFromSeedNorm = std::max(0.0, std::min(1.0,
-                                                    cv::norm(worldPosition - seedWorldPosition) / pointInertiaRadius));
+                        auto vector = worldPosition - seedWorldPosition;
+                        float length = vector.length();
+                        float distFromSeedNorm = std::max(0.0f, std::min(1.0f,
+                                                    length / pointInertiaRadius));
                         score += (1.0f - distFromSeedNorm) * pointInertiaFactor;
                     }
 
@@ -368,30 +371,27 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         return false;
     }
 
-    void calculate_basic_score(cv::Mat& depthMatrix,
-                                cv::Mat& scoreMatrix,
-                                const float heightFactor,
-                                const float depthFactor,
-                                const ScalingCoordinateMapper& mapper)
+    void calculate_basic_score(sensekit::Vector3f* worldPoints,
+                               cv::Size depthSize,
+                               cv::Mat& scoreMatrix,
+                               const float heightFactor,
+                               const float depthFactor)
     {
         PROFILE_FUNC();
-        scoreMatrix = cv::Mat::zeros(depthMatrix.size(), CV_32FC1);
+        scoreMatrix = cv::Mat::zeros(depthSize, CV_32FC1);
 
-        int width = depthMatrix.cols;
-        int height = depthMatrix.rows;
+        int width = depthSize.width;
+        int height = depthSize.height;
 
-        for (int y = 0; y < height; y++)
+        for (int y = 0; y < height; ++y)
         {
-            float* depthRow = depthMatrix.ptr<float>(y);
             float* scoreRow = scoreMatrix.ptr<float>(y);
 
-            for (int x = 0; x < width; x++)
+            for (int x = 0; x < width; ++x, ++worldPoints, ++scoreRow)
             {
-                float depth = *depthRow;
-                if (depth != 0)
+                sensekit::Vector3f worldPosition = *worldPoints;
+                if (worldPosition.z != 0)
                 {
-                    cv::Point3f worldPosition = mapper.convert_depth_to_world(x, y, depth);
-
                     float score = 0;
                     score += worldPosition.y * heightFactor;
                     score += (MAX_DEPTH - worldPosition.z) * depthFactor;
@@ -402,8 +402,6 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 {
                     *scoreRow = 0;
                 }
-                ++depthRow;
-                ++scoreRow;
             }
         }
     }
@@ -446,65 +444,64 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         } while (!done && nonZeroCount < imageLength && ++iterations < maxIterations);
     }
 
-    static float get_depth_area(cv::Point3f& p1,
-                                cv::Point3f& p2,
-                                cv::Point3f& p3,
-                                const ScalingCoordinateMapper& mapper)
+    static float get_depth_area(sensekit::Vector3f& world1,
+                                sensekit::Vector3f& world2,
+                                sensekit::Vector3f& world3)
     {
         PROFILE_FUNC();
-        cv::Point3f world1 = mapper.convert_depth_to_world(p1);
-        cv::Point3f world2 = mapper.convert_depth_to_world(p2);
-        cv::Point3f world3 = mapper.convert_depth_to_world(p3);
 
-        cv::Point3f v1 = world2 - world1;
-        cv::Point3f v2 = world3 - world1;
+        sensekit::Vector3f v1 = world2 - world1;
+        sensekit::Vector3f v2 = world3 - world1;
 
-        float area = static_cast<float>(0.5 * cv::norm(v1.cross(v2)));
+        sensekit::Vector3f cross = v1.cross(v2);
+        float length = cross.length();
+        float area = 0.5f * length;
         return area;
     }
 
-    void calculate_segment_area(cv::Mat& depthMatrix,
-                                cv::Mat& areaMatrix,
-                                cv::Mat& areaSqrtMatrix,
-                                const ScalingCoordinateMapper& mapper)
+    void calculate_per_point_area(sensekit::Vector3f* worldPoints,
+                                  sensekit::Vector2f* worldDeltas,
+                                  cv::Size depthSize,
+                                  cv::Mat& areaMatrix,
+                                  cv::Mat& areaSqrtMatrix)
     {
         PROFILE_FUNC();
-        int width = depthMatrix.cols;
-        int height = depthMatrix.rows;
+        int width = depthSize.width;
+        int height = depthSize.height;
 
-        areaMatrix = cv::Mat::zeros(depthMatrix.size(), CV_32FC1);
-        areaSqrtMatrix = cv::Mat::zeros(depthMatrix.size(), CV_32FC1);
+        areaMatrix = cv::Mat::zeros(depthSize, CV_32FC1);
+        areaSqrtMatrix = cv::Mat::zeros(depthSize, CV_32FC1);
 
-        for (int y = 0; y < height - 1; y++)
+        for (int y = 0; y < height; y++)
         {
-            float* depthRow = depthMatrix.ptr<float>(y);
-            float* nextDepthRow = depthMatrix.ptr<float>(y + 1);
             float* areaRow = areaMatrix.ptr<float>(y);
             float* areaSqrtRow = areaSqrtMatrix.ptr<float>(y);
 
-            for (int x = 0; x < width - 1; x++)
+            for (int x = 0; x < width; ++x, ++worldPoints, ++worldDeltas, ++areaRow, ++areaSqrtRow)
             {
                 float area = 0;
-                float depth1 = *depthRow;
 
-                if (depth1 != 0)
+                sensekit::Vector3f w1 = *worldPoints;
+                if (w1.z != 0)
                 {
-                    cv::Point3f p1(x, y, depth1);
-                    cv::Point3f p2(x + 1, y, depth1);
-                    cv::Point3f p3(x, y + 1, depth1);
-                    cv::Point3f p4(x + 1, y + 1, depth1);
+                    sensekit::Vector2f delta = *worldDeltas;
 
-                    area += get_depth_area(p1, p2, p3, mapper);
-                    area += get_depth_area(p2, p3, p4, mapper);
+                    sensekit::Vector3f w2 = w1;
+                    w2.x += delta.x;
+
+                    sensekit::Vector3f w3 = w1;
+                    w3.y += delta.y;
+
+                    sensekit::Vector3f w4 = w1;
+                    w4.x += delta.x;
+                    w4.y += delta.y;
+
+                    area += get_depth_area(w1, w2, w3);
+                    area += get_depth_area(w2, w3, w4);
                 }
 
                 *areaRow = area;
                 *areaSqrtRow = sqrt(area);
-
-                ++depthRow;
-                ++nextDepthRow;
-                ++areaRow;
-                ++areaSqrtRow;
             }
         }
     }

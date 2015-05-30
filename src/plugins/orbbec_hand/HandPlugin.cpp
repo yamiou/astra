@@ -17,7 +17,6 @@ namespace sensekit { namespace plugins { namespace hand {
 
     HandPlugin::~HandPlugin()
     {
-        PROFILE_UPDATE();
         #if __ANDROID__
             PROFILE_OUTPUT("/sdcard/hand_profile.txt");
         #else

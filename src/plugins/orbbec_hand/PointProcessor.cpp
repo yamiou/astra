@@ -50,21 +50,66 @@ namespace sensekit { namespace plugins { namespace hand {
         PROFILE_FUNC();
     }
 
+    void PointProcessor::calculate_world_points(TrackingMatrices& matrices, ScalingCoordinateMapper mapper)
+    {
+        PROFILE_FUNC();
+
+        cv::Mat& depthMatrix = matrices.depth;
+        sensekit::Vector3f* worldPoints = matrices.worldPoints;
+        sensekit::Vector2f* worldDeltas = matrices.worldDeltas;
+
+        int width = depthMatrix.cols;
+        int height = depthMatrix.rows;
+
+        for (int y = 0; y < height; y++)
+        {
+            float* depthRow = depthMatrix.ptr<float>(y);
+
+            for (int x = 0; x < width; ++x, ++worldPoints, ++worldDeltas, ++depthRow)
+            {
+                float depth = *depthRow;
+                Vector3f& p = *worldPoints;
+                Vector2f& delta = *worldDeltas;
+                if (depth < 1)
+                {
+                    p.x = 0;
+                    p.y = 0;
+                    p.z = 0;
+                    delta.x = 0;
+                    delta.y = 0;
+                }
+                else
+                {
+                    mapper.convert_depth_to_world(x, y, depth,
+                                                  p.x, p.y, p.z);
+                    float wx, wy, wz;
+                    mapper.convert_depth_to_world(x+1, y+1, depth,
+                                                  wx, wy, wz);
+                    delta.x = wx - p.x;
+                    delta.y = wy - p.y;
+                }
+            }
+        }
+    }
+
     void PointProcessor::initialize_common_calculations(TrackingMatrices& matrices)
     {
         PROFILE_FUNC();
         auto scalingMapper = get_scaling_mapper(matrices);
 
-        segmentation::calculate_basic_score(matrices.depth,
+        calculate_world_points(matrices, scalingMapper);
+
+        segmentation::calculate_basic_score(matrices.worldPoints,
+                                            matrices.depth.size(),
                                             matrices.basicScore,
                                             m_heightScoreFactor,
-                                            m_depthScoreFactor,
-                                            scalingMapper);
+                                            m_depthScoreFactor);
 
-        segmentation::calculate_segment_area(matrices.depth,
-                                             matrices.area,
-                                             matrices.areaSqrt,
-                                             scalingMapper);
+        segmentation::calculate_per_point_area(matrices.worldPoints,
+                                               matrices.worldDeltas,
+                                               matrices.depth.size(),
+                                               matrices.area,
+                                               matrices.areaSqrt);
 
     }
 
@@ -91,12 +136,9 @@ namespace sensekit { namespace plugins { namespace hand {
 
         ++trackedPoint.inactiveFrameCount;
 
-        cv::Point seedPosition = trackedPoint.position;
-        float referenceDepth = trackedPoint.worldPosition.z;
-
         TrackingData updateTrackingData(matrices,
-                                        seedPosition,
-                                        referenceDepth,
+                                        trackedPoint.position,
+                                        trackedPoint.worldPosition,
                                         trackedPoint.referenceAreaSqrt,
                                         m_segmentationBandwidthDepthNear,
                                         m_segmentationBandwidthDepthFar,
@@ -127,13 +169,13 @@ namespace sensekit { namespace plugins { namespace hand {
 
             cv::Point3f estimatedPosition = scalingMapper.convert_world_to_depth(estimatedWorldPosition);
 
+            cv::Point seedPosition;
             seedPosition.x = MAX(0, MIN(width - 1, static_cast<int>(estimatedPosition.x)));
             seedPosition.y = MAX(0, MIN(height - 1, static_cast<int>(estimatedPosition.y)));
-            referenceDepth = estimatedPosition.z;
 
             TrackingData recoverTrackingData(matrices,
                                              seedPosition,
-                                             referenceDepth,
+                                             estimatedWorldPosition,
                                              trackedPoint.referenceAreaSqrt,
                                              m_segmentationBandwidthDepthNear,
                                              m_segmentationBandwidthDepthFar,
@@ -282,7 +324,6 @@ namespace sensekit { namespace plugins { namespace hand {
         PROFILE_FUNC();
         for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
         {
-            //TODO take this and make it a method on TrackedPoint
             TrackedPoint& trackedPoint = *iter;
 
             float resizeFactor = get_resize_factor(matrices);
@@ -293,11 +334,17 @@ namespace sensekit { namespace plugins { namespace hand {
 
             bool resizeNeeded = matrices.depthFullSize.cols != matrices.depth.cols;
 
+            bool processRefinedPosition = false;
+
             if (resizeNeeded &&
                 trackedPoint.trackingStatus == TrackingStatus::Tracking &&
                 trackedPoint.pointType == TrackedPointType::ActivePoint)
             {
-                cv::Point3f refinedWorldPosition = get_refined_high_res_position(matrices, trackedPoint);
+                cv::Point3f refinedWorldPosition = trackedPoint.worldPosition;
+                if (processRefinedPosition)
+                {
+                    cv::Point3f refinedWorldPosition = get_refined_high_res_position(matrices, trackedPoint);
+                }
 
                 cv::Point3f smoothedWorldPosition = smooth_world_positions(trackedPoint.fullSizeWorldPosition, refinedWorldPosition);
 
@@ -350,8 +397,7 @@ namespace sensekit { namespace plugins { namespace hand {
         PROFILE_FUNC();
         assert(trackedPoint.pointType == TrackedPointType::ActivePoint);
 
-        float referenceDepth = trackedPoint.worldPosition.z;
-        if (referenceDepth == 0)
+        if (trackedPoint.worldPosition.z == 0)
         {
             return trackedPoint.worldPosition;
         }
@@ -382,20 +428,23 @@ namespace sensekit { namespace plugins { namespace hand {
         //initialize_common_calculations(matrices);
         ScalingCoordinateMapper roiMapper(matrices.fullSizeMapper, 1.0, windowLeft, windowTop);
 
-        segmentation::calculate_basic_score(matrices.depth,
+        calculate_world_points(matrices, roiMapper);
+
+        segmentation::calculate_basic_score(matrices.worldPoints,
+                                            matrices.depth.size(),
                                             matrices.basicScore,
                                             m_heightScoreFactor,
-                                            m_depthScoreFactor,
-                                            roiMapper);
+                                            m_depthScoreFactor);
 
-        segmentation::calculate_segment_area(matrices.depth,
-                                             matrices.area,
-                                             matrices.areaSqrt,
-                                             roiMapper);
+        segmentation::calculate_per_point_area(matrices.worldPoints,
+                                               matrices.worldDeltas,
+                                               matrices.depth.size(),
+                                               matrices.area,
+                                               matrices.areaSqrt);
 
         TrackingData refinementTrackingData(matrices,
                                             roiPosition,
-                                            referenceDepth,
+                                            trackedPoint.worldPosition,
                                             referenceAreaSqrt,
                                             m_segmentationBandwidthDepthNear,
                                             m_segmentationBandwidthDepthFar,
@@ -458,9 +507,6 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Point3f fullSizeDepthPosition = cv_convert_world_to_depth(fullSizeMapper, newWorldPosition);
 
         trackedPoint.fullSizePosition = cv::Point(fullSizeDepthPosition.x, fullSizeDepthPosition.y);
-
-        //trackedPoint.position.x = fullSizeDepthPosition.x / resizeFactor;
-        //trackedPoint.position.y = fullSizeDepthPosition.y / resizeFactor;
 
         cv::Point3f deltaPosition = newWorldPosition - trackedPoint.fullSizeWorldPosition;
         trackedPoint.fullSizeWorldPosition = newWorldPosition;
@@ -680,9 +726,15 @@ namespace sensekit { namespace plugins { namespace hand {
             return;
         }
 
+        auto scalingMapper = get_scaling_mapper(matrices);
+        cv::Point3f referenceWorldPosition =
+                        scalingMapper.convert_depth_to_world(seedPosition.x,
+                                                             seedPosition.y,
+                                                             referenceDepth);
+
         TrackingData createTrackingData(matrices,
                                         seedPosition,
-                                        referenceDepth,
+                                        referenceWorldPosition,
                                         referenceAreaSqrt,
                                         m_segmentationBandwidthDepthNear,
                                         m_segmentationBandwidthDepthFar,
@@ -716,7 +768,6 @@ namespace sensekit { namespace plugins { namespace hand {
 
         float depth = matrices.depth.at<float>(targetPoint);
 
-        auto scalingMapper = get_scaling_mapper(matrices);
         cv::Point3f worldPosition = scalingMapper.convert_depth_to_world(targetPoint.x,
                                                                          targetPoint.y,
                                                                          depth);

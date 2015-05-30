@@ -39,6 +39,16 @@ namespace sensekit { namespace plugins { namespace hand {
         HandTracker::~HandTracker()
         {
             PROFILE_FUNC();
+            if (m_worldPoints != nullptr)
+            {
+                delete[] m_worldPoints;
+                m_worldPoints = nullptr;
+            }
+            if (m_worldDeltas != nullptr)
+            {
+                delete[] m_worldDeltas;
+                m_worldDeltas = nullptr;
+            }
         }
 
         void HandTracker::create_streams(PluginServiceProxy& pluginService, Sensor streamset)
@@ -66,6 +76,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
                 update_tracking(depthFrame);
             }
+            PROFILE_UPDATE();
         }
 
         void HandTracker::reset()
@@ -117,6 +128,24 @@ namespace sensekit { namespace plugins { namespace hand {
             m_refineScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_refineEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
 
+            int numPoints = matDepth.cols * matDepth.rows;
+            if (m_worldPoints == nullptr || m_worldDeltas == nullptr || m_numWorldpoints != numPoints)
+            {
+                if (m_worldPoints != nullptr)
+                {
+                    delete[] m_worldPoints;
+                    m_worldPoints = nullptr;
+                }
+                if (m_worldDeltas != nullptr)
+                {
+                    delete[] m_worldDeltas;
+                    m_worldDeltas = nullptr;
+                }
+
+                m_numWorldpoints = numPoints;
+                m_worldPoints = new sensekit::Vector3f[numPoints];
+                m_worldDeltas = new sensekit::Vector2f[numPoints];
+            }
 
             bool debugLayersEnabled = m_debugImageStream->has_connections();
 
@@ -132,6 +161,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_layerEdgeDistance,
                                             m_debugUpdateSegmentation,
                                             m_debugUpdateScore,
+                                            m_worldPoints,
+                                            m_worldDeltas,
                                             debugLayersEnabled,
                                             m_depthStream.coordinateMapper());
 
@@ -156,6 +187,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_layerEdgeDistance,
                                             m_debugCreateSegmentation,
                                             m_debugCreateScore,
+                                            m_worldPoints,
+                                            m_worldDeltas,
                                             debugLayersEnabled,
                                             m_depthStream.coordinateMapper());
 
@@ -217,6 +250,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                                 m_refineEdgeDistance,
                                                 m_debugRefineSegmentation,
                                                 m_debugRefineScore,
+                                                m_worldPoints,
+                                                m_worldDeltas,
                                                 false,
                                                 m_depthStream.coordinateMapper());
 
@@ -228,8 +263,9 @@ namespace sensekit { namespace plugins { namespace hand {
         void HandTracker::generate_hand_frame(sensekit_frame_index_t frameIndex)
         {
             PROFILE_FUNC();
+            PROFILE_BEGIN(begin_write);
             sensekit_handframe_wrapper_t* handFrame = m_handStream->begin_write(frameIndex);
-
+            PROFILE_END();
             if (handFrame != nullptr)
             {
                 handFrame->frame.handpoints = reinterpret_cast<sensekit_handpoint_t*>(&(handFrame->frame_data));
@@ -237,7 +273,9 @@ namespace sensekit { namespace plugins { namespace hand {
 
                 update_hand_frame(m_pointProcessor.get_trackedPoints(), handFrame->frame);
 
+                PROFILE_BEGIN(end_write);
                 m_handStream->end_write();
+                PROFILE_END();
             }
         }
 

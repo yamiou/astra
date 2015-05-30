@@ -1,12 +1,14 @@
 #include "ScalingCoordinateMapper.h"
 #include <opencv2/core/core.hpp>
 #include <SenseKitUL/streams/Depth.h>
+#include <Shiny.h>
 
 namespace sensekit { namespace plugins { namespace hand {
 
     cv::Point3f cv_convert_depth_to_world(const sensekit::CoordinateMapper& mapper,
                                           float depthX, float depthY, float depthZ)
     {
+        PROFILE_FUNC();
         float worldX, worldY, worldZ;
 
         mapper.convert_depth_to_world(depthX, depthY, depthZ, &worldX, &worldY, &worldZ);
@@ -17,6 +19,7 @@ namespace sensekit { namespace plugins { namespace hand {
     cv::Point3f cv_convert_depth_to_world(const sensekit::CoordinateMapper& mapper,
                                           int depthX, int depthY, float depthZ)
     {
+        PROFILE_FUNC();
         return cv_convert_depth_to_world(mapper,
                                          static_cast<float>(depthX),
                                          static_cast<float>(depthY),
@@ -26,12 +29,14 @@ namespace sensekit { namespace plugins { namespace hand {
     cv::Point3f cv_convert_depth_to_world(const sensekit::CoordinateMapper& mapper,
                                           const cv::Point3f& depth)
     {
+        PROFILE_FUNC();
         return cv_convert_depth_to_world(mapper, depth.x, depth.y, depth.z);
     }
 
     cv::Point3f cv_convert_world_to_depth(const sensekit::CoordinateMapper& mapper,
                                           float worldX, float worldY, float worldZ)
     {
+        PROFILE_FUNC();
         float depthX, depthY, depthZ;
         mapper.convert_world_to_depth(worldX,
                                       worldY,
@@ -46,6 +51,7 @@ namespace sensekit { namespace plugins { namespace hand {
     cv::Point3f cv_convert_world_to_depth(const sensekit::CoordinateMapper& mapper,
                                           const cv::Point3f& world)
     {
+        PROFILE_FUNC();
         return cv_convert_world_to_depth(mapper, world.x, world.y, world.z);
     }
 
@@ -56,6 +62,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                           float offsetY,
                                           float depth)
     {
+        PROFILE_FUNC();
         if (depth == 0)
         {
             return position;

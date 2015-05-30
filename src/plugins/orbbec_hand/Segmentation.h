@@ -14,23 +14,24 @@ namespace sensekit { namespace plugins { namespace hand {
 
         bool find_next_velocity_seed_pixel(cv::Mat& foregroundMatrix,
                                         cv::Mat& searchedMatrix,
-                                        cv::Point& foregroundPosition, 
+                                        cv::Point& foregroundPosition,
                                         cv::Point& nextSearchStart);
 
         void calculate_edge_distance(cv::Mat& segmentationMatrix,
                                      cv::Mat& areaSqrtMatrix,
                                      cv::Mat& edgeDistanceMatrix);
 
-        void calculate_basic_score(cv::Mat& depthMatrix,
+        void calculate_basic_score(sensekit::Vector3f* worldPoints,
+                                   cv::Size depthSize,
                                    cv::Mat& scoreMatrix,
                                    const float heightFactor,
-                                   const float depthFactor,
-                                   const ScalingCoordinateMapper& mapper);
+                                   const float depthFactor);
 
-        void calculate_segment_area(cv::Mat& depthMatrix,
-                                    cv::Mat& areaMatrix,
-                                    cv::Mat& areaSqrtMatrix,
-                                    const ScalingCoordinateMapper& mapper);
+        void calculate_per_point_area(sensekit::Vector3f* worldPoints,
+                                      sensekit::Vector2f* worldDeltas,
+                                      cv::Size depthSize,
+                                      cv::Mat& areaMatrix,
+                                      cv::Mat& areaSqrtMatrix);
 
         float count_neighborhood_area(cv::Mat& matSegmentation,
                                       cv::Mat& matDepth,

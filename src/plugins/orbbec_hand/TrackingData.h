@@ -65,6 +65,8 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat& foregroundSearched;
         cv::Mat& debugSegmentation;
         cv::Mat& debugScore;
+        sensekit::Vector3f* worldPoints;
+        sensekit::Vector2f* worldDeltas;
         bool debugLayersEnabled;
         int layerCount;
         const sensekit::CoordinateMapper& fullSizeMapper;
@@ -81,6 +83,8 @@ namespace sensekit { namespace plugins { namespace hand {
                          cv::Mat& layerEdgeDistance,
                          cv::Mat& debugSegmentation,
                          cv::Mat& debugScore,
+                         sensekit::Vector3f* worldPoints,
+                         sensekit::Vector2f* worldDeltas,
                          bool debugLayersEnabled,
                          const sensekit::CoordinateMapper& fullSizeMapper)
             :
@@ -97,9 +101,11 @@ namespace sensekit { namespace plugins { namespace hand {
             debugSegmentation(debugSegmentation),
             debugScore(debugScore),
             debugLayersEnabled(debugLayersEnabled),
+            worldPoints(worldPoints),
+            worldDeltas(worldDeltas),
             layerCount(0),
             fullSizeMapper(fullSizeMapper)
-            {}
+            { }
     };
 
     inline float get_resize_factor(TrackingMatrices& matrices)
@@ -120,7 +126,7 @@ namespace sensekit { namespace plugins { namespace hand {
     {
         TrackingMatrices& matrices;
         const cv::Point& seedPosition;
-        const float referenceDepth;
+        const cv::Point3f referenceWorldPosition;
         const float referenceAreaSqrt;
         const float bandwidthDepthNear;
         const float bandwidthDepthFar;
@@ -135,7 +141,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         TrackingData(TrackingMatrices& matrices,
                      const cv::Point& seedPosition,
-                     const float referenceDepth,
+                     const cv::Point3f referenceWorldPosition,
                      const float referenceAreaSqrt,
                      const float bandwidthDepthNear,
                      const float bandwidthDepthFar,
@@ -149,7 +155,7 @@ namespace sensekit { namespace plugins { namespace hand {
                      const float pointInertiaRadius)
             : matrices(matrices),
               seedPosition(seedPosition),
-              referenceDepth(referenceDepth),
+              referenceWorldPosition(referenceWorldPosition),
               referenceAreaSqrt(referenceAreaSqrt),
               bandwidthDepthNear(bandwidthDepthNear),
               bandwidthDepthFar(bandwidthDepthFar),
