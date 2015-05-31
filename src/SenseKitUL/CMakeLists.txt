@@ -29,10 +29,14 @@ set(${_projname}_SOURCES
   ../../include/SenseKitUL/streams/skeleton_capi.h
   ../../include/SenseKitUL/streams/skeleton_types.h
   ../../include/SenseKitUL/Plugins/stream_types.h
+  ../../include/SenseKitUL/streams/Point.h
+  ../../include/SenseKitUL/streams/point_capi.h
+  ../../include/SenseKitUL/streams/point_types.h
   depth_capi.cpp
   color_capi.cpp
   image_capi.cpp
   hand_capi.cpp
+  point_capi.cpp
   skeleton_capi.cpp
   SenseKitUL.cpp
   generic_stream_api.h
