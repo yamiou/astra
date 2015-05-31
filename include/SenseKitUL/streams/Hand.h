@@ -14,9 +14,9 @@ namespace sensekit {
     public:
         explicit HandPoint(sensekit_handpoint_t handPoint) :
             m_handPoint(handPoint),
-            m_depthPosition(*reinterpret_cast<Vector2i*>(&handPoint.depthPosition)),
-            m_worldPosition(*reinterpret_cast<Vector3f*>(&handPoint.worldPosition)),
-            m_worldDeltaPosition(*reinterpret_cast<Vector3f*>(&handPoint.worldDeltaPosition))
+            m_depthPosition(Vector2i::from_cvector(handPoint.depthPosition)),
+            m_worldPosition(Vector3f::from_cvector(handPoint.worldPosition)),
+            m_worldDeltaPosition(Vector3f::from_cvector(handPoint.worldDeltaPosition))
         { }
 
         inline int32_t trackingId() const { return m_handPoint.trackingId; }

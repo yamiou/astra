@@ -29,7 +29,7 @@ namespace samples { namespace common {
 
         void set_light_direction(const sensekit_vector3f_t& direction)
         {
-            m_lightVector = reinterpret_cast<const Vector3f&>(direction);
+            m_lightVector = Vector3f::from_cvector(direction);
         }
 
         void set_ambient_color(const sensekit_rgb_pixel_t& color)

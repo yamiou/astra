@@ -8,6 +8,21 @@ namespace sensekit {
 
     struct Vector3i : public sensekit_vector3i_t
     {
+        static inline Vector3i& from_cvector(sensekit_vector3i_t& cvector)
+        {
+            return *reinterpret_cast<Vector3i*>(&cvector);
+        }
+
+        static inline const Vector3i& from_cvector(const sensekit_vector3i_t& cvector)
+        {
+            return *reinterpret_cast<const Vector3i*>(&cvector);
+        }
+
+        static inline Vector3i* from_cvector_ptr(sensekit_vector3i_t* p_cvector)
+        {
+            return reinterpret_cast<Vector3i*>(p_cvector);
+        }
+
         Vector3i()
         {
             this->x = 0;

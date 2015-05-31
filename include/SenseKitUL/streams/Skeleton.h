@@ -17,7 +17,7 @@ namespace sensekit {
 
         inline sensekit_joint_status status() { return m_joint.status; }
         inline sensekit_joint_type type() { return m_joint.jointType; }
-        inline const Vector3f& position() { return reinterpret_cast<Vector3f&>(m_joint.position); }
+        inline const Vector3f& position() { return Vector3f::from_cvector(m_joint.position); }
 
     private:
         sensekit_skeleton_joint_t m_joint;
