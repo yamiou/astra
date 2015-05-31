@@ -9,6 +9,7 @@
 #ifdef _WIN32
 #include <GL/glut.h>
 #else
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #include <GLUT/glut.h>
 #endif
 
@@ -71,7 +72,7 @@ void SimpleColorViewer::init(int argc, char **argv)
 
     m_reader = m_sensor.create_reader();
     m_reader.stream<sensekit::ColorStream>().start();
-    
+
     int colorWidth = 320;
     int colorHeight = 240;
     m_width = colorWidth;
@@ -99,8 +100,6 @@ void SimpleColorViewer::display()
         return;
 
     sensekit::ColorFrame colorFrame = frame.get<sensekit::ColorFrame>();
-
-    size_t colorLength;
 
     auto colorData = colorFrame.data();
 

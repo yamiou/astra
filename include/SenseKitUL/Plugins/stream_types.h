@@ -21,8 +21,13 @@ struct _sensekit_handframe {
     sensekit_handpoint_t* handpoints;
 };
 
+#if defined(_MSC_VER)
 #pragma warning( push )
 #pragma warning( disable : 4200 )
+#elsif
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wc99-extensions"
+#endif
 
 typedef struct _sensekit_imageframe_wrapper {
     _sensekit_imageframe frame;
@@ -34,6 +39,10 @@ typedef struct _sensekit_handframe_wrapper {
     char frame_data[];
 } sensekit_handframe_wrapper_t;
 
+#if defined(_MSC_VER)
 #pragma warning( pop )
+#elsif
+#pragma GCC diagnostic pop
+#endif
 
 #endif /* STREAM_TYPES_H */

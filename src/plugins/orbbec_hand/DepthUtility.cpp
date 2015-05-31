@@ -88,9 +88,9 @@ namespace sensekit { namespace plugins { namespace hand {
         //analyze_velocities(matDepth, m_matDepthVelErode);
     }
 
-    void DepthUtility::depthFrameToMat(DepthFrame& depthFrameSrc, 
-                                       const int width, 
-                                       const int height, 
+    void DepthUtility::depthFrameToMat(DepthFrame& depthFrameSrc,
+                                       const int width,
+                                       const int height,
                                        cv::Mat& matTarget)
     {
         //ensure initialized
@@ -129,8 +129,6 @@ namespace sensekit { namespace plugins { namespace hand {
             for (int x = 0; x < width; ++x)
             {
                 float depth = *depthRow;
-
-                uint8_t fillType = *filledDepthMaskRow;
 
                 if (depth == 0)
                 {
@@ -187,7 +185,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
                 //suppress signal when a pixel jumps a long distance from near to far
                 bool isJumpingAway = (absDeltaPercent > maxDepthJumpPercent && movingAway);
-                
+
                 if (isZeroDepth || isFilled || isJumpingAway)
                 {
                     //set the average to the current depth, and set velocity to zero
@@ -287,7 +285,7 @@ namespace sensekit { namespace plugins { namespace hand {
             for (int x = 0; x < width; ++x, ++depthRow, ++velFilteredRow)
             {
                 //matVelocityFiltered is already abs(vel)
-                
+
                 float depth = *depthRow;
                 int chunkIndex = depth_to_chunk_index(depth);
                 if (chunkIndex >= 0 && depth != 0)
@@ -307,7 +305,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         const float chunkRange = MAX_CHUNK_DEPTH - MIN_CHUNK_DEPTH;
         const float chunk_size = chunkRange / NUM_DEPTH_VEL_CHUNKS;
-        
+
         for (int i = 0; i < NUM_DEPTH_VEL_CHUNKS; i++)
         {
             float maxVel = m_maxVel[i];

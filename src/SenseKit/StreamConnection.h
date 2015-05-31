@@ -77,7 +77,6 @@ namespace sensekit {
 
         Stream* m_stream{nullptr};
         StreamBin* m_bin{nullptr};
-        sensekit_stream_t m_handle{nullptr};
         ParameterBin* m_pendingParameterResult{nullptr};
 
         FrontBufferReadyCallback m_binFrontBufferReadyCallback;

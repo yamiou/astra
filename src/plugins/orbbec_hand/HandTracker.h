@@ -43,7 +43,7 @@ namespace sensekit { namespace plugins { namespace hand {
         void update_hand_frame(std::vector<TrackedPoint>& internalTrackedPoints, _sensekit_handframe& frame);
 
         void track_points(cv::Mat& matDepth, cv::Mat& matDepthFullSize, cv::Mat& matForeground);
-        
+
         //fields
 
         PluginServiceProxy& m_pluginService;
@@ -61,9 +61,6 @@ namespace sensekit { namespace plugins { namespace hand {
 
         using HandStreamPtr = std::unique_ptr<HandStream>;
         HandStreamPtr m_handStream;
-
-        int m_width;
-        int m_height;
 
         cv::Mat m_matDepth;
         cv::Mat m_matDepthFullSize;

@@ -60,7 +60,6 @@ namespace samples { namespace common {
 
         size_t m_outputWidth;
         size_t m_outputHeight;
-        size_t m_outputByteLength;
 
         using BufferPtr = std::unique_ptr<sensekit_rgb_pixel_t[]>;
         BufferPtr m_outputBuffer{nullptr};
@@ -106,7 +105,6 @@ namespace samples { namespace common {
     {
         const short* depthData = frame.data();
         const CoordinateMapper& mapper = m_depthStream.coordinateMapper();
-        const size_t depthLength = frame.byteLength();
 
         const int depthWidth = frame.resolutionX();
         const int depthHeight = frame.resolutionY();
@@ -262,8 +260,6 @@ namespace samples { namespace common {
         prepare_buffer(depthWidth, depthHeight);
 
         const short* depthRowPtr = frame.data();
-        const size_t depthLength = frame.byteLength();
-        const CoordinateMapper& mapper = m_depthStream.coordinateMapper();
 
         sensekit_rgb_pixel_t* textureRowPtr = m_outputBuffer.get();
 

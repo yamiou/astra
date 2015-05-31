@@ -14,8 +14,8 @@ namespace sensekit { namespace plugins {
         StreamBin(PluginServiceProxy& pluginService,
                   sensekit_stream_t streamHandle,
                   size_t dataSize)
-            : m_pluginService(pluginService),
-              m_streamHandle(streamHandle)
+            : m_streamHandle(streamHandle),
+              m_pluginService(pluginService)
         {
             size_t dataWrapperSize = dataSize + sizeof(TFrameType);
             m_pluginService.create_stream_bin(streamHandle,

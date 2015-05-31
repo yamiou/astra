@@ -4,9 +4,8 @@
 namespace sensekit {
 
     PluginManager::PluginManager(SenseKitContext& context)
-        : m_context(context),
-          m_pluginService(std::make_unique<PluginService>(context)),
-          m_logger("PluginManager")
+        : m_logger("PluginManager"),
+          m_pluginService(std::make_unique<PluginService>(context))
     {
         m_pluginServiceProxy = m_pluginService->create_proxy();
     }

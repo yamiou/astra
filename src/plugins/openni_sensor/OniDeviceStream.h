@@ -56,8 +56,8 @@ namespace sensekit { namespace plugins {
                                   desc),
               m_oniDevice(oniDevice),
               m_oniSensorType(oniSensorType),
-              m_numComponentPerPixel(numComponentPerPixel),
-              m_bytesPerPixel(sizeof(block_type) * numComponentPerPixel)
+              m_bytesPerPixel(sizeof(block_type) * numComponentPerPixel),
+              m_numComponentPerPixel(numComponentPerPixel)
         {}
 
         virtual ~OniDeviceStream()
@@ -209,8 +209,8 @@ namespace sensekit { namespace plugins {
                                    sensekit_streamconnection_t connection);
 
     protected:
-        openni::SensorType m_oniSensorType;
         openni::Device& m_oniDevice;
+        openni::SensorType m_oniSensorType;
         openni::VideoStream m_oniStream;
         openni::VideoMode m_oniVideoMode;
 

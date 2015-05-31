@@ -10,9 +10,8 @@
 class sfLine : public sf::Drawable
 {
 public:
-    sfLine(const sf::Vector2f& point1, const sf::Vector2f& point2, sf::Color color, float thickness) :
-        color(color), 
-        thickness(thickness)
+    sfLine(const sf::Vector2f& point1, const sf::Vector2f& point2, sf::Color color, float thickness)
+        : color(color)
     {
         sf::Vector2f direction = point2 - point1;
         sf::Vector2f unitDirection = direction / std::sqrt(direction.x*direction.x + direction.y*direction.y);
@@ -34,10 +33,8 @@ public:
         target.draw(vertices, 4, sf::Quads);
     }
 
-
 private:
     sf::Vertex vertices[4];
-    float thickness;
     sf::Color color;
 };
 
@@ -241,7 +238,7 @@ public:
 
         float thickness = 4;
         auto it = pointList.begin();
-        
+
         sensekit::Vector2i lastPoint = *it;
         while (it != pointList.end())
         {
@@ -261,7 +258,6 @@ public:
     void drawHandPoints(sf::RenderWindow& window, float depthScale)
     {
         float radius = 16;
-        auto size = window.getSize();
         sf::Color candidateColor(255, 255, 0);
         sf::Color lostColor(255, 0, 0);
         sf::Color trackingColor(128, 138, 0);

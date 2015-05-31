@@ -16,10 +16,10 @@ namespace sensekit { namespace plugins {
         Stream(PluginServiceProxy& pluginService,
                Sensor streamSet,
                StreamDescription description) :
+            m_logger(pluginService, "PluginStream"),
             m_pluginService(pluginService),
             m_streamSet(streamSet),
-            m_description(description),
-            m_logger(pluginService, "PluginStream")
+            m_description(description)
         {
             create_stream(description);
         }
@@ -80,8 +80,6 @@ namespace sensekit { namespace plugins {
                                size_t inByteLength,
                                sensekit_parameter_data_t inData,
                                sensekit_parameter_bin_t& parameterBin) {};
-
-        virtual void on_new_buffer(sensekit_frame_t* newBuffer) { }
 
         void create_stream(StreamDescription& description)
         {

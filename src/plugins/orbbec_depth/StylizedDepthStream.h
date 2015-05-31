@@ -24,7 +24,6 @@ namespace sensekit { namespace plugins { namespace depth {
                              StreamDescription(SENSEKIT_STREAM_STYLIZED_DEPTH,
                                                DEFAULT_SUBTYPE), 0),
               m_reader(streamSet.create_reader()),
-              m_sourceHandle(sourceStream),
               m_sensor(streamSet)
         {
             m_depthStream = m_reader.stream<sensekit::DepthStream>();
@@ -65,12 +64,9 @@ namespace sensekit { namespace plugins { namespace depth {
                                sensekit_parameter_bin_t& parameterBin) {};
 
     private:
-
-        sensekit_stream_t m_sourceHandle;
         DepthStream m_depthStream{nullptr};
         StreamReader m_reader;
         Sensor m_sensor;
-
     };
 
 }}}

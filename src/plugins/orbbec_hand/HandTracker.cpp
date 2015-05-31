@@ -26,7 +26,7 @@ namespace sensekit { namespace plugins { namespace hand {
             m_processingSizeWidth(settings.processingSizeWidth),
             m_processingSizeHeight(settings.processingSizeHeight)
         {
-            create_streams(pluginService, streamset);
+            create_streams(m_pluginService, streamset);
 
             m_depthStream = m_reader.stream<DepthStream>(depthDesc.get_subtype());
             m_depthStream.start();
@@ -39,6 +39,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void HandTracker::create_streams(PluginServiceProxy& pluginService, Sensor streamset)
         {
+            m_logger.info("creating hand streams");
             m_handStream = make_unique<HandStream>(pluginService, streamset, SENSEKIT_HANDS_MAX_HAND_COUNT);
 
             const int bytesPerPixel = 3;
@@ -75,7 +76,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
             //use same frameIndex as source depth frame
             sensekit_frame_index_t frameIndex = depthFrame.frameIndex();
-            
+
             if (m_handStream->has_connections())
             {
                 generate_hand_frame(frameIndex);
@@ -87,8 +88,8 @@ namespace sensekit { namespace plugins { namespace hand {
             }
         }
 
-        void HandTracker::track_points(cv::Mat& matDepth, 
-                                       cv::Mat& matDepthFullSize, 
+        void HandTracker::track_points(cv::Mat& matDepth,
+                                       cv::Mat& matDepthFullSize,
                                        cv::Mat& matVelocitySignal)
         {
             m_layerSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
@@ -109,7 +110,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
 
             bool debugLayersEnabled = m_debugImageStream->has_connections();
-            
+
             TrackingMatrices updateMatrices(matDepthFullSize,
                                             matDepth,
                                             m_matArea,
@@ -427,7 +428,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 break;
             }
 
-            if (view != DEBUG_HAND_VIEW_HANDWINDOW && 
+            if (view != DEBUG_HAND_VIEW_HANDWINDOW &&
                 view != DEBUG_HAND_VIEW_CREATE_SCORE &&
                 view != DEBUG_HAND_VIEW_UPDATE_SCORE &&
                 view != DEBUG_HAND_VIEW_DEPTH_MOD &&

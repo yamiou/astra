@@ -91,7 +91,6 @@ namespace sensekit {
         bool m_locked{false};
         bool m_isFrameReadyForLock{false};
         sensekit_frame_index_t m_lastFrameIndex{-1};
-        sensekit_reader_frame_t* m_currentFrame{nullptr};
         StreamSet& m_streamSet;
         ConnectionMap m_streamMap;
         Signal<sensekit_reader_t, sensekit_reader_frame_t> m_frameReadySignal;

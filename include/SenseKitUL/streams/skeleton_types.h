@@ -47,15 +47,24 @@ struct _sensekit_skeletonframe {
     sensekit_skeleton_t* skeletons;
 };
 
+#if defined(_MSC_VER)
 #pragma warning( push )
 #pragma warning( disable : 4200 )
+#elsif
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wc99-extensions"
+#endif
 
 typedef struct _sensekit_skeletonframe_wrapper {
     _sensekit_skeletonframe frame;
     char frame_data[];
 } sensekit_skeletonframe_wrapper_t;
 
-#pragma  warning( pop )
+#if defined(_MSC_VER)
+#pragma warning( pop )
+#elsif
+#pragma GCC diagnostic pop
+#endif
 
 typedef struct _sensekit_skeletonframe* sensekit_skeletonframe_t;
 typedef sensekit_streamconnection_t sensekit_skeletonstream_t;

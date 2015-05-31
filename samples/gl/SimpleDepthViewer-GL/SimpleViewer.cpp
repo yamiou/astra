@@ -9,6 +9,7 @@
 #ifdef _WIN32
 #include <GL/glut.h>
 #else
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #include <GLUT/glut.h>
 #endif
 

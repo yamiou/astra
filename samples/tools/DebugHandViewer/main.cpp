@@ -184,7 +184,6 @@ public:
     void drawHandPoints(sf::RenderWindow& window, float depthScale)
     {
         float radius = 16;
-        auto size = window.getSize();
         sf::Color candidateColor(255, 255, 0);
         sf::Color lostColor(255, 0, 0);
         sf::Color trackingColor(128, 138, 0);
@@ -416,7 +415,7 @@ int main(int argc, char** argv)
     auto handStream = reader.stream<sensekit::HandStream>();
     handStream.start();
     handStream.set_include_candidate_points(true);
-    
+
     reader.stream<sensekit::DebugHandStream>().start();
     reader.addListener(listener);
 
