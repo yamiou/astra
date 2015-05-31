@@ -24,7 +24,7 @@ struct _sensekit_handframe {
 #if defined(_MSC_VER)
 #pragma warning( push )
 #pragma warning( disable : 4200 )
-#elsif
+#else
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wc99-extensions"
 #endif
@@ -41,7 +41,7 @@ typedef struct _sensekit_handframe_wrapper {
 
 #if defined(_MSC_VER)
 #pragma warning( pop )
-#elsif
+#else
 #pragma GCC diagnostic pop
 #endif
 
