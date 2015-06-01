@@ -11,6 +11,10 @@ add_subdirectory(SenseKitUL)
 add_subdirectory(SenseKitAPI)
 add_subdirectory(plugins)
 
+if (SENSEKIT_ANDROID)
+  add_subdirectory(jni)
+endif()
+
 set (_projname "ProxyPreprocessor")
 
 add_custom_target(${_projname} ALL
