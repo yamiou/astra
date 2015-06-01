@@ -1,7 +1,15 @@
 #ifndef DEPTHUTILITY_H
 #define DEPTHUTILITY_H
 
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Woverloaded-virtual"
+#endif
 #include <opencv2/opencv.hpp>
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
+
 #include <SenseKitUL/SenseKitUL.h>
 #include "HandSettings.h"
 

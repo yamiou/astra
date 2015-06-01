@@ -343,7 +343,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 cv::Point3f refinedWorldPosition = trackedPoint.worldPosition;
                 if (processRefinedPosition)
                 {
-                    cv::Point3f refinedWorldPosition = get_refined_high_res_position(matrices, trackedPoint);
+                    refinedWorldPosition = get_refined_high_res_position(matrices, trackedPoint);
                 }
 
                 cv::Point3f smoothedWorldPosition = smooth_world_positions(trackedPoint.fullSizeWorldPosition, refinedWorldPosition);

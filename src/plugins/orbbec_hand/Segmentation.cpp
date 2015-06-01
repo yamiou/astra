@@ -2,7 +2,6 @@
 #include <queue>
 #include "ScalingCoordinateMapper.h"
 #include <cmath>
-#include <opencv2/opencv.hpp>
 #include "Segmentation.h"
 #include "constants.h"
 #include <Shiny.h>
