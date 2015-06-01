@@ -50,7 +50,7 @@ struct _sensekit_skeletonframe {
 #if defined(_MSC_VER)
 #pragma warning( push )
 #pragma warning( disable : 4200 )
-#else
+#elsif defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wc99-extensions"
 #endif
@@ -62,7 +62,7 @@ typedef struct _sensekit_skeletonframe_wrapper {
 
 #if defined(_MSC_VER)
 #pragma warning( pop )
-#else
+#elsif defined(__GNUC__)
 #pragma GCC diagnostic pop
 #endif
 

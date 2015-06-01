@@ -6,13 +6,12 @@ namespace sensekit {
     std::string get_application_name()
     {
         FILE *file;
-        size_t length;
 
         const size_t NAME_LENGTH = 1024;
         char appName[NAME_LENGTH];
 
         file = fopen("/proc/self/cmdline", "r");
-        length = fread(appName, 1, NAME_LENGTH, file);
+        fread(appName, 1, NAME_LENGTH, file);
         fclose(file);
 
         return std::string(appName);
