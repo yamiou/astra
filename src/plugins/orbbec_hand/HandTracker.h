@@ -92,7 +92,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         sensekit::Vector3f* m_worldPoints { nullptr };
         sensekit::Vector2f* m_worldDeltas { nullptr };
-        size_t m_numWorldpoints { 0 };
+        int m_numWorldPoints { 0 };
 
         DebugVisualizer m_debugVisualizer;
     };

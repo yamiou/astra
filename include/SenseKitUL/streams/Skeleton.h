@@ -47,7 +47,7 @@ namespace sensekit {
             }
 
             m_jointsInitialized = true;
-            for (int i = 0; i < m_skeleton.jointCount; ++i)
+            for (size_t i = 0; i < m_skeleton.jointCount; ++i)
             {
                 if (m_skeleton.joints[i].status ==
                     SENSEKIT_JOINT_STATUS_TRACKED)
@@ -149,7 +149,7 @@ namespace sensekit {
 
             sensekit_skeletonframe_get_skeletons_ptr(m_skeletonFrame, &skeletonPtr, &skeletonCount);
 
-            for (int i = 0; i < skeletonCount; ++i, ++skeletonPtr)
+            for (size_t i = 0; i < skeletonCount; ++i, ++skeletonPtr)
             {
                 sensekit_skeleton_t& p = *skeletonPtr;
                 if (p.status != sensekit_skeleton_status::SENSEKIT_SKELETON_STATUS_NOT_TRACKED)

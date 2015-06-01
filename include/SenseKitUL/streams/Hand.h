@@ -132,7 +132,7 @@ namespace sensekit {
 
             sensekit_handframe_get_shared_hand_array(m_handFrame, &handPtr, &maxHandCount);
 
-            for (int i = 0; i < maxHandCount; ++i, ++handPtr)
+            for (size_t i = 0; i < maxHandCount; ++i, ++handPtr)
             {
                 sensekit_handpoint_t& p = *handPtr;
                 if (p.status != sensekit_handstatus_t::HAND_STATUS_NOTTRACKING)

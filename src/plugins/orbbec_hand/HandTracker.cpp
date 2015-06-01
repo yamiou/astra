@@ -133,7 +133,7 @@ namespace sensekit { namespace plugins { namespace hand {
             m_refineEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
 
             int numPoints = matDepth.cols * matDepth.rows;
-            if (m_worldPoints == nullptr || m_worldDeltas == nullptr || m_numWorldpoints != numPoints)
+            if (m_worldPoints == nullptr || m_worldDeltas == nullptr || m_numWorldPoints != numPoints)
             {
                 if (m_worldPoints != nullptr)
                 {
@@ -146,7 +146,7 @@ namespace sensekit { namespace plugins { namespace hand {
                     m_worldDeltas = nullptr;
                 }
 
-                m_numWorldpoints = numPoints;
+                m_numWorldPoints = numPoints;
                 m_worldPoints = new sensekit::Vector3f[numPoints];
                 m_worldDeltas = new sensekit::Vector2f[numPoints];
             }
