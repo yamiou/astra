@@ -76,7 +76,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
                 update_tracking(depthFrame);
             }
-            PROFILE_UPDATE();
+            //PROFILE_UPDATE();
         }
 
         void HandTracker::reset()

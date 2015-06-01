@@ -106,8 +106,8 @@ namespace sensekit { namespace plugins { namespace xs {
                 uint16_t depth = *p_depth;
                 Vector3f& point = *p_points;
 
-                float normalizedX = x / conversionData.resolutionX - .5f;
-                float normalizedY = .5f - y / conversionData.resolutionY;
+                float normalizedX = static_cast<float>(x) / conversionData.resolutionX - .5f;
+                float normalizedY = .5f - static_cast<float>(y) / conversionData.resolutionY;
 
                 point.x = normalizedX * depth * conversionData.xzFactor;
                 point.y = normalizedY * depth * conversionData.yzFactor;

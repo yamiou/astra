@@ -100,9 +100,9 @@ namespace sensekit { namespace plugins { namespace hand {
             foregroundSearched(foregroundSearched),
             debugSegmentation(debugSegmentation),
             debugScore(debugScore),
-            debugLayersEnabled(debugLayersEnabled),
             worldPoints(worldPoints),
             worldDeltas(worldDeltas),
+            debugLayersEnabled(debugLayersEnabled),
             layerCount(0),
             fullSizeMapper(fullSizeMapper)
             { }

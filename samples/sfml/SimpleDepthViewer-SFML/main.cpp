@@ -5,18 +5,20 @@
 #include <chrono>
 #include <iostream>
 #include <iomanip>
+#include <Shiny.h>
 
 class DepthFrameListener : public sensekit::FrameReadyListener
 {
 public:
-    DepthFrameListener(sensekit::DepthStream& depthStream)
-        : m_visualizerPtr(new samples::common::LitDepthVisualizer(depthStream))
+    DepthFrameListener()
     {
+        PROFILE_FUNC();
         m_lastTimepoint = clock_type::now();
     }
 
     void init_texture(int width, int height)
     {
+        PROFILE_FUNC();
         if (m_displayBuffer == nullptr || width != m_displayWidth || height != m_displayHeight)
         {
             m_displayWidth = width;
@@ -36,6 +38,8 @@ public:
 
     void check_fps()
     {
+        PROFILE_FUNC();
+
         const double frameWeight = 0.2;
 
         auto newTimepoint = clock_type::now();
@@ -56,17 +60,44 @@ public:
                   << std::endl;
     }
 
+    void print_value(sensekit::PointFrame& pointFrame)
+    {
+        if (pointFrame.is_valid())
+        {
+            int width = pointFrame.resolutionX();
+            int height = pointFrame.resolutionY();
+            int frameIndex = pointFrame.frameIndex();
+
+            const sensekit::Vector3f* points = pointFrame.data();
+
+            size_t index = ((width * (height / 2.0f)) + (width / 2.0f));
+            sensekit::Vector3f middle = points[index];
+
+            std::cout << "depth frameIndex: " << frameIndex
+                      << " wX: " << middle.x
+                      << " wY: " << middle.y
+                      << " wZ: " << middle.z
+                      << std::endl;
+        }
+    }
+
     virtual void on_frame_ready(sensekit::StreamReader& reader,
                                 sensekit::Frame& frame) override
     {
-        sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
+        PROFILE_FUNC();
+        sensekit::PointFrame pointFrame = frame.get<sensekit::PointFrame>();
+        print_value(pointFrame);
 
-        int width = depthFrame.resolutionX();
-        int height = depthFrame.resolutionY();
+        int width = pointFrame.resolutionX();
+        int height = pointFrame.resolutionY();
 
         init_texture(width, height);
-        m_visualizerPtr->update(depthFrame);
-        sensekit_rgb_pixel_t* vizBuffer = m_visualizerPtr->get_output();
+
+        PROFILE_BEGIN(viz_update);
+        m_visualizer.update(pointFrame);
+        PROFILE_END();
+
+        sensekit_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
         for(int i = 0; i < width * height; i++)
         {
             int rgbaOffset = i *4;
@@ -76,11 +107,14 @@ public:
             m_displayBuffer[rgbaOffset + 3] = 255;
         }
         m_texture.update(m_displayBuffer.get());
-        check_fps();
+//        check_fps();
+
+        PROFILE_UPDATE();
     }
 
     void drawTo(sf::RenderWindow& window)
     {
+        PROFILE_FUNC();
         if (m_displayBuffer != nullptr)
         {
             float depthScale = window.getView().getSize().x / m_displayWidth;
@@ -92,8 +126,7 @@ public:
     }
 
 private:
-    using VizPtr = std::unique_ptr<samples::common::LitDepthVisualizer>;
-    VizPtr m_visualizerPtr;
+    samples::common::LitDepthVisualizer m_visualizer;
 
     using duration_type = std::chrono::duration<double>;
     duration_type m_frameDuration;
@@ -111,6 +144,7 @@ private:
 
 int main(int argc, char** argv)
 {
+    PROFILE_FUNC();
     sensekit::SenseKit::initialize();
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Depth Viewer");
@@ -118,10 +152,9 @@ int main(int argc, char** argv)
     sensekit::Sensor sensor;
     sensekit::StreamReader reader = sensor.create_reader();
 
-    auto ds = reader.stream<sensekit::DepthStream>();
-    ds.start();
+    reader.stream<sensekit::PointStream>().start();
 
-    DepthFrameListener listener(ds);
+    DepthFrameListener listener;
 
     reader.addListener(listener);
 
@@ -144,8 +177,9 @@ int main(int argc, char** argv)
         listener.drawTo(window);
         window.display();
     }
+    PROFILE_UPDATE();
+    PROFILE_OUTPUT("depthviewer_profile.txt");
 
     sensekit::SenseKit::terminate();
-
     return 0;
 }

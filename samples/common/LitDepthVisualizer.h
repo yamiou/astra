@@ -2,7 +2,7 @@
 #define LITDEPTHVISUALIZER_H
 
 #include <SenseKit/sensekit_capi.h>
-#include <SenseKitUL/streams/Depth.h>
+#include <SenseKitUL/streams/Point.h>
 #include <SenseKitUL/Vector.h>
 #include <cstring>
 #include <algorithm>
@@ -14,8 +14,7 @@ namespace samples { namespace common {
     class LitDepthVisualizer
     {
     public:
-        LitDepthVisualizer(DepthStream depthStream)
-            : m_depthStream(depthStream)
+        LitDepthVisualizer()
         {
             m_lightColor = {210, 210, 210};
             m_lightVector = {0.44022f, -0.17609f, 0.88045f};
@@ -42,13 +41,12 @@ namespace samples { namespace common {
             m_blurRadius = radius;
         }
 
-        void update(DepthFrame& frame);
+        void update(PointFrame& pointFrame);
 
         sensekit_rgb_pixel_t* get_output() { return m_outputBuffer.get(); }
 
     private:
         using VectorMapPtr = std::unique_ptr<Vector3f[]>;
-        VectorMapPtr m_positionMap{nullptr};
         VectorMapPtr m_normalMap{nullptr};
         VectorMapPtr m_blurNormalMap{nullptr};
         size_t m_normalMapLength{0};
@@ -64,10 +62,8 @@ namespace samples { namespace common {
         using BufferPtr = std::unique_ptr<sensekit_rgb_pixel_t[]>;
         BufferPtr m_outputBuffer{nullptr};
 
-        sensekit::DepthStream m_depthStream;
-
         void prepare_buffer(size_t width, size_t height);
-        void calculate_normals(DepthFrame& frame);
+        void calculate_normals(PointFrame& pointFrame);
     };
 
     void box_blur(const Vector3f* in,
@@ -101,19 +97,17 @@ namespace samples { namespace common {
         }
     }
 
-    void LitDepthVisualizer::calculate_normals(DepthFrame& frame)
+    void LitDepthVisualizer::calculate_normals(PointFrame& pointFrame)
     {
-        const short* depthData = frame.data();
-        const CoordinateMapper& mapper = m_depthStream.coordinateMapper();
+        const Vector3f* positionMap = pointFrame.data();
 
-        const int depthWidth = frame.resolutionX();
-        const int depthHeight = frame.resolutionY();
+        const int width = pointFrame.resolutionX();
+        const int height = pointFrame.resolutionY();
 
-        const int numPixels = depthWidth * depthHeight;
+        const int numPixels = width * height;
 
         if (m_normalMap == nullptr || m_normalMapLength != numPixels)
         {
-            m_positionMap = std::make_unique<Vector3f[]>(numPixels);
             m_normalMap = std::make_unique<Vector3f[]>(numPixels);
             m_blurNormalMap = std::make_unique<Vector3f[]>(numPixels);
 
@@ -122,59 +116,43 @@ namespace samples { namespace common {
             m_normalMapLength = numPixels;
         }
 
-        Vector3f* positionMap = m_positionMap.get();
-
-        for (int y = 0; y < depthHeight; y++)
-        {
-            for(int x = 0; x < depthWidth; x++)
-            {
-                const size_t index = x + y * depthWidth;
-                const uint16_t depth = depthData[index];
-
-                if (depth == 0)
-                    continue;
-
-                positionMap[index] = mapper.convert_depth_to_world(Vector3f(x,y, depthData[index]));
-            }
-        }
-
         Vector3f* normMap = m_normalMap.get();
 
         //top row
-        for (int x = 0; x < depthWidth; ++x)
+        for (int x = 0; x < width; ++x)
         {
             *normMap = Vector3f::zero();
             ++normMap;
         }
 
-        for (int y = 1; y < depthHeight - 1; ++y)
+        for (int y = 1; y < height - 1; ++y)
         {
             //first pixel at start of row
             *normMap = Vector3f::zero();
             ++normMap;
 
-            for (int x = 1; x < depthWidth - 1; ++x)
+            for (int x = 1; x < width - 1; ++x)
             {
-                size_t index = x + y * depthWidth;
+                size_t index = x + y * width;
                 size_t rightIndex = index + 1;
                 size_t leftIndex = index - 1;
-                size_t upIndex = index - depthWidth;
-                size_t downIndex = index + depthWidth;
+                size_t upIndex = index - width;
+                size_t downIndex = index + width;
 
-                int16_t depth = depthData[index];
-                int16_t depthLeft = depthData[leftIndex];
-                int16_t depthRight = depthData[rightIndex];
-                int16_t depthUp = depthData[upIndex];
-                int16_t depthDown = depthData[downIndex];
+                Vector3f point = positionMap[index];
+                Vector3f pointLeft = positionMap[leftIndex];
+                Vector3f pointRight = positionMap[rightIndex];
+                Vector3f pointUp = positionMap[upIndex];
+                Vector3f pointDown = positionMap[downIndex];
 
                 Vector3f normAvg;
 
-                if (depth != 0)
+                if (point.z != 0)
                 {
-                    if (depthRight != 0 && depthDown != 0)
+                    if (pointRight.z != 0 && pointDown.z != 0)
                     {
-                        Vector3f v1 = positionMap[rightIndex] - positionMap[index];
-                        Vector3f v2 = positionMap[downIndex] - positionMap[index];
+                        Vector3f v1 = pointRight - point;
+                        Vector3f v2 = pointDown - point;
 
                         Vector3f norm = v2.cross(v1);
                         normAvg.x += norm.x;
@@ -182,22 +160,10 @@ namespace samples { namespace common {
                         normAvg.z += norm.z;
                     }
 
-                    if (depthRight != 0 && depthUp != 0)
+                    if (pointRight.z != 0 && pointUp.z != 0)
                     {
-                        Vector3f v1 = positionMap[upIndex] - positionMap[index];
-                        Vector3f v2 = positionMap[rightIndex] - positionMap[index];
-
-                        Vector3f norm = v2.cross(v1);
-
-                        normAvg.x += norm.x;
-                        normAvg.y += norm.y;
-                        normAvg.z += norm.z;
-                    }
-
-                    if (depthLeft != 0 && depthUp != 0)
-                    {
-                        Vector3f v1 = positionMap[leftIndex] - positionMap[index];
-                        Vector3f v2 = positionMap[upIndex] - positionMap[index];
+                        Vector3f v1 = pointUp - point;
+                        Vector3f v2 = pointRight - point;
 
                         Vector3f norm = v2.cross(v1);
 
@@ -206,10 +172,22 @@ namespace samples { namespace common {
                         normAvg.z += norm.z;
                     }
 
-                    if (depthLeft != 0 && depthDown != 0)
+                    if (pointLeft.z != 0 && pointUp.z != 0)
                     {
-                        Vector3f v1 = positionMap[downIndex] - positionMap[index];
-                        Vector3f v2 = positionMap[leftIndex] - positionMap[index];
+                        Vector3f v1 = pointLeft - point;
+                        Vector3f v2 = pointUp - point;
+
+                        Vector3f norm = v2.cross(v1);
+
+                        normAvg.x += norm.x;
+                        normAvg.y += norm.y;
+                        normAvg.z += norm.z;
+                    }
+
+                    if (pointLeft.z != 0 && pointDown.z != 0)
+                    {
+                        Vector3f v1 = pointDown - point;
+                        Vector3f v2 = pointLeft - point;
 
                         Vector3f norm = v2.cross(v1);
 
@@ -229,13 +207,13 @@ namespace samples { namespace common {
         }
 
         //bottom row
-        for (int x = 0; x < depthWidth; ++x)
+        for (int x = 0; x < width; ++x)
         {
             *normMap = Vector3f::zero();
             ++normMap;
         }
 
-        box_blur(m_normalMap.get(), m_blurNormalMap.get(), depthWidth, depthHeight, m_blurRadius);
+        box_blur(m_normalMap.get(), m_blurNormalMap.get(), width, height, m_blurRadius);
     }
 
     void LitDepthVisualizer::prepare_buffer(size_t width, size_t height)
@@ -250,30 +228,27 @@ namespace samples { namespace common {
         std::fill(m_outputBuffer.get(), m_outputBuffer.get()+m_outputWidth*m_outputHeight, sensekit_rgb_pixel_t{0,0,0});
     }
 
-    void LitDepthVisualizer::update(sensekit::DepthFrame& frame)
+    void LitDepthVisualizer::update(sensekit::PointFrame& pointFrame)
     {
-        calculate_normals(frame);
+        calculate_normals(pointFrame);
 
-        const size_t depthWidth = frame.resolutionX();
-        const size_t depthHeight = frame.resolutionY();
+        const size_t width = pointFrame.resolutionX();
+        const size_t height = pointFrame.resolutionY();
 
-        prepare_buffer(depthWidth, depthHeight);
+        prepare_buffer(width, height);
 
-        const short* depthRowPtr = frame.data();
+        const Vector3f* pointData = pointFrame.data();
 
-        sensekit_rgb_pixel_t* textureRowPtr = m_outputBuffer.get();
+        sensekit_rgb_pixel_t* texturePtr = m_outputBuffer.get();
 
         const Vector3f* normMap = m_blurNormalMap.get();
         const bool useNormalMap = normMap != nullptr;
 
-        for (int y = 0; y < depthHeight; ++y)
+        for (int y = 0; y < height; ++y)
         {
-            const short* depthPtr = depthRowPtr;
-            sensekit_rgb_pixel_t* texturePtr = textureRowPtr;
-
-            for (int x = 0; x < depthWidth; ++x, ++depthPtr, ++normMap, ++texturePtr)
+            for (int x = 0; x < width; ++x, ++pointData, ++normMap, ++texturePtr)
             {
-                int16_t depth = *depthPtr;
+                float depth = (*pointData).z;
 
                 Vector3f norm(1,0,0);
 
@@ -284,7 +259,7 @@ namespace samples { namespace common {
 
                 if (!norm.is_zero())
                 {
-                    const float fadeFactor = 1 - 0.6*std::max(0.0f, std::min(1.0f, ((depth - 400) / 3200.0f)));
+                    const float fadeFactor = 1 - 0.6*std::max(0.0f, std::min(1.0f, ((depth - 400.0f) / 3200.0f)));
                     const float diffuseFactor = norm.dot(m_lightVector);
 
                     sensekit_rgb_pixel_t diffuseColor;
@@ -308,9 +283,6 @@ namespace samples { namespace common {
                     texturePtr->b = std::max(0, std::min(255, (int)(fadeFactor*(m_ambientColor.b + diffuseColor.b))));
                 }
             }
-
-            depthRowPtr += depthWidth;
-            textureRowPtr += m_outputWidth;
         }
     }
 }}

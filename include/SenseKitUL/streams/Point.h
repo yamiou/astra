@@ -26,7 +26,7 @@ namespace sensekit {
         sensekit_pointstream_t m_pointStream;
     };
 
-    class PointFrame : public PointFrame<Vector3f, SENSEKIT_STREAM_POINT>
+    class PointFrame : public ImageFrame<Vector3f, SENSEKIT_STREAM_POINT>
     {
     public:
         PointFrame(sensekit_imageframe_t frame)

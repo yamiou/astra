@@ -44,8 +44,7 @@ public:
     using PointList = std::deque < sensekit::Vector2i >;
     using PointMap = std::unordered_map < int, PointList >;
 
-    HandFrameListener(sensekit::DepthStream& depthStream)
-        : m_visualizerPtr(new samples::common::LitDepthVisualizer(depthStream))
+    HandFrameListener()
     {
         m_font.loadFromFile("Inconsolata.otf");
     }
@@ -86,15 +85,15 @@ public:
 
     void processDepth(sensekit::Frame& frame)
     {
-        sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
+        sensekit::PointFrame pointFrame = frame.get<sensekit::PointFrame>();
 
-        int width = depthFrame.resolutionX();
-        int height = depthFrame.resolutionY();
+        int width = pointFrame.resolutionX();
+        int height = pointFrame.resolutionY();
 
         init_texture(width, height);
 
-        m_visualizerPtr->update(depthFrame);
-        sensekit_rgb_pixel_t* vizBuffer = m_visualizerPtr->get_output();
+        m_visualizer.update(pointFrame);
+        sensekit_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
 
         for (int i = 0; i < width * height; i++)
         {
@@ -311,8 +310,7 @@ public:
     }
 
 private:
-    using VizPtr = std::unique_ptr<samples::common::LitDepthVisualizer>;
-    VizPtr m_visualizerPtr;
+    samples::common::LitDepthVisualizer m_visualizer;
 
     long double m_frameDuration{ 0 };
     std::clock_t m_lastTimepoint { 0 };
@@ -341,11 +339,10 @@ int main(int argc, char** argv)
     sensekit::Sensor sensor;
     sensekit::StreamReader reader = sensor.create_reader();
 
-    auto ds = reader.stream<sensekit::DepthStream>();
-    ds.start();
+    reader.stream<sensekit::PointStream>().start();
     reader.stream<sensekit::HandStream>().start();
 
-    HandFrameListener listener(ds);
+    HandFrameListener listener;
 
     reader.addListener(listener);
 
