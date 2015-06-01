@@ -268,16 +268,25 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             return INVALID_POINT;
         }
 
-        calculate_edge_distance(data.matrices.layerSegmentation,
-                                data.matrices.areaSqrt,
-                                data.matrices.layerEdgeDistance);
+        bool activePoint = data.pointType == TrackedPointType::ActivePoint;
 
-        calculate_layer_score(data);
+        cv::Mat& matScore = data.matrices.basicScore;
+        if (activePoint)
+        {
+            calculate_edge_distance(data.matrices.layerSegmentation,
+                                    data.matrices.areaSqrt,
+                                    data.matrices.layerEdgeDistance,
+                                    data.targetEdgeDistance * 2.0f);
+
+            calculate_layer_score(data);
+
+            matScore = data.matrices.layerScore;
+        }
 
         double min, max;
         cv::Point minLoc, maxLoc;
 
-        cv::minMaxLoc(data.matrices.layerScore, &min, &max, &minLoc, &maxLoc, data.matrices.layerSegmentation);
+        cv::minMaxLoc(matScore, &min, &max, &minLoc, &maxLoc, data.matrices.layerSegmentation);
 
         if (data.matrices.debugLayersEnabled)
         {
@@ -407,7 +416,8 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
     void calculate_edge_distance(cv::Mat& segmentationMatrix,
                                  cv::Mat& areaSqrtMatrix,
-                                 cv::Mat& edgeDistanceMatrix)
+                                 cv::Mat& edgeDistanceMatrix,
+                                 const float maxEdgeDistance)
     {
         PROFILE_FUNC();
         cv::Mat eroded;
@@ -431,6 +441,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         bool done;
         do
         {
+            PROFILE_BEGIN(edge_dist_loop);
             //erode makes the image smaller
             cv::erode(eroded, eroded, crossElement);
             //accumulate the eroded image to the edgeDistance buffer
@@ -438,7 +449,15 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
             nonZeroCount = cv::countNonZero(eroded);
             done = (nonZeroCount == 0);
+            double min, max;
 
+            cv::minMaxLoc(edgeDistanceMatrix, &min, &max);
+            if (max > maxEdgeDistance)
+            {
+                done = true;
+            }
+
+            PROFILE_END();
             //nonZeroCount < imageLength guards against segmentation with all 1's, which will never erode
         } while (!done && nonZeroCount < imageLength && ++iterations < maxIterations);
     }
