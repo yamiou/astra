@@ -8,7 +8,7 @@ namespace sensekit {
         m_streamSets.clear();
     }
 
-    StreamSet& StreamSetCatalog::get_or_add(std::string uri)
+    StreamSet& StreamSetCatalog::get_or_add(std::string uri, bool claim)
     {
         auto it = m_streamSets.find(uri);
 
@@ -22,6 +22,11 @@ namespace sensekit {
         else
         {
             streamSet = it->second.get();
+        }
+
+        if (claim)
+        {
+            streamSet->claim();
         }
 
         return *streamSet;

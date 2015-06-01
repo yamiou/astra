@@ -14,10 +14,10 @@ namespace sensekit { namespace plugins { namespace xs {
         PROFILE_FUNC();
         m_logger.info("PointProcessor ctor");
 
-        sensekit_streamsetconnection_t conn;
-        pluginService.connect_to_streamset(streamset, conn);
+        const char* uri;
+        pluginService.get_streamset_uri(streamset, &uri);
 
-        m_sensor = Sensor(conn);
+        m_sensor = Sensor(uri);
         m_reader = m_sensor.create_reader();
 
         m_depthStream = m_reader.stream<DepthStream>(depthDesc.get_subtype());

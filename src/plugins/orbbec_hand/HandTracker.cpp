@@ -15,7 +15,7 @@ namespace sensekit { namespace plugins { namespace hand {
         using namespace std;
 
         HandTracker::HandTracker(PluginServiceProxy& pluginService,
-                                 Sensor& streamset,
+                                 sensekit_streamset_t streamSet,
                                  StreamDescription& depthDesc,
                                  PluginLogger& pluginLogger,
                                  HandSettings& settings) :
@@ -23,12 +23,17 @@ namespace sensekit { namespace plugins { namespace hand {
             m_logger(pluginLogger),
             m_depthUtility(settings.processingSizeWidth, settings.processingSizeHeight, settings.depthUtilitySettings),
             m_pointProcessor(pluginLogger, settings.pointProcessorSettings),
-            m_reader(streamset.create_reader()),
             m_processingSizeWidth(settings.processingSizeWidth),
             m_processingSizeHeight(settings.processingSizeHeight)
         {
             PROFILE_FUNC();
-            create_streams(m_pluginService, streamset);
+
+            const char* uri;
+            pluginService.get_streamset_uri(streamSet, &uri);
+
+            m_sensor = Sensor(uri);
+            m_reader = m_sensor.create_reader();
+            create_streams(m_pluginService, streamSet);
 
             m_depthStream = m_reader.stream<DepthStream>(depthDesc.get_subtype());
             m_depthStream.start();
@@ -48,19 +53,16 @@ namespace sensekit { namespace plugins { namespace hand {
             }
         }
 
-        void HandTracker::create_streams(PluginServiceProxy& pluginService, Sensor streamset)
+        void HandTracker::create_streams(PluginServiceProxy& pluginService, sensekit_streamset_t streamSet)
         {
             PROFILE_FUNC();
             m_logger.info("creating hand streams");
-            sensekit_streamset_t set;
-
-            pluginService.get_streamset_from_streamsetconnection(streamset.get_handle(), set);
-            m_handStream = make_unique<HandStream>(pluginService, set, SENSEKIT_HANDS_MAX_HAND_COUNT);
+            m_handStream = make_unique<HandStream>(pluginService, streamSet, SENSEKIT_HANDS_MAX_HAND_COUNT);
 
             const int bytesPerPixel = 3;
 
             m_debugImageStream = make_unique<DebugHandStream>(pluginService,
-                                                              set,
+                                                              streamSet,
                                                               m_processingSizeWidth,
                                                               m_processingSizeHeight,
                                                               bytesPerPixel);

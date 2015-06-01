@@ -22,14 +22,14 @@ namespace sensekit { namespace plugins { namespace hand {
     {
     public:
         HandTracker(PluginServiceProxy& pluginService,
-                    Sensor& streamset,
+                    sensekit_streamset_t streamSet,
                     StreamDescription& depthDesc,
                     PluginLogger& pluginLogger,
                     HandSettings& settings);
         virtual ~HandTracker();
         virtual void on_frame_ready(StreamReader& reader, Frame& frame) override;
     private:
-        void create_streams(PluginServiceProxy& pluginService, Sensor streamset);
+        void create_streams(PluginServiceProxy& pluginService, sensekit_streamset_t streamSet);
         void reset();
         void generate_hand_frame(sensekit_frame_index_t frameIndex);
         static void copy_position(cv::Point3f& source, sensekit_vector3f_t& target);
@@ -54,13 +54,14 @@ namespace sensekit { namespace plugins { namespace hand {
         PluginLogger& m_logger;
         DepthUtility m_depthUtility;
         PointProcessor m_pointProcessor;
+        Sensor m_sensor;
         StreamReader m_reader;
         float m_processingSizeWidth;
         float m_processingSizeHeight;
 
         DepthStream m_depthStream;
 
-        using ColorStreamPtr = std::unique_ptr <DebugHandStream> ;
+        using ColorStreamPtr = std::unique_ptr<DebugHandStream>;
         ColorStreamPtr m_debugImageStream;
 
         using HandStreamPtr = std::unique_ptr<HandStream>;

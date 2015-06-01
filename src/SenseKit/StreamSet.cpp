@@ -10,7 +10,7 @@ namespace sensekit {
     { }
 
     StreamSet::~StreamSet()
-    { }
+    {}
 
     StreamConnection* StreamSet::create_stream_connection(const sensekit_stream_desc_t& desc)
     {

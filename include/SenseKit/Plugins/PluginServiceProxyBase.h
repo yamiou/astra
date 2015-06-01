@@ -41,13 +41,9 @@ struct PluginServiceProxyBase
     sensekit_status_t (*destroy_stream_set)(void*,
                                             sensekit_streamset_t&);
 
-    sensekit_status_t (*connect_to_streamset)(void*,
-                                              sensekit_streamset_t,
-                                              sensekit_streamsetconnection_t&);
-
-    sensekit_status_t (*get_streamset_from_streamsetconnection)(void*,
-                                                                sensekit_streamsetconnection_t,
-                                                                sensekit_streamset_t&);
+    sensekit_status_t (*get_streamset_uri)(void*,
+                                           sensekit_streamset_t,
+                                           const char**);
 
     sensekit_status_t (*create_stream)(void*,
                                        sensekit_streamset_t,

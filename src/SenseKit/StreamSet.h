@@ -9,6 +9,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <cassert>
 
 namespace sensekit {
 
@@ -27,6 +28,12 @@ namespace sensekit {
 
         bool destroy_stream_connection(StreamConnection* connection);
 
+        void claim()
+        {
+            assert(m_isClaimed != true);
+            m_isClaimed = true;
+        }
+
         //plugins only below
 
         Stream* create_stream(sensekit_stream_desc_t desc, stream_callbacks_t callbacks);
@@ -39,7 +46,7 @@ namespace sensekit {
         sensekit_stream_t find_stream_by_type_subtype(sensekit_stream_type_t type,
                                                       sensekit_stream_subtype_t subtype) const;
 
-        std::string get_uri() { return m_uri; }
+        const std::string& get_uri() { return m_uri; }
 
         sensekit_streamset_t get_handle()
             { return reinterpret_cast<sensekit_streamset_t>(this); }
@@ -57,6 +64,8 @@ namespace sensekit {
         StreamCollection m_streamCollection;
 
         Logger m_logger;
+        bool m_isClaimed{false};
+
         std::string m_uri;
 
         using StreamSetConnectionPtr = std::unique_ptr<StreamSetConnection>;

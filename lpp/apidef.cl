@@ -125,23 +125,14 @@
                 :funcname "destroy_stream_set"
                 :params (list (make-param :type "sensekit_streamset_t&" :name "setHandle")))
 
-;; sensekit_status_t connect_to_streamset(sensekit_streamset_t setHandle,
-;;                                        sensekit_streamsetconnection_t& conn)
+;; sensekit_status_t get_streamset_uri(sensekit_streamset_t setHandle,
+;;                                     const char* uri)
 (add-func       :funcset "plugin"
                 :returntype "sensekit_status_t"
-                :funcname "connect_to_streamset"
+                :funcname "get_streamset_uri"
                 :params (list
                          (make-param :type "sensekit_streamset_t" :name "setHandle")
-                         (make-param :type "sensekit_streamsetconnection_t&" :name "conn")))
-
-;; sensekit_status_t get_streamset_from_streamsetconnection(sensekit_streamsetconnection_t connection,
-;;                                                          sensekit_streamset_t setHandle)
-(add-func       :funcset "plugin"
-                :returntype "sensekit_status_t"
-                :funcname "get_streamset_from_streamsetconnection"
-                :params (list
-                         (make-param :type "sensekit_streamsetconnection_t" :name "connection")
-                         (make-param :type "sensekit_streamset_t&" :name "setHandle")))
+                         (make-param :type "const char**" :name "uri" :deref T)))
 
 ;; sensekit_status_t create_stream(sensekit_streamset_t setHandle,
 ;;                                 sensekit_stream_desc_t desc,

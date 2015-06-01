@@ -21,10 +21,10 @@ namespace sensekit { namespace plugins { namespace skeleton {
             : m_sourceStreamHandle(sourceStream),
               m_pluginService(pluginService)
         {
-            sensekit_streamsetconnection_t conn;
-            pluginService.connect_to_streamset(streamSet, conn);
+            const char* uri;
+            m_pluginService.get_streamset_uri(streamSet, &uri);
 
-            m_sensor = Sensor(conn);
+            m_sensor = Sensor(uri);
             m_reader = m_sensor.create_reader();
             m_depthStream = m_reader.stream<sensekit::DepthStream>();
             m_depthStream.start();

@@ -13,7 +13,7 @@ namespace sensekit {
         StreamSetCatalog() = default;
         ~StreamSetCatalog();
 
-        StreamSet& get_or_add(std::string uri);
+        StreamSet& get_or_add(std::string uri, bool claim = false);
         StreamSet* find_streamset_for_stream(Stream* stream);
 
         void visit_sets(std::function<void(StreamSet*)> visitorMethod);

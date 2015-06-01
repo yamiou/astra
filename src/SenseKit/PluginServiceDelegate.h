@@ -67,18 +67,11 @@ namespace sensekit {
             return static_cast<PluginService*>(pluginService)->destroy_stream_set(setHandle);
         }
 
-        static sensekit_status_t connect_to_streamset(void* pluginService,
-                                                      sensekit_streamset_t setHandle,
-                                                      sensekit_streamsetconnection_t& conn)
+        static sensekit_status_t get_streamset_uri(void* pluginService,
+                                                   sensekit_streamset_t setHandle,
+                                                   const char** uri)
         {
-            return static_cast<PluginService*>(pluginService)->connect_to_streamset(setHandle, conn);
-        }
-
-        static sensekit_status_t get_streamset_from_streamsetconnection(void* pluginService,
-                                                                        sensekit_streamsetconnection_t connection,
-                                                                        sensekit_streamset_t& setHandle)
-        {
-            return static_cast<PluginService*>(pluginService)->get_streamset_from_streamsetconnection(connection, setHandle);
+            return static_cast<PluginService*>(pluginService)->get_streamset_uri(setHandle, *uri);
         }
 
         static sensekit_status_t create_stream(void* pluginService,

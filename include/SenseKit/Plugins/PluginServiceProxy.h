@@ -59,16 +59,10 @@ namespace sensekit {
         return PluginServiceProxyBase::destroy_stream_set(pluginService, setHandle);
     }
 
-    sensekit_status_t connect_to_streamset(sensekit_streamset_t setHandle,
-                                           sensekit_streamsetconnection_t& conn)
+    sensekit_status_t get_streamset_uri(sensekit_streamset_t setHandle,
+                                        const char** uri)
     {
-        return PluginServiceProxyBase::connect_to_streamset(pluginService, setHandle, conn);
-    }
-
-    sensekit_status_t get_streamset_from_streamsetconnection(sensekit_streamsetconnection_t connection,
-                                                             sensekit_streamset_t& setHandle)
-    {
-        return PluginServiceProxyBase::get_streamset_from_streamsetconnection(pluginService, connection, setHandle);
+        return PluginServiceProxyBase::get_streamset_uri(pluginService, setHandle, uri);
     }
 
     sensekit_status_t create_stream(sensekit_streamset_t setHandle,

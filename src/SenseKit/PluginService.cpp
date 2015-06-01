@@ -24,7 +24,7 @@ namespace sensekit
 
     sensekit_status_t PluginService::create_stream_set(const char* streamUri, sensekit_streamset_t& streamSet)
     {
-        StreamSet& set = m_context.get_setCatalog().get_or_add(streamUri);
+        StreamSet& set = m_context.get_setCatalog().get_or_add(streamUri, true);
         streamSet = set.get_handle();
 
         m_logger.info("creating streamset: %s %x", streamUri, streamSet);
@@ -136,23 +136,13 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::connect_to_streamset(sensekit_streamset_t setHandle,
-                                                          sensekit_streamsetconnection_t& conn)
+    sensekit_status_t PluginService::get_streamset_uri(sensekit_streamset_t setHandle,
+                                                       const char*& uri)
     {
+        assert(setHandle != nullptr);
+
         StreamSet* actualSet = StreamSet::get_ptr(setHandle);
-        m_logger.info("connecting to streamset: %s", actualSet->get_uri().c_str());
-
-        StreamSetConnection* connection = actualSet->add_new_connection();
-        conn = connection->get_handle();
-
-        return SENSEKIT_STATUS_SUCCESS;
-    }
-
-    sensekit_status_t PluginService::get_streamset_from_streamsetconnection(sensekit_streamsetconnection_t connection,
-                                                                            sensekit_streamset_t& setHandle)
-    {
-        StreamSetConnection* actualConnection = StreamSetConnection::get_ptr(connection);
-        setHandle = actualConnection->get_streamSet()->get_handle();
+        uri = actualSet->get_uri().c_str();
 
         return SENSEKIT_STATUS_SUCCESS;
     }
