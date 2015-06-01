@@ -18,9 +18,9 @@ namespace sensekit { namespace plugins { namespace hand {
     HandPlugin::~HandPlugin()
     {
         #if __ANDROID__
-        //    PROFILE_OUTPUT("/sdcard/hand_profile.txt");
+            PROFILE_OUTPUT("/sdcard/hand_profile.txt");
         #else
-        //    PROFILE_OUTPUT("hand_profile.txt");
+            PROFILE_OUTPUT("hand_profile.txt");
         #endif
     }
 
