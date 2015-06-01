@@ -9,25 +9,6 @@
 
 namespace sensekit { namespace plugins { namespace hand {
 
-    class StreamHandleHash
-    {
-    public:
-        std::size_t operator()(const sensekit_stream_t streamHandle) const
-        {
-            return std::hash<sensekit_stream_t>()(streamHandle);
-        }
-    };
-
-    class StreamHandleEqualTo
-    {
-    public:
-        std::size_t operator()(const sensekit_stream_t& lhs,
-                               const sensekit_stream_t& rhs) const
-        {
-            return lhs == rhs;
-        }
-    };
-
     class HandPlugin : public PluginBase
     {
     public:
