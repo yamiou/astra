@@ -33,6 +33,8 @@ namespace sensekit { namespace plugins { namespace hand {
             m_depthStream = m_reader.stream<DepthStream>(depthDesc.get_subtype());
             m_depthStream.start();
 
+            m_reader.stream<PointStream>().start();
+
             m_reader.addListener(*this);
         }
 
@@ -73,8 +75,8 @@ namespace sensekit { namespace plugins { namespace hand {
                 m_debugImageStream->has_connections())
             {
                 DepthFrame depthFrame = frame.get<DepthFrame>();
-
-                update_tracking(depthFrame);
+                PointFrame pointFrame = frame.get<PointFrame>();
+                update_tracking(depthFrame, pointFrame);
             }
             PROFILE_UPDATE();
         }
@@ -86,12 +88,12 @@ namespace sensekit { namespace plugins { namespace hand {
             m_pointProcessor.reset();
         }
 
-        void HandTracker::update_tracking(DepthFrame& depthFrame)
+        void HandTracker::update_tracking(DepthFrame& depthFrame, PointFrame& pointFrame)
         {
             PROFILE_FUNC();
             m_depthUtility.processDepthToVelocitySignal(depthFrame, m_matDepth, m_matDepthFullSize, m_matVelocitySignal);
 
-            track_points(m_matDepth, m_matDepthFullSize, m_matVelocitySignal);
+            track_points(m_matDepth, m_matDepthFullSize, m_matVelocitySignal, pointFrame.data());
 
             //use same frameIndex as source depth frame
             sensekit_frame_index_t frameIndex = depthFrame.frameIndex();
@@ -109,9 +111,11 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void HandTracker::track_points(cv::Mat& matDepth,
                                        cv::Mat& matDepthFullSize,
-                                       cv::Mat& matVelocitySignal)
+                                       cv::Mat& matVelocitySignal,
+                                       const Vector3f* fullSizeWorldPoints)
         {
             PROFILE_FUNC();
+
             m_layerSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_layerScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_layerEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
@@ -147,6 +151,8 @@ namespace sensekit { namespace plugins { namespace hand {
                 m_worldDeltas = new sensekit::Vector2f[numPoints];
             }
 
+            const conversion_cache_t depthToWorldData = m_depthStream.depth_to_world_data();
+
             bool debugLayersEnabled = m_debugImageStream->has_connections();
 
             TrackingMatrices updateMatrices(matDepthFullSize,
@@ -161,10 +167,12 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_layerEdgeDistance,
                                             m_debugUpdateSegmentation,
                                             m_debugUpdateScore,
+                                            fullSizeWorldPoints,
                                             m_worldPoints,
                                             m_worldDeltas,
                                             debugLayersEnabled,
-                                            m_depthStream.coordinateMapper());
+                                            m_depthStream.coordinateMapper(),
+                                            depthToWorldData);
 
             m_pointProcessor.initialize_common_calculations(updateMatrices);
 
@@ -187,10 +195,12 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_layerEdgeDistance,
                                             m_debugCreateSegmentation,
                                             m_debugCreateScore,
+                                            fullSizeWorldPoints,
                                             m_worldPoints,
                                             m_worldDeltas,
                                             debugLayersEnabled,
-                                            m_depthStream.coordinateMapper());
+                                            m_depthStream.coordinateMapper(),
+                                            depthToWorldData);
 
             //add new points (unless already tracking)
             if (!m_debugImageStream->use_mouse_probe())
@@ -250,10 +260,12 @@ namespace sensekit { namespace plugins { namespace hand {
                                                 m_refineEdgeDistance,
                                                 m_debugRefineSegmentation,
                                                 m_debugRefineScore,
+                                                fullSizeWorldPoints,
                                                 m_worldPoints,
                                                 m_worldDeltas,
                                                 false,
-                                                m_depthStream.coordinateMapper());
+                                                m_depthStream.coordinateMapper(),
+                                                depthToWorldData);
 
             m_pointProcessor.update_full_resolution_points(refinementMatrices);
 

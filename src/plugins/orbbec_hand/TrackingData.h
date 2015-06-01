@@ -65,11 +65,13 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat& foregroundSearched;
         cv::Mat& debugSegmentation;
         cv::Mat& debugScore;
+        const sensekit::Vector3f* fullSizeWorldPoints;
         sensekit::Vector3f* worldPoints;
         sensekit::Vector2f* worldDeltas;
         bool debugLayersEnabled;
         int layerCount;
         const sensekit::CoordinateMapper& fullSizeMapper;
+        const conversion_cache_t depthToWorldData;
 
         TrackingMatrices(cv::Mat& depthFullSize,
                          cv::Mat& depth,
@@ -83,10 +85,12 @@ namespace sensekit { namespace plugins { namespace hand {
                          cv::Mat& layerEdgeDistance,
                          cv::Mat& debugSegmentation,
                          cv::Mat& debugScore,
+                         const sensekit::Vector3f* fullSizeWorldPoints,
                          sensekit::Vector3f* worldPoints,
                          sensekit::Vector2f* worldDeltas,
                          bool debugLayersEnabled,
-                         const sensekit::CoordinateMapper& fullSizeMapper)
+                         const sensekit::CoordinateMapper& fullSizeMapper,
+                         const conversion_cache_t depthToWorldData)
             :
             depthFullSize(depthFullSize),
             depth(depth),
@@ -100,11 +104,13 @@ namespace sensekit { namespace plugins { namespace hand {
             foregroundSearched(foregroundSearched),
             debugSegmentation(debugSegmentation),
             debugScore(debugScore),
+            fullSizeWorldPoints(fullSizeWorldPoints),
             worldPoints(worldPoints),
             worldDeltas(worldDeltas),
             debugLayersEnabled(debugLayersEnabled),
             layerCount(0),
-            fullSizeMapper(fullSizeMapper)
+            fullSizeMapper(fullSizeMapper),
+            depthToWorldData(depthToWorldData)
             { }
     };
 

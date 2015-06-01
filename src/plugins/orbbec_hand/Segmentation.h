@@ -21,14 +21,14 @@ namespace sensekit { namespace plugins { namespace hand {
                                      cv::Mat& areaSqrtMatrix,
                                      cv::Mat& edgeDistanceMatrix);
 
-        void calculate_basic_score(sensekit::Vector3f* worldPoints,
+        void calculate_basic_score(const sensekit::Vector3f* worldPoints,
                                    cv::Size depthSize,
                                    cv::Mat& scoreMatrix,
                                    const float heightFactor,
                                    const float depthFactor);
 
-        void calculate_per_point_area(sensekit::Vector3f* worldPoints,
-                                      sensekit::Vector2f* worldDeltas,
+        void calculate_per_point_area(const sensekit::Vector3f* worldPoints,
+                                      const sensekit::Vector2f* worldDeltas,
                                       cv::Size depthSize,
                                       cv::Mat& areaMatrix,
                                       cv::Mat& areaSqrtMatrix);

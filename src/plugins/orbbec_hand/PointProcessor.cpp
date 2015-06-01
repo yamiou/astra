@@ -54,37 +54,44 @@ namespace sensekit { namespace plugins { namespace hand {
     {
         PROFILE_FUNC();
 
-        cv::Mat& depthMatrix = matrices.depth;
+        const sensekit::Vector3f* fullSizeWorldPoints = matrices.fullSizeWorldPoints;
         sensekit::Vector3f* worldPoints = matrices.worldPoints;
         sensekit::Vector2f* worldDeltas = matrices.worldDeltas;
+        auto depthToWorldData = matrices.depthToWorldData;
 
-        int width = depthMatrix.cols;
-        int height = depthMatrix.rows;
+        int fullSizeWidth = matrices.depthFullSize.cols;
+        int width = matrices.depth.cols;
+        int height = matrices.depth.rows;
 
-        for (int y = 0; y < height; y++)
+        float offsetX = mapper.offsetX();
+        float offsetY = mapper.offsetY();
+        float scale = mapper.scale();
+        int intScale = static_cast<int>(scale);
+
+        for (int y = 0; y < height; ++y)
         {
-            float* depthRow = depthMatrix.ptr<float>(y);
-
-            for (int x = 0; x < width; ++x, ++worldPoints, ++worldDeltas, ++depthRow)
+            for (int x = 0; x < width; ++x, ++worldPoints, ++worldDeltas)
             {
-                float depth = *depthRow;
-                Vector3f& p = *worldPoints;
+                int fullSizeIndex = (x + y * fullSizeWidth) * intScale;
+                const Vector3f& p = fullSizeWorldPoints[fullSizeIndex];
+                *worldPoints = p;
+                const float depth = p.z;
                 Vector2f& delta = *worldDeltas;
-                if (depth < 1)
+                if (depth == 0)
                 {
-                    p.x = 0;
-                    p.y = 0;
-                    p.z = 0;
                     delta.x = 0;
                     delta.y = 0;
                 }
                 else
                 {
-                    mapper.convert_depth_to_world(x, y, depth,
-                                                  p.x, p.y, p.z);
-                    float wx, wy, wz;
-                    mapper.convert_depth_to_world(x+1, y+1, depth,
-                                                  wx, wy, wz);
+                    float depthX = (x + 1 + offsetX) * scale;
+                    float depthY = (y + 1 + offsetY) * scale;
+                    float normalizedX = depthX / depthToWorldData.resolutionX - .5f;
+                    float normalizedY = .5f - depthY / depthToWorldData.resolutionY;
+
+                    float wx = normalizedX * depth * depthToWorldData.xzFactor;
+                    float wy = normalizedY * depth * depthToWorldData.yzFactor;
+
                     delta.x = wx - p.x;
                     delta.y = wy - p.y;
                 }

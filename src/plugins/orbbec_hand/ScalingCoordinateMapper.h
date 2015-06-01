@@ -43,8 +43,6 @@ namespace sensekit { namespace plugins { namespace hand {
               m_offsetY(offsetY)
         { }
 
-        float scale() const { return m_scale; }
-
         inline cv::Point3f convert_depth_to_world(int depthX, int depthY, float depthZ) const
         {
             PROFILE_FUNC();
@@ -89,6 +87,10 @@ namespace sensekit { namespace plugins { namespace hand {
 
             return depth;
         }
+
+        inline float scale() const { return m_scale; }
+        inline float offsetX() const { return m_offsetX; }
+        inline float offsetY() const { return m_offsetY; }
 
     private:
         const sensekit::CoordinateMapper m_mapper;

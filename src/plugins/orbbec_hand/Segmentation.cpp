@@ -187,7 +187,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         cv::Mat& layerScoreMatrix = data.matrices.layerScore;
         const float pointInertiaFactor = data.pointInertiaFactor;
         const float pointInertiaRadius = data.pointInertiaRadius;
-        sensekit::Vector3f* worldPoints = data.matrices.worldPoints;
+        const sensekit::Vector3f* worldPoints = data.matrices.worldPoints;
 
         ScalingCoordinateMapper mapper = get_scaling_mapper(data.matrices);
 
@@ -370,7 +370,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         return false;
     }
 
-    void calculate_basic_score(sensekit::Vector3f* worldPoints,
+    void calculate_basic_score(const sensekit::Vector3f* worldPoints,
                                cv::Size depthSize,
                                cv::Mat& scoreMatrix,
                                const float heightFactor,
@@ -388,7 +388,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
             for (int x = 0; x < width; ++x, ++worldPoints, ++scoreRow)
             {
-                sensekit::Vector3f worldPosition = *worldPoints;
+                const sensekit::Vector3f worldPosition = *worldPoints;
                 if (worldPosition.z != 0)
                 {
                     float score = 0;
@@ -443,9 +443,9 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         } while (!done && nonZeroCount < imageLength && ++iterations < maxIterations);
     }
 
-    static float get_depth_area(sensekit::Vector3f& world1,
-                                sensekit::Vector3f& world2,
-                                sensekit::Vector3f& world3)
+    static float get_depth_area(const sensekit::Vector3f& world1,
+                                const sensekit::Vector3f& world2,
+                                const sensekit::Vector3f& world3)
     {
         PROFILE_FUNC();
 
@@ -458,8 +458,8 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         return area;
     }
 
-    void calculate_per_point_area(sensekit::Vector3f* worldPoints,
-                                  sensekit::Vector2f* worldDeltas,
+    void calculate_per_point_area(const sensekit::Vector3f* worldPoints,
+                                  const sensekit::Vector2f* worldDeltas,
                                   cv::Size depthSize,
                                   cv::Mat& areaMatrix,
                                   cv::Mat& areaSqrtMatrix)
@@ -480,10 +480,10 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             {
                 float area = 0;
 
-                sensekit::Vector3f w1 = *worldPoints;
+                const sensekit::Vector3f w1 = *worldPoints;
                 if (w1.z != 0)
                 {
-                    sensekit::Vector2f delta = *worldDeltas;
+                    const sensekit::Vector2f delta = *worldDeltas;
 
                     sensekit::Vector3f w2 = w1;
                     w2.x += delta.x;

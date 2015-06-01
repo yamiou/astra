@@ -3,18 +3,18 @@
 
 #include <opencv2/imgproc/imgproc.hpp>
 #include <SenseKitUL/SenseKitUL.h>
+#include <SenseKitUL/Plugins/stream_types.h>
+#include <SenseKit/Plugins/PluginKit.h>
 
 #include "DepthUtility.h"
 #include "TrackedPoint.h"
 #include "PointProcessor.h"
-#include <SenseKitUL/Plugins/stream_types.h>
 #include "ScalingCoordinateMapper.h"
-#include <SenseKit/Plugins/PluginKit.h>
 #include "HandStream.h"
 #include "DebugHandStream.h"
 #include "DebugVisualizer.h"
-#include <memory>
 #include "HandSettings.h"
+#include <memory>
 
 namespace sensekit { namespace plugins { namespace hand {
 
@@ -39,10 +39,13 @@ namespace sensekit { namespace plugins { namespace hand {
         void overlay_circle(_sensekit_imageframe& imageFrame);
         void update_debug_image_frame(_sensekit_imageframe& sensekitColorframe);
         void generate_hand_debug_image_frame(sensekit_frame_index_t frameIndex);
-        void update_tracking(DepthFrame& depthFrame);
+        void update_tracking(DepthFrame& depthFrame, PointFrame& pointFrame);
         void update_hand_frame(std::vector<TrackedPoint>& internalTrackedPoints, _sensekit_handframe& frame);
 
-        void track_points(cv::Mat& matDepth, cv::Mat& matDepthFullSize, cv::Mat& matForeground);
+        void track_points(cv::Mat& matDepth,
+                          cv::Mat& matDepthFullSize,
+                          cv::Mat& matForeground,
+                          const Vector3f* worldPoints);
 
         //fields
 
