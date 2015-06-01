@@ -13,6 +13,7 @@ namespace sensekit { namespace plugins { namespace xs {
        m_reader(streamset.create_reader())
     {
         PROFILE_FUNC();
+        m_logger.info("PointProcessor ctor");
 
         m_depthStream = m_reader.stream<DepthStream>(depthDesc.get_subtype());
         m_depthStream.start();
@@ -23,7 +24,7 @@ namespace sensekit { namespace plugins { namespace xs {
     PointProcessor::~PointProcessor()
     {
         PROFILE_FUNC();
-
+        m_logger.info("PointProcessor dtor");
     }
 
     void PointProcessor::on_frame_ready(StreamReader& reader, Frame& frame)

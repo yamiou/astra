@@ -78,6 +78,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 PointFrame pointFrame = frame.get<PointFrame>();
                 update_tracking(depthFrame, pointFrame);
             }
+
             PROFILE_UPDATE();
         }
 

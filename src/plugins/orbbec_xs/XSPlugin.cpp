@@ -9,9 +9,12 @@ namespace sensekit { namespace plugins { namespace xs {
                                       sensekit_stream_t streamHandle,
                                       sensekit_stream_desc_t streamDesc)
     {
+        get_logger().info("XS on stream added: %d,%d", streamDesc.type, streamDesc.subtype);
         if (streamDesc.type == SENSEKIT_STREAM_DEPTH &&
             m_pointProcessorMap.find(streamHandle) == m_pointProcessorMap.end())
         {
+            get_logger().info("XS creating point processor");
+
             Sensor sensor(setHandle);
             StreamDescription depthDescription = streamDesc;
 
@@ -27,6 +30,7 @@ namespace sensekit { namespace plugins { namespace xs {
                                         sensekit_stream_t streamHandle,
                                         sensekit_stream_desc_t streamDesc)
     {
+        get_logger().info("XS on stream removed: %d,%d", streamDesc.type, streamDesc.subtype);
         auto it = m_pointProcessorMap.find(streamHandle);
         if (it != m_pointProcessorMap.end())
         {

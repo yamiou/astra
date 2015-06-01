@@ -5,6 +5,7 @@
 #include <SenseKitUL/streams/hand_types.h>
 #include <SenseKitUL/skul_ctypes.h>
 #include <SenseKitUL/Plugins/stream_types.h>
+#include <Shiny.h>
 
 namespace sensekit { namespace plugins { namespace hand {
 
@@ -40,6 +41,20 @@ namespace sensekit { namespace plugins { namespace hand {
     private:
         void get_include_candidates(sensekit_parameter_bin_t& parameterBin);
         void set_include_candidates(size_t inByteLength, sensekit_parameter_data_t& inData);
+
+        virtual void on_connection_removed(sensekit_bin_t bin,
+                                           sensekit_streamconnection_t connection) override
+        {
+            SingleBinStream::on_connection_removed(bin, connection);
+
+            PROFILE_UPDATE();
+
+            #if __ANDROID__
+                PROFILE_OUTPUT("/sdcard/hand_profile.txt");
+            #else
+                PROFILE_OUTPUT("hand_profile.txt");
+            #endif
+        }
 
         bool m_includeCandidatePoints{ false };
     };
