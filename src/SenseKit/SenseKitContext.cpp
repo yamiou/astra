@@ -30,6 +30,8 @@ namespace sensekit {
         m_logger->warn("Hold on to yer butts");
         m_logger->info("logger file: %s", logPath.c_str());
 
+        m_rootSet = std::make_unique<StreamSet>();
+
         m_streamServiceProxy = create_stream_proxy(this);
         sensekit_api_set_proxy(get_streamServiceProxy());
         m_logger->trace("API Proxy set");

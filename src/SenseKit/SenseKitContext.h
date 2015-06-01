@@ -95,7 +95,7 @@ namespace sensekit {
 
         void raise_existing_streams_added(stream_added_callback_t callback, void* clientTag);
 
-        StreamSet& get_rootSet() { return m_rootSet; }
+        StreamSet& get_rootSet() { return *m_rootSet; }
 
         StreamServiceProxyBase* get_streamServiceProxy() { return m_streamServiceProxy; }
 
@@ -107,7 +107,8 @@ namespace sensekit {
         using LoggerPtr = std::unique_ptr<Logger>;
         LoggerPtr m_logger;
 
-        StreamSet m_rootSet;
+        using StreamSetPtr = std::unique_ptr<StreamSet>;
+        StreamSetPtr m_rootSet;
 
         StreamServiceProxyBase* m_streamServiceProxy;
 

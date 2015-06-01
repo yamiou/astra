@@ -4,13 +4,15 @@
 
 namespace sensekit {
 
-    StreamSet::StreamSet()
+    StreamSet::StreamSet() :
+      m_logger("StreamSet")
     { }
     StreamSet::~StreamSet()
     { }
 
     StreamConnection* StreamSet::create_stream_connection(const sensekit_stream_desc_t& desc)
     {
+        m_logger.info("create_stream_connection for %d, %d", desc.type, desc.subtype);
         Stream* stream = find_stream_by_type_subtype_impl(desc.type, desc.subtype);
 
         if (stream == nullptr)
@@ -45,8 +47,13 @@ namespace sensekit {
 
         if (stream == nullptr)
         {
+            m_logger.info("create_stream for %d,%d", desc.type, desc.subtype);
             stream = new Stream(desc);
             m_streamCollection.insert(stream);
+        }
+        else
+        {
+            m_logger.info("create_stream for %d,%d already exists, inflating placeholder stream", desc.type, desc.subtype);
         }
 
         stream->set_callbacks(callbacks);
@@ -56,6 +63,7 @@ namespace sensekit {
 
     Stream* StreamSet::create_stream_placeholder(sensekit_stream_desc_t desc)
     {
+        m_logger.info("create_stream_placeholder for %d,%d", desc.type, desc.subtype);
         Stream* stream = new Stream(desc);
         m_streamCollection.insert(stream);
 

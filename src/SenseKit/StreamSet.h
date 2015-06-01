@@ -2,6 +2,7 @@
 #define STREAMSET_H
 
 #include "Stream.h"
+#include "Logger.h"
 
 #include <unordered_set>
 #include <vector>
@@ -48,6 +49,8 @@ namespace sensekit {
 
         using StreamCollection = std::unordered_set<Stream*>;
         StreamCollection m_streamCollection;
+
+        Logger m_logger;
     };
 }
 
