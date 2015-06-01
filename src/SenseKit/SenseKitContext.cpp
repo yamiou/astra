@@ -43,6 +43,7 @@ namespace sensekit {
 #else
         m_pluginManager->load_plugin("libopenni_sensor.so");
         m_pluginManager->load_plugin("liborbbec_hand.so");
+        m_pluginManager->load_plugin("liborbbec_xs.so");
 #endif
 
         if (m_pluginManager->plugin_count() == 0)
