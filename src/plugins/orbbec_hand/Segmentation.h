@@ -1,14 +1,7 @@
 #ifndef SEGMENTATION_H
 #define SEGMENTATION_H
 
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Woverloaded-virtual"
-#endif
-#include <opencv2/opencv.hpp>
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
+#include <opencv2/imgproc/imgproc.hpp>
 #include "ScalingCoordinateMapper.h"
 
 namespace sensekit { namespace plugins { namespace hand {
