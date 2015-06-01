@@ -46,11 +46,6 @@ namespace sensekit { namespace plugins { namespace hand {
                 delete[] m_worldPoints;
                 m_worldPoints = nullptr;
             }
-            if (m_worldDeltas != nullptr)
-            {
-                delete[] m_worldDeltas;
-                m_worldDeltas = nullptr;
-            }
         }
 
         void HandTracker::create_streams(PluginServiceProxy& pluginService, Sensor streamset)
@@ -134,22 +129,16 @@ namespace sensekit { namespace plugins { namespace hand {
             m_refineEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
 
             int numPoints = matDepth.cols * matDepth.rows;
-            if (m_worldPoints == nullptr || m_worldDeltas == nullptr || m_numWorldPoints != numPoints)
+            if (m_worldPoints == nullptr || m_numWorldPoints != numPoints)
             {
                 if (m_worldPoints != nullptr)
                 {
                     delete[] m_worldPoints;
                     m_worldPoints = nullptr;
                 }
-                if (m_worldDeltas != nullptr)
-                {
-                    delete[] m_worldDeltas;
-                    m_worldDeltas = nullptr;
-                }
 
                 m_numWorldPoints = numPoints;
                 m_worldPoints = new sensekit::Vector3f[numPoints];
-                m_worldDeltas = new sensekit::Vector2f[numPoints];
             }
 
             const conversion_cache_t depthToWorldData = m_depthStream.depth_to_world_data();
@@ -170,7 +159,6 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_debugUpdateScore,
                                             fullSizeWorldPoints,
                                             m_worldPoints,
-                                            m_worldDeltas,
                                             debugLayersEnabled,
                                             m_depthStream.coordinateMapper(),
                                             depthToWorldData);
@@ -198,7 +186,6 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_debugCreateScore,
                                             fullSizeWorldPoints,
                                             m_worldPoints,
-                                            m_worldDeltas,
                                             debugLayersEnabled,
                                             m_depthStream.coordinateMapper(),
                                             depthToWorldData);
@@ -263,7 +250,6 @@ namespace sensekit { namespace plugins { namespace hand {
                                                 m_debugRefineScore,
                                                 fullSizeWorldPoints,
                                                 m_worldPoints,
-                                                m_worldDeltas,
                                                 false,
                                                 m_depthStream.coordinateMapper(),
                                                 depthToWorldData);

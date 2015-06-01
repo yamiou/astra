@@ -42,7 +42,7 @@ namespace sensekit { namespace plugins { namespace hand {
         bool test_point_in_range(TrackingMatrices& matrices, const cv::Point& targetPoint, TrackingStatus status, int trackingId);
     private:
         cv::Point3f smooth_world_positions(const cv::Point3f& oldWorldPosition, const cv::Point3f& newWorldPosition);
-        void calculate_world_points(TrackingMatrices& matrices, ScalingCoordinateMapper mapper);
+        void calculate_area(TrackingMatrices& matrices, ScalingCoordinateMapper mapper);
         void updateTrackedPoint(TrackingMatrices& matrices,
                                 ScalingCoordinateMapper& scalingMapper,
                                 TrackedPoint& trackedPoint);

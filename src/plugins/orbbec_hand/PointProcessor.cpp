@@ -50,18 +50,24 @@ namespace sensekit { namespace plugins { namespace hand {
         PROFILE_FUNC();
     }
 
-    void PointProcessor::calculate_world_points(TrackingMatrices& matrices, ScalingCoordinateMapper mapper)
+    void PointProcessor::calculate_area(TrackingMatrices& matrices, ScalingCoordinateMapper mapper)
     {
         PROFILE_FUNC();
 
         const sensekit::Vector3f* fullSizeWorldPoints = matrices.fullSizeWorldPoints;
         sensekit::Vector3f* worldPoints = matrices.worldPoints;
-        sensekit::Vector2f* worldDeltas = matrices.worldDeltas;
         auto depthToWorldData = matrices.depthToWorldData;
+        cv::Mat& areaMatrix = matrices.area;
+        cv::Mat& areaSqrtMatrix = matrices.areaSqrt;
+
+        cv::Size depthSize = matrices.depth.size();
+
+        areaMatrix = cv::Mat::zeros(depthSize, CV_32FC1);
+        areaSqrtMatrix = cv::Mat::zeros(depthSize, CV_32FC1);
 
         int fullSizeWidth = matrices.depthFullSize.cols;
-        int width = matrices.depth.cols;
-        int height = matrices.depth.rows;
+        int width = depthSize.width;
+        int height = depthSize.height;
 
         float offsetX = mapper.offsetX();
         float offsetY = mapper.offsetY();
@@ -70,19 +76,17 @@ namespace sensekit { namespace plugins { namespace hand {
 
         for (int y = 0; y < height; ++y)
         {
-            for (int x = 0; x < width; ++x, ++worldPoints, ++worldDeltas)
+            float* areaRow = areaMatrix.ptr<float>(y);
+            float* areaSqrtRow = areaSqrtMatrix.ptr<float>(y);
+
+            for (int x = 0; x < width; ++x, ++worldPoints, ++areaRow, ++areaSqrtRow)
             {
                 int fullSizeIndex = (x + y * fullSizeWidth) * intScale;
                 const Vector3f& p = fullSizeWorldPoints[fullSizeIndex];
                 *worldPoints = p;
                 const float depth = p.z;
-                Vector2f& delta = *worldDeltas;
-                if (depth == 0)
-                {
-                    delta.x = 0;
-                    delta.y = 0;
-                }
-                else
+
+                if (depth != 0)
                 {
                     float depthX = (x + 1 + offsetX) * scale;
                     float depthY = (y + 1 + offsetY) * scale;
@@ -92,8 +96,18 @@ namespace sensekit { namespace plugins { namespace hand {
                     float wx = normalizedX * depth * depthToWorldData.xzFactor;
                     float wy = normalizedY * depth * depthToWorldData.yzFactor;
 
-                    delta.x = wx - p.x;
-                    delta.y = wy - p.y;
+                    float deltaX = wx - p.x;
+                    float deltaY = wy - p.y;
+
+                    float area = fabs(deltaX * deltaY);
+
+                    *areaRow = area;
+                    *areaSqrtRow = sqrt(area);
+                }
+                else
+                {
+                    *areaRow = 0;
+                    *areaSqrtRow = 0;
                 }
             }
         }
@@ -104,19 +118,13 @@ namespace sensekit { namespace plugins { namespace hand {
         PROFILE_FUNC();
         auto scalingMapper = get_scaling_mapper(matrices);
 
-        calculate_world_points(matrices, scalingMapper);
+        calculate_area(matrices, scalingMapper);
 
         segmentation::calculate_basic_score(matrices.worldPoints,
                                             matrices.depth.size(),
                                             matrices.basicScore,
                                             m_heightScoreFactor,
                                             m_depthScoreFactor);
-
-        segmentation::calculate_per_point_area(matrices.worldPoints,
-                                               matrices.worldDeltas,
-                                               matrices.depth.size(),
-                                               matrices.area,
-                                               matrices.areaSqrt);
 
     }
 
@@ -435,19 +443,13 @@ namespace sensekit { namespace plugins { namespace hand {
         //initialize_common_calculations(matrices);
         ScalingCoordinateMapper roiMapper(matrices.fullSizeMapper, 1.0, windowLeft, windowTop);
 
-        calculate_world_points(matrices, roiMapper);
+        calculate_area(matrices, roiMapper);
 
         segmentation::calculate_basic_score(matrices.worldPoints,
                                             matrices.depth.size(),
                                             matrices.basicScore,
                                             m_heightScoreFactor,
                                             m_depthScoreFactor);
-
-        segmentation::calculate_per_point_area(matrices.worldPoints,
-                                               matrices.worldDeltas,
-                                               matrices.depth.size(),
-                                               matrices.area,
-                                               matrices.areaSqrt);
 
         TrackingData refinementTrackingData(matrices,
                                             roiPosition,

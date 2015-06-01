@@ -67,7 +67,6 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat& debugScore;
         const sensekit::Vector3f* fullSizeWorldPoints;
         sensekit::Vector3f* worldPoints;
-        sensekit::Vector2f* worldDeltas;
         bool debugLayersEnabled;
         int layerCount;
         const sensekit::CoordinateMapper& fullSizeMapper;
@@ -87,7 +86,6 @@ namespace sensekit { namespace plugins { namespace hand {
                          cv::Mat& debugScore,
                          const sensekit::Vector3f* fullSizeWorldPoints,
                          sensekit::Vector3f* worldPoints,
-                         sensekit::Vector2f* worldDeltas,
                          bool debugLayersEnabled,
                          const sensekit::CoordinateMapper& fullSizeMapper,
                          const conversion_cache_t depthToWorldData)
@@ -106,7 +104,6 @@ namespace sensekit { namespace plugins { namespace hand {
             debugScore(debugScore),
             fullSizeWorldPoints(fullSizeWorldPoints),
             worldPoints(worldPoints),
-            worldDeltas(worldDeltas),
             debugLayersEnabled(debugLayersEnabled),
             layerCount(0),
             fullSizeMapper(fullSizeMapper),

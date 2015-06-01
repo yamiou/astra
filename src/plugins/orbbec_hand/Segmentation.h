@@ -28,12 +28,6 @@ namespace sensekit { namespace plugins { namespace hand {
                                    const float heightFactor,
                                    const float depthFactor);
 
-        void calculate_per_point_area(const sensekit::Vector3f* worldPoints,
-                                      const sensekit::Vector2f* worldDeltas,
-                                      cv::Size depthSize,
-                                      cv::Mat& areaMatrix,
-                                      cv::Mat& areaSqrtMatrix);
-
         float count_neighborhood_area(cv::Mat& matSegmentation,
                                       cv::Mat& matDepth,
                                       cv::Mat& matArea,

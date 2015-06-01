@@ -462,68 +462,6 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         } while (!done && nonZeroCount < imageLength && ++iterations < maxIterations);
     }
 
-    static float get_depth_area(const sensekit::Vector3f& world1,
-                                const sensekit::Vector3f& world2,
-                                const sensekit::Vector3f& world3)
-    {
-        PROFILE_FUNC();
-
-        sensekit::Vector3f v1 = world2 - world1;
-        sensekit::Vector3f v2 = world3 - world1;
-
-        sensekit::Vector3f cross = v1.cross(v2);
-        float length = cross.length();
-        float area = 0.5f * length;
-        return area;
-    }
-
-    void calculate_per_point_area(const sensekit::Vector3f* worldPoints,
-                                  const sensekit::Vector2f* worldDeltas,
-                                  cv::Size depthSize,
-                                  cv::Mat& areaMatrix,
-                                  cv::Mat& areaSqrtMatrix)
-    {
-        PROFILE_FUNC();
-        int width = depthSize.width;
-        int height = depthSize.height;
-
-        areaMatrix = cv::Mat::zeros(depthSize, CV_32FC1);
-        areaSqrtMatrix = cv::Mat::zeros(depthSize, CV_32FC1);
-
-        for (int y = 0; y < height; y++)
-        {
-            float* areaRow = areaMatrix.ptr<float>(y);
-            float* areaSqrtRow = areaSqrtMatrix.ptr<float>(y);
-
-            for (int x = 0; x < width; ++x, ++worldPoints, ++worldDeltas, ++areaRow, ++areaSqrtRow)
-            {
-                float area = 0;
-
-                const sensekit::Vector3f w1 = *worldPoints;
-                if (w1.z != 0)
-                {
-                    const sensekit::Vector2f delta = *worldDeltas;
-
-                    sensekit::Vector3f w2 = w1;
-                    w2.x += delta.x;
-
-                    sensekit::Vector3f w3 = w1;
-                    w3.y += delta.y;
-
-                    sensekit::Vector3f w4 = w1;
-                    w4.x += delta.x;
-                    w4.y += delta.y;
-
-                    area += get_depth_area(w1, w2, w3);
-                    area += get_depth_area(w2, w3, w4);
-                }
-
-                *areaRow = area;
-                *areaSqrtRow = sqrt(area);
-            }
-        }
-    }
-
     void visit_callback_if_valid_position(int width,
                                           int height,
                                           int x,

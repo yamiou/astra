@@ -91,7 +91,6 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat m_refineEdgeDistance;
 
         sensekit::Vector3f* m_worldPoints { nullptr };
-        sensekit::Vector2f* m_worldDeltas { nullptr };
         int m_numWorldPoints { 0 };
 
         DebugVisualizer m_debugVisualizer;
