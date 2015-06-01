@@ -84,6 +84,13 @@ SENSEKIT_API_EX sensekit_status_t sensekit_reader_get_depthstream(sensekit_reade
                                       depthStream);
 }
 
+SENSEKIT_API_EX sensekit_status_t sensekit_depthstream_get_depth_to_world_data(sensekit_depthstream_t depthStream,
+                                                                               conversion_cache_t* conversion_data)
+{
+    conversion_cache_t conversionCache = sensekit_depth_fetch_conversion_cache(depthStream);
+    memcpy(conversion_data, &conversionCache, sizeof(conversion_cache_t));
+}
+
 SENSEKIT_API_EX sensekit_status_t sensekit_depthstream_get_hfov(sensekit_depthstream_t depthStream,
                                                                 float* hFov)
 {

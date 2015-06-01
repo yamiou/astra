@@ -86,6 +86,15 @@ namespace sensekit {
 
         static const sensekit_stream_type_t id = SENSEKIT_STREAM_DEPTH;
 
+        conversion_cache_t depth_to_world_data()
+        {
+            conversion_cache_t data;
+
+            sensekit_depthstream_get_depth_to_world_data(m_depthStream, &data);
+
+            return data;
+        }
+
         float horizontalFieldOfView()
         {
             float hFov;
