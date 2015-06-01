@@ -20,7 +20,9 @@ namespace sensekit { namespace plugins { namespace xs {
     private:
         void create_point_stream_if_necessary(DepthFrame& depthFrame);
 
-        void process_depth(DepthFrame& depthFrame);
+        void update_pointframe_from_depth(DepthFrame& depthFrame);
+        void calculate_point_frame(DepthFrame& depthFrame,
+                                   Vector3f* p_points);
 
         PluginServiceProxy& m_pluginService;
         Sensor m_streamset;
@@ -30,6 +32,8 @@ namespace sensekit { namespace plugins { namespace xs {
 
         using PointStreamPtr = std::unique_ptr<PointStream>;
         PointStreamPtr m_pointStream;
+
+        conversion_cache_t m_depthConversionCache;
     };
 
 } } }

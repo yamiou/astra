@@ -263,9 +263,9 @@ namespace sensekit { namespace plugins { namespace hand {
         void HandTracker::generate_hand_frame(sensekit_frame_index_t frameIndex)
         {
             PROFILE_FUNC();
-            PROFILE_BEGIN(begin_write);
+
             sensekit_handframe_wrapper_t* handFrame = m_handStream->begin_write(frameIndex);
-            PROFILE_END();
+
             if (handFrame != nullptr)
             {
                 handFrame->frame.handpoints = reinterpret_cast<sensekit_handpoint_t*>(&(handFrame->frame_data));
