@@ -102,7 +102,6 @@ namespace sensekit { namespace plugins { namespace xs {
         {
             for (int x = 0; x < width; ++x, ++p_points, ++p_depth)
             {
-                PROFILE_BEGIN(point_math);
                 uint16_t depth = *p_depth;
                 Vector3f& point = *p_points;
 
@@ -112,8 +111,6 @@ namespace sensekit { namespace plugins { namespace xs {
                 point.x = normalizedX * depth * conversionData.xzFactor;
                 point.y = normalizedY * depth * conversionData.yzFactor;
                 point.z = depth;
-
-                PROFILE_END();
             }
         }
     }
