@@ -7,6 +7,7 @@
 #include <SenseKit/Plugins/PluginLogger.h>
 #include <system_error>
 #include <cassert>
+#include <unordered_set>
 
 namespace sensekit { namespace plugins {
 
@@ -38,7 +39,8 @@ namespace sensekit { namespace plugins {
             m_logger(pluginService, "PluginStream"),
             m_pluginService(pluginService),
             m_streamSet(streamSet),
-            m_description(description)
+            m_description(description),
+            m_inhibitCallbacks(true)
         {
             create_stream(description);
         }
@@ -55,6 +57,7 @@ namespace sensekit { namespace plugins {
         inline sensekit::plugins::PluginLogger& get_logger() { return m_logger; }
         inline PluginServiceProxy& get_pluginService() const { return m_pluginService; }
 
+        inline void enable_callbacks();
     private:
         sensekit::plugins::PluginLogger m_logger;
 
@@ -118,9 +121,8 @@ namespace sensekit { namespace plugins {
         Sensor m_streamSet;
         StreamDescription m_description;
         sensekit_stream_t m_streamHandle{nullptr};
-
-    protected:
-
+        bool m_inhibitCallbacks;
+        std::unordered_set<sensekit_streamconnection_t> m_savedConnections;
     };
 
     inline void Stream::set_parameter(sensekit_streamconnection_t connection,
@@ -151,7 +153,15 @@ namespace sensekit { namespace plugins {
                                          sensekit_streamconnection_t connection)
     {
         assert(stream == m_streamHandle);
-        on_connection_added(connection);
+        if (m_inhibitCallbacks)
+        {
+            m_logger.info("Saving a connection_added for later");
+            m_savedConnections.insert(connection);
+        }
+        else
+        {
+            on_connection_added(connection);
+        }
     }
 
     inline void Stream::connection_removed(sensekit_stream_t stream,
@@ -159,7 +169,33 @@ namespace sensekit { namespace plugins {
                                            sensekit_streamconnection_t connection)
     {
         assert(stream == m_streamHandle);
-        on_connection_removed(bin, connection);
+        if (m_inhibitCallbacks)
+        {
+            m_savedConnections.erase(connection);
+        }
+        else
+        {
+            on_connection_removed(bin, connection);
+        }
+    }
+
+    inline void Stream::enable_callbacks()
+    {
+        if (!m_inhibitCallbacks)
+        {
+            return;
+        }
+        m_inhibitCallbacks = false;
+
+        if (m_savedConnections.size() > 0)
+        {
+            m_logger.info("Flushing saved connection_added connections");
+            for (auto connection : m_savedConnections)
+            {
+                on_connection_added(connection);
+            }
+            m_savedConnections.clear();
+        }
     }
 }}
 

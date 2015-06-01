@@ -58,7 +58,9 @@ namespace sensekit { namespace plugins {
               m_oniSensorType(oniSensorType),
               m_bytesPerPixel(sizeof(block_type) * numComponentPerPixel),
               m_numComponentPerPixel(numComponentPerPixel)
-        {}
+        {
+            enable_callbacks();
+        }
 
         virtual ~OniDeviceStream()
         {
