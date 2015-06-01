@@ -78,7 +78,9 @@ namespace sensekit {
         }
         else
         {
+#ifdef DEBUG
             sensekit_frame_index_t oldFrameIndex = get_frontBuffer()->frameIndex;
+#endif
             size_t oldFBI = m_frontBufferIndex;
             m_frontBufferIndex = m_backBufferHeadIndex;
             m_backBufferTailIndex = oldFBI;
