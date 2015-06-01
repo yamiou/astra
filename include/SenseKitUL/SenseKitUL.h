@@ -7,5 +7,6 @@
 #include "streams/Hand.h"
 #include "streams/DebugHand.h"
 #include "streams/Skeleton.h"
+#include "streams/Point.h"
 
 #endif /* SENSEKITUL_H */
