@@ -2,6 +2,9 @@
 #define STREAMSETCONNECTION_H
 
 #include <SenseKit/sensekit_types.h>
+#include "StreamReader.h"
+#include <vector>
+#include <memory>
 
 namespace sensekit {
 
@@ -14,12 +17,23 @@ namespace sensekit {
             : m_streamSet(streamSet)
         {}
 
+        StreamSetConnection() {}
+
         ~StreamSetConnection() = default;
 
         StreamSetConnection& operator=(const StreamSetConnection& rhs) = delete;
         StreamSetConnection(const StreamSetConnection& conn) = delete;
 
         StreamSet* get_streamSet() { return m_streamSet; }
+
+        void connect_to(StreamSet* streamSet)
+        {
+            m_streamSet = streamSet;
+        }
+
+        StreamReader* create_reader() { return nullptr; };
+
+        bool is_connected() { return m_streamSet != nullptr; }
 
         static StreamSetConnection* get_ptr(sensekit_streamsetconnection_t conn)
         {
@@ -32,7 +46,12 @@ namespace sensekit {
         }
 
     private:
-        StreamSet* m_streamSet;
+        StreamSet* m_streamSet{nullptr};
+
+        using ReaderPtr = std::unique_ptr<StreamReader>;
+        using ReaderList = std::vector<ReaderPtr>;
+
+        ReaderList m_readers;
     };
 }
 

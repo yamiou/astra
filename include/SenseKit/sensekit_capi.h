@@ -8,15 +8,12 @@
 SENSEKIT_BEGIN_DECLS
 
 SENSEKIT_API sensekit_status_t sensekit_initialize();
-
 SENSEKIT_API sensekit_status_t sensekit_terminate();
 
 SENSEKIT_API sensekit_status_t sensekit_streamset_open(const char* connectionString,
                                                        sensekit_streamsetconnection_t* streamSet);
 
 SENSEKIT_API sensekit_status_t sensekit_streamset_close(sensekit_streamsetconnection_t* streamSet);
-
-SENSEKIT_API char* sensekit_get_status_string(sensekit_status_t status);
 
 SENSEKIT_API sensekit_status_t sensekit_reader_create(sensekit_streamsetconnection_t streamSet,
                                                       sensekit_reader_t* reader);

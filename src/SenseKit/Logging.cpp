@@ -2,8 +2,6 @@
 
 #include <SenseKit/sensekit_types.h>
 
-INITIALIZE_LOGGING
-
 namespace sensekit {
 
     void initialize_logging(const char* logFilePath)

@@ -1,4 +1,5 @@
 ﻿#include "StreamSet.h"
+#include "StreamSetConnection.h"
 #include <iostream>
 #include <cassert>
 
@@ -85,6 +86,30 @@ namespace sensekit {
         m_connections.push_back(std::move(ptr));
 
         return conn;
+    }
+
+    void StreamSet::link_existing_connection(sensekit::StreamSetConnection* connection)
+    {
+        assert(connection != nullptr);
+
+        connection->connect_to(this);
+        m_connections.push_back(StreamSetConnectionPtr(connection));
+    }
+
+    void StreamSet::disconnect_streamset_connection(StreamSetConnection* connection)
+    {
+        assert(connection != nullptr);
+
+        connection->connect_to(nullptr);
+
+        auto it = std::find_if(m_connections.begin(), m_connections.end(),
+                               [&connection] (StreamSetConnectionPtr& ptr) -> bool
+                               {
+                                   return ptr.get() == connection;
+                               });
+
+        if (it != m_connections.end())
+            m_connections.erase(it);
     }
 
     void StreamSet::destroy_stream(Stream* stream)

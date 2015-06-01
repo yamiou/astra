@@ -4,20 +4,49 @@
 #include <SenseKitAPI.h>
 #include <SenseKit/host_events.h>
 
-static sensekit::SenseKitContext g_Context;
+static sensekit::SenseKitContext* g_ContextPtr = nullptr;
 
 SENSEKIT_BEGIN_DECLS
+
+SENSEKIT_API sensekit_status_t sensekit_initialize()
+{
+    g_ContextPtr = new sensekit::SenseKitContext();
+    return g_ContextPtr->initialize();
+}
+
+SENSEKIT_API sensekit_status_t sensekit_terminate()
+{
+    sensekit_status_t rc =  g_ContextPtr->terminate();
+    delete g_ContextPtr;
+    g_ContextPtr = nullptr;
+
+    return rc;
+}
 
 ^^^BEGINREPLACE:stream^^^
 SENSEKIT_API ^RETURN^ sensekit_^FUNC^(^PARAMS^)
 {
-    return g_Context.^FUNC^(^PARAMS:names,deref^);
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->^FUNC^(^PARAMS:names,deref^);
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
 }
 
 ^^^ENDREPLACE^^^
 SENSEKIT_API sensekit_status_t sensekit_notify_host_event(sensekit_event_id id, const void* data, size_t dataSize)
 {
-    return g_Context.notify_host_event(id, data, dataSize);
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->notify_host_event(id, data, dataSize);
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
 }
 
 SENSEKIT_API sensekit_status_t sensekit_notify_resource_available(const char* resourceURI)

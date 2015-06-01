@@ -27,15 +27,12 @@ namespace sensekit {
         SenseKitContext(const SenseKitContext& context) = delete;
 
         sensekit_status_t initialize();
-
         sensekit_status_t terminate();
 
         sensekit_status_t streamset_open(const char* connectionString,
                                          sensekit_streamsetconnection_t& streamSet);
 
         sensekit_status_t streamset_close(sensekit_streamsetconnection_t& streamSet);
-
-        char* get_status_string(sensekit_status_t status);
 
         sensekit_status_t reader_create(sensekit_streamsetconnection_t streamSet,
                                         sensekit_reader_t& reader);

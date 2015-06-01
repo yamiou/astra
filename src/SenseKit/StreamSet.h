@@ -3,7 +3,6 @@
 
 #include "Stream.h"
 #include "Logger.h"
-#include "StreamSetConnection.h"
 
 #include <unordered_set>
 #include <vector>
@@ -12,6 +11,8 @@
 #include <cassert>
 
 namespace sensekit {
+
+    class StreamSetConnection;
 
     class StreamSet
     {
@@ -23,6 +24,8 @@ namespace sensekit {
         StreamSet(const StreamSet& streamSet) = delete;
 
         StreamSetConnection* add_new_connection();
+        void link_existing_connection(StreamSetConnection* connection);
+        void disconnect_streamset_connection(StreamSetConnection* connection);
 
         StreamConnection* create_stream_connection(const sensekit_stream_desc_t& desc);
 
@@ -32,6 +35,11 @@ namespace sensekit {
         {
             assert(m_isClaimed != true);
             m_isClaimed = true;
+        }
+
+        bool is_claimed()
+        {
+            return m_isClaimed;
         }
 
         //plugins only below

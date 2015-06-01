@@ -115,7 +115,7 @@ int main(int argc, char** argv)
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Depth Viewer");
 
-    sensekit::Sensor sensor("device/sensor0");
+    sensekit::Sensor sensor;
     sensekit::StreamReader reader = sensor.create_reader();
 
     reader.stream<sensekit::PointStream>().start();

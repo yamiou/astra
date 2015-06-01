@@ -22,16 +22,6 @@ SENSEKIT_API_PROXY void sensekit_api_set_proxy(StreamServiceProxyBase* proxy)
     __sensekit_api_proxy_ptr = proxy;
 }
 
-SENSEKIT_API sensekit_status_t sensekit_initialize()
-{
-    return get_api_proxy()->initialize();
-}
-
-SENSEKIT_API sensekit_status_t sensekit_terminate()
-{
-    return get_api_proxy()->terminate();
-}
-
 SENSEKIT_API sensekit_status_t sensekit_streamset_open(const char* connectionString,
                                                        sensekit_streamsetconnection_t* streamSet)
 {
@@ -41,11 +31,6 @@ SENSEKIT_API sensekit_status_t sensekit_streamset_open(const char* connectionStr
 SENSEKIT_API sensekit_status_t sensekit_streamset_close(sensekit_streamsetconnection_t* streamSet)
 {
     return get_api_proxy()->streamset_close(streamSet);
-}
-
-SENSEKIT_API char* sensekit_get_status_string(sensekit_status_t status)
-{
-    return get_api_proxy()->get_status_string(status);
 }
 
 SENSEKIT_API sensekit_status_t sensekit_reader_create(sensekit_streamsetconnection_t streamSet,

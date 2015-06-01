@@ -220,16 +220,16 @@
                               (make-param :type "va_list" :name "args")))
 
 ;; SENSEKIT_API sensekit_status_t sensekit_initialize();
-(add-func       :funcset "stream"
-                :returntype "sensekit_status_t"
-                :funcname "initialize"
-                :params '())
+;; (add-func       :funcset "stream"
+;;                 :returntype "sensekit_status_t"
+;;                 :funcname "initialize"
+;;                 :params '())
 
 ;; SENSEKIT_API sensekit_status_t sensekit_terminate();
-(add-func       :funcset "stream"
-                :returntype "sensekit_status_t"
-                :funcname "terminate"
-                :params '())
+;; (add-func       :funcset "stream"
+;;                 :returntype "sensekit_status_t"
+;;                 :funcname "terminate"
+;;                 :params '())
 
 ;;SENSEKIT_API sensekit_status_t sensekit_streamset_open(const char* connectionString,
 ;;                                                       sensekit_streamsetconnection_t* streamSet);
@@ -246,10 +246,10 @@
                 :params (list (make-param :type "sensekit_streamsetconnection_t*" :name "streamSet" :deref T)))
 
 ;; SENSEKIT_API char* sensekit_get_status_string(sensekit_status_t status);
-(add-func       :funcset "stream"
-                :returntype "char*"
-                :funcname "get_status_string"
-                :params (list (make-param :type "sensekit_status_t" :name "status")))
+;; (add-func       :funcset "stream"
+;;                 :returntype "sensekit_status_t"
+;;                 :funcname "get_status_string"
+;;                 :params (list (make-param :type "sensekit_status_t" :name "status")))
 
 ;; SENSEKIT_API sensekit_status_t sensekit_reader_create(sensekit_streamsetconnection_t streamSet,
 ;;                                                       sensekit_reader_t* reader);

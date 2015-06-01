@@ -1,11 +1,34 @@
 #include "StreamSetCatalog.h"
 #include <cassert>
+#include "StreamSet.h"
+#include "StreamSetConnection.h"
 
 namespace sensekit {
 
     StreamSetCatalog::~StreamSetCatalog()
     {
         m_streamSets.clear();
+    }
+
+    StreamSetConnection& StreamSetCatalog::open_set_connection(std::string uri)
+    {
+        std::string finalUri = uri;
+        if (uri == "device/default")
+        {
+            m_logger.info("default uri provided.");
+            finalUri = "device/sensor0";
+        }
+
+        StreamSet& set = get_or_add(finalUri, false);
+        return *set.add_new_connection();
+    }
+
+    void StreamSetCatalog::close_set_connection(StreamSetConnection* conn)
+    {
+        assert(conn != nullptr);
+
+        StreamSet* set = conn->get_streamSet();
+        set->disconnect_streamset_connection(conn);
     }
 
     StreamSet& StreamSetCatalog::get_or_add(std::string uri, bool claim)
@@ -42,14 +65,7 @@ namespace sensekit {
                                    return el.second->is_member(stream->get_handle());
                                });
 
-        if (it != m_streamSets.end())
-        {
-            return it->second.get();
-        }
-        else
-        {
-            return nullptr;
-        }
+        return it != m_streamSets.end() ? it->second.get() : nullptr;
     }
 
     void StreamSetCatalog::visit_sets(std::function<void(StreamSet*)> visitorMethod)

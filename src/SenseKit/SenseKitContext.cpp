@@ -4,11 +4,14 @@
 #include <SenseKitAPI.h>
 #include "StreamReader.h"
 #include "StreamConnection.h"
+#include "StreamSetConnection.h"
 #include "StreamServiceDelegate.h"
 #include "CreateStreamProxy.h"
 #include "Logging.h"
 #include "Core/OSProcesses.h"
 #include "sensekit_private.h"
+
+INITIALIZE_LOGGING
 
 namespace sensekit {
 
@@ -75,30 +78,50 @@ namespace sensekit {
 
     sensekit_status_t SenseKitContext::streamset_open(const char* uri, sensekit_streamsetconnection_t& streamSet)
     {
+
         m_logger->info("client opening streamset: %s", uri);
 
-        streamSet = nullptr;
-        StreamSet& set = m_setCatalog.get_or_add(uri);
-
-        StreamSetConnection* conn = set.add_new_connection();
-        streamSet = conn->get_handle();
+        StreamSetConnection& conn = m_setCatalog.open_set_connection(uri);
+        streamSet = conn.get_handle();
 
         return SENSEKIT_STATUS_SUCCESS;
     }
-
 
     sensekit_status_t SenseKitContext::streamset_close(sensekit_streamsetconnection_t& streamSet)
     {
+        if (!m_initialized)
+        {
+            streamSet = nullptr;
+            return SENSEKIT_STATUS_SUCCESS;
+        }
+
+        StreamSetConnection* actualConnection = StreamSetConnection::get_ptr(streamSet);
+//TODO: move inside stream sets, ughh
+
+        if (actualConnection->is_connected())
+        {
+            auto it = m_readers.begin();
+            while (it != m_readers.end())
+            {
+                if (&(*it)->get_streamSet() == actualConnection->get_streamSet())
+                {
+                    it = m_readers.erase(it);
+                }
+            }
+        }
+
+        m_logger->info("client closing streamset");
+        m_setCatalog.close_set_connection(actualConnection);
         streamSet = nullptr;
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    char* SenseKitContext::get_status_string(sensekit_status_t status)
-    {
-        //TODO
-        return nullptr;
-    }
+    // char* SenseKitContext::get_status_string(sensekit_status_t status)
+    // {
+    //     //TODO
+    //     return nullptr;
+    // }
 
     sensekit_status_t SenseKitContext::reader_create(sensekit_streamsetconnection_t streamSet,
                                                      sensekit_reader_t& reader)
@@ -118,6 +141,12 @@ namespace sensekit {
     sensekit_status_t SenseKitContext::reader_destroy(sensekit_reader_t& reader)
     {
         assert(reader != nullptr);
+
+        if (!m_initialized)
+        {
+            reader = nullptr;
+            return SENSEKIT_STATUS_SUCCESS;
+        }
 
         StreamReader* actualReader = StreamReader::get_ptr(reader);
 
@@ -249,16 +278,32 @@ namespace sensekit {
 
     sensekit_status_t SenseKitContext::reader_unregister_frame_ready_callback(sensekit_reader_callback_id_t& callbackId)
     {
+        if (!m_initialized)
+        {
+            delete callbackId;
+            callbackId = nullptr;
+            return SENSEKIT_STATUS_SUCCESS;
+        }
+
         sensekit_reader_callback_id_t cb = callbackId;
         assert(cb != nullptr);
         assert(cb->reader != nullptr);
 
         CallbackId cbId = cb->callbackId;
         StreamReader* actualReader = StreamReader::get_ptr(cb->reader);
-
         delete cb;
         callbackId = nullptr;
-        actualReader->unregister_frame_ready_callback(cbId);
+
+        auto it = std::find_if(m_readers.begin(), m_readers.end(),
+                               [&actualReader] (ReaderPtr& readerPtr)
+                               {
+                                   return readerPtr.get() == actualReader;
+                               });
+
+        if (it != m_readers.end())
+        {
+            actualReader->unregister_frame_ready_callback(cbId);
+        }
 
         return SENSEKIT_STATUS_SUCCESS;
     }

@@ -28,7 +28,8 @@ namespace sensekit {
         }
 
         Sensor()
-        { }
+            : Sensor("device/default")
+        {}
 
         bool is_valid() { return m_sensorRef != nullptr; }
 
@@ -70,7 +71,6 @@ namespace sensekit {
     {
         return lhs.m_sensorRef == rhs.m_sensorRef;
     }
-
 
     StreamReader Sensor::create_reader()
     {

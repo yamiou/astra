@@ -10,16 +10,6 @@ namespace sensekit {
     {
     public:
 
-        sensekit_status_t initialize()
-        {
-            return StreamServiceProxyBase::initialize(streamService);
-        }
-
-        sensekit_status_t terminate()
-        {
-            return StreamServiceProxyBase::terminate(streamService);
-        }
-
         sensekit_status_t streamset_open(const char* connectionString,
                                          sensekit_streamsetconnection_t* streamSet)
         {
@@ -29,11 +19,6 @@ namespace sensekit {
         sensekit_status_t streamset_close(sensekit_streamsetconnection_t* streamSet)
         {
             return StreamServiceProxyBase::streamset_close(streamService, streamSet);
-        }
-
-        char* get_status_string(sensekit_status_t status)
-        {
-            return StreamServiceProxyBase::get_status_string(streamService, status);
         }
 
         sensekit_status_t reader_create(sensekit_streamsetconnection_t streamSet,

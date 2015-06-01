@@ -12,11 +12,8 @@ namespace sensekit {
     {
         StreamServiceProxyBase* proxy = new StreamServiceProxyBase;
 
-        proxy->initialize = &StreamServiceDelegate::initialize;
-        proxy->terminate = &StreamServiceDelegate::terminate;
         proxy->streamset_open = &StreamServiceDelegate::streamset_open;
         proxy->streamset_close = &StreamServiceDelegate::streamset_close;
-        proxy->get_status_string = &StreamServiceDelegate::get_status_string;
         proxy->reader_create = &StreamServiceDelegate::reader_create;
         proxy->reader_destroy = &StreamServiceDelegate::reader_destroy;
         proxy->reader_get_stream = &StreamServiceDelegate::reader_get_stream;
