@@ -70,8 +70,10 @@ namespace sensekit {
         if (!m_locked)
             return;
 
-        if (m_bin != nullptr)
+        if (m_currentFrame != nullptr && m_bin != nullptr)
             m_bin->unlock_front_buffer();
+
+        m_currentFrame = nullptr;
 
         m_locked = false;
     }
