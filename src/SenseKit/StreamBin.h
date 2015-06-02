@@ -3,9 +3,10 @@
 
 #include <exception>
 #include <array>
-#include <atomic>
 #include <SenseKit/sensekit_types.h>
 #include "Core/Signal.h"
+#include <SenseKit/Plugins/plugin_capi.h>
+#include "Logger.h"
 
 namespace sensekit {
 
@@ -24,22 +25,13 @@ namespace sensekit {
         //exposed to plugins
         sensekit_frame_t* get_backBuffer()
             {
-                return m_buffers[m_backBufferTailIndex];
+                return &m_buffers[m_backBufferIndex];
             }
 
         sensekit_frame_t* cycle_buffers();
 
-        //TODO support reference counting for multi-client scenarios
-        sensekit_frame_t* lock_front_buffer()
-            {
-                m_frontBufferLocked = true;
-                return get_frontBuffer();
-            }
-
-        void unlock_front_buffer()
-            {
-                m_frontBufferLocked = false;
-            }
+        sensekit_frame_t* lock_front_buffer();
+        void unlock_front_buffer();
 
         sensekit_callback_id_t register_front_buffer_ready_callback(FrontBufferReadyCallback callback);
         void unregister_front_buffer_ready_callback(sensekit_callback_id_t& callbackId);
@@ -74,23 +66,29 @@ namespace sensekit {
             { return reinterpret_cast<StreamBin*>(bin); }
 
     private:
-        void allocate_buffers(size_t bufferLengthInBytes);
+        inline bool is_front_buffer_locked() { return m_frontBufferLockCount > 0; }
+        void init_buffers(size_t bufferLengthInBytes);
+        void deinit_buffers();
+        void init_buffer(sensekit_frame_t& frame, size_t bufferLengthInBytes);
+        void deinit_buffer(sensekit_frame_t& frame);
         sensekit_frame_t* get_frontBuffer();
-        size_t inc_index(size_t index);
+        sensekit_frame_t* get_middleBuffer();
 
         size_t m_bufferSize{0};
-        std::atomic_bool m_frontBufferLocked;
 
         size_t m_frontBufferIndex{0};
-        size_t m_backBufferHeadIndex{1};
-        size_t m_backBufferTailIndex{1};
+        size_t m_middleBufferIndex{1};
+        size_t m_backBufferIndex{2};
+
+        uint32_t m_frontBufferLockCount{0};
 
         const static size_t BUFFER_COUNT = 3;
-        using FrameBufferArray = std::array<sensekit_frame_t*, BUFFER_COUNT>;
+        sensekit_frame_t m_buffers[BUFFER_COUNT];
 
-        FrameBufferArray m_buffers;
         int m_connectedCount{0};
         int m_activeCount{0};
+
+        Logger m_logger;
 
         Signal<StreamBin*, sensekit_frame_index_t> m_frontBufferReadySignal;
     };
