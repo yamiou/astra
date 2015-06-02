@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <cassert>
 #include "Core/Signal.h"
+#include "Logger.h"
 
 namespace sensekit {
 
@@ -96,6 +97,8 @@ namespace sensekit {
         Signal<sensekit_reader_t, sensekit_reader_frame_t> m_frameReadySignal;
 
         StreamConnection::FrameReadyCallback m_scFrameReadyCallback;
+
+        Logger m_logger;
     };
 }
 

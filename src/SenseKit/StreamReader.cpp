@@ -9,7 +9,8 @@ namespace sensekit {
 
     StreamReader::StreamReader(StreamSet& streamSet) :
         m_streamSet(streamSet),
-        m_scFrameReadyCallback(nullptr)
+        m_scFrameReadyCallback(nullptr),
+        m_logger("StreamReader")
     {}
 
     StreamReader::~StreamReader()
@@ -72,6 +73,7 @@ namespace sensekit {
 
     void StreamReader::on_connection_frame_ready(StreamConnection* connection, sensekit_frame_index_t frameIndex)
     {
+        m_logger.trace("%x connection_frame_ready fi: %d lfi: %d", this, frameIndex, m_lastFrameIndex);
         if (frameIndex > m_lastFrameIndex)
         {
             auto& desc = connection->get_description();
@@ -165,6 +167,8 @@ namespace sensekit {
 
     void StreamReader::lock_private()
     {
+        m_logger.trace("%x lock_private", this);
+
         for (auto pair : m_streamMap)
         {
             ReaderConnectionData* data = pair.second;
@@ -176,25 +180,31 @@ namespace sensekit {
 
     void StreamReader::unlock()
     {
+        m_logger.trace("%x unlock m_locked: %d", this, m_locked);
+
         if (!m_locked)
             return; // TODO: exception here?
+        m_locked = false;
 
         for(auto pair : m_streamMap)
         {
             ReaderConnectionData* data = pair.second;
-            data->connection->unlock();
             data->isNewFrameReady = false;
             if (data->currentFrameIndex > m_lastFrameIndex)
             {
                 m_lastFrameIndex = data->currentFrameIndex;
             }
         }
-
-        m_locked = false;
+        for(auto pair : m_streamMap)
+        {
+            ReaderConnectionData* data = pair.second;
+            data->connection->unlock();
+        }
     }
 
     void StreamReader::check_for_all_frames_ready()
     {
+        m_logger.trace("%x check_for_all_frames_ready", this);
         bool allReady = true;
         for (auto pair : m_streamMap)
         {
@@ -216,6 +226,7 @@ namespace sensekit {
 
     void StreamReader::raise_frame_ready()
     {
+        m_logger.trace("%x raise_frame_ready 1 m_locked: %d", this, m_locked);
         if (m_frameReadySignal.slot_count() == 0)
         {
             //no clients to serve, don't bother locking and unlocking
@@ -230,6 +241,7 @@ namespace sensekit {
         sensekit_reader_frame_t frame = get_handle();
         m_frameReadySignal.raise(reader, frame);
 
+        m_logger.trace("%x raise_frame_ready 2 m_locked: %d", this, m_locked);
         if (!wasLocked && m_locked)
         {
             unlock();
