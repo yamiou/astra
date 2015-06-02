@@ -152,7 +152,6 @@ namespace sensekit { namespace plugins {
     inline void Stream::connection_added(sensekit_stream_t stream,
                                          sensekit_streamconnection_t connection)
     {
-        assert(stream == m_streamHandle);
         if (m_inhibitCallbacks)
         {
             m_logger.info("Saving a connection_added for later");
@@ -160,6 +159,7 @@ namespace sensekit { namespace plugins {
         }
         else
         {
+            assert(stream == m_streamHandle);
             on_connection_added(connection);
         }
     }
@@ -168,13 +168,13 @@ namespace sensekit { namespace plugins {
                                            sensekit_bin_t bin,
                                            sensekit_streamconnection_t connection)
     {
-        assert(stream == m_streamHandle);
         if (m_inhibitCallbacks)
         {
             m_savedConnections.erase(connection);
         }
         else
         {
+            assert(stream == m_streamHandle);
             on_connection_removed(bin, connection);
         }
     }
