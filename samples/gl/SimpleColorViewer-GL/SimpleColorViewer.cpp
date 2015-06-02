@@ -68,8 +68,6 @@ SimpleColorViewer::~SimpleColorViewer()
 
 void SimpleColorViewer::init(int argc, char **argv)
 {
-    sensekit::SenseKit::initialize();
-
     m_reader = m_sensor.create_reader();
     m_reader.stream<sensekit::ColorStream>().start();
 
