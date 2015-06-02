@@ -23,7 +23,7 @@ namespace sensekit {
         defaultConf.setGlobally(el::ConfigurationType::Filename, logFilePath);
 
         el::Loggers::setDefaultConfigurations(defaultConf, true);
-        el::Loggers::setLoggingLevel(el::Level::Debug);
+        el::Loggers::setLoggingLevel(el::Level::Fatal);
 
         defaultConf.clear();
     }
