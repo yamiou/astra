@@ -1,7 +1,9 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
-#ifndef __ANDROID__
+#ifdef __ANDROID__
+#define ELPP_DISABLE_DEFAULT_CRASH_HANDLING
+#else // not android
 #define ELPP_STACKTRACE_ON_CRASH
 #endif
 
