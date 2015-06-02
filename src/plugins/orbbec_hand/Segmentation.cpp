@@ -12,11 +12,13 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
     struct PointTTL
     {
-        cv::Point point;
+        int x;
+        int y;
         float ttl;
 
-        PointTTL(cv::Point point, float ttl) :
-            point(point),
+        PointTTL(int x, int y, float ttl) :
+            x(x),
+            y(y),
             ttl(ttl)
         { }
     };
@@ -26,36 +28,45 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                  PointTTL pt)
     {
         PROFILE_FUNC();
-        const cv::Point& p = pt.point;
-        float& ttlRef = pt.ttl;
-
+        const int& x = pt.x;
+        const int& y = pt.y;
         int width = matVisited.cols;
         int height = matVisited.rows;
 
-        cv::Point right(p.x + 1, p.y);
-        cv::Point left(p.x - 1, p.y);
-        cv::Point down(p.x, p.y + 1);
-        cv::Point up(p.x, p.y - 1);
+        if (x < 1 || x > width - 2 ||
+            y < 1 || y > height - 2)
+        {
+            return;
+        }
 
-        if (right.x < width && 0 == matVisited.at<char>(right))
+        float& ttlRef = pt.ttl;
+
+        char& rightVisited = matVisited.at<char>(y, x+1);
+        if (0 == rightVisited)
         {
-            matVisited.at<char>(right) = 1;
-            pointQueue.push(PointTTL(right, ttlRef));
+            rightVisited = 1;
+            pointQueue.push(PointTTL(x+1, y, ttlRef));
         }
-        if (left.x >= 0 && 0 == matVisited.at<char>(left))
+
+        char& leftVisited = matVisited.at<char>(y, x-1);
+        if (0 == leftVisited)
         {
-            matVisited.at<char>(left) = 1;
-            pointQueue.push(PointTTL(left, ttlRef));
+            leftVisited = 1;
+            pointQueue.push(PointTTL(x-1, y, ttlRef));
         }
-        if (down.y < height && 0 == matVisited.at<char>(down))
+
+        char& downVisited = matVisited.at<char>(y+1, x);
+        if (0 == downVisited)
         {
-            matVisited.at<char>(down) = 1;
-            pointQueue.push(PointTTL(down, ttlRef));
+            downVisited = 1;
+            pointQueue.push(PointTTL(x, y+1, ttlRef));
         }
-        if (up.y >= 0 && 0 == matVisited.at<char>(up))
+
+        char& upVisited = matVisited.at<char>(y-1, x);
+        if (0 == upVisited)
         {
-            matVisited.at<char>(up) = 1;
-            pointQueue.push(PointTTL(up, ttlRef));
+            upVisited = 1;
+            pointQueue.push(PointTTL(x, y-1, ttlRef));
         }
     }
 
@@ -74,7 +85,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         std::queue<PointTTL> pointQueue;
 
-        pointQueue.push(PointTTL(data.seedPosition, maxSegmentationDist));
+        pointQueue.push(PointTTL(data.seedPosition.x, data.seedPosition.y, maxSegmentationDist));
 
         matVisited.at<char>(data.seedPosition) = 1;
 
@@ -82,7 +93,8 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         {
             PointTTL pt = pointQueue.front();
             pointQueue.pop();
-            const cv::Point& p = pt.point;
+            const int& x = pt.x;
+            const int& y = pt.y;
             float& ttlRef = pt.ttl;
 
             if (ttlRef <= 0)
@@ -90,14 +102,14 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 continue;
             }
 
-            searchedMatrix.at<char>(p) = PixelType::SearchedFromOutOfRange;
+            searchedMatrix.at<char>(y, x) = PixelType::SearchedFromOutOfRange;
 
-            float depth = depthMatrix.at<float>(p);
+            float depth = depthMatrix.at<float>(y, x);
             bool pointInRange = depth != 0 && depth > minDepth && depth < maxDepth;
 
             if (pointInRange)
             {
-                return p;
+                return cv::Point(x, y);
             }
 
             ttlRef -= referenceAreaSqrt;
@@ -142,24 +154,25 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             }
         }
 
-        pointQueue.push(PointTTL(seedPosition, maxSegmentationDist));
+        pointQueue.push(PointTTL(seedPosition.x, seedPosition.y, maxSegmentationDist));
 
-        matVisited.at<char>(data.seedPosition) = 1;
+        matVisited.at<char>(seedPosition) = 1;
 
         while (!pointQueue.empty())
         {
             PointTTL pt = pointQueue.front();
             pointQueue.pop();
-            const cv::Point& p = pt.point;
+            const int& x = pt.x;
+            const int& y = pt.y;
             float& ttlRef = pt.ttl;
 
             if (velocitySignalPolicy == VELOCITY_POLICY_RESET_TTL &&
-                velocitySignalMatrix.at<char>(p) == PixelType::Foreground)
+                velocitySignalMatrix.at<char>(y, x) == PixelType::Foreground)
             {
                 ttlRef = maxSegmentationDist;
             }
 
-            float depth = depthMatrix.at<float>(p);
+            float depth = depthMatrix.at<float>(y, x);
             bool pointOutOfRange = depth == 0 || depth < minDepth || depth > maxDepth;
 
             if (ttlRef <= 0 || pointOutOfRange)
@@ -167,8 +180,8 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 continue;
             }
 
-            searchedMatrix.at<char>(p) = PixelType::Searched;
-            segmentationMatrix.at<char>(p) = PixelType::Foreground;
+            searchedMatrix.at<char>(y, x) = PixelType::Searched;
+            segmentationMatrix.at<char>(y, x) = PixelType::Foreground;
 
             ttlRef -= referenceAreaSqrt;
 
