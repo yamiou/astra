@@ -90,7 +90,9 @@ namespace sensekit {
 
             if (frameIndex != -1)
             {
+#ifdef DEBUG
                 assert(frameIndex > oldFrameIndex);
+#endif
                 m_frontBufferReadySignal.raise(this, frameIndex);
             }
         }
