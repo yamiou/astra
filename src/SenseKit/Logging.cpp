@@ -13,7 +13,6 @@ namespace sensekit {
         el::Loggers::addFlag(el::LoggingFlag::CreateLoggerAutomatically);
         el::Loggers::addFlag(el::LoggingFlag::ColoredTerminalOutput);
         el::Loggers::addFlag(el::LoggingFlag::HierarchicalLogging);
-        el::Loggers::setLoggingLevel(el::Level::Info);
 
         el::Configurations defaultConf;
 
@@ -24,6 +23,7 @@ namespace sensekit {
         defaultConf.setGlobally(el::ConfigurationType::Filename, logFilePath);
 
         el::Loggers::setDefaultConfigurations(defaultConf, true);
+        el::Loggers::setLoggingLevel(el::Level::Debug);
 
         defaultConf.clear();
     }
