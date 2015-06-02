@@ -24,11 +24,13 @@ endif()
 
 include_directories ("$ENV{OPENNI2_INCLUDE}")
 
+include_directories(${_projname} ${SHINY_INCLUDE})
+
 add_library(${_projname} SHARED ${${_projname}_SOURCES})
 
 set_target_properties(${_projname} PROPERTIES FOLDER "plugins")
 
-target_link_libraries(${_projname} SenseKitAPI ${OpenNI2_LIBRARY})
+target_link_libraries(${_projname} SenseKitAPI Shiny ${OpenNI2_LIBRARY})
 
 install(TARGETS ${_projname}
   RUNTIME DESTINATION bin/Plugins/

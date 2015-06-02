@@ -9,6 +9,7 @@
 #include <OpenNI.h>
 #include <SenseKitUL/streams/image_types.h>
 #include <memory>
+#include <Shiny.h>
 
 #ifndef MIN
 #define MIN(a,b) (((a)<(b))?(a):(b))
@@ -28,7 +29,10 @@ namespace sensekit { namespace plugins {
                             StreamDescription desc)
             : Stream(pluginService,
                      streamSet,
-                     desc) { }
+                     desc)
+        {
+             PROFILE_FUNC();
+        }
 
         virtual sensekit_status_t read_frame() = 0;
         virtual sensekit_status_t open() = 0;
@@ -59,16 +63,19 @@ namespace sensekit { namespace plugins {
               m_bytesPerPixel(sizeof(block_type) * numComponentPerPixel),
               m_numComponentPerPixel(numComponentPerPixel)
         {
+            PROFILE_FUNC();
             enable_callbacks();
         }
 
         virtual ~OniDeviceStream()
         {
+            PROFILE_FUNC();
             close();
         }
 
         virtual sensekit_status_t open() override final
         {
+            PROFILE_FUNC();
             if (m_isOpen)
                 return SENSEKIT_STATUS_SUCCESS;
 
@@ -100,10 +107,9 @@ namespace sensekit { namespace plugins {
             return SENSEKIT_STATUS_SUCCESS;
         }
 
-
-
         virtual sensekit_status_t close() override final
         {
+            PROFILE_FUNC();
             if (!m_isOpen)
                 return SENSEKIT_STATUS_SUCCESS;
 
@@ -121,6 +127,7 @@ namespace sensekit { namespace plugins {
 
         virtual sensekit_status_t start() override final
         {
+            PROFILE_FUNC();
             if (!m_isOpen || m_isStreaming)
                 return SENSEKIT_STATUS_SUCCESS;
 
@@ -135,6 +142,7 @@ namespace sensekit { namespace plugins {
 
         virtual sensekit_status_t stop() override final
         {
+            PROFILE_FUNC();
             if (!m_isOpen || !m_isStreaming)
                 return SENSEKIT_STATUS_SUCCESS;
 
@@ -153,6 +161,7 @@ namespace sensekit { namespace plugins {
                                       sensekit_parameter_id id,
                                       sensekit_parameter_bin_t& parameterBin) override
         {
+            PROFILE_FUNC();
             switch (id)
             {
             case SENSEKIT_PARAMETER_IMAGE_HFOV:
@@ -190,6 +199,7 @@ namespace sensekit { namespace plugins {
 
         virtual void on_new_buffer(wrapper_type* wrapper)
         {
+            PROFILE_FUNC();
             if (wrapper == nullptr)
                 return;
 
@@ -206,9 +216,9 @@ namespace sensekit { namespace plugins {
 
         virtual openni::VideoStream* get_oni_stream() override { return &m_oniStream; }
 
-        void on_connection_added(sensekit_streamconnection_t connection);
-        void on_connection_removed(sensekit_bin_t bin,
-                                   sensekit_streamconnection_t connection);
+        virtual void on_connection_added(sensekit_streamconnection_t connection) override;
+        virtual void on_connection_removed(sensekit_bin_t bin,
+                                   sensekit_streamconnection_t connection) override;
 
     protected:
         openni::Device& m_oniDevice;
@@ -238,6 +248,7 @@ namespace sensekit { namespace plugins {
     void OniDeviceStream<TFrameWrapper,
                          TBufferBlockType>::on_connection_added(sensekit_streamconnection_t connection)
     {
+        PROFILE_FUNC();
         m_bin->link_connection(connection);
     }
 
@@ -246,6 +257,7 @@ namespace sensekit { namespace plugins {
                          TBufferBlockType>::on_connection_removed(sensekit_bin_t bin,
                                                                   sensekit_streamconnection_t connection)
     {
+        PROFILE_FUNC();
         m_bin->unlink_connection(connection);
 
         if (!m_bin->has_connections())
@@ -257,6 +269,7 @@ namespace sensekit { namespace plugins {
     template<typename TFrameWrapper, typename TBufferBlockType>
     sensekit_status_t OniDeviceStream<TFrameWrapper, TBufferBlockType>::read_frame()
     {
+        PROFILE_FUNC();
         if (!is_streaming()) return SENSEKIT_STATUS_SUCCESS;
 
         openni::VideoFrameRef ref;

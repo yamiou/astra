@@ -1,4 +1,5 @@
 #include "OniDeviceStreamSet.h"
+#include <Shiny.h>
 
 namespace sensekit { namespace plugins {
 
@@ -7,6 +8,7 @@ namespace sensekit { namespace plugins {
         : m_logger(pluginService, "OniDeviceStreamSet"),
           m_pluginService(pluginService)
     {
+        PROFILE_FUNC();
         m_uri = info->getUri();
         m_pluginService.create_stream_set(m_streamSetHandle);
         m_sensor = std::make_unique<Sensor>(m_streamSetHandle);
@@ -14,12 +16,14 @@ namespace sensekit { namespace plugins {
 
     OniDeviceStreamSet::~OniDeviceStreamSet()
     {
+        PROFILE_FUNC();
         m_pluginService.destroy_stream_set(m_streamSetHandle);
         close();
     }
 
     sensekit_status_t OniDeviceStreamSet::open()
     {
+        PROFILE_FUNC();
         if (m_isOpen)
             return SENSEKIT_STATUS_SUCCESS;
 
@@ -43,6 +47,7 @@ namespace sensekit { namespace plugins {
 
     sensekit_status_t OniDeviceStreamSet::close()
     {
+        PROFILE_FUNC();
         if (!m_isOpen)
             return SENSEKIT_STATUS_SUCCESS;
 
@@ -58,6 +63,7 @@ namespace sensekit { namespace plugins {
 
     sensekit_status_t OniDeviceStreamSet::read()
     {
+        PROFILE_FUNC();
         if (!m_isOpen || m_streams.size() == 0)
             return SENSEKIT_STATUS_SUCCESS;
 
@@ -83,6 +89,7 @@ namespace sensekit { namespace plugins {
 
     sensekit_status_t OniDeviceStreamSet::open_sensor_streams()
     {
+        PROFILE_FUNC();
         if (m_oniDevice.hasSensor(openni::SENSOR_COLOR))
         {
             OniColorStream* stream = new OniColorStream(m_pluginService,
@@ -134,6 +141,7 @@ namespace sensekit { namespace plugins {
 
     sensekit_status_t OniDeviceStreamSet::close_sensor_streams()
     {
+        PROFILE_FUNC();
         m_streams.clear();
         m_oniStreams.fill(nullptr);
 

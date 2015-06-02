@@ -3,6 +3,7 @@
 #include <SenseKitUL/skul_ctypes.h>
 #include "OniDepthStream.h"
 #include "OniColorStream.h"
+#include <Shiny.h>
 
 EXPORT_PLUGIN(sensekit::plugins::OpenNIPlugin)
 
@@ -12,6 +13,7 @@ namespace sensekit
     {
         void OpenNIPlugin::init_openni()
         {
+            PROFILE_FUNC();
             openni::Version version = openni::OpenNI::getVersion();
 
             get_logger().info("Initializing OpenNI v%d.%d.%d.%d",
@@ -45,6 +47,7 @@ namespace sensekit
 
         void OpenNIPlugin::on_host_event(sensekit_event_id id, const void* data, size_t dataSize)
         {
+            PROFILE_FUNC();
             switch (id)
             {
             case SENSEKIT_EVENT_RESOURCE_AVAILABLE:
@@ -54,6 +57,7 @@ namespace sensekit
 
         void OpenNIPlugin::onDeviceConnected(const ::openni::DeviceInfo* info)
         {
+            PROFILE_FUNC();
             get_logger().info("device connected: %s", info->getUri());
 
             OniDeviceStreamSet* set = new OniDeviceStreamSet(get_pluginService(), info);
@@ -64,6 +68,7 @@ namespace sensekit
 
         void OpenNIPlugin::onDeviceDisconnected(const ::openni::DeviceInfo* info)
         {
+            PROFILE_FUNC();
             get_logger().info("device disconnected: %s", info->getUri());
             auto it = std::find_if(m_sets.begin(), m_sets.end(),
                                    [&info] (SetPtr& setPtr)
@@ -77,19 +82,22 @@ namespace sensekit
 
         OpenNIPlugin::~OpenNIPlugin()
         {
+            PROFILE_FUNC();
             m_sets.clear();
             get_logger().info("shutting down openni");
             openni::OpenNI::shutdown();
         }
 
-
         void OpenNIPlugin::temp_update()
         {
+            PROFILE_FUNC();
             read_streams();
+            PROFILE_UPDATE();
         }
 
         sensekit_status_t OpenNIPlugin::read_streams()
         {
+            PROFILE_FUNC();
             for(auto& set : m_sets)
             {
                 set->read();
