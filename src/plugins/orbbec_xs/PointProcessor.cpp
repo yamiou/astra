@@ -84,7 +84,9 @@ namespace sensekit { namespace plugins { namespace xs {
             Vector3f* p_points = reinterpret_cast<Vector3f*>(pointFrameWrapper->frame.data);
             calculate_point_frame(depthFrame, p_points);
 
+            PROFILE_BEGIN(pointframe_end_write);
             m_pointStream->end_write();
+            PROFILE_END();
         }
     }
 

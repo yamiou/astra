@@ -83,6 +83,11 @@ namespace sensekit
         OpenNIPlugin::~OpenNIPlugin()
         {
             PROFILE_FUNC();
+            #ifndef __ANDROID__
+                PROFILE_UPDATE();
+                PROFILE_OUTPUT("profile_openni_sensor.txt");
+            #endif
+
             m_sets.clear();
             get_logger().info("shutting down openni");
             openni::OpenNI::shutdown();

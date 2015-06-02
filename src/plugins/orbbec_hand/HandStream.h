@@ -47,12 +47,9 @@ namespace sensekit { namespace plugins { namespace hand {
         {
             SingleBinStream::on_connection_removed(bin, connection);
 
-            PROFILE_UPDATE();
-
-            #if __ANDROID__
+            #ifdef __ANDROID__
+                PROFILE_UPDATE();
                 PROFILE_OUTPUT("/sdcard/profile_orbbec_hand.txt");
-            #else
-                PROFILE_OUTPUT("profile_orbbec_hand.txt");
             #endif
         }
 

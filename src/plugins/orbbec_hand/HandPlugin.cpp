@@ -16,7 +16,12 @@ namespace sensekit { namespace plugins { namespace hand {
     }
 
     HandPlugin::~HandPlugin()
-    { }
+    {
+        #ifndef __ANDROID__
+            PROFILE_UPDATE();
+            PROFILE_OUTPUT("profile_orbbec_hand.txt");
+        #endif
+    }
 
     void HandPlugin::on_initialize()
     {
