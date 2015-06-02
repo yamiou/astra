@@ -1,7 +1,7 @@
 #include <jni.h>
 #include <SenseKit/SenseKit.h>
 #include <SenseKit/host_events.h>
-#include "com_orbbec_jni_SenseKit.h"
+#include "sensekit_wrapper.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,16 +19,16 @@ extern "C" {
 
     JNIEXPORT void JNICALL Java_com_orbbec_jni_SenseKit_notify_1resource_1available(JNIEnv* env, jclass cls, jstring uri)
     {
-        const char* uriString = (*env)->GetStringUTFChars(env, uri, NULL);
+        const char* uriString = env->GetStringUTFChars(uri, NULL);
         sensekit_notify_resource_available(uriString);
-        (*env)->ReleaseStringUTFChars(env, uri, uriString);
+        env->ReleaseStringUTFChars(uri, uriString);
     }
 
     JNIEXPORT void JNICALL Java_com_orbbec_jni_SenseKit_notify_1resource_1unavailable(JNIEnv* env, jclass cls, jstring uri)
     {
-        const char* uriString = (*env)->GetStringUTFChars(env, uri, NULL);
+        const char* uriString = env->GetStringUTFChars(uri, NULL);
         sensekit_notify_resource_unavailable(uriString);
-        (*env)->ReleaseStringUTFChars(env, uri, uriString);
+        env->ReleaseStringUTFChars(uri, uriString);
     }
 
 #ifdef __cplusplus
