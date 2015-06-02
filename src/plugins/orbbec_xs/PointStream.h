@@ -5,6 +5,7 @@
 #include <SenseKitUL/streams/point_types.h>
 #include <SenseKitUL/skul_ctypes.h>
 #include <SenseKitUL/Plugins/stream_types.h>
+#include <Shiny.h>
 
 namespace sensekit { namespace plugins { namespace xs {
 
@@ -22,7 +23,18 @@ namespace sensekit { namespace plugins { namespace xs {
                               StreamDescription(SENSEKIT_STREAM_POINT,
                                                 DEFAULT_SUBTYPE),
                               width * height * sizeof(sensekit_vector3f_t))
-        { }
+        {
+            PROFILE_FUNC();
+        }
+
+    private:
+        virtual void on_connection_removed(sensekit_bin_t bin,
+                                           sensekit_streamconnection_t connection) override
+        {
+            PROFILE_FUNC();
+
+            SingleBinStream::on_connection_removed(bin, connection);
+        }
     };
 }}}
 

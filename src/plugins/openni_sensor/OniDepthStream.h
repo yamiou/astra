@@ -63,15 +63,15 @@ namespace sensekit { namespace plugins {
                                            sensekit_streamconnection_t connection) override
         {
             PROFILE_FUNC();
-            
+
             OniDeviceStream::on_connection_removed(bin, connection);
 
             PROFILE_UPDATE();
 
             #if __ANDROID__
-                PROFILE_OUTPUT("/sdcard/openni_sensor_profile.txt");
+                PROFILE_OUTPUT("/sdcard/profile_openni_sensor.txt");
             #else
-                PROFILE_OUTPUT("openni_sensor_profile.txt");
+                PROFILE_OUTPUT("profile_openni_sensor.txt");
             #endif
         }
 

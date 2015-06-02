@@ -50,9 +50,9 @@ namespace sensekit { namespace plugins { namespace hand {
             PROFILE_UPDATE();
 
             #if __ANDROID__
-                PROFILE_OUTPUT("/sdcard/hand_profile.txt");
+                PROFILE_OUTPUT("/sdcard/profile_orbbec_hand.txt");
             #else
-                PROFILE_OUTPUT("hand_profile.txt");
+                PROFILE_OUTPUT("profile_orbbec_hand.txt");
             #endif
         }
 
