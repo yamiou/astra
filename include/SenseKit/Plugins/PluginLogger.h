@@ -26,7 +26,7 @@ namespace sensekit { namespace plugins {
         {
             va_list args;
             va_start(args, format);
-            m_pluginService.log(m_loggerName.c_str(), sensekit_log_severity_t::TRACE, format, args);
+            m_pluginService.log(m_loggerName.c_str(), sensekit_log_severity_t::SK_TRACE, format, args);
             va_end(args);
         }
 
@@ -34,7 +34,7 @@ namespace sensekit { namespace plugins {
         {
             va_list args;
             va_start(args, format);
-            m_pluginService.log(m_loggerName.c_str(), sensekit_log_severity_t::INFO, format, args);
+            m_pluginService.log(m_loggerName.c_str(), sensekit_log_severity_t::SK_INFO, format, args);
             va_end(args);
         }
 
@@ -42,7 +42,7 @@ namespace sensekit { namespace plugins {
         {
             va_list args;
             va_start(args, format);
-            m_pluginService.log(m_loggerName.c_str(), sensekit_log_severity_t::DEBUG, format, args);
+            m_pluginService.log(m_loggerName.c_str(), sensekit_log_severity_t::SK_DEBUG, format, args);
             va_end(args);
         }
 
@@ -50,7 +50,7 @@ namespace sensekit { namespace plugins {
         {
             va_list args;
             va_start(args, format);
-            m_pluginService.log(m_loggerName.c_str(), sensekit_log_severity_t::WARN, format, args);
+            m_pluginService.log(m_loggerName.c_str(), sensekit_log_severity_t::SK_WARN, format, args);
             va_end(args);
         }
 
@@ -58,7 +58,7 @@ namespace sensekit { namespace plugins {
         {
             va_list args;
             va_start(args, format);
-            m_pluginService.log(m_loggerName.c_str(), sensekit_log_severity_t::ERROR, format, args);
+            m_pluginService.log(m_loggerName.c_str(), sensekit_log_severity_t::SK_ERROR, format, args);
             va_end(args);
         }
 
@@ -66,7 +66,7 @@ namespace sensekit { namespace plugins {
         {
             va_list args;
             va_start(args, format);
-            m_pluginService.log(m_loggerName.c_str(), sensekit_log_severity_t::FATAL, format, args);
+            m_pluginService.log(m_loggerName.c_str(), sensekit_log_severity_t::SK_FATAL, format, args);
             va_end(args);
         }
     private:

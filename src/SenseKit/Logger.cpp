@@ -10,22 +10,22 @@ namespace sensekit {
     {
         switch(logLevel)
         {
-        case TRACE:
+        case SK_TRACE:
             CLOG(TRACE, channel) << message;
             break;
-        case DEBUG:
+        case SK_DEBUG:
             CLOG(DEBUG, channel) << message;
             break;
-        case INFO:
+        case SK_INFO:
             CLOG(INFO, channel) << message;
             break;
-        case WARN:
+        case SK_WARN:
             CLOG(WARNING, channel) << message;
             break;
-        case ERROR:
+        case SK_ERROR:
             CLOG(ERROR, channel) << message;
             break;
-        case FATAL:
+        case SK_FATAL:
             CLOG(FATAL, channel) << message;
             break;
         }
@@ -83,7 +83,7 @@ namespace sensekit {
     {
         va_list args;
         va_start(args, format);
-        log_vargs(channel, sensekit_log_severity_t::TRACE, format, args);
+        log_vargs(channel, sensekit_log_severity_t::SK_TRACE, format, args);
         va_end(args);
     }
 
@@ -91,7 +91,7 @@ namespace sensekit {
     {
         va_list args;
         va_start(args, format);
-        log_vargs(channel, sensekit_log_severity_t::INFO, format, args);
+        log_vargs(channel, sensekit_log_severity_t::SK_INFO, format, args);
         va_end(args);
     }
 
@@ -99,7 +99,7 @@ namespace sensekit {
     {
         va_list args;
         va_start(args, format);
-        log_vargs(channel, sensekit_log_severity_t::DEBUG, format, args);
+        log_vargs(channel, sensekit_log_severity_t::SK_DEBUG, format, args);
         va_end(args);
     }
 
@@ -107,7 +107,7 @@ namespace sensekit {
     {
         va_list args;
         va_start(args, format);
-        log_vargs(channel, sensekit_log_severity_t::WARN, format, args);
+        log_vargs(channel, sensekit_log_severity_t::SK_WARN, format, args);
         va_end(args);
     }
 
@@ -115,7 +115,7 @@ namespace sensekit {
     {
         va_list args;
         va_start(args, format);
-        log_vargs(channel, sensekit_log_severity_t::ERROR, format, args);
+        log_vargs(channel, sensekit_log_severity_t::SK_ERROR, format, args);
         va_end(args);
     }
 
@@ -123,7 +123,7 @@ namespace sensekit {
     {
         va_list args;
         va_start(args, format);
-        log_vargs(channel, sensekit_log_severity_t::FATAL, format, args);
+        log_vargs(channel, sensekit_log_severity_t::SK_FATAL, format, args);
         va_end(args);
     }
 
@@ -131,7 +131,7 @@ namespace sensekit {
     {
         va_list args;
         va_start(args, format);
-        log_vargs(sensekit_log_severity_t::TRACE, format, args);
+        log_vargs(sensekit_log_severity_t::SK_TRACE, format, args);
         va_end(args);
     }
 
@@ -139,7 +139,7 @@ namespace sensekit {
     {
         va_list args;
         va_start(args, format);
-        log_vargs(sensekit_log_severity_t::INFO, format, args);
+        log_vargs(sensekit_log_severity_t::SK_INFO, format, args);
         va_end(args);
     }
 
@@ -147,7 +147,7 @@ namespace sensekit {
     {
         va_list args;
         va_start(args, format);
-        log_vargs(sensekit_log_severity_t::DEBUG, format, args);
+        log_vargs(sensekit_log_severity_t::SK_DEBUG, format, args);
         va_end(args);
     }
 
@@ -155,7 +155,7 @@ namespace sensekit {
     {
         va_list args;
         va_start(args, format);
-        log_vargs(sensekit_log_severity_t::WARN, format, args);
+        log_vargs(sensekit_log_severity_t::SK_WARN, format, args);
         va_end(args);
     }
 
@@ -163,7 +163,7 @@ namespace sensekit {
     {
         va_list args;
         va_start(args, format);
-        log_vargs(sensekit_log_severity_t::ERROR, format, args);
+        log_vargs(sensekit_log_severity_t::SK_ERROR, format, args);
         va_end(args);
     }
 
@@ -171,7 +171,7 @@ namespace sensekit {
     {
         va_list args;
         va_start(args, format);
-        log_vargs(sensekit_log_severity_t::FATAL, format, args);
+        log_vargs(sensekit_log_severity_t::SK_FATAL, format, args);
         va_end(args);
     }
 }
