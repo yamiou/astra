@@ -273,7 +273,10 @@ namespace sensekit { namespace plugins {
         if (!is_streaming()) return SENSEKIT_STATUS_SUCCESS;
 
         openni::VideoFrameRef ref;
-        if (m_oniStream.readFrame(&ref) == ::openni::STATUS_OK)
+        PROFILE_BEGIN(oni_stream_readFrame);
+        auto status = m_oniStream.readFrame(&ref);
+        PROFILE_END();
+        if (status == ::openni::STATUS_OK)
         {
             const block_type* oniFrameData = static_cast<const block_type*>(ref.getData());
 
@@ -289,7 +292,9 @@ namespace sensekit { namespace plugins {
 
             memcpy(wrapper->frame.data, oniFrameData, byteSize);
 
+            PROFILE_BEGIN(oni_stream_end_write);
             m_bin->end_write();
+            PROFILE_END();
 
             ++m_frameIndex;
         }

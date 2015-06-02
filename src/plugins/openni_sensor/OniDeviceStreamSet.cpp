@@ -63,7 +63,7 @@ namespace sensekit { namespace plugins {
 
     sensekit_status_t OniDeviceStreamSet::read()
     {
-        PROFILE_FUNC();
+        PROFILE_BLOCK(streamset_read);
         if (!m_isOpen || m_streams.size() == 0)
             return SENSEKIT_STATUS_SUCCESS;
 
