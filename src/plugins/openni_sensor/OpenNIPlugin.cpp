@@ -62,7 +62,7 @@ namespace sensekit
 
                 int scanned = sscanf(resourceUri, "usb/%u/%u/%u/%u", &vid, &pid, &bus, &address);
 
-                if (scanned != 4)
+                if (scanned == 4)
                 {
                     char oniUri[1024];
                     snprintf(oniUri, 1024, "%04hx:%04hx@%hhu/%hhu", vid, pid, bus, address);
