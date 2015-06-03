@@ -60,27 +60,34 @@ namespace sensekit
                 unsigned int bus = 0;
                 unsigned int address = 0;
 
-                sscanf(resourceUri, "usb/%u/%u/%u/%u", &vid, &pid, &bus, &address);
+                int scanned = sscanf(resourceUri, "usb/%u/%u/%u/%u", &vid, &pid, &bus, &address);
 
-                char oniUri[1024];
-                snprintf(oniUri, 1024, "%04hx:%04hx@%hhu/%hhu", vid, pid, bus, address);
-
-                openni::Array<openni::DeviceInfo> devices;
-                openni::OpenNI::enumerateDevices(&devices);
-
-                for(int i = 0; i < devices.getSize(); i++)
+                if (scanned != 4)
                 {
-                    const openni::DeviceInfo& info = devices[i];
-                    if (strcmp(oniUri, info.getUri()) == 0)
+                    char oniUri[1024];
+                    snprintf(oniUri, 1024, "%04hx:%04hx@%hhu/%hhu", vid, pid, bus, address);
+
+                    openni::Array<openni::DeviceInfo> devices;
+                    openni::OpenNI::enumerateDevices(&devices);
+
+                    for(int i = 0; i < devices.getSize(); i++)
                     {
-                        get_logger().info("device connected: %s", info.getUri());
+                        const openni::DeviceInfo& info = devices[i];
+                        if (strcmp(oniUri, info.getUri()) == 0)
+                        {
+                            get_logger().info("device connected: %s", info.getUri());
 
-                        SetPtr setPtr = std::make_unique<OniDeviceStreamSet>(get_pluginService(), &info);
-                        setPtr->open();
+                            SetPtr setPtr = std::make_unique<OniDeviceStreamSet>(get_pluginService(), &info);
+                            setPtr->open();
 
-                        m_sets.push_back(std::move(setPtr));
-                        break;
+                            m_sets.push_back(std::move(setPtr));
+                            break;
+                        }
                     }
+                }
+                else
+                {
+                    get_logger.debug("unknown resource uri: %s", resourceUri);
                 }
             }
 #endif
@@ -116,10 +123,10 @@ namespace sensekit
         OpenNIPlugin::~OpenNIPlugin()
         {
             PROFILE_FUNC();
-            #ifndef __ANDROID__
-                PROFILE_UPDATE();
-                PROFILE_OUTPUT("profile_openni_sensor.txt");
-            #endif
+#ifndef __ANDROID__
+            PROFILE_UPDATE();
+            PROFILE_OUTPUT("profile_openni_sensor.txt");
+#endif
 
             m_sets.clear();
             get_logger().info("shutting down openni");
