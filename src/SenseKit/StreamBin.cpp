@@ -97,7 +97,11 @@ namespace sensekit {
             //can't swap front buffers because there is still an outstanding lock
             return;
         }
-
+        m_logger.trace("%x unlock pre indices: f: %d m: %d b: %d",
+            this,
+            get_frontBuffer()->frameIndex,
+            get_middleBuffer()->frameIndex,
+            get_backBuffer()->frameIndex);
         sensekit_frame_index_t frontFrameIndex = get_frontBuffer()->frameIndex;
         sensekit_frame_index_t middleFrameIndex = get_middleBuffer()->frameIndex;
 
@@ -110,16 +114,26 @@ namespace sensekit {
             m_frontBufferIndex = m_middleBufferIndex;
             m_middleBufferIndex = oldFrontBufferIndex;
 
-            sensekit_frame_index_t frameIndex = get_frontBuffer()->frameIndex;
 
-            m_frontBufferReadySignal.raise(this, frameIndex);
+            m_logger.trace("%x unlock front/mid indices: f: %d m: %d b: %d",
+                this,
+                get_frontBuffer()->frameIndex,
+                get_middleBuffer()->frameIndex,
+                get_backBuffer()->frameIndex);
+
+            raiseFrameReadySignal();
         }
     }
 
     sensekit_frame_t* StreamBin::cycle_buffers()
     {
-        m_logger.trace("%x cycling buffer. lock count: %u", this, m_frontBufferLockCount);
-
+        m_logger.trace("%x cycling buffer. lock count: %u produced frame index: %d",
+                            this, m_frontBufferLockCount, get_backBuffer()->frameIndex);
+        m_logger.trace("%x cycle pre indices: f: %d m: %d b: %d",
+            this,
+            get_frontBuffer()->frameIndex,
+            get_middleBuffer()->frameIndex,
+            get_backBuffer()->frameIndex);
         if (is_front_buffer_locked())
         {
             //Can't change front buffer.
@@ -127,6 +141,12 @@ namespace sensekit {
             size_t oldBackBufferIndex = m_backBufferIndex;
             m_backBufferIndex = m_middleBufferIndex;
             m_middleBufferIndex = oldBackBufferIndex;
+
+            m_logger.trace("%x cycle back/mid indices: f: %d m: %d b: %d",
+                this,
+                get_frontBuffer()->frameIndex,
+                get_middleBuffer()->frameIndex,
+                get_backBuffer()->frameIndex);
         }
         else
         {
@@ -134,23 +154,40 @@ namespace sensekit {
             sensekit_frame_index_t oldFrameIndex = get_frontBuffer()->frameIndex;
 #endif
             //The rare case where neither front or back buffers are locked.
-            //Rotate all three buffers
+            //Rotate back buffer directly to front buffer. (Ignore middle.)
             size_t oldFrontBufferIndex = m_frontBufferIndex;
-            m_frontBufferIndex = m_middleBufferIndex;
-            m_middleBufferIndex = m_backBufferIndex;
+            m_frontBufferIndex = m_backBufferIndex;
             m_backBufferIndex = oldFrontBufferIndex;
 
-            sensekit_frame_index_t frameIndex = get_frontBuffer()->frameIndex;
-
-            if (frameIndex != -1)
-            {
 #ifdef DEBUG
+            sensekit_frame_index_t newFrameIndex = get_frontBuffer()->frameIndex;
+            if (frameIndex != -1 && newFrameIndex <= oldFrameIndex)
+            {
+                m_logger.warn("%x buffers cycled with out-of-order frame indices: %d->%d",
+                                this, oldFrameIndex, newFrameIndex);
                 assert(frameIndex > oldFrameIndex);
-#endif
-                m_frontBufferReadySignal.raise(this, frameIndex);
             }
+#endif
+
+            m_logger.trace("%x cycle front/back indices: f: %d m: %d b: %d",
+                this,
+                get_frontBuffer()->frameIndex,
+                get_middleBuffer()->frameIndex,
+                get_backBuffer()->frameIndex);
+
+            raiseFrameReadySignal();
         }
 
         return get_backBuffer();
+    }
+
+    void StreamBin::raiseFrameReadySignal()
+    {
+        sensekit_frame_index_t frameIndex = get_frontBuffer()->frameIndex;
+
+        if (frameIndex != -1)
+        {
+            m_frontBufferReadySignal.raise(this, frameIndex);
+        }
     }
 }

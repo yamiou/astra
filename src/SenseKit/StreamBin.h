@@ -73,6 +73,7 @@ namespace sensekit {
         void deinit_buffer(sensekit_frame_t& frame);
         sensekit_frame_t* get_frontBuffer();
         sensekit_frame_t* get_middleBuffer();
+        void raiseFrameReadySignal();
 
         size_t m_bufferSize{0};
 
