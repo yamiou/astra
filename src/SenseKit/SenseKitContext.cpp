@@ -8,6 +8,7 @@
 #include "CreateStreamProxy.h"
 #include "Logging.h"
 #include "Core/OSProcesses.h"
+#include "sensekit_private.h"
 
 namespace sensekit {
 
@@ -185,33 +186,37 @@ namespace sensekit {
                                                          int timeoutMillis,
                                                          sensekit_reader_frame_t& frame)
     {
-        assert(reader != nullptr);
+        if (reader == nullptr)
+        {
+            m_logger->warn("reader_open_frame called with null reader");
+            assert(reader != nullptr);
+            return SENSEKIT_STATUS_INVALID_OPERATION;
+        }
 
         StreamReader* actualReader = StreamReader::get_ptr(reader);
-        sensekit_status_t rc = actualReader->lock(timeoutMillis);
 
-        if (rc == SENSEKIT_STATUS_SUCCESS)
-        {
-            frame = reader;
-        }
-        else
-        {
-            frame = nullptr;
-        }
-
-        return rc;
+        return actualReader->lock(timeoutMillis, frame);
     }
 
     sensekit_status_t SenseKitContext::reader_close_frame(sensekit_reader_frame_t& frame)
     {
-        assert(frame != nullptr);
+        if (frame == nullptr)
+        {
+            m_logger->warn("reader_close_frame called with null frame");
+            assert(frame != nullptr);
+            return SENSEKIT_STATUS_INVALID_OPERATION;
+        }
 
         StreamReader* actualReader = StreamReader::from_frame(frame);
-        actualReader->unlock();
 
-        frame = nullptr;
+        if (actualReader == nullptr)
+        {
+            m_logger->warn("reader_close_frame couldn't retrieve StreamReader from frame");
+            assert(actualReader != nullptr);
+            return SENSEKIT_STATUS_INTERNAL_ERROR;
+        }
 
-        return SENSEKIT_STATUS_SUCCESS;
+        return actualReader->unlock(frame);
     }
 
     sensekit_status_t SenseKitContext::reader_register_frame_ready_callback(sensekit_reader_t reader,

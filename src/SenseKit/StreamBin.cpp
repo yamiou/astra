@@ -84,11 +84,11 @@ namespace sensekit {
     void StreamBin::unlock_front_buffer()
     {
         m_logger.trace("%x unlocking front buffer. lock count: %u -> %u", this, m_frontBufferLockCount, m_frontBufferLockCount-1);
-        assert(m_frontBufferLockCount != 0);
         if (m_frontBufferLockCount == 0)
         {
             //TODO: error, logging
             m_logger.warn("%x StreamBin unlocked too many times!", this);
+            assert(m_frontBufferLockCount != 0);
             return;
         }
         --m_frontBufferLockCount;

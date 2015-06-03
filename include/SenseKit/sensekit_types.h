@@ -30,7 +30,7 @@ typedef struct _sensekit_streamconnection* sensekit_streamconnection_t;
 typedef struct _sensekit_frame sensekit_frame_t;
 
 typedef struct _sensekit_reader* sensekit_reader_t;
-typedef sensekit_reader_t sensekit_reader_frame_t;
+typedef struct _sensekit_reader_frame* sensekit_reader_frame_t;
 
 typedef void* sensekit_parameter_data_t;
 typedef int32_t sensekit_parameter_id;
@@ -46,7 +46,9 @@ typedef enum {
     SENSEKIT_STATUS_INVALID_PARAMETER = 1,
     SENSEKIT_STATUS_DEVICE_ERROR = 2,
     SENSEKIT_STATUS_TIMEOUT = 3,
-    SENSEKIT_STATUS_INVALID_PARAMETER_TOKEN = 4
+    SENSEKIT_STATUS_INVALID_PARAMETER_TOKEN = 4,
+    SENSEKIT_STATUS_INVALID_OPERATION = 5,
+    SENSEKIT_STATUS_INTERNAL_ERROR = 6
 } sensekit_status_t;
 
 typedef size_t sensekit_callback_id_t;

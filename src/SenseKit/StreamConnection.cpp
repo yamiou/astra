@@ -7,7 +7,8 @@
 namespace sensekit {
 
     StreamConnection::StreamConnection(Stream* stream)
-        : m_stream(stream)
+        : m_stream(stream),
+          m_logger("StreamConnection")
     {
         assert (stream != nullptr);
 
@@ -48,8 +49,11 @@ namespace sensekit {
 
     sensekit_frame_t* StreamConnection::lock()
     {
+        m_logger.trace("%x lock", this);
         if (m_locked)
+        {
             return m_currentFrame;
+        }
 
         if (m_bin != nullptr)
         {
@@ -67,15 +71,20 @@ namespace sensekit {
 
     void StreamConnection::unlock()
     {
+        m_logger.trace("%x unlock", this);
+
         if (!m_locked)
-            return;
+        {
+            m_logger.warn("%x StreamConnection::unlock() not locked", this);
+            assert(m_locked);
+        }
 
         if (m_currentFrame != nullptr && m_bin != nullptr)
+        {
+            m_currentFrame = nullptr;
+            m_locked = false;
             m_bin->unlock_front_buffer();
-
-        m_currentFrame = nullptr;
-
-        m_locked = false;
+        }
     }
 
     void StreamConnection::start()

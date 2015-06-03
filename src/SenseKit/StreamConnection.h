@@ -5,6 +5,7 @@
 #include <SenseKit/Plugins/plugin_capi.h>
 #include "StreamBin.h"
 #include "ParameterBin.h"
+#include "Logger.h"
 
 namespace sensekit {
 
@@ -83,6 +84,8 @@ namespace sensekit {
         sensekit_callback_id_t m_binFrontBufferReadyCallbackId;
 
         Signal<StreamConnection*, sensekit_frame_index_t> m_frameReadySignal;
+
+        Logger m_logger;
     };
 }
 
