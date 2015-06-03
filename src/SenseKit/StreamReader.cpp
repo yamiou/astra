@@ -22,13 +22,8 @@ namespace sensekit {
             m_streamSet.destroy_stream_connection(data->connection);
             delete data;
         }
-        m_streamMap.clear();
 
-        for (sensekit_reader_frame_t frame : m_frameList)
-        {
-            delete frame;
-        }
-        m_frameList.clear();
+        m_streamMap.clear();
     }
 
     StreamConnection* StreamReader::find_stream_of_type(sensekit_stream_desc_t& desc)
@@ -219,22 +214,25 @@ namespace sensekit {
     {
         m_logger.trace("%x acquire_reader_frame", this);
 
-        for (sensekit_reader_frame_t frame : m_frameList)
+        for (auto& frame : m_frameList)
         {
             if (frame->status == SENSEKIT_FRAME_STATUS_AVAILABLE)
             {
-                return frame;
+                return frame.get();
             }
         }
 
         //m_frameList empty or all frames locked already
-        _sensekit_reader_frame* newFrame = new _sensekit_reader_frame;
+
+        FramePtr newFrame = std::make_unique<_sensekit_reader_frame>();
         newFrame->id = m_frameList.size();
         newFrame->status = SENSEKIT_FRAME_STATUS_AVAILABLE;
         newFrame->reader = get_handle();
-        m_frameList.push_back(newFrame);
 
-        return newFrame;
+        sensekit_reader_frame_t framePtr = newFrame.get();
+        m_frameList.push_back(std::move(newFrame));
+
+        return framePtr;
     }
 
     sensekit_status_t StreamReader::return_locked_frame(sensekit_reader_frame_t& readerFrame)
@@ -271,7 +269,7 @@ namespace sensekit {
             return SENSEKIT_STATUS_INVALID_PARAMETER;
         }
 
-        sensekit_reader_frame_t checkFrame = m_frameList[readerFrame->id];
+        sensekit_reader_frame_t checkFrame = m_frameList[readerFrame->id].get();
         if (readerFrame != checkFrame)
         {
             m_logger.warn("%x return_locked_frame readerFrame parameter does not match pointer in frameList", this);
@@ -319,11 +317,11 @@ namespace sensekit {
         }
 
         //all frames should be available at this point
-        for (sensekit_reader_frame_t frame : m_frameList)
+        for (auto& frame : m_frameList)
         {
             if (frame->status != SENSEKIT_FRAME_STATUS_AVAILABLE)
             {
-                m_logger.warn("%x unlock_connections_if_able called but connections are not locked", this);
+                m_logger.warn("%x unlock_connections_if_able called but not all frames have been returned", this);
                 assert(frame->status == SENSEKIT_FRAME_STATUS_AVAILABLE);
             }
         }

@@ -113,7 +113,9 @@ namespace sensekit {
                                                  StreamDescEqualTo>;
         ConnectionMap m_streamMap;
 
-        using FrameList = std::vector<_sensekit_reader_frame*>;
+        using FramePtr  = std::unique_ptr<_sensekit_reader_frame>;
+        using FrameList = std::vector<FramePtr>;
+
         FrameList m_frameList;
         int32_t m_lockedFrameCount{0};
 
