@@ -64,7 +64,6 @@ namespace sensekit { namespace plugins {
               m_numComponentPerPixel(numComponentPerPixel)
         {
             PROFILE_FUNC();
-            enable_callbacks();
         }
 
         virtual ~OniDeviceStream()
@@ -104,6 +103,7 @@ namespace sensekit { namespace plugins {
 
             m_isOpen = true;
 
+            enable_callbacks();
             return SENSEKIT_STATUS_SUCCESS;
         }
 
@@ -249,6 +249,7 @@ namespace sensekit { namespace plugins {
                          TBufferBlockType>::on_connection_added(sensekit_streamconnection_t connection)
     {
         PROFILE_FUNC();
+        assert(m_bin != nullptr);
         m_bin->link_connection(connection);
     }
 
