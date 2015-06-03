@@ -55,7 +55,7 @@ namespace sensekit
             case SENSEKIT_EVENT_RESOURCE_AVAILABLE:
                 const char* resourceUri = static_cast<const char*>(data);
 
-                get_logger().debug("resource uri received: %s", resourceUri);
+                get_logger().info("resource uri received: %s", resourceUri);
 
                 unsigned int vid = 0;
                 unsigned int pid = 0;
@@ -67,14 +67,17 @@ namespace sensekit
                 if (scanned == 4)
                 {
                     char oniUri[1024];
-                    snprintf(oniUri, 1024, "%04hx:%04hx@%hhu/%hhu", vid, pid, bus, address);
+                    snprintf(oniUri, 1024, "%04hx/%04hx@%hhu/%hhu", vid, pid, bus, address);
+                    get_logger().info("parsed oniUri: %s", oniUri);
 
                     openni::Array<openni::DeviceInfo> devices;
                     openni::OpenNI::enumerateDevices(&devices);
+                    get_logger().info("num devices: %d", devices.getSize());
 
                     for(int i = 0; i < devices.getSize(); i++)
                     {
                         const openni::DeviceInfo& info = devices[i];
+                        get_logger().info("found sensor: %s", info.getUri());
                         if (strcmp(oniUri, info.getUri()) == 0)
                         {
                             get_logger().info("device connected: %s", info.getUri());
@@ -89,7 +92,7 @@ namespace sensekit
                 }
                 else
                 {
-                    get_logger().debug("unknown resource uri: %s", resourceUri);
+                    get_logger().info("unknown resource uri: %s", resourceUri);
                 }
             }
 #endif
