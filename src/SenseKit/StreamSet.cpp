@@ -51,6 +51,12 @@ namespace sensekit {
             stream = new Stream(desc);
             m_streamCollection.insert(stream);
         }
+        else if (stream->is_available())
+        {
+            m_logger.warn("create_stream for %d,%d already exists, already inflated", desc.type, desc.subtype);
+            assert(!stream->is_available());
+            return nullptr;
+        }
         else
         {
             m_logger.info("create_stream for %d,%d already exists, inflating placeholder stream", desc.type, desc.subtype);
