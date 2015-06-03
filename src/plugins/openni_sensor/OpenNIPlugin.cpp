@@ -55,6 +55,8 @@ namespace sensekit
             case SENSEKIT_EVENT_RESOURCE_AVAILABLE:
                 const char* resourceUri = static_cast<const char*>(data);
 
+                get_logger().debug("resource uri received: %s", resourceUri);
+
                 unsigned int vid = 0;
                 unsigned int pid = 0;
                 unsigned int bus = 0;
@@ -87,7 +89,7 @@ namespace sensekit
                 }
                 else
                 {
-                    get_logger.debug("unknown resource uri: %s", resourceUri);
+                    get_logger().debug("unknown resource uri: %s", resourceUri);
                 }
             }
 #endif
