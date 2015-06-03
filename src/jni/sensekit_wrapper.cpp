@@ -17,14 +17,18 @@ extern "C" {
         sensekit_terminate();
     }
 
-    JNIEXPORT void JNICALL Java_com_orbbec_jni_SenseKit_notify_1resource_1available(JNIEnv* env, jclass cls, jstring uri)
+    JNIEXPORT void JNICALL Java_com_orbbec_jni_SenseKit_notify_1resource_1available(JNIEnv* env,
+                                                                                    jclass cls,
+                                                                                    jstring uri)
     {
         const char* uriString = env->GetStringUTFChars(uri, NULL);
         sensekit_notify_resource_available(uriString);
         env->ReleaseStringUTFChars(uri, uriString);
     }
 
-    JNIEXPORT void JNICALL Java_com_orbbec_jni_SenseKit_notify_1resource_1unavailable(JNIEnv* env, jclass cls, jstring uri)
+    JNIEXPORT void JNICALL Java_com_orbbec_jni_SenseKit_notify_1resource_1unavailable(JNIEnv* env,
+                                                                                      jclass cls,
+                                                                                      jstring uri)
     {
         const char* uriString = env->GetStringUTFChars(uri, NULL);
         sensekit_notify_resource_unavailable(uriString);

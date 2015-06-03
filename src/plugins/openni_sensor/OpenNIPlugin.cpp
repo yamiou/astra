@@ -63,7 +63,7 @@ namespace sensekit
                 sscanf(resourceUri, "usb/%u/%u/%u/%u", &vid, &pid, &bus, &address);
 
                 char oniUri[1024];
-                snprintf(oniUri, 1024, "%.4x/%.4x@%x/%x", vid, pid, bus, address);
+                snprintf(oniUri, 1024, "%04hx:%04hx@%hhu/%hhu", vid, pid, bus, address);
 
                 openni::Array<openni::DeviceInfo> devices;
                 openni::OpenNI::enumerateDevices(&devices);
@@ -75,10 +75,11 @@ namespace sensekit
                     {
                         get_logger().info("device connected: %s", info.getUri());
 
-                        OniDeviceStreamSet* set = new OniDeviceStreamSet(get_pluginService(), &info);
-                        set->open();
+                        SetPtr setPtr = std::make_unique<OniDeviceStreamSet>(get_pluginService(), &info);
+                        setPtr->open();
 
-                        m_sets.push_back(SetPtr(set));
+                        m_sets.push_back(std::move(setPtr));
+                        break;
                     }
                 }
             }
@@ -91,10 +92,10 @@ namespace sensekit
 #ifndef __ANDROID__
             get_logger().info("device connected: %s", info->getUri());
 
-            OniDeviceStreamSet* set = new OniDeviceStreamSet(get_pluginService(), info);
-            set->open();
+            SetPtr setPtr = std::make_unique<OniDeviceStreamSet>(get_pluginService(), info);
+            setPtr->open();
 
-            m_sets.push_back(SetPtr(set));
+            m_sets.push_back(std::move(setPtr));
 #endif
         }
 
