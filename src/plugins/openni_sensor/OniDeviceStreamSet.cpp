@@ -90,7 +90,9 @@ namespace sensekit { namespace plugins {
     sensekit_status_t OniDeviceStreamSet::open_sensor_streams()
     {
         PROFILE_FUNC();
-        if (m_oniDevice.hasSensor(openni::SENSOR_COLOR))
+
+        bool enableColor = false;
+        if (enableColor && m_oniDevice.hasSensor(openni::SENSOR_COLOR))
         {
             OniColorStream* stream = new OniColorStream(m_pluginService,
                                                         *m_sensor,
