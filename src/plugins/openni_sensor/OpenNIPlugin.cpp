@@ -81,11 +81,7 @@ namespace sensekit
                         if (strcmp(oniUri, info.getUri()) == 0)
                         {
                             get_logger().info("device connected: %s", info.getUri());
-
-                            SetPtr setPtr = std::make_unique<OniDeviceStreamSet>(get_pluginService(), &info);
-                            setPtr->open();
-
-                            m_sets.push_back(std::move(setPtr));
+                            add_or_get_device(info.getUri());
                             break;
                         }
                     }
@@ -98,16 +94,40 @@ namespace sensekit
 #endif
         }
 
+        OniDeviceStreamSet* OpenNIPlugin::add_or_get_device(const char* oniUri)
+
+        {
+            OniDeviceStreamSet* device = find_device(oniUri);
+
+            if (device)
+                return device;
+
+            SetPtr setPtr = std::make_unique<OniDeviceStreamSet>(get_pluginService(), oniUri);
+            setPtr->open();
+
+            device = setPtr.get();
+            m_sets.push_back(std::move(setPtr));
+
+            return device;
+        }
+
+        OniDeviceStreamSet* OpenNIPlugin::find_device(const char* oniUri)
+        {
+            auto it = std::find_if(m_sets.begin(), m_sets.end(),
+                                   [&oniUri] (SetPtr& setPtr) -> bool
+                                   {
+                                       return setPtr->get_uri() == oniUri;
+                                   });
+
+            return it != m_sets.end() ? it->get() : nullptr;
+        }
+
         void OpenNIPlugin::onDeviceConnected(const ::openni::DeviceInfo* info)
         {
             PROFILE_FUNC();
 #ifndef __ANDROID__
             get_logger().info("device connected: %s", info->getUri());
-
-            SetPtr setPtr = std::make_unique<OniDeviceStreamSet>(get_pluginService(), info);
-            setPtr->open();
-
-            m_sets.push_back(std::move(setPtr));
+            add_or_get_device(info->getUri());
 #endif
         }
 

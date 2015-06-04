@@ -42,6 +42,9 @@ namespace sensekit
             virtual void onDeviceConnected(const ::openni::DeviceInfo* info) override;
             virtual void onDeviceDisconnected(const ::openni::DeviceInfo* info) override;
 
+            OniDeviceStreamSet* add_or_get_device(const char* oniUri);
+            OniDeviceStreamSet* find_device(const char* oniUri);
+
             sensekit_status_t read_streams();
 
             using SetPtr = std::unique_ptr<OniDeviceStreamSet>;

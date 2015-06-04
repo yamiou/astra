@@ -4,12 +4,12 @@
 namespace sensekit { namespace plugins {
 
     OniDeviceStreamSet::OniDeviceStreamSet(PluginServiceProxy& pluginService,
-                                           const openni::DeviceInfo* info)
+                                           const char* uri)
         : m_logger(pluginService, "OniDeviceStreamSet"),
-          m_pluginService(pluginService)
+          m_pluginService(pluginService),
+          m_uri(uri)
     {
         PROFILE_FUNC();
-        m_uri = info->getUri();
         m_pluginService.create_stream_set(m_streamSetHandle);
         m_sensor = std::make_unique<Sensor>(m_streamSetHandle);
     }
