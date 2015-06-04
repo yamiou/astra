@@ -88,8 +88,37 @@ namespace sensekit { namespace plugins {
 
             get_logger().info("created oni stream of type: %d", get_description().get_type());
 
+            const openni::SensorInfo& pInfo = m_oniStream.getSensorInfo();
+            auto& modes = pInfo.getSupportedVideoModes();
+
+            get_logger().info("stream type %d supports modes:", get_description().get_type());
+
+            for(int i = 0; i < modes.getSize(); i++)
+            {
+                const openni::VideoMode& mode = modes[i];
+
+                if (mode.getResolutionX() == 320 &&
+                    mode.getResolutionY() == 240 &&
+                    mode.getFps() == 30 &&
+                    mode.getPixelFormat() == openni::PIXEL_FORMAT_DEPTH_1_MM)
+                {
+                    m_oniStream.setVideoMode(mode);
+                }
+
+                get_logger().info("- w: %d h: %d fps: %d pf: %d",
+                        mode.getResolutionX(),
+                        mode.getResolutionY(),
+                        mode.getFps(),
+                        mode.getPixelFormat());
+            }
+
             m_oniVideoMode = m_oniStream.getVideoMode();
 
+            get_logger().info("Selected mode: w: %d h: %d fps: %d pf: %d",
+                        m_oniVideoMode.getResolutionX(),
+                        m_oniVideoMode.getResolutionY(),
+                        m_oniVideoMode.getFps(),
+                        m_oniVideoMode.getPixelFormat());
             m_bufferLength =
                 m_oniVideoMode.getResolutionX() *
                 m_oniVideoMode.getResolutionY() *
