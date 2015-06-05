@@ -353,7 +353,8 @@ void process_key_input(sensekit::StreamReader& reader, HandDebugFrameListener& l
     {
         listener.toggle_output_fps();
     }
-    if (key.code == sf::Keyboard::Tilde)
+    if (key.code == sf::Keyboard::Tilde ||
+        key.code == sf::Keyboard::Dash)
     {
         request_view_mode(reader, DEBUG_HAND_VIEW_DEPTH);
     }
