@@ -632,7 +632,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
                     //failed N consecutive tests within the probation period
                     //gave the active point a few extra frames to recover
-                    trackedPoint.trackingStatus = TrackingStatus::Dead;
+                    trackedPoint.trackingStatus = TrackingStatus::Lost;
                     exitProbation = true;
                 }
             }
@@ -640,7 +640,7 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 //failed N tests total (non-consecutive) within the probation period
                 //too many failed tests, so long...
-                trackedPoint.trackingStatus = TrackingStatus::Dead;
+                trackedPoint.trackingStatus = TrackingStatus::Lost;
                 exitProbation = true;
             }
 
