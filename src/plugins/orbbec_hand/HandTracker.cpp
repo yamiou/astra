@@ -170,7 +170,10 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_depthStream.coordinateMapper(),
                                             depthToWorldData);
 
-            m_pointProcessor.initialize_common_calculations(updateMatrices);
+            if (!m_debugImageStream->pause_input())
+            {
+                m_pointProcessor.initialize_common_calculations(updateMatrices);
+            }
 
             //Update existing points first so that if we lose a point, we might recover it in the "add new" stage below
             //without having at least one frame of a lost point.
