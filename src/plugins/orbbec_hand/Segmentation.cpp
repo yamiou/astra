@@ -201,6 +201,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         const float pointInertiaFactor = data.pointInertiaFactor;
         const float pointInertiaRadius = data.pointInertiaRadius;
         const sensekit::Vector3f* worldPoints = data.matrices.worldPoints;
+        cv::Mat& segmentationMatrix = data.matrices.layerSegmentation;
 
         ScalingCoordinateMapper mapper = get_scaling_mapper(data.matrices);
 
@@ -224,9 +225,21 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             float* basicScoreRow = basicScoreMatrix.ptr<float>(y);
             float* edgeDistanceRow = edgeDistanceMatrix.ptr<float>(y);
             float* layerScoreRow = layerScoreMatrix.ptr<float>(y);
+            char* segmentationRow = segmentationMatrix.ptr<char>(y);
 
-            for (int x = 0; x < width; ++x, ++depthRow, ++worldPoints, ++basicScoreRow, ++edgeDistanceRow, ++layerScoreRow)
+            for (int x = 0; x < width; ++x,
+                                       ++depthRow,
+                                       ++worldPoints,
+                                       ++basicScoreRow,
+                                       ++edgeDistanceRow,
+                                       ++layerScoreRow,
+                                       ++segmentationRow)
             {
+                if (*segmentationRow != PixelType::Foreground)
+                {
+                    continue;
+                }
+
                 float depth = *depthRow;
                 if (depth != 0 && x > minX && x < maxX && y > minY && y < maxY)
                 {
