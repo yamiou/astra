@@ -65,6 +65,8 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat& foregroundSearched;
         cv::Mat& debugSegmentation;
         cv::Mat& debugScore;
+        cv::Mat& debugTestPassMap;
+        bool enableTestPassMap;
         const sensekit::Vector3f* fullSizeWorldPoints;
         sensekit::Vector3f* worldPoints;
         bool debugLayersEnabled;
@@ -84,6 +86,8 @@ namespace sensekit { namespace plugins { namespace hand {
                          cv::Mat& layerEdgeDistance,
                          cv::Mat& debugSegmentation,
                          cv::Mat& debugScore,
+                         cv::Mat& debugTestPassMap,
+                         bool enableTestPassMap,
                          const sensekit::Vector3f* fullSizeWorldPoints,
                          sensekit::Vector3f* worldPoints,
                          bool debugLayersEnabled,
@@ -102,6 +106,8 @@ namespace sensekit { namespace plugins { namespace hand {
             foregroundSearched(foregroundSearched),
             debugSegmentation(debugSegmentation),
             debugScore(debugScore),
+            debugTestPassMap(debugTestPassMap),
+            enableTestPassMap(enableTestPassMap),
             fullSizeWorldPoints(fullSizeWorldPoints),
             worldPoints(worldPoints),
             debugLayersEnabled(debugLayersEnabled),

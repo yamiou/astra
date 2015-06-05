@@ -168,6 +168,8 @@ namespace sensekit { namespace plugins { namespace hand {
 
         cv::Point newTargetPoint = segmentation::converge_track_point_from_seed(updateTrackingData);
 
+        calculateTestPassMap(matrices);
+
         validateAndUpdateTrackedPoint(matrices, scalingMapper, trackedPoint, newTargetPoint);
 
         //lost a tracked point, try to guess the position using previous position delta for second chance to recover
@@ -348,6 +350,52 @@ namespace sensekit { namespace plugins { namespace hand {
             }
         }
         return passed;
+    }
+
+    void PointProcessor::calculateTestPassMap(TrackingMatrices& matrices)
+    {
+        if (!matrices.enableTestPassMap)
+        {
+            return;
+        }
+
+        int width = matrices.depth.cols;
+        int height = matrices.depth.rows;
+
+        cv::Mat& testPassMap = matrices.debugTestPassMap;
+        cv::Mat& segmentationMatrix = matrices.layerSegmentation;
+        const bool outputTestLog = false;
+
+        for (int y = 0; y < height; ++y)
+        {
+            char* testPassMapRow = testPassMap.ptr<char>(y);
+            char* segmentationRow = segmentationMatrix.ptr<char>(y);
+
+            for (int x = 0; x < width; ++x, ++testPassMapRow, ++segmentationRow)
+            {
+                if (*segmentationRow != PixelType::Foreground)
+                {
+                    continue;
+                }
+                cv::Point seedPosition(x, y);
+                bool validPointInRange = test_point_in_range(matrices, seedPosition, -1, outputTestLog);
+                bool validPointArea = false;
+                bool validRadiusTest = false;
+
+                if (validPointInRange)
+                {
+                    validPointArea = test_point_area(matrices, seedPosition, -1, outputTestLog);
+                    validRadiusTest = test_foreground_radius_percentage(matrices, seedPosition, -1, outputTestLog);
+                }
+
+                bool passAllTests = validPointInRange && validPointArea && validRadiusTest;
+
+                if (passAllTests)
+                {
+                    *testPassMapRow = PixelType::Foreground;
+                }
+            }
+        }
     }
 
     void PointProcessor::update_full_resolution_points(TrackingMatrices& matrices)

@@ -126,6 +126,7 @@ namespace sensekit { namespace plugins { namespace hand {
             m_refineForegroundSearched = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_debugUpdateScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_debugCreateScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
+            m_debugTestPassMap = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_matDepthWindow = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_refineSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_refineScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
@@ -147,6 +148,7 @@ namespace sensekit { namespace plugins { namespace hand {
             const conversion_cache_t depthToWorldData = m_depthStream.depth_to_world_data();
 
             bool debugLayersEnabled = m_debugImageStream->has_connections();
+            bool enabledTestPassMap = m_debugImageStream->view_type() == DEBUG_HAND_VIEW_TEST_PASS_MAP;
 
             TrackingMatrices updateMatrices(matDepthFullSize,
                                             matDepth,
@@ -160,6 +162,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_layerEdgeDistance,
                                             m_debugUpdateSegmentation,
                                             m_debugUpdateScore,
+                                            m_debugTestPassMap,
+                                            enabledTestPassMap,
                                             fullSizeWorldPoints,
                                             m_worldPoints,
                                             debugLayersEnabled,
@@ -187,6 +191,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_layerEdgeDistance,
                                             m_debugCreateSegmentation,
                                             m_debugCreateScore,
+                                            m_debugTestPassMap,
+                                            enabledTestPassMap,
                                             fullSizeWorldPoints,
                                             m_worldPoints,
                                             debugLayersEnabled,
@@ -283,6 +289,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                                 m_refineEdgeDistance,
                                                 m_debugRefineSegmentation,
                                                 m_debugRefineScore,
+                                                m_debugTestPassMap,
+                                                enabledTestPassMap,
                                                 fullSizeWorldPoints,
                                                 m_worldPoints,
                                                 false,
@@ -468,6 +476,7 @@ namespace sensekit { namespace plugins { namespace hand {
             RGBPixel foregroundColor(0, 0, 255);
             RGBPixel searchedColor(128, 255, 0);
             RGBPixel searchedColor2(0, 128, 255);
+            RGBPixel testPassColor(0, 255, 128);
 
             DebugHandViewType view = m_debugImageStream->view_type();
 
@@ -524,13 +533,22 @@ namespace sensekit { namespace plugins { namespace hand {
                 m_debugVisualizer.showDepthMat(m_matDepthWindow,
                                                colorFrame);
                 break;
+            case DEBUG_HAND_VIEW_TEST_PASS_MAP:
+                m_debugVisualizer.showDepthMat(m_matDepth,
+                                               colorFrame);
+                m_debugVisualizer.overlayMask(m_debugTestPassMap,
+                                              colorFrame,
+                                              testPassColor,
+                                              PixelType::Foreground);
+                break;
             }
 
             if (view != DEBUG_HAND_VIEW_HANDWINDOW &&
                 view != DEBUG_HAND_VIEW_CREATE_SCORE &&
                 view != DEBUG_HAND_VIEW_UPDATE_SCORE &&
                 view != DEBUG_HAND_VIEW_DEPTH_MOD &&
-                view != DEBUG_HAND_VIEW_DEPTH_AVG)
+                view != DEBUG_HAND_VIEW_DEPTH_AVG &&
+                view != DEBUG_HAND_VIEW_TEST_PASS_MAP)
             {
                 if (view == DEBUG_HAND_VIEW_CREATE_SEARCHED)
                 {

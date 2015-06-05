@@ -255,6 +255,9 @@ public:
         case DEBUG_HAND_VIEW_HANDWINDOW:
             return "Hand window";
             break;
+        case DEBUG_HAND_VIEW_TEST_PASS_MAP:
+            return "Test pass map";
+            break;
         default:
             return "Unknown view";
             break;
@@ -406,9 +409,13 @@ void process_key_input(sensekit::StreamReader& reader, HandDebugFrameListener& l
     {
         request_view_mode(reader, DEBUG_HAND_VIEW_HANDWINDOW);
     }
-    else if (key.code == sf::Keyboard::Dash)
+    else if (key.code == sf::Keyboard::W)
     {
         request_view_mode(reader, DEBUG_HAND_VIEW_DEPTH_AVG);
+    }
+    else if (key.code == sf::Keyboard::E)
+    {
+        request_view_mode(reader, DEBUG_HAND_VIEW_TEST_PASS_MAP);
     }
     else if (key.code == sf::Keyboard::M)
     {

@@ -73,6 +73,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                       const cv::Point3f& newWorldPosition,
                                                       const float resizeFactor,
                                                       const CoordinateMapper& fullSizeMapper);
+        void calculateTestPassMap(TrackingMatrices& matrices);
 
         PointProcessorSettings& m_settings;
         PluginLogger& m_logger;
