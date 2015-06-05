@@ -240,22 +240,30 @@ namespace sensekit { namespace plugins { namespace hand {
 
     bool PointProcessor::test_point_in_range(TrackingMatrices& matrices,
                                              const cv::Point& targetPoint,
-                                             TrackingStatus status,
-                                             int trackingId)
+                                             int trackingId,
+                                             bool outputLog)
     {
         PROFILE_FUNC();
         if (targetPoint == segmentation::INVALID_POINT ||
             targetPoint.x < 0 || targetPoint.x >= matrices.depth.cols ||
             targetPoint.y < 0 || targetPoint.y >= matrices.depth.rows)
         {
-            if (status == TrackingStatus::Tracking)
+            if (outputLog)
             {
-                m_logger.trace("test_point_in_range failed #%d: position: (%d, %d)",
-                               trackingId,
-                               targetPoint.x,
-                               targetPoint.y);
+                m_logger.info("test_point_in_range failed #%d: position: (%d, %d)",
+                              trackingId,
+                              targetPoint.x,
+                              targetPoint.y);
             }
             return false;
+        }
+
+        if (outputLog)
+        {
+            m_logger.info("test_point_in_range success #%d: position: (%d, %d)",
+                          trackingId,
+                          targetPoint.x,
+                          targetPoint.y);
         }
 
         return true;
@@ -263,37 +271,41 @@ namespace sensekit { namespace plugins { namespace hand {
 
     bool PointProcessor::test_point_area(TrackingMatrices& matrices,
                                          const cv::Point& targetPoint,
-                                         TrackingStatus status,
-                                         int trackingId)
+                                         int trackingId,
+                                         bool outputLog)
     {
         PROFILE_FUNC();
         float area = get_point_area(matrices, targetPoint);
 
         bool validPointArea = area > m_minArea && area < m_maxArea;
 
-        if (status == TrackingStatus::Tracking && !validPointArea)
+        if (outputLog)
         {
-            m_logger.trace("test_point_area failed #%d: area %f not within [%f, %f]",
-                           trackingId,
-                           area,
-                           m_minArea,
-                           m_maxArea);
+            if (validPointArea)
+            {
+                m_logger.info("test_point_area passed #%d: area %f within [%f, %f]",
+                              trackingId,
+                              area,
+                              m_minArea,
+                              m_maxArea);
+            }
+            else
+            {
+                m_logger.info("test_point_area failed #%d: area %f not within [%f, %f]",
+                              trackingId,
+                              area,
+                              m_minArea,
+                              m_maxArea);
+            }
         }
-        /*else if (status == TrackingStatus::NotTracking && validPointArea)
-        {
-            m_logger.trace("test_point_area passed: area %f within [%f, %f]",
-                           area,
-                           m_minArea,
-                           m_maxArea);
-        }*/
 
         return validPointArea;
     }
 
     bool PointProcessor::test_foreground_radius_percentage(TrackingMatrices& matrices,
                                                            const cv::Point& targetPoint,
-                                                           TrackingStatus status,
-                                                           int trackingId)
+                                                           int trackingId,
+                                                           bool outputLog)
     {
         PROFILE_FUNC();
         auto scalingMapper = get_scaling_mapper(matrices);
@@ -314,23 +326,27 @@ namespace sensekit { namespace plugins { namespace hand {
         bool passTest2 = percentForeground2 < m_foregroundRadiusMaxPercent2;
         bool passed = passTest1 && passTest2;
 
-        if (status == TrackingStatus::Tracking && !passed)
+        if (outputLog)
         {
-            m_logger.trace("test_foreground_radius_percentage failed #%d: perc1 %f (max %f) perc2 %f (max %f)",
-                           trackingId,
-                           percentForeground1,
-                           m_foregroundRadiusMaxPercent1,
-                           percentForeground2,
-                           m_foregroundRadiusMaxPercent2);
+            if (passed)
+            {
+                m_logger.info("test_foreground_radius_percentage passed #%d: perc1 %f (max %f) perc2 %f (max %f)",
+                              trackingId,
+                              percentForeground1,
+                              m_foregroundRadiusMaxPercent1,
+                              percentForeground2,
+                              m_foregroundRadiusMaxPercent2);
+            }
+            else
+            {
+                m_logger.info("test_foreground_radius_percentage failed #%d: perc1 %f (max %f) perc2 %f (max %f)",
+                              trackingId,
+                              percentForeground1,
+                              m_foregroundRadiusMaxPercent1,
+                              percentForeground2,
+                              m_foregroundRadiusMaxPercent2);
+            }
         }
-        /*else if (status == TrackingStatus::NotTracking && passed)
-        {
-            m_logger.trace("test_foreground_radius_percentage passed: perc1 %f (max %f) perc2 %f (max %f)",
-                           percentForeground1,
-                           m_foregroundRadiusMaxPercent1,
-                           percentForeground2,
-                           m_foregroundRadiusMaxPercent2);
-        }*/
         return passed;
     }
 
@@ -576,15 +592,16 @@ namespace sensekit { namespace plugins { namespace hand {
         }
 
         auto oldStatus = trackedPoint.trackingStatus;
+        bool outputTestLog = false;
 
-        bool validPointInRange = test_point_in_range(matrices, newTargetPoint, trackedPoint.trackingStatus, trackedPoint.trackingId);
+        bool validPointInRange = test_point_in_range(matrices, newTargetPoint, trackedPoint.trackingId, outputTestLog);
         bool validPointArea = false;
         bool validRadiusTest = false;
 
         if (validPointInRange)
         {
-            validPointArea = test_point_area(matrices, newTargetPoint, trackedPoint.trackingStatus, trackedPoint.trackingId);
-            validRadiusTest = test_foreground_radius_percentage(matrices, newTargetPoint, trackedPoint.trackingStatus, trackedPoint.trackingId);
+            validPointArea = test_point_area(matrices, newTargetPoint, trackedPoint.trackingId, outputTestLog);
+            validRadiusTest = test_foreground_radius_percentage(matrices, newTargetPoint, trackedPoint.trackingId, outputTestLog);
         }
 
         bool passAllTests = validPointInRange && validPointArea && validRadiusTest;
@@ -758,15 +775,16 @@ namespace sensekit { namespace plugins { namespace hand {
 
         cv::Point targetPoint = segmentation::converge_track_point_from_seed(createTrackingData);
 
-        bool validPointInRange = test_point_in_range(matrices, targetPoint, TrackingStatus::NotTracking, -1);
+        bool outputTestLog = false;
+        bool validPointInRange = test_point_in_range(matrices, targetPoint, -1, outputTestLog);
 
         if (!validPointInRange)
         {
             return;
         }
 
-        bool validPointArea = test_point_area(matrices, targetPoint, TrackingStatus::NotTracking, -1);
-        bool validRadiusTest = test_foreground_radius_percentage(matrices, targetPoint, TrackingStatus::NotTracking, -1);
+        bool validPointArea = test_point_area(matrices, targetPoint, -1, outputTestLog);
+        bool validRadiusTest = test_foreground_radius_percentage(matrices, targetPoint, -1, outputTestLog);
 
         if (!validPointArea || !validRadiusTest)
         {

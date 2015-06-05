@@ -39,16 +39,18 @@ namespace sensekit { namespace plugins { namespace hand {
         float foregroundRadius2() const { return m_foregroundRadius2; }
 
         float get_point_area(TrackingMatrices& matrices, const cv::Point& point);
-        bool test_point_in_range(TrackingMatrices& matrices, const cv::Point& targetPoint, TrackingStatus status, int trackingId);
-
+        bool test_point_in_range(TrackingMatrices& matrices,
+                                 const cv::Point& targetPoint,
+                                 int trackingId,
+                                 bool outputLog);
         bool test_point_area(TrackingMatrices& matrices,
                              const cv::Point& targetPoint,
-                             TrackingStatus status,
-                             int trackingId);
+                             int trackingId,
+                             bool outputLog);
         bool test_foreground_radius_percentage(TrackingMatrices& matrices,
                                                const cv::Point& targetPoint,
-                                               TrackingStatus status,
-                                               int trackingId);
+                                               int trackingId,
+                                               bool outputLog);
 
     private:
         cv::Point3f smooth_world_positions(const cv::Point3f& oldWorldPosition, const cv::Point3f& newWorldPosition);

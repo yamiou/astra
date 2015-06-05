@@ -239,10 +239,12 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 cv::Point seedPosition = get_mouse_probe_position();
 
+                bool outputTestLog = true;
+
                 bool validPointInRange = m_pointProcessor.test_point_in_range(createMatrices,
                                                                               seedPosition,
-                                                                              TrackingStatus::NotTracking,
-                                                                              -1);
+                                                                              0,
+                                                                              outputTestLog);
                 bool validPointArea = false;
                 bool validRadiusTest = false;
 
@@ -250,18 +252,18 @@ namespace sensekit { namespace plugins { namespace hand {
                 {
                     validPointArea = m_pointProcessor.test_point_area(createMatrices,
                                                                       seedPosition,
-                                                                      TrackingStatus::NotTracking,
-                                                                      -1);
+                                                                      0,
+                                                                      outputTestLog);
                     validRadiusTest = m_pointProcessor.test_foreground_radius_percentage(createMatrices,
                                                                                          seedPosition,
-                                                                                         TrackingStatus::NotTracking,
-                                                                                         -1);
+                                                                                         0,
+                                                                                         outputTestLog);
                 }
 
-                printf("point test: inRange: %d validArea: %d validRadius: %d\n",
-                            validPointInRange,
-                            validPointArea,
-                            validRadiusTest);
+                m_logger.info("point test: inRange: %d validArea: %d validRadius: %d\n",
+                              validPointInRange,
+                              validPointArea,
+                              validRadiusTest);
 
                 m_debugImageStream->clear_spawn_point_request();
             }
