@@ -205,10 +205,7 @@ namespace sensekit { namespace plugins { namespace hand {
             }
             else
             {
-                auto normPosition = m_debugImageStream->mouse_norm_position();
-                int x = MAX(0, MIN(m_processingSizeWidth, normPosition.x * m_processingSizeWidth));
-                int y = MAX(0, MIN(m_processingSizeHeight, normPosition.y * m_processingSizeHeight));
-                cv::Point seedPosition(x, y);
+                cv::Point seedPosition = get_mouse_probe_position();
                 m_pointProcessor.updateTrackedPointOrCreateNewPointFromSeedPosition(createMatrices, seedPosition);
 
                 float area = m_pointProcessor.get_point_area(createMatrices, seedPosition);
@@ -238,6 +235,37 @@ namespace sensekit { namespace plugins { namespace hand {
                                                                         score);
             }
 
+            if (m_debugImageStream->spawn_point_requested())
+            {
+                cv::Point seedPosition = get_mouse_probe_position();
+
+                bool validPointInRange = m_pointProcessor.test_point_in_range(createMatrices,
+                                                                              seedPosition,
+                                                                              TrackingStatus::NotTracking,
+                                                                              -1);
+                bool validPointArea = false;
+                bool validRadiusTest = false;
+
+                if (validPointInRange)
+                {
+                    validPointArea = m_pointProcessor.test_point_area(createMatrices,
+                                                                      seedPosition,
+                                                                      TrackingStatus::NotTracking,
+                                                                      -1);
+                    validRadiusTest = m_pointProcessor.test_foreground_radius_percentage(createMatrices,
+                                                                                         seedPosition,
+                                                                                         TrackingStatus::NotTracking,
+                                                                                         -1);
+                }
+
+                printf("point test: inRange: %d validArea: %d validRadius: %d\n",
+                            validPointInRange,
+                            validPointArea,
+                            validRadiusTest);
+
+                m_debugImageStream->clear_spawn_point_request();
+            }
+
             //remove old points
             m_pointProcessor.removeOldOrDeadPoints();
 
@@ -262,6 +290,14 @@ namespace sensekit { namespace plugins { namespace hand {
             m_pointProcessor.update_full_resolution_points(refinementMatrices);
 
             m_pointProcessor.update_trajectories();
+        }
+
+        cv::Point HandTracker::get_mouse_probe_position()
+        {
+            auto normPosition = m_debugImageStream->mouse_norm_position();
+            int x = MAX(0, MIN(m_processingSizeWidth, normPosition.x * m_processingSizeWidth));
+            int y = MAX(0, MIN(m_processingSizeHeight, normPosition.y * m_processingSizeHeight));
+            return cv::Point(x, y);
         }
 
         void HandTracker::generate_hand_frame(sensekit_frame_index_t frameIndex)

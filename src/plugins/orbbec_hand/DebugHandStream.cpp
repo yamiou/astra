@@ -43,6 +43,11 @@ namespace sensekit { namespace plugins { namespace hand {
                                     sensekit_parameter_data_t inData,
                                     sensekit_parameter_bin_t& parameterBin)
     {
+        switch (commandId)
+        {
+        case SENSEKIT_PARAMETER_DEBUG_HAND_SPAWN_POINT:
+            invoke_spawn_point(inByteLength, inData, parameterBin);
+        }
     }
 
     void DebugHandStream::get_view_parameter(sensekit_parameter_bin_t& parameterBin)
@@ -102,4 +107,12 @@ namespace sensekit { namespace plugins { namespace hand {
             m_pauseInput = newPauseInput;
         }
     }
+
+    void DebugHandStream::invoke_spawn_point(size_t inByteLength,
+                                             sensekit_parameter_data_t inData,
+                                             sensekit_parameter_bin_t& parameterBin)
+    {
+        m_spawnPointRequested = true;
+    }
+
 }}}

@@ -40,6 +40,16 @@ namespace sensekit { namespace plugins { namespace hand {
 
         float get_point_area(TrackingMatrices& matrices, const cv::Point& point);
         bool test_point_in_range(TrackingMatrices& matrices, const cv::Point& targetPoint, TrackingStatus status, int trackingId);
+
+        bool test_point_area(TrackingMatrices& matrices,
+                             const cv::Point& targetPoint,
+                             TrackingStatus status,
+                             int trackingId);
+        bool test_foreground_radius_percentage(TrackingMatrices& matrices,
+                                               const cv::Point& targetPoint,
+                                               TrackingStatus status,
+                                               int trackingId);
+
     private:
         cv::Point3f smooth_world_positions(const cv::Point3f& oldWorldPosition, const cv::Point3f& newWorldPosition);
         void calculate_area(TrackingMatrices& matrices, ScalingCoordinateMapper mapper);
@@ -54,21 +64,14 @@ namespace sensekit { namespace plugins { namespace hand {
                                            ScalingCoordinateMapper& scalingMapper,
                                            TrackedPoint& trackedPoint,
                                            const cv::Point& targetPoint);
-        bool test_point_area(TrackingMatrices& matrices,
-                             const cv::Point& targetPoint,
-                             TrackingStatus status,
-                             int trackingId);
-        bool test_foreground_radius_percentage(TrackingMatrices& matrices,
-                                               const cv::Point& targetPoint,
-                                               TrackingStatus status,
-                                               int trackingId);
+        void start_probation(TrackedPoint& trackedPoint);
+        void end_probation(TrackedPoint& trackedPoint);
+        void update_tracked_point_data(TrackingMatrices& matrices, ScalingCoordinateMapper& scalingMapper, TrackedPoint& trackedPoint, const cv::Point& newTargetPoint);
         void update_tracked_point_from_world_position(TrackedPoint& trackedPoint,
                                                       const cv::Point3f& newWorldPosition,
                                                       const float resizeFactor,
                                                       const CoordinateMapper& fullSizeMapper);
-        void start_probation(TrackedPoint& trackedPoint);
-        void end_probation(TrackedPoint& trackedPoint);
-        void update_tracked_point_data(TrackingMatrices& matrices, ScalingCoordinateMapper& scalingMapper, TrackedPoint& trackedPoint, const cv::Point& newTargetPoint);
+
         PointProcessorSettings& m_settings;
         PluginLogger& m_logger;
         float m_segmentationBandwidthDepthNear;

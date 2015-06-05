@@ -347,6 +347,14 @@ void toggle_pause_input(sensekit::StreamReader& reader)
     reader.stream<sensekit::DebugHandStream>().set_pause_input(g_pauseInput);
 }
 
+void process_mouse_button(sensekit::StreamReader& reader)
+{
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+    {
+        reader.stream<sensekit::DebugHandStream>().spawn_point();
+    }
+}
+
 void process_key_input(sensekit::StreamReader& reader, HandDebugFrameListener& listener, sf::Event::KeyEvent key)
 {
     if (key.code == sf::Keyboard::F)
@@ -456,6 +464,19 @@ int main(int argc, char** argv)
             else if (event.type == sf::Event::MouseMoved)
             {
                 process_mouse_move(window, reader);
+                process_mouse_button(reader);
+            }
+            else if (event.type == sf::Event::MouseButtonPressed)
+            {
+                if (event.mouseButton.button == sf::Mouse::Right)
+                {
+                    toggle_pause_input(reader);
+                }
+                else
+                {
+                    process_mouse_move(window, reader);
+                    process_mouse_button(reader);
+                }
             }
         }
 

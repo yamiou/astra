@@ -157,4 +157,17 @@ SENSEKIT_API_EX sensekit_status_t sensekit_debug_handstream_set_pause_input(sens
                                          reinterpret_cast<sensekit_parameter_data_t>(&pauseInput));
 }
 
+SENSEKIT_API_EX sensekit_status_t sensekit_debug_handstream_spawn_point(sensekit_debug_handstream_t debugHandStream)
+{
+    size_t resultLength;
+    sensekit_result_token_t token;
+    return sensekit_stream_invoke(debugHandStream,
+                                  SENSEKIT_PARAMETER_DEBUG_HAND_SPAWN_POINT,
+                                  0,
+                                  nullptr,
+                                  &resultLength,
+                                  &token);
+}
+
+
 SENSEKIT_END_DECLS
