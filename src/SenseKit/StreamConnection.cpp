@@ -151,15 +151,10 @@ namespace sensekit {
                                          size_t& resultByteLength,
                                          sensekit_result_token_t& token)
     {
-        sensekit_parameter_bin_t parameterBinHandle;
+        sensekit_parameter_bin_t parameterBinHandle = nullptr;
         m_stream->get_parameter(this, id, parameterBinHandle);
 
-        //delete old parameter result -- only one outstanding allowed at a time
-        clear_pending_parameter_result();
-        m_pendingParameterResult = ParameterBin::get_ptr(parameterBinHandle);
-        resultByteLength = m_pendingParameterResult->byteLength();
-        token = parameterBinHandle;
-        //TODO: cache resultData with a token lookup, set the token out parameter
+        cache_parameter_bin_token(parameterBinHandle, resultByteLength, token);
     }
 
     sensekit_status_t StreamConnection::get_result(sensekit_result_token_t token,
@@ -186,10 +181,32 @@ namespace sensekit {
                                   size_t inByteLength,
                                   sensekit_parameter_data_t inData,
                                   size_t& resultByteLength,
-                                  sensekit_result_token_t token)
+                                  sensekit_result_token_t& token)
     {
-        sensekit_parameter_bin_t parameterBin;
-        m_stream->invoke(this, commandId, inByteLength, inData, parameterBin);
+        sensekit_parameter_bin_t parameterBinHandle = nullptr;
+        m_stream->invoke(this, commandId, inByteLength, inData, parameterBinHandle);
+
+        cache_parameter_bin_token(parameterBinHandle, resultByteLength, token);
+    }
+
+    void StreamConnection::cache_parameter_bin_token(sensekit_parameter_bin_t parameterBinHandle,
+                                                     size_t& resultByteLength,
+                                                     sensekit_result_token_t& token)
+    {
+        //delete old parameter result -- only one outstanding allowed at a time
+        clear_pending_parameter_result();
+        if (parameterBinHandle != nullptr)
+        {
+            m_pendingParameterResult = ParameterBin::get_ptr(parameterBinHandle);
+            resultByteLength = m_pendingParameterResult->byteLength();
+            token = parameterBinHandle;
+        }
+        else
+        {
+            m_pendingParameterResult = nullptr;
+            resultByteLength = 0;
+            token = nullptr;
+        }
     }
 
     void StreamConnection::clear_pending_parameter_result()

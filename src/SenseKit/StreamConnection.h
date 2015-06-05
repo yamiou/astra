@@ -62,13 +62,16 @@ namespace sensekit {
 
         void invoke(sensekit_command_id commandId,
                     size_t inByteLength,
-                    sensekit_parameter_data_t    inData,
+                    sensekit_parameter_data_t inData,
                     size_t& resultByteLength,
-                    sensekit_result_token_t token);
+                    sensekit_result_token_t& token);
 
     private:
         void on_bin_front_buffer_ready(StreamBin* bin, sensekit_frame_index_t frameIndex);
         void clear_pending_parameter_result();
+        void cache_parameter_bin_token(sensekit_parameter_bin_t parameterBinHandle,
+                                       size_t& resultByteLength,
+                                       sensekit_result_token_t& token);
 
         _sensekit_streamconnection m_connection;
         sensekit_frame_t* m_currentFrame{nullptr};
