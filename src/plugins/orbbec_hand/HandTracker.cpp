@@ -213,7 +213,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
                 float area = m_pointProcessor.get_point_area(createMatrices, seedPosition);
                 float depth = matDepth.at<float>(seedPosition);
-                float score = m_matBasicScore.at<float>(seedPosition);
+                float score = m_debugCreateScore.at<float>(seedPosition);
                 float edgeDist = m_layerEdgeDistance.at<float>(seedPosition);
 
                 float foregroundRadius1 = m_pointProcessor.foregroundRadius1();
@@ -473,7 +473,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                colorFrame);
                 break;
             case DEBUG_HAND_VIEW_CREATE_SCORE:
-                m_debugVisualizer.showNormArray<float>(m_matBasicScore,
+                m_debugVisualizer.showNormArray<float>(m_debugCreateScore,
                                                        m_debugCreateSegmentation,
                                                        colorFrame);
                 break;

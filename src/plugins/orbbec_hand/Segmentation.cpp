@@ -244,16 +244,9 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                     }
 
                     float edgeDistance = *edgeDistanceRow;
-                    float edgeScore = (targetEdgeDist - std::abs(targetEdgeDist - edgeDistance)) * edgeDistanceFactor;
-                    if (edgeScore > 0)
-                    {
-                        score += edgeScore;
-                    }
-                    else
-                    {
-                        score = 0;
-                    }
+                    float edgeScore = edgeDistanceFactor * std::min(edgeDistance, targetEdgeDist) / targetEdgeDist;
 
+                    score += edgeScore;
 
                     *layerScoreRow = score;
                 }
@@ -272,7 +265,6 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         data.matrices.layerSegmentation = cv::Mat::zeros(size, CV_8UC1);
         data.matrices.layerEdgeDistance = cv::Mat::zeros(size, CV_32FC1);
         data.matrices.layerScore = cv::Mat::zeros(size, CV_32FC1);
-        //data.matrices.matLayerSegmentation.setTo(cv::Scalar(0));
 
         segment_foreground(data);
 
@@ -283,18 +275,16 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         bool activePoint = data.pointType == TrackedPointType::ActivePoint;
 
-        cv::Mat& matScore = data.matrices.basicScore;
+        cv::Mat& matScore = data.matrices.layerScore;
+
         if (activePoint)
         {
             calculate_edge_distance(data.matrices.layerSegmentation,
                                     data.matrices.areaSqrt,
                                     data.matrices.layerEdgeDistance,
                                     data.targetEdgeDistance * 2.0f);
-
-            calculate_layer_score(data);
-
-            matScore = data.matrices.layerScore;
         }
+        calculate_layer_score(data);
 
         double min, max;
         cv::Point minLoc, maxLoc;
@@ -309,13 +299,11 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 data.matrices.debugSegmentation,
                 data.matrices.debugSegmentation,
                 data.matrices.layerSegmentation);
-            if (data.pointType == TrackedPointType::ActivePoint)
-            {
-                cv::Mat scoreMask;
 
-                cv::inRange(data.matrices.layerScore, 1, INT_MAX, scoreMask);
-                cv::normalize(data.matrices.layerScore, data.matrices.debugScore, 0, 1, cv::NORM_MINMAX, -1, scoreMask);
-            }
+            cv::Mat scoreMask;
+            cv::inRange(matScore, 1, INT_MAX, scoreMask);
+            //matScore.copyTo(data.matrices.debugScore, scoreMask);
+            cv::normalize(matScore, data.matrices.debugScore, 0, 1, cv::NORM_MINMAX, -1, scoreMask);
         }
 
         if (maxLoc.x == -1 && maxLoc.y == -1)

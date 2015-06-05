@@ -46,13 +46,13 @@ namespace sensekit { namespace plugins { namespace hand {
         float targetEdgeDistance{ 40 }; //mm
         float heightScoreFactor{ 0.5 };
         float depthScoreFactor{ 1.0 };
-        float edgeDistanceScoreFactor{ 4.0 };
-        float pointInertiaFactor{ 50.0 };
-        float pointInertiaRadius{ 60 }; //mm
+        float edgeDistanceScoreFactor{ 100.0 };
+        float pointInertiaFactor{ 100.0 };
+        float pointInertiaRadius{ 100.0 }; //mm
         int maxInactiveFramesForCandidatePoints{ 60 };
         int maxInactiveFramesForLostPoints{ 15 };
         int maxInactiveFramesForActivePoints{ 480 };
-        float pointSmoothingFactor{ 0.5 };
+        float pointSmoothingFactor{ 0.95 };
         float pointDeadBandSmoothingFactor{ 0.05 };
         float pointSmoothingDeadZone{ 50 }; //mm
         float foregroundRadius1{ 100 };
