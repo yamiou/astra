@@ -87,7 +87,10 @@ namespace sensekit { namespace plugins { namespace hand {
         void HandTracker::update_tracking(DepthFrame& depthFrame, PointFrame& pointFrame)
         {
             PROFILE_FUNC();
-            m_depthUtility.processDepthToVelocitySignal(depthFrame, m_matDepth, m_matDepthFullSize, m_matVelocitySignal);
+            if (!m_debugImageStream->pause_input())
+            {
+                m_depthUtility.processDepthToVelocitySignal(depthFrame, m_matDepth, m_matDepthFullSize, m_matVelocitySignal);
+            }
 
             track_points(m_matDepth, m_matDepthFullSize, m_matVelocitySignal, pointFrame.data());
 
@@ -210,6 +213,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
                 float area = m_pointProcessor.get_point_area(createMatrices, seedPosition);
                 float depth = matDepth.at<float>(seedPosition);
+                float score = m_matBasicScore.at<float>(seedPosition);
                 float edgeDist = m_layerEdgeDistance.at<float>(seedPosition);
 
                 float foregroundRadius1 = m_pointProcessor.foregroundRadius1();
@@ -226,11 +230,12 @@ namespace sensekit { namespace plugins { namespace hand {
                                                                                                    seedPosition,
                                                                                                    foregroundRadius2,
                                                                                                    mapper);
-                printf("depth: %f fg1: %f fg2: %f edge: %f area: %f\n", depth,
+                printf("depth: %f fg1: %f fg2: %f edge: %f area: %f score: %f\n", depth,
                                                                         percentForeground1,
                                                                         percentForeground2,
                                                                         edgeDist,
-                                                                        area);
+                                                                        area,
+                                                                        score);
             }
 
             //remove old points
@@ -468,7 +473,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                colorFrame);
                 break;
             case DEBUG_HAND_VIEW_CREATE_SCORE:
-                m_debugVisualizer.showNormArray<float>(m_debugCreateScore,
+                m_debugVisualizer.showNormArray<float>(m_matBasicScore,
                                                        m_debugCreateSegmentation,
                                                        colorFrame);
                 break;

@@ -54,6 +54,9 @@ SENSEKIT_API_EX sensekit_status_t sensekit_debug_handstream_set_mouse_position(s
 SENSEKIT_API_EX sensekit_status_t sensekit_debug_handstream_set_use_mouse_probe(sensekit_debug_handstream_t debugHandStream,
                                                                                 bool useMouseProbe);
 
+SENSEKIT_API_EX sensekit_status_t sensekit_debug_handstream_set_pause_input(sensekit_debug_handstream_t debugHandStream,
+                                                                            bool pauseInput);
+
 SENSEKIT_END_DECLS
 
 #endif // HAND_CAPI_H

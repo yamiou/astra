@@ -34,6 +34,11 @@ namespace sensekit {
             sensekit_debug_handstream_set_mouse_position(m_debugHandStream, position);
         }
 
+        void set_pause_input(bool pauseInput)
+        {
+            sensekit_debug_handstream_set_pause_input(m_debugHandStream, pauseInput);
+        }
+
         DebugHandViewType get_view_type()
         {
             DebugHandViewType view;

@@ -333,11 +333,18 @@ void process_mouse_move(sf::RenderWindow& window, sensekit::StreamReader& reader
 }
 
 static bool g_mouseProbe = false;
+static bool g_pauseInput = false;
 
 void toggle_mouse_probe(sensekit::StreamReader& reader)
 {
     g_mouseProbe = !g_mouseProbe;
     reader.stream<sensekit::DebugHandStream>().set_use_mouse_probe(g_mouseProbe);
+}
+
+void toggle_pause_input(sensekit::StreamReader& reader)
+{
+    g_pauseInput = !g_pauseInput;
+    reader.stream<sensekit::DebugHandStream>().set_pause_input(g_pauseInput);
 }
 
 void process_key_input(sensekit::StreamReader& reader, HandDebugFrameListener& listener, sf::Event::KeyEvent key)
@@ -397,6 +404,10 @@ void process_key_input(sensekit::StreamReader& reader, HandDebugFrameListener& l
     else if (key.code == sf::Keyboard::M)
     {
         toggle_mouse_probe(reader);
+    }
+    else if (key.code == sf::Keyboard::P)
+    {
+        toggle_pause_input(reader);
     }
 }
 
