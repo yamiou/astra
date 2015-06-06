@@ -79,8 +79,9 @@ namespace sensekit {
         TrackedInstance();
         virtual ~TrackedInstance();
 
-        TrackedInstance(TrackedInstance&&) = default;
-        TrackedInstance& operator=(TrackedInstance&&) = default;
+        // comment these out until we find a workaround for VS2013
+        //TrackedInstance(TrackedInstance&&) = default;
+        //TrackedInstance& operator=(TrackedInstance&&) = default;
 
         TrackedInstance(const TrackedInstance&) = default;
         TrackedInstance& operator=(const TrackedInstance&) = default;
