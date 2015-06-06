@@ -32,7 +32,9 @@ namespace sensekit {
         m_logger = std::make_unique<Logger>("Context");
 
         m_logger->warn("Hold on to yer butts");
+#ifdef NYAN_MODE
         log_nyan(*m_logger.get());
+#endif
         m_logger->info("logger file: %s", logPath.c_str());
 
         m_streamServiceProxy = create_stream_proxy(this);
