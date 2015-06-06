@@ -62,7 +62,7 @@ namespace sensekit {
     sensekit_status_t SenseKitContext::terminate()
     {
         if (!m_initialized)
-            return SENSEKIT_STATUS_SUCCESS;
+            return SENSEKIT_STATUS_UNINITIALIZED;
 
         m_pluginManager.reset();
 
@@ -78,7 +78,6 @@ namespace sensekit {
 
     sensekit_status_t SenseKitContext::streamset_open(const char* uri, sensekit_streamsetconnection_t& streamSet)
     {
-
         m_logger->info("client opening streamset: %s", uri);
 
         StreamSetConnection& conn = m_setCatalog.open_set_connection(uri);
@@ -96,25 +95,19 @@ namespace sensekit {
         }
 
         StreamSetConnection* actualConnection = StreamSetConnection::get_ptr(streamSet);
-//TODO: move inside stream sets, ughh
 
-        if (actualConnection->is_connected())
+        if (actualConnection)
         {
-            auto it = m_readers.begin();
-            while (it != m_readers.end())
-            {
-                if (&(*it)->get_streamSet() == actualConnection->get_streamSet())
-                {
-                    it = m_readers.erase(it);
-                }
-            }
+            m_setCatalog.close_set_connection(actualConnection);
+        }
+        else
+        {
+            m_logger->warn("attempt to close a non-existent stream set");
         }
 
-        m_logger->info("client closing streamset");
-        m_setCatalog.close_set_connection(actualConnection);
         streamSet = nullptr;
 
-        return SENSEKIT_STATUS_SUCCESS;
+        return actualConnection != nullptr ? SENSEKIT_STATUS_SUCCESS : SENSEKIT_STATUS_INVALID_PARAMETER;
     }
 
     // char* SenseKitContext::get_status_string(sensekit_status_t status)
@@ -129,38 +122,37 @@ namespace sensekit {
         assert(streamSet != nullptr);
 
         StreamSetConnection* actualConnection = StreamSetConnection::get_ptr(streamSet);
-        ReaderPtr actualReader(new StreamReader(*actualConnection->get_streamSet()));
 
-        reader = actualReader->get_handle();
+        if (actualConnection)
+        {
+            StreamReader* actualReader = actualConnection->create_reader();
+            m_activeReaders.push_back(actualReader);
 
-        m_readers.push_back(std::move(actualReader));
+            reader = actualReader->get_handle();
 
-        return SENSEKIT_STATUS_SUCCESS;
+            return SENSEKIT_STATUS_SUCCESS;
+        }
+        else
+        {
+            m_logger->warn("attempt to create reader from non-existent stream set");
+            return SENSEKIT_STATUS_INVALID_PARAMETER;
+        }
     }
 
     sensekit_status_t SenseKitContext::reader_destroy(sensekit_reader_t& reader)
     {
         assert(reader != nullptr);
 
-        if (!m_initialized)
-        {
-            reader = nullptr;
-            return SENSEKIT_STATUS_SUCCESS;
-        }
-
         StreamReader* actualReader = StreamReader::get_ptr(reader);
 
-        auto it = std::find_if(m_readers.begin(),
-                               m_readers.end(),
-                               [&actualReader] (ReaderPtr& element)
-                               -> bool
-                               {
-                                   return actualReader == element.get();
-                               });
-
-        if (it != m_readers.end())
+        if (actualReader)
         {
-            m_readers.erase(it);
+            StreamSetConnection& connection = actualReader->get_connection();
+            connection.destroy_reader(actualReader);
+        }
+        else
+        {
+            m_logger->warn("attempt to destroy a non-existent reader: %p", reader);
         }
 
         reader = nullptr;
@@ -177,11 +169,19 @@ namespace sensekit {
 
         StreamReader* actualReader = StreamReader::get_ptr(reader);
 
-        sensekit_stream_desc_t desc;
-        desc.type = type;
-        desc.subtype = subtype;
+        if (actualReader)
+        {
+            sensekit_stream_desc_t desc;
+            desc.type = type;
+            desc.subtype = subtype;
 
-        connection = actualReader->get_stream(desc)->get_handle();
+            connection = actualReader->get_stream(desc)->get_handle();
+        }
+        else
+        {
+            m_logger->warn("get_stream called on non-existent reader");
+            connection = nullptr;
+        }
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -189,7 +189,16 @@ namespace sensekit {
     sensekit_status_t SenseKitContext::stream_get_description(sensekit_streamconnection_t connection,
                                                               sensekit_stream_desc_t* description)
     {
-        *description = StreamConnection::get_ptr(connection)->get_description();
+        StreamConnection* actualConnection = StreamConnection::get_ptr(connection);
+
+        if (actualConnection)
+        {
+            *description = actualConnection->get_description();
+        }
+        else
+        {
+            m_logger->warn("get_description called on non-existent stream");
+        }
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -201,7 +210,14 @@ namespace sensekit {
 
         StreamConnection* actualConnection = StreamConnection::get_ptr(connection);
 
-        actualConnection->start();
+        if (actualConnection)
+        {
+            actualConnection->start();
+        }
+        else
+        {
+            m_logger->warn("start called on non-existent stream");
+        }
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -213,7 +229,14 @@ namespace sensekit {
 
         StreamConnection* actualConnection = StreamConnection::get_ptr(connection);
 
-        actualConnection->stop();
+        if (actualConnection)
+        {
+            actualConnection->start();
+        }
+        else
+        {
+            m_logger->warn("stop called on non-existent stream");
+        }
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -231,7 +254,15 @@ namespace sensekit {
 
         StreamReader* actualReader = StreamReader::get_ptr(reader);
 
-        return actualReader->lock(timeoutMillis, frame);
+        if (actualReader)
+        {
+            return actualReader->lock(timeoutMillis, frame);
+        }
+        else
+        {
+            m_logger->warn("open_frame called on non-existent reader");
+            return SENSEKIT_STATUS_INVALID_PARAMETER;
+        }
     }
 
     sensekit_status_t SenseKitContext::reader_close_frame(sensekit_reader_frame_t& frame)
@@ -245,7 +276,7 @@ namespace sensekit {
 
         StreamReader* actualReader = StreamReader::from_frame(frame);
 
-        if (actualReader == nullptr)
+        if (!actualReader)
         {
             m_logger->warn("reader_close_frame couldn't retrieve StreamReader from frame");
             assert(actualReader != nullptr);
@@ -265,15 +296,23 @@ namespace sensekit {
 
         StreamReader* actualReader = StreamReader::get_ptr(reader);
 
-        CallbackId cbId = actualReader->register_frame_ready_callback(callback, clientTag);
+        if (actualReader)
+        {
+            CallbackId cbId = actualReader->register_frame_ready_callback(callback, clientTag);
 
-        sensekit_reader_callback_id_t cb = new _sensekit_reader_callback_id;
-        callbackId = cb;
+            sensekit_reader_callback_id_t cb = new _sensekit_reader_callback_id;
+            callbackId = cb;
 
-        cb->reader = reader;
-        cb->callbackId = cbId;
+            cb->reader = reader;
+            cb->callbackId = cbId;
 
-        return SENSEKIT_STATUS_SUCCESS;
+            return SENSEKIT_STATUS_SUCCESS;
+        }
+        else
+        {
+            m_logger->warn("register_frame_ready_callback called on non-existent reader");
+            return SENSEKIT_STATUS_INVALID_PARAMETER;
+        }
     }
 
     sensekit_status_t SenseKitContext::reader_unregister_frame_ready_callback(sensekit_reader_callback_id_t& callbackId)
@@ -291,21 +330,20 @@ namespace sensekit {
 
         CallbackId cbId = cb->callbackId;
         StreamReader* actualReader = StreamReader::get_ptr(cb->reader);
-        delete cb;
-        callbackId = nullptr;
 
-        auto it = std::find_if(m_readers.begin(), m_readers.end(),
-                               [&actualReader] (ReaderPtr& readerPtr)
-                               {
-                                   return readerPtr.get() == actualReader;
-                               });
-
-        if (it != m_readers.end())
+        if (actualReader)
         {
             actualReader->unregister_frame_ready_callback(cbId);
         }
+        else
+        {
+            m_logger->warn("unregister_frame_ready_callback for non-existent reader: %p", cb->reader);
+        }
 
-        return SENSEKIT_STATUS_SUCCESS;
+        delete cb;
+        callbackId = nullptr;
+
+        return actualReader != nullptr ? SENSEKIT_STATUS_SUCCESS : SENSEKIT_STATUS_INVALID_PARAMETER;
     }
 
     sensekit_status_t SenseKitContext::reader_get_frame(sensekit_reader_frame_t frame,
@@ -317,13 +355,20 @@ namespace sensekit {
 
         StreamReader* actualReader = StreamReader::from_frame(frame);
 
-        sensekit_stream_desc_t desc;
-        desc.type = type;
-        desc.subtype = subtype;
+        if (actualReader)
+        {
+            sensekit_stream_desc_t desc;
+            desc.type = type;
+            desc.subtype = subtype;
 
-        subFrame = actualReader->get_subframe(desc);
-
-        return SENSEKIT_STATUS_SUCCESS;
+            subFrame = actualReader->get_subframe(desc);
+            return SENSEKIT_STATUS_SUCCESS;
+        }
+        else
+        {
+            m_logger->warn("get_frame called on non-existent reader/frame combo");
+            return SENSEKIT_STATUS_INVALID_PARAMETER;
+        }
     }
 
     sensekit_status_t SenseKitContext::temp_update()
@@ -356,9 +401,17 @@ namespace sensekit {
         assert(connection->handle != nullptr);
 
         StreamConnection* actualConnection = StreamConnection::get_ptr(connection);
-        actualConnection->set_parameter(parameterId, inByteLength, inData);
 
-        return SENSEKIT_STATUS_SUCCESS;
+        if (actualConnection)
+        {
+            actualConnection->set_parameter(parameterId, inByteLength, inData);
+            return SENSEKIT_STATUS_SUCCESS;
+        }
+        else
+        {
+            m_logger->warn("set_parameter called on non-existent stream");
+            return SENSEKIT_STATUS_INVALID_PARAMETER;
+        }
     }
 
     sensekit_status_t SenseKitContext::stream_get_parameter(sensekit_streamconnection_t connection,
@@ -371,9 +424,16 @@ namespace sensekit {
 
         StreamConnection* actualConnection = StreamConnection::get_ptr(connection);
 
-        actualConnection->get_parameter(parameterId, resultByteLength, token);
-
-        return SENSEKIT_STATUS_SUCCESS;
+        if (actualConnection)
+        {
+            actualConnection->get_parameter(parameterId, resultByteLength, token);
+            return SENSEKIT_STATUS_SUCCESS;
+        }
+        else
+        {
+            m_logger->warn("get_parameter called on non-existent stream");
+            return SENSEKIT_STATUS_INVALID_PARAMETER;
+        }
     }
 
     sensekit_status_t SenseKitContext::stream_get_result(sensekit_streamconnection_t connection,
@@ -385,7 +445,15 @@ namespace sensekit {
         assert(connection->handle != nullptr);
 
         StreamConnection* actualConnection = StreamConnection::get_ptr(connection);
-        return actualConnection->get_result(token, dataByteLength, dataDestination);
+        if (actualConnection)
+        {
+            return actualConnection->get_result(token, dataByteLength, dataDestination);
+        }
+        else
+        {
+            m_logger->warn("get_result called on non-existent stream");
+            return SENSEKIT_STATUS_INVALID_PARAMETER;
+        }
     }
 
     sensekit_status_t SenseKitContext::stream_invoke(sensekit_streamconnection_t connection,
@@ -399,9 +467,17 @@ namespace sensekit {
         assert(connection->handle != nullptr);
 
         StreamConnection* actualConnection = StreamConnection::get_ptr(connection);
-        actualConnection->invoke(commandId, inByteLength, inData, resultByteLength, token);
 
-        return SENSEKIT_STATUS_SUCCESS;
+        if (actualConnection)
+        {
+            actualConnection->invoke(commandId, inByteLength, inData, resultByteLength, token);
+            return SENSEKIT_STATUS_SUCCESS;
+        }
+        else
+        {
+            m_logger->warn("invoke called on non-existent stream");
+            return SENSEKIT_STATUS_INVALID_PARAMETER;
+        }
     }
 
     sensekit_status_t SenseKitContext::notify_host_event(sensekit_event_id id, const void* data, size_t dataSize)

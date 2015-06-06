@@ -2,6 +2,7 @@
 #define STREAMREADER_H
 
 #include <SenseKit/sensekit_types.h>
+#include "Registry.h"
 #include "StreamSet.h"
 #include "StreamConnection.h"
 #include <unordered_map>
@@ -43,16 +44,16 @@ namespace sensekit {
         sensekit_frame_index_t currentFrameIndex;
     };
 
-    class StreamReader
+    class StreamReader : public TrackedInstance<StreamReader>
     {
     public:
-        StreamReader(StreamSet& streamSet);
+        StreamReader(StreamSetConnection& connection);
         ~StreamReader();
 
         StreamReader& operator=(const StreamReader& rhs) = delete;
         StreamReader(const StreamReader& reader) = delete;
 
-        inline StreamSet& get_streamSet() const { return m_streamSet; }
+        inline StreamSetConnection& get_connection() const { return m_connection; }
 
         inline sensekit_reader_t get_handle() { return reinterpret_cast<sensekit_reader_t>(this); }
 
@@ -67,14 +68,15 @@ namespace sensekit {
         sensekit_status_t lock(int timeoutMillis, sensekit_reader_frame_t& readerFrame);
         sensekit_status_t unlock(sensekit_reader_frame_t& readerFrame);
 
-        static inline StreamReader* get_ptr(sensekit_reader_t reader) { return reinterpret_cast<StreamReader*>(reader); }
+        static inline StreamReader* get_ptr(sensekit_reader_t reader) { return Registry::get<StreamReader>(reader); }
         static inline StreamReader* from_frame(sensekit_reader_frame_t& frame)
         {
             if (frame == nullptr)
             {
                 return nullptr;
             }
-            return reinterpret_cast<StreamReader*>(frame->reader);
+
+            return get_ptr(frame->reader);
         }
 
     private:
@@ -105,7 +107,7 @@ namespace sensekit {
         bool m_locked{false};
         bool m_isFrameReadyForLock{false};
         sensekit_frame_index_t m_lastFrameIndex{-1};
-        StreamSet& m_streamSet;
+        StreamSetConnection& m_connection;
 
         using ConnectionMap = std::unordered_map<sensekit_stream_desc_t,
                                                  ReaderConnectionData*,

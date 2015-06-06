@@ -44,8 +44,8 @@ namespace sensekit {
 
         //plugins only below
 
-        Stream* create_stream(sensekit_stream_desc_t desc, stream_callbacks_t callbacks);
-        Stream* create_stream_placeholder(sensekit_stream_desc_t desc);
+        Stream* register_stream(sensekit_stream_desc_t desc, stream_callbacks_t callbacks);
+        Stream* register_orphan_stream(sensekit_stream_desc_t desc);
 
         void destroy_stream(Stream* stream);
 

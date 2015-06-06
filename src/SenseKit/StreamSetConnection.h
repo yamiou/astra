@@ -1,43 +1,43 @@
 #ifndef STREAMSETCONNECTION_H
 #define STREAMSETCONNECTION_H
 
+#include "Registry.h"
 #include <SenseKit/sensekit_types.h>
 #include "StreamReader.h"
 #include <vector>
 #include <memory>
+#include "Logger.h"
 
 namespace sensekit {
 
     class StreamSet;
 
-    class StreamSetConnection
+    class StreamSetConnection : public TrackedInstance<StreamSetConnection>
     {
     public:
         StreamSetConnection(StreamSet* streamSet)
-            : m_streamSet(streamSet)
+            : m_streamSet(streamSet),
+              m_logger("StreamSetConnection")
         {}
 
-        StreamSetConnection() {}
-
-        ~StreamSetConnection() = default;
+        ~StreamSetConnection()
+        {
+            m_logger.trace("destroying StreamSetConnection: %p", this);
+        }
 
         StreamSetConnection& operator=(const StreamSetConnection& rhs) = delete;
         StreamSetConnection(const StreamSetConnection& conn) = delete;
 
         StreamSet* get_streamSet() { return m_streamSet; }
 
-        void connect_to(StreamSet* streamSet)
-        {
-            m_streamSet = streamSet;
-        }
-
-        StreamReader* create_reader() { return nullptr; };
+        StreamReader* create_reader();
+        bool destroy_reader(StreamReader* reader);
 
         bool is_connected() { return m_streamSet != nullptr; }
 
         static StreamSetConnection* get_ptr(sensekit_streamsetconnection_t conn)
         {
-            return reinterpret_cast<StreamSetConnection*>(conn);
+            return Registry::get<StreamSetConnection>(conn);
         }
 
         sensekit_streamsetconnection_t get_handle()
@@ -52,6 +52,8 @@ namespace sensekit {
         using ReaderList = std::vector<ReaderPtr>;
 
         ReaderList m_readers;
+
+        Logger m_logger;
     };
 }
 

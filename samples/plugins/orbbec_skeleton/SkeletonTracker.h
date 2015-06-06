@@ -43,9 +43,9 @@ namespace sensekit { namespace plugins { namespace skeleton {
     private:
         sensekit_stream_t m_sourceStreamHandle;
         DepthStream m_depthStream{nullptr};
+        Sensor m_sensor;
         StreamReader m_reader;
         PluginServiceProxy& m_pluginService;
-        Sensor m_sensor;
 
         using SkeletonStreamPtr = std::unique_ptr<SkeletonStream>;
         SkeletonStreamPtr m_skeletonStream;

@@ -6,6 +6,7 @@
 #include "StreamBin.h"
 #include "ParameterBin.h"
 #include "Logger.h"
+#include "Registry.h"
 
 namespace sensekit {
 
@@ -13,7 +14,7 @@ namespace sensekit {
     class Stream;
     class StreamConnection;
 
-    class StreamConnection
+    class StreamConnection : public TrackedInstance<StreamConnection>
     {
     public:
         using FrameReadyCallback = std::function<void(StreamConnection*, sensekit_frame_index_t)>;
@@ -40,7 +41,7 @@ namespace sensekit {
 
         static StreamConnection* get_ptr(sensekit_streamconnection_t conn)
         {
-            return reinterpret_cast<StreamConnection*>(conn->handle);
+            return Registry::get<StreamConnection>(conn->handle);
         }
 
         const sensekit_stream_desc_t& get_description() const;

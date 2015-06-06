@@ -115,10 +115,9 @@ namespace sensekit {
         using PluginManagerPtr = std::unique_ptr<PluginManager>;
         PluginManagerPtr m_pluginManager;
 
-        using ReaderPtr = std::unique_ptr<StreamReader>;
-        using ReaderList = std::vector<ReaderPtr>;
+        using ReaderList = std::vector<StreamReader*>;
 
-        ReaderList m_readers;
+        ReaderList m_activeReaders;
         StreamSetCatalog m_setCatalog;
     };
 }

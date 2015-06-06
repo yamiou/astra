@@ -20,7 +20,7 @@ namespace sensekit {
 
         if (stream == nullptr)
         {
-            stream = create_stream_placeholder(desc);
+            stream = register_orphan_stream(desc);
         }
 
         return stream->create_connection();
@@ -43,7 +43,7 @@ namespace sensekit {
         return true;
     }
 
-    Stream* StreamSet::create_stream(sensekit_stream_desc_t desc,
+    Stream* StreamSet::register_stream(sensekit_stream_desc_t desc,
                                      stream_callbacks_t callbacks)
     {
         Stream* stream = find_stream_by_type_subtype_impl(desc.type, desc.subtype);
@@ -62,7 +62,7 @@ namespace sensekit {
         }
         else
         {
-            m_logger.info("create_stream for %d,%d already exists, inflating placeholder stream", desc.type, desc.subtype);
+            m_logger.info("create_stream for %d,%d already exists, adopting orphan stream", desc.type, desc.subtype);
         }
 
         stream->set_callbacks(callbacks);
@@ -70,9 +70,9 @@ namespace sensekit {
         return stream;
     }
 
-    Stream* StreamSet::create_stream_placeholder(sensekit_stream_desc_t desc)
+    Stream* StreamSet::register_orphan_stream(sensekit_stream_desc_t desc)
     {
-        m_logger.info("create_stream_placeholder for %d,%d", desc.type, desc.subtype);
+        m_logger.info("create_orphan_stream for %d,%d", desc.type, desc.subtype);
         Stream* stream = new Stream(desc);
         m_streamCollection.insert(stream);
 
@@ -88,19 +88,9 @@ namespace sensekit {
         return conn;
     }
 
-    void StreamSet::link_existing_connection(sensekit::StreamSetConnection* connection)
-    {
-        assert(connection != nullptr);
-
-        connection->connect_to(this);
-        m_connections.push_back(StreamSetConnectionPtr(connection));
-    }
-
     void StreamSet::disconnect_streamset_connection(StreamSetConnection* connection)
     {
         assert(connection != nullptr);
-
-        connection->connect_to(nullptr);
 
         auto it = std::find_if(m_connections.begin(), m_connections.end(),
                                [&connection] (StreamSetConnectionPtr& ptr) -> bool

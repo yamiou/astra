@@ -45,6 +45,8 @@ set(${_projname}_SOURCES
   StreamSetCatalog.cpp
   StreamSet.cpp
   StreamSet.h
+  StreamSetConnection.h
+  StreamSetConnection.cpp
   Logger.h
   Logger.cpp
   Logging.h
@@ -60,6 +62,8 @@ set(${_projname}_SOURCES
   Core/shared_library.h
   Core/shared_library_linux.cpp
   Core/shared_library_windows.cpp
+  Registry.h
+  Registry.cpp
   )
 
 set(${_projname}_SOURCES_GEN

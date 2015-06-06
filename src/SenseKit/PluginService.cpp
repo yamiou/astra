@@ -99,10 +99,10 @@ namespace sensekit
     {
         // TODO add to specific stream set
         StreamSet* set = StreamSet::get_ptr(setHandle);
-        Stream* stream = set->create_stream(desc, pluginCallbacks);
+        Stream* stream = set->register_stream(desc, pluginCallbacks);
         handle = stream->get_handle();
 
-        m_logger.info("created stream -- handle %x type: %d", handle, desc.type);
+        m_logger.info("registered stream -- handle %x type: %d", handle, desc.type);
 
         m_streamAddedSignal.raise(setHandle, handle, desc);
 

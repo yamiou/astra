@@ -3,23 +3,25 @@
 #include <cassert>
 #include <chrono>
 #include <SenseKit/sensekit_capi.h>
+#include "StreamSetConnection.h"
 
 namespace sensekit {
     using namespace std::placeholders;
 
-    StreamReader::StreamReader(StreamSet& streamSet) :
-        m_streamSet(streamSet),
+    StreamReader::StreamReader(StreamSetConnection& connection) :
+        m_connection(connection),
         m_scFrameReadyCallback(nullptr),
         m_logger("StreamReader")
     {}
 
     StreamReader::~StreamReader()
     {
+        m_logger.trace("destroying reader: %p", this);
         for (auto pair : m_streamMap)
         {
             ReaderConnectionData* data = pair.second;
             data->connection->unregister_frame_ready_callback(data->scFrameReadyCallbackId);
-            m_streamSet.destroy_stream_connection(data->connection);
+            m_connection.get_streamSet()->destroy_stream_connection(data->connection);
             delete data;
         }
 
@@ -55,7 +57,7 @@ namespace sensekit {
         if (connection != nullptr)
             return connection;
 
-        connection = m_streamSet.create_stream_connection(desc);
+        connection = m_connection.get_streamSet()->create_stream_connection(desc);
 
         assert(connection != nullptr);
 
