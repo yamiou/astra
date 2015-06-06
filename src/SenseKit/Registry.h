@@ -94,7 +94,7 @@ namespace sensekit {
     };
 
     template<typename T>
-    const Registry::tag_ TrackedInstance<T>::TAG{};
+    const Registry::tag_ TrackedInstance<T>::TAG = Registry::tag_();
 
     template<typename T>
     TrackedInstance<T>::TrackedInstance()
