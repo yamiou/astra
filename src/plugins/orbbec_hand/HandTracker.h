@@ -42,6 +42,9 @@ namespace sensekit { namespace plugins { namespace hand {
         void update_tracking(DepthFrame& depthFrame, PointFrame& pointFrame);
         void update_hand_frame(std::vector<TrackedPoint>& internalTrackedPoints, _sensekit_handframe& frame);
 
+        void debug_probe_point(TrackingMatrices& matrices);
+        void debug_spawn_point(TrackingMatrices& matrices);
+
         void track_points(cv::Mat& matDepth,
                           cv::Mat& matDepthFullSize,
                           cv::Mat& matForeground,

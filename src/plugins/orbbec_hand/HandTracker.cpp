@@ -217,68 +217,10 @@ namespace sensekit { namespace plugins { namespace hand {
             }
             else
             {
-                cv::Point seedPosition = get_mouse_probe_position();
-                m_pointProcessor.updateTrackedPointOrCreateNewPointFromSeedPosition(createMatrices, seedPosition);
-
-                float area = m_pointProcessor.get_point_area(createMatrices, seedPosition);
-                float depth = matDepth.at<float>(seedPosition);
-                float score = m_debugCreateScore.at<float>(seedPosition);
-                float edgeDist = m_layerEdgeDistance.at<float>(seedPosition);
-
-                float foregroundRadius1 = m_pointProcessor.foregroundRadius1();
-                float foregroundRadius2 = m_pointProcessor.foregroundRadius2();
-
-                auto mapper = get_scaling_mapper(createMatrices);
-                float percentForeground1 = segmentation::get_percent_foreground_along_circumference(matDepth,
-                                                                                                   m_layerSegmentation,
-                                                                                                   seedPosition,
-                                                                                                   foregroundRadius1,
-                                                                                                   mapper);
-                float percentForeground2 = segmentation::get_percent_foreground_along_circumference(matDepth,
-                                                                                                   m_layerSegmentation,
-                                                                                                   seedPosition,
-                                                                                                   foregroundRadius2,
-                                                                                                   mapper);
-                printf("depth: %f fg1: %f fg2: %f edge: %f area: %f score: %f\n", depth,
-                                                                        percentForeground1,
-                                                                        percentForeground2,
-                                                                        edgeDist,
-                                                                        area,
-                                                                        score);
+                debug_probe_point(createMatrices);
             }
 
-            if (m_debugImageStream->spawn_point_requested())
-            {
-                cv::Point seedPosition = get_mouse_probe_position();
-
-                bool outputTestLog = true;
-
-                bool validPointInRange = m_pointProcessor.test_point_in_range(createMatrices,
-                                                                              seedPosition,
-                                                                              0,
-                                                                              outputTestLog);
-                bool validPointArea = false;
-                bool validRadiusTest = false;
-
-                if (validPointInRange)
-                {
-                    validPointArea = m_pointProcessor.test_point_area(createMatrices,
-                                                                      seedPosition,
-                                                                      0,
-                                                                      outputTestLog);
-                    validRadiusTest = m_pointProcessor.test_foreground_radius_percentage(createMatrices,
-                                                                                         seedPosition,
-                                                                                         0,
-                                                                                         outputTestLog);
-                }
-
-                SINFO("HandTracker", "point test: inRange: %d validArea: %d validRadius: %d\n",
-                              validPointInRange,
-                              validPointArea,
-                              validRadiusTest);
-
-                m_debugImageStream->clear_spawn_point_request();
-            }
+            debug_spawn_point(createMatrices);
 
             //remove old points
             m_pointProcessor.removeOldOrDeadPoints();
@@ -306,6 +248,88 @@ namespace sensekit { namespace plugins { namespace hand {
             m_pointProcessor.update_full_resolution_points(refinementMatrices);
 
             m_pointProcessor.update_trajectories();
+        }
+
+        void HandTracker::debug_probe_point(TrackingMatrices& matrices)
+        {
+            if (!m_debugImageStream->use_mouse_probe())
+            {
+                return;
+            }
+
+            cv::Point seedPosition = get_mouse_probe_position();
+            m_pointProcessor.updateTrackedPointOrCreateNewPointFromSeedPosition(matrices, seedPosition);
+
+            cv::Mat& matDepth = matrices.depth;
+
+            float area = m_pointProcessor.get_point_area(matrices, seedPosition);
+            float depth = matDepth.at<float>(seedPosition);
+            float score = m_debugCreateScore.at<float>(seedPosition);
+            float edgeDist = m_layerEdgeDistance.at<float>(seedPosition);
+
+            float foregroundRadius1 = m_pointProcessor.foregroundRadius1();
+            float foregroundRadius2 = m_pointProcessor.foregroundRadius2();
+
+            auto mapper = get_scaling_mapper(matrices);
+            float percentForeground1 = segmentation::get_percent_foreground_along_circumference(matDepth,
+                                                                                               m_layerSegmentation,
+                                                                                               seedPosition,
+                                                                                               foregroundRadius1,
+                                                                                               mapper);
+            float percentForeground2 = segmentation::get_percent_foreground_along_circumference(matDepth,
+                                                                                               m_layerSegmentation,
+                                                                                               seedPosition,
+                                                                                               foregroundRadius2,
+                                                                                               mapper);
+            SINFO("HandTracker", "depth: %f fg1: %f fg2: %f edge: %f area: %f score: %f", depth,
+                                                                    percentForeground1,
+                                                                    percentForeground2,
+                                                                    edgeDist,
+                                                                    area,
+                                                                    score);
+        }
+
+        void HandTracker::debug_spawn_point(TrackingMatrices& matrices)
+        {
+            if (!m_debugImageStream->spawn_point_requested())
+            {
+                return;
+            }
+            if (!m_debugImageStream->pause_input())
+            {
+                m_pointProcessor.initialize_common_calculations(matrices);
+            }
+            cv::Point seedPosition = get_mouse_probe_position();
+
+            m_pointProcessor.updateTrackedPointOrCreateNewPointFromSeedPosition(matrices, seedPosition);
+
+            bool outputTestLog = true;
+
+            bool validPointInRange = m_pointProcessor.test_point_in_range(matrices,
+                                                                          seedPosition,
+                                                                          0,
+                                                                          outputTestLog);
+            bool validPointArea = false;
+            bool validRadiusTest = false;
+
+            if (validPointInRange)
+            {
+                validPointArea = m_pointProcessor.test_point_area(matrices,
+                                                                  seedPosition,
+                                                                  0,
+                                                                  outputTestLog);
+                validRadiusTest = m_pointProcessor.test_foreground_radius_percentage(matrices,
+                                                                                     seedPosition,
+                                                                                     0,
+                                                                                     outputTestLog);
+            }
+
+                SINFO("HandTracker", "point test: inRange: %d validArea: %d validRadius: %d",
+                          validPointInRange,
+                          validPointArea,
+                          validRadiusTest);
+
+            m_debugImageStream->clear_spawn_point_request();
         }
 
         cv::Point HandTracker::get_mouse_probe_position()
