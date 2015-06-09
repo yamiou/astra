@@ -414,7 +414,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
             bool processRefinedPosition = false;
 
-            if (resizeNeeded &&
+            if (false && resizeNeeded &&
                 trackedPoint.trackingStatus == TrackingStatus::Tracking &&
                 trackedPoint.pointType == TrackedPointType::ActivePoint)
             {
