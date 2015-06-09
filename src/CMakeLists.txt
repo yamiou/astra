@@ -13,6 +13,7 @@ add_subdirectory(plugins)
 
 if (SENSEKIT_ANDROID)
   add_subdirectory(jni)
+  add_subdirectory(android)
 endif()
 
 set (_projname "ProxyPreprocessor")
