@@ -39,7 +39,8 @@ namespace sensekit { namespace plugins { namespace hand {
         m_maxFailedTestsInProbation(settings.maxFailedTestsInProbation),
         m_probationFrameCount(settings.probationFrameCount),
         m_maxFailedTestsInProbationActivePoints(settings.maxFailedTestsInProbationActivePoints),
-        m_secondChanceMinDistance(settings.secondChanceMinDistance)
+        m_secondChanceMinDistance(settings.secondChanceMinDistance),
+        m_mergePointDistance(settings.mergePointDistance)
     {
         PROFILE_FUNC();
     }
@@ -730,6 +731,7 @@ namespace sensekit { namespace plugins { namespace hand {
     void PointProcessor::removeDuplicatePoints()
     {
         PROFILE_FUNC();
+
         for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
         {
             TrackedPoint& tracked = *iter;
@@ -737,7 +739,8 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 TrackedPoint& otherTracked = *otherIter;
                 bool bothNotDead = tracked.trackingStatus != TrackingStatus::Dead && otherTracked.trackingStatus != TrackingStatus::Dead;
-                if (tracked.trackingId != otherTracked.trackingId && bothNotDead && tracked.position == otherTracked.position)
+                float pointDist = cv::norm(tracked.worldPosition - otherTracked.worldPosition);
+                if (tracked.trackingId != otherTracked.trackingId && bothNotDead && pointDist < m_mergePointDistance)
                 {
                     tracked.inactiveFrameCount = MIN(tracked.inactiveFrameCount, otherTracked.inactiveFrameCount);
                     if (otherTracked.pointType == TrackedPointType::ActivePoint && tracked.pointType != TrackedPointType::ActivePoint)
