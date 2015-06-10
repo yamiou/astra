@@ -309,7 +309,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
             cv::Mat scoreMask;
             cv::inRange(matScore, 1, INT_MAX, scoreMask);
-            //matScore.copyTo(data.matrices.debugScore, scoreMask);
+            matScore.copyTo(data.matrices.debugScoreValue, scoreMask);
             cv::normalize(matScore, data.matrices.debugScore, 0, 1, cv::NORM_MINMAX, -1, scoreMask);
         }
 

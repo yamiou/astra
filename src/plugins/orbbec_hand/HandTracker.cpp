@@ -134,6 +134,9 @@ namespace sensekit { namespace plugins { namespace hand {
             m_refineSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_refineScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_refineEdgeDistance = cv::Mat::zeros(matDepth.size(), CV_32FC1);
+            m_debugUpdateScoreValue = cv::Mat::zeros(matDepth.size(), CV_32FC1);
+            m_debugCreateScoreValue = cv::Mat::zeros(matDepth.size(), CV_32FC1);
+            m_debugRefineScoreValue = cv::Mat::zeros(matDepth.size(), CV_32FC1);
 
             int numPoints = matDepth.cols * matDepth.rows;
             if (m_worldPoints == nullptr || m_numWorldPoints != numPoints)
@@ -165,6 +168,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_layerEdgeDistance,
                                             m_debugUpdateSegmentation,
                                             m_debugUpdateScore,
+                                            m_debugUpdateScoreValue,
                                             m_debugTestPassMap,
                                             enabledTestPassMap,
                                             fullSizeWorldPoints,
@@ -197,6 +201,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_layerEdgeDistance,
                                             m_debugCreateSegmentation,
                                             m_debugCreateScore,
+                                            m_debugCreateScoreValue,
                                             m_debugTestPassMap,
                                             enabledTestPassMap,
                                             fullSizeWorldPoints,
@@ -237,6 +242,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                 m_refineEdgeDistance,
                                                 m_debugRefineSegmentation,
                                                 m_debugRefineScore,
+                                                m_debugRefineScoreValue,
                                                 m_debugTestPassMap,
                                                 enabledTestPassMap,
                                                 fullSizeWorldPoints,
@@ -264,7 +270,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
             float area = m_pointProcessor.get_point_area(matrices, seedPosition);
             float depth = matDepth.at<float>(seedPosition);
-            float score = m_debugCreateScore.at<float>(seedPosition);
+            float score = m_debugCreateScoreValue.at<float>(seedPosition);
             float edgeDist = m_layerEdgeDistance.at<float>(seedPosition);
 
             float foregroundRadius1 = m_pointProcessor.foregroundRadius1();
@@ -326,7 +332,11 @@ namespace sensekit { namespace plugins { namespace hand {
                                                                                      outputTestLog);
             }
 
-                SINFO("HandTracker", "point test: inRange: %d validArea: %d validRadius: %d",
+            float depth = matrices.depth.at<float>(seedPosition);
+            float score = m_debugCreateScoreValue.at<float>(seedPosition);
+            SINFO("HandTracker", "point test: depth: %f score: %f inRange: %d validArea: %d validRadius: %d",
+                          depth,
+                          score,
                           validPointInRange,
                           validPointArea,
                           validRadiusTest);
