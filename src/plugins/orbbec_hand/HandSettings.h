@@ -12,6 +12,8 @@ namespace sensekit { namespace plugins { namespace hand {
         float maxDepthJumpPercent{ 0.1 };
         int erodeSize{ 1 };
         float depthAdjustmentFactor{ 2.5 };
+        float minDepth { 1000 };
+        float maxDepth { 4000 };
     };
 
     struct TrajectoryAnalyzerSettings

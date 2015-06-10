@@ -13,7 +13,9 @@ namespace sensekit { namespace plugins { namespace hand {
         m_velocityThresholdFactor(settings.velocityThresholdFactor),
         m_maxDepthJumpPercent(settings.maxDepthJumpPercent),
         m_erodeSize(settings.erodeSize),
-        m_depthAdjustmentFactor(settings.depthAdjustmentFactor)
+        m_depthAdjustmentFactor(settings.depthAdjustmentFactor),
+        m_minDepth(settings.minDepth),
+        m_maxDepth(settings.maxDepth)
     {
         PROFILE_FUNC();
         m_rectElement = cv::getStructuringElement(cv::MORPH_RECT,
@@ -265,8 +267,15 @@ namespace sensekit { namespace plugins { namespace hand {
                 if (depth != 0.0f)
                 {
                     float& velFiltered = *velFilteredRow;
-                    float depthM = depth / 1000.0f;
-                    velFiltered /= depthM * m_depthAdjustmentFactor;
+                    if (depth > m_minDepth && depth < m_maxDepth)
+                    {
+                        float depthM = depth / 1000.0f;
+                        velFiltered /= depthM * m_depthAdjustmentFactor;
+                    }
+                    else
+                    {
+                        velFiltered = 0;
+                    }
                 }
             }
         }

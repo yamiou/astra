@@ -36,6 +36,8 @@ namespace sensekit { namespace plugins { namespace hand {
         settings.maxDepthJumpPercent = get_float_from_table(t, "depthutility.maxDepthJumpPercent", settings.maxDepthJumpPercent);
         settings.erodeSize = get_int_from_table(t, "depthutility.erodeSize", settings.erodeSize);
         settings.depthAdjustmentFactor = get_float_from_table(t, "depthutility.depthAdjustmentFactor", settings.depthAdjustmentFactor);
+        settings.minDepth = get_float_from_table(t, "depthutility.minDepth", settings.minDepth);
+        settings.maxDepth = get_float_from_table(t, "depthutility.maxDepth", settings.maxDepth);
 
         return settings;
     }
