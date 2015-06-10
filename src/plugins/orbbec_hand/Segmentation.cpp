@@ -208,7 +208,6 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         auto seedWorldPosition = sensekit::Vector3f(data.referenceWorldPosition.x,
                                                     data.referenceWorldPosition.y,
                                                     data.referenceWorldPosition.z);
-        bool activePoint = data.pointType == TrackedPointType::ActivePoint;
 
         int width = depthMatrix.cols;
         int height = depthMatrix.rows;
@@ -247,7 +246,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
                     float score = *basicScoreRow;
 
-                    if (activePoint && pointInertiaRadius > 0)
+                    if (pointInertiaRadius > 0)
                     {
                         auto vector = worldPosition - seedWorldPosition;
                         float length = vector.length();
@@ -286,17 +285,12 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             return INVALID_POINT;
         }
 
-        bool activePoint = data.pointType == TrackedPointType::ActivePoint;
-
         cv::Mat& matScore = data.matrices.layerScore;
 
-        if (activePoint)
-        {
-            calculate_edge_distance(data.matrices.layerSegmentation,
+        calculate_edge_distance(data.matrices.layerSegmentation,
                                     data.matrices.areaSqrt,
                                     data.matrices.layerEdgeDistance,
                                     data.targetEdgeDistance * 2.0f);
-        }
         calculate_layer_score(data);
 
         double min, max;

@@ -139,7 +139,6 @@ namespace sensekit { namespace plugins { namespace hand {
         const float referenceAreaSqrt;
         const float bandwidthDepthNear;
         const float bandwidthDepthFar;
-        const TrackedPointType pointType;
         const int iterationMax;
         const float maxSegmentationDist;
         const SegmentationVelocityPolicy velocityPolicy;
@@ -154,7 +153,6 @@ namespace sensekit { namespace plugins { namespace hand {
                      const float referenceAreaSqrt,
                      const float bandwidthDepthNear,
                      const float bandwidthDepthFar,
-                     const TrackedPointType pointType,
                      const int iterationMax,
                      const float maxSegmentationDist,
                      const SegmentationVelocityPolicy velocityPolicy,
@@ -168,7 +166,6 @@ namespace sensekit { namespace plugins { namespace hand {
               referenceAreaSqrt(referenceAreaSqrt),
               bandwidthDepthNear(bandwidthDepthNear),
               bandwidthDepthFar(bandwidthDepthFar),
-              pointType(pointType),
               iterationMax(iterationMax),
               maxSegmentationDist(maxSegmentationDist),
               velocityPolicy(velocityPolicy),

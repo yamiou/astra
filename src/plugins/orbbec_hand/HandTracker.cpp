@@ -303,6 +303,8 @@ namespace sensekit { namespace plugins { namespace hand {
 
             m_pointProcessor.updateTrackedPointOrCreateNewPointFromSeedPosition(matrices, seedPosition);
 
+            m_pointProcessor.calculateTestPassMap(matrices);
+
             bool outputTestLog = true;
 
             bool validPointInRange = m_pointProcessor.test_point_in_range(matrices,

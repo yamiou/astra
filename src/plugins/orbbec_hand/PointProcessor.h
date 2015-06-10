@@ -51,6 +51,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                const cv::Point& targetPoint,
                                                int trackingId,
                                                bool outputLog);
+        void calculateTestPassMap(TrackingMatrices& matrices);
 
     private:
         cv::Point3f smooth_world_positions(const cv::Point3f& oldWorldPosition, const cv::Point3f& newWorldPosition);
@@ -73,7 +74,6 @@ namespace sensekit { namespace plugins { namespace hand {
                                                       const cv::Point3f& newWorldPosition,
                                                       const float resizeFactor,
                                                       const CoordinateMapper& fullSizeMapper);
-        void calculateTestPassMap(TrackingMatrices& matrices);
 
         PointProcessorSettings& m_settings;
         float m_segmentationBandwidthDepthNear;

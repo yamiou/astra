@@ -14,8 +14,8 @@ minDepth = 1000.0 #float
 maxDepth = 4000.0 #float
 
 [pointprocessor]
-segmentationBandwidthDepthNear = 500.0 #mm #float
-segmentationBandwidthDepthFar = 100.0 #mm #float
+segmentationBandwidthDepthNear = 200.0 #mm #float
+segmentationBandwidthDepthFar = 200.0 #mm #float
 maxMatchDistLostActive = 500.0 #mm #float
 maxMatchDistDefault = 200.0 #mm #float
 iterationMaxInitial = 1

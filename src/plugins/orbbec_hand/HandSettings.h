@@ -32,8 +32,8 @@ namespace sensekit { namespace plugins { namespace hand {
     {
         TrajectoryAnalyzerSettings trajectoryAnalyzerSettings;
 
-        float segmentationBandwidthDepthNear{ 500 };
-        float segmentationBandwidthDepthFar{ 100 };
+        float segmentationBandwidthDepthNear{ 200 };
+        float segmentationBandwidthDepthFar{ 200 };
         float maxMatchDistLostActive{ 500 }; //mm
         float maxMatchDistDefault{ 200 }; //mm
         int iterationMaxInitial{ 1 };
