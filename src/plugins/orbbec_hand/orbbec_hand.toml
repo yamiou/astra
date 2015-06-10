@@ -9,7 +9,7 @@ depthSmoothingFactor = 0.05 #float
 velocityThresholdFactor = 0.005 #float
 maxDepthJumpPercent = 0.1 #float
 erodeSize = 1
-depthAdjustmentFactor = 0.0025 #float
+depthAdjustmentFactor = 2.5 #float
 
 [pointprocessor]
 segmentationBandwidthDepthNear = 500.0 #mm #float

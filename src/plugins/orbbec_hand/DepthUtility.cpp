@@ -262,10 +262,11 @@ namespace sensekit { namespace plugins { namespace hand {
             for (int x = 0; x < width; ++x, ++depthRow, ++velFilteredRow)
             {
                 float depth = *depthRow;
-                if (depth != 0)
+                if (depth != 0.0f)
                 {
                     float& velFiltered = *velFilteredRow;
-                    velFiltered /= depth * m_depthAdjustmentFactor;
+                    float depthM = depth / 1000.0f;
+                    velFiltered /= depthM * m_depthAdjustmentFactor;
                 }
             }
         }
@@ -330,10 +331,11 @@ namespace sensekit { namespace plugins { namespace hand {
             float maxVel = m_maxVel[i];
             int count = m_depthCount[i];
             float startDepth = (MIN_CHUNK_DEPTH + i * chunk_size) / 1000.0f;
+            float endDepth = (MIN_CHUNK_DEPTH + (1 + i) * chunk_size) / 1000.0f;
             float ratio = 0;
-            if (startDepth > 0)
+            if (endDepth != 0.0f)
             {
-                ratio = maxVel / startDepth;
+                ratio = maxVel / endDepth;
             }
 
             printf("[%.1fm %d,%f,%f] ", startDepth, count, maxVel, ratio);
