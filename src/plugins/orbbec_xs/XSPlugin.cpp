@@ -11,7 +11,6 @@ namespace sensekit { namespace plugins { namespace xs {
                                    sensekit_stream_desc_t streamDesc)
     {
         PROFILE_FUNC();
-        get_logger().info("XS on stream added: %d,%d", streamDesc.type, streamDesc.subtype);
         if (streamDesc.type == SENSEKIT_STREAM_DEPTH &&
             m_pointProcessorMap.find(streamHandle) == m_pointProcessorMap.end())
         {
@@ -33,7 +32,6 @@ namespace sensekit { namespace plugins { namespace xs {
                                      sensekit_stream_desc_t streamDesc)
     {
         PROFILE_FUNC();
-        get_logger().info("XS on stream removed: %d,%d", streamDesc.type, streamDesc.subtype);
         auto it = m_pointProcessorMap.find(streamHandle);
         if (it != m_pointProcessorMap.end())
         {

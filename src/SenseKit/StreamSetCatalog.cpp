@@ -2,6 +2,7 @@
 #include <cassert>
 #include "StreamSet.h"
 #include "StreamSetConnection.h"
+#include "Core/Signal.h"
 
 namespace sensekit {
 
@@ -40,11 +41,24 @@ namespace sensekit {
         {
             StreamSetPtr ssPtr = std::make_unique<StreamSet>(uri);
             streamSet = ssPtr.get();
-            m_streamSets.insert(std::make_pair(uri, std::move(ssPtr)));
+
+            auto added = ssPtr->register_for_stream_registered_event(
+                [this] (StreamRegisteredEventArgs args)
+                {
+                    on_stream_registered(args);
+                });
+
+            auto removed = ssPtr->register_for_stream_unregistering_event(
+                [this] (StreamUnregisteringEventArgs args)
+                {
+                    on_stream_unregistering(args);
+                });
+
+            m_streamSets.insert(std::make_pair(uri, std::make_unique<StreamSetEntry>(std::move(ssPtr), added, removed)));
         }
         else
         {
-            streamSet = it->second.get();
+            streamSet = it->second->streamSet.get();
         }
 
         if (claim)
@@ -55,6 +69,16 @@ namespace sensekit {
         return *streamSet;
     }
 
+    void StreamSetCatalog::on_stream_registered(StreamRegisteredEventArgs args)
+    {
+        m_streamRegisteredSignal.raise(args);
+    }
+
+    void StreamSetCatalog::on_stream_unregistering(StreamUnregisteringEventArgs args)
+    {
+        m_streamUnregisteringSignal.raise(args);
+    }
+
     StreamSet* StreamSetCatalog::find_streamset_for_stream(Stream* stream)
     {
         assert(stream != nullptr);
@@ -62,17 +86,17 @@ namespace sensekit {
         auto it = std::find_if(m_streamSets.begin(), m_streamSets.end(),
                                [&stream] (StreamSetMap::value_type& el) -> bool
                                {
-                                   return el.second->is_member(stream->get_handle());
+                                   return el.second->streamSet->is_member(stream->get_handle());
                                });
 
-        return it != m_streamSets.end() ? it->second.get() : nullptr;
+        return it != m_streamSets.end() ? it->second->streamSet.get() : nullptr;
     }
 
     void StreamSetCatalog::visit_sets(std::function<void(StreamSet*)> visitorMethod)
     {
         for(auto& pair : m_streamSets)
         {
-            visitorMethod(pair.second.get());
+            visitorMethod(pair.second->streamSet.get());
         }
     }
 

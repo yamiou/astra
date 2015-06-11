@@ -25,37 +25,37 @@ namespace sensekit { namespace plugins { namespace hand {
 
     void HandPlugin::on_initialize()
     {
-        get_pluginService().register_stream_added_callback(&HandPlugin::stream_added_handler_thunk,
-                                                           this,
-                                                           &m_streamAddedCallbackId);
+        get_pluginService().register_stream_registered_callback(&HandPlugin::stream_registered_handler_thunk,
+                                                                this,
+                                                                &m_streamAddedCallbackId);
 
-        get_pluginService().register_stream_removing_callback(&HandPlugin::stream_removing_handler_thunk,
-                                                              this,
-                                                              &m_streamRemovingCallbackId);
+        get_pluginService().register_stream_unregistering_callback(&HandPlugin::stream_unregistering_handler_thunk,
+                                                                   this,
+                                                                   &m_streamRemovingCallbackId);
     }
 
-    void HandPlugin::stream_added_handler_thunk(void* clientTag,
-                                                 sensekit_streamset_t setHandle,
-                                                 sensekit_stream_t streamHandle,
-                                                 sensekit_stream_desc_t desc)
+    void HandPlugin::stream_registered_handler_thunk(void* clientTag,
+                                                     sensekit_streamset_t setHandle,
+                                                     sensekit_stream_t streamHandle,
+                                                     sensekit_stream_desc_t desc)
     {
         HandPlugin* plugin = static_cast<HandPlugin*>(clientTag);
-        plugin->stream_added_handler(setHandle, streamHandle, desc);
+        plugin->stream_registered_handler(setHandle, streamHandle, desc);
     }
 
-    void HandPlugin::stream_removing_handler_thunk(void* clientTag,
-                                                    sensekit_streamset_t setHandle,
-                                                    sensekit_stream_t streamHandle,
-                                                    sensekit_stream_desc_t desc)
+    void HandPlugin::stream_unregistering_handler_thunk(void* clientTag,
+                                                        sensekit_streamset_t setHandle,
+                                                        sensekit_stream_t streamHandle,
+                                                        sensekit_stream_desc_t desc)
 
     {
         HandPlugin* plugin = static_cast<HandPlugin*>(clientTag);
-        plugin->stream_removing_handler(setHandle, streamHandle, desc);
+        plugin->stream_unregistering_handler(setHandle, streamHandle, desc);
     }
 
-    void HandPlugin::stream_added_handler(sensekit_streamset_t setHandle,
-                                           sensekit_stream_t streamHandle,
-                                           sensekit_stream_desc_t streamDesc)
+    void HandPlugin::stream_registered_handler(sensekit_streamset_t setHandle,
+                                               sensekit_stream_t streamHandle,
+                                               sensekit_stream_desc_t streamDesc)
     {
         if (streamDesc.type == SENSEKIT_STREAM_DEPTH &&
             m_streamTrackerMap.find(streamHandle) == m_streamTrackerMap.end())
@@ -76,9 +76,9 @@ namespace sensekit { namespace plugins { namespace hand {
         }
     }
 
-    void HandPlugin::stream_removing_handler(sensekit_streamset_t setHandle,
-                                              sensekit_stream_t streamHandle,
-                                              sensekit_stream_desc_t desc)
+    void HandPlugin::stream_unregistering_handler(sensekit_streamset_t setHandle,
+                                                  sensekit_stream_t streamHandle,
+                                                  sensekit_stream_desc_t desc)
     {
         auto it = m_streamTrackerMap.find(streamHandle);
         if (it != m_streamTrackerMap.end())

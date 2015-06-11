@@ -71,16 +71,16 @@
 ;;                                                  sensekit_callback_id_t* callbackId)
 (add-func       :funcset "plugin"
                 :returntype "sensekit_status_t"
-                :funcname "register_stream_added_callback"
-                :params (list (make-param :type "stream_added_callback_t" :name "callback")
+                :funcname "register_stream_registered_callback"
+                :params (list (make-param :type "stream_registered_callback_t" :name "callback")
                               (make-param :type "void*" :name "clientTag")
                               (make-param :type "sensekit_callback_id_t*" :name "callbackId" :deref T)))
 
 ;; sensekit_status_t register_stream_removing_callback(stream_removing_callback_t callback, void* clientTag, sensekit_callback_id_t* callbackId)
 (add-func       :funcset "plugin"
                 :returntype "sensekit_status_t"
-                :funcname "register_stream_removing_callback"
-                :params (list (make-param :type "stream_removing_callback_t" :name "callback")
+                :funcname "register_stream_unregistering_callback"
+                :params (list (make-param :type "stream_unregistering_callback_t" :name "callback")
                               (make-param :type "void*" :name "clientTag")
                               (make-param :type "sensekit_callback_id_t*" :name "callbackId" :deref T)))
 
@@ -103,13 +103,13 @@
 ;; sensekit_status_t unregister_stream_added_callback(sensekit_callback_id_t callbackId)
 (add-func       :funcset "plugin"
                 :returntype "sensekit_status_t"
-                :funcname "unregister_stream_added_callback"
+                :funcname "unregister_stream_registered_callback"
                 :params (list (make-param :type "sensekit_callback_id_t" :name "callback")))
 
 ;; sensekit_status_t unregister_stream_removing_callback(sensekit_callback_id_t callbackId)
 (add-func       :funcset "plugin"
                 :returntype "sensekit_status_t"
-                :funcname "unregister_stream_removing_callback"
+                :funcname "unregister_stream_unregistering_callback"
                 :params (list (make-param :type "sensekit_callback_id_t" :name "callback")))
 
 ;; sensekit_status_t create_stream_set(sensekit_streamset_t& setHandle)

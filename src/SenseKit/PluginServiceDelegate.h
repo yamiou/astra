@@ -12,20 +12,20 @@ namespace sensekit {
     {
     public:
 
-        static sensekit_status_t register_stream_added_callback(void* pluginService,
-                                                                stream_added_callback_t callback,
-                                                                void* clientTag,
-                                                                sensekit_callback_id_t* callbackId)
+        static sensekit_status_t register_stream_registered_callback(void* pluginService,
+                                                                     stream_registered_callback_t callback,
+                                                                     void* clientTag,
+                                                                     sensekit_callback_id_t* callbackId)
         {
-            return static_cast<PluginService*>(pluginService)->register_stream_added_callback(callback, clientTag, *callbackId);
+            return static_cast<PluginService*>(pluginService)->register_stream_registered_callback(callback, clientTag, *callbackId);
         }
 
-        static sensekit_status_t register_stream_removing_callback(void* pluginService,
-                                                                   stream_removing_callback_t callback,
-                                                                   void* clientTag,
-                                                                   sensekit_callback_id_t* callbackId)
+        static sensekit_status_t register_stream_unregistering_callback(void* pluginService,
+                                                                        stream_unregistering_callback_t callback,
+                                                                        void* clientTag,
+                                                                        sensekit_callback_id_t* callbackId)
         {
-            return static_cast<PluginService*>(pluginService)->register_stream_removing_callback(callback, clientTag, *callbackId);
+            return static_cast<PluginService*>(pluginService)->register_stream_unregistering_callback(callback, clientTag, *callbackId);
         }
 
         static sensekit_status_t register_host_event_callback(void* pluginService,
@@ -42,16 +42,16 @@ namespace sensekit {
             return static_cast<PluginService*>(pluginService)->unregister_host_event_callback(callback);
         }
 
-        static sensekit_status_t unregister_stream_added_callback(void* pluginService,
-                                                                  sensekit_callback_id_t callback)
+        static sensekit_status_t unregister_stream_registered_callback(void* pluginService,
+                                                                       sensekit_callback_id_t callback)
         {
-            return static_cast<PluginService*>(pluginService)->unregister_stream_added_callback(callback);
+            return static_cast<PluginService*>(pluginService)->unregister_stream_registered_callback(callback);
         }
 
-        static sensekit_status_t unregister_stream_removing_callback(void* pluginService,
-                                                                     sensekit_callback_id_t callback)
+        static sensekit_status_t unregister_stream_unregistering_callback(void* pluginService,
+                                                                          sensekit_callback_id_t callback)
         {
-            return static_cast<PluginService*>(pluginService)->unregister_stream_removing_callback(callback);
+            return static_cast<PluginService*>(pluginService)->unregister_stream_unregistering_callback(callback);
         }
 
         static sensekit_status_t create_stream_set(void* pluginService,

@@ -3,8 +3,11 @@
 
 #include "Stream.h"
 #include "Logger.h"
-
+#include "Core/Signal.h"
+#include "StreamRegisteredEventArgs.h"
+#include "StreamUnregisteringEventArgs.h"
 #include <unordered_set>
+#include <functional>
 #include <vector>
 #include <memory>
 #include <string>
@@ -56,13 +59,31 @@ namespace sensekit {
 
         const std::string& get_uri() { return m_uri; }
 
-        sensekit_streamset_t get_handle()
-            { return reinterpret_cast<sensekit_streamset_t>(this); }
+        sensekit_streamset_t get_handle() { return reinterpret_cast<sensekit_streamset_t>(this); }
 
         void visit_streams(std::function<void(Stream*)> visitorMethod);
 
-        static StreamSet* get_ptr(sensekit_streamset_t handle)
-            { return reinterpret_cast<StreamSet*>(handle); }
+        static StreamSet* get_ptr(sensekit_streamset_t handle) { return reinterpret_cast<StreamSet*>(handle); }
+
+        sensekit_callback_id_t register_for_stream_registered_event(StreamRegisteredCallback callback)
+        {
+            return m_streamRegisteredSignal += callback;
+        }
+
+        sensekit_callback_id_t register_for_stream_unregistering_event(StreamUnregisteringCallback callback)
+        {
+            return m_streamUnregisteringSignal += callback;
+        }
+
+        void unregister_for_stream_registered_event(sensekit_callback_id_t callbackId)
+        {
+            m_streamRegisteredSignal -= callbackId;
+        }
+
+        void unregister_for_stream_unregistering_event(sensekit_callback_id_t callbackId)
+        {
+            m_streamUnregisteringSignal -= callbackId;
+        }
 
     private:
         Stream* find_stream_by_type_subtype_impl(sensekit_stream_type_t type,
@@ -79,6 +100,9 @@ namespace sensekit {
         using StreamSetConnectionPtr = std::unique_ptr<StreamSetConnection>;
         using StreamSetConnectionList = std::vector<StreamSetConnectionPtr>;
         StreamSetConnectionList m_connections;
+
+        Signal<StreamRegisteredEventArgs> m_streamRegisteredSignal;
+        Signal<StreamUnregisteringEventArgs> m_streamUnregisteringSignal;
     };
 }
 

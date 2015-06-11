@@ -105,8 +105,8 @@ private:
 
     using BufferPtr = std::unique_ptr < uint8_t[] > ;
     BufferPtr m_displayBuffer { nullptr };
-    int m_displayWidth { 0 };
-    int m_displayHeight { 0 };
+    int m_displayWidth{0};
+    int m_displayHeight{0};
 };
 
 int main(int argc, char** argv)

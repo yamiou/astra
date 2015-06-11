@@ -93,9 +93,6 @@ namespace sensekit {
 
         sensekit_status_t temp_update();
 
-
-        void raise_existing_streams_added(stream_added_callback_t callback, void* clientTag);
-
         StreamServiceProxyBase* get_streamServiceProxy() { return m_streamServiceProxy; }
 
         sensekit_status_t notify_host_event(sensekit_event_id id, const void* data, size_t dataSize);

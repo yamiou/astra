@@ -10,15 +10,15 @@ struct PluginServiceProxyBase
 {
     void* pluginService;
 
-    sensekit_status_t (*register_stream_added_callback)(void*,
-                                                        stream_added_callback_t,
-                                                        void*,
-                                                        sensekit_callback_id_t*);
+    sensekit_status_t (*register_stream_registered_callback)(void*,
+                                                             stream_registered_callback_t,
+                                                             void*,
+                                                             sensekit_callback_id_t*);
 
-    sensekit_status_t (*register_stream_removing_callback)(void*,
-                                                           stream_removing_callback_t,
-                                                           void*,
-                                                           sensekit_callback_id_t*);
+    sensekit_status_t (*register_stream_unregistering_callback)(void*,
+                                                                stream_unregistering_callback_t,
+                                                                void*,
+                                                                sensekit_callback_id_t*);
 
     sensekit_status_t (*register_host_event_callback)(void*,
                                                       host_event_callback_t,
@@ -28,11 +28,11 @@ struct PluginServiceProxyBase
     sensekit_status_t (*unregister_host_event_callback)(void*,
                                                         sensekit_callback_id_t);
 
-    sensekit_status_t (*unregister_stream_added_callback)(void*,
-                                                          sensekit_callback_id_t);
+    sensekit_status_t (*unregister_stream_registered_callback)(void*,
+                                                               sensekit_callback_id_t);
 
-    sensekit_status_t (*unregister_stream_removing_callback)(void*,
-                                                             sensekit_callback_id_t);
+    sensekit_status_t (*unregister_stream_unregistering_callback)(void*,
+                                                                  sensekit_callback_id_t);
 
     sensekit_status_t (*create_stream_set)(void*,
                                            const char*,

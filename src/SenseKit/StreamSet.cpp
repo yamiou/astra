@@ -48,24 +48,29 @@ namespace sensekit {
     {
         Stream* stream = find_stream_by_type_subtype_impl(desc.type, desc.subtype);
 
-        if (stream == nullptr)
+        if (stream)
         {
+            assert(!stream->is_available());
+            if (stream->is_available())
+            {
+                m_logger.warn("create_stream for %d,%d already exists, already inflated", desc.type, desc.subtype);
+                return nullptr;
+            }
+
+            m_logger.info("create_stream for %d,%d already exists, adopting orphan stream", desc.type, desc.subtype);
+        }
+        else
+        {
+
             m_logger.info("create_stream for %d,%d", desc.type, desc.subtype);
             stream = new Stream(desc);
             m_streamCollection.insert(stream);
         }
-        else if (stream->is_available())
-        {
-            m_logger.warn("create_stream for %d,%d already exists, already inflated", desc.type, desc.subtype);
-            assert(!stream->is_available());
-            return nullptr;
-        }
-        else
-        {
-            m_logger.info("create_stream for %d,%d already exists, adopting orphan stream", desc.type, desc.subtype);
-        }
 
         stream->set_callbacks(callbacks);
+
+        m_streamRegisteredSignal.raise(StreamRegisteredEventArgs(this, stream, desc));
+
 
         return stream;
     }
@@ -109,7 +114,12 @@ namespace sensekit {
         auto it = m_streamCollection.find(stream);
         if (it != m_streamCollection.end())
         {
-            (*it)->clear_callbacks();
+            if (stream->is_available())
+            {
+                m_streamUnregisteringSignal.raise(
+                    StreamUnregisteringEventArgs(this, stream, stream->get_description()));
+            }
+            stream->clear_callbacks();
         }
     }
 

@@ -21,20 +21,20 @@ namespace sensekit { namespace plugins { namespace hand {
         virtual void on_initialize() override;
 
     private:
-        static void stream_added_handler_thunk(void* clientTag,
+        static void stream_registered_handler_thunk(void* clientTag,
                                                sensekit_streamset_t setHandle,
                                                sensekit_stream_t streamHandle,
                                                sensekit_stream_desc_t desc);
 
-        static void stream_removing_handler_thunk(void* clientTag,
+        static void stream_unregistering_handler_thunk(void* clientTag,
                                                   sensekit_streamset_t setHandle,
                                                   sensekit_stream_t streamHandle,
                                                   sensekit_stream_desc_t desc);
 
-        void stream_added_handler(sensekit_streamset_t setHandle,
+        void stream_registered_handler(sensekit_streamset_t setHandle,
                                   sensekit_stream_t streamHandle,
                                   sensekit_stream_desc_t desc);
-        void stream_removing_handler(sensekit_streamset_t setHandle,
+        void stream_unregistering_handler(sensekit_streamset_t setHandle,
                                      sensekit_stream_t streamHandle,
                                      sensekit_stream_desc_t desc);
 

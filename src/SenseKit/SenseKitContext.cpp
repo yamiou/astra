@@ -380,20 +380,6 @@ namespace sensekit {
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    void SenseKitContext::raise_existing_streams_added(stream_added_callback_t callback, void* clientTag)
-    {
-        m_setCatalog.visit_sets(
-            [&callback, &clientTag] (StreamSet* set)
-            {
-                sensekit_streamset_t setHandle = set->get_handle();
-                set->visit_streams(
-                    [&setHandle, &callback, &clientTag] (Stream* stream)
-                    {
-                        callback(clientTag, setHandle, stream->get_handle(), stream->get_description());
-                    });
-            });
-    }
-
     sensekit_status_t SenseKitContext::stream_set_parameter(sensekit_streamconnection_t connection,
                                                             sensekit_parameter_id parameterId,
                                                             size_t inByteLength,

@@ -34,14 +34,14 @@ namespace sensekit {
         void register_for_stream_events()
         {
             get_pluginService().
-                register_stream_added_callback(&PluginBase::stream_added_handler_thunk,
-                                               this,
-                                               &m_streamAddedCallbackId);
+                register_stream_registered_callback(&PluginBase::stream_added_handler_thunk,
+                                                    this,
+                                                    &m_streamAddedCallbackId);
 
             get_pluginService().
-                register_stream_removing_callback(&PluginBase::stream_removing_handler_thunk,
-                                                  this,
-                                                  &m_streamRemovingCallbackId);
+                register_stream_unregistering_callback(&PluginBase::stream_removing_handler_thunk,
+                                                       this,
+                                                       &m_streamRemovingCallbackId);
         }
 
         void register_for_host_events()
@@ -55,8 +55,8 @@ namespace sensekit {
 
         void unregister_for_stream_events()
         {
-            get_pluginService().unregister_stream_added_callback(m_streamAddedCallbackId);
-            get_pluginService().unregister_stream_removing_callback(m_streamRemovingCallbackId);
+            get_pluginService().unregister_stream_registered_callback(m_streamAddedCallbackId);
+            get_pluginService().unregister_stream_unregistering_callback(m_streamRemovingCallbackId);
         }
 
         void unregister_for_host_events()
@@ -136,30 +136,30 @@ namespace sensekit {
     };
 }
 
-#define EXPORT_PLUGIN(className)                                                         \
-                                                                                         \
-    static className* g_plugin;                                                          \
-                                                                                         \
-    SENSEKIT_BEGIN_DECLS                                                                 \
-                                                                                         \
+#define EXPORT_PLUGIN(className)                                        \
+                                                                        \
+    static className* g_plugin;                                         \
+                                                                        \
+    SENSEKIT_BEGIN_DECLS                                                \
+                                                                        \
     SENSEKIT_EXPORT void sensekit_plugin_initialize(PluginServiceProxyBase* pluginProxy) \
-    {                                                                                    \
-        g_plugin = new className(                                                        \
-            static_cast<sensekit::PluginServiceProxy*>(pluginProxy));                    \
-        g_plugin->initialize();                                                          \
-    }                                                                                    \
-                                                                                         \
-    SENSEKIT_EXPORT void sensekit_plugin_update()                                        \
-    {                                                                                    \
-        g_plugin->temp_update();                                                         \
-    }                                                                                    \
-                                                                                         \
-    SENSEKIT_EXPORT void sensekit_plugin_terminate()                                     \
-    {                                                                                    \
-        delete g_plugin;                                                                 \
-        g_plugin = nullptr;                                                              \
-    }                                                                                    \
-                                                                                         \
+    {                                                                   \
+        g_plugin = new className(                                       \
+            static_cast<sensekit::PluginServiceProxy*>(pluginProxy));   \
+        g_plugin->initialize();                                         \
+    }                                                                   \
+                                                                        \
+    SENSEKIT_EXPORT void sensekit_plugin_update()                       \
+    {                                                                   \
+        g_plugin->temp_update();                                        \
+    }                                                                   \
+                                                                        \
+    SENSEKIT_EXPORT void sensekit_plugin_terminate()                    \
+    {                                                                   \
+        delete g_plugin;                                                \
+        g_plugin = nullptr;                                             \
+    }                                                                   \
+                                                                        \
     SENSEKIT_END_DECLS
 
 #endif /* PLUGINBASE_H */

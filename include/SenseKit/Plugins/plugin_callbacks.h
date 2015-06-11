@@ -32,15 +32,15 @@ typedef void(*connection_removed_callback_t)(void*,
                                              sensekit_streamconnection_t);
 
 
-typedef void(*stream_added_callback_t)(void*,
-                                       sensekit_streamset_t,
-                                       sensekit_stream_t,
-                                       sensekit_stream_desc_t);
+typedef void(*stream_registered_callback_t)(void*,
+                                            sensekit_streamset_t,
+                                            sensekit_stream_t,
+                                            sensekit_stream_desc_t);
 
-typedef void(*stream_removing_callback_t)(void*,
-                                          sensekit_streamset_t,
-                                          sensekit_stream_t,
-                                          sensekit_stream_desc_t);
+typedef void(*stream_unregistering_callback_t)(void*,
+                                               sensekit_streamset_t,
+                                               sensekit_stream_t,
+                                               sensekit_stream_desc_t);
 
 typedef void(*host_event_callback_t)(void*,
                                      sensekit_event_id,
@@ -49,11 +49,11 @@ typedef void(*host_event_callback_t)(void*,
 
 struct stream_callbacks_t {
     void* context;
-    set_parameter_callback_t set_parameter_callback;
-    get_parameter_callback_t get_parameter_callback;
-    invoke_callback_t invoke_callback;
-    connection_added_callback_t connection_added_callback;
-    connection_removed_callback_t connection_removed_callback;
+set_parameter_callback_t set_parameter_callback;
+get_parameter_callback_t get_parameter_callback;
+invoke_callback_t invoke_callback;
+connection_added_callback_t connection_added_callback;
+connection_removed_callback_t connection_removed_callback;
 };
 
 #endif /* PLUGIN_CALLBACKS_H */

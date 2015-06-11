@@ -37,8 +37,6 @@ namespace sensekit
 
     private:
         SenseKitContext& m_context;
-        Signal<sensekit_streamset_t, sensekit_stream_t, sensekit_stream_desc_t> m_streamAddedSignal;
-        Signal<sensekit_streamset_t, sensekit_stream_t, sensekit_stream_desc_t> m_streamRemovingSignal;
         Signal<sensekit_event_id, const void*, size_t> m_hostEventSignal;
 
         Logger m_logger;

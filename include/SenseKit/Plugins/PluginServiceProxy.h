@@ -12,18 +12,18 @@ namespace sensekit {
     {
     public:
 
-    sensekit_status_t register_stream_added_callback(stream_added_callback_t callback,
-                                                     void* clientTag,
-                                                     sensekit_callback_id_t* callbackId)
+    sensekit_status_t register_stream_registered_callback(stream_registered_callback_t callback,
+                                                          void* clientTag,
+                                                          sensekit_callback_id_t* callbackId)
     {
-        return PluginServiceProxyBase::register_stream_added_callback(pluginService, callback, clientTag, callbackId);
+        return PluginServiceProxyBase::register_stream_registered_callback(pluginService, callback, clientTag, callbackId);
     }
 
-    sensekit_status_t register_stream_removing_callback(stream_removing_callback_t callback,
-                                                        void* clientTag,
-                                                        sensekit_callback_id_t* callbackId)
+    sensekit_status_t register_stream_unregistering_callback(stream_unregistering_callback_t callback,
+                                                             void* clientTag,
+                                                             sensekit_callback_id_t* callbackId)
     {
-        return PluginServiceProxyBase::register_stream_removing_callback(pluginService, callback, clientTag, callbackId);
+        return PluginServiceProxyBase::register_stream_unregistering_callback(pluginService, callback, clientTag, callbackId);
     }
 
     sensekit_status_t register_host_event_callback(host_event_callback_t callback,
@@ -38,14 +38,14 @@ namespace sensekit {
         return PluginServiceProxyBase::unregister_host_event_callback(pluginService, callback);
     }
 
-    sensekit_status_t unregister_stream_added_callback(sensekit_callback_id_t callback)
+    sensekit_status_t unregister_stream_registered_callback(sensekit_callback_id_t callback)
     {
-        return PluginServiceProxyBase::unregister_stream_added_callback(pluginService, callback);
+        return PluginServiceProxyBase::unregister_stream_registered_callback(pluginService, callback);
     }
 
-    sensekit_status_t unregister_stream_removing_callback(sensekit_callback_id_t callback)
+    sensekit_status_t unregister_stream_unregistering_callback(sensekit_callback_id_t callback)
     {
-        return PluginServiceProxyBase::unregister_stream_removing_callback(pluginService, callback);
+        return PluginServiceProxyBase::unregister_stream_unregistering_callback(pluginService, callback);
     }
 
     sensekit_status_t create_stream_set(const char* setUri,

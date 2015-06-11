@@ -4,6 +4,8 @@
 #include "PluginServiceDelegate.h"
 #include <SenseKit/Plugins/PluginServiceProxyBase.h>
 #include <SenseKit/sensekit_types.h>
+#include "StreamRegisteredEventArgs.h"
+#include "StreamUnregisteringEventArgs.h"
 #include "CreatePluginProxy.h"
 #include "ParameterBin.h"
 #include "Logging.h"
@@ -44,50 +46,50 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::register_stream_added_callback(stream_added_callback_t callback,
+    sensekit_status_t PluginService::register_stream_registered_callback(stream_registered_callback_t callback,
                                                                     void* clientTag,
                                                                     CallbackId& callbackId)
     {
-        auto thunk = [clientTag, callback](sensekit_streamset_t ss,
-                                           sensekit_stream_t s,
-                                           sensekit_stream_desc_t d)
+        auto thunk = [clientTag, callback](StreamRegisteredEventArgs args)
             {
-                callback(clientTag, ss, s, d);
+                callback(clientTag,
+                         args.streamSet->get_handle(),
+                         args.stream->get_handle(),
+                         args.description);
             };
 
-        callbackId = m_streamAddedSignal += thunk;
-
-        m_context.raise_existing_streams_added(callback, clientTag);
+        m_context.get_setCatalog().register_for_stream_registered_event(thunk);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::register_stream_removing_callback(stream_removing_callback_t callback,
+    sensekit_status_t PluginService::register_stream_unregistering_callback(stream_unregistering_callback_t callback,
                                                                        void* clientTag,
                                                                        CallbackId& callbackId)
     {
-        auto thunk = [clientTag, callback](sensekit_streamset_t ss,
-                                           sensekit_stream_t s,
-                                           sensekit_stream_desc_t d)
+        auto thunk = [clientTag, callback](StreamUnregisteringEventArgs args)
             {
-                callback(clientTag, ss, s, d);
+                callback(clientTag,
+                         args.streamSet->get_handle(),
+                         args.stream->get_handle(),
+                         args.description);
             };
 
-        callbackId = m_streamRemovingSignal += thunk;
+        m_context.get_setCatalog().register_for_stream_unregistering_event(thunk);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::unregister_stream_added_callback(CallbackId callbackId)
+    sensekit_status_t PluginService::unregister_stream_registered_callback(CallbackId callbackId)
     {
-        m_streamAddedSignal -= callbackId;
+        m_context.get_setCatalog().unregister_for_stream_registered_event(callbackId);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::unregister_stream_removing_callback(CallbackId callbackId)
+    sensekit_status_t PluginService::unregister_stream_unregistering_callback(CallbackId callbackId)
     {
-        m_streamRemovingSignal -= callbackId;
+        m_context.get_setCatalog().unregister_form_stream_unregistering_event(callbackId);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -103,8 +105,6 @@ namespace sensekit
         handle = stream->get_handle();
 
         m_logger.info("registered stream -- handle %x type: %d", handle, desc.type);
-
-        m_streamAddedSignal.raise(setHandle, handle, desc);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -126,8 +126,6 @@ namespace sensekit
         const sensekit_stream_desc_t& desc = stream->get_description();
 
         m_logger.info("destroying stream -- handle: %x type: %d", stream->get_handle(), desc.type);
-
-        m_streamRemovingSignal.raise(set->get_handle(), streamHandle, desc);
 
         set->destroy_stream(stream);
 

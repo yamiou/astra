@@ -31,18 +31,18 @@ namespace sensekit
         PluginServiceProxyBase* create_proxy();
         void notify_host_event(sensekit_event_id id, const void* data, size_t dataSize);
 
-        sensekit_status_t register_stream_added_callback(stream_added_callback_t callback,
-                                                         void* clientTag,
-                                                         sensekit_callback_id_t& callbackId);
-        sensekit_status_t register_stream_removing_callback(stream_removing_callback_t callback,
-                                                            void* clientTag,
-                                                            sensekit_callback_id_t& callbackId);
+        sensekit_status_t register_stream_registered_callback(stream_registered_callback_t callback,
+                                                              void* clientTag,
+                                                              sensekit_callback_id_t& callbackId);
+        sensekit_status_t register_stream_unregistering_callback(stream_unregistering_callback_t callback,
+                                                                 void* clientTag,
+                                                                 sensekit_callback_id_t& callbackId);
         sensekit_status_t register_host_event_callback(host_event_callback_t callback,
                                                        void* clientTag,
                                                        sensekit_callback_id_t& callbackId);
         sensekit_status_t unregister_host_event_callback(sensekit_callback_id_t callback);
-        sensekit_status_t unregister_stream_added_callback(sensekit_callback_id_t callback);
-        sensekit_status_t unregister_stream_removing_callback(sensekit_callback_id_t callback);
+        sensekit_status_t unregister_stream_registered_callback(sensekit_callback_id_t callback);
+        sensekit_status_t unregister_stream_unregistering_callback(sensekit_callback_id_t callback);
         sensekit_status_t create_stream_set(const char* setUri,
                                             sensekit_streamset_t& setHandle);
         sensekit_status_t destroy_stream_set(sensekit_streamset_t& setHandle);
@@ -76,8 +76,6 @@ namespace sensekit
 
     private:
         SenseKitContext& m_context;
-        Signal<sensekit_streamset_t, sensekit_stream_t, sensekit_stream_desc_t> m_streamAddedSignal;
-        Signal<sensekit_streamset_t, sensekit_stream_t, sensekit_stream_desc_t> m_streamRemovingSignal;
         Signal<sensekit_event_id, const void*, size_t> m_hostEventSignal;
 
         Logger m_logger;
