@@ -20,7 +20,7 @@ namespace sensekit { namespace plugins { namespace hand {
     {
         float maxSteadyDelta{ 5 };
         int minSteadyFrames{ 15 };
-        int minHeadingDist{ 75 };
+        int minHeadingDist{ 125 };
         float deltaHeadingFactor{ 0.5 };
         float minHeadingDiffForInflection{ 135 };
         float maxHeadingDiffForContinuation{ 45 };
