@@ -409,7 +409,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 if (worldPosition.z != 0)
                 {
                     float score = 0;
-                    score += worldPosition.y * heightFactor;
+                    score += (5000 + worldPosition.y) * heightFactor;
                     score += (MAX_DEPTH - worldPosition.z) * depthFactor;
 
                     *scoreRow = score;
