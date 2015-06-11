@@ -27,7 +27,7 @@ typedef void(*host_event_callback_t)(void*,
 struct stream_callbacks_t {
     void* context;
 ^^^BEGINREPLACE:plugincallbacks^^^
-^FUNC^_callback_t ^FUNC^_callback;
+    ^FUNC^_callback_t ^FUNC^_callback;
 ^^^ENDREPLACE^^^
 };
 

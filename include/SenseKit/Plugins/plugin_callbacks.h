@@ -49,11 +49,11 @@ typedef void(*host_event_callback_t)(void*,
 
 struct stream_callbacks_t {
     void* context;
-set_parameter_callback_t set_parameter_callback;
-get_parameter_callback_t get_parameter_callback;
-invoke_callback_t invoke_callback;
-connection_added_callback_t connection_added_callback;
-connection_removed_callback_t connection_removed_callback;
+    set_parameter_callback_t set_parameter_callback;
+    get_parameter_callback_t get_parameter_callback;
+    invoke_callback_t invoke_callback;
+    connection_added_callback_t connection_added_callback;
+    connection_removed_callback_t connection_removed_callback;
 };
 
 #endif /* PLUGIN_CALLBACKS_H */
