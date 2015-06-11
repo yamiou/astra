@@ -57,7 +57,6 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat& depth;
         cv::Mat& area;
         cv::Mat& areaSqrt;
-        cv::Mat& basicScore;
         cv::Mat& velocitySignal;
         cv::Mat& layerSegmentation;
         cv::Mat& layerScore;
@@ -79,7 +78,6 @@ namespace sensekit { namespace plugins { namespace hand {
                          cv::Mat& depth,
                          cv::Mat& area,
                          cv::Mat& areaSqrt,
-                         cv::Mat& basicScore,
                          cv::Mat& velocitySignal,
                          cv::Mat& foregroundSearched,
                          cv::Mat& layerSegmentation,
@@ -100,7 +98,6 @@ namespace sensekit { namespace plugins { namespace hand {
             depth(depth),
             area(area),
             areaSqrt(areaSqrt),
-            basicScore(basicScore),
             velocitySignal(velocitySignal),
             layerSegmentation(layerSegmentation),
             layerScore(layerScore),
@@ -145,6 +142,8 @@ namespace sensekit { namespace plugins { namespace hand {
         const int iterationMax;
         const float maxSegmentationDist;
         const SegmentationVelocityPolicy velocityPolicy;
+        const float depthFactor;
+        const float heightFactor;
         const float edgeDistanceFactor;
         const float targetEdgeDistance;
         const float pointInertiaFactor;
@@ -159,6 +158,8 @@ namespace sensekit { namespace plugins { namespace hand {
                      const int iterationMax,
                      const float maxSegmentationDist,
                      const SegmentationVelocityPolicy velocityPolicy,
+                     const float depthFactor,
+                     const float heightFactor,
                      const float edgeDistanceFactor,
                      const float targetEdgeDistance,
                      const float pointInertiaFactor,
@@ -172,6 +173,8 @@ namespace sensekit { namespace plugins { namespace hand {
               iterationMax(iterationMax),
               maxSegmentationDist(maxSegmentationDist),
               velocityPolicy(velocityPolicy),
+              depthFactor(depthFactor),
+              heightFactor(heightFactor),
               edgeDistanceFactor(edgeDistanceFactor),
               targetEdgeDistance(targetEdgeDistance),
               pointInertiaFactor(pointInertiaFactor),

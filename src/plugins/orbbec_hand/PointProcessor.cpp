@@ -119,13 +119,6 @@ namespace sensekit { namespace plugins { namespace hand {
         auto scalingMapper = get_scaling_mapper(matrices);
 
         calculate_area(matrices, scalingMapper);
-
-        segmentation::calculate_basic_score(matrices.worldPoints,
-                                            matrices.depth.size(),
-                                            matrices.basicScore,
-                                            m_heightScoreFactor,
-                                            m_depthScoreFactor);
-
     }
 
     void PointProcessor::updateTrackedPoints(TrackingMatrices& matrices)
@@ -160,6 +153,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                         m_iterationMaxTracking,
                                         m_maxSegmentationDist,
                                         VELOCITY_POLICY_IGNORE,
+                                        m_depthScoreFactor,
+                                        m_heightScoreFactor,
                                         m_edgeDistanceScoreFactor,
                                         m_targetEdgeDistance,
                                         m_pointInertiaFactor,
@@ -198,6 +193,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                              m_iterationMaxTracking,
                                              m_maxSegmentationDist,
                                              VELOCITY_POLICY_IGNORE,
+                                             m_depthScoreFactor,
+                                             m_heightScoreFactor,
                                              m_edgeDistanceScoreFactor,
                                              m_targetEdgeDistance,
                                              m_pointInertiaFactor,
@@ -507,12 +504,6 @@ namespace sensekit { namespace plugins { namespace hand {
 
         calculate_area(matrices, roiMapper);
 
-        segmentation::calculate_basic_score(matrices.worldPoints,
-                                            matrices.depth.size(),
-                                            matrices.basicScore,
-                                            m_heightScoreFactor,
-                                            m_depthScoreFactor);
-
         TrackingData refinementTrackingData(matrices,
                                             roiPosition,
                                             trackedPoint.worldPosition,
@@ -522,6 +513,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_iterationMaxRefinement,
                                             m_maxSegmentationDist,
                                             VELOCITY_POLICY_IGNORE,
+                                            m_depthScoreFactor,
+                                            m_heightScoreFactor,
                                             m_edgeDistanceScoreFactor,
                                             m_targetEdgeDistance,
                                             m_pointInertiaFactor,
@@ -814,6 +807,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                         m_iterationMaxInitial,
                                         m_maxSegmentationDist,
                                         VELOCITY_POLICY_RESET_TTL,
+                                        m_depthScoreFactor,
+                                        m_heightScoreFactor,
                                         m_edgeDistanceScoreFactor,
                                         m_targetEdgeDistance,
                                         m_pointInertiaFactor,

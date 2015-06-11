@@ -22,12 +22,6 @@ namespace sensekit { namespace plugins { namespace hand {
                                      cv::Mat& edgeDistanceMatrix,
                                      const float maxEdgeDistance);
 
-        void calculate_basic_score(const sensekit::Vector3f* worldPoints,
-                                   cv::Size depthSize,
-                                   cv::Mat& scoreMatrix,
-                                   const float heightFactor,
-                                   const float depthFactor);
-
         float count_neighborhood_area(cv::Mat& matSegmentation,
                                       cv::Mat& matDepth,
                                       cv::Mat& matArea,

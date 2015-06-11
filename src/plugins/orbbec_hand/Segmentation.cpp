@@ -120,7 +120,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         return INVALID_POINT;
     }
 
-    static void segment_foreground(TrackingData& data)
+    static float segment_foreground_and_get_average_depth(TrackingData& data)
     {
         PROFILE_FUNC();
         const float& maxSegmentationDist = data.maxSegmentationDist;
@@ -133,6 +133,9 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         cv::Mat& searchedMatrix = data.matrices.foregroundSearched;
 
         std::queue<PointTTL> pointQueue;
+
+        double totalDepth = 0;
+        int depthCount = 0;
 
         //does the seed point start in range?
         //If not, it will search outward until it finds in range pixels
@@ -150,7 +153,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             if (seedPosition == INVALID_POINT)
             {
                 //No in range pixels found, no foreground to set
-                return;
+                return 0.0f;
             }
         }
 
@@ -180,6 +183,9 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 continue;
             }
 
+            totalDepth += depth;
+            ++depthCount;
+
             searchedMatrix.at<char>(y, x) = PixelType::Searched;
             segmentationMatrix.at<char>(y, x) = PixelType::Foreground;
 
@@ -187,14 +193,24 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
             enqueue_neighbors(matVisited, pointQueue, pt);
         }
+
+        if (depthCount > 0)
+        {
+            float averageDepth = static_cast<float>(totalDepth / depthCount);
+            return averageDepth;
+        }
+        else
+        {
+            return 0.0f;
+        }
     }
 
-    void calculate_layer_score(TrackingData& data)
+    void calculate_layer_score(TrackingData& data, const float layerAverageDepth)
     {
         PROFILE_FUNC();
-        cv::Mat& depthMatrix = data.matrices.depth;
-        cv::Mat& basicScoreMatrix = data.matrices.basicScore;
         cv::Mat& edgeDistanceMatrix = data.matrices.layerEdgeDistance;
+        const float depthFactor = data.depthFactor;
+        const float heightFactor = data.heightFactor;
         const float edgeDistanceFactor = data.edgeDistanceFactor;
         const float targetEdgeDist = data.targetEdgeDistance;
         cv::Mat& layerScoreMatrix = data.matrices.layerScore;
@@ -203,14 +219,16 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         const sensekit::Vector3f* worldPoints = data.matrices.worldPoints;
         cv::Mat& segmentationMatrix = data.matrices.layerSegmentation;
 
+        layerScoreMatrix = cv::Mat::zeros(data.matrices.depth.size(), CV_32FC1);
+
         ScalingCoordinateMapper mapper = get_scaling_mapper(data.matrices);
 
         auto seedWorldPosition = sensekit::Vector3f(data.referenceWorldPosition.x,
                                                     data.referenceWorldPosition.y,
                                                     data.referenceWorldPosition.z);
 
-        int width = depthMatrix.cols;
-        int height = depthMatrix.rows;
+        int width = data.matrices.depth.cols;
+        int height = data.matrices.depth.rows;
 
         int edgeRadius = mapper.scale() * width / 32;
         int minX = edgeRadius - 1;
@@ -220,16 +238,12 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         for (int y = 0; y < height; y++)
         {
-            float* depthRow = depthMatrix.ptr<float>(y);
-            float* basicScoreRow = basicScoreMatrix.ptr<float>(y);
             float* edgeDistanceRow = edgeDistanceMatrix.ptr<float>(y);
             float* layerScoreRow = layerScoreMatrix.ptr<float>(y);
             char* segmentationRow = segmentationMatrix.ptr<char>(y);
 
             for (int x = 0; x < width; ++x,
-                                       ++depthRow,
                                        ++worldPoints,
-                                       ++basicScoreRow,
                                        ++edgeDistanceRow,
                                        ++layerScoreRow,
                                        ++segmentationRow)
@@ -239,12 +253,17 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                     continue;
                 }
 
-                float depth = *depthRow;
-                if (depth != 0 && x > minX && x < maxX && y > minY && y < maxY)
+                sensekit::Vector3f worldPosition = *worldPoints;
+                if (worldPosition.z != 0 && x > minX && x < maxX && y > minY && y < maxY)
                 {
-                    sensekit::Vector3f worldPosition = *worldPoints;
+                    //start with arbitrary large value to prevent scores from going negative
+                    //(which is ok algorithmically, but debug visuals don't like it)
+                    float score = 10000;
 
-                    float score = *basicScoreRow;
+                    score += worldPosition.y * heightFactor;
+
+                    float depthDiff = layerAverageDepth - worldPosition.z;
+                    score += depthDiff * depthFactor;
 
                     if (pointInertiaRadius > 0)
                     {
@@ -278,9 +297,9 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         data.matrices.layerEdgeDistance = cv::Mat::zeros(size, CV_32FC1);
         data.matrices.layerScore = cv::Mat::zeros(size, CV_32FC1);
 
-        segment_foreground(data);
+        const float layerAverageDepth = segment_foreground_and_get_average_depth(data);
 
-        if (data.matrices.layerSegmentation.empty())
+        if (layerAverageDepth == 0.0f || data.matrices.layerSegmentation.empty())
         {
             return INVALID_POINT;
         }
@@ -291,7 +310,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                     data.matrices.areaSqrt,
                                     data.matrices.layerEdgeDistance,
                                     data.targetEdgeDistance * 2.0f);
-        calculate_layer_score(data);
+        calculate_layer_score(data, layerAverageDepth);
 
         double min, max;
         cv::Point minLoc, maxLoc;
@@ -385,41 +404,6 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         nextSearchStart.x = width;
         nextSearchStart.y = height;
         return false;
-    }
-
-    void calculate_basic_score(const sensekit::Vector3f* worldPoints,
-                               cv::Size depthSize,
-                               cv::Mat& scoreMatrix,
-                               const float heightFactor,
-                               const float depthFactor)
-    {
-        PROFILE_FUNC();
-        scoreMatrix = cv::Mat::zeros(depthSize, CV_32FC1);
-
-        int width = depthSize.width;
-        int height = depthSize.height;
-
-        for (int y = 0; y < height; ++y)
-        {
-            float* scoreRow = scoreMatrix.ptr<float>(y);
-
-            for (int x = 0; x < width; ++x, ++worldPoints, ++scoreRow)
-            {
-                const sensekit::Vector3f worldPosition = *worldPoints;
-                if (worldPosition.z != 0)
-                {
-                    float score = 0;
-                    score += (5000 + worldPosition.y) * heightFactor;
-                    score += (MAX_DEPTH - worldPosition.z) * depthFactor;
-
-                    *scoreRow = score;
-                }
-                else
-                {
-                    *scoreRow = 0;
-                }
-            }
-        }
     }
 
     void calculate_edge_distance(cv::Mat& segmentationMatrix,
