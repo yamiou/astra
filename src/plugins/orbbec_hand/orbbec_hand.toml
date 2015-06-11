@@ -14,8 +14,8 @@ minDepth = 1000.0 #float
 maxDepth = 4000.0 #float
 
 [pointprocessor]
-segmentationBandwidthDepthNear = 200.0 #mm #float
-segmentationBandwidthDepthFar = 200.0 #mm #float
+segmentationBandwidthDepthNear = 100.0 #mm #float
+segmentationBandwidthDepthFar = 100.0 #mm #float
 maxMatchDistLostActive = 500.0 #mm #float
 maxMatchDistDefault = 200.0 #mm #float
 iterationMaxInitial = 1
@@ -29,7 +29,7 @@ maxSegmentationDist = 250.0 #mm #float
 steadyDeadBandRadius = 75.0 #mm #float
 targetEdgeDistance = 40.0 #mm #float
 heightScoreFactor = 0.5 #float
-depthScoreFactor = 1.0 #float
+depthScoreFactor = 1000.0 #float
 edgeDistanceScoreFactor = 100.0 #float
 pointInertiaFactor = 100.0 #float
 pointInertiaRadius = 100.0 #mm #float

@@ -262,7 +262,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
                     score += worldPosition.y * heightFactor;
 
-                    float depthDiff = layerAverageDepth - worldPosition.z;
+                    float depthDiff = 1.0 - worldPosition.z / layerAverageDepth;
                     score += depthDiff * depthFactor;
 
                     if (pointInertiaRadius > 0)
