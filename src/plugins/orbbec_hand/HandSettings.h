@@ -39,7 +39,7 @@ namespace sensekit { namespace plugins { namespace hand {
         int iterationMaxInitial{ 1 };
         int iterationMaxTracking{ 1 };
         int iterationMaxRefinement{ 1 };
-        float minArea{ 0 }; //mm^2
+        float minArea{ 3000 }; //mm^2
         float maxArea{ 30000 }; //mm^2
         float areaBandwidth{ 250 }; //mm
         float areaBandwidthDepth{ 100 }; //mm
@@ -59,6 +59,8 @@ namespace sensekit { namespace plugins { namespace hand {
         float pointSmoothingDeadZone{ 50 }; //mm
         float foregroundRadius1{ 100 };
         float foregroundRadius2{ 150 };
+        float foregroundRadiusMinPercent1{ 0.08 };
+        float foregroundRadiusMinPercent2{ 0.04 };
         float foregroundRadiusMaxPercent1{ 0.35 };
         float foregroundRadiusMaxPercent2{ 0.15 };
         int maxFailedTestsInProbation{ 5 };

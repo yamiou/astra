@@ -308,7 +308,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
             m_pointProcessor.calculateTestPassMap(matrices);
 
-            bool outputTestLog = true;
+            TestBehavior outputTestLog = TEST_BEHAVIOR_LOG;
 
             bool validPointInRange = m_pointProcessor.test_point_in_range(matrices,
                                                                           seedPosition,

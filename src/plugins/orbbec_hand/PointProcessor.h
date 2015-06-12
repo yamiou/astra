@@ -13,6 +13,12 @@ namespace sensekit { namespace plugins { namespace hand {
 
     struct TrackedPoint;
 
+    enum TestBehavior
+    {
+        TEST_BEHAVIOR_NONE = 0,
+        TEST_BEHAVIOR_LOG = 1
+    };
+
     class PointProcessor
     {
     public:
@@ -42,15 +48,15 @@ namespace sensekit { namespace plugins { namespace hand {
         bool test_point_in_range(TrackingMatrices& matrices,
                                  const cv::Point& targetPoint,
                                  int trackingId,
-                                 bool outputLog);
+                                 TestBehavior outputLog);
         bool test_point_area(TrackingMatrices& matrices,
                              const cv::Point& targetPoint,
                              int trackingId,
-                             bool outputLog);
+                             TestBehavior outputLog);
         bool test_foreground_radius_percentage(TrackingMatrices& matrices,
                                                const cv::Point& targetPoint,
                                                int trackingId,
-                                               bool outputLog);
+                                               TestBehavior outputLog);
         void calculateTestPassMap(TrackingMatrices& matrices);
 
     private:
@@ -103,6 +109,8 @@ namespace sensekit { namespace plugins { namespace hand {
         float m_pointSmoothingDeadZone;
         float m_foregroundRadius1;
         float m_foregroundRadius2;
+        float m_foregroundRadiusMinPercent1;
+        float m_foregroundRadiusMinPercent2;
         float m_foregroundRadiusMaxPercent1;
         float m_foregroundRadiusMaxPercent2;
         int m_maxFailedTestsInProbation;

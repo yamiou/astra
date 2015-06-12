@@ -73,6 +73,8 @@ namespace sensekit { namespace plugins { namespace hand {
         settings.pointSmoothingDeadZone = get_float_from_table(t, "pointprocessor.pointSmoothingDeadZone", settings.pointSmoothingDeadZone);
         settings.foregroundRadius1 = get_float_from_table(t, "pointprocessor.foregroundRadius1", settings.foregroundRadius1);
         settings.foregroundRadius2 = get_float_from_table(t, "pointprocessor.foregroundRadius2", settings.foregroundRadius2);
+        settings.foregroundRadiusMinPercent1 = get_float_from_table(t, "pointprocessor.foregroundRadiusMinPercent1", settings.foregroundRadiusMinPercent1);
+        settings.foregroundRadiusMinPercent2 = get_float_from_table(t, "pointprocessor.foregroundRadiusMinPercent2", settings.foregroundRadiusMinPercent2);
         settings.foregroundRadiusMaxPercent1 = get_float_from_table(t, "pointprocessor.foregroundRadiusMaxPercent1", settings.foregroundRadiusMaxPercent1);
         settings.foregroundRadiusMaxPercent2 = get_float_from_table(t, "pointprocessor.foregroundRadiusMaxPercent2", settings.foregroundRadiusMaxPercent2);
         settings.maxFailedTestsInProbation = get_int_from_table(t, "pointprocessor.maxFailedTestsInProbation", settings.maxFailedTestsInProbation);
