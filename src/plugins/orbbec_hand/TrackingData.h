@@ -3,6 +3,7 @@
 
 #include <opencv2/core/core.hpp>
 #include "ScalingCoordinateMapper.h"
+#include "HandSettings.h"
 
 namespace sensekit { namespace plugins { namespace hand {
 
@@ -26,6 +27,18 @@ namespace sensekit { namespace plugins { namespace hand {
         Tracking,
         Lost,
         Dead
+    };
+
+    enum TestBehavior
+    {
+        TEST_BEHAVIOR_NONE = 0,
+        TEST_BEHAVIOR_LOG = 1
+    };
+
+    enum TestPhase
+    {
+        TEST_PHASE_CREATE = 0,
+        TEST_PHASE_UPDATE = 1
     };
 
     inline std::string tracking_status_to_string(TrackingStatus status)
@@ -137,48 +150,24 @@ namespace sensekit { namespace plugins { namespace hand {
         const cv::Point& seedPosition;
         const cv::Point3f referenceWorldPosition;
         const float referenceAreaSqrt;
-        const float bandwidthDepthNear;
-        const float bandwidthDepthFar;
-        const int iterationMax;
-        const float maxSegmentationDist;
         const SegmentationVelocityPolicy velocityPolicy;
-        const float depthFactor;
-        const float heightFactor;
-        const float edgeDistanceFactor;
-        const float targetEdgeDistance;
-        const float pointInertiaFactor;
-        const float pointInertiaRadius;
+        const SegmentationSettings settings;
+        const TestPhase phase;
 
         TrackingData(TrackingMatrices& matrices,
                      const cv::Point& seedPosition,
                      const cv::Point3f referenceWorldPosition,
                      const float referenceAreaSqrt,
-                     const float bandwidthDepthNear,
-                     const float bandwidthDepthFar,
-                     const int iterationMax,
-                     const float maxSegmentationDist,
                      const SegmentationVelocityPolicy velocityPolicy,
-                     const float depthFactor,
-                     const float heightFactor,
-                     const float edgeDistanceFactor,
-                     const float targetEdgeDistance,
-                     const float pointInertiaFactor,
-                     const float pointInertiaRadius)
+                     const SegmentationSettings settings,
+                     const TestPhase phase)
             : matrices(matrices),
               seedPosition(seedPosition),
               referenceWorldPosition(referenceWorldPosition),
               referenceAreaSqrt(referenceAreaSqrt),
-              bandwidthDepthNear(bandwidthDepthNear),
-              bandwidthDepthFar(bandwidthDepthFar),
-              iterationMax(iterationMax),
-              maxSegmentationDist(maxSegmentationDist),
               velocityPolicy(velocityPolicy),
-              depthFactor(depthFactor),
-              heightFactor(heightFactor),
-              edgeDistanceFactor(edgeDistanceFactor),
-              targetEdgeDistance(targetEdgeDistance),
-              pointInertiaFactor(pointInertiaFactor),
-              pointInertiaRadius(pointInertiaRadius)
+              settings(settings),
+              phase(phase)
         {}
     };
 }}}

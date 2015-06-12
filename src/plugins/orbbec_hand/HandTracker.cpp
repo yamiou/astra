@@ -18,6 +18,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                  sensekit_streamset_t streamSet,
                                  StreamDescription& depthDesc,
                                  HandSettings& settings) :
+            m_settings(settings),
             m_pluginService(pluginService),
             m_depthUtility(settings.processingSizeWidth, settings.processingSizeHeight, settings.depthUtilitySettings),
             m_pointProcessor(settings.pointProcessorSettings),
@@ -265,13 +266,17 @@ namespace sensekit { namespace plugins { namespace hand {
 
             cv::Mat& matDepth = matrices.depth;
 
-            float area = m_pointProcessor.get_point_area(matrices, seedPosition);
+            auto segmentationSettings = m_settings.pointProcessorSettings.segmentationSettings;
+
+            float area = segmentation::get_point_area(matrices,
+                            segmentationSettings.areaTestSettings,
+                            seedPosition);
             float depth = matDepth.at<float>(seedPosition);
             float score = m_debugCreateScoreValue.at<float>(seedPosition);
             float edgeDist = m_layerEdgeDistance.at<float>(seedPosition);
 
-            float foregroundRadius1 = m_pointProcessor.foregroundRadius1();
-            float foregroundRadius2 = m_pointProcessor.foregroundRadius2();
+            float foregroundRadius1 = segmentationSettings.circumferenceTestSettings.foregroundRadius1;
+            float foregroundRadius2 = segmentationSettings.circumferenceTestSettings.foregroundRadius2;
 
             auto mapper = get_scaling_mapper(matrices);
             float percentForeground1 = segmentation::get_max_sequential_circumference_percentage(matDepth,
@@ -311,26 +316,27 @@ namespace sensekit { namespace plugins { namespace hand {
             const TestBehavior outputTestLog = TEST_BEHAVIOR_LOG;
             const TestPhase phase = TEST_PHASE_UPDATE;
 
-            bool validPointInRange = m_pointProcessor.test_point_in_range(matrices,
-                                                                          seedPosition,
-                                                                          0,
-                                                                          phase,
-                                                                          outputTestLog);
+            bool validPointInRange = segmentation::test_point_in_range(matrices,
+                                                                       seedPosition,
+                                                                       0,
+                                                                       outputTestLog);
             bool validPointArea = false;
             bool validRadiusTest = false;
 
             if (validPointInRange)
             {
-                validPointArea = m_pointProcessor.test_point_area(matrices,
-                                                                  seedPosition,
-                                                                  0,
-                                                                  phase,
-                                                                  outputTestLog);
-                validRadiusTest = m_pointProcessor.test_foreground_radius_percentage(matrices,
-                                                                                     seedPosition,
-                                                                                     0,
-                                                                                     phase,
-                                                                                     outputTestLog);
+                validPointArea = segmentation::test_point_area(matrices,
+                                    m_settings.pointProcessorSettings.segmentationSettings.areaTestSettings,
+                                                               seedPosition,
+                                                               0,
+                                                               phase,
+                                                               outputTestLog);
+                validRadiusTest = segmentation::test_foreground_radius_percentage(matrices,
+                                    m_settings.pointProcessorSettings.segmentationSettings.circumferenceTestSettings,
+                                                                                  seedPosition,
+                                                                                  0,
+                                                                                  phase,
+                                                                                  outputTestLog);
             }
 
             float depth = matrices.depth.at<float>(seedPosition);
@@ -504,8 +510,9 @@ namespace sensekit { namespace plugins { namespace hand {
                 mark_image_pixel(imageFrame, color, p);
             };
 
-            float foregroundRadius1 = m_pointProcessor.foregroundRadius1();
-            float foregroundRadius2 = m_pointProcessor.foregroundRadius2();
+            auto segmentationSettings = m_settings.pointProcessorSettings.segmentationSettings;
+            float foregroundRadius1 = segmentationSettings.circumferenceTestSettings.foregroundRadius1;
+            float foregroundRadius2 = segmentationSettings.circumferenceTestSettings.foregroundRadius2;
 
             segmentation::visit_circle_circumference_sequential(m_matDepth, cv::Point(x, y), foregroundRadius1, mapper, callback);
             segmentation::visit_circle_circumference_sequential(m_matDepth, cv::Point(x, y), foregroundRadius2, mapper, callback);

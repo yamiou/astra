@@ -13,18 +13,6 @@ namespace sensekit { namespace plugins { namespace hand {
 
     struct TrackedPoint;
 
-    enum TestBehavior
-    {
-        TEST_BEHAVIOR_NONE = 0,
-        TEST_BEHAVIOR_LOG = 1
-    };
-
-    enum TestPhase
-    {
-        TEST_PHASE_CREATE = 0,
-        TEST_PHASE_UPDATE = 1
-    };
-
     class PointProcessor
     {
     public:
@@ -47,25 +35,6 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void reset();
 
-        float foregroundRadius1() const { return m_foregroundRadius1; }
-        float foregroundRadius2() const { return m_foregroundRadius2; }
-
-        float get_point_area(TrackingMatrices& matrices, const cv::Point& point);
-        bool test_point_in_range(TrackingMatrices& matrices,
-                                 const cv::Point& targetPoint,
-                                 int trackingId,
-                                 TestPhase phase,
-                                 TestBehavior outputLog);
-        bool test_point_area(TrackingMatrices& matrices,
-                             const cv::Point& targetPoint,
-                             int trackingId,
-                             TestPhase phase,
-                             TestBehavior outputLog);
-        bool test_foreground_radius_percentage(TrackingMatrices& matrices,
-                                               const cv::Point& targetPoint,
-                                               int trackingId,
-                                               TestPhase phase,
-                                               TestBehavior outputLog);
         void calculateTestPassMap(TrackingMatrices& matrices, const TestPhase phase);
 
     private:
@@ -91,42 +60,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                       const CoordinateMapper& fullSizeMapper);
 
         PointProcessorSettings& m_settings;
-        float m_segmentationBandwidthDepthNear;
-        float m_segmentationBandwidthDepthFar;
-        float m_maxMatchDistLostActive;
-        float m_maxMatchDistDefault;
-        int m_iterationMaxInitial;
-        int m_iterationMaxTracking;
-        int m_iterationMaxRefinement;
-        float m_minArea;
-        float m_maxArea;
-        float m_areaBandwidth;
-        float m_areaBandwidthDepth;
-        float m_maxSegmentationDist;
-        float m_steadyDeadBandRadius;
-        float m_targetEdgeDistance;
-        float m_heightScoreFactor;
-        float m_depthScoreFactor;
-        float m_edgeDistanceScoreFactor;
-        float m_pointInertiaFactor;
-        float m_pointInertiaRadius;
-        int m_maxInactiveFramesForCandidatePoints;
-        int m_maxInactiveFramesForLostPoints;
-        int m_maxInactiveFramesForActivePoints;
-        float m_pointSmoothingFactor;
-        float m_pointDeadBandSmoothingFactor;
-        float m_pointSmoothingDeadZone;
-        float m_foregroundRadius1;
-        float m_foregroundRadius2;
-        float m_foregroundRadiusMinPercent1;
-        float m_foregroundRadiusMinPercent2;
-        float m_foregroundRadiusMaxPercent1;
-        float m_foregroundRadiusMaxPercent2;
-        int m_maxFailedTestsInProbation;
-        int m_probationFrameCount;
-        int m_maxFailedTestsInProbationActivePoints;
-        float m_secondChanceMinDistance;
-        float m_mergePointDistance;
+        int m_probationFrameCount { 0 };
 
         int m_nextTrackingId{ 0 };
         //TODO consider std::list<TrackedPoint>

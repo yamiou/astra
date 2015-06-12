@@ -28,41 +28,54 @@ namespace sensekit { namespace plugins { namespace hand {
         int maxFramesBetweenInflections{ 90 };
     };
 
-    struct PointProcessorSettings
+    struct AreaTestSettings
     {
-        TrajectoryAnalyzerSettings trajectoryAnalyzerSettings;
-
-        float segmentationBandwidthDepthNear{ 100 };
-        float segmentationBandwidthDepthFar{ 100 };
-        float maxMatchDistLostActive{ 500 }; //mm
-        float maxMatchDistDefault{ 200 }; //mm
-        int iterationMaxInitial{ 1 };
-        int iterationMaxTracking{ 1 };
-        int iterationMaxRefinement{ 1 };
-        float minArea{ 3000 }; //mm^2
-        float maxArea{ 30000 }; //mm^2
         float areaBandwidth{ 250 }; //mm
         float areaBandwidthDepth{ 100 }; //mm
-        float maxSegmentationDist{ 250 }; //mm
-        float steadyDeadBandRadius{ 75 }; //mm
-        float targetEdgeDistance{ 40 }; //mm
-        float heightScoreFactor{ 0.5 };
-        float depthScoreFactor{ 1000.0 };
-        float edgeDistanceScoreFactor{ 100.0 };
-        float pointInertiaFactor{ 100.0 };
-        float pointInertiaRadius{ 100.0 }; //mm
-        int maxInactiveFramesForCandidatePoints{ 60 };
-        int maxInactiveFramesForLostPoints{ 15 };
-        int maxInactiveFramesForActivePoints{ 480 };
-        float pointSmoothingFactor{ 0.95 };
-        float pointDeadBandSmoothingFactor{ 0.05 };
-        float pointSmoothingDeadZone{ 50 }; //mm
+        float minArea{ 3000 }; //mm^2
+        float maxArea{ 30000 }; //mm^2
+    };
+
+    struct CircumferenceTestSettings
+    {
         float foregroundRadius1{ 100 };
         float foregroundRadius2{ 150 };
         float foregroundRadiusMinPercent1{ 0.08 };
         float foregroundRadiusMinPercent2{ 0.04 };
         float foregroundRadiusMaxPercent1{ 0.35 };
         float foregroundRadiusMaxPercent2{ 0.15 };
+    };
+
+    struct SegmentationSettings
+    {
+        AreaTestSettings areaTestSettings;
+        CircumferenceTestSettings circumferenceTestSettings;
+
+        float segmentationBandwidthDepthNear{ 100 };
+        float segmentationBandwidthDepthFar{ 100 };
+        float maxSegmentationDist{ 250 }; //mm
+        float heightScoreFactor{ 0.5 };
+        float depthScoreFactor{ 1000.0 };
+        float targetEdgeDistance{ 40 }; //mm
+        float edgeDistanceScoreFactor{ 100.0 };
+        float pointInertiaFactor{ 100.0 };
+        float pointInertiaRadius{ 100.0 }; //mm
+    };
+
+    struct PointProcessorSettings
+    {
+        TrajectoryAnalyzerSettings trajectoryAnalyzerSettings;
+        SegmentationSettings segmentationSettings;
+
+        float maxMatchDistLostActive{ 500 }; //mm
+        float maxMatchDistDefault{ 200 }; //mm
+        float steadyDeadBandRadius{ 75 }; //mm
+        int maxInactiveFramesForCandidatePoints{ 60 };
+        int maxInactiveFramesForLostPoints{ 15 };
+        int maxInactiveFramesForActivePoints{ 480 };
+        float pointSmoothingFactor{ 0.95 };
+        float pointDeadBandSmoothingFactor{ 0.05 };
+        float pointSmoothingDeadZone{ 50 }; //mm
         int maxFailedTestsInProbation{ 5 };
         int probationFrameCount{ 30 };
         int maxFailedTestsInProbationActivePoints{ 3 };

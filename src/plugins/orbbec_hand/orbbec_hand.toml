@@ -14,42 +14,45 @@ minDepth = 1000.0 #float
 maxDepth = 4000.0 #float
 
 [pointprocessor]
-segmentationBandwidthDepthNear = 100.0 #mm #float
-segmentationBandwidthDepthFar = 100.0 #mm #float
 maxMatchDistLostActive = 500.0 #mm #float
 maxMatchDistDefault = 200.0 #mm #float
-iterationMaxInitial = 1
-iterationMaxTracking = 1
-iterationMaxRefinement = 1
-minArea = 3000.0 #mm^2 #float
-maxArea = 30000.0 #mm^2 #float
-areaBandwidth = 250.0 #mm #float
-areaBandwidthDepth = 100.0 #mm #float
-maxSegmentationDist = 250.0 #mm #float
 steadyDeadBandRadius = 75.0 #mm #float
-targetEdgeDistance = 40.0 #mm #float
-heightScoreFactor = 0.5 #float
-depthScoreFactor = 1000.0 #float
-edgeDistanceScoreFactor = 100.0 #float
-pointInertiaFactor = 100.0 #float
-pointInertiaRadius = 100.0 #mm #float
 maxInactiveFramesForCandidatePoints = 60
 maxInactiveFramesForLostPoints = 15
 maxInactiveFramesForActivePoints = 480
 pointSmoothingFactor = 0.95 #float
 pointDeadBandSmoothingFactor = 0.05 #float
 pointSmoothingDeadZone = 50.0 #mm #float
+maxFailedTestsInProbation = 5
+probationFrameCount = 30
+maxFailedTestsInProbationActivePoints = 3
+secondChanceMinDistance = 100.0 #float
+mergePointDistance = 100.0 #mm #float
+
+[segmentation]
+segmentationBandwidthDepthNear = 100.0 #mm #float
+segmentationBandwidthDepthFar = 100.0 #mm #float
+maxSegmentationDist = 250.0 #mm #float
+heightScoreFactor = 0.5 #float
+depthScoreFactor = 1000.0 #float
+targetEdgeDistance = 40.0 #mm #float
+edgeDistanceScoreFactor = 100.0 #float
+pointInertiaFactor = 100.0 #float
+pointInertiaRadius = 100.0 #mm #float
+
+[areatest]
+areaBandwidth = 250.0 #mm #float
+areaBandwidthDepth = 100.0 #mm #float
+minArea = 3000.0 #mm^2 #float
+maxArea = 30000.0 #mm^2 #float
+
+[circumferencetest]
 foregroundRadius1 = 100.0 #float
 foregroundRadius2 = 150.0 #float
 foregroundRadiusMinPercent1 = 0.08 #float
 foregroundRadiusMinPercent2 = 0.04 #float
 foregroundRadiusMaxPercent1 = 0.30 #float
 foregroundRadiusMaxPercent2 = 0.12 #float
-maxFailedTestsInProbation = 5
-probationFrameCount = 30
-maxFailedTestsInProbationActivePoints = 3
-secondChanceMinDistance = 100.0 #float
-mergePointDistance = 100.0 #mm #float
 
 [trajectoryanalyzer]
 maxSteadyDelta = 5.0 #float

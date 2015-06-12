@@ -6,43 +6,7 @@
 namespace sensekit { namespace plugins { namespace hand {
 
     PointProcessor::PointProcessor(PointProcessorSettings& settings) :
-        m_settings(settings),
-        m_segmentationBandwidthDepthNear(settings.segmentationBandwidthDepthNear), //mm
-        m_segmentationBandwidthDepthFar(settings.segmentationBandwidthDepthFar),  //mm
-        m_maxMatchDistLostActive(settings.maxMatchDistLostActive),  //mm
-        m_maxMatchDistDefault(settings.maxMatchDistDefault),     //mm
-        m_iterationMaxInitial(settings.iterationMaxInitial),
-        m_iterationMaxTracking(settings.iterationMaxTracking),
-        m_iterationMaxRefinement(settings.iterationMaxRefinement),
-        m_minArea(settings.minArea),                   //mm^2
-        m_maxArea(settings.maxArea),               //mm^2
-        m_areaBandwidth(settings.areaBandwidth),           //mm
-        m_areaBandwidthDepth(settings.areaBandwidthDepth),      //mm
-        m_maxSegmentationDist(settings.maxSegmentationDist),     //mm
-        m_steadyDeadBandRadius(settings.steadyDeadBandRadius),    //mm
-        m_targetEdgeDistance(settings.targetEdgeDistance),       //mm
-        m_heightScoreFactor(settings.heightScoreFactor),
-        m_depthScoreFactor(settings.depthScoreFactor),
-        m_edgeDistanceScoreFactor(settings.edgeDistanceScoreFactor),
-        m_pointInertiaFactor(settings.pointInertiaFactor),
-        m_pointInertiaRadius(settings.pointInertiaRadius),       //mm
-        m_maxInactiveFramesForCandidatePoints(settings.maxInactiveFramesForCandidatePoints),
-        m_maxInactiveFramesForLostPoints(settings.maxInactiveFramesForLostPoints),
-        m_maxInactiveFramesForActivePoints(settings.maxInactiveFramesForActivePoints),
-        m_pointSmoothingFactor(settings.pointSmoothingFactor),
-        m_pointDeadBandSmoothingFactor(settings.pointDeadBandSmoothingFactor),
-        m_pointSmoothingDeadZone(settings.pointSmoothingDeadZone),     //mm
-        m_foregroundRadius1(settings.foregroundRadius1),
-        m_foregroundRadius2(settings.foregroundRadius2),
-        m_foregroundRadiusMinPercent1(settings.foregroundRadiusMinPercent1),
-        m_foregroundRadiusMinPercent2(settings.foregroundRadiusMinPercent2),
-        m_foregroundRadiusMaxPercent1(settings.foregroundRadiusMaxPercent1),
-        m_foregroundRadiusMaxPercent2(settings.foregroundRadiusMaxPercent2),
-        m_maxFailedTestsInProbation(settings.maxFailedTestsInProbation),
-        m_probationFrameCount(settings.probationFrameCount),
-        m_maxFailedTestsInProbationActivePoints(settings.maxFailedTestsInProbationActivePoints),
-        m_secondChanceMinDistance(settings.secondChanceMinDistance),
-        m_mergePointDistance(settings.mergePointDistance)
+        m_settings(settings)
     {
         PROFILE_FUNC();
     }
@@ -150,19 +114,11 @@ namespace sensekit { namespace plugins { namespace hand {
                                         trackedPoint.position,
                                         trackedPoint.worldPosition,
                                         trackedPoint.referenceAreaSqrt,
-                                        m_segmentationBandwidthDepthNear,
-                                        m_segmentationBandwidthDepthFar,
-                                        m_iterationMaxTracking,
-                                        m_maxSegmentationDist,
                                         VELOCITY_POLICY_IGNORE,
-                                        m_depthScoreFactor,
-                                        m_heightScoreFactor,
-                                        m_edgeDistanceScoreFactor,
-                                        m_targetEdgeDistance,
-                                        m_pointInertiaFactor,
-                                        m_pointInertiaRadius);
+                                        m_settings.segmentationSettings,
+                                        TEST_PHASE_UPDATE);
 
-        cv::Point newTargetPoint = segmentation::converge_track_point_from_seed(updateTrackingData);
+        cv::Point newTargetPoint = segmentation::track_point_from_seed(updateTrackingData);
 
         calculateTestPassMap(matrices, TEST_PHASE_UPDATE);
 
@@ -175,10 +131,11 @@ namespace sensekit { namespace plugins { namespace hand {
         double xyDeltaNorm = cv::norm(xyDelta);
         if (trackedPoint.trackingStatus != TrackingStatus::Tracking &&
             newTargetPoint == segmentation::INVALID_POINT &&
-            xyDeltaNorm > m_secondChanceMinDistance)
+            xyDeltaNorm > m_settings.secondChanceMinDistance)
         {
             auto movementDirection = xyDelta * (1.0f / xyDeltaNorm);
-            auto estimatedWorldPosition = trackedPoint.worldPosition + movementDirection * m_maxSegmentationDist;
+            float maxSegmentationDist = m_settings.segmentationSettings.maxSegmentationDist;
+            auto estimatedWorldPosition = trackedPoint.worldPosition + movementDirection * maxSegmentationDist;
 
             cv::Point3f estimatedPosition = scalingMapper.convert_world_to_depth(estimatedWorldPosition);
 
@@ -190,19 +147,11 @@ namespace sensekit { namespace plugins { namespace hand {
                                              seedPosition,
                                              estimatedWorldPosition,
                                              trackedPoint.referenceAreaSqrt,
-                                             m_segmentationBandwidthDepthNear,
-                                             m_segmentationBandwidthDepthFar,
-                                             m_iterationMaxTracking,
-                                             m_maxSegmentationDist,
                                              VELOCITY_POLICY_IGNORE,
-                                             m_depthScoreFactor,
-                                             m_heightScoreFactor,
-                                             m_edgeDistanceScoreFactor,
-                                             m_targetEdgeDistance,
-                                             m_pointInertiaFactor,
-                                             m_pointInertiaRadius);
+                                             m_settings.segmentationSettings,
+                                             TEST_PHASE_UPDATE);
 
-                newTargetPoint = segmentation::converge_track_point_from_seed(recoverTrackingData);
+                newTargetPoint = segmentation::track_point_from_seed(recoverTrackingData);
 
                 validateAndUpdateTrackedPoint(matrices, scalingMapper, trackedPoint, newTargetPoint);
 
@@ -219,162 +168,6 @@ namespace sensekit { namespace plugins { namespace hand {
         PROFILE_FUNC();
         m_trackedPoints.clear();
         m_nextTrackingId = 0;
-    }
-
-    float PointProcessor::get_point_area(TrackingMatrices& matrices, const cv::Point& point)
-    {
-        PROFILE_FUNC();
-        auto scalingMapper = get_scaling_mapper(matrices);
-
-        float area = segmentation::count_neighborhood_area(matrices.layerSegmentation,
-                                                           matrices.depth,
-                                                           matrices.area,
-                                                           point,
-                                                           m_areaBandwidth,
-                                                           m_areaBandwidthDepth,
-                                                           scalingMapper);
-
-        return area;
-    }
-
-    bool PointProcessor::test_point_in_range(TrackingMatrices& matrices,
-                                             const cv::Point& targetPoint,
-                                             int trackingId,
-                                             TestPhase phase,
-                                             TestBehavior outputLog)
-    {
-        PROFILE_FUNC();
-        if (targetPoint == segmentation::INVALID_POINT ||
-            targetPoint.x < 0 || targetPoint.x >= matrices.depth.cols ||
-            targetPoint.y < 0 || targetPoint.y >= matrices.depth.rows)
-        {
-            if (outputLog == TEST_BEHAVIOR_LOG)
-            {
-                SINFO("PointProcessor", "test_point_in_range failed #%d: position: (%d, %d)",
-                              trackingId,
-                              targetPoint.x,
-                              targetPoint.y);
-            }
-            return false;
-        }
-
-        if (outputLog == TEST_BEHAVIOR_LOG)
-        {
-            SINFO("PointProcessor", "test_point_in_range success #%d: position: (%d, %d)",
-                          trackingId,
-                          targetPoint.x,
-                          targetPoint.y);
-        }
-
-        return true;
-    }
-
-    bool PointProcessor::test_point_area(TrackingMatrices& matrices,
-                                         const cv::Point& targetPoint,
-                                         int trackingId,
-                                         TestPhase phase,
-                                         TestBehavior outputLog)
-    {
-        PROFILE_FUNC();
-        float area = get_point_area(matrices, targetPoint);
-
-        float minArea = m_minArea;
-        if (phase == TEST_PHASE_UPDATE)
-        {
-            //no minimum during update phase
-            minArea = 0;
-        }
-
-        bool validPointArea = area > minArea && area < m_maxArea;
-
-        if (outputLog == TEST_BEHAVIOR_LOG)
-        {
-            if (validPointArea)
-            {
-                SINFO("PointProcessor", "test_point_area passed #%d: area %f within [%f, %f]",
-                              trackingId,
-                              area,
-                              minArea,
-                              m_maxArea);
-            }
-            else
-            {
-                SINFO("PointProcessor", "test_point_area failed #%d: area %f not within [%f, %f]",
-                              trackingId,
-                              area,
-                              minArea,
-                              m_maxArea);
-            }
-        }
-
-        return validPointArea;
-    }
-
-    bool PointProcessor::test_foreground_radius_percentage(TrackingMatrices& matrices,
-                                                           const cv::Point& targetPoint,
-                                                           int trackingId,
-                                                           TestPhase phase,
-                                                           TestBehavior outputLog)
-    {
-        PROFILE_FUNC();
-        auto scalingMapper = get_scaling_mapper(matrices);
-
-        float percentForeground1 = segmentation::get_max_sequential_circumference_percentage(matrices.depth,
-                                                                                             matrices.layerSegmentation,
-                                                                                             targetPoint,
-                                                                                             m_foregroundRadius1,
-                                                                                             scalingMapper);
-
-        float percentForeground2 = segmentation::get_max_sequential_circumference_percentage(matrices.depth,
-                                                                                             matrices.layerSegmentation,
-                                                                                             targetPoint,
-                                                                                             m_foregroundRadius2,
-                                                                                             scalingMapper);
-
-        float minPercent1 = m_foregroundRadiusMinPercent1;
-        float minPercent2 = m_foregroundRadiusMinPercent2;
-
-        if (phase == TEST_PHASE_UPDATE)
-        {
-            //no minimum during update phase
-            minPercent1 = 0;
-            minPercent2 = 0;
-        }
-
-        bool passTest1 = percentForeground1 >= minPercent1 &&
-                         percentForeground1 <= m_foregroundRadiusMaxPercent1;
-
-        bool passTest2 = percentForeground2 >= minPercent2 &&
-                         percentForeground2 <= m_foregroundRadiusMaxPercent2;
-
-        bool passed = passTest1 && passTest2;
-
-        if (outputLog == TEST_BEHAVIOR_LOG)
-        {
-            if (passed)
-            {
-                SINFO("PointProcessor", "test_foreground_radius_percentage passed #%d: perc1 %f [%f,%f] perc2 %f [%f,%f]",
-                              trackingId,
-                              percentForeground1,
-                              minPercent1,
-                              m_foregroundRadiusMaxPercent1,
-                              percentForeground2,
-                              minPercent2,
-                              m_foregroundRadiusMaxPercent2);
-            }
-            else
-            {
-                SINFO("PointProcessor", "test_foreground_radius_percentage failed #%d: perc1 %f [%f,%f] perc2 %f [%f,%f]",
-                              trackingId,
-                              percentForeground1,
-                              minPercent1,
-                              m_foregroundRadiusMaxPercent1,
-                              percentForeground2,
-                              minPercent2,
-                              m_foregroundRadiusMaxPercent2);
-            }
-        }
-        return passed;
     }
 
     void PointProcessor::calculateTestPassMap(TrackingMatrices& matrices, const TestPhase phase)
@@ -403,14 +196,27 @@ namespace sensekit { namespace plugins { namespace hand {
                     continue;
                 }
                 cv::Point seedPosition(x, y);
-                bool validPointInRange = test_point_in_range(matrices, seedPosition, -1, phase, outputTestLog);
+                bool validPointInRange = segmentation::test_point_in_range(matrices,
+                                                                           seedPosition,
+                                                                           -1,
+                                                                           outputTestLog);
                 bool validPointArea = false;
                 bool validRadiusTest = false;
 
                 if (validPointInRange)
                 {
-                    validPointArea = test_point_area(matrices, seedPosition, -1, phase, outputTestLog);
-                    validRadiusTest = test_foreground_radius_percentage(matrices, seedPosition, -1, phase, outputTestLog);
+                    validPointArea = segmentation::test_point_area(matrices,
+                                            m_settings.segmentationSettings.areaTestSettings,
+                                                                   seedPosition,
+                                                                   -1,
+                                                                   phase,
+                                                                   outputTestLog);
+                    validRadiusTest = segmentation::test_foreground_radius_percentage(matrices,
+                                            m_settings.segmentationSettings.circumferenceTestSettings,
+                                                                                      seedPosition,
+                                                                                      -1,
+                                                                                      phase,
+                                                                                      outputTestLog);
                 }
 
                 bool passAllTests = validPointInRange && validPointArea && validRadiusTest;
@@ -538,19 +344,11 @@ namespace sensekit { namespace plugins { namespace hand {
                                             roiPosition,
                                             trackedPoint.worldPosition,
                                             referenceAreaSqrt,
-                                            m_segmentationBandwidthDepthNear,
-                                            m_segmentationBandwidthDepthFar,
-                                            m_iterationMaxRefinement,
-                                            m_maxSegmentationDist,
                                             VELOCITY_POLICY_IGNORE,
-                                            m_depthScoreFactor,
-                                            m_heightScoreFactor,
-                                            m_edgeDistanceScoreFactor,
-                                            m_targetEdgeDistance,
-                                            m_pointInertiaFactor,
-                                            m_pointInertiaRadius);
+                                            m_settings.segmentationSettings,
+                                            TEST_PHASE_UPDATE);
 
-        cv::Point targetPoint = segmentation::converge_track_point_from_seed(refinementTrackingData);
+        cv::Point targetPoint = segmentation::track_point_from_seed(refinementTrackingData);
 
         if (targetPoint == segmentation::INVALID_POINT)
         {
@@ -579,13 +377,14 @@ namespace sensekit { namespace plugins { namespace hand {
                                                        const cv::Point3f& newWorldPosition)
     {
         PROFILE_FUNC();
-        float smoothingFactor = m_pointSmoothingFactor;
+        float smoothingFactor = m_settings.pointSmoothingFactor;
 
         float delta = cv::norm(newWorldPosition - oldWorldPosition);
-        if (delta < m_pointSmoothingDeadZone)
+        if (delta < m_settings.pointSmoothingDeadZone)
         {
-            float factorRamp = delta / m_pointSmoothingDeadZone;
-            smoothingFactor = m_pointSmoothingFactor * factorRamp + m_pointDeadBandSmoothingFactor * (1 - factorRamp);
+            float factorRamp = delta / m_settings.pointSmoothingDeadZone;
+            smoothingFactor = m_settings.pointSmoothingFactor * factorRamp +
+                              m_settings.pointDeadBandSmoothingFactor * (1 - factorRamp);
         }
 
         return oldWorldPosition * (1 - smoothingFactor) + newWorldPosition * smoothingFactor;
@@ -641,7 +440,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         auto steadyDist = cv::norm(worldPosition - trackedPoint.steadyWorldPosition);
 
-        if (steadyDist > m_steadyDeadBandRadius)
+        if (steadyDist > m_settings.steadyDeadBandRadius)
         {
             trackedPoint.steadyWorldPosition = worldPosition;
             trackedPoint.inactiveFrameCount = 0;
@@ -663,14 +462,27 @@ namespace sensekit { namespace plugins { namespace hand {
         const TestBehavior outputTestLog = TEST_BEHAVIOR_NONE;
         const TestPhase phase = TEST_PHASE_UPDATE;
 
-        bool validPointInRange = test_point_in_range(matrices, newTargetPoint, trackedPoint.trackingId, phase, outputTestLog);
+        bool validPointInRange = segmentation::test_point_in_range(matrices,
+                                                                   newTargetPoint,
+                                                                   trackedPoint.trackingId,
+                                                                   outputTestLog);
         bool validPointArea = false;
         bool validRadiusTest = false;
 
         if (validPointInRange)
         {
-            validPointArea = test_point_area(matrices, newTargetPoint, trackedPoint.trackingId, phase, outputTestLog);
-            validRadiusTest = test_foreground_radius_percentage(matrices, newTargetPoint, trackedPoint.trackingId, phase, outputTestLog);
+            validPointArea = segmentation::test_point_area(matrices,
+                                    m_settings.segmentationSettings.areaTestSettings,
+                                                           newTargetPoint,
+                                                           trackedPoint.trackingId,
+                                                           phase,
+                                                           outputTestLog);
+            validRadiusTest = segmentation::test_foreground_radius_percentage(matrices,
+                                    m_settings.segmentationSettings.circumferenceTestSettings,
+                                                                              newTargetPoint,
+                                                                              trackedPoint.trackingId,
+                                                                              phase,
+                                                                              outputTestLog);
         }
 
         bool passAllTests = validPointInRange && validPointArea && validRadiusTest;
@@ -702,7 +514,7 @@ namespace sensekit { namespace plugins { namespace hand {
             bool exitProbation = false;
             if (trackedPoint.pointType == TrackedPointType::ActivePoint)
             {
-                if (trackedPoint.failedInRangeTestCount >= m_maxFailedTestsInProbationActivePoints)
+                if (trackedPoint.failedInRangeTestCount >= m_settings.maxFailedTestsInProbationActivePoints)
                 {
                     //failed because of out of range points, perhaps certain artifacts like finger pointed at camera
                     //go to Lost status for a short time
@@ -712,7 +524,7 @@ namespace sensekit { namespace plugins { namespace hand {
                     trackedPoint.trackingStatus = TrackingStatus::Lost;
                     exitProbation = true;
                 }
-                else if (trackedPoint.failedTestCount >= m_maxFailedTestsInProbationActivePoints)
+                else if (trackedPoint.failedTestCount >= m_settings.maxFailedTestsInProbationActivePoints)
                 {
                     //had valid in range points but must have failed the real tests
 
@@ -722,7 +534,7 @@ namespace sensekit { namespace plugins { namespace hand {
                     exitProbation = true;
                 }
             }
-            else if (trackedPoint.failedTestCount >= m_maxFailedTestsInProbation)
+            else if (trackedPoint.failedTestCount >= m_settings.maxFailedTestsInProbation)
             {
                 //failed N tests total (non-consecutive) within the probation period
                 //too many failed tests, so long...
@@ -764,7 +576,9 @@ namespace sensekit { namespace plugins { namespace hand {
                 TrackedPoint& otherTracked = *otherIter;
                 bool bothNotDead = tracked.trackingStatus != TrackingStatus::Dead && otherTracked.trackingStatus != TrackingStatus::Dead;
                 float pointDist = cv::norm(tracked.worldPosition - otherTracked.worldPosition);
-                if (tracked.trackingId != otherTracked.trackingId && bothNotDead && pointDist < m_mergePointDistance)
+                if (tracked.trackingId != otherTracked.trackingId &&
+                    bothNotDead &&
+                    pointDist < m_settings.mergePointDistance)
                 {
                     tracked.inactiveFrameCount = MIN(tracked.inactiveFrameCount, otherTracked.inactiveFrameCount);
                     if (otherTracked.pointType == TrackedPointType::ActivePoint && tracked.pointType != TrackedPointType::ActivePoint)
@@ -785,16 +599,16 @@ namespace sensekit { namespace plugins { namespace hand {
         {
             TrackedPoint& tracked = *iter;
 
-            int max = m_maxInactiveFramesForCandidatePoints;
+            int max = m_settings.maxInactiveFramesForCandidatePoints;
             if (tracked.pointType == TrackedPointType::ActivePoint)
             {
                 if (tracked.trackingStatus == TrackingStatus::Lost)
                 {
-                    max = m_maxInactiveFramesForLostPoints;
+                    max = m_settings.maxInactiveFramesForLostPoints;
                 }
                 else
                 {
-                    max = m_maxInactiveFramesForActivePoints;
+                    max = m_settings.maxInactiveFramesForActivePoints;
                 }
             }
             //if inactive for more than a certain number of frames, or dead, remove point
@@ -833,32 +647,37 @@ namespace sensekit { namespace plugins { namespace hand {
                                         seedPosition,
                                         referenceWorldPosition,
                                         referenceAreaSqrt,
-                                        m_segmentationBandwidthDepthNear,
-                                        m_segmentationBandwidthDepthFar,
-                                        m_iterationMaxInitial,
-                                        m_maxSegmentationDist,
                                         VELOCITY_POLICY_RESET_TTL,
-                                        m_depthScoreFactor,
-                                        m_heightScoreFactor,
-                                        m_edgeDistanceScoreFactor,
-                                        m_targetEdgeDistance,
-                                        m_pointInertiaFactor,
-                                        m_pointInertiaRadius);
+                                        m_settings.segmentationSettings,
+                                        TEST_PHASE_CREATE);
 
-        cv::Point targetPoint = segmentation::converge_track_point_from_seed(createTrackingData);
+        cv::Point targetPoint = segmentation::track_point_from_seed(createTrackingData);
 
         const TestBehavior outputTestLog = TEST_BEHAVIOR_NONE;
         const TestPhase phase = TEST_PHASE_CREATE;
 
-        bool validPointInRange = test_point_in_range(matrices, targetPoint, -1, phase, outputTestLog);
+        bool validPointInRange = segmentation::test_point_in_range(matrices,
+                                                                   targetPoint,
+                                                                   -1,
+                                                                   outputTestLog);
 
         if (!validPointInRange)
         {
             return;
         }
 
-        bool validPointArea = test_point_area(matrices, targetPoint, -1, phase, outputTestLog);
-        bool validRadiusTest = test_foreground_radius_percentage(matrices, targetPoint, -1, phase, outputTestLog);
+        bool validPointArea = segmentation::test_point_area(matrices,
+                                    m_settings.segmentationSettings.areaTestSettings,
+                                                            targetPoint,
+                                                            -1,
+                                                            phase,
+                                                            outputTestLog);
+        bool validRadiusTest = segmentation::test_foreground_radius_percentage(matrices,
+                                    m_settings.segmentationSettings.circumferenceTestSettings,
+                                                                               targetPoint,
+                                                                               -1,
+                                                                               phase,
+                                                                               outputTestLog);
 
         if (!validPointArea || !validRadiusTest)
         {
@@ -879,11 +698,11 @@ namespace sensekit { namespace plugins { namespace hand {
             if (trackedPoint.trackingStatus != TrackingStatus::Dead)
             {
                 float dist = cv::norm(trackedPoint.worldPosition - worldPosition);
-                float maxDist = m_maxMatchDistDefault;
+                float maxDist = m_settings.maxMatchDistDefault;
                 bool lostPoint = trackedPoint.trackingStatus == TrackingStatus::Lost;
                 if (lostPoint && trackedPoint.pointType == TrackedPointType::ActivePoint)
                 {
-                    maxDist = m_maxMatchDistLostActive;
+                    maxDist = m_settings.maxMatchDistLostActive;
                 }
                 if (dist < maxDist)
                 {

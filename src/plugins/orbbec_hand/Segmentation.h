@@ -12,6 +12,29 @@ namespace sensekit { namespace plugins { namespace hand {
 
         static cv::Point INVALID_POINT(-1, -1);
 
+        float get_point_area(TrackingMatrices& matrices,
+                             AreaTestSettings& settings,
+                             const cv::Point& point);
+
+        bool test_point_in_range(TrackingMatrices& matrices,
+                                 const cv::Point& targetPoint,
+                                 int trackingId,
+                                 TestBehavior outputLog);
+
+        bool test_point_area(TrackingMatrices& matrices,
+                             AreaTestSettings& settings,
+                             const cv::Point& targetPoint,
+                             int trackingId,
+                             TestPhase phase,
+                             TestBehavior outputLog);
+
+        bool test_foreground_radius_percentage(TrackingMatrices& matrices,
+                                               CircumferenceTestSettings& settings,
+                                               const cv::Point& targetPoint,
+                                               int trackingId,
+                                               TestPhase phase,
+                                               TestBehavior outputLog);
+
         bool find_next_velocity_seed_pixel(cv::Mat& foregroundMatrix,
                                         cv::Mat& searchedMatrix,
                                         cv::Point& foregroundPosition,
@@ -30,7 +53,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                       const float bandwidthDepth,
                                       const ScalingCoordinateMapper& mapper);
 
-        cv::Point converge_track_point_from_seed(TrackingData& data);
+        cv::Point track_point_from_seed(TrackingData& data);
 
         void visit_circle_circumference(cv::Mat& matDepth,
                                         const cv::Point& center,

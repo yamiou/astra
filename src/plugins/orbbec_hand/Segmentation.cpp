@@ -5,6 +5,7 @@
 #include "Segmentation.h"
 #include "constants.h"
 #include <Shiny.h>
+#include <SenseKit/Plugins/PluginLogger.h>
 
 #define MAX_DEPTH 10000
 
@@ -76,9 +77,9 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         PROFILE_FUNC();
         assert(matVisited.size() == data.matrices.depth.size());
 
-        const float minDepth = data.referenceWorldPosition.z - data.bandwidthDepthNear;
-        const float maxDepth = data.referenceWorldPosition.z + data.bandwidthDepthFar;
-        const float maxSegmentationDist = data.maxSegmentationDist;
+        const float minDepth = data.referenceWorldPosition.z - data.settings.segmentationBandwidthDepthNear;
+        const float maxDepth = data.referenceWorldPosition.z + data.settings.segmentationBandwidthDepthFar;
+        const float maxSegmentationDist = data.settings.maxSegmentationDist;
         const float referenceAreaSqrt = data.referenceAreaSqrt;
         cv::Mat& depthMatrix = data.matrices.depth;
         cv::Mat& searchedMatrix = data.matrices.foregroundSearched;
@@ -123,7 +124,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
     static float segment_foreground_and_get_average_depth(TrackingData& data)
     {
         PROFILE_FUNC();
-        const float& maxSegmentationDist = data.maxSegmentationDist;
+        const float& maxSegmentationDist = data.settings.maxSegmentationDist;
         const SegmentationVelocityPolicy& velocitySignalPolicy = data.velocityPolicy;
         const float seedDepth = data.matrices.depth.at<float>(data.seedPosition);
         const float referenceAreaSqrt = data.referenceAreaSqrt;
@@ -139,8 +140,8 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         //does the seed point start in range?
         //If not, it will search outward until it finds in range pixels
-        const float minDepth = data.referenceWorldPosition.z - data.bandwidthDepthNear;
-        const float maxDepth = data.referenceWorldPosition.z + data.bandwidthDepthFar;
+        const float minDepth = data.referenceWorldPosition.z - data.settings.segmentationBandwidthDepthNear;
+        const float maxDepth = data.referenceWorldPosition.z + data.settings.segmentationBandwidthDepthFar;
 
         cv::Mat matVisited = cv::Mat::zeros(depthMatrix.size(), CV_8UC1);
 
@@ -209,13 +210,13 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
     {
         PROFILE_FUNC();
         cv::Mat& edgeDistanceMatrix = data.matrices.layerEdgeDistance;
-        const float depthFactor = data.depthFactor;
-        const float heightFactor = data.heightFactor;
-        const float edgeDistanceFactor = data.edgeDistanceFactor;
-        const float targetEdgeDist = data.targetEdgeDistance;
+        const float depthFactor = data.settings.depthScoreFactor;
+        const float heightFactor = data.settings.heightScoreFactor;
+        const float edgeDistanceFactor = data.settings.edgeDistanceScoreFactor;
+        const float targetEdgeDist = data.settings.targetEdgeDistance;
         cv::Mat& layerScoreMatrix = data.matrices.layerScore;
-        const float pointInertiaFactor = data.pointInertiaFactor;
-        const float pointInertiaRadius = data.pointInertiaRadius;
+        const float pointInertiaFactor = data.settings.pointInertiaFactor;
+        const float pointInertiaRadius = data.settings.pointInertiaRadius;
         const sensekit::Vector3f* worldPoints = data.matrices.worldPoints;
         cv::Mat& segmentationMatrix = data.matrices.layerSegmentation;
 
@@ -289,7 +290,170 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         }
     }
 
-    static cv::Point track_point_from_seed(TrackingData& data)
+
+    bool test_point_in_range(TrackingMatrices& matrices,
+                             const cv::Point& targetPoint,
+                             int trackingId,
+                             TestBehavior outputLog)
+    {
+        PROFILE_FUNC();
+        if (targetPoint == segmentation::INVALID_POINT ||
+            targetPoint.x < 0 || targetPoint.x >= matrices.depth.cols ||
+            targetPoint.y < 0 || targetPoint.y >= matrices.depth.rows)
+        {
+            if (outputLog == TEST_BEHAVIOR_LOG)
+            {
+                SINFO("PointProcessor", "test_point_in_range failed #%d: position: (%d, %d)",
+                              trackingId,
+                              targetPoint.x,
+                              targetPoint.y);
+            }
+            return false;
+        }
+
+        if (outputLog == TEST_BEHAVIOR_LOG)
+        {
+            SINFO("PointProcessor", "test_point_in_range success #%d: position: (%d, %d)",
+                          trackingId,
+                          targetPoint.x,
+                          targetPoint.y);
+        }
+
+        return true;
+    }
+
+    float get_point_area(TrackingMatrices& matrices,
+                         AreaTestSettings& settings,
+                         const cv::Point& point)
+    {
+        PROFILE_FUNC();
+        auto scalingMapper = get_scaling_mapper(matrices);
+
+        float area = count_neighborhood_area(matrices.layerSegmentation,
+                                             matrices.depth,
+                                             matrices.area,
+                                             point,
+                                             settings.areaBandwidth,
+                                             settings.areaBandwidthDepth,
+                                             scalingMapper);
+
+        return area;
+    }
+
+    bool test_point_area(TrackingMatrices& matrices,
+                         AreaTestSettings& settings,
+                         const cv::Point& targetPoint,
+                         int trackingId,
+                         TestPhase phase,
+                         TestBehavior outputLog)
+    {
+        PROFILE_FUNC();
+        float area = get_point_area(matrices, settings, targetPoint);
+
+        float minArea = settings.minArea;
+        const float maxArea = settings.maxArea;
+        if (phase == TEST_PHASE_UPDATE)
+        {
+            //minimum of 0 during update phase
+            minArea = 0;
+        }
+
+        bool validPointArea = area > minArea && area < maxArea;
+
+        if (outputLog == TEST_BEHAVIOR_LOG)
+        {
+            if (validPointArea)
+            {
+                SINFO("Segmentation", "test_point_area passed #%d: area %f within [%f, %f]",
+                              trackingId,
+                              area,
+                              minArea,
+                              maxArea);
+            }
+            else
+            {
+                SINFO("Segmentation", "test_point_area failed #%d: area %f not within [%f, %f]",
+                              trackingId,
+                              area,
+                              minArea,
+                              maxArea);
+            }
+        }
+
+        return validPointArea;
+    }
+
+    bool test_foreground_radius_percentage(TrackingMatrices& matrices,
+                                           CircumferenceTestSettings& settings,
+                                           const cv::Point& targetPoint,
+                                           int trackingId,
+                                           TestPhase phase,
+                                           TestBehavior outputLog)
+    {
+        PROFILE_FUNC();
+        auto scalingMapper = get_scaling_mapper(matrices);
+
+        float percentForeground1 = get_max_sequential_circumference_percentage(matrices.depth,
+                                                                               matrices.layerSegmentation,
+                                                                               targetPoint,
+                                                                               settings.foregroundRadius1,
+                                                                               scalingMapper);
+
+        float percentForeground2 = get_max_sequential_circumference_percentage(matrices.depth,
+                                                                               matrices.layerSegmentation,
+                                                                               targetPoint,
+                                                                               settings.foregroundRadius2,
+                                                                               scalingMapper);
+
+        float minPercent1 = settings.foregroundRadiusMinPercent1;
+        float minPercent2 = settings.foregroundRadiusMinPercent2;
+        const float maxPercent1 = settings.foregroundRadiusMaxPercent1;
+        const float maxPercent2 = settings.foregroundRadiusMaxPercent2;
+
+        if (phase == TEST_PHASE_UPDATE)
+        {
+            //no minimum during update phase
+            minPercent1 = 0;
+            minPercent2 = 0;
+        }
+
+        bool passTest1 = percentForeground1 >= minPercent1 &&
+                         percentForeground1 <= maxPercent1;
+
+        bool passTest2 = percentForeground2 >= minPercent2 &&
+                         percentForeground2 <= maxPercent2;
+
+        bool passed = passTest1 && passTest2;
+
+        if (outputLog == TEST_BEHAVIOR_LOG)
+        {
+            if (passed)
+            {
+                SINFO("Segmentation", "test_foreground_radius_percentage passed #%d: perc1 %f [%f,%f] perc2 %f [%f,%f]",
+                              trackingId,
+                              percentForeground1,
+                              minPercent1,
+                              maxPercent1,
+                              percentForeground2,
+                              minPercent2,
+                              maxPercent2);
+            }
+            else
+            {
+                SINFO("Segmentation", "test_foreground_radius_percentage failed #%d: perc1 %f [%f,%f] perc2 %f [%f,%f]",
+                              trackingId,
+                              percentForeground1,
+                              minPercent1,
+                              maxPercent1,
+                              percentForeground2,
+                              minPercent2,
+                              maxPercent2);
+            }
+        }
+        return passed;
+    }
+
+    cv::Point track_point_from_seed(TrackingData& data)
     {
         PROFILE_FUNC();
         cv::Size size = data.matrices.depth.size();
@@ -309,7 +473,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         calculate_edge_distance(data.matrices.layerSegmentation,
                                     data.matrices.areaSqrt,
                                     data.matrices.layerEdgeDistance,
-                                    data.targetEdgeDistance * 2.0f);
+                                    data.settings.targetEdgeDistance * 2.0f);
         calculate_layer_score(data, layerAverageDepth);
 
         double min, max;
@@ -338,23 +502,6 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         }
 
         return maxLoc;
-    }
-
-    cv::Point converge_track_point_from_seed(TrackingData& data)
-    {
-        PROFILE_FUNC();
-        cv::Point point = data.seedPosition;
-        cv::Point lastPoint = data.seedPosition;
-        int iterations = 0;
-
-        do
-        {
-            lastPoint = point;
-            point = track_point_from_seed(data);
-            ++iterations;
-        } while (point != lastPoint && iterations < data.iterationMax && point != INVALID_POINT);
-
-        return point;
     }
 
     bool find_next_velocity_seed_pixel(cv::Mat& velocitySignalMatrix,

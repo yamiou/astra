@@ -53,6 +53,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         //fields
 
+        HandSettings& m_settings;
         PluginServiceProxy& m_pluginService;
         DepthUtility m_depthUtility;
         PointProcessor m_pointProcessor;
