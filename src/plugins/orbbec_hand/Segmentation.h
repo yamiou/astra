@@ -38,7 +38,13 @@ namespace sensekit { namespace plugins { namespace hand {
                                         const ScalingCoordinateMapper& mapper,
                                         std::function<void(cv::Point)> callback);
 
-        float get_percent_foreground_along_circumference(cv::Mat& matDepth,
+        void visit_circle_circumference_sequential(cv::Mat& matDepth,
+                                                   const cv::Point& center,
+                                                   const float& radius,
+                                                   const ScalingCoordinateMapper& mapper,
+                                                   std::function<void(cv::Point)> callback);
+
+        float get_max_sequential_circumference_percentage(cv::Mat& matDepth,
                                                          cv::Mat& matSegmentation,
                                                          const cv::Point& center,
                                                          const float& radius,

@@ -307,17 +307,17 @@ namespace sensekit { namespace plugins { namespace hand {
         PROFILE_FUNC();
         auto scalingMapper = get_scaling_mapper(matrices);
 
-        float percentForeground1 = segmentation::get_percent_foreground_along_circumference(matrices.depth,
-                                                                                            matrices.layerSegmentation,
-                                                                                            targetPoint,
-                                                                                            m_foregroundRadius1,
-                                                                                            scalingMapper);
+        float percentForeground1 = segmentation::get_max_sequential_circumference_percentage(matrices.depth,
+                                                                                             matrices.layerSegmentation,
+                                                                                             targetPoint,
+                                                                                             m_foregroundRadius1,
+                                                                                             scalingMapper);
 
-        float percentForeground2 = segmentation::get_percent_foreground_along_circumference(matrices.depth,
-                                                                                            matrices.layerSegmentation,
-                                                                                            targetPoint,
-                                                                                            m_foregroundRadius2,
-                                                                                            scalingMapper);
+        float percentForeground2 = segmentation::get_max_sequential_circumference_percentage(matrices.depth,
+                                                                                             matrices.layerSegmentation,
+                                                                                             targetPoint,
+                                                                                             m_foregroundRadius2,
+                                                                                             scalingMapper);
 
         bool passTest1 = percentForeground1 < m_foregroundRadiusMaxPercent1;
         bool passTest2 = percentForeground2 < m_foregroundRadiusMaxPercent2;

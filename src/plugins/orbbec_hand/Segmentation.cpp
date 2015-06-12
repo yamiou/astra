@@ -503,13 +503,16 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         while (dx >= dy)
         {
             visit_callback_if_valid_position(width, height, cx + dx, cy + dy, callback);
-            visit_callback_if_valid_position(width, height, cx + dy, cy + dx, callback);
             visit_callback_if_valid_position(width, height, cx - dx, cy + dy, callback);
-            visit_callback_if_valid_position(width, height, cx - dy, cy + dx, callback);
             visit_callback_if_valid_position(width, height, cx - dx, cy - dy, callback);
-            visit_callback_if_valid_position(width, height, cx - dy, cy - dx, callback);
             visit_callback_if_valid_position(width, height, cx + dx, cy - dy, callback);
-            visit_callback_if_valid_position(width, height, cx + dy, cy - dx, callback);
+            if (dx != dy)
+            {
+                visit_callback_if_valid_position(width, height, cx + dy, cy + dx, callback);
+                visit_callback_if_valid_position(width, height, cx - dy, cy + dx, callback);
+                visit_callback_if_valid_position(width, height, cx - dy, cy - dx, callback);
+                visit_callback_if_valid_position(width, height, cx + dy, cy - dx, callback);
+            }
 
             dy++;
             if (radiusError < 0)
@@ -524,37 +527,202 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         }
     }
 
-    void accumulate_foreground_at_position(cv::Mat& matSegmentation,
-                                           cv::Point p,
-                                           int& foregroundCount,
-                                           int& totalCount)
+    void visit_circle_circumference_sequential(cv::Mat& matDepth,
+                                               const cv::Point& center,
+                                               const float& radius,
+                                               const ScalingCoordinateMapper& mapper,
+                                               std::function<void(cv::Point)> callback)
     {
         PROFILE_FUNC();
-        ++totalCount;
-        if (matSegmentation.at<uint8_t>(p) == PixelType::Foreground)
+        int width = matDepth.cols;
+        int height = matDepth.rows;
+        if (center.x < 0 || center.x >= width ||
+            center.y < 0 || center.y >= height ||
+            radius < 1)
         {
-            ++foregroundCount;
+            return;
+        }
+
+        float referenceDepth = matDepth.at<float>(center);
+        if (referenceDepth == 0)
+        {
+            return;
+        }
+
+        cv::Point offsetRight = offset_pixel_location_by_mm(mapper, center, radius, 0, referenceDepth);
+
+        //http://en.wikipedia.org/wiki/Midpoint_circle_algorithm
+        int pixelRadius = offsetRight.x - center.x;
+        int cx = center.x;
+        int cy = center.y;
+
+        std::vector<sensekit::Vector2i> offsets;
+
+        {
+            int dx = pixelRadius; //radius in pixels
+            int dy = 0;
+            int radiusError = 1 - dx;
+
+            while (dx >= dy)
+            {
+                offsets.push_back(Vector2i(dx, dy));
+
+                dy++;
+                if (radiusError < 0)
+                {
+                    radiusError += 2 * dy + 1;
+                }
+                else
+                {
+                    dx--;
+                    radiusError += 2 * (dy - dx) + 1;
+                }
+            }
+        }
+
+        int length = offsets.size();
+
+        for (int i = 1; i < length; ++i)
+        {
+            //dx, dy
+            int dx = offsets[i].x;
+            int dy = offsets[i].y;
+
+            visit_callback_if_valid_position(width, height, cx + dx, cy + dy, callback);
+        }
+
+        //even quadrants are reversed order
+        for (int i = length-1; i >= 0; --i)
+        {
+            //dy, dx
+            int dx = offsets[i].x;
+            int dy = offsets[i].y;
+
+            if (dx != dy)
+            {
+                visit_callback_if_valid_position(width, height, cx + dy, cy + dx, callback);
+            }
+        }
+
+        for (int i = 1; i < length; ++i)
+        {
+            //-dy, dx
+            int dx = offsets[i].x;
+            int dy = offsets[i].y;
+            visit_callback_if_valid_position(width, height, cx - dy, cy + dx, callback);
+        }
+
+        for (int i = length-1; i >= 0; --i)
+        {
+            //-dx, dy
+            int dx = offsets[i].x;
+            int dy = offsets[i].y;
+            if (dx != dy)
+            {
+                visit_callback_if_valid_position(width, height, cx - dx, cy + dy, callback);
+            }
+        }
+
+        for (int i = 1; i < length; ++i)
+        {
+            //-dx, -dy
+            int dx = offsets[i].x;
+            int dy = offsets[i].y;
+            visit_callback_if_valid_position(width, height, cx - dx, cy - dy, callback);
+        }
+
+        for (int i = length-1; i >= 0; --i)
+        {
+            //-dy, -dx
+            int dx = offsets[i].x;
+            int dy = offsets[i].y;
+            if (dx != dy)
+            {
+                visit_callback_if_valid_position(width, height, cx - dy, cy - dx, callback);
+            }
+        }
+
+        for (int i = 1; i < length; ++i)
+        {
+            //dy, -dx
+            int dx = offsets[i].x;
+            int dy = offsets[i].y;
+            visit_callback_if_valid_position(width, height, cx + dy, cy - dx, callback);
+        }
+
+        for (int i = length-1; i >= 0; --i)
+        {
+            //dx, -dy
+            int dx = offsets[i].x;
+            int dy = offsets[i].y;
+            if (dx != dy)
+            {
+                visit_callback_if_valid_position(width, height, cx + dx, cy - dy, callback);
+            }
         }
     }
 
-    float get_percent_foreground_along_circumference(cv::Mat& matDepth,
-                                                     cv::Mat& matSegmentation,
-                                                     const cv::Point& center,
-                                                     const float& radius,
-                                                     const ScalingCoordinateMapper& mapper)
+    float get_max_sequential_circumference_percentage(cv::Mat& matDepth,
+                                                      cv::Mat& matSegmentation,
+                                                      const cv::Point& center,
+                                                      const float& radius,
+                                                      const ScalingCoordinateMapper& mapper)
     {
         PROFILE_FUNC();
         int foregroundCount = 0;
+        int maxCount = 0;
+        int firstSegmentCount = 0;
+        bool isFirstSegment = true;
         int totalCount = 0;
+        bool firstIsForeground = false;
+        bool lastIsForeground = false;
 
         auto callback = [&](cv::Point p)
         {
-            accumulate_foreground_at_position(matSegmentation, p, foregroundCount, totalCount);
+            bool isForeground = matSegmentation.at<uint8_t>(p) == PixelType::Foreground;
+            if (isForeground)
+            {
+                ++foregroundCount;
+                if (totalCount == 0)
+                {
+                    //started on a foreground segment, might need to add to the last segment
+                    firstIsForeground = true;
+                }
+            }
+            else
+            {
+                if (foregroundCount > maxCount)
+                {
+                    maxCount = foregroundCount;
+                }
+                if (isFirstSegment)
+                {
+                    firstSegmentCount = foregroundCount;
+                    isFirstSegment = false;
+                }
+                foregroundCount = 0;
+            }
+            lastIsForeground = isForeground;
+            ++totalCount;
         };
 
-        visit_circle_circumference(matDepth, center, radius, mapper, callback);
+        visit_circle_circumference_sequential(matDepth, center, radius, mapper, callback);
 
-        float percentForeground = foregroundCount / static_cast<float>(totalCount);
+        if (lastIsForeground)
+        {
+            if (firstIsForeground)
+            {
+                //add the first and last segment
+                foregroundCount += firstSegmentCount;
+            }
+
+            if (foregroundCount > maxCount)
+            {
+                maxCount = foregroundCount;
+            }
+        }
+
+        float percentForeground = maxCount / static_cast<float>(totalCount);
 
         return percentForeground;
     }
