@@ -306,13 +306,15 @@ namespace sensekit { namespace plugins { namespace hand {
 
             m_pointProcessor.updateTrackedPointOrCreateNewPointFromSeedPosition(matrices, seedPosition);
 
-            m_pointProcessor.calculateTestPassMap(matrices);
+            m_pointProcessor.calculateTestPassMap(matrices, TEST_PHASE_UPDATE);
 
-            TestBehavior outputTestLog = TEST_BEHAVIOR_LOG;
+            const TestBehavior outputTestLog = TEST_BEHAVIOR_LOG;
+            const TestPhase phase = TEST_PHASE_CREATE;
 
             bool validPointInRange = m_pointProcessor.test_point_in_range(matrices,
                                                                           seedPosition,
                                                                           0,
+                                                                          phase,
                                                                           outputTestLog);
             bool validPointArea = false;
             bool validRadiusTest = false;
@@ -322,10 +324,12 @@ namespace sensekit { namespace plugins { namespace hand {
                 validPointArea = m_pointProcessor.test_point_area(matrices,
                                                                   seedPosition,
                                                                   0,
+                                                                  phase,
                                                                   outputTestLog);
                 validRadiusTest = m_pointProcessor.test_foreground_radius_percentage(matrices,
                                                                                      seedPosition,
                                                                                      0,
+                                                                                     phase,
                                                                                      outputTestLog);
             }
 

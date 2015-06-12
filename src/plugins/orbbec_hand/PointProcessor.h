@@ -19,6 +19,12 @@ namespace sensekit { namespace plugins { namespace hand {
         TEST_BEHAVIOR_LOG = 1
     };
 
+    enum TestPhase
+    {
+        TEST_PHASE_CREATE = 0,
+        TEST_PHASE_UPDATE = 1
+    };
+
     class PointProcessor
     {
     public:
@@ -48,16 +54,19 @@ namespace sensekit { namespace plugins { namespace hand {
         bool test_point_in_range(TrackingMatrices& matrices,
                                  const cv::Point& targetPoint,
                                  int trackingId,
+                                 TestPhase phase,
                                  TestBehavior outputLog);
         bool test_point_area(TrackingMatrices& matrices,
                              const cv::Point& targetPoint,
                              int trackingId,
+                             TestPhase phase,
                              TestBehavior outputLog);
         bool test_foreground_radius_percentage(TrackingMatrices& matrices,
                                                const cv::Point& targetPoint,
                                                int trackingId,
+                                               TestPhase phase,
                                                TestBehavior outputLog);
-        void calculateTestPassMap(TrackingMatrices& matrices);
+        void calculateTestPassMap(TrackingMatrices& matrices, const TestPhase phase);
 
     private:
         cv::Point3f smooth_world_positions(const cv::Point3f& oldWorldPosition, const cv::Point3f& newWorldPosition);
