@@ -294,7 +294,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 SINFO("PointProcessor", "test_point_area passed #%d: area %f within [%f, %f]",
                               trackingId,
                               area,
-                              m_minArea,
+                              minArea,
                               m_maxArea);
             }
             else
@@ -302,7 +302,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 SINFO("PointProcessor", "test_point_area failed #%d: area %f not within [%f, %f]",
                               trackingId,
                               area,
-                              m_minArea,
+                              minArea,
                               m_maxArea);
             }
         }
@@ -356,10 +356,10 @@ namespace sensekit { namespace plugins { namespace hand {
                 SINFO("PointProcessor", "test_foreground_radius_percentage passed #%d: perc1 %f [%f,%f] perc2 %f [%f,%f]",
                               trackingId,
                               percentForeground1,
-                              m_foregroundRadiusMinPercent1,
+                              minPercent1,
                               m_foregroundRadiusMaxPercent1,
                               percentForeground2,
-                              m_foregroundRadiusMinPercent2,
+                              minPercent2,
                               m_foregroundRadiusMaxPercent2);
             }
             else
@@ -367,10 +367,10 @@ namespace sensekit { namespace plugins { namespace hand {
                 SINFO("PointProcessor", "test_foreground_radius_percentage failed #%d: perc1 %f [%f,%f] perc2 %f [%f,%f]",
                               trackingId,
                               percentForeground1,
-                              m_foregroundRadiusMinPercent1,
+                              minPercent1,
                               m_foregroundRadiusMaxPercent1,
                               percentForeground2,
-                              m_foregroundRadiusMinPercent2,
+                              minPercent2,
                               m_foregroundRadiusMaxPercent2);
             }
         }
