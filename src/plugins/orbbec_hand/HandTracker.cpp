@@ -17,12 +17,10 @@ namespace sensekit { namespace plugins { namespace hand {
         HandTracker::HandTracker(PluginServiceProxy& pluginService,
                                  sensekit_streamset_t streamSet,
                                  StreamDescription& depthDesc,
-                                 PluginLogger& pluginLogger,
                                  HandSettings& settings) :
             m_pluginService(pluginService),
-            m_logger(pluginLogger),
             m_depthUtility(settings.processingSizeWidth, settings.processingSizeHeight, settings.depthUtilitySettings),
-            m_pointProcessor(pluginLogger, settings.pointProcessorSettings),
+            m_pointProcessor(settings.pointProcessorSettings),
             m_processingSizeWidth(settings.processingSizeWidth),
             m_processingSizeHeight(settings.processingSizeHeight)
         {
@@ -56,7 +54,7 @@ namespace sensekit { namespace plugins { namespace hand {
         void HandTracker::create_streams(PluginServiceProxy& pluginService, sensekit_streamset_t streamSet)
         {
             PROFILE_FUNC();
-            m_logger.info("creating hand streams");
+            SINFO("HandTracker", "creating hand streams");
             m_handStream = make_unique<HandStream>(pluginService, streamSet, SENSEKIT_HANDS_MAX_HAND_COUNT);
 
             const int bytesPerPixel = 3;
@@ -274,7 +272,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                                                          outputTestLog);
                 }
 
-                m_logger.info("point test: inRange: %d validArea: %d validRadius: %d\n",
+                SINFO("HandTracker", "point test: inRange: %d validArea: %d validRadius: %d\n",
                               validPointInRange,
                               validPointArea,
                               validRadiusTest);

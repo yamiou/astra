@@ -78,7 +78,7 @@ namespace sensekit { namespace plugins {
             if (m_isOpen)
                 return SENSEKIT_STATUS_SUCCESS;
 
-            get_logger().info("creating oni stream of type: %d", get_description().get_type());
+            SINFO("OniDeviceStream", "creating oni stream of type: %d", get_description().get_type());
             openni::Status rc = m_oniStream.create(m_oniDevice, m_oniSensorType);
 
             if (rc != openni::STATUS_OK)
@@ -86,12 +86,12 @@ namespace sensekit { namespace plugins {
                 return SENSEKIT_STATUS_DEVICE_ERROR;
             }
 
-            get_logger().info("created oni stream of type: %d", get_description().get_type());
+            SINFO("OniDeviceStream", "created oni stream of type: %d", get_description().get_type());
 
             const openni::SensorInfo& pInfo = m_oniStream.getSensorInfo();
             auto& modes = pInfo.getSupportedVideoModes();
 
-            get_logger().info("stream type %d supports modes:", get_description().get_type());
+            SINFO("OniDeviceStream", "stream type %d supports modes:", get_description().get_type());
 
             for(int i = 0; i < modes.getSize(); i++)
             {
@@ -105,7 +105,7 @@ namespace sensekit { namespace plugins {
                     m_oniStream.setVideoMode(mode);
                 }
 
-                get_logger().info("- w: %d h: %d fps: %d pf: %d",
+                SINFO("OniDeviceStream", "- w: %d h: %d fps: %d pf: %d",
                         mode.getResolutionX(),
                         mode.getResolutionY(),
                         mode.getFps(),
@@ -114,7 +114,7 @@ namespace sensekit { namespace plugins {
 
             m_oniVideoMode = m_oniStream.getVideoMode();
 
-            get_logger().info("Selected mode: w: %d h: %d fps: %d pf: %d",
+            SINFO("OniDeviceStream", "Selected mode: w: %d h: %d fps: %d pf: %d",
                         m_oniVideoMode.getResolutionX(),
                         m_oniVideoMode.getResolutionY(),
                         m_oniVideoMode.getFps(),
@@ -146,7 +146,7 @@ namespace sensekit { namespace plugins {
 
             on_close();
 
-            get_logger().info("destroying oni stream of type: %d", get_description().get_type());
+            SINFO("OniDeviceStream", "destroying oni stream of type: %d", get_description().get_type());
             m_oniStream.destroy();
 
             m_isOpen = m_isStreaming = false;
@@ -160,9 +160,9 @@ namespace sensekit { namespace plugins {
             if (!m_isOpen || m_isStreaming)
                 return SENSEKIT_STATUS_SUCCESS;
 
-            get_logger().info("starting oni stream of type: %d", get_description().get_type());
+            SINFO("OniDeviceStream", "starting oni stream of type: %d", get_description().get_type());
             m_oniStream.start();
-            get_logger().info("started oni stream of type: %d", get_description().get_type());
+            SINFO("OniDeviceStream", "started oni stream of type: %d", get_description().get_type());
 
             m_isStreaming = true;
 
@@ -175,9 +175,9 @@ namespace sensekit { namespace plugins {
             if (!m_isOpen || !m_isStreaming)
                 return SENSEKIT_STATUS_SUCCESS;
 
-            get_logger().info("stopping oni stream of type: %d", get_description().get_type());
+            SINFO("OniDeviceStream", "stopping oni stream of type: %d", get_description().get_type());
             m_oniStream.stop();
-            get_logger().info("stopped oni stream of type: %d", get_description().get_type());
+            SINFO("OniDeviceStream", "stopped oni stream of type: %d", get_description().get_type());
 
             m_isStreaming = false;
 

@@ -5,11 +5,9 @@
 namespace sensekit {
 
     StreamBin::StreamBin(size_t bufferLengthInBytes)
-        : m_bufferSize(bufferLengthInBytes),
-          m_logger("StreamBin")
-
+        : m_bufferSize(bufferLengthInBytes)
     {
-        m_logger.trace("Created StreamBin %x", this);
+        STRACE("StreamBin", "Created StreamBin %x", this);
         init_buffers(bufferLengthInBytes);
     }
 
@@ -75,7 +73,7 @@ namespace sensekit {
 
     sensekit_frame_t* StreamBin::lock_front_buffer()
     {
-        m_logger.trace("%x locking front buffer. lock count: %u -> %u", this, m_frontBufferLockCount, m_frontBufferLockCount+1);
+        STRACE("StreamBin", "%x locking front buffer. lock count: %u -> %u", this, m_frontBufferLockCount, m_frontBufferLockCount+1);
 
         ++m_frontBufferLockCount;
         return get_frontBuffer();
@@ -83,11 +81,11 @@ namespace sensekit {
 
     void StreamBin::unlock_front_buffer()
     {
-        m_logger.trace("%x unlocking front buffer. lock count: %u -> %u", this, m_frontBufferLockCount, m_frontBufferLockCount-1);
+        STRACE("StreamBin", "%x unlocking front buffer. lock count: %u -> %u", this, m_frontBufferLockCount, m_frontBufferLockCount-1);
         if (m_frontBufferLockCount == 0)
         {
             //TODO: error, logging
-            m_logger.warn("%x StreamBin unlocked too many times!", this);
+            SWARN("StreamBin", "%x StreamBin unlocked too many times!", this);
             assert(m_frontBufferLockCount != 0);
             return;
         }
@@ -97,7 +95,7 @@ namespace sensekit {
             //can't swap front buffers because there is still an outstanding lock
             return;
         }
-        m_logger.trace("%x unlock pre indices: f: %d m: %d b: %d",
+        STRACE("StreamBin", "%x unlock pre indices: f: %d m: %d b: %d",
             this,
             get_frontBuffer()->frameIndex,
             get_middleBuffer()->frameIndex,
@@ -115,7 +113,7 @@ namespace sensekit {
             m_middleBufferIndex = oldFrontBufferIndex;
 
 
-            m_logger.trace("%x unlock front/mid indices: f: %d m: %d b: %d",
+            STRACE("StreamBin", "%x unlock front/mid indices: f: %d m: %d b: %d",
                 this,
                 get_frontBuffer()->frameIndex,
                 get_middleBuffer()->frameIndex,
@@ -127,9 +125,9 @@ namespace sensekit {
 
     sensekit_frame_t* StreamBin::cycle_buffers()
     {
-        m_logger.trace("%x cycling buffer. lock count: %u produced frame index: %d",
+        STRACE("StreamBin", "%x cycling buffer. lock count: %u produced frame index: %d",
                             this, m_frontBufferLockCount, get_backBuffer()->frameIndex);
-        m_logger.trace("%x cycle pre indices: f: %d m: %d b: %d",
+        STRACE("StreamBin", "%x cycle pre indices: f: %d m: %d b: %d",
             this,
             get_frontBuffer()->frameIndex,
             get_middleBuffer()->frameIndex,
@@ -142,7 +140,7 @@ namespace sensekit {
             m_backBufferIndex = m_middleBufferIndex;
             m_middleBufferIndex = oldBackBufferIndex;
 
-            m_logger.trace("%x cycle back/mid indices: f: %d m: %d b: %d",
+            STRACE("StreamBin", "%x cycle back/mid indices: f: %d m: %d b: %d",
                 this,
                 get_frontBuffer()->frameIndex,
                 get_middleBuffer()->frameIndex,
@@ -163,13 +161,13 @@ namespace sensekit {
             sensekit_frame_index_t newFrameIndex = get_frontBuffer()->frameIndex;
             if (frameIndex != -1 && newFrameIndex <= oldFrameIndex)
             {
-                m_logger.warn("%x buffers cycled with out-of-order frame indices: %d->%d",
+                SWARN("StreamBin", "%x buffers cycled with out-of-order frame indices: %d->%d",
                                 this, oldFrameIndex, newFrameIndex);
                 assert(frameIndex > oldFrameIndex);
             }
 #endif
 
-            m_logger.trace("%x cycle front/back indices: f: %d m: %d b: %d",
+            STRACE("StreamBin", "%x cycle front/back indices: f: %d m: %d b: %d",
                 this,
                 get_frontBuffer()->frameIndex,
                 get_middleBuffer()->frameIndex,

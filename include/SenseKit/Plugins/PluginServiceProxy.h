@@ -120,10 +120,13 @@ namespace sensekit {
 
     sensekit_status_t log(const char* channel,
                           sensekit_log_severity_t logLevel,
+                          const char* fileName,
+                          int lineNo,
+                          const char* func,
                           const char* format,
                           va_list args)
     {
-        return PluginServiceProxyBase::log(pluginService, channel, logLevel, format, args);
+        return PluginServiceProxyBase::log(pluginService, channel, logLevel, fileName, lineNo, func, format, args);
     }
     };
 }

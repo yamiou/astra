@@ -86,6 +86,9 @@ struct PluginServiceProxyBase
                              const char*,
                              sensekit_log_severity_t,
                              const char*,
+                             int,
+                             const char*,
+                             const char*,
                              va_list);
 
 };

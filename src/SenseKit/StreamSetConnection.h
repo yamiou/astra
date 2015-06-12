@@ -16,13 +16,12 @@ namespace sensekit {
     {
     public:
         StreamSetConnection(StreamSet* streamSet)
-            : m_streamSet(streamSet),
-              m_logger("StreamSetConnection")
+            : m_streamSet(streamSet)
         {}
 
         ~StreamSetConnection()
         {
-            m_logger.trace("destroying StreamSetConnection: %p", this);
+            STRACE("StreamSetConnection", "destroying StreamSetConnection: %p", this);
         }
 
         StreamSetConnection& operator=(const StreamSetConnection& rhs) = delete;
@@ -52,8 +51,6 @@ namespace sensekit {
         using ReaderList = std::vector<ReaderPtr>;
 
         ReaderList m_readers;
-
-        Logger m_logger;
     };
 }
 

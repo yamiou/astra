@@ -6,8 +6,7 @@ namespace sensekit { namespace plugins {
     OniDeviceStreamSet::OniDeviceStreamSet(std::string name,
                                            PluginServiceProxy& pluginService,
                                            const char* uri)
-        : m_logger(pluginService, "OniDeviceStreamSet"),
-          m_pluginService(pluginService),
+        : m_pluginService(pluginService),
           m_uri(uri)
     {
         PROFILE_FUNC();
@@ -28,16 +27,16 @@ namespace sensekit { namespace plugins {
         if (m_isOpen)
             return SENSEKIT_STATUS_SUCCESS;
 
-        m_logger.info("opening device: %s", m_uri.c_str());
+        SINFO("OniDeviceStreamSet", "opening device: %s", m_uri.c_str());
         openni::Status rc =  m_oniDevice.open(m_uri.c_str());
 
         if (rc != openni::STATUS_OK)
         {
-            m_logger.warn("failed to open device: %s", openni::OpenNI::getExtendedError());
+            SWARN("OniDeviceStreamSet", "failed to open device: %s", openni::OpenNI::getExtendedError());
             return SENSEKIT_STATUS_DEVICE_ERROR;
         }
 
-        m_logger.info("opened device: %s", m_uri.c_str());
+        SINFO("OniDeviceStreamSet", "opened device: %s", m_uri.c_str());
 
         open_sensor_streams();
 
@@ -54,7 +53,7 @@ namespace sensekit { namespace plugins {
 
         close_sensor_streams();
 
-        m_logger.info("closing oni device: %s", m_uri.c_str());
+        SINFO("OniDeviceStreamSet", "closing oni device: %s", m_uri.c_str());
         m_oniDevice.close();
 
         m_isOpen = false;
@@ -113,7 +112,7 @@ namespace sensekit { namespace plugins {
             }
 
             if ( rc != SENSEKIT_STATUS_SUCCESS)
-                m_logger.warn("unable to open openni color stream.");
+                SWARN("OniDeviceStreamSet", "unable to open openni color stream.");
         }
 
         if (m_oniDevice.hasSensor(openni::SENSOR_DEPTH))
@@ -136,7 +135,7 @@ namespace sensekit { namespace plugins {
             }
 
             if ( rc != SENSEKIT_STATUS_SUCCESS)
-                m_logger.warn("unable to open openni depth stream.");
+                SWARN("OniDeviceStreamSet", "unable to open openni depth stream.");
         }
 
         return SENSEKIT_STATUS_SUCCESS;

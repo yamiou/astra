@@ -5,9 +5,8 @@
 
 namespace sensekit { namespace plugins { namespace hand {
 
-    PointProcessor::PointProcessor(PluginLogger& pluginLogger, PointProcessorSettings& settings) :
+    PointProcessor::PointProcessor(PointProcessorSettings& settings) :
         m_settings(settings),
-        m_logger(pluginLogger),
         m_segmentationBandwidthDepthNear(settings.segmentationBandwidthDepthNear), //mm
         m_segmentationBandwidthDepthFar(settings.segmentationBandwidthDepthFar),  //mm
         m_maxMatchDistLostActive(settings.maxMatchDistLostActive),  //mm
@@ -211,7 +210,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
                 if (trackedPoint.trackingStatus == TrackingStatus::Tracking)
                 {
-                    m_logger.trace("updateTrackedPoint 2nd chance recovered #%d",
+                    STRACE("PointProcessor", "updateTrackedPoint 2nd chance recovered #%d",
                                   trackedPoint.trackingId);
                 }
             }
@@ -252,7 +251,7 @@ namespace sensekit { namespace plugins { namespace hand {
         {
             if (outputLog)
             {
-                m_logger.info("test_point_in_range failed #%d: position: (%d, %d)",
+                SINFO("PointProcessor", "test_point_in_range failed #%d: position: (%d, %d)",
                               trackingId,
                               targetPoint.x,
                               targetPoint.y);
@@ -262,7 +261,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         if (outputLog)
         {
-            m_logger.info("test_point_in_range success #%d: position: (%d, %d)",
+            SINFO("PointProcessor", "test_point_in_range success #%d: position: (%d, %d)",
                           trackingId,
                           targetPoint.x,
                           targetPoint.y);
@@ -285,7 +284,7 @@ namespace sensekit { namespace plugins { namespace hand {
         {
             if (validPointArea)
             {
-                m_logger.info("test_point_area passed #%d: area %f within [%f, %f]",
+                SINFO("PointProcessor", "test_point_area passed #%d: area %f within [%f, %f]",
                               trackingId,
                               area,
                               m_minArea,
@@ -293,7 +292,7 @@ namespace sensekit { namespace plugins { namespace hand {
             }
             else
             {
-                m_logger.info("test_point_area failed #%d: area %f not within [%f, %f]",
+                SINFO("PointProcessor", "test_point_area failed #%d: area %f not within [%f, %f]",
                               trackingId,
                               area,
                               m_minArea,
@@ -332,7 +331,7 @@ namespace sensekit { namespace plugins { namespace hand {
         {
             if (passed)
             {
-                m_logger.info("test_foreground_radius_percentage passed #%d: perc1 %f (max %f) perc2 %f (max %f)",
+                SINFO("PointProcessor", "test_foreground_radius_percentage passed #%d: perc1 %f (max %f) perc2 %f (max %f)",
                               trackingId,
                               percentForeground1,
                               m_foregroundRadiusMaxPercent1,
@@ -341,7 +340,7 @@ namespace sensekit { namespace plugins { namespace hand {
             }
             else
             {
-                m_logger.info("test_foreground_radius_percentage failed #%d: perc1 %f (max %f) perc2 %f (max %f)",
+                SINFO("PointProcessor", "test_foreground_radius_percentage failed #%d: perc1 %f (max %f) perc2 %f (max %f)",
                               trackingId,
                               percentForeground1,
                               m_foregroundRadiusMaxPercent1,
@@ -452,7 +451,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
             if (it == m_trajectories.end())
             {
-                TrajectoryAnalyzer analyzer(trackingId, m_logger, m_settings.trajectoryAnalyzerSettings);
+                TrajectoryAnalyzer analyzer(trackingId, m_settings.trajectoryAnalyzerSettings);
                 analyzer.update(trackedPoint);
                 m_trajectories.insert(std::make_pair(trackingId, analyzer));
             }
@@ -724,7 +723,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         if (trackedPoint.trackingStatus != oldStatus)
         {
-            m_logger.trace("validateAndUpdateTrackedPoint: #%d status %s --> status %s",
+            STRACE("PointProcessor", "validateAndUpdateTrackedPoint: #%d status %s --> status %s",
                            trackedPoint.trackingId,
                            tracking_status_to_string(oldStatus).c_str(),
                            tracking_status_to_string(trackedPoint.trackingStatus).c_str());
@@ -871,7 +870,7 @@ namespace sensekit { namespace plugins { namespace hand {
                         trackedPoint.worldPosition = worldPosition;
                         trackedPoint.worldDeltaPosition = cv::Point3f();
 
-                        m_logger.trace("createCycle: Recovered #%d",
+                        STRACE("PointProcessor", "createCycle: Recovered #%d",
                                         trackedPoint.trackingId);
 
                         //it could be faulty recovery, so start out in probation just like a new point
@@ -885,7 +884,7 @@ namespace sensekit { namespace plugins { namespace hand {
         }
         if (!existingPoint)
         {
-            m_logger.trace("createCycle: Created new point #%d",
+            STRACE("PointProcessor", "createCycle: Created new point #%d",
                            m_nextTrackingId);
 
             TrackedPoint newPoint(targetPoint, worldPosition, m_nextTrackingId);

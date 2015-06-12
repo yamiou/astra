@@ -8,17 +8,12 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "Logger.h"
 
 namespace sensekit {
 
     class StreamSetCatalog
     {
     public:
-        StreamSetCatalog()
-            : m_logger("StreamSetCatalog")
-        {}
-
         ~StreamSetCatalog();
 
         StreamSetConnection& open_set_connection(std::string uri);
@@ -85,7 +80,6 @@ namespace sensekit {
         using StreamSetMap = std::map<std::string, StreamSetEntryPtr>;
 
         StreamSetMap m_streamSets;
-        Logger m_logger;
 
         void on_stream_registered(StreamRegisteredEventArgs args);
         void on_stream_unregistering(StreamUnregisteringEventArgs args);

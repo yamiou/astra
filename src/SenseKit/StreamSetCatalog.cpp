@@ -3,6 +3,7 @@
 #include "StreamSet.h"
 #include "StreamSetConnection.h"
 #include "Core/Signal.h"
+#include "Logger.h"
 
 namespace sensekit {
 
@@ -16,7 +17,7 @@ namespace sensekit {
         std::string finalUri = uri;
         if (uri == "device/default")
         {
-            m_logger.info("default uri provided.");
+            SINFO("StreamSetCatalog", "default uri provided.");
             finalUri = "device/sensor0";
         }
 

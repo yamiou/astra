@@ -29,7 +29,7 @@ namespace sensekit
         StreamSet& set = m_context.get_setCatalog().get_or_add(streamUri, true);
         streamSet = set.get_handle();
 
-        m_logger.info("creating streamset: %s %x", streamUri, streamSet);
+        SINFO("PluginService", "creating streamset: %s %x", streamUri, streamSet);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -38,7 +38,7 @@ namespace sensekit
     {
         StreamSet* actualSet = StreamSet::get_ptr(streamSet);
 
-        m_logger.info("destroying streamset: %s %x", actualSet->get_uri().c_str(), streamSet);
+        SINFO("PluginService", "destroying streamset: %s %x", actualSet->get_uri().c_str(), streamSet);
         m_context.get_setCatalog().destroy_set(actualSet);
 
         streamSet = nullptr;
@@ -104,7 +104,7 @@ namespace sensekit
         Stream* stream = set->register_stream(desc, pluginCallbacks);
         handle = stream->get_handle();
 
-        m_logger.info("registered stream -- handle %x type: %d", handle, desc.type);
+        SINFO("PluginService", "registered stream -- handle %x type: %d", handle, desc.type);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -125,7 +125,7 @@ namespace sensekit
 
         const sensekit_stream_desc_t& desc = stream->get_description();
 
-        m_logger.info("destroying stream -- handle: %x type: %d", stream->get_handle(), desc.type);
+        SINFO("PluginService", "destroying stream -- handle: %x type: %d", stream->get_handle(), desc.type);
 
         set->destroy_stream(stream);
 
@@ -156,7 +156,7 @@ namespace sensekit
         binHandle = bin->get_handle();
         binBuffer = bin->get_backBuffer();
 
-        m_logger.info("creating bin -- handle: %x stream: %x type: %d size: %u",
+        SINFO("PluginService", "creating bin -- handle: %x stream: %x type: %d size: %u",
                       binHandle,
                       streamHandle,
                       actualStream->get_description().type,
@@ -172,7 +172,7 @@ namespace sensekit
         Stream* actualStream = Stream::get_ptr(streamHandle);
         StreamBin* bin = StreamBin::get_ptr(binHandle);
 
-        m_logger.info("destroying bin -- %x stream: %x type: %d size: %u",
+        SINFO("PluginService", "destroying bin -- %x stream: %x type: %d size: %u",
                       binHandle,
                       streamHandle,
                       actualStream->get_description().type,
@@ -214,7 +214,7 @@ namespace sensekit
         Stream* stream = underlyingConnection->get_stream();
         if (binHandle != nullptr)
         {
-            m_logger.info("linking connection to bin -- stream: %x type: %d conn: %x bin: %x",
+            SINFO("PluginService", "linking connection to bin -- stream: %x type: %d conn: %x bin: %x",
                           stream->get_handle(),
                           stream->get_description().type,
                           connection,
@@ -222,7 +222,7 @@ namespace sensekit
         }
         else
         {
-            m_logger.info("unlinking connection to bin -- stream: %x type: %d conn: %x",
+            SINFO("PluginService", "unlinking connection to bin -- stream: %x type: %d conn: %x",
                           stream->get_handle(),
                           stream->get_description().type,
                           connection);
@@ -247,11 +247,14 @@ namespace sensekit
     }
 
     sensekit_status_t PluginService::log(const char* channel,
-                                         sensekit_log_severity_t logLevel,
-                                         const char* format,
-                                         va_list args)
+                              sensekit_log_severity_t logLevel,
+                              const char* fileName,
+                              int lineNo,
+                              const char* func,
+                              const char* format,
+                              va_list args)
     {
-        sensekit::log_vargs(channel, logLevel, format, args);
+        sensekit::log_vargs(channel, logLevel, fileName, lineNo, func, format, args);
         return SENSEKIT_STATUS_SUCCESS;
     }
 

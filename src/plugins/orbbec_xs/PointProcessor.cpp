@@ -4,15 +4,13 @@
 namespace sensekit { namespace plugins { namespace xs {
 
     PointProcessor::PointProcessor(PluginServiceProxy& pluginService,
-                   sensekit_streamset_t streamset,
-                   StreamDescription& depthDesc,
-                   PluginLogger& pluginLogger) :
-       m_pluginService(pluginService),
-       m_streamSet(streamset),
-       m_logger(pluginLogger)
+                                   sensekit_streamset_t streamset,
+                                   StreamDescription& depthDesc)
+        : m_pluginService(pluginService),
+          m_streamSet(streamset)
     {
         PROFILE_FUNC();
-        m_logger.info("PointProcessor ctor");
+        SINFO("PointerProcessor", "PointProcessor ctor");
 
         const char* uri;
         pluginService.get_streamset_uri(streamset, &uri);
@@ -29,7 +27,7 @@ namespace sensekit { namespace plugins { namespace xs {
     PointProcessor::~PointProcessor()
     {
         PROFILE_FUNC();
-        m_logger.info("PointProcessor dtor");
+        SINFO("PointerProcessor", "PointProcessor dtor");
     }
 
     void PointProcessor::on_frame_ready(StreamReader& reader, Frame& frame)
@@ -55,7 +53,7 @@ namespace sensekit { namespace plugins { namespace xs {
             return;
         }
         //TODO check for changes in depthFrame width and height and update bin size
-        m_logger.info("creating point stream");
+        SINFO("PointerProcessor", "creating point stream");
 
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();

@@ -25,13 +25,8 @@ namespace sensekit { namespace plugins {
 
         std::string get_uri() { return m_uri; }
 
-    protected:
-        inline sensekit::plugins::PluginLogger& get_logger() { return m_logger; }
-
     private:
         bool m_isOpen{false};
-
-        sensekit::plugins::PluginLogger m_logger;
 
         sensekit_status_t open_sensor_streams();
         sensekit_status_t close_sensor_streams();

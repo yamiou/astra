@@ -7,8 +7,7 @@
 namespace sensekit {
 
     StreamConnection::StreamConnection(Stream* stream)
-        : m_stream(stream),
-          m_logger("StreamConnection")
+        : m_stream(stream)
     {
         assert (stream != nullptr);
 
@@ -49,7 +48,7 @@ namespace sensekit {
 
     sensekit_frame_t* StreamConnection::lock()
     {
-        m_logger.trace("%x lock", this);
+        STRACE("StreamConnection", "%x lock", this);
         if (m_locked)
         {
             return m_currentFrame;
@@ -71,11 +70,11 @@ namespace sensekit {
 
     void StreamConnection::unlock()
     {
-        m_logger.trace("%x unlock", this);
+        STRACE("StreamConnection", "%x unlock", this);
 
         if (!m_locked)
         {
-            m_logger.warn("%x StreamConnection::unlock() not locked", this);
+            SWARN("StreamConnection", "%x StreamConnection::unlock() not locked", this);
             assert(m_locked);
         }
 

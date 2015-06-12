@@ -14,14 +14,13 @@ namespace sensekit { namespace plugins { namespace xs {
         if (streamDesc.type == SENSEKIT_STREAM_DEPTH &&
             m_pointProcessorMap.find(streamHandle) == m_pointProcessorMap.end())
         {
-            get_logger().info("XS creating point processor");
+            SINFO("XSPlugin", "XS creating point processor");
 
             StreamDescription depthDescription = streamDesc;
 
             auto pointProcessorPtr = std::make_unique<PointProcessor>(get_pluginService(),
                                                                       setHandle,
-                                                                      depthDescription,
-                                                                      get_logger());
+                                                                      depthDescription);
 
             m_pointProcessorMap[streamHandle] = std::move(pointProcessorPtr);
         }

@@ -69,7 +69,6 @@ namespace sensekit { namespace plugins { namespace hand {
             HandTracker* tracker = new HandTracker(get_pluginService(),
                                                    setHandle,
                                                    depthDescription,
-                                                   get_logger(),
                                                    m_settings);
 
             m_streamTrackerMap[streamHandle] = tracker;

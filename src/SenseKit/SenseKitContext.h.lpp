@@ -44,9 +44,6 @@ namespace sensekit {
     private:
         bool m_initialized{false};
 
-        using LoggerPtr = std::unique_ptr<Logger>;
-        LoggerPtr m_logger;
-
         StreamServiceProxyBase* m_streamServiceProxy;
 
         using PluginManagerPtr = std::unique_ptr<PluginManager>;

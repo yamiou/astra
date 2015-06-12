@@ -12,21 +12,22 @@
 #include <memory>
 #include <string>
 #include <cassert>
+#include "StreamSetConnection.h"
 
 namespace sensekit {
-
-    class StreamSetConnection;
 
     class StreamSet
     {
     public:
+        using VisitorFunc = std::function<void(Stream*)>;
+
         StreamSet(std::string uri);
-        ~StreamSet();
 
         StreamSet& operator=(const StreamSet& rhs) = delete;
         StreamSet(const StreamSet& streamSet) = delete;
 
         StreamSetConnection* add_new_connection();
+
         void link_existing_connection(StreamSetConnection* connection);
         void disconnect_streamset_connection(StreamSetConnection* connection);
 
@@ -34,16 +35,8 @@ namespace sensekit {
 
         bool destroy_stream_connection(StreamConnection* connection);
 
-        void claim()
-        {
-            assert(m_isClaimed != true);
-            m_isClaimed = true;
-        }
-
-        bool is_claimed()
-        {
-            return m_isClaimed;
-        }
+        void claim();
+        bool is_claimed() const;
 
         //plugins only below
 
@@ -61,29 +54,14 @@ namespace sensekit {
 
         sensekit_streamset_t get_handle() { return reinterpret_cast<sensekit_streamset_t>(this); }
 
-        void visit_streams(std::function<void(Stream*)> visitorMethod);
+        void visit_streams(VisitorFunc visitorMethod);
 
         static StreamSet* get_ptr(sensekit_streamset_t handle) { return reinterpret_cast<StreamSet*>(handle); }
 
-        sensekit_callback_id_t register_for_stream_registered_event(StreamRegisteredCallback callback)
-        {
-            return m_streamRegisteredSignal += callback;
-        }
-
-        sensekit_callback_id_t register_for_stream_unregistering_event(StreamUnregisteringCallback callback)
-        {
-            return m_streamUnregisteringSignal += callback;
-        }
-
-        void unregister_for_stream_registered_event(sensekit_callback_id_t callbackId)
-        {
-            m_streamRegisteredSignal -= callbackId;
-        }
-
-        void unregister_for_stream_unregistering_event(sensekit_callback_id_t callbackId)
-        {
-            m_streamUnregisteringSignal -= callbackId;
-        }
+        sensekit_callback_id_t register_for_stream_registered_event(StreamRegisteredCallback callback);
+        sensekit_callback_id_t register_for_stream_unregistering_event(StreamUnregisteringCallback callback);
+        void unregister_for_stream_registered_event(sensekit_callback_id_t callbackId);
+        void unregister_for_stream_unregistering_event(sensekit_callback_id_t callbackId);
 
     private:
         Stream* find_stream_by_type_subtype_impl(sensekit_stream_type_t type,
@@ -92,7 +70,6 @@ namespace sensekit {
         using StreamCollection = std::unordered_set<Stream*>;
         StreamCollection m_streamCollection;
 
-        Logger m_logger;
         bool m_isClaimed{false};
 
         std::string m_uri;

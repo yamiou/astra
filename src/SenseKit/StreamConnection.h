@@ -3,16 +3,14 @@
 
 #include <SenseKit/sensekit_types.h>
 #include <SenseKit/Plugins/plugin_capi.h>
-#include "StreamBin.h"
 #include "ParameterBin.h"
+#include "StreamBin.h"
 #include "Logger.h"
 #include "Registry.h"
 
 namespace sensekit {
 
-    class StreamBin;
     class Stream;
-    class StreamConnection;
 
     class StreamConnection : public TrackedInstance<StreamConnection>
     {
@@ -84,12 +82,10 @@ namespace sensekit {
         StreamBin* m_bin{nullptr};
         ParameterBin* m_pendingParameterResult{nullptr};
 
-        FrontBufferReadyCallback m_binFrontBufferReadyCallback;
+        StreamBin::FrontBufferReadyCallback m_binFrontBufferReadyCallback;
         sensekit_callback_id_t m_binFrontBufferReadyCallbackId;
 
         Signal<StreamConnection*, sensekit_frame_index_t> m_frameReadySignal;
-
-        Logger m_logger;
     };
 }
 

@@ -216,6 +216,9 @@
                 :funcname "log"
                 :params (list (make-param :type "const char*" :name "channel")
                               (make-param :type "sensekit_log_severity_t" :name "logLevel")
+                              (make-param :type "const char*" :name "fileName")
+                              (make-param :type "int" :name "lineNo")
+                              (make-param :type "const char*" :name "func")
                               (make-param :type "const char*" :name "format")
                               (make-param :type "va_list" :name "args")))
 

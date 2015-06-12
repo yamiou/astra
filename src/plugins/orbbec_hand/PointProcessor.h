@@ -16,7 +16,7 @@ namespace sensekit { namespace plugins { namespace hand {
     class PointProcessor
     {
     public:
-        PointProcessor(PluginLogger& pluginLogger, PointProcessorSettings& settings);
+        PointProcessor(PointProcessorSettings& settings);
         virtual ~PointProcessor();
 
         void initialize_common_calculations(TrackingMatrices& matrices);
@@ -76,7 +76,6 @@ namespace sensekit { namespace plugins { namespace hand {
         void calculateTestPassMap(TrackingMatrices& matrices);
 
         PointProcessorSettings& m_settings;
-        PluginLogger& m_logger;
         float m_segmentationBandwidthDepthNear;
         float m_segmentationBandwidthDepthFar;
         float m_maxMatchDistLostActive;

@@ -21,8 +21,7 @@ namespace sensekit
     {
     public:
         PluginService(SenseKitContext& context)
-            : m_context(context),
-              m_logger("PluginService")
+            : m_context(context)
             {}
 
         PluginService(const PluginService& service) = delete;
@@ -71,14 +70,15 @@ namespace sensekit
                                             sensekit_parameter_data_t& parameterData);
         sensekit_status_t log(const char* channel,
                               sensekit_log_severity_t logLevel,
+                              const char* fileName,
+                              int lineNo,
+                              const char* func,
                               const char* format,
                               va_list args);
 
     private:
         SenseKitContext& m_context;
         Signal<sensekit_event_id, const void*, size_t> m_hostEventSignal;
-
-        Logger m_logger;
     };
 }
 

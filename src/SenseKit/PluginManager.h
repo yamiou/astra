@@ -48,8 +48,6 @@ namespace sensekit {
         std::vector<std::string> find_libraries(const std::string& pluginsPath);
         void try_load_plugin(const std::string& path);
 
-        Logger m_logger;
-
         using PluginList = std::vector<PluginFuncs>;
         PluginList m_pluginList;
 

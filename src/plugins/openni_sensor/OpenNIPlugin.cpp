@@ -1,5 +1,4 @@
 ﻿#include "OpenNIPlugin.h"
-#include <SenseKit/SenseKit.h>
 #include <SenseKitUL/skul_ctypes.h>
 #include "OniDepthStream.h"
 #include "OniColorStream.h"
@@ -18,7 +17,7 @@ namespace sensekit
             PROFILE_FUNC();
             openni::Version version = openni::OpenNI::getVersion();
 
-            get_logger().info("Initializing OpenNI v%d.%d.%d.%d",
+            SINFO("OpenNIPlugin", "Initializing OpenNI v%d.%d.%d.%d",
                               version.major,
                               version.minor,
                               version.maintenance,
@@ -35,11 +34,11 @@ namespace sensekit
 
             if (!successful)
             {
-                get_logger().warn("Failed to initialize OpenNI: %s", openni::OpenNI::getExtendedError());
+                SWARN("OpenNIPlugin", "Failed to initialize OpenNI: %s", openni::OpenNI::getExtendedError());
             }
             else
             {
-                get_logger().info("Initialized OpenNI v%d.%d.%d.%d",
+                SINFO("OpenNIPlugin", "Initialized OpenNI v%d.%d.%d.%d",
                                   version.major,
                                   version.minor,
                                   version.maintenance,
@@ -56,7 +55,7 @@ namespace sensekit
             case SENSEKIT_EVENT_RESOURCE_AVAILABLE:
                 const char* resourceUri = static_cast<const char*>(data);
 
-                get_logger().info("resource uri received: %s", resourceUri);
+                SINFO("OpenNIPlugin", "resource uri received: %s", resourceUri);
 
                 unsigned int vid = 0;
                 unsigned int pid = 0;
@@ -69,19 +68,19 @@ namespace sensekit
                 {
                     char oniUri[1024];
                     snprintf(oniUri, 1024, "%04hx/%04hx@%hhu/%hhu", vid, pid, bus, address);
-                    get_logger().info("parsed oniUri: %s", oniUri);
+                    SINFO("OpenNIPlugin", "parsed oniUri: %s", oniUri);
 
                     openni::Array<openni::DeviceInfo> devices;
                     openni::OpenNI::enumerateDevices(&devices);
-                    get_logger().info("num devices: %d", devices.getSize());
+                    SINFO("OpenNIPlugin", "num devices: %d", devices.getSize());
 
                     for(int i = 0; i < devices.getSize(); i++)
                     {
                         const openni::DeviceInfo& info = devices[i];
-                        get_logger().info("found sensor: %s", info.getUri());
+                        SINFO("OpenNIPlugin", "found sensor: %s", info.getUri());
                         if (strcmp(oniUri, info.getUri()) == 0)
                         {
-                            get_logger().info("device connected: %s", info.getUri());
+                            SINFO("OpenNIPlugin", "device connected: %s", info.getUri());
                             add_or_get_device(info.getUri());
                             break;
                         }
@@ -89,7 +88,7 @@ namespace sensekit
                 }
                 else
                 {
-                    get_logger().info("unknown resource uri: %s", resourceUri);
+                    SINFO("OpenNIPlugin", "unknown resource uri: %s", resourceUri);
                 }
             }
 #endif
@@ -132,7 +131,7 @@ namespace sensekit
         {
             PROFILE_FUNC();
 #ifndef __ANDROID__
-            get_logger().info("device connected: %s", info->getUri());
+            SINFO("OpenNIPlugin", "device connected: %s", info->getUri());
             add_or_get_device(info->getUri());
 #endif
         }
@@ -140,7 +139,7 @@ namespace sensekit
         void OpenNIPlugin::onDeviceDisconnected(const ::openni::DeviceInfo* info)
         {
             PROFILE_FUNC();
-            get_logger().info("device disconnected: %s", info->getUri());
+            SINFO("OpenNIPlugin", "device disconnected: %s", info->getUri());
             auto it = std::find_if(m_sets.begin(), m_sets.end(),
                                    [&info] (SetPtr& setPtr)
                                    -> bool
@@ -160,7 +159,7 @@ namespace sensekit
 #endif
 
             m_sets.clear();
-            get_logger().info("shutting down openni");
+            SINFO("OpenNIPlugin", "shutting down openni");
             openni::OpenNI::shutdown();
         }
 

@@ -9,7 +9,9 @@
 
 #define ELPP_NO_DEFAULT_LOG_FILE
 
+
 #include "vendor/easylogging++.h"
+
 
 #define INITIALIZE_LOGGING INITIALIZE_EASYLOGGINGPP
 

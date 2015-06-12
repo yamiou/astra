@@ -138,10 +138,13 @@ namespace sensekit {
         static sensekit_status_t log(void* pluginService,
                                      const char* channel,
                                      sensekit_log_severity_t logLevel,
+                                     const char* fileName,
+                                     int lineNo,
+                                     const char* func,
                                      const char* format,
                                      va_list args)
         {
-            return static_cast<PluginService*>(pluginService)->log(channel, logLevel, format, args);
+            return static_cast<PluginService*>(pluginService)->log(channel, logLevel, fileName, lineNo, func, format, args);
         }
     };
 }

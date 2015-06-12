@@ -2,7 +2,8 @@
 #define OPENNIPLUGIN_H
 
 #include <SenseKit/SenseKit.h>
-#include <SenseKit/Plugins/PluginKit.h>
+#include <SenseKit/Plugins/PluginBase.h>
+#include <SenseKit/Plugins/PluginLogger.h>
 #include "OniDeviceStream.h"
 #include "OniDeviceStreamSet.h"
 #include <memory>
@@ -23,10 +24,10 @@ namespace sensekit
         public:
             OpenNIPlugin(PluginServiceProxy* pluginService)
                 : PluginBase(pluginService, "openni_sensor")
-                {
-                    register_for_host_events();
-                    init_openni();
-                }
+            {
+                register_for_host_events();
+                init_openni();
+            }
 
             virtual ~OpenNIPlugin();
             virtual void temp_update() override;

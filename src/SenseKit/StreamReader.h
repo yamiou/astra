@@ -3,16 +3,17 @@
 
 #include <SenseKit/sensekit_types.h>
 #include "Registry.h"
-#include "StreamSet.h"
-#include "StreamConnection.h"
 #include <unordered_map>
 #include <vector>
 #include <cassert>
 #include "Core/Signal.h"
-#include "Logger.h"
 #include "sensekit_private.h"
+#include "StreamConnection.h"
 
 namespace sensekit {
+
+    class StreamSetConnection;
+    //class StreamConnection;
 
     class StreamDescHash
     {
@@ -124,8 +125,6 @@ namespace sensekit {
         Signal<sensekit_reader_t, sensekit_reader_frame_t> m_frameReadySignal;
 
         StreamConnection::FrameReadyCallback m_scFrameReadyCallback;
-
-        Logger m_logger;
     };
 }
 

@@ -2,9 +2,9 @@
 #define PLUGINSTREAM_H
 
 #include <SenseKit/SenseKit.h>
+#include <SenseKit/Plugins/PluginLogger.h>
 #include <SenseKit/Plugins/PluginServiceProxy.h>
 #include <SenseKit/Plugins/StreamCallbackListener.h>
-#include <SenseKit/Plugins/PluginLogger.h>
 #include <system_error>
 #include <cassert>
 #include <unordered_set>
@@ -35,12 +35,11 @@ namespace sensekit { namespace plugins {
     public:
         Stream(PluginServiceProxy& pluginService,
                sensekit_streamset_t streamSet,
-               StreamDescription description) :
-            m_logger(pluginService, "PluginStream"),
-            m_pluginService(pluginService),
-            m_streamSet(streamSet),
-            m_description(description),
-            m_inhibitCallbacks(true)
+               StreamDescription description)
+            : m_pluginService(pluginService),
+              m_streamSet(streamSet),
+              m_description(description),
+              m_inhibitCallbacks(true)
         {
             create_stream(description);
         }
@@ -54,13 +53,10 @@ namespace sensekit { namespace plugins {
         inline sensekit_stream_t get_handle() { return m_streamHandle; }
 
     protected:
-        inline sensekit::plugins::PluginLogger& get_logger() { return m_logger; }
         inline PluginServiceProxy& get_pluginService() const { return m_pluginService; }
-
         inline void enable_callbacks();
-    private:
-        sensekit::plugins::PluginLogger m_logger;
 
+    private:
         virtual void connection_added(sensekit_stream_t stream,
                                       sensekit_streamconnection_t connection) override final;
 
@@ -155,7 +151,7 @@ namespace sensekit { namespace plugins {
     {
         if (m_inhibitCallbacks)
         {
-            m_logger.info("Saving a connection_added for later");
+            SINFO("Stream", "Saving a connection_added for later");
             m_savedConnections.insert(connection);
         }
         else
@@ -190,7 +186,7 @@ namespace sensekit { namespace plugins {
 
         if (m_savedConnections.size() > 0)
         {
-            m_logger.info("Flushing saved connection_added connections");
+            SINFO("Stream", "Flushing saved connection_added connections");
             for (auto connection : m_savedConnections)
             {
                 on_connection_added(connection);

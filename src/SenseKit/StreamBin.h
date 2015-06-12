@@ -10,12 +10,11 @@
 
 namespace sensekit {
 
-    class StreamBin;
-    using FrontBufferReadyCallback = std::function<void(StreamBin*,sensekit_frame_index_t)>;
-
     class StreamBin
     {
     public:
+        using FrontBufferReadyCallback = std::function<void(StreamBin*,sensekit_frame_index_t)>;
+
         StreamBin(size_t bufferSizeInBytes);
         ~StreamBin();
 
@@ -88,8 +87,6 @@ namespace sensekit {
 
         int m_connectedCount{0};
         int m_activeCount{0};
-
-        Logger m_logger;
 
         Signal<StreamBin*, sensekit_frame_index_t> m_frontBufferReadySignal;
     };

@@ -4,8 +4,8 @@
 #include <SenseKit/sensekit_types.h>
 #include <SenseKit/host_events.h>
 #include "PluginServiceProxy.h"
-#include <SenseKit/Plugins/PluginLogger.h>
 #include <cassert>
+#include <SenseKit/Plugins/PluginLogger.h>
 
 namespace sensekit {
 
@@ -13,8 +13,7 @@ namespace sensekit {
     {
     public:
         PluginBase(PluginServiceProxy* pluginService, const char* pluginName)
-            :  m_pluginService(pluginService),
-               m_logger(*pluginService, pluginName)
+            :  m_pluginService(pluginService)
         {
             assert(pluginService != nullptr);
         }
@@ -27,7 +26,6 @@ namespace sensekit {
 
     protected:
         inline PluginServiceProxy& get_pluginService() const  { return *m_pluginService; }
-        inline sensekit::plugins::PluginLogger& get_logger() { return m_logger; }
 
         virtual void on_initialize() { };
 
@@ -67,7 +65,6 @@ namespace sensekit {
     private:
 
         PluginServiceProxy* m_pluginService{nullptr};
-        sensekit::plugins::PluginLogger m_logger;
 
         static void stream_added_handler_thunk(void* clientTag,
                                                sensekit_streamset_t setHandle,
@@ -139,11 +136,13 @@ namespace sensekit {
 #define EXPORT_PLUGIN(className)                                                         \
                                                                                          \
     static className* g_plugin;                                                          \
+    sensekit::PluginServiceProxy* __g_serviceProxy;                                      \
                                                                                          \
     SENSEKIT_BEGIN_DECLS                                                                 \
                                                                                          \
     SENSEKIT_EXPORT void sensekit_plugin_initialize(PluginServiceProxyBase* pluginProxy) \
     {                                                                                    \
+        __g_serviceProxy = static_cast<sensekit::PluginServiceProxy*>(pluginProxy);      \
         g_plugin = new className(                                                        \
             static_cast<sensekit::PluginServiceProxy*>(pluginProxy));                    \
         g_plugin->initialize();                                                          \
@@ -158,6 +157,7 @@ namespace sensekit {
     {                                                                                    \
         delete g_plugin;                                                                 \
         g_plugin = nullptr;                                                              \
+        __g_serviceProxy = nullptr;                                                      \
     }                                                                                    \
                                                                                          \
     SENSEKIT_END_DECLS
