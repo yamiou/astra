@@ -21,8 +21,7 @@ namespace sensekit
     {
     public:
         PluginService(SenseKitContext& context)
-            : m_context(context),
-              m_logger("PluginService")
+            : m_context(context)
             {}
 
         PluginService(const PluginService& service) = delete;
@@ -38,8 +37,6 @@ namespace sensekit
     private:
         SenseKitContext& m_context;
         Signal<sensekit_event_id, const void*, size_t> m_hostEventSignal;
-
-        Logger m_logger;
     };
 }
 
