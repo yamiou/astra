@@ -47,6 +47,8 @@ set(${_projname}_SOURCES
   StreamSet.h
   StreamSetConnection.h
   StreamSetConnection.cpp
+  StreamRegisteredEventArgs.h
+  StreamUnregisteringEventArgs.h
   Logger.h
   Logger.cpp
   Logging.h

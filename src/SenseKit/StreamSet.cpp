@@ -11,16 +11,17 @@ namespace sensekit {
 
     StreamConnection* StreamSet::create_stream_connection(const sensekit_stream_desc_t& desc)
     {
-        STRACE("StreamSet", "create_stream_connection: (%u,%u) on %s", desc.type,desc.subtype, m_uri.c_str());
+        STRACE("StreamSet", "connecting to (%u,%u) on %s", desc.type,desc.subtype, m_uri.c_str());
 
         Stream* stream = find_stream_by_type_subtype_impl(desc.type, desc.subtype);
 
         if (!stream)
         {
-            STRACE("StreamSet","create_stream_connection: register orphan stream of type (%u,%u) on %s",
-                           desc.type,
-                           desc.subtype,
-                           m_uri.c_str());
+            STRACE("StreamSet",
+                   "registering orphan stream of type (%u,%u) on %s",
+                   desc.type,
+                   desc.subtype,
+                   m_uri.c_str());
 
             stream = register_orphan_stream(desc);
         }
@@ -39,15 +40,15 @@ namespace sensekit {
         }
 
         Stream* stream = connection->get_stream();
-        STRACE("StreamSet","destroy_stream_connection: destroying %p on %s", connection, m_uri.c_str());
+        STRACE("StreamSet","destroying %p on %s", connection, m_uri.c_str());
         stream->destroy_connection(connection);
 
         if (!stream->has_connections()
             && !stream->is_available())
         {
-            STRACE("StreamSet","destroy_stream_connection: removing unused/unavailable stream %p on %s",
-                           stream,
-                           m_uri.c_str());
+            STRACE("StreamSet","removing unused/unavailable stream %p on %s",
+                   stream,
+                   m_uri.c_str());
 
             m_streamCollection.erase(stream);
             delete stream;
@@ -67,21 +68,21 @@ namespace sensekit {
             if (stream->is_available())
             {
                 SWARN("StreamSet","register_stream: (%u,%u) already exists, already inflated on %s",
-                              desc.type,
-                              desc.subtype,
-                              m_uri.c_str());
+                      desc.type,
+                      desc.subtype,
+                      m_uri.c_str());
 
                 return nullptr;
             }
 
-            STRACE("StreamSet","register_stream: (%u,%u) already exists, adopting orphan stream on %s",
-                           desc.type,
-                           desc.subtype,
-                           m_uri.c_str());
+            STRACE("StreamSet","(%u,%u) already exists, adopting orphan stream on %s",
+                   desc.type,
+                   desc.subtype,
+                   m_uri.c_str());
         }
         else
         {
-            STRACE("StreamSet","register_stream: (%u,%u) on %s", desc.type, desc.subtype, m_uri.c_str());
+            STRACE("StreamSet","registering (%u,%u) on %s", desc.type, desc.subtype, m_uri.c_str());
             stream = new Stream(desc);
             m_streamCollection.insert(stream);
         }
@@ -95,7 +96,7 @@ namespace sensekit {
 
     Stream* StreamSet::register_orphan_stream(sensekit_stream_desc_t desc)
     {
-        STRACE("StreamSet","register_orphan_stream: (%u,%u) on %s", desc.type, desc.subtype, m_uri.c_str());
+        STRACE("StreamSet","registering orphan (%u,%u) on %s", desc.type, desc.subtype, m_uri.c_str());
         Stream* stream = new Stream(desc);
         m_streamCollection.insert(stream);
 
@@ -104,7 +105,7 @@ namespace sensekit {
 
     StreamSetConnection* StreamSet::add_new_connection()
     {
-        STRACE("StreamSet","add_new_connection: %s", m_uri.c_str());
+        STRACE("StreamSet","new connection to %s", m_uri.c_str());
         StreamSetConnectionPtr ptr = std::make_unique<StreamSetConnection>(this);
         StreamSetConnection* conn = ptr.get();
         m_connections.push_back(std::move(ptr));
@@ -129,15 +130,18 @@ namespace sensekit {
 
         if (it != m_connections.end())
         {
-            STRACE("StreamSet","disconnect_streamset_connection: disconnecting %p connection on %s",
-                           connection,
-                           m_uri.c_str());
+            STRACE("StreamSet","disconnecting %p connection from %s",
+                   connection,
+                   m_uri.c_str());
 
             m_connections.erase(it);
         }
         else
         {
-            SWARN("StreamSet","disconnect_streamset_connection: %p connection not found on %s", connection, m_uri.c_str());
+            SWARN("StreamSet",
+                  "disconnect_streamset_connection: %p connection not found on %s",
+                  connection,
+                  m_uri.c_str());
         }
     }
 
@@ -152,7 +156,7 @@ namespace sensekit {
         auto it = m_streamCollection.find(stream);
         if (it != m_streamCollection.end())
         {
-            STRACE("StreamSet","destroy_stream: destroying %p on %s", stream, m_uri.c_str());
+            STRACE("StreamSet","destroying stream %p on %s", stream, m_uri.c_str());
             if (stream->is_available())
             {
                 m_streamUnregisteringSignal.raise(
