@@ -10,7 +10,7 @@ velocityThresholdFactor = 0.005 #float
 maxDepthJumpPercent = 0.1 #float
 erodeSize = 1
 depthAdjustmentFactor = 2.5 #float
-minDepth = 1000.0 #float
+minDepth = 500.0 #float
 maxDepth = 4000.0 #float
 
 [pointprocessor]
