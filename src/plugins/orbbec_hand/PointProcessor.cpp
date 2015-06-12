@@ -341,10 +341,10 @@ namespace sensekit { namespace plugins { namespace hand {
             minPercent2 = 0;
         }
 
-        bool passTest1 = percentForeground1 >= m_foregroundRadiusMinPercent1 &&
+        bool passTest1 = percentForeground1 >= minPercent1 &&
                          percentForeground1 <= m_foregroundRadiusMaxPercent1;
 
-        bool passTest2 = percentForeground2 >= m_foregroundRadiusMinPercent2 &&
+        bool passTest2 = percentForeground2 >= minPercent2 &&
                          percentForeground2 <= m_foregroundRadiusMaxPercent2;
 
         bool passed = passTest1 && passTest2;
