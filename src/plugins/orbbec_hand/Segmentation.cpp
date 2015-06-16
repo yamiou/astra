@@ -340,16 +340,31 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         return area;
     }
 
-    bool test_point_area(TrackingMatrices& matrices,
-                         AreaTestSettings& settings,
-                         const cv::Point& targetPoint,
-                         int trackingId,
-                         TestPhase phase,
-                         TestBehavior outputLog)
+
+    float get_point_area_integral(TrackingMatrices& matrices,
+                                  cv::Mat& integralArea,
+                                  AreaTestSettings& settings,
+                                  const cv::Point& point)
     {
         PROFILE_FUNC();
-        float area = get_point_area(matrices, settings, targetPoint);
+        auto scalingMapper = get_scaling_mapper(matrices);
 
+        float area = count_neighborhood_area_integral(matrices.depth,
+                                                      integralArea,
+                                                      point,
+                                                      settings.areaBandwidth,
+                                                      scalingMapper);
+
+        return area;
+    }
+
+    bool test_point_area_core(float area,
+                              AreaTestSettings& settings,
+                              int trackingId,
+                              TestPhase phase,
+                              TestBehavior outputLog)
+    {
+        PROFILE_FUNC();
         float minArea = settings.minArea;
         const float maxArea = settings.maxArea;
         if (phase == TEST_PHASE_UPDATE)
@@ -381,6 +396,34 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         }
 
         return validPointArea;
+    }
+
+    bool test_point_area(TrackingMatrices& matrices,
+                         AreaTestSettings& settings,
+                         const cv::Point& targetPoint,
+                         int trackingId,
+                         TestPhase phase,
+                         TestBehavior outputLog)
+    {
+        PROFILE_FUNC();
+        float area = get_point_area(matrices, settings, targetPoint);
+
+        return test_point_area_core(area, settings, trackingId, phase, outputLog);
+    }
+
+
+    bool test_point_area_integral(TrackingMatrices& matrices,
+                                  cv::Mat& integralArea,
+                                  AreaTestSettings& settings,
+                                  const cv::Point& targetPoint,
+                                  int trackingId,
+                                  TestPhase phase,
+                                  TestBehavior outputLog)
+    {
+        PROFILE_FUNC();
+        float area = get_point_area_integral(matrices, integralArea, settings, targetPoint);
+
+        return test_point_area_core(area, settings, trackingId, phase, outputLog);
     }
 
     bool test_foreground_radius_percentage(TrackingMatrices& matrices,
@@ -453,6 +496,124 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         return passed;
     }
 
+    cv::Mat& calculate_integral_area(TrackingMatrices& matrices)
+    {
+        PROFILE_FUNC();
+        cv::Mat& segmentationMatrix = matrices.layerSegmentation;
+        cv::Mat& areaMatrix = matrices.area;
+        cv::Mat& integralAreaMatrix = matrices.layerIntegralArea;
+        integralAreaMatrix = cv::Mat::zeros(matrices.depth.size(), CV_32FC1);
+
+        int width = matrices.depth.cols;
+        int height = matrices.depth.rows;
+
+        float* lastIntegralAreaRow = nullptr;
+        for (int y = 0; y < height; y++)
+        {
+            char* segmentationRow = segmentationMatrix.ptr<char>(y);
+            float* areaRow = areaMatrix.ptr<float>(y);
+            float* integralAreaRow = integralAreaMatrix.ptr<float>(y);
+            float* integralAreaRowStart = integralAreaRow;
+
+            float leftArea = 0;
+            float upLeftArea = 0;
+
+            for (int x = 0; x < width; ++x,
+                                       ++areaRow,
+                                       ++integralAreaRow,
+                                       ++segmentationRow)
+            {
+                float upArea = 0;
+                if (lastIntegralAreaRow != nullptr)
+                {
+                    upArea = *lastIntegralAreaRow;
+                    ++lastIntegralAreaRow;
+                }
+
+                float currentArea = 0;
+
+                if (*segmentationRow == PixelType::Foreground)
+                {
+                    currentArea = *areaRow;
+                }
+
+                float area = currentArea + leftArea + upArea - upLeftArea;
+
+                *integralAreaRow = area;
+
+                leftArea = area;
+                upLeftArea = upArea;
+            }
+
+            lastIntegralAreaRow = integralAreaRowStart;
+        }
+
+        return integralAreaMatrix;
+    }
+
+    void test_and_reset_foreground_points(TrackingData& data)
+    {
+        PROFILE_FUNC();
+        auto matrices = data.matrices;
+        cv::Mat& segmentationMatrix = matrices.layerSegmentation;
+        const sensekit::Vector3f* worldPoints = matrices.worldPoints;
+
+        int width = matrices.depth.cols;
+        int height = matrices.depth.rows;
+
+        auto areaTestSettings = data.settings.areaTestSettings;
+        auto circumferenceTestSettings = data.settings.circumferenceTestSettings;
+
+        auto integralArea = calculate_integral_area(matrices);
+
+        TestPhase phase = data.phase;
+        TestBehavior outputTestLog = TEST_BEHAVIOR_NONE;
+
+        for (int y = 0; y < height; y++)
+        {
+            char* segmentationRow = segmentationMatrix.ptr<char>(y);
+
+            for (int x = 0; x < width; ++x,
+                                       ++worldPoints,
+                                       ++segmentationRow)
+            {
+                if (*segmentationRow != PixelType::Foreground)
+                {
+                    continue;
+                }
+
+                sensekit::Vector3f worldPosition = *worldPoints;
+                if (worldPosition.z != 0)
+                {
+                    cv::Point seedPosition(x, y);
+                    bool validPointArea = test_point_area_integral(matrices,
+                                                                   integralArea,
+                                                                   areaTestSettings,
+                                                                   seedPosition,
+                                                                   0,
+                                                                   phase,
+                                                                   outputTestLog);
+                    bool validRadiusTest = false;
+
+                    if (validPointArea)
+                    {
+                        validRadiusTest = test_foreground_radius_percentage(matrices,
+                                                                            circumferenceTestSettings,
+                                                                            seedPosition,
+                                                                            0,
+                                                                            phase,
+                                                                            outputTestLog);
+                    }
+
+                    if (!validPointArea || !validRadiusTest)
+                    {
+                        *segmentationRow = PixelType::Background;
+                    }
+                }
+            }
+        }
+    }
+
     cv::Point track_point_from_seed(TrackingData& data)
     {
         PROFILE_FUNC();
@@ -474,6 +635,9 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                     data.matrices.areaSqrt,
                                     data.matrices.layerEdgeDistance,
                                     data.settings.targetEdgeDistance * 2.0f);
+
+        test_and_reset_foreground_points(data);
+
         calculate_layer_score(data, layerAverageDepth);
 
         double min, max;
@@ -681,6 +845,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                                std::function<void(cv::Point)> callback)
     {
         PROFILE_FUNC();
+
         int width = matDepth.cols;
         int height = matDepth.rows;
         if (center.x < 0 || center.x >= width ||
@@ -704,6 +869,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         int cy = center.y;
 
         std::vector<sensekit::Vector2i> offsets;
+        offsets.reserve(pixelRadius);
 
         {
             int dx = pixelRadius; //radius in pixels
@@ -727,13 +893,16 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             }
         }
 
+        PROFILE_BEGIN(circ_callbacks);
+
         int length = offsets.size();
 
         for (int i = 1; i < length; ++i)
         {
             //dx, dy
-            int dx = offsets[i].x;
-            int dy = offsets[i].y;
+            sensekit::Vector2i delta = offsets[i];
+            int dx = delta.x;
+            int dy = delta.y;
 
             visit_callback_if_valid_position(width, height, cx + dx, cy + dy, callback);
         }
@@ -742,8 +911,9 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         for (int i = length-1; i >= 0; --i)
         {
             //dy, dx
-            int dx = offsets[i].x;
-            int dy = offsets[i].y;
+            sensekit::Vector2i delta = offsets[i];
+            int dx = delta.x;
+            int dy = delta.y;
 
             if (dx != dy)
             {
@@ -754,16 +924,20 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         for (int i = 1; i < length; ++i)
         {
             //-dy, dx
-            int dx = offsets[i].x;
-            int dy = offsets[i].y;
+            sensekit::Vector2i delta = offsets[i];
+            int dx = delta.x;
+            int dy = delta.y;
+
             visit_callback_if_valid_position(width, height, cx - dy, cy + dx, callback);
         }
 
         for (int i = length-1; i >= 0; --i)
         {
             //-dx, dy
-            int dx = offsets[i].x;
-            int dy = offsets[i].y;
+            sensekit::Vector2i delta = offsets[i];
+            int dx = delta.x;
+            int dy = delta.y;
+
             if (dx != dy)
             {
                 visit_callback_if_valid_position(width, height, cx - dx, cy + dy, callback);
@@ -773,16 +947,18 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         for (int i = 1; i < length; ++i)
         {
             //-dx, -dy
-            int dx = offsets[i].x;
-            int dy = offsets[i].y;
+            sensekit::Vector2i delta = offsets[i];
+            int dx = delta.x;
+            int dy = delta.y;
             visit_callback_if_valid_position(width, height, cx - dx, cy - dy, callback);
         }
 
         for (int i = length-1; i >= 0; --i)
         {
             //-dy, -dx
-            int dx = offsets[i].x;
-            int dy = offsets[i].y;
+            sensekit::Vector2i delta = offsets[i];
+            int dx = delta.x;
+            int dy = delta.y;
             if (dx != dy)
             {
                 visit_callback_if_valid_position(width, height, cx - dy, cy - dx, callback);
@@ -792,21 +968,24 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         for (int i = 1; i < length; ++i)
         {
             //dy, -dx
-            int dx = offsets[i].x;
-            int dy = offsets[i].y;
+            sensekit::Vector2i delta = offsets[i];
+            int dx = delta.x;
+            int dy = delta.y;
             visit_callback_if_valid_position(width, height, cx + dy, cy - dx, callback);
         }
 
         for (int i = length-1; i >= 0; --i)
         {
             //dx, -dy
-            int dx = offsets[i].x;
-            int dy = offsets[i].y;
+            sensekit::Vector2i delta = offsets[i];
+            int dx = delta.x;
+            int dy = delta.y;
             if (dx != dy)
             {
                 visit_callback_if_valid_position(width, height, cx + dx, cy - dy, callback);
             }
         }
+        PROFILE_END();
     }
 
     float get_max_sequential_circumference_percentage(cv::Mat& matDepth,
@@ -925,6 +1104,40 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 ++segmentationRow;
             }
         }
+
+        return area;
+    }
+
+
+    float count_neighborhood_area_integral(cv::Mat& matDepth,
+                                           cv::Mat& matAreaIntegral,
+                                           const cv::Point& center,
+                                           const float bandwidth,
+                                           const ScalingCoordinateMapper& mapper)
+    {
+        PROFILE_FUNC();
+        if (center.x < 0 || center.y < 0 ||
+            center.x >= matDepth.cols || center.y >= matDepth.rows)
+        {
+            return 0;
+        }
+
+        float startingDepth = matDepth.at<float>(center);
+
+        cv::Point topLeft = offset_pixel_location_by_mm(mapper, center, -bandwidth, bandwidth, startingDepth);
+        cv::Point bottomRight = offset_pixel_location_by_mm(mapper, center, bandwidth, -bandwidth, startingDepth);
+
+        int32_t x0 = MAX(0, topLeft.x);
+        int32_t y0 = MAX(0, topLeft.y);
+        int32_t x1 = MIN(matDepth.cols - 1, bottomRight.x);
+        int32_t y1 = MIN(matDepth.rows - 1, bottomRight.y);
+
+        float area = 0;
+
+        area += matAreaIntegral.at<float>(y1, x1);
+        area += matAreaIntegral.at<float>(y0, x0);
+        area -= matAreaIntegral.at<float>(y0, x1);
+        area -= matAreaIntegral.at<float>(y1, x0);
 
         return area;
     }

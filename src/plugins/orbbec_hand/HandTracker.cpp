@@ -166,6 +166,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_layerSegmentation,
                                             m_layerScore,
                                             m_layerEdgeDistance,
+                                            m_layerIntegralArea,
                                             m_debugUpdateSegmentation,
                                             m_debugUpdateScore,
                                             m_debugUpdateScoreValue,
@@ -198,6 +199,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_layerSegmentation,
                                             m_layerScore,
                                             m_layerEdgeDistance,
+                                            m_layerIntegralArea,
                                             m_debugCreateSegmentation,
                                             m_debugCreateScore,
                                             m_debugCreateScoreValue,
@@ -238,6 +240,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                 m_refineSegmentation,
                                                 m_refineScore,
                                                 m_refineEdgeDistance,
+                                                m_layerIntegralArea,
                                                 m_debugRefineSegmentation,
                                                 m_debugRefineScore,
                                                 m_debugRefineScoreValue,
@@ -268,9 +271,13 @@ namespace sensekit { namespace plugins { namespace hand {
 
             auto segmentationSettings = m_settings.pointProcessorSettings.segmentationSettings;
 
-            float area = segmentation::get_point_area(matrices,
+            cv::Mat& integralArea = segmentation::calculate_integral_area(matrices);
+
+            float area = segmentation::get_point_area_integral(matrices,
+                            integralArea,
                             segmentationSettings.areaTestSettings,
                             seedPosition);
+
             float depth = matDepth.at<float>(seedPosition);
             float score = m_debugCreateScoreValue.at<float>(seedPosition);
             float edgeDist = m_layerEdgeDistance.at<float>(seedPosition);

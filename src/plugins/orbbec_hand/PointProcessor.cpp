@@ -413,7 +413,6 @@ namespace sensekit { namespace plugins { namespace hand {
             trackedPoint.isInProbation = true;
             trackedPoint.probationFrameCount = 0;
             trackedPoint.failedTestCount = 0;
-            trackedPoint.failedInRangeTestCount = 0;
         }
     }
 
@@ -422,7 +421,6 @@ namespace sensekit { namespace plugins { namespace hand {
         PROFILE_FUNC();
         trackedPoint.isInProbation = false;
         trackedPoint.failedTestCount = 0;
-        trackedPoint.failedInRangeTestCount = 0;
     }
 
     void PointProcessor::update_tracked_point_data(TrackingMatrices& matrices, ScalingCoordinateMapper& scalingMapper, TrackedPoint& trackedPoint, const cv::Point& newTargetPoint)
@@ -460,53 +458,24 @@ namespace sensekit { namespace plugins { namespace hand {
 
         auto oldStatus = trackedPoint.trackingStatus;
         const TestBehavior outputTestLog = TEST_BEHAVIOR_NONE;
-        const TestPhase phase = TEST_PHASE_UPDATE;
 
         bool validPointInRange = segmentation::test_point_in_range(matrices,
                                                                    newTargetPoint,
                                                                    trackedPoint.trackingId,
                                                                    outputTestLog);
-        bool validPointArea = false;
-        bool validRadiusTest = false;
 
         if (validPointInRange)
-        {
-            validPointArea = segmentation::test_point_area(matrices,
-                                    m_settings.segmentationSettings.areaTestSettings,
-                                                           newTargetPoint,
-                                                           trackedPoint.trackingId,
-                                                           phase,
-                                                           outputTestLog);
-            validRadiusTest = segmentation::test_foreground_radius_percentage(matrices,
-                                    m_settings.segmentationSettings.circumferenceTestSettings,
-                                                                              newTargetPoint,
-                                                                              trackedPoint.trackingId,
-                                                                              phase,
-                                                                              outputTestLog);
-        }
-
-        bool passAllTests = validPointInRange && validPointArea && validRadiusTest;
-
-        if (passAllTests)
         {
             trackedPoint.trackingStatus = TrackingStatus::Tracking;
             if (trackedPoint.pointType == TrackedPointType::ActivePoint)
             {
                 trackedPoint.failedTestCount = 0;
-                trackedPoint.failedInRangeTestCount = 0;
             }
         }
         else
         {
             start_probation(trackedPoint);
-            if (!passAllTests)
-            {
-                ++trackedPoint.failedTestCount;
-            }
-            if (!validPointInRange)
-            {
-                ++trackedPoint.failedInRangeTestCount;
-            }
+            ++trackedPoint.failedTestCount;
         }
 
         if (trackedPoint.isInProbation)
@@ -514,17 +483,7 @@ namespace sensekit { namespace plugins { namespace hand {
             bool exitProbation = false;
             if (trackedPoint.pointType == TrackedPointType::ActivePoint)
             {
-                if (trackedPoint.failedInRangeTestCount >= m_settings.maxFailedTestsInProbationActivePoints)
-                {
-                    //failed because of out of range points, perhaps certain artifacts like finger pointed at camera
-                    //go to Lost status for a short time
-
-                    //failed N consecutive tests within the probation period
-                    //gave the active point a few extra frames to recover
-                    trackedPoint.trackingStatus = TrackingStatus::Lost;
-                    exitProbation = true;
-                }
-                else if (trackedPoint.failedTestCount >= m_settings.maxFailedTestsInProbationActivePoints)
+                if (trackedPoint.failedTestCount >= m_settings.maxFailedTestsInProbationActivePoints)
                 {
                     //had valid in range points but must have failed the real tests
 
@@ -550,7 +509,7 @@ namespace sensekit { namespace plugins { namespace hand {
             }
         }
 
-        if (passAllTests)
+        if (validPointInRange)
         {
             update_tracked_point_data(matrices, scalingMapper, trackedPoint, newTargetPoint);
         }
@@ -654,7 +613,6 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Point targetPoint = segmentation::track_point_from_seed(createTrackingData);
 
         const TestBehavior outputTestLog = TEST_BEHAVIOR_NONE;
-        const TestPhase phase = TEST_PHASE_CREATE;
 
         bool validPointInRange = segmentation::test_point_in_range(matrices,
                                                                    targetPoint,
@@ -662,24 +620,6 @@ namespace sensekit { namespace plugins { namespace hand {
                                                                    outputTestLog);
 
         if (!validPointInRange)
-        {
-            return;
-        }
-
-        bool validPointArea = segmentation::test_point_area(matrices,
-                                    m_settings.segmentationSettings.areaTestSettings,
-                                                            targetPoint,
-                                                            -1,
-                                                            phase,
-                                                            outputTestLog);
-        bool validRadiusTest = segmentation::test_foreground_radius_percentage(matrices,
-                                    m_settings.segmentationSettings.circumferenceTestSettings,
-                                                                               targetPoint,
-                                                                               -1,
-                                                                               phase,
-                                                                               outputTestLog);
-
-        if (!validPointArea || !validRadiusTest)
         {
             return;
         }

@@ -16,6 +16,11 @@ namespace sensekit { namespace plugins { namespace hand {
                              AreaTestSettings& settings,
                              const cv::Point& point);
 
+        float get_point_area_integral(TrackingMatrices& matrices,
+                                      cv::Mat& integralArea,
+                                      AreaTestSettings& settings,
+                                      const cv::Point& point);
+
         bool test_point_in_range(TrackingMatrices& matrices,
                                  const cv::Point& targetPoint,
                                  int trackingId,
@@ -35,6 +40,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                                TestPhase phase,
                                                TestBehavior outputLog);
 
+        void test_and_reset_foreground_points(TrackingData& data);
+
         bool find_next_velocity_seed_pixel(cv::Mat& foregroundMatrix,
                                         cv::Mat& searchedMatrix,
                                         cv::Point& foregroundPosition,
@@ -52,6 +59,14 @@ namespace sensekit { namespace plugins { namespace hand {
                                       const float bandwidth,
                                       const float bandwidthDepth,
                                       const ScalingCoordinateMapper& mapper);
+
+        cv::Mat& calculate_integral_area(TrackingMatrices& matrices);
+
+        float count_neighborhood_area_integral(cv::Mat& matDepth,
+                                               cv::Mat& matAreaIntegral,
+                                               const cv::Point& center,
+                                               const float bandwidth,
+                                               const ScalingCoordinateMapper& mapper);
 
         cv::Point track_point_from_seed(TrackingData& data);
 

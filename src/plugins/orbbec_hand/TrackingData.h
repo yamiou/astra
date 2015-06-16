@@ -13,6 +13,7 @@ namespace sensekit { namespace plugins { namespace hand {
         Foreground = 1,
         Searched = 2,
         SearchedFromOutOfRange = 3,
+        ForegroundFailedTest = 4
     };
 
     enum TrackedPointType
@@ -74,6 +75,7 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat& layerSegmentation;
         cv::Mat& layerScore;
         cv::Mat& layerEdgeDistance;
+        cv::Mat& layerIntegralArea;
         cv::Mat& foregroundSearched;
         cv::Mat& debugSegmentation;
         cv::Mat& debugScore;
@@ -96,6 +98,7 @@ namespace sensekit { namespace plugins { namespace hand {
                          cv::Mat& layerSegmentation,
                          cv::Mat& layerScore,
                          cv::Mat& layerEdgeDistance,
+                         cv::Mat& layerIntegralArea,
                          cv::Mat& debugSegmentation,
                          cv::Mat& debugScore,
                          cv::Mat& debugScoreValue,
@@ -115,6 +118,7 @@ namespace sensekit { namespace plugins { namespace hand {
             layerSegmentation(layerSegmentation),
             layerScore(layerScore),
             layerEdgeDistance(layerEdgeDistance),
+            layerIntegralArea(layerIntegralArea),
             foregroundSearched(foregroundSearched),
             debugSegmentation(debugSegmentation),
             debugScore(debugScore),
