@@ -436,17 +436,21 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         PROFILE_FUNC();
         auto scalingMapper = get_scaling_mapper(matrices);
 
+        std::vector<sensekit::Vector2i>& points = matrices.layerCirclePoints;
+
         float percentForeground1 = get_max_sequential_circumference_percentage(matrices.depth,
                                                                                matrices.layerSegmentation,
                                                                                targetPoint,
                                                                                settings.foregroundRadius1,
-                                                                               scalingMapper);
+                                                                               scalingMapper,
+                                                                               points);
 
         float percentForeground2 = get_max_sequential_circumference_percentage(matrices.depth,
                                                                                matrices.layerSegmentation,
                                                                                targetPoint,
                                                                                settings.foregroundRadius2,
-                                                                               scalingMapper);
+                                                                               scalingMapper,
+                                                                               points);
 
         float minPercent1 = settings.foregroundRadiusMinPercent1;
         float minPercent2 = settings.foregroundRadiusMinPercent2;
@@ -607,7 +611,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
                     if (!validPointArea || !validRadiusTest)
                     {
-                        *segmentationRow = PixelType::Background;
+                        *segmentationRow = PixelType::ForegroundFailedTest;
                     }
                 }
             }
@@ -765,84 +769,24 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         } while (!done && nonZeroCount < imageLength && ++iterations < maxIterations);
     }
 
-    void visit_callback_if_valid_position(int width,
-                                          int height,
-                                          int x,
-                                          int y,
-                                          std::function<void(cv::Point)> callback)
+    void append_if_valid_position(int width,
+                                  int height,
+                                  int x,
+                                  int y,
+                                  std::vector<sensekit::Vector2i>& list)
     {
-        PROFILE_FUNC();
         if (x >= 0 && x < width &&
             y >= 0 && y < height)
         {
-            callback(cv::Point(x, y));
+            list.push_back(sensekit::Vector2i(x, y));
         }
     }
 
-    void visit_circle_circumference(cv::Mat& matDepth,
-                                    const cv::Point& center,
-                                    const float& radius,
-                                    const ScalingCoordinateMapper& mapper,
-                                    std::function<void(cv::Point)> callback)
-    {
-        PROFILE_FUNC();
-        int width = matDepth.cols;
-        int height = matDepth.rows;
-        if (center.x < 0 || center.x >= width ||
-            center.y < 0 || center.y >= height ||
-            radius < 1)
-        {
-            return;
-        }
-
-        float referenceDepth = matDepth.at<float>(center);
-        if (referenceDepth == 0)
-        {
-            return;
-        }
-
-        cv::Point offsetRight = offset_pixel_location_by_mm(mapper, center, radius, 0, referenceDepth);
-
-        //http://en.wikipedia.org/wiki/Midpoint_circle_algorithm
-        int pixelRadius = offsetRight.x - center.x;
-        int cx = center.x;
-        int cy = center.y;
-        int dx = pixelRadius; //radius in pixels
-        int dy = 0;
-        int radiusError = 1 - dx;
-
-        while (dx >= dy)
-        {
-            visit_callback_if_valid_position(width, height, cx + dx, cy + dy, callback);
-            visit_callback_if_valid_position(width, height, cx - dx, cy + dy, callback);
-            visit_callback_if_valid_position(width, height, cx - dx, cy - dy, callback);
-            visit_callback_if_valid_position(width, height, cx + dx, cy - dy, callback);
-            if (dx != dy)
-            {
-                visit_callback_if_valid_position(width, height, cx + dy, cy + dx, callback);
-                visit_callback_if_valid_position(width, height, cx - dy, cy + dx, callback);
-                visit_callback_if_valid_position(width, height, cx - dy, cy - dx, callback);
-                visit_callback_if_valid_position(width, height, cx + dy, cy - dx, callback);
-            }
-
-            dy++;
-            if (radiusError < 0)
-            {
-                radiusError += 2 * dy + 1;
-            }
-            else
-            {
-                dx--;
-                radiusError += 2 * (dy - dx) + 1;
-            }
-        }
-    }
-
-    void visit_circle_circumference_sequential(cv::Mat& matDepth,
-                                               const cv::Point& center,
-                                               const float& radius,
-                                               const ScalingCoordinateMapper& mapper,
-                                               std::function<void(cv::Point)> callback)
+    void get_circumference_points(cv::Mat& matDepth,
+                                  const cv::Point& center,
+                                  const float& radius,
+                                  const ScalingCoordinateMapper& mapper,
+                                  std::vector<sensekit::Vector2i>& points)
     {
         PROFILE_FUNC();
 
@@ -869,6 +813,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         int cy = center.y;
 
         std::vector<sensekit::Vector2i> offsets;
+        //reserve a slight overestimation of number of points for 1/8 of circumference
         offsets.reserve(pixelRadius);
 
         {
@@ -893,7 +838,11 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             }
         }
 
-        PROFILE_BEGIN(circ_callbacks);
+        PROFILE_BEGIN(circ_checks);
+
+        //clear & reuse capacity across calls
+        points.clear();
+        points.reserve(static_cast<int>(pixelRadius * 2 * M_PI));
 
         int length = offsets.size();
 
@@ -904,7 +853,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             int dx = delta.x;
             int dy = delta.y;
 
-            visit_callback_if_valid_position(width, height, cx + dx, cy + dy, callback);
+            append_if_valid_position(width, height, cx + dx, cy + dy, points);
         }
 
         //even quadrants are reversed order
@@ -917,7 +866,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
             if (dx != dy)
             {
-                visit_callback_if_valid_position(width, height, cx + dy, cy + dx, callback);
+                append_if_valid_position(width, height, cx + dy, cy + dx, points);
             }
         }
 
@@ -928,7 +877,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             int dx = delta.x;
             int dy = delta.y;
 
-            visit_callback_if_valid_position(width, height, cx - dy, cy + dx, callback);
+            append_if_valid_position(width, height, cx - dy, cy + dx, points);
         }
 
         for (int i = length-1; i >= 0; --i)
@@ -940,7 +889,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
             if (dx != dy)
             {
-                visit_callback_if_valid_position(width, height, cx - dx, cy + dy, callback);
+                append_if_valid_position(width, height, cx - dx, cy + dy, points);
             }
         }
 
@@ -950,7 +899,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             sensekit::Vector2i delta = offsets[i];
             int dx = delta.x;
             int dy = delta.y;
-            visit_callback_if_valid_position(width, height, cx - dx, cy - dy, callback);
+            append_if_valid_position(width, height, cx - dx, cy - dy, points);
         }
 
         for (int i = length-1; i >= 0; --i)
@@ -961,7 +910,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             int dy = delta.y;
             if (dx != dy)
             {
-                visit_callback_if_valid_position(width, height, cx - dy, cy - dx, callback);
+                append_if_valid_position(width, height, cx - dy, cy - dx, points);
             }
         }
 
@@ -971,7 +920,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             sensekit::Vector2i delta = offsets[i];
             int dx = delta.x;
             int dy = delta.y;
-            visit_callback_if_valid_position(width, height, cx + dy, cy - dx, callback);
+            append_if_valid_position(width, height, cx + dy, cy - dx, points);
         }
 
         for (int i = length-1; i >= 0; --i)
@@ -982,7 +931,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             int dy = delta.y;
             if (dx != dy)
             {
-                visit_callback_if_valid_position(width, height, cx + dx, cy - dy, callback);
+                append_if_valid_position(width, height, cx + dx, cy - dy, points);
             }
         }
         PROFILE_END();
@@ -992,7 +941,8 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                                       cv::Mat& matSegmentation,
                                                       const cv::Point& center,
                                                       const float& radius,
-                                                      const ScalingCoordinateMapper& mapper)
+                                                      const ScalingCoordinateMapper& mapper,
+                                                      std::vector<sensekit::Vector2i>& points)
     {
         PROFILE_FUNC();
         int foregroundCount = 0;
@@ -1003,9 +953,11 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         bool firstIsForeground = false;
         bool lastIsForeground = false;
 
-        auto callback = [&](cv::Point p)
+        get_circumference_points(matDepth, center, radius, mapper, points);
+
+        for (auto p : points)
         {
-            bool isForeground = matSegmentation.at<uint8_t>(p) == PixelType::Foreground;
+            bool isForeground = matSegmentation.at<uint8_t>(p.y, p.x) == PixelType::Foreground;
             if (isForeground)
             {
                 ++foregroundCount;
@@ -1030,9 +982,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             }
             lastIsForeground = isForeground;
             ++totalCount;
-        };
-
-        visit_circle_circumference_sequential(matDepth, center, radius, mapper, callback);
+        }
 
         if (lastIsForeground)
         {

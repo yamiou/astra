@@ -286,16 +286,20 @@ namespace sensekit { namespace plugins { namespace hand {
             float foregroundRadius2 = segmentationSettings.circumferenceTestSettings.foregroundRadius2;
 
             auto mapper = get_scaling_mapper(matrices);
+            std::vector<sensekit::Vector2i>& points = matrices.layerCirclePoints;
+
             float percentForeground1 = segmentation::get_max_sequential_circumference_percentage(matDepth,
                                                                                                  m_layerSegmentation,
                                                                                                  seedPosition,
                                                                                                  foregroundRadius1,
-                                                                                                 mapper);
+                                                                                                 mapper,
+                                                                                                 points);
             float percentForeground2 = segmentation::get_max_sequential_circumference_percentage(matDepth,
                                                                                                  m_layerSegmentation,
                                                                                                  seedPosition,
                                                                                                  foregroundRadius2,
-                                                                                                 mapper);
+                                                                                                 mapper,
+                                                                                                 points);
             SINFO("HandTracker", "depth: %f fg1: %f fg2: %f edge: %f area: %f score: %f", depth,
                                                                     percentForeground1,
                                                                     percentForeground2,
@@ -492,7 +496,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void mark_image_pixel(_sensekit_imageframe& imageFrame,
                               RGBPixel color,
-                              cv::Point p)
+                              sensekit::Vector2i p)
         {
             PROFILE_FUNC();
             RGBPixel* colorData = static_cast<RGBPixel*>(imageFrame.data);
@@ -512,17 +516,25 @@ namespace sensekit { namespace plugins { namespace hand {
 
             RGBPixel color(255, 0, 255);
 
-            auto callback = [&](cv::Point p)
-            {
-                mark_image_pixel(imageFrame, color, p);
-            };
-
             auto segmentationSettings = m_settings.pointProcessorSettings.segmentationSettings;
             float foregroundRadius1 = segmentationSettings.circumferenceTestSettings.foregroundRadius1;
             float foregroundRadius2 = segmentationSettings.circumferenceTestSettings.foregroundRadius2;
 
-            segmentation::visit_circle_circumference_sequential(m_matDepth, cv::Point(x, y), foregroundRadius1, mapper, callback);
-            segmentation::visit_circle_circumference_sequential(m_matDepth, cv::Point(x, y), foregroundRadius2, mapper, callback);
+            std::vector<sensekit::Vector2i> points;
+
+            segmentation::get_circumference_points(m_matDepth, cv::Point(x, y), foregroundRadius1, mapper, points);
+
+            for (auto p : points)
+            {
+                mark_image_pixel(imageFrame, color, p);
+            }
+
+            segmentation::get_circumference_points(m_matDepth, cv::Point(x, y), foregroundRadius2, mapper, points);
+
+            for (auto p : points)
+            {
+                mark_image_pixel(imageFrame, color, p);
+            }
         }
 
         void HandTracker::update_debug_image_frame(_sensekit_imageframe& colorFrame)

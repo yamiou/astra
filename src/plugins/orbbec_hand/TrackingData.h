@@ -88,6 +88,7 @@ namespace sensekit { namespace plugins { namespace hand {
         int layerCount;
         const sensekit::CoordinateMapper& fullSizeMapper;
         const conversion_cache_t depthToWorldData;
+        std::vector<sensekit::Vector2i> layerCirclePoints;
 
         TrackingMatrices(cv::Mat& depthFullSize,
                          cv::Mat& depth,

@@ -70,23 +70,18 @@ namespace sensekit { namespace plugins { namespace hand {
 
         cv::Point track_point_from_seed(TrackingData& data);
 
-        void visit_circle_circumference(cv::Mat& matDepth,
-                                        const cv::Point& center,
-                                        const float& radius,
-                                        const ScalingCoordinateMapper& mapper,
-                                        std::function<void(cv::Point)> callback);
-
-        void visit_circle_circumference_sequential(cv::Mat& matDepth,
-                                                   const cv::Point& center,
-                                                   const float& radius,
-                                                   const ScalingCoordinateMapper& mapper,
-                                                   std::function<void(cv::Point)> callback);
+        void get_circumference_points(cv::Mat& matDepth,
+                                      const cv::Point& center,
+                                      const float& radius,
+                                      const ScalingCoordinateMapper& mapper,
+                                      std::vector<sensekit::Vector2i>& points);
 
         float get_max_sequential_circumference_percentage(cv::Mat& matDepth,
-                                                         cv::Mat& matSegmentation,
-                                                         const cv::Point& center,
-                                                         const float& radius,
-                                                         const ScalingCoordinateMapper& mapper);
+                                                          cv::Mat& matSegmentation,
+                                                          const cv::Point& center,
+                                                          const float& radius,
+                                                          const ScalingCoordinateMapper& mapper,
+                                                          std::vector<sensekit::Vector2i>& points);
 
     }
 }}}
