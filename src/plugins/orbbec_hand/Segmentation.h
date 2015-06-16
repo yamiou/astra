@@ -8,6 +8,12 @@ namespace sensekit { namespace plugins { namespace hand {
 
     struct TrackingData;
 
+    enum ForegroundStatus
+    {
+        FOREGROUND_EMPTY = 0,
+        FOREGROUND_HAS_POINTS = 1
+    };
+
     namespace segmentation {
 
         static cv::Point INVALID_POINT(-1, -1);
@@ -40,7 +46,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                TestPhase phase,
                                                TestBehavior outputLog);
 
-        void test_and_reset_foreground_points(TrackingData& data);
+        ForegroundStatus test_and_reset_foreground_points(TrackingData& data);
 
         bool find_next_velocity_seed_pixel(cv::Mat& foregroundMatrix,
                                         cv::Mat& searchedMatrix,

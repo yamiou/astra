@@ -16,17 +16,20 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         int x;
         int y;
         float ttl;
+        float referenceDepth;
 
-        PointTTL(int x, int y, float ttl) :
+        PointTTL(int x, int y, float ttl, float referenceDepth) :
             x(x),
             y(y),
-            ttl(ttl)
+            ttl(ttl),
+            referenceDepth(referenceDepth)
         { }
     };
 
     static void enqueue_neighbors(cv::Mat& matVisited,
                                  std::queue<PointTTL>& pointQueue,
-                                 PointTTL pt)
+                                 PointTTL pt,
+                                 float referenceDepth)
     {
         PROFILE_FUNC();
         const int& x = pt.x;
@@ -46,28 +49,28 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         if (0 == rightVisited)
         {
             rightVisited = 1;
-            pointQueue.push(PointTTL(x+1, y, ttlRef));
+            pointQueue.push(PointTTL(x+1, y, ttlRef, referenceDepth));
         }
 
         char& leftVisited = matVisited.at<char>(y, x-1);
         if (0 == leftVisited)
         {
             leftVisited = 1;
-            pointQueue.push(PointTTL(x-1, y, ttlRef));
+            pointQueue.push(PointTTL(x-1, y, ttlRef, referenceDepth));
         }
 
         char& downVisited = matVisited.at<char>(y+1, x);
         if (0 == downVisited)
         {
             downVisited = 1;
-            pointQueue.push(PointTTL(x, y+1, ttlRef));
+            pointQueue.push(PointTTL(x, y+1, ttlRef, referenceDepth));
         }
 
         char& upVisited = matVisited.at<char>(y-1, x);
         if (0 == upVisited)
         {
             upVisited = 1;
-            pointQueue.push(PointTTL(x, y-1, ttlRef));
+            pointQueue.push(PointTTL(x, y-1, ttlRef, referenceDepth));
         }
     }
 
@@ -86,7 +89,10 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         std::queue<PointTTL> pointQueue;
 
-        pointQueue.push(PointTTL(data.seedPosition.x, data.seedPosition.y, maxSegmentationDist));
+        pointQueue.push(PointTTL(data.seedPosition.x,
+                                 data.seedPosition.y,
+                                 maxSegmentationDist,
+                                 data.referenceWorldPosition.z));
 
         matVisited.at<char>(data.seedPosition) = 1;
 
@@ -115,7 +121,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
             ttlRef -= referenceAreaSqrt;
 
-            enqueue_neighbors(matVisited, pointQueue, pt);
+            enqueue_neighbors(matVisited, pointQueue, pt, depth);
         }
 
         return INVALID_POINT;
@@ -138,9 +144,11 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         double totalDepth = 0;
         int depthCount = 0;
 
+        const float bandwidthDepth = data.settings.segmentationBandwidthDepthNear;
+
         //does the seed point start in range?
         //If not, it will search outward until it finds in range pixels
-        const float minDepth = data.referenceWorldPosition.z - data.settings.segmentationBandwidthDepthNear;
+        const float minDepth = data.referenceWorldPosition.z - bandwidthDepth;
         const float maxDepth = data.referenceWorldPosition.z + data.settings.segmentationBandwidthDepthFar;
 
         cv::Mat matVisited = cv::Mat::zeros(depthMatrix.size(), CV_8UC1);
@@ -158,7 +166,10 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             }
         }
 
-        pointQueue.push(PointTTL(seedPosition.x, seedPosition.y, maxSegmentationDist));
+        pointQueue.push(PointTTL(seedPosition.x,
+                                 seedPosition.y,
+                                 maxSegmentationDist,
+                                 data.referenceWorldPosition.z));
 
         matVisited.at<char>(seedPosition) = 1;
 
@@ -169,6 +180,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             const int& x = pt.x;
             const int& y = pt.y;
             float& ttlRef = pt.ttl;
+            const float referenceDepth = pt.referenceDepth;
 
             if (velocitySignalPolicy == VELOCITY_POLICY_RESET_TTL &&
                 velocitySignalMatrix.at<char>(y, x) == PixelType::Foreground)
@@ -177,7 +189,9 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             }
 
             float depth = depthMatrix.at<float>(y, x);
-            bool pointOutOfRange = depth == 0 || depth < minDepth || depth > maxDepth;
+            bool pointOutOfRange = depth == 0 ||
+                                   depth < referenceDepth - bandwidthDepth ||
+                                   depth > referenceDepth + bandwidthDepth;
 
             if (ttlRef <= 0 || pointOutOfRange)
             {
@@ -192,7 +206,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
             ttlRef -= referenceAreaSqrt;
 
-            enqueue_neighbors(matVisited, pointQueue, pt);
+            enqueue_neighbors(matVisited, pointQueue, pt, depth);
         }
 
         if (depthCount > 0)
@@ -555,7 +569,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         return integralAreaMatrix;
     }
 
-    void test_and_reset_foreground_points(TrackingData& data)
+    ForegroundStatus test_and_reset_foreground_points(TrackingData& data)
     {
         PROFILE_FUNC();
         auto matrices = data.matrices;
@@ -572,6 +586,8 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         TestPhase phase = data.phase;
         TestBehavior outputTestLog = TEST_BEHAVIOR_NONE;
+
+        ForegroundStatus status = FOREGROUND_EMPTY;
 
         for (int y = 0; y < height; y++)
         {
@@ -609,13 +625,18 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                                                             outputTestLog);
                     }
 
-                    if (!validPointArea || !validRadiusTest)
+                    if (validPointArea && validRadiusTest)
                     {
-                        *segmentationRow = PixelType::ForegroundFailedTest;
+                        status = FOREGROUND_HAS_POINTS;
+                    }
+                    else
+                    {
+                        *segmentationRow = PixelType::Background;
                     }
                 }
             }
         }
+        return status;
     }
 
     cv::Point track_point_from_seed(TrackingData& data)
@@ -640,7 +661,12 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                     data.matrices.layerEdgeDistance,
                                     data.settings.targetEdgeDistance * 2.0f);
 
-        test_and_reset_foreground_points(data);
+        ForegroundStatus status = test_and_reset_foreground_points(data);
+
+        if (status == FOREGROUND_EMPTY)
+        {
+            return INVALID_POINT;
+        }
 
         calculate_layer_score(data, layerAverageDepth);
 
