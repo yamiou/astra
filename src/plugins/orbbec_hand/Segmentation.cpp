@@ -880,7 +880,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         //clear & reuse capacity across calls
         points.clear();
-        points.reserve(static_cast<int>(pixelRadius * 2 * M_PI));
+        points.reserve(static_cast<int>(pixelRadius * 2.0f * PI_F));
 
         int length = offsets.size();
 
