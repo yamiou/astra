@@ -332,7 +332,6 @@ namespace sensekit { namespace plugins { namespace hand {
 
             bool validPointInRange = segmentation::test_point_in_range(matrices,
                                                                        seedPosition,
-                                                                       0,
                                                                        outputTestLog);
             bool validPointArea = false;
             bool validRadiusTest = false;
@@ -342,13 +341,11 @@ namespace sensekit { namespace plugins { namespace hand {
                 validPointArea = segmentation::test_point_area(matrices,
                                     m_settings.pointProcessorSettings.segmentationSettings.areaTestSettings,
                                                                seedPosition,
-                                                               0,
                                                                phase,
                                                                outputTestLog);
                 validRadiusTest = segmentation::test_foreground_radius_percentage(matrices,
                                     m_settings.pointProcessorSettings.segmentationSettings.circumferenceTestSettings,
                                                                                   seedPosition,
-                                                                                  0,
                                                                                   phase,
                                                                                   outputTestLog);
             }

@@ -29,20 +29,17 @@ namespace sensekit { namespace plugins { namespace hand {
 
         bool test_point_in_range(TrackingMatrices& matrices,
                                  const cv::Point& targetPoint,
-                                 int trackingId,
                                  TestBehavior outputLog);
 
         bool test_point_area(TrackingMatrices& matrices,
                              AreaTestSettings& settings,
                              const cv::Point& targetPoint,
-                             int trackingId,
                              TestPhase phase,
                              TestBehavior outputLog);
 
         bool test_foreground_radius_percentage(TrackingMatrices& matrices,
                                                CircumferenceTestSettings& settings,
                                                const cv::Point& targetPoint,
-                                               int trackingId,
                                                TestPhase phase,
                                                TestBehavior outputLog);
 

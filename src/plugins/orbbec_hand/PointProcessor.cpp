@@ -400,7 +400,6 @@ namespace sensekit { namespace plugins { namespace hand {
 
         bool validPointInRange = segmentation::test_point_in_range(matrices,
                                                                    newTargetPoint,
-                                                                   trackedPoint.trackingId,
                                                                    outputTestLog);
 
         if (validPointInRange)
@@ -555,7 +554,6 @@ namespace sensekit { namespace plugins { namespace hand {
 
         bool validPointInRange = segmentation::test_point_in_range(matrices,
                                                                    targetPoint,
-                                                                   -1,
                                                                    outputTestLog);
 
         if (!validPointInRange)

@@ -20,7 +20,6 @@ namespace sensekit { namespace plugins { namespace hand {
     cv::Point3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
                                           float depthX, float depthY, float depthZ)
     {
-        PROFILE_FUNC();
         float worldX, worldY, worldZ;
 
         convert_depth_to_world_f(depthToWorldData,
@@ -33,7 +32,6 @@ namespace sensekit { namespace plugins { namespace hand {
     cv::Point3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
                                           int depthX, int depthY, float depthZ)
     {
-        PROFILE_FUNC();
         return cv_convert_depth_to_world(depthToWorldData,
                                          static_cast<float>(depthX),
                                          static_cast<float>(depthY),
@@ -43,15 +41,12 @@ namespace sensekit { namespace plugins { namespace hand {
     cv::Point3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
                                           const cv::Point3f& depth)
     {
-        PROFILE_FUNC();
         return cv_convert_depth_to_world(depthToWorldData, depth.x, depth.y, depth.z);
     }
 
     cv::Point3f cv_convert_world_to_depth(const conversion_cache_t& depthToWorldData,
                                           float worldX, float worldY, float worldZ)
     {
-        PROFILE_FUNC();
-
         float depthX = depthToWorldData.coeffX * worldX / worldZ + depthToWorldData.halfResX;
         float depthY = depthToWorldData.halfResY - depthToWorldData.coeffY * worldY / worldZ;
         float depthZ = worldZ;
@@ -62,7 +57,6 @@ namespace sensekit { namespace plugins { namespace hand {
     cv::Point3f cv_convert_world_to_depth(const conversion_cache_t& depthToWorldData,
                                           const cv::Point3f& world)
     {
-        PROFILE_FUNC();
         return cv_convert_world_to_depth(depthToWorldData, world.x, world.y, world.z);
     }
 
@@ -72,7 +66,6 @@ namespace sensekit { namespace plugins { namespace hand {
                                                                    float offsetY,
                                                                    float depthZ) const
     {
-        PROFILE_FUNC();
         if (depthZ == 0)
         {
             return position;

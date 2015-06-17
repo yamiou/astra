@@ -307,7 +307,6 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
     bool test_point_in_range(TrackingMatrices& matrices,
                              const cv::Point& targetPoint,
-                             int trackingId,
                              TestBehavior outputLog)
     {
         PROFILE_FUNC();
@@ -317,8 +316,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         {
             if (outputLog == TEST_BEHAVIOR_LOG)
             {
-                SINFO("PointProcessor", "test_point_in_range failed #%d: position: (%d, %d)",
-                              trackingId,
+                SINFO("PointProcessor", "test_point_in_range failed: position: (%d, %d)",
                               targetPoint.x,
                               targetPoint.y);
             }
@@ -327,8 +325,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         if (outputLog == TEST_BEHAVIOR_LOG)
         {
-            SINFO("PointProcessor", "test_point_in_range success #%d: position: (%d, %d)",
-                          trackingId,
+            SINFO("PointProcessor", "test_point_in_range success: position: (%d, %d)",
                           targetPoint.x,
                           targetPoint.y);
         }
@@ -360,7 +357,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                   AreaTestSettings& settings,
                                   const cv::Point& point)
     {
-        PROFILE_FUNC();
+        //PROFILE_FUNC();
         auto scalingMapper = get_scaling_mapper(matrices);
 
         float area = count_neighborhood_area_integral(matrices.depth,
@@ -374,11 +371,10 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
     bool test_point_area_core(float area,
                               AreaTestSettings& settings,
-                              int trackingId,
                               TestPhase phase,
                               TestBehavior outputLog)
     {
-        PROFILE_FUNC();
+        //PROFILE_FUNC();
         float minArea = settings.minArea;
         const float maxArea = settings.maxArea;
         if (phase == TEST_PHASE_UPDATE)
@@ -393,16 +389,14 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         {
             if (validPointArea)
             {
-                SINFO("Segmentation", "test_point_area passed #%d: area %f within [%f, %f]",
-                              trackingId,
+                SINFO("Segmentation", "test_point_area passed: area %f within [%f, %f]",
                               area,
                               minArea,
                               maxArea);
             }
             else
             {
-                SINFO("Segmentation", "test_point_area failed #%d: area %f not within [%f, %f]",
-                              trackingId,
+                SINFO("Segmentation", "test_point_area failed: area %f not within [%f, %f]",
                               area,
                               minArea,
                               maxArea);
@@ -415,14 +409,13 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
     bool test_point_area(TrackingMatrices& matrices,
                          AreaTestSettings& settings,
                          const cv::Point& targetPoint,
-                         int trackingId,
                          TestPhase phase,
                          TestBehavior outputLog)
     {
         PROFILE_FUNC();
         float area = get_point_area(matrices, settings, targetPoint);
 
-        return test_point_area_core(area, settings, trackingId, phase, outputLog);
+        return test_point_area_core(area, settings, phase, outputLog);
     }
 
 
@@ -430,20 +423,18 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                   cv::Mat& integralArea,
                                   AreaTestSettings& settings,
                                   const cv::Point& targetPoint,
-                                  int trackingId,
                                   TestPhase phase,
                                   TestBehavior outputLog)
     {
         PROFILE_FUNC();
         float area = get_point_area_integral(matrices, integralArea, settings, targetPoint);
 
-        return test_point_area_core(area, settings, trackingId, phase, outputLog);
+        return test_point_area_core(area, settings, phase, outputLog);
     }
 
     bool test_foreground_radius_percentage(TrackingMatrices& matrices,
                                            CircumferenceTestSettings& settings,
                                            const cv::Point& targetPoint,
-                                           int trackingId,
                                            TestPhase phase,
                                            TestBehavior outputLog)
     {
@@ -490,8 +481,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         {
             if (passed)
             {
-                SINFO("Segmentation", "test_foreground_radius_percentage passed #%d: perc1 %f [%f,%f] perc2 %f [%f,%f]",
-                              trackingId,
+                SINFO("Segmentation", "test_foreground_radius_percentage passed: perc1 %f [%f,%f] perc2 %f [%f,%f]",
                               percentForeground1,
                               minPercent1,
                               maxPercent1,
@@ -501,8 +491,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             }
             else
             {
-                SINFO("Segmentation", "test_foreground_radius_percentage failed #%d: perc1 %f [%f,%f] perc2 %f [%f,%f]",
-                              trackingId,
+                SINFO("Segmentation", "test_foreground_radius_percentage failed: perc1 %f [%f,%f] perc2 %f [%f,%f]",
                               percentForeground1,
                               minPercent1,
                               maxPercent1,
@@ -591,14 +580,20 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         ForegroundStatus status = FOREGROUND_EMPTY;
 
-        for (int y = 0; y < height; ++y)
+        const int xskip = 2;
+        const int yskip = 2;
+        const int maxY = height - yskip;
+
+        for (int y = 0; y <= maxY; y += yskip)
         {
             char* segmentationRow = segmentationMatrix.ptr<char>(y);
             char* testPassRow = testPassMatrix.ptr<char>(y);
+            char* testPassRowNext = testPassMatrix.ptr<char>(y+1);
 
-            for (int x = 0; x < width; ++x,
-                                       ++segmentationRow,
-                                       ++testPassRow)
+            for (int x = 0; x < width; x += xskip,
+                                       segmentationRow += xskip,
+                                       testPassRow += xskip,
+                                       testPassRowNext += xskip)
             {
                 if (*segmentationRow != PixelType::Foreground)
                 {
@@ -610,7 +605,6 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                                                integralArea,
                                                                areaTestSettings,
                                                                seedPosition,
-                                                               0,
                                                                phase,
                                                                outputTestLog);
                 bool validRadiusTest = false;
@@ -620,7 +614,6 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                     validRadiusTest = test_foreground_radius_percentage(matrices,
                                                                         circumferenceTestSettings,
                                                                         seedPosition,
-                                                                        0,
                                                                         phase,
                                                                         outputTestLog);
                 }
@@ -629,6 +622,9 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 {
                     status = FOREGROUND_HAS_POINTS;
                     *testPassRow = PixelType::Foreground;
+                    *(testPassRow+1) = PixelType::Foreground;
+                    *testPassRowNext = PixelType::Foreground;
+                    *(testPassRowNext+1) = PixelType::Foreground;
                 }
             }
         }
@@ -880,7 +876,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             }
         }
 
-        PROFILE_BEGIN(circ_checks);
+        //PROFILE_BEGIN(circ_checks);
 
         //clear & reuse capacity across calls
         points.clear();
@@ -1023,7 +1019,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 }
             }
         }
-        PROFILE_END();
+        //PROFILE_END();
     }
 
     float get_max_sequential_circumference_percentage(cv::Mat& matDepth,
@@ -1154,7 +1150,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                            const float bandwidth,
                                            const ScalingCoordinateMapper& mapper)
     {
-        PROFILE_FUNC();
+        //PROFILE_FUNC();
         int width = matDepth.cols;
         int height = matDepth.rows;
         if (center.x < 0 || center.y < 0 ||
