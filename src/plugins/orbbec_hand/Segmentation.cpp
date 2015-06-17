@@ -824,19 +824,6 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         } while (!done && nonZeroCount < imageLength && ++iterations < maxIterations);
     }
 
-    void append_if_valid_position(int width,
-                                  int height,
-                                  int x,
-                                  int y,
-                                  std::vector<sensekit::Vector2i>& list)
-    {
-        if (x >= 0 && x < width &&
-            y >= 0 && y < height)
-        {
-            list.push_back(sensekit::Vector2i(x, y));
-        }
-    }
-
     void get_circumference_points(cv::Mat& matDepth,
                                   const cv::Point& center,
                                   const float& radius,
@@ -901,92 +888,139 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         int length = offsets.size();
 
+        //Order and the permutations of dx,dy are critical here
+        //so the points list will contain the points in order
+
         for (int i = 1; i < length; ++i)
         {
             //dx, dy
-            sensekit::Vector2i delta = offsets[i];
-            int dx = delta.x;
-            int dy = delta.y;
+            const sensekit::Vector2i delta = offsets[i];
+            const int x = cx + delta.x;
+            const int y = cy + delta.y;
 
-            append_if_valid_position(width, height, cx + dx, cy + dy, points);
+            if (x >= 0 && x < width &&
+                y >= 0 && y < height)
+            {
+                points.push_back(sensekit::Vector2i(x, y));
+            }
         }
 
         //even quadrants are reversed order
         for (int i = length-1; i >= 0; --i)
         {
             //dy, dx
-            sensekit::Vector2i delta = offsets[i];
-            int dx = delta.x;
-            int dy = delta.y;
+            const sensekit::Vector2i delta = offsets[i];
 
+            const int dx = delta.x;
+            const int dy = delta.y;
             if (dx != dy)
             {
-                append_if_valid_position(width, height, cx + dy, cy + dx, points);
+                const int x = cx + dy;
+                const int y = cy + dx;
+                if (x >= 0 && x < width &&
+                    y >= 0 && y < height)
+                {
+                    points.push_back(sensekit::Vector2i(x, y));
+                }
             }
         }
 
         for (int i = 1; i < length; ++i)
         {
             //-dy, dx
-            sensekit::Vector2i delta = offsets[i];
-            int dx = delta.x;
-            int dy = delta.y;
+            const sensekit::Vector2i delta = offsets[i];
+            const int x = cx - delta.y;
+            const int y = cy + delta.x;
 
-            append_if_valid_position(width, height, cx - dy, cy + dx, points);
+            if (x >= 0 && x < width &&
+                y >= 0 && y < height)
+            {
+                points.push_back(sensekit::Vector2i(x, y));
+            }
         }
 
         for (int i = length-1; i >= 0; --i)
         {
             //-dx, dy
-            sensekit::Vector2i delta = offsets[i];
-            int dx = delta.x;
-            int dy = delta.y;
+            const sensekit::Vector2i delta = offsets[i];
 
+            const int dx = delta.x;
+            const int dy = delta.y;
             if (dx != dy)
             {
-                append_if_valid_position(width, height, cx - dx, cy + dy, points);
+                const int x = cx - dx;
+                const int y = cy + dy;
+                if (x >= 0 && x < width &&
+                    y >= 0 && y < height)
+                {
+                    points.push_back(sensekit::Vector2i(x, y));
+                }
             }
         }
 
         for (int i = 1; i < length; ++i)
         {
             //-dx, -dy
-            sensekit::Vector2i delta = offsets[i];
-            int dx = delta.x;
-            int dy = delta.y;
-            append_if_valid_position(width, height, cx - dx, cy - dy, points);
+            const sensekit::Vector2i delta = offsets[i];
+            const int x = cx - delta.x;
+            const int y = cy - delta.y;
+
+            if (x >= 0 && x < width &&
+                y >= 0 && y < height)
+            {
+                points.push_back(sensekit::Vector2i(x, y));
+            }
         }
 
         for (int i = length-1; i >= 0; --i)
         {
             //-dy, -dx
-            sensekit::Vector2i delta = offsets[i];
-            int dx = delta.x;
-            int dy = delta.y;
+            const sensekit::Vector2i delta = offsets[i];
+
+            const int dx = delta.x;
+            const int dy = delta.y;
             if (dx != dy)
             {
-                append_if_valid_position(width, height, cx - dy, cy - dx, points);
+                const int x = cx - dy;
+                const int y = cy - dx;
+                if (x >= 0 && x < width &&
+                    y >= 0 && y < height)
+                {
+                    points.push_back(sensekit::Vector2i(x, y));
+                }
             }
         }
 
         for (int i = 1; i < length; ++i)
         {
             //dy, -dx
-            sensekit::Vector2i delta = offsets[i];
-            int dx = delta.x;
-            int dy = delta.y;
-            append_if_valid_position(width, height, cx + dy, cy - dx, points);
+            const sensekit::Vector2i delta = offsets[i];
+            const int x = cx + delta.y;
+            const int y = cy - delta.x;
+
+            if (x >= 0 && x < width &&
+                y >= 0 && y < height)
+            {
+                points.push_back(sensekit::Vector2i(x, y));
+            }
         }
 
         for (int i = length-1; i >= 0; --i)
         {
             //dx, -dy
-            sensekit::Vector2i delta = offsets[i];
-            int dx = delta.x;
-            int dy = delta.y;
+            const sensekit::Vector2i delta = offsets[i];
+
+            const int dx = delta.x;
+            const int dy = delta.y;
             if (dx != dy)
             {
-                append_if_valid_position(width, height, cx + dx, cy - dy, points);
+                const int x = cx + dx;
+                const int y = cy - dy;
+                if (x >= 0 && x < width &&
+                    y >= 0 && y < height)
+                {
+                    points.push_back(sensekit::Vector2i(x, y));
+                }
             }
         }
         PROFILE_END();
