@@ -655,7 +655,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         calculate_edge_distance(data.matrices.layerSegmentation,
                                 data.matrices.areaSqrt,
                                 data.matrices.layerEdgeDistance,
-                                data.settings.targetEdgeDistance * 2.0f);
+                                data.settings.targetEdgeDistance);
 
         ForegroundStatus status = create_test_pass_from_foreground(data);
 
@@ -860,7 +860,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             return;
         }
 
-        cv::Point offsetRight = offset_pixel_location_by_mm(mapper, center, radius, 0, referenceDepth);
+        cv::Point offsetRight = mapper.offset_pixel_location_by_mm(center, radius, 0, referenceDepth);
 
         //http://en.wikipedia.org/wiki/Midpoint_circle_algorithm
         int pixelRadius = offsetRight.x - center.x;
@@ -1075,8 +1075,8 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         float startingDepth = matDepth.at<float>(center);
 
-        cv::Point topLeft = offset_pixel_location_by_mm(mapper, center, -bandwidth, bandwidth, startingDepth);
-        cv::Point bottomRight = offset_pixel_location_by_mm(mapper, center, bandwidth, -bandwidth, startingDepth);
+        cv::Point topLeft = mapper.offset_pixel_location_by_mm(center, -bandwidth, bandwidth, startingDepth);
+        cv::Point bottomRight = mapper.offset_pixel_location_by_mm(center, bandwidth, -bandwidth, startingDepth);
 
         int32_t x0 = MAX(0, topLeft.x);
         int32_t y0 = MAX(0, topLeft.y);
@@ -1129,8 +1129,8 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         float startingDepth = matDepth.at<float>(center);
 
-        cv::Point topLeft = offset_pixel_location_by_mm(mapper, center, -bandwidth, bandwidth, startingDepth);
-        cv::Point bottomRight = offset_pixel_location_by_mm(mapper, center, bandwidth, -bandwidth, startingDepth);
+        cv::Point topLeft = mapper.offset_pixel_location_by_mm(center, -bandwidth, bandwidth, startingDepth);
+        cv::Point bottomRight = mapper.offset_pixel_location_by_mm(center, bandwidth, -bandwidth, startingDepth);
 
         int32_t x0 = MAX(0, topLeft.x);
         int32_t y0 = MAX(0, topLeft.y);

@@ -67,26 +67,37 @@ namespace sensekit { namespace plugins { namespace hand {
     }
 
 
-    cv::Point offset_pixel_location_by_mm(const ScalingCoordinateMapper& mapper,
-                                          const cv::Point& position,
-                                          float offsetX,
-                                          float offsetY,
-                                          float depth)
+    cv::Point ScalingCoordinateMapper::offset_pixel_location_by_mm(const cv::Point& position,
+                                                                   float offsetX,
+                                                                   float offsetY,
+                                                                   float depthZ) const
     {
         PROFILE_FUNC();
-        if (depth == 0)
+        if (depthZ == 0)
         {
             return position;
         }
-        cv::Point3f world = mapper.convert_depth_to_world(static_cast<float>(position.x),
-                                                          static_cast<float>(position.y),
-                                                          depth);
 
-        world.x += offsetX;
-        world.y += offsetY;
+        const conversion_cache_t& depthToWorldData = m_depthToWorldData;
 
-        cv::Point3f offsetLocal = mapper.convert_world_to_depth(world);
+        float fullSizeDepthX = (position.x + m_offsetX) * m_scale;
+        float fullSizeDepthY = (position.y + m_offsetY) * m_scale;
 
-        return cv::Point(static_cast<int>(offsetLocal.x), static_cast<int>(offsetLocal.y));
+        float normalizedX = fullSizeDepthX / depthToWorldData.resolutionX - .5f;
+        float normalizedY = .5f - fullSizeDepthY / depthToWorldData.resolutionY;
+
+        float worldX = normalizedX * depthZ * depthToWorldData.xzFactor;
+        float worldY = normalizedY * depthZ * depthToWorldData.yzFactor;
+
+        worldX += offsetX;
+        worldY += offsetY;
+
+        float fullSizeDepthX2 = depthToWorldData.coeffX * worldX / depthZ + depthToWorldData.halfResX;
+        float fullSizeDepthY2 = depthToWorldData.halfResY - depthToWorldData.coeffY * worldY / depthZ;
+
+        float finalDepthX = (fullSizeDepthX2 / m_scale) - m_offsetX;
+        float finalDepthY = (fullSizeDepthY2 / m_scale) - m_offsetY;
+
+        return cv::Point(static_cast<int>(finalDepthX), static_cast<int>(finalDepthY));
     }
 }}}

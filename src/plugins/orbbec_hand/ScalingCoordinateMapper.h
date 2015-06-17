@@ -28,12 +28,6 @@ namespace sensekit { namespace plugins { namespace hand {
     cv::Point3f cv_convert_world_to_depth(const conversion_cache_t& depthToWorldData,
                                           const cv::Point3f& world);
 
-    cv::Point offset_pixel_location_by_mm(const ScalingCoordinateMapper& mapper,
-                                          const cv::Point& position,
-                                          float offsetX,
-                                          float offsetY,
-                                          float depth);
-
     class ScalingCoordinateMapper
     {
     public:
@@ -89,10 +83,15 @@ namespace sensekit { namespace plugins { namespace hand {
             cv::Point3f depth = cv_convert_world_to_depth(m_depthToWorldData, worldPosition);
 
             depth.x = (depth.x / m_scale) - m_offsetX;
-            depth.y = (depth.y / m_scale) - m_offsetX;
+            depth.y = (depth.y / m_scale) - m_offsetY;
 
             return depth;
         }
+
+        cv::Point offset_pixel_location_by_mm(const cv::Point& position,
+                                              float offsetX,
+                                              float offsetY,
+                                              float depthZ) const;
 
         inline float scale() const { return m_scale; }
         inline float offsetX() const { return m_offsetX; }
