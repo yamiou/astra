@@ -515,7 +515,7 @@ namespace sensekit { namespace plugins { namespace hand {
             int y = MAX(0, MIN(m_processingSizeHeight, normPosition.y * m_processingSizeHeight));
 
             float resizeFactor = m_matDepthFullSize.cols / static_cast<float>(m_matDepth.cols);
-            ScalingCoordinateMapper mapper(m_depthStream.coordinateMapper(), resizeFactor);
+            ScalingCoordinateMapper mapper(m_depthStream.depth_to_world_data(), resizeFactor);
 
             RGBPixel color(255, 0, 255);
 

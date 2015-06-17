@@ -149,7 +149,7 @@ namespace sensekit { namespace plugins { namespace hand {
     {
         const float resizeFactor = get_resize_factor(matrices);
 
-        return ScalingCoordinateMapper(matrices.fullSizeMapper, resizeFactor);
+        return ScalingCoordinateMapper(matrices.depthToWorldData, resizeFactor);
     }
 
     struct TrackingData

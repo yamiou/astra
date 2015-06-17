@@ -9,19 +9,23 @@ namespace sensekit { namespace plugins { namespace hand {
 
     class ScalingCoordinateMapper;
 
-    cv::Point3f cv_convert_depth_to_world(const sensekit::CoordinateMapper& mapper,
+    void convert_depth_to_world_f(const conversion_cache_t& depthToWorldData,
+                                  float depthX, float depthY, float depthZ,
+                                  float& worldX, float& worldY, float& worldZ);
+
+    cv::Point3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
                                           int depthX, int depthY, float depthZ);
 
-    cv::Point3f cv_convert_depth_to_world(const sensekit::CoordinateMapper& mapper,
+    cv::Point3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
                                           float depthX, float depthY, float depthZ);
 
-    cv::Point3f cv_convert_depth_to_world(const sensekit::CoordinateMapper& mapper,
+    cv::Point3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
                                           const cv::Point3f& depth);
 
-    cv::Point3f cv_convert_world_to_depth(const sensekit::CoordinateMapper& mapper,
+    cv::Point3f cv_convert_world_to_depth(const conversion_cache_t& depthToWorldData,
                                           float worldX, float worldY, float worldZ);
 
-    cv::Point3f cv_convert_world_to_depth(const sensekit::CoordinateMapper& mapper,
+    cv::Point3f cv_convert_world_to_depth(const conversion_cache_t& depthToWorldData,
                                           const cv::Point3f& world);
 
     cv::Point offset_pixel_location_by_mm(const ScalingCoordinateMapper& mapper,
@@ -33,11 +37,11 @@ namespace sensekit { namespace plugins { namespace hand {
     class ScalingCoordinateMapper
     {
     public:
-        ScalingCoordinateMapper(const sensekit::CoordinateMapper& mapper,
+        ScalingCoordinateMapper(const conversion_cache_t depthToWorldData,
                                 const float scale,
                                 const float offsetX = 0,
                                 const float offsetY = 0)
-            : m_mapper(mapper),
+            : m_depthToWorldData(depthToWorldData),
               m_scale(scale),
               m_offsetX(offsetX),
               m_offsetY(offsetY)
@@ -49,7 +53,7 @@ namespace sensekit { namespace plugins { namespace hand {
             depthX = (depthX + m_offsetX) * m_scale;
             depthY = (depthY + m_offsetY) * m_scale;
 
-            return cv_convert_depth_to_world(m_mapper, depthX, depthY, depthZ);
+            return cv_convert_depth_to_world(m_depthToWorldData, depthX, depthY, depthZ);
         }
 
         inline void convert_depth_to_world(int depthX, int depthY, float depthZ,
@@ -59,7 +63,9 @@ namespace sensekit { namespace plugins { namespace hand {
             depthX = (depthX + m_offsetX) * m_scale;
             depthY = (depthY + m_offsetY) * m_scale;
 
-            m_mapper.convert_depth_to_world(depthX, depthY, depthZ, &worldX, &worldY, &worldZ);
+            convert_depth_to_world_f(m_depthToWorldData,
+                                     depthX, depthY, depthZ,
+                                     worldX, worldY, worldZ);
         }
 
         inline cv::Point3f convert_depth_to_world(float depthX, float depthY, float depthZ) const
@@ -68,7 +74,7 @@ namespace sensekit { namespace plugins { namespace hand {
             depthX = (depthX + m_offsetX) * m_scale;
             depthY = (depthY + m_offsetY) * m_scale;
 
-            return cv_convert_depth_to_world(m_mapper, depthX, depthY, depthZ);
+            return cv_convert_depth_to_world(m_depthToWorldData, depthX, depthY, depthZ);
         }
 
         inline cv::Point3f convert_depth_to_world(cv::Point3f depthPosition) const
@@ -80,7 +86,7 @@ namespace sensekit { namespace plugins { namespace hand {
         inline cv::Point3f convert_world_to_depth(cv::Point3f worldPosition) const
         {
             PROFILE_FUNC();
-            cv::Point3f depth = cv_convert_world_to_depth(m_mapper, worldPosition);
+            cv::Point3f depth = cv_convert_world_to_depth(m_depthToWorldData, worldPosition);
 
             depth.x = (depth.x / m_scale) - m_offsetX;
             depth.y = (depth.y / m_scale) - m_offsetX;
@@ -93,7 +99,7 @@ namespace sensekit { namespace plugins { namespace hand {
         inline float offsetY() const { return m_offsetY; }
 
     private:
-        const sensekit::CoordinateMapper m_mapper;
+        const conversion_cache_t m_depthToWorldData;
         const float m_scale;
         const float m_offsetX;
         const float m_offsetY;

@@ -55,7 +55,7 @@ namespace sensekit { namespace plugins { namespace hand {
         void update_tracked_point_from_world_position(TrackedPoint& trackedPoint,
                                                       const cv::Point3f& newWorldPosition,
                                                       const float resizeFactor,
-                                                      const CoordinateMapper& fullSizeMapper);
+                                                      const conversion_cache_t& depthToWorldData);
 
         PointProcessorSettings& m_settings;
         int m_probationFrameCount { 0 };

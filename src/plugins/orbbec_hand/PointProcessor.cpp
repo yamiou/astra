@@ -200,7 +200,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 update_tracked_point_from_world_position(trackedPoint,
                                                          smoothedWorldPosition,
                                                          resizeFactor,
-                                                         matrices.fullSizeMapper);
+                                                         matrices.depthToWorldData);
             }
             else
             {
@@ -275,7 +275,7 @@ namespace sensekit { namespace plugins { namespace hand {
         roi.copyTo(matrices.depth);
 
         //initialize_common_calculations(matrices);
-        ScalingCoordinateMapper roiMapper(matrices.fullSizeMapper, 1.0, windowLeft, windowTop);
+        ScalingCoordinateMapper roiMapper(matrices.depthToWorldData, 1.0, windowLeft, windowTop);
 
         calculate_area(matrices, roiMapper);
 
@@ -304,7 +304,7 @@ namespace sensekit { namespace plugins { namespace hand {
             refinedDepth = trackedPoint.worldPosition.z;
         }
 
-        cv::Point3f refinedWorldPosition = cv_convert_depth_to_world(matrices.fullSizeMapper,
+        cv::Point3f refinedWorldPosition = cv_convert_depth_to_world(matrices.depthToWorldData,
                                                                      refinedFullSizeX,
                                                                      refinedFullSizeY,
                                                                      refinedDepth);
@@ -332,10 +332,10 @@ namespace sensekit { namespace plugins { namespace hand {
     void PointProcessor::update_tracked_point_from_world_position(TrackedPoint& trackedPoint,
                                                                   const cv::Point3f& newWorldPosition,
                                                                   const float resizeFactor,
-                                                                  const CoordinateMapper& fullSizeMapper)
+                                                                  const conversion_cache_t& depthToWorldData)
     {
         PROFILE_FUNC();
-        cv::Point3f fullSizeDepthPosition = cv_convert_world_to_depth(fullSizeMapper, newWorldPosition);
+        cv::Point3f fullSizeDepthPosition = cv_convert_world_to_depth(depthToWorldData, newWorldPosition);
 
         trackedPoint.fullSizePosition = cv::Point(fullSizeDepthPosition.x, fullSizeDepthPosition.y);
 
