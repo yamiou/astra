@@ -76,6 +76,7 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat& layerScore;
         cv::Mat& layerEdgeDistance;
         cv::Mat& layerIntegralArea;
+        cv::Mat& layerTestPassMap;
         cv::Mat& foregroundSearched;
         cv::Mat& debugSegmentation;
         cv::Mat& debugScore;
@@ -100,6 +101,7 @@ namespace sensekit { namespace plugins { namespace hand {
                          cv::Mat& layerScore,
                          cv::Mat& layerEdgeDistance,
                          cv::Mat& layerIntegralArea,
+                         cv::Mat& layerTestPassMap,
                          cv::Mat& debugSegmentation,
                          cv::Mat& debugScore,
                          cv::Mat& debugScoreValue,
@@ -120,6 +122,7 @@ namespace sensekit { namespace plugins { namespace hand {
             layerScore(layerScore),
             layerEdgeDistance(layerEdgeDistance),
             layerIntegralArea(layerIntegralArea),
+            layerTestPassMap(layerTestPassMap),
             foregroundSearched(foregroundSearched),
             debugSegmentation(debugSegmentation),
             debugScore(debugScore),

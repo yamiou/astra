@@ -85,14 +85,17 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat m_debugUpdateScore;
         cv::Mat m_debugCreateScore;
         cv::Mat m_debugRefineScore;
-        cv::Mat m_debugTestPassMap;
         cv::Mat m_debugUpdateScoreValue;
         cv::Mat m_debugCreateScoreValue;
         cv::Mat m_debugRefineScoreValue;
+        cv::Mat m_debugCreateTestPassMap;
+        cv::Mat m_debugUpdateTestPassMap;
+        cv::Mat m_debugRefineTestPassMap;
 
         cv::Mat m_layerSegmentation;
         cv::Mat m_layerScore;
         cv::Mat m_layerEdgeDistance;
+        cv::Mat m_layerTestPassMap;
 
         cv::Mat m_refineForegroundSearched;
         cv::Mat m_refineSegmentation;

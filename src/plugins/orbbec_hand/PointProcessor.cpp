@@ -120,8 +120,6 @@ namespace sensekit { namespace plugins { namespace hand {
 
         cv::Point newTargetPoint = segmentation::track_point_from_seed(updateTrackingData);
 
-        calculateTestPassMap(matrices, TEST_PHASE_UPDATE);
-
         validateAndUpdateTrackedPoint(matrices, scalingMapper, trackedPoint, newTargetPoint);
 
         //lost a tracked point, try to guess the position using previous position delta for second chance to recover
@@ -168,65 +166,6 @@ namespace sensekit { namespace plugins { namespace hand {
         PROFILE_FUNC();
         m_trackedPoints.clear();
         m_nextTrackingId = 0;
-    }
-
-    void PointProcessor::calculateTestPassMap(TrackingMatrices& matrices, const TestPhase phase)
-    {
-        if (!matrices.enableTestPassMap)
-        {
-            return;
-        }
-
-        int width = matrices.depth.cols;
-        int height = matrices.depth.rows;
-
-        cv::Mat& testPassMap = matrices.debugTestPassMap;
-        cv::Mat& segmentationMatrix = matrices.layerSegmentation;
-        const TestBehavior outputTestLog = TEST_BEHAVIOR_NONE;
-
-        for (int y = 0; y < height; ++y)
-        {
-            char* testPassMapRow = testPassMap.ptr<char>(y);
-            char* segmentationRow = segmentationMatrix.ptr<char>(y);
-
-            for (int x = 0; x < width; ++x, ++testPassMapRow, ++segmentationRow)
-            {
-                if (*segmentationRow != PixelType::Foreground)
-                {
-                    continue;
-                }
-                cv::Point seedPosition(x, y);
-                bool validPointInRange = segmentation::test_point_in_range(matrices,
-                                                                           seedPosition,
-                                                                           -1,
-                                                                           outputTestLog);
-                bool validPointArea = false;
-                bool validRadiusTest = false;
-
-                if (validPointInRange)
-                {
-                    validPointArea = segmentation::test_point_area(matrices,
-                                            m_settings.segmentationSettings.areaTestSettings,
-                                                                   seedPosition,
-                                                                   -1,
-                                                                   phase,
-                                                                   outputTestLog);
-                    validRadiusTest = segmentation::test_foreground_radius_percentage(matrices,
-                                            m_settings.segmentationSettings.circumferenceTestSettings,
-                                                                                      seedPosition,
-                                                                                      -1,
-                                                                                      phase,
-                                                                                      outputTestLog);
-                }
-
-                bool passAllTests = validPointInRange && validPointArea && validRadiusTest;
-
-                if (passAllTests)
-                {
-                    *testPassMapRow = PixelType::Foreground;
-                }
-            }
-        }
     }
 
     void PointProcessor::update_full_resolution_points(TrackingMatrices& matrices)

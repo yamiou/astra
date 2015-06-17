@@ -46,7 +46,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                TestPhase phase,
                                                TestBehavior outputLog);
 
-        ForegroundStatus test_and_reset_foreground_points(TrackingData& data);
+        ForegroundStatus create_test_pass_from_foreground(TrackingData& data);
 
         bool find_next_velocity_seed_pixel(cv::Mat& foregroundMatrix,
                                         cv::Mat& searchedMatrix,
@@ -73,6 +73,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                                const cv::Point& center,
                                                const float bandwidth,
                                                const ScalingCoordinateMapper& mapper);
+
+        cv::Point track_point_impl(TrackingData& data);
 
         cv::Point track_point_from_seed(TrackingData& data);
 

@@ -35,8 +35,6 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void reset();
 
-        void calculateTestPassMap(TrackingMatrices& matrices, const TestPhase phase);
-
     private:
         cv::Point3f smooth_world_positions(const cv::Point3f& oldWorldPosition, const cv::Point3f& newWorldPosition);
         void calculate_area(TrackingMatrices& matrices, ScalingCoordinateMapper mapper);

@@ -130,7 +130,6 @@ namespace sensekit { namespace plugins { namespace hand {
             m_refineForegroundSearched = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_debugUpdateScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_debugCreateScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-            m_debugTestPassMap = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_matDepthWindow = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_refineSegmentation = cv::Mat::zeros(matDepth.size(), CV_8UC1);
             m_refineScore = cv::Mat::zeros(matDepth.size(), CV_32FC1);
@@ -138,6 +137,9 @@ namespace sensekit { namespace plugins { namespace hand {
             m_debugUpdateScoreValue = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_debugCreateScoreValue = cv::Mat::zeros(matDepth.size(), CV_32FC1);
             m_debugRefineScoreValue = cv::Mat::zeros(matDepth.size(), CV_32FC1);
+            m_debugCreateTestPassMap = cv::Mat::zeros(matDepth.size(), CV_8UC1);
+            m_debugUpdateTestPassMap = cv::Mat::zeros(matDepth.size(), CV_8UC1);
+            m_debugRefineTestPassMap = cv::Mat::zeros(matDepth.size(), CV_8UC1);
 
             int numPoints = matDepth.cols * matDepth.rows;
             if (m_worldPoints == nullptr || m_numWorldPoints != numPoints)
@@ -167,10 +169,11 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_layerScore,
                                             m_layerEdgeDistance,
                                             m_layerIntegralArea,
+                                            m_layerTestPassMap,
                                             m_debugUpdateSegmentation,
                                             m_debugUpdateScore,
                                             m_debugUpdateScoreValue,
-                                            m_debugTestPassMap,
+                                            m_debugUpdateTestPassMap,
                                             enabledTestPassMap,
                                             fullSizeWorldPoints,
                                             m_worldPoints,
@@ -200,10 +203,11 @@ namespace sensekit { namespace plugins { namespace hand {
                                             m_layerScore,
                                             m_layerEdgeDistance,
                                             m_layerIntegralArea,
+                                            m_layerTestPassMap,
                                             m_debugCreateSegmentation,
                                             m_debugCreateScore,
                                             m_debugCreateScoreValue,
-                                            m_debugTestPassMap,
+                                            m_debugCreateTestPassMap,
                                             enabledTestPassMap,
                                             fullSizeWorldPoints,
                                             m_worldPoints,
@@ -241,10 +245,11 @@ namespace sensekit { namespace plugins { namespace hand {
                                                 m_refineScore,
                                                 m_refineEdgeDistance,
                                                 m_layerIntegralArea,
+                                                m_layerTestPassMap,
                                                 m_debugRefineSegmentation,
                                                 m_debugRefineScore,
                                                 m_debugRefineScoreValue,
-                                                m_debugTestPassMap,
+                                                m_debugRefineTestPassMap,
                                                 enabledTestPassMap,
                                                 fullSizeWorldPoints,
                                                 m_worldPoints,
@@ -321,8 +326,6 @@ namespace sensekit { namespace plugins { namespace hand {
             cv::Point seedPosition = get_mouse_probe_position();
 
             m_pointProcessor.updateTrackedPointOrCreateNewPointFromSeedPosition(matrices, seedPosition);
-
-            m_pointProcessor.calculateTestPassMap(matrices, TEST_PHASE_UPDATE);
 
             const TestBehavior outputTestLog = TEST_BEHAVIOR_LOG;
             const TestPhase phase = TEST_PHASE_CREATE;
@@ -603,12 +606,9 @@ namespace sensekit { namespace plugins { namespace hand {
                                                colorFrame);
                 break;
             case DEBUG_HAND_VIEW_TEST_PASS_MAP:
-                m_debugVisualizer.showDepthMat(m_matDepth,
-                                               colorFrame);
-                m_debugVisualizer.overlayMask(m_debugTestPassMap,
-                                              colorFrame,
-                                              testPassColor,
-                                              PixelType::Foreground);
+                m_debugVisualizer.showNormArray<char>(m_debugUpdateTestPassMap,
+                                                      m_debugUpdateTestPassMap,
+                                                      colorFrame);
                 break;
             }
 

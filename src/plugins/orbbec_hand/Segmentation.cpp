@@ -232,7 +232,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         const float pointInertiaFactor = data.settings.pointInertiaFactor;
         const float pointInertiaRadius = data.settings.pointInertiaRadius;
         const sensekit::Vector3f* worldPoints = data.matrices.worldPoints;
-        cv::Mat& segmentationMatrix = data.matrices.layerSegmentation;
+        cv::Mat& testPassMatrix = data.matrices.layerTestPassMap;
 
         layerScoreMatrix = cv::Mat::zeros(data.matrices.depth.size(), CV_32FC1);
 
@@ -255,15 +255,15 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         {
             float* edgeDistanceRow = edgeDistanceMatrix.ptr<float>(y);
             float* layerScoreRow = layerScoreMatrix.ptr<float>(y);
-            char* segmentationRow = segmentationMatrix.ptr<char>(y);
+            char* testPassRow = testPassMatrix.ptr<char>(y);
 
             for (int x = 0; x < width; ++x,
                                        ++worldPoints,
                                        ++edgeDistanceRow,
                                        ++layerScoreRow,
-                                       ++segmentationRow)
+                                       ++testPassRow)
             {
-                if (*segmentationRow != PixelType::Foreground)
+                if (*testPassRow != PixelType::Foreground)
                 {
                     continue;
                 }
@@ -569,12 +569,14 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         return integralAreaMatrix;
     }
 
-    ForegroundStatus test_and_reset_foreground_points(TrackingData& data)
+    ForegroundStatus create_test_pass_from_foreground(TrackingData& data)
     {
         PROFILE_FUNC();
         auto matrices = data.matrices;
         cv::Mat& segmentationMatrix = matrices.layerSegmentation;
-        const sensekit::Vector3f* worldPoints = matrices.worldPoints;
+        cv::Mat& testPassMatrix = matrices.layerTestPassMap;
+
+        testPassMatrix = cv::Mat::zeros(segmentationMatrix.size(), CV_8UC1);
 
         int width = matrices.depth.cols;
         int height = matrices.depth.rows;
@@ -589,57 +591,51 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         ForegroundStatus status = FOREGROUND_EMPTY;
 
-        for (int y = 0; y < height; y++)
+        for (int y = 0; y < height; ++y)
         {
             char* segmentationRow = segmentationMatrix.ptr<char>(y);
+            char* testPassRow = testPassMatrix.ptr<char>(y);
 
             for (int x = 0; x < width; ++x,
-                                       ++worldPoints,
-                                       ++segmentationRow)
+                                       ++segmentationRow,
+                                       ++testPassRow)
             {
                 if (*segmentationRow != PixelType::Foreground)
                 {
                     continue;
                 }
 
-                sensekit::Vector3f worldPosition = *worldPoints;
-                if (worldPosition.z != 0)
+                cv::Point seedPosition(x, y);
+                bool validPointArea = test_point_area_integral(matrices,
+                                                               integralArea,
+                                                               areaTestSettings,
+                                                               seedPosition,
+                                                               0,
+                                                               phase,
+                                                               outputTestLog);
+                bool validRadiusTest = false;
+
+                if (validPointArea)
                 {
-                    cv::Point seedPosition(x, y);
-                    bool validPointArea = test_point_area_integral(matrices,
-                                                                   integralArea,
-                                                                   areaTestSettings,
-                                                                   seedPosition,
-                                                                   0,
-                                                                   phase,
-                                                                   outputTestLog);
-                    bool validRadiusTest = false;
+                    validRadiusTest = test_foreground_radius_percentage(matrices,
+                                                                        circumferenceTestSettings,
+                                                                        seedPosition,
+                                                                        0,
+                                                                        phase,
+                                                                        outputTestLog);
+                }
 
-                    if (validPointArea)
-                    {
-                        validRadiusTest = test_foreground_radius_percentage(matrices,
-                                                                            circumferenceTestSettings,
-                                                                            seedPosition,
-                                                                            0,
-                                                                            phase,
-                                                                            outputTestLog);
-                    }
-
-                    if (validPointArea && validRadiusTest)
-                    {
-                        status = FOREGROUND_HAS_POINTS;
-                    }
-                    else
-                    {
-                        *segmentationRow = PixelType::Background;
-                    }
+                if (validPointArea && validRadiusTest)
+                {
+                    status = FOREGROUND_HAS_POINTS;
+                    *testPassRow = PixelType::Foreground;
                 }
             }
         }
         return status;
     }
 
-    cv::Point track_point_from_seed(TrackingData& data)
+    cv::Point track_point_impl(TrackingData& data, bool debugLayersEnabled)
     {
         PROFILE_FUNC();
         cv::Size size = data.matrices.depth.size();
@@ -657,11 +653,28 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         cv::Mat& matScore = data.matrices.layerScore;
 
         calculate_edge_distance(data.matrices.layerSegmentation,
-                                    data.matrices.areaSqrt,
-                                    data.matrices.layerEdgeDistance,
-                                    data.settings.targetEdgeDistance * 2.0f);
+                                data.matrices.areaSqrt,
+                                data.matrices.layerEdgeDistance,
+                                data.settings.targetEdgeDistance * 2.0f);
 
-        ForegroundStatus status = test_and_reset_foreground_points(data);
+        ForegroundStatus status = create_test_pass_from_foreground(data);
+
+        if (debugLayersEnabled)
+        {
+            ++data.matrices.layerCount;
+
+            cv::Mat layerCountMat = cv::Mat(size, CV_8UC1, cv::Scalar(data.matrices.layerCount));
+
+            cv::bitwise_or(layerCountMat,
+                data.matrices.debugSegmentation,
+                data.matrices.debugSegmentation,
+                data.matrices.layerSegmentation);
+
+            cv::bitwise_or(layerCountMat,
+                data.matrices.debugTestPassMap,
+                data.matrices.debugTestPassMap,
+                data.matrices.layerTestPassMap);
+        }
 
         if (status == FOREGROUND_EMPTY)
         {
@@ -675,15 +688,8 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         cv::minMaxLoc(matScore, &min, &max, &minLoc, &maxLoc, data.matrices.layerSegmentation);
 
-        if (data.matrices.debugLayersEnabled)
+        if (debugLayersEnabled)
         {
-            ++data.matrices.layerCount;
-
-            cv::bitwise_or(cv::Mat(size, CV_8UC1, cv::Scalar(data.matrices.layerCount)),
-                data.matrices.debugSegmentation,
-                data.matrices.debugSegmentation,
-                data.matrices.layerSegmentation);
-
             cv::Mat scoreMask;
             cv::inRange(matScore, 1, INT_MAX, scoreMask);
             matScore.copyTo(data.matrices.debugScoreValue, scoreMask);
@@ -696,6 +702,29 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         }
 
         return maxLoc;
+    }
+
+    cv::Point track_point_from_seed(TrackingData& data)
+    {
+        bool debugLayersEnabled = false;
+        cv::Point p1 = track_point_impl(data, debugLayersEnabled);
+
+        if (p1 == INVALID_POINT)
+        {
+            return INVALID_POINT;
+        }
+
+        debugLayersEnabled = data.matrices.debugLayersEnabled;
+        cv::Point p2 = track_point_impl(data, debugLayersEnabled);
+
+        //track everything twice to ensure a stable convergence
+        if (p2 == INVALID_POINT ||
+            p1 != p2)
+        {
+            return INVALID_POINT;
+        }
+
+        return p2;
     }
 
     bool find_next_velocity_seed_pixel(cv::Mat& velocitySignalMatrix,
