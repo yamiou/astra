@@ -28,14 +28,14 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
     static void enqueue_neighbors(cv::Mat& matVisited,
                                  std::queue<PointTTL>& pointQueue,
-                                 PointTTL pt,
+                                 const PointTTL& pt,
                                  float referenceDepth)
     {
         PROFILE_FUNC();
         const int& x = pt.x;
         const int& y = pt.y;
-        int width = matVisited.cols;
-        int height = matVisited.rows;
+        const int width = matVisited.cols;
+        const int height = matVisited.rows;
 
         if (x < 1 || x > width - 2 ||
             y < 1 || y > height - 2)
@@ -43,7 +43,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             return;
         }
 
-        float& ttlRef = pt.ttl;
+        const float& ttlRef = pt.ttl;
 
         char& rightVisited = matVisited.at<char>(y, x+1);
         if (0 == rightVisited)
