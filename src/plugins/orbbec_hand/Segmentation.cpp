@@ -1121,8 +1121,10 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                            const ScalingCoordinateMapper& mapper)
     {
         PROFILE_FUNC();
+        int width = matDepth.cols;
+        int height = matDepth.rows;
         if (center.x < 0 || center.y < 0 ||
-            center.x >= matDepth.cols || center.y >= matDepth.rows)
+            center.x >= width || center.y >= height)
         {
             return 0;
         }
@@ -1130,12 +1132,15 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         float startingDepth = matDepth.at<float>(center);
 
         cv::Point topLeft = mapper.offset_pixel_location_by_mm(center, -bandwidth, bandwidth, startingDepth);
-        cv::Point bottomRight = mapper.offset_pixel_location_by_mm(center, bandwidth, -bandwidth, startingDepth);
+
+        int offsetX = center.x - topLeft.x;
+        int offsetY = center.y - topLeft.y;
+        cv::Point bottomRight(center.x + offsetX, center.y + offsetY);
 
         int32_t x0 = MAX(0, topLeft.x);
         int32_t y0 = MAX(0, topLeft.y);
-        int32_t x1 = MIN(matDepth.cols - 1, bottomRight.x);
-        int32_t y1 = MIN(matDepth.rows - 1, bottomRight.y);
+        int32_t x1 = MIN(width - 1, bottomRight.x);
+        int32_t y1 = MIN(height - 1, bottomRight.y);
 
         float area = 0;
 

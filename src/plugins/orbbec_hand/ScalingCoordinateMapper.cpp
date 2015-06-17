@@ -80,23 +80,18 @@ namespace sensekit { namespace plugins { namespace hand {
 
         const conversion_cache_t& depthToWorldData = m_depthToWorldData;
 
-        float fullSizeDepthX = (position.x + m_offsetX) * m_scale;
-        float fullSizeDepthY = (position.y + m_offsetY) * m_scale;
+        const float scaledDepth = depthZ * m_scale;
 
-        float normalizedX = fullSizeDepthX / depthToWorldData.resolutionX - .5f;
-        float normalizedY = .5f - fullSizeDepthY / depthToWorldData.resolutionY;
+        //This bakes the world to depth conversion and full size to scaled conversion into
+        //a single factor that we apply to the requested offset.
+        //This process is equivalent to depth_to_world, adding offsetX/Y to world position,
+        //then doing world_to_depth.
 
-        float worldX = normalizedX * depthZ * depthToWorldData.xzFactor;
-        float worldY = normalizedY * depthZ * depthToWorldData.yzFactor;
+        const float xFactor = depthToWorldData.resolutionX / (scaledDepth * depthToWorldData.xzFactor);
+        const float finalDepthX = position.x + offsetX * xFactor;
 
-        worldX += offsetX;
-        worldY += offsetY;
-
-        float fullSizeDepthX2 = depthToWorldData.coeffX * worldX / depthZ + depthToWorldData.halfResX;
-        float fullSizeDepthY2 = depthToWorldData.halfResY - depthToWorldData.coeffY * worldY / depthZ;
-
-        float finalDepthX = (fullSizeDepthX2 / m_scale) - m_offsetX;
-        float finalDepthY = (fullSizeDepthY2 / m_scale) - m_offsetY;
+        const float yFactor = depthToWorldData.resolutionY / (scaledDepth * depthToWorldData.yzFactor);
+        const float finalDepthY = position.y - offsetY * yFactor;
 
         return cv::Point(static_cast<int>(finalDepthX), static_cast<int>(finalDepthY));
     }
