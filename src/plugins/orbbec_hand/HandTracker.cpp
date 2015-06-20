@@ -227,10 +227,10 @@ namespace sensekit { namespace plugins { namespace hand {
             }
             else
             {
-                debug_probe_point(createMatrices);
+                debug_spawn_point(createMatrices);
             }
 
-            debug_spawn_point(createMatrices);
+            debug_probe_point(createMatrices);
 
             //remove old points
             m_pointProcessor.removeOldOrDeadPoints();
@@ -269,97 +269,71 @@ namespace sensekit { namespace plugins { namespace hand {
                 return;
             }
 
-            cv::Point seedPosition = get_mouse_probe_position();
-            m_pointProcessor.updateTrackedPointOrCreateNewPointFromSeedPosition(matrices, seedPosition);
+            cv::Point probePosition = get_mouse_probe_position();
 
             cv::Mat& matDepth = matrices.depth;
 
-            auto segmentationSettings = m_settings.pointProcessorSettings.segmentationSettings;
-
-            cv::Mat& integralArea = segmentation::calculate_integral_area(matrices);
-
-            float area = segmentation::get_point_area_integral(matrices,
-                            integralArea,
-                            segmentationSettings.areaTestSettings,
-                            seedPosition);
-
-            float depth = matDepth.at<float>(seedPosition);
-            float score = m_debugCreateScoreValue.at<float>(seedPosition);
-            float edgeDist = m_layerEdgeDistance.at<float>(seedPosition);
-
-            float foregroundRadius1 = segmentationSettings.circumferenceTestSettings.foregroundRadius1;
-            float foregroundRadius2 = segmentationSettings.circumferenceTestSettings.foregroundRadius2;
-
-            auto mapper = get_scaling_mapper(matrices);
-            std::vector<sensekit::Vector2i>& points = matrices.layerCirclePoints;
-
-            float percentForeground1 = segmentation::get_max_sequential_circumference_percentage(matDepth,
-                                                                                                 m_layerSegmentation,
-                                                                                                 seedPosition,
-                                                                                                 foregroundRadius1,
-                                                                                                 mapper,
-                                                                                                 points);
-            float percentForeground2 = segmentation::get_max_sequential_circumference_percentage(matDepth,
-                                                                                                 m_layerSegmentation,
-                                                                                                 seedPosition,
-                                                                                                 foregroundRadius2,
-                                                                                                 mapper,
-                                                                                                 points);
-            SINFO("HandTracker", "depth: %f fg1: %f fg2: %f edge: %f area: %f score: %f", depth,
-                                                                    percentForeground1,
-                                                                    percentForeground2,
-                                                                    edgeDist,
-                                                                    area,
-                                                                    score);
-        }
-
-        void HandTracker::debug_spawn_point(TrackingMatrices& matrices)
-        {
-            if (!m_debugImageStream->spawn_point_requested())
-            {
-                return;
-            }
-            if (!m_debugImageStream->pause_input())
-            {
-                m_pointProcessor.initialize_common_calculations(matrices);
-            }
-            cv::Point seedPosition = get_mouse_probe_position();
-
-            m_pointProcessor.updateTrackedPointOrCreateNewPointFromSeedPosition(matrices, seedPosition);
+            float depth = matDepth.at<float>(probePosition);
+            float score = m_debugCreateScoreValue.at<float>(probePosition);
+            float edgeDist = m_layerEdgeDistance.at<float>(probePosition);
 
             const TestBehavior outputTestLog = TEST_BEHAVIOR_LOG;
             const TestPhase phase = TEST_PHASE_CREATE;
 
             bool validPointInRange = segmentation::test_point_in_range(matrices,
-                                                                       seedPosition,
+                                                                       probePosition,
                                                                        outputTestLog);
             bool validPointArea = false;
             bool validRadiusTest = false;
 
             if (validPointInRange)
             {
+                auto segmentationSettings = m_settings.pointProcessorSettings.segmentationSettings;
+
                 validPointArea = segmentation::test_point_area(matrices,
-                                    m_settings.pointProcessorSettings.segmentationSettings.areaTestSettings,
-                                                               seedPosition,
+                                                segmentationSettings.areaTestSettings,
+                                                               probePosition,
                                                                phase,
                                                                outputTestLog);
                 validRadiusTest = segmentation::test_foreground_radius_percentage(matrices,
-                                    m_settings.pointProcessorSettings.segmentationSettings.circumferenceTestSettings,
-                                                                                  seedPosition,
+                                                segmentationSettings.circumferenceTestSettings,
+                                                                                  probePosition,
                                                                                   phase,
                                                                                   outputTestLog);
             }
 
-            float depth = matrices.depth.at<float>(seedPosition);
-            float score = m_debugCreateScoreValue.at<float>(seedPosition);
-            SINFO("HandTracker", "point test: depth: %f score: %f inRange: %d validArea: %d validRadius: %d",
-                          depth,
-                          score,
-                          validPointInRange,
-                          validPointArea,
-                          validRadiusTest);
+            bool allPointsPass = validPointInRange && validPointArea && validRadiusTest;
 
-            m_debugImageStream->clear_spawn_point_request();
+            SINFO("HandTracker", "depth: %f score: %f edge %f tests: %s",
+                       depth,
+                       score,
+                       edgeDist,
+                       allPointsPass ? "PASS" : "FAIL");
+        }
+
+        void HandTracker::debug_spawn_point(TrackingMatrices& matrices)
+        {
+            if (!m_debugImageStream->pause_input())
+            {
+                m_pointProcessor.initialize_common_calculations(matrices);
+            }
+            cv::Point seedPosition = get_spawn_position();
+
+            m_pointProcessor.updateTrackedPointOrCreateNewPointFromSeedPosition(matrices, seedPosition);
+        }
+
+        cv::Point HandTracker::get_spawn_position()
+        {
+            auto normPosition = m_debugImageStream->mouse_norm_position();
+
+            if (m_debugImageStream->spawn_point_locked())
+            {
+                normPosition = m_debugImageStream->spawn_norm_position();
+            }
+
+            int x = MAX(0, MIN(m_processingSizeWidth, normPosition.x * m_processingSizeWidth));
+            int y = MAX(0, MIN(m_processingSizeHeight, normPosition.y * m_processingSizeHeight));
+            return cv::Point(x, y);
         }
 
         cv::Point HandTracker::get_mouse_probe_position()
@@ -507,9 +481,6 @@ namespace sensekit { namespace plugins { namespace hand {
         void HandTracker::overlay_circle(_sensekit_imageframe& imageFrame)
         {
             PROFILE_FUNC();
-            auto normPosition = m_debugImageStream->mouse_norm_position();
-            int x = MAX(0, MIN(m_processingSizeWidth, normPosition.x * m_processingSizeWidth));
-            int y = MAX(0, MIN(m_processingSizeHeight, normPosition.y * m_processingSizeHeight));
 
             float resizeFactor = m_matDepthFullSize.cols / static_cast<float>(m_matDepth.cols);
             ScalingCoordinateMapper mapper(m_depthStream.depth_to_world_data(), resizeFactor);
@@ -520,21 +491,28 @@ namespace sensekit { namespace plugins { namespace hand {
             float foregroundRadius1 = segmentationSettings.circumferenceTestSettings.foregroundRadius1;
             float foregroundRadius2 = segmentationSettings.circumferenceTestSettings.foregroundRadius2;
 
+            cv::Point probePosition = get_mouse_probe_position();
+
             std::vector<sensekit::Vector2i> points;
 
-            segmentation::get_circumference_points(m_matDepth, cv::Point(x, y), foregroundRadius1, mapper, points);
+            segmentation::get_circumference_points(m_matDepth, probePosition, foregroundRadius1, mapper, points);
 
             for (auto p : points)
             {
                 mark_image_pixel(imageFrame, color, p);
             }
 
-            segmentation::get_circumference_points(m_matDepth, cv::Point(x, y), foregroundRadius2, mapper, points);
+            segmentation::get_circumference_points(m_matDepth, probePosition, foregroundRadius2, mapper, points);
 
             for (auto p : points)
             {
                 mark_image_pixel(imageFrame, color, p);
             }
+
+            cv::Point spawnPosition = get_spawn_position();
+            RGBPixel spawnColor(255, 0, 255);
+
+            mark_image_pixel(imageFrame, spawnColor, Vector2i(spawnPosition.x, spawnPosition.y));
         }
 
         void HandTracker::update_debug_image_frame(_sensekit_imageframe& colorFrame)

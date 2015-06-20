@@ -50,6 +50,7 @@ namespace sensekit { namespace plugins { namespace hand {
                           cv::Mat& matForeground,
                           const Vector3f* worldPoints);
         cv::Point get_mouse_probe_position();
+        cv::Point get_spawn_position();
 
         //fields
 

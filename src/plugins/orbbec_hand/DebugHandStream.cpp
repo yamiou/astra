@@ -22,6 +22,9 @@ namespace sensekit { namespace plugins { namespace hand {
         case SENSEKIT_PARAMETER_DEBUG_HAND_PAUSE_INPUT:
             set_pause_input(inByteLength, inData);
             break;
+        case SENSEKIT_PARAMETER_DEBUG_HAND_LOCK_SPAWN_POINT:
+            set_lock_spawn_point(inByteLength, inData);
+            break;
         }
     }
 
@@ -43,11 +46,6 @@ namespace sensekit { namespace plugins { namespace hand {
                                     sensekit_parameter_data_t inData,
                                     sensekit_parameter_bin_t& parameterBin)
     {
-        switch (commandId)
-        {
-        case SENSEKIT_PARAMETER_DEBUG_HAND_SPAWN_POINT:
-            invoke_spawn_point(inByteLength, inData, parameterBin);
-        }
     }
 
     void DebugHandStream::get_view_parameter(sensekit_parameter_bin_t& parameterBin)
@@ -108,11 +106,18 @@ namespace sensekit { namespace plugins { namespace hand {
         }
     }
 
-    void DebugHandStream::invoke_spawn_point(size_t inByteLength,
-                                             sensekit_parameter_data_t inData,
-                                             sensekit_parameter_bin_t& parameterBin)
+    void DebugHandStream::set_lock_spawn_point(size_t inByteLength, sensekit_parameter_data_t& inData)
     {
-        m_spawnPointRequested = true;
-    }
+        if (inByteLength >= sizeof(bool))
+        {
+            bool newLockSpawnPoint;
+            memcpy(&newLockSpawnPoint, inData, sizeof(bool));
 
+            if (newLockSpawnPoint && !m_lockSpawnPoint)
+            {
+                m_spawnNormPosition = m_mouseNormPosition;
+            }
+            m_lockSpawnPoint = newLockSpawnPoint;
+        }
+    }
 }}}

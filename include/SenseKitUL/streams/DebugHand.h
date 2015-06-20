@@ -39,9 +39,9 @@ namespace sensekit {
             sensekit_debug_handstream_set_pause_input(m_debugHandStream, pauseInput);
         }
 
-        void spawn_point()
+        void set_lock_spawn_point(bool lockSpawnPoint)
         {
-            sensekit_debug_handstream_spawn_point(m_debugHandStream);
+            sensekit_debug_handstream_set_lock_spawn_point(m_debugHandStream, lockSpawnPoint);
         }
 
         DebugHandViewType get_view_type()

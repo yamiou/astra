@@ -337,6 +337,7 @@ void process_mouse_move(sf::RenderWindow& window, sensekit::StreamReader& reader
 
 static bool g_mouseProbe = false;
 static bool g_pauseInput = false;
+static bool g_lockSpawnPoint = false;
 
 void toggle_mouse_probe(sensekit::StreamReader& reader)
 {
@@ -350,12 +351,10 @@ void toggle_pause_input(sensekit::StreamReader& reader)
     reader.stream<sensekit::DebugHandStream>().set_pause_input(g_pauseInput);
 }
 
-void process_mouse_button(sensekit::StreamReader& reader)
+void toggle_spawn_lock(sensekit::StreamReader& reader)
 {
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-    {
-        reader.stream<sensekit::DebugHandStream>().spawn_point();
-    }
+    g_lockSpawnPoint = !g_lockSpawnPoint;
+    reader.stream<sensekit::DebugHandStream>().set_lock_spawn_point(g_lockSpawnPoint);
 }
 
 void process_key_input(sensekit::StreamReader& reader, HandDebugFrameListener& listener, sf::Event::KeyEvent key)
@@ -471,7 +470,6 @@ int main(int argc, char** argv)
             else if (event.type == sf::Event::MouseMoved)
             {
                 process_mouse_move(window, reader);
-                process_mouse_button(reader);
             }
             else if (event.type == sf::Event::MouseButtonPressed)
             {
@@ -482,7 +480,7 @@ int main(int argc, char** argv)
                 else
                 {
                     process_mouse_move(window, reader);
-                    process_mouse_button(reader);
+                    toggle_spawn_lock(reader);
                 }
             }
         }
