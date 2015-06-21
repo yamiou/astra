@@ -30,10 +30,10 @@ namespace sensekit { namespace plugins { namespace hand {
 
     struct AreaTestSettings
     {
-        float areaBandwidth{ 250 }; //mm
+        float areaBandwidth{ 150 }; //mm
         float areaBandwidthDepth{ 100 }; //mm
         float minArea{ 3000 }; //mm^2
-        float maxArea{ 30000 }; //mm^2
+        float maxArea{ 35000 }; //mm^2
     };
 
     struct CircumferenceTestSettings
