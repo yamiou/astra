@@ -277,6 +277,8 @@ namespace sensekit { namespace plugins { namespace hand {
             float score = m_debugCreateScoreValue.at<float>(probePosition);
             float edgeDist = m_layerEdgeDistance.at<float>(probePosition);
 
+            auto segmentationSettings = m_settings.pointProcessorSettings.segmentationSettings;
+
             const TestBehavior outputTestLog = TEST_BEHAVIOR_LOG;
             const TestPhase phase = TEST_PHASE_CREATE;
 
@@ -288,13 +290,12 @@ namespace sensekit { namespace plugins { namespace hand {
 
             if (validPointInRange)
             {
-                auto segmentationSettings = m_settings.pointProcessorSettings.segmentationSettings;
-
-                validPointArea = segmentation::test_point_area(matrices,
+                validPointArea = segmentation::test_point_area_integral(matrices,
+                                                                        matrices.layerIntegralArea,
                                                 segmentationSettings.areaTestSettings,
-                                                               probePosition,
-                                                               phase,
-                                                               outputTestLog);
+                                                                        probePosition,
+                                                                        phase,
+                                                                        outputTestLog);
                 validRadiusTest = segmentation::test_foreground_radius_percentage(matrices,
                                                 segmentationSettings.circumferenceTestSettings,
                                                                                   probePosition,
@@ -581,8 +582,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                                colorFrame);
                 break;
             case DEBUG_HAND_VIEW_TEST_PASS_MAP:
-                m_debugVisualizer.showNormArray<char>(m_debugUpdateTestPassMap,
-                                                      m_debugUpdateTestPassMap,
+                m_debugVisualizer.showNormArray<char>(m_debugCreateTestPassMap,
+                                                      m_debugCreateTestPassMap,
                                                       colorFrame);
                 break;
             }

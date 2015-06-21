@@ -702,7 +702,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
     cv::Point track_point_from_seed(TrackingData& data)
     {
-        bool debugLayersEnabled = false;
+        bool debugLayersEnabled = data.matrices.debugLayersEnabled;
         cv::Point p1 = track_point_impl(data, debugLayersEnabled);
 
         if (p1 == INVALID_POINT)
@@ -710,7 +710,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             return INVALID_POINT;
         }
 
-        debugLayersEnabled = data.matrices.debugLayersEnabled;
+        debugLayersEnabled = false;
         cv::Point p2 = track_point_impl(data, debugLayersEnabled);
 
         //track everything twice to ensure a stable convergence
@@ -1106,7 +1106,10 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         float startingDepth = matDepth.at<float>(center);
 
         cv::Point topLeft = mapper.offset_pixel_location_by_mm(center, -bandwidth, bandwidth, startingDepth);
-        cv::Point bottomRight = mapper.offset_pixel_location_by_mm(center, bandwidth, -bandwidth, startingDepth);
+
+        int offsetX = center.x - topLeft.x;
+        int offsetY = center.y - topLeft.y;
+        cv::Point bottomRight(center.x + offsetX, center.y + offsetY);
 
         int32_t x0 = MAX(0, topLeft.x);
         int32_t y0 = MAX(0, topLeft.y);
@@ -1115,28 +1118,19 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         float area = 0;
 
-        for (int y = y0; y < y1; y++)
+        for (int y = y0; y <= y1; y++)
         {
-            float* depthRow = matDepth.ptr<float>(y);
             char* segmentationRow = matSegmentation.ptr<char>(y);
             float* areaRow = matArea.ptr<float>(y);
 
-            depthRow += x0;
             segmentationRow += x0;
             areaRow += x0;
-            for (int x = x0; x < x1; x++)
+            for (int x = x0; x <= x1; ++x, ++areaRow, ++segmentationRow)
             {
                 if (*segmentationRow == PixelType::Foreground)
                 {
-                    float depth = *depthRow;
-                    if (std::fabs(depth - startingDepth) < bandwidthDepth)
-                    {
-                        area += *areaRow;
-                    }
+                    area += *areaRow;
                 }
-                ++depthRow;
-                ++areaRow;
-                ++segmentationRow;
             }
         }
 
@@ -1167,8 +1161,9 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         int offsetY = center.y - topLeft.y;
         cv::Point bottomRight(center.x + offsetX, center.y + offsetY);
 
-        int32_t x0 = MAX(0, topLeft.x);
-        int32_t y0 = MAX(0, topLeft.y);
+        //subtract one from topLeft because formula below is exclusive on the lower bounds
+        int32_t x0 = MAX(0, topLeft.x-1);
+        int32_t y0 = MAX(0, topLeft.y-1);
         int32_t x1 = MIN(width - 1, bottomRight.x);
         int32_t y1 = MIN(height - 1, bottomRight.y);
 

@@ -36,6 +36,13 @@ namespace sensekit { namespace plugins { namespace hand {
                              const cv::Point& targetPoint,
                              TestPhase phase,
                              TestBehavior outputLog);
+                             
+        bool test_point_area_integral(TrackingMatrices& matrices,
+                                      cv::Mat& integralArea,
+                                      AreaTestSettings& settings,
+                                      const cv::Point& targetPoint,
+                                      TestPhase phase,
+                                      TestBehavior outputLog);
 
         bool test_foreground_radius_percentage(TrackingMatrices& matrices,
                                                CircumferenceTestSettings& settings,
