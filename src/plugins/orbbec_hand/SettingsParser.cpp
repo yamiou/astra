@@ -106,6 +106,16 @@ namespace sensekit { namespace plugins { namespace hand {
         return settings;
     }
 
+    NaturalEdgeTestSettings parse_natural_edge_test_settings(cpptoml::table t)
+    {
+        NaturalEdgeTestSettings settings;
+
+        settings.naturalEdgeBandwidth = get_float_from_table(t, "naturaledgetest.naturalEdgeBandwidth", settings.naturalEdgeBandwidth);
+        settings.minPercentNaturalEdges = get_float_from_table(t, "naturaledgetest.minPercentNaturalEdges", settings.minPercentNaturalEdges);
+
+        return settings;
+    }
+
     SegmentationSettings parse_segmentation_settings(cpptoml::table t)
     {
         SegmentationSettings settings;
@@ -122,6 +132,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         settings.areaTestSettings = parse_area_test_settings(t);
         settings.circumferenceTestSettings = parse_circumference_test_settings(t);
+        settings.naturalEdgeTestSettings = parse_natural_edge_test_settings(t);
 
         return settings;
     }

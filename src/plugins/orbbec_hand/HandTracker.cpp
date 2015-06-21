@@ -287,6 +287,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                                        outputTestLog);
             bool validPointArea = false;
             bool validRadiusTest = false;
+            bool validNaturalEdges = false;
 
             if (validPointInRange)
             {
@@ -301,9 +302,18 @@ namespace sensekit { namespace plugins { namespace hand {
                                                                                   probePosition,
                                                                                   phase,
                                                                                   outputTestLog);
+
+                validNaturalEdges = segmentation::test_natural_edges(matrices,
+                                                segmentationSettings.naturalEdgeTestSettings,
+                                                                     probePosition,
+                                                                     phase,
+                                                                     outputTestLog);
             }
 
-            bool allPointsPass = validPointInRange && validPointArea && validRadiusTest;
+            bool allPointsPass = validPointInRange &&
+                                 validPointArea &&
+                                 validRadiusTest &&
+                                 validNaturalEdges;
 
             SINFO("HandTracker", "depth: %f score: %f edge %f tests: %s",
                        depth,
@@ -558,7 +568,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                       colorFrame);
                 break;
             case DEBUG_HAND_VIEW_CREATE_SEGMENTATION:
-                m_debugVisualizer.showNormArray<char>(m_debugCreateSegmentation,
+                            m_debugVisualizer.showNormArray<char>(m_debugCreateSegmentation,
                                                       m_debugCreateSegmentation,
                                                       colorFrame);
                 break;

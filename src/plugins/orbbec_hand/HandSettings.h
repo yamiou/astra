@@ -36,6 +36,12 @@ namespace sensekit { namespace plugins { namespace hand {
         float maxArea{ 35000 }; //mm^2
     };
 
+    struct NaturalEdgeTestSettings
+    {
+        float naturalEdgeBandwidth{ 150 }; //mm
+        float minPercentNaturalEdges { 0.8 }; //mm^2
+    };
+
     struct CircumferenceTestSettings
     {
         float foregroundRadius1{ 100 };
@@ -50,6 +56,7 @@ namespace sensekit { namespace plugins { namespace hand {
     {
         AreaTestSettings areaTestSettings;
         CircumferenceTestSettings circumferenceTestSettings;
+        NaturalEdgeTestSettings naturalEdgeTestSettings;
 
         float segmentationBandwidthDepthNear{ 100 };
         float segmentationBandwidthDepthFar{ 100 };

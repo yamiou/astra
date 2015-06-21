@@ -36,7 +36,7 @@ namespace sensekit { namespace plugins { namespace hand {
                              const cv::Point& targetPoint,
                              TestPhase phase,
                              TestBehavior outputLog);
-                             
+
         bool test_point_area_integral(TrackingMatrices& matrices,
                                       cv::Mat& integralArea,
                                       AreaTestSettings& settings,
@@ -95,6 +95,17 @@ namespace sensekit { namespace plugins { namespace hand {
                                                           const ScalingCoordinateMapper& mapper,
                                                           std::vector<sensekit::Vector2i>& points);
 
+        float get_percent_natural_edges(cv::Mat& matDepth,
+                                        cv::Mat& matSegmentation,
+                                        const cv::Point& center,
+                                        const float bandwidth,
+                                        const ScalingCoordinateMapper& mapper);
+
+        bool test_natural_edges(TrackingMatrices& matrices,
+                                NaturalEdgeTestSettings& settings,
+                                const cv::Point& targetPoint,
+                                TestPhase phase,
+                                TestBehavior outputLog);
     }
 }}}
 

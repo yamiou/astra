@@ -193,8 +193,14 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                    depth < referenceDepth - bandwidthDepth ||
                                    depth > referenceDepth + bandwidthDepth;
 
-            if (ttlRef <= 0 || pointOutOfRange)
+            if (ttlRef <= 0)
             {
+                segmentationMatrix.at<char>(y, x) = PixelType::ForegroundOutOfRangeEdge;
+                continue;
+            }
+            else if (pointOutOfRange)
+            {
+                segmentationMatrix.at<char>(y, x) = PixelType::ForegroundNaturalEdge;
                 continue;
             }
 
@@ -432,6 +438,103 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         return test_point_area_core(area, settings, phase, outputLog);
     }
 
+    float get_percent_natural_edges(cv::Mat& matDepth,
+                                    cv::Mat& matSegmentation,
+                                    const cv::Point& center,
+                                    const float bandwidth,
+                                    const ScalingCoordinateMapper& mapper)
+    {
+        PROFILE_FUNC();
+        int width = matDepth.cols;
+        int height = matDepth.rows;
+        if (center.x < 0 || center.y < 0 ||
+            center.x >= width || center.y >= height)
+        {
+            return 0;
+        }
+
+        float startingDepth = matDepth.at<float>(center);
+
+        cv::Point topLeft = mapper.offset_pixel_location_by_mm(center, -bandwidth, bandwidth, startingDepth);
+
+        int offsetX = center.x - topLeft.x;
+        int offsetY = center.y - topLeft.y;
+        cv::Point bottomRight(center.x + offsetX, center.y + offsetY);
+
+        int32_t x0 = MAX(0, topLeft.x);
+        int32_t y0 = MAX(0, topLeft.y);
+        int32_t x1 = MIN(width - 1, bottomRight.x);
+        int32_t y1 = MIN(height - 1, bottomRight.y);
+
+        int naturalEdgeCount = 0;
+        int totalEdgeCount = 0;
+
+        for (int y = y0; y <= y1; y++)
+        {
+            char* segmentationRow = matSegmentation.ptr<char>(y);
+
+            segmentationRow += x0;
+            for (int x = x0; x <= x1; ++x, ++segmentationRow)
+            {
+                char segmentation = *segmentationRow;
+                if (segmentation == PixelType::ForegroundNaturalEdge)
+                {
+                    ++naturalEdgeCount;
+                    ++totalEdgeCount;
+                }
+                else if (segmentation == PixelType::ForegroundOutOfRangeEdge)
+                {
+                    ++totalEdgeCount;
+                }
+            }
+        }
+
+        float percentNaturalEdges = 0;
+        if (totalEdgeCount > 0)
+        {
+            percentNaturalEdges = naturalEdgeCount / static_cast<float>(totalEdgeCount);
+        }
+
+        return percentNaturalEdges;
+    }
+
+    bool test_natural_edges(TrackingMatrices& matrices,
+                            NaturalEdgeTestSettings& settings,
+                            const cv::Point& targetPoint,
+                            TestPhase phase,
+                            TestBehavior outputLog)
+    {
+        PROFILE_FUNC();
+
+        auto scalingMapper = get_scaling_mapper(matrices);
+        float percentNaturalEdges = get_percent_natural_edges(matrices.depth,
+                                                              matrices.layerSegmentation,
+                                                              targetPoint,
+                                                              settings.naturalEdgeBandwidth,
+                                                              scalingMapper);
+
+        float minPercentNaturalEdges = settings.minPercentNaturalEdges;
+
+        bool passed = percentNaturalEdges >= minPercentNaturalEdges;
+
+        if (outputLog == TEST_BEHAVIOR_LOG)
+        {
+            if (passed)
+            {
+                SINFO("Segmentation", "test_natural_edges passed: %f (minimum %f)",
+                              percentNaturalEdges,
+                              minPercentNaturalEdges);
+            }
+            else
+            {
+                SINFO("Segmentation", "test_natural_edges failed: %f (minimum %f)",
+                              percentNaturalEdges,
+                              minPercentNaturalEdges);
+            }
+        }
+        return passed;
+    }
+
     bool test_foreground_radius_percentage(TrackingMatrices& matrices,
                                            CircumferenceTestSettings& settings,
                                            const cv::Point& targetPoint,
@@ -572,6 +675,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         auto areaTestSettings = data.settings.areaTestSettings;
         auto circumferenceTestSettings = data.settings.circumferenceTestSettings;
+        auto naturalEdgeTestSettings = data.settings.naturalEdgeTestSettings;
 
         auto integralArea = calculate_integral_area(matrices);
 
@@ -618,7 +722,17 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                                                         outputTestLog);
                 }
 
-                if (validPointArea && validRadiusTest)
+                bool validNaturalEdgeTest = false;
+                if (validRadiusTest)
+                {
+                    validNaturalEdgeTest = test_natural_edges(matrices,
+                                                              naturalEdgeTestSettings,
+                                                              seedPosition,
+                                                              phase,
+                                                              outputTestLog);
+                }
+
+                if (validPointArea && validRadiusTest && validNaturalEdgeTest)
                 {
                     status = FOREGROUND_HAS_POINTS;
                     *testPassRow = PixelType::Foreground;

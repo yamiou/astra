@@ -46,6 +46,10 @@ areaBandwidthDepth = 100.0 #mm #float
 minArea = 3000.0 #mm^2 #float
 maxArea = 35000.0 #mm^2 #float
 
+[naturaledgetest]
+naturalEdgeBandwidth = 150.0 #mm #float
+minPercentNaturalEdges = 0.8 #float
+
 [circumferencetest]
 foregroundRadius1 = 100.0 #float
 foregroundRadius2 = 150.0 #float

@@ -13,7 +13,8 @@ namespace sensekit { namespace plugins { namespace hand {
         Foreground = 1,
         Searched = 2,
         SearchedFromOutOfRange = 3,
-        ForegroundFailedTest = 4
+        ForegroundNaturalEdge = 4,
+        ForegroundOutOfRangeEdge = 5
     };
 
     enum TrackedPointType
