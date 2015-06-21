@@ -631,13 +631,14 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         return status;
     }
 
-    cv::Point track_point_impl(TrackingData& data, bool debugLayersEnabled)
+    cv::Point track_point_from_seed(TrackingData& data)
     {
         PROFILE_FUNC();
         cv::Size size = data.matrices.depth.size();
         data.matrices.layerSegmentation = cv::Mat::zeros(size, CV_8UC1);
         data.matrices.layerEdgeDistance = cv::Mat::zeros(size, CV_32FC1);
         data.matrices.layerScore = cv::Mat::zeros(size, CV_32FC1);
+        const bool debugLayersEnabled = data.matrices.debugLayersEnabled;
 
         const float layerAverageDepth = segment_foreground_and_get_average_depth(data);
 
@@ -698,29 +699,6 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         }
 
         return maxLoc;
-    }
-
-    cv::Point track_point_from_seed(TrackingData& data)
-    {
-        bool debugLayersEnabled = data.matrices.debugLayersEnabled;
-        cv::Point p1 = track_point_impl(data, debugLayersEnabled);
-
-        if (p1 == INVALID_POINT)
-        {
-            return INVALID_POINT;
-        }
-
-        debugLayersEnabled = false;
-        cv::Point p2 = track_point_impl(data, debugLayersEnabled);
-
-        //track everything twice to ensure a stable convergence
-        if (p2 == INVALID_POINT ||
-            p1 != p2)
-        {
-            return INVALID_POINT;
-        }
-
-        return p2;
     }
 
     bool find_next_velocity_seed_pixel(cv::Mat& velocitySignalMatrix,
