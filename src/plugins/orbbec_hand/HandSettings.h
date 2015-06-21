@@ -54,7 +54,7 @@ namespace sensekit { namespace plugins { namespace hand {
         float segmentationBandwidthDepthNear{ 100 };
         float segmentationBandwidthDepthFar{ 100 };
         float maxSegmentationDist{ 250 }; //mm
-        float heightScoreFactor{ 0.5 };
+        float heightScoreFactor{ 0.125 };
         float depthScoreFactor{ 1000.0 };
         float targetEdgeDistance{ 40 }; //mm
         float edgeDistanceScoreFactor{ 100.0 };
@@ -73,7 +73,7 @@ namespace sensekit { namespace plugins { namespace hand {
         int maxInactiveFramesForCandidatePoints{ 60 };
         int maxInactiveFramesForLostPoints{ 15 };
         int maxInactiveFramesForActivePoints{ 480 };
-        float pointSmoothingFactor{ 0.95 };
+        float pointSmoothingFactor{ 0.75 };
         float pointDeadBandSmoothingFactor{ 0.05 };
         float pointSmoothingDeadZone{ 50 }; //mm
         int maxFailedTestsInProbation{ 5 };
