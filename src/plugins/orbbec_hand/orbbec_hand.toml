@@ -30,7 +30,7 @@ secondChanceMinDistance = 100.0 #float
 mergePointDistance = 100.0 #mm #float
 
 [segmentation]
-segmentationBandwidthDepthNear = 100.0 #mm #float
+segmentationBandwidthDepthNear = 500.0 #mm #float
 segmentationBandwidthDepthFar = 100.0 #mm #float
 maxSegmentationDist = 250.0 #mm #float
 heightScoreFactor = 0.125 #float

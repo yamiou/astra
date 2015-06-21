@@ -58,7 +58,7 @@ namespace sensekit { namespace plugins { namespace hand {
         CircumferenceTestSettings circumferenceTestSettings;
         NaturalEdgeTestSettings naturalEdgeTestSettings;
 
-        float segmentationBandwidthDepthNear{ 100 };
+        float segmentationBandwidthDepthNear{ 500 };
         float segmentationBandwidthDepthFar{ 100 };
         float maxSegmentationDist{ 250 }; //mm
         float heightScoreFactor{ 0.125 };

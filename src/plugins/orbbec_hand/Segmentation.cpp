@@ -16,20 +16,17 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         int x;
         int y;
         float ttl;
-        float referenceDepth;
 
-        PointTTL(int x, int y, float ttl, float referenceDepth) :
+        PointTTL(int x, int y, float ttl) :
             x(x),
             y(y),
-            ttl(ttl),
-            referenceDepth(referenceDepth)
+            ttl(ttl)
         { }
     };
 
     static void enqueue_neighbors(cv::Mat& matVisited,
                                  std::queue<PointTTL>& pointQueue,
-                                 const PointTTL& pt,
-                                 float referenceDepth)
+                                 const PointTTL& pt)
     {
         PROFILE_FUNC();
         const int& x = pt.x;
@@ -49,28 +46,28 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         if (0 == rightVisited)
         {
             rightVisited = 1;
-            pointQueue.push(PointTTL(x+1, y, ttlRef, referenceDepth));
+            pointQueue.push(PointTTL(x+1, y, ttlRef));
         }
 
         char& leftVisited = matVisited.at<char>(y, x-1);
         if (0 == leftVisited)
         {
             leftVisited = 1;
-            pointQueue.push(PointTTL(x-1, y, ttlRef, referenceDepth));
+            pointQueue.push(PointTTL(x-1, y, ttlRef));
         }
 
         char& downVisited = matVisited.at<char>(y+1, x);
         if (0 == downVisited)
         {
             downVisited = 1;
-            pointQueue.push(PointTTL(x, y+1, ttlRef, referenceDepth));
+            pointQueue.push(PointTTL(x, y+1, ttlRef));
         }
 
         char& upVisited = matVisited.at<char>(y-1, x);
         if (0 == upVisited)
         {
             upVisited = 1;
-            pointQueue.push(PointTTL(x, y-1, ttlRef, referenceDepth));
+            pointQueue.push(PointTTL(x, y-1, ttlRef));
         }
     }
 
@@ -91,8 +88,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         pointQueue.push(PointTTL(data.seedPosition.x,
                                  data.seedPosition.y,
-                                 maxSegmentationDist,
-                                 data.referenceWorldPosition.z));
+                                 maxSegmentationDist));
 
         matVisited.at<char>(data.seedPosition) = 1;
 
@@ -121,7 +117,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
             ttlRef -= referenceAreaSqrt;
 
-            enqueue_neighbors(matVisited, pointQueue, pt, depth);
+            enqueue_neighbors(matVisited, pointQueue, pt);
         }
 
         return INVALID_POINT;
@@ -168,8 +164,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         pointQueue.push(PointTTL(seedPosition.x,
                                  seedPosition.y,
-                                 maxSegmentationDist,
-                                 data.referenceWorldPosition.z));
+                                 maxSegmentationDist));
 
         matVisited.at<char>(seedPosition) = 1;
 
@@ -180,7 +175,6 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             const int& x = pt.x;
             const int& y = pt.y;
             float& ttlRef = pt.ttl;
-            const float referenceDepth = pt.referenceDepth;
 
             if (velocitySignalPolicy == VELOCITY_POLICY_RESET_TTL &&
                 velocitySignalMatrix.at<char>(y, x) == PixelType::Foreground)
@@ -190,8 +184,8 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
             float depth = depthMatrix.at<float>(y, x);
             bool pointOutOfRange = depth == 0 ||
-                                   depth < referenceDepth - bandwidthDepth ||
-                                   depth > referenceDepth + bandwidthDepth;
+                                   depth < minDepth ||
+                                   depth > maxDepth;
 
             if (ttlRef <= 0)
             {
@@ -212,7 +206,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
             ttlRef -= referenceAreaSqrt;
 
-            enqueue_neighbors(matVisited, pointQueue, pt, depth);
+            enqueue_neighbors(matVisited, pointQueue, pt);
         }
 
         if (depthCount > 0)
