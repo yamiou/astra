@@ -149,16 +149,21 @@ namespace sensekit { namespace plugins { namespace hand {
                                              m_settings.segmentationSettings,
                                              TEST_PHASE_UPDATE);
 
-                newTargetPoint = segmentation::track_point_from_seed(recoverTrackingData);
+            newTargetPoint = segmentation::track_point_from_seed(recoverTrackingData);
 
+            //test for invalid point here so we don't increment failed test counts
+            //for second chance recovery
+            if (newTargetPoint != segmentation::INVALID_POINT)
+            {
                 validateAndUpdateTrackedPoint(matrices, scalingMapper, trackedPoint, newTargetPoint);
-
-                if (trackedPoint.trackingStatus == TrackingStatus::Tracking)
-                {
-                    STRACE("PointProcessor", "updateTrackedPoint 2nd chance recovered #%d",
-                                  trackedPoint.trackingId);
-                }
             }
+
+            if (trackedPoint.trackingStatus == TrackingStatus::Tracking)
+            {
+                STRACE("PointProcessor", "updateTrackedPoint 2nd chance recovered #%d",
+                              trackedPoint.trackingId);
+            }
+        }
     }
 
     void PointProcessor::reset()
@@ -349,6 +354,7 @@ namespace sensekit { namespace plugins { namespace hand {
         PROFILE_FUNC();
         if (!trackedPoint.isInProbation)
         {
+            STRACE("PointProcessor", "started probation for: %d", trackedPoint.trackingId);
             trackedPoint.isInProbation = true;
             trackedPoint.probationFrameCount = 0;
             trackedPoint.failedTestCount = 0;
@@ -418,7 +424,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         if (trackedPoint.isInProbation)
         {
-            bool exitProbation = false;
+            bool probationFailed = false;
             if (trackedPoint.pointType == TrackedPointType::ActivePoint)
             {
                 if (trackedPoint.failedTestCount >= m_settings.maxFailedTestsInProbationActivePoints)
@@ -428,7 +434,8 @@ namespace sensekit { namespace plugins { namespace hand {
                     //failed N consecutive tests within the probation period
                     //gave the active point a few extra frames to recover
                     trackedPoint.trackingStatus = TrackingStatus::Lost;
-                    exitProbation = true;
+                    probationFailed = true;
+                    STRACE("PointProcessor", "lost an active point: %d", trackedPoint.trackingId);
                 }
             }
             else if (trackedPoint.failedTestCount >= m_settings.maxFailedTestsInProbation)
@@ -436,14 +443,19 @@ namespace sensekit { namespace plugins { namespace hand {
                 //failed N tests total (non-consecutive) within the probation period
                 //too many failed tests, so long...
                 trackedPoint.trackingStatus = TrackingStatus::Lost;
-                exitProbation = true;
+                probationFailed = true;
             }
 
             ++trackedPoint.probationFrameCount;
-            if (trackedPoint.probationFrameCount > m_probationFrameCount || exitProbation)
+            if (trackedPoint.probationFrameCount > m_settings.probationFrameCount || probationFailed)
             {
                 //you're out of probation, but we're keeping an eye on you...
                 end_probation(trackedPoint);
+                STRACE("PointProcessor", "ended probation: %d count: %d/%d probationFailed: %d",
+                            trackedPoint.trackingId,
+                            trackedPoint.probationFrameCount,
+                            m_settings.probationFrameCount,
+                            probationFailed);
             }
         }
 

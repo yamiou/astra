@@ -58,7 +58,6 @@ namespace sensekit { namespace plugins { namespace hand {
                                                       const conversion_cache_t& depthToWorldData);
 
         PointProcessorSettings& m_settings;
-        int m_probationFrameCount { 0 };
 
         int m_nextTrackingId{ 0 };
         //TODO consider std::list<TrackedPoint>
