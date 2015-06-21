@@ -183,7 +183,6 @@ public:
 
     void drawHandPoints(sf::RenderWindow& window, float depthScale)
     {
-        float radius = 16;
         sf::Color candidateColor(255, 255, 0);
         sf::Color lostColor(255, 0, 0);
         sf::Color trackingColor(128, 138, 0);
@@ -205,12 +204,15 @@ public:
 
             float circleX = (p.x + 0.5) * depthScale;
             float circleY = (p.y + 0.5) * depthScale;
-            drawCircle(window, radius, circleX, circleY, color);
-
-            drawHandLabel(window, radius, circleX, circleY, handPoint);
+            if (m_showCircles)
+            {
+                drawCircle(window, m_circleRadius, circleX, circleY, color);
+            }
+            
+            drawHandLabel(window, m_circleRadius, circleX, circleY, handPoint);
             if (status == HAND_STATUS_TRACKING)
             {
-                drawHandPosition(window, radius, circleX, circleY, handPoint);
+                drawHandPosition(window, m_circleRadius, circleX, circleY, handPoint);
             }
         }
     }
@@ -299,6 +301,12 @@ public:
     {
         m_outputFPS = !m_outputFPS;
     }
+
+    void toggle_circles()
+    {
+        m_showCircles = !m_showCircles;
+    }
+
 private:
     long double m_frameDuration{ 0 };
     std::clock_t m_lastTimepoint{ 0 };
@@ -317,6 +325,8 @@ private:
     int m_displayWidth{ 1 };
     int m_displayHeight{ 1 };
     bool m_outputFPS{ false };
+    float m_circleRadius { 16 };
+    bool m_showCircles { true };
 };
 
 void request_view_mode(sensekit::StreamReader& reader, sensekit::DebugHandViewType view)
@@ -423,6 +433,10 @@ void process_key_input(sensekit::StreamReader& reader, HandDebugFrameListener& l
     else if (key.code == sf::Keyboard::P)
     {
         toggle_pause_input(reader);
+    }
+    else if (key.code == sf::Keyboard::C)
+    {
+        listener.toggle_circles();
     }
 }
 

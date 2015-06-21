@@ -612,5 +612,6 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 overlay_circle(colorFrame);
             }
+            m_debugVisualizer.overlayCrosshairs(m_pointProcessor.get_trackedPoints(), colorFrame);
         }
 }}}

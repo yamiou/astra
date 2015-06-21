@@ -55,15 +55,15 @@ namespace sensekit { namespace plugins { namespace hand {
                             }
                             else if (isActivePoint)
                             {
-                                r = 0;
-                                g = 0;
-                                b = 255;
+                                r = 128;
+                                g = 138;
+                                b = 0;
                             }
                             else
                             {
-                                r = 228;
-                                g = 228;
-                                b = 255;
+                                r = 255;
+                                g = 255;
+                                b = 0;
                             }
                         }
                         else
@@ -95,7 +95,7 @@ namespace sensekit { namespace plugins { namespace hand {
             int height = matMask.rows;
 
             RGBPixel* colorData = static_cast<RGBPixel*>(imageFrame.data);
-            
+
             for (int y = 0; y < height; ++y)
             {
                 const char* maskRow = matMask.ptr<char>(y);
@@ -103,7 +103,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 for (int x = 0; x < width; ++x, ++maskRow, ++colorData)
                 {
                     uint8_t maskValue = *maskRow;
-                    
+
                     if (maskValue == targetValue)
                     {
                         *colorData = maskColor;
@@ -137,7 +137,7 @@ namespace sensekit { namespace plugins { namespace hand {
                         value = 0;
                     }
                     RGBPixel color(0, value, value);
-                    
+
                     *colorData = color;
                 }
             }
@@ -159,7 +159,7 @@ namespace sensekit { namespace plugins { namespace hand {
             int height = matVelocity.rows;
 
             RGBPixel* colorData = static_cast<RGBPixel*>(imageFrame.data);
-            
+
             for (int y = 0; y < height; ++y)
             {
                 const float* velocityRow = matVelocity.ptr<float>(y);
@@ -168,7 +168,7 @@ namespace sensekit { namespace plugins { namespace hand {
                     float velocity = *velocityRow;
 
                     uint8_t velocityValue = static_cast<uint8_t>(255 * sqrt(min(1.0f, abs(velocity / maxScale))));
-                    
+
                     RGBPixel color(0, velocityValue, 0);
                     if (velocity < 0)
                     {
@@ -188,15 +188,15 @@ namespace sensekit { namespace plugins { namespace hand {
         {
             assert(mat.cols == imageFrame.metadata.width);
             assert(mat.rows == imageFrame.metadata.height);
-            
+
             int width = mat.cols;
             int height = mat.rows;
-            
+
             double min, max;
             cv::Point minLoc, maxLoc;
-            
+
             bool emptyMask = mask.empty();
-            
+
             if (!emptyMask)
             {
                 assert(mat.size() == mask.size());
@@ -206,8 +206,8 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 cv::minMaxLoc(mat, &min, &max, &minLoc, &maxLoc);
             }
-            
-            
+
+
             double range = max - min;
             bool rangeZero = abs(range) < 0.00001;
 
