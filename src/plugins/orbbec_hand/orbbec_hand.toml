@@ -55,7 +55,7 @@ foregroundRadius1 = 100.0 #float
 foregroundRadius2 = 150.0 #float
 foregroundRadiusMinPercent1 = 0.08 #float
 foregroundRadiusMinPercent2 = 0.04 #float
-foregroundRadiusMaxPercent1 = 0.30 #float
+foregroundRadiusMaxPercent1 = 0.35 #float
 foregroundRadiusMaxPercent2 = 0.15 #float
 
 [trajectoryanalyzer]
