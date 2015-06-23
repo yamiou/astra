@@ -51,7 +51,7 @@ namespace sensekit {
         const char* loggingLevelKey = "logging.level";
         if (t.contains_qualified(loggingLevelKey))
         {
-            auto logLevel = *t.get_qualified_as<std::string>(loggingLevelKey);
+            auto logLevel = t.get_qualified(loggingLevelKey)->as<std::string>()->get();
             auto severity = convert_string_to_severity(logLevel);
 
             if (severity != SK_UNKNOWN)
