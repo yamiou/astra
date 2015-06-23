@@ -11,12 +11,12 @@
 
 
 #include "vendor/easylogging++.h"
-
+#include <SenseKit/sensekit_types.h>
 
 #define INITIALIZE_LOGGING INITIALIZE_EASYLOGGINGPP
 
 namespace sensekit {
-    void initialize_logging(const char* logFilePath);
+    void initialize_logging(const char* logFilePath, sensekit_log_severity_t severity);
 }
 
 #endif /* LOGGING_H */

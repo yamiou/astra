@@ -10,6 +10,7 @@
 #include "Logging.h"
 #include "Core/OSProcesses.h"
 #include "sensekit_private.h"
+#include "Configuration.h"
 
 INITIALIZE_LOGGING
 
@@ -24,10 +25,14 @@ namespace sensekit {
 
 #if __ANDROID__
         std::string logPath = get_application_filepath() + "sensekit.log";
+        std::string configPath = get_application_filepath() + "sensekit.toml";
 #else
         std::string logPath = "logs/sensekit.log";
+        std::string configPath = "sensekit.toml";
 #endif
-        initialize_logging(logPath.c_str());
+
+        std::unique_ptr<Configuration> config(Configuration::load_from_file(configPath.c_str()));
+        initialize_logging(logPath.c_str(), config->severityLevel());
 
         SWARN("SenseKitContext", "Hold on to yer butts");
         SINFO("SenseKitContext", "logger file: %s", logPath.c_str());

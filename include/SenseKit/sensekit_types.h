@@ -62,6 +62,7 @@ typedef void(*sensekit_frame_ready_callback_t)(void* clientTag,
                                                sensekit_reader_frame_t frame);
 
 typedef enum {
+    SK_UNKNOWN,
     SK_FATAL,
     SK_ERROR,
     SK_WARN,

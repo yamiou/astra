@@ -29,6 +29,8 @@ set(${_projname}_SOURCES
   SenseKitContext.cpp
   CreateStreamProxy.h
   CreatePluginProxy.h
+  Configuration.h
+  Configuration.cpp
   SenseKit.cpp
   Stream.h
   Stream.cpp

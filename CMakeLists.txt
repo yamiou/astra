@@ -64,10 +64,7 @@ add_custom_target(${SDK_DEPENDENT_TARGET})
 set(SHINY_INCLUDE "${PROJECT_SOURCE_DIR}/vendor/shinyprofiler/include")
 add_subdirectory(vendor)
 add_subdirectory(src)
-
-if (NOT SENSEKIT_ANDROID)
-  add_subdirectory(samples)
-endif()
+add_subdirectory(samples)
 
 set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/sdk")
 MESSAGE("CMAKE_INSTALL_PREFIX : ${CMAKE_INSTALL_PREFIX}")

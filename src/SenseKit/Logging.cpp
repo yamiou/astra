@@ -4,7 +4,28 @@
 
 namespace sensekit {
 
-    void initialize_logging(const char* logFilePath)
+    el::Level convert_sk_to_elpp_level(sensekit_log_severity_t severity)
+    {
+        switch (severity)
+        {
+        case SK_INFO:
+            return el::Level::Info;
+        case SK_WARN:
+            return el::Level::Warning;
+        case SK_ERROR:
+            return el::Level::Error;
+        case SK_FATAL:
+            return el::Level::Fatal;
+        case SK_DEBUG:
+            return el::Level::Debug;
+        case SK_TRACE:
+            return el::Level::Trace;
+        default:
+            return el::Level::Unknown;
+        }
+    }
+
+    void initialize_logging(const char* logFilePath, sensekit_log_severity_t severity)
     {
         const char TRUE_STRING[] = "true";
 
@@ -21,7 +42,7 @@ namespace sensekit {
         defaultConf.setGlobally(el::ConfigurationType::Filename, logFilePath);
 
         el::Loggers::setDefaultConfigurations(defaultConf, true);
-        el::Loggers::setLoggingLevel(el::Level::Fatal);
+        el::Loggers::setLoggingLevel(convert_sk_to_elpp_level(severity));
 
         defaultConf.clear();
     }

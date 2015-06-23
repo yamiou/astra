@@ -69,6 +69,15 @@ namespace sensekit {
                 .construct(1, channel) << message;
 
             break;
+        case SK_UNKNOWN:
+            el::base::Writer(el::Level::Unknown,
+                             fileName,
+                             lineNo,
+                             func,
+                             el::base::DispatchAction::NormalLog)
+                .construct(1, channel) << message;
+
+            break;
         }
     }
 
