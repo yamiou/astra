@@ -21,7 +21,9 @@ void print_hand_frame(sensekit_handframe_t handFrame)
     int activeHandCount = 0;
 
     sensekit_handpoint_t* point = handPoints;
-    for (int i = 0; i < handCount; i++)
+
+    int i;
+    for (i = 0; i < handCount; i++)
     {
         if (point->status == HAND_STATUS_TRACKING)
         {
