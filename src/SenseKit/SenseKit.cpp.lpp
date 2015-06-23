@@ -5,21 +5,29 @@
 #include <SenseKit/host_events.h>
 
 static sensekit::SenseKitContext* g_ContextPtr = nullptr;
+static bool g_Initialized = false;
 
 SENSEKIT_BEGIN_DECLS
 
 SENSEKIT_API sensekit_status_t sensekit_initialize()
 {
+    if (g_Initialized)
+        return SENSEKIT_STATUS_SUCCESS;
+
+    g_Initialized = true;
     g_ContextPtr = new sensekit::SenseKitContext();
     return g_ContextPtr->initialize();
 }
 
 SENSEKIT_API sensekit_status_t sensekit_terminate()
 {
+    if (!g_Initialized)
+        return SENSEKIT_STATUS_SUCCESS;
+
     sensekit_status_t rc =  g_ContextPtr->terminate();
     delete g_ContextPtr;
     g_ContextPtr = nullptr;
-
+    g_Initialized = false;
     return rc;
 }
 
