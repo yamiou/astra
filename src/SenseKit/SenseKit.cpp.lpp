@@ -3,8 +3,9 @@
 #include <SenseKit/Plugins/StreamServiceProxyBase.h>
 #include <SenseKitAPI.h>
 #include <SenseKit/host_events.h>
+#include <memory>
 
-static sensekit::SenseKitContext* g_ContextPtr = nullptr;
+static std::unique_ptr<sensekit::SenseKitContext> g_ContextPtr(nullptr);
 static bool g_Initialized = false;
 
 SENSEKIT_BEGIN_DECLS
@@ -15,7 +16,8 @@ SENSEKIT_API sensekit_status_t sensekit_initialize()
         return SENSEKIT_STATUS_SUCCESS;
 
     g_Initialized = true;
-    g_ContextPtr = new sensekit::SenseKitContext();
+    g_ContextPtr = std::make_unique<sensekit::SenseKitContext>();
+
     return g_ContextPtr->initialize();
 }
 
@@ -25,9 +27,9 @@ SENSEKIT_API sensekit_status_t sensekit_terminate()
         return SENSEKIT_STATUS_SUCCESS;
 
     sensekit_status_t rc =  g_ContextPtr->terminate();
-    delete g_ContextPtr;
     g_ContextPtr = nullptr;
     g_Initialized = false;
+
     return rc;
 }
 
