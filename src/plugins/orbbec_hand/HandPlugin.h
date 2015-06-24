@@ -39,8 +39,8 @@ namespace sensekit { namespace plugins { namespace hand {
                                      sensekit_stream_desc_t desc);
 
 
-        sensekit_callback_id_t m_streamAddedCallbackId;
-        sensekit_callback_id_t m_streamRemovingCallbackId;
+        sensekit_callback_id_t m_streamAddedCallbackId{0};
+        sensekit_callback_id_t m_streamRemovingCallbackId{0};
 
         using StreamTrackerMap =  std::unordered_map<sensekit_stream_t,
                                                      HandTracker*,

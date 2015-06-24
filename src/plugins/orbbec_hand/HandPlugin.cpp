@@ -21,6 +21,9 @@ namespace sensekit { namespace plugins { namespace hand {
             PROFILE_UPDATE();
             PROFILE_OUTPUT("profile_orbbec_hand.txt");
         #endif
+
+        get_pluginService().unregister_stream_registered_callback(m_streamAddedCallbackId);
+        get_pluginService().unregister_stream_unregistering_callback(m_streamRemovingCallbackId);
     }
 
     void HandPlugin::on_initialize()
