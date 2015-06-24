@@ -27,7 +27,6 @@ SENSEKIT_API sensekit_status_t sensekit_terminate()
         return SENSEKIT_STATUS_SUCCESS;
 
     sensekit_status_t rc =  g_ContextPtr->terminate();
-    g_ContextPtr = nullptr;
     g_Initialized = false;
 
     return rc;
