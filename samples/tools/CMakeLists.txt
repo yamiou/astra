@@ -1,1 +1,2 @@
 add_subdirectory(DebugHandViewer)
+add_subdirectory(StreamRecorder)

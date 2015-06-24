@@ -20,5 +20,6 @@ add_subdirectory(orbbec_hand)
 add_subdirectory(orbbec_xs)
 
 if (NOT SENSEKIT_ANDROID)
+  add_subdirectory(orbbec_streamplayer)
   add_subdirectory(dummy)
 endif()
