@@ -22,10 +22,11 @@ namespace sensekit { namespace plugins {
             {
                 memcpy(parameterData, &m_conversionCache, resultByteLength);
             }
-            return;
+            break;
         }
+        default:
+            OniDeviceStream::on_get_parameter(connection, id, parameterBin);
+            break;
         }
-
-        OniDeviceStream::on_get_parameter(connection, id, parameterBin);
     }
 }}
