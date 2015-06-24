@@ -52,6 +52,17 @@ namespace sensekit { namespace plugins {
             return reinterpret_cast<TFrameType*>(m_currentBuffer->data);
         }
 
+        std::pair<sensekit_frame_t*, TFrameType*> begin_write_ex(size_t frameIndex)
+        {
+            if (m_locked)
+                std::make_pair(m_currentBuffer, reinterpret_cast<TFrameType*>(m_currentBuffer->data));
+
+            m_locked = true;
+            m_currentBuffer->frameIndex = frameIndex;
+
+            return std::make_pair(m_currentBuffer, reinterpret_cast<TFrameType*>(m_currentBuffer->data));
+        }
+
         void end_write()
         {
             if (!m_locked)
