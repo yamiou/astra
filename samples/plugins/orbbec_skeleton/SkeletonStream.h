@@ -22,7 +22,9 @@ namespace sensekit { namespace plugins { namespace skeleton {
                                                           DEFAULT_SUBTYPE),
                               sizeof(sensekit_skeleton_t) * skeletonCount)
 
-        {}
+        {
+            enable_callbacks();
+        }
     };
 }}}
 
