@@ -22,15 +22,13 @@ namespace sensekit { namespace plugins { namespace hand {
             m_pluginService(pluginService),
             m_depthUtility(settings.processingSizeWidth, settings.processingSizeHeight, settings.depthUtilitySettings),
             m_pointProcessor(settings.pointProcessorSettings),
+            m_sensor(get_uri_for_streamset(pluginService, streamSet)),
             m_processingSizeWidth(settings.processingSizeWidth),
             m_processingSizeHeight(settings.processingSizeHeight)
+
         {
             PROFILE_FUNC();
 
-            const char* uri;
-            pluginService.get_streamset_uri(streamSet, &uri);
-
-            m_sensor = Sensor(uri);
             m_reader = m_sensor.create_reader();
             create_streams(m_pluginService, streamSet);
 

@@ -7,15 +7,11 @@ namespace sensekit { namespace plugins { namespace xs {
                                    sensekit_streamset_t streamset,
                                    StreamDescription& depthDesc)
         : m_pluginService(pluginService),
+       m_sensor(get_uri_for_streamset(pluginService, streamset)),
           m_streamSet(streamset)
     {
         PROFILE_FUNC();
         SINFO("PointerProcessor", "PointProcessor ctor");
-
-        const char* uri;
-        pluginService.get_streamset_uri(streamset, &uri);
-
-        m_sensor = Sensor(uri);
         m_reader = m_sensor.create_reader();
 
         m_depthStream = m_reader.stream<DepthStream>(depthDesc.get_subtype());
