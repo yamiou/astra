@@ -9,6 +9,14 @@
 
 namespace sensekit {
 
+    inline const char* get_uri_for_streamset(PluginServiceProxy& pluginService, sensekit_streamset_t streamSet)
+    {
+        const char* uri;
+        pluginService.get_streamset_uri(streamSet, &uri);
+
+        return uri;
+    }
+
     class PluginBase
     {
     public:
