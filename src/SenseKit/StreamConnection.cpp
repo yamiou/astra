@@ -153,6 +153,7 @@ namespace sensekit {
         sensekit_parameter_bin_t parameterBinHandle = nullptr;
         m_stream->get_parameter(this, id, parameterBinHandle);
 
+        assert(parameterBinHandle != nullptr);
         cache_parameter_bin_token(parameterBinHandle, resultByteLength, token);
     }
 
@@ -171,6 +172,7 @@ namespace sensekit {
         {
             //Results are read-once-only, then they self destruct.
             //Client tried to get result in wrong order, or with duplicate or stale token
+            SWARN("StreamConnection", "no pending parameter result.", this);
             clear_pending_parameter_result();
             return SENSEKIT_STATUS_INVALID_PARAMETER_TOKEN;
         }
