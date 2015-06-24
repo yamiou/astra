@@ -58,7 +58,7 @@ namespace sensekit
                          args.description);
             };
 
-        m_context.get_setCatalog().register_for_stream_registered_event(thunk);
+        callbackId = m_context.get_setCatalog().register_for_stream_registered_event(thunk);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -75,7 +75,7 @@ namespace sensekit
                          args.description);
             };
 
-        m_context.get_setCatalog().register_for_stream_unregistering_event(thunk);
+        callbackId = m_context.get_setCatalog().register_for_stream_unregistering_event(thunk);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
