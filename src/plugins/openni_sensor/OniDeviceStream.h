@@ -31,7 +31,7 @@ namespace sensekit { namespace plugins {
                      streamSet,
                      desc)
         {
-             PROFILE_FUNC();
+            PROFILE_FUNC();
         }
 
         virtual sensekit_status_t read_frame() = 0;
@@ -106,19 +106,19 @@ namespace sensekit { namespace plugins {
                 }
 
                 SINFO("OniDeviceStream", "- w: %d h: %d fps: %d pf: %d",
-                        mode.getResolutionX(),
-                        mode.getResolutionY(),
-                        mode.getFps(),
-                        mode.getPixelFormat());
+                                  mode.getResolutionX(),
+                                  mode.getResolutionY(),
+                                  mode.getFps(),
+                                  mode.getPixelFormat());
             }
 
             m_oniVideoMode = m_oniStream.getVideoMode();
 
             SINFO("OniDeviceStream", "Selected mode: w: %d h: %d fps: %d pf: %d",
-                        m_oniVideoMode.getResolutionX(),
-                        m_oniVideoMode.getResolutionY(),
-                        m_oniVideoMode.getFps(),
-                        m_oniVideoMode.getPixelFormat());
+                              m_oniVideoMode.getResolutionX(),
+                              m_oniVideoMode.getResolutionY(),
+                              m_oniVideoMode.getFps(),
+                              m_oniVideoMode.getPixelFormat());
             m_bufferLength =
                 m_oniVideoMode.getResolutionX() *
                 m_oniVideoMode.getResolutionY() *
@@ -191,6 +191,7 @@ namespace sensekit { namespace plugins {
                                       sensekit_parameter_bin_t& parameterBin) override
         {
             PROFILE_FUNC();
+
             switch (id)
             {
             case SENSEKIT_PARAMETER_IMAGE_HFOV:
@@ -247,7 +248,7 @@ namespace sensekit { namespace plugins {
 
         virtual void on_connection_added(sensekit_streamconnection_t connection) override;
         virtual void on_connection_removed(sensekit_bin_t bin,
-                                   sensekit_streamconnection_t connection) override;
+                                           sensekit_streamconnection_t connection) override;
 
     protected:
         openni::Device& m_oniDevice;

@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include <Shiny.h>
 
-using ConversionMap = std::unordered_map <sensekit_depthstream_t, conversion_cache_t>;
+using ConversionMap = std::unordered_map<sensekit_depthstream_t, conversion_cache_t>;
 
 ConversionMap g_sensekit_conversion_map;
 
