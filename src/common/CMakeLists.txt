@@ -2,5 +2,8 @@ include(ConfigUserFile)
 
 set(COMMON_DIR_FOLDER "common/")
 
-add_subdirectory(serialization)
+
+if (NOT SENSEKIT_ANDROID)
+    add_subdirectory(serialization)
+endif()
 add_subdirectory(clock)
