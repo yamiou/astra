@@ -10,7 +10,10 @@ add_subdirectory(SenseKit)
 add_subdirectory(SenseKitUL)
 add_subdirectory(SenseKitAPI)
 add_subdirectory(plugins)
-add_subdirectory(common)
+
+if (NOT SENSEKIT_ANDROID)
+  add_subdirectory(common)
+endif()
 
 if (SENSEKIT_ANDROID)
   add_subdirectory(jni)
