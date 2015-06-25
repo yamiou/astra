@@ -8,7 +8,7 @@
 
 // https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
 // http://stackoverflow.com/questions/3350852/how-to-correctly-fix-zero-sized-array-in-struct-union-warning-c4200-without
-#if defined(__GNUC__) || defined(__clang__)
+#if ! defined(__ANDROID__) && (defined(__GNUC__) || defined(__clang__))
 #define PACK_STRUCT __attribute__((packed))
 #else
 #define PACK_STRUCT

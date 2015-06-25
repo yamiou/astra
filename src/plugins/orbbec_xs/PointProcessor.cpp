@@ -7,7 +7,7 @@ namespace sensekit { namespace plugins { namespace xs {
                                    sensekit_streamset_t streamset,
                                    StreamDescription& depthDesc)
         : m_pluginService(pluginService),
-       m_sensor(get_uri_for_streamset(pluginService, streamset)),
+          m_sensor(get_uri_for_streamset(pluginService, streamset)),
           m_streamSet(streamset)
     {
         PROFILE_FUNC();
@@ -36,6 +36,7 @@ namespace sensekit { namespace plugins { namespace xs {
 
         if (m_pointStream->has_connections())
         {
+            STRACE("PointProcessor", "updating point frame");
             update_pointframe_from_depth(depthFrame);
         }
     }
@@ -54,6 +55,7 @@ namespace sensekit { namespace plugins { namespace xs {
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
         m_pointStream = std::make_unique<PointStream>(m_pluginService, m_streamSet, width, height);
+        SINFO("PointProcessor", "created point stream");
 
         m_depthConversionCache = m_depthStream.depth_to_world_data();
     }

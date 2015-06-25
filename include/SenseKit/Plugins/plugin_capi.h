@@ -6,7 +6,7 @@
 #include <SenseKit/Plugins/StreamServiceProxyBase.h>
 #include <SenseKit/Plugins/PluginServiceProxyBase.h>
 
-#if defined(__GNUC__) || defined(__clang__)
+#if ! defined(__ANDROID__) && (defined(__GNUC__) || defined(__clang__))
 #define PACK_STRUCT __attribute__((packed))
 #else
 #define PACK_STRUCT
