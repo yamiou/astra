@@ -24,9 +24,9 @@ namespace sensekit { namespace serialization {
         ProtoFrameOutputStream(ZeroCopyOutputStream* outputStream);
         ~ProtoFrameOutputStream();
 
-        void stage_frame(Frame* frame) override;
-        void stage_frame_description(FrameDescription* frameDesc) override;
-        void stage_stream_header(StreamHeader* streamHeader) override;
+        void stage_frame(Frame& frame) override;
+        void stage_frame_description(FrameDescription& frameDesc) override;
+        void stage_stream_header(StreamHeader& streamHeader) override;
         bool write_frame() override;
         bool write_frame_description() override;
         bool write_stream_header() override;
@@ -34,7 +34,7 @@ namespace sensekit { namespace serialization {
     private:
         void populate_frame_message(size_t byteLength, int frameIndex, void* rawFrameWrapper, proto::Frame& message);
         void populate_frame_description_message(double framePeriod, int bufferLength, proto::FrameDescription& frameDescriptionMessage);
-        void populate_stream_header_message(int frameType, proto::StreamHeader streamHeaderMessage);
+        void populate_stream_header_message(int frameType, proto::StreamHeader& streamHeaderMessage);
 
         std::unique_ptr<ZeroCopyOutputStream> m_outputStream;
 

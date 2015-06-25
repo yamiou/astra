@@ -16,27 +16,27 @@ namespace sensekit { namespace serialization {
             
     }
 
-    void ProtoFrameOutputStream::stage_frame(Frame* frame)
+    void ProtoFrameOutputStream::stage_frame(Frame& frame)
     {
         proto::Frame frameMessage;
-        populate_frame_message(frame->byteLength, frame->frameIndex, frame->rawFrameWrapper, frameMessage);
+        populate_frame_message(frame.byteLength, frame.frameIndex, frame.rawFrameWrapper, frameMessage);
 
         m_frameMessage = frameMessage;
            
     }
 
-    void ProtoFrameOutputStream::stage_frame_description(FrameDescription* frameDesc)
+    void ProtoFrameOutputStream::stage_frame_description(FrameDescription& frameDesc)
     {
         proto::FrameDescription frameDescMessage;
-        populate_frame_description_message(frameDesc->framePeriod, frameDesc->bufferLength, frameDescMessage);
+        populate_frame_description_message(frameDesc.framePeriod, frameDesc.bufferLength, frameDescMessage);
 
         m_frameDescriptionMessage = frameDescMessage;
     }
 
-    void ProtoFrameOutputStream::stage_stream_header(StreamHeader* streamHeader)
+    void ProtoFrameOutputStream::stage_stream_header(StreamHeader& streamHeader)
     {
         proto::StreamHeader streamHeaderMessage;
-        populate_stream_header_message(streamHeader->frameType, streamHeaderMessage);
+        populate_stream_header_message(streamHeader.frameType, streamHeaderMessage);
 
         m_streamHeaderMessage = streamHeaderMessage;
     }
@@ -71,7 +71,7 @@ namespace sensekit { namespace serialization {
         frameDescriptionMessage.set_bufferlength(bufferLength);
     }
 
-    void ProtoFrameOutputStream::populate_stream_header_message(int frameType, proto::StreamHeader streamHeaderMessage)
+    void ProtoFrameOutputStream::populate_stream_header_message(int frameType, proto::StreamHeader& streamHeaderMessage)
     {
         streamHeaderMessage.set_frametype(frameType);
     }

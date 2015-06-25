@@ -12,9 +12,9 @@ namespace sensekit { namespace serialization {
         FrameOutputStream() { }
         virtual ~FrameOutputStream() { }
 
-        virtual void stage_frame(Frame* frame) = 0;
-        virtual void stage_frame_description(FrameDescription* frameDesc) = 0;
-        virtual void stage_stream_header(StreamHeader* streamHeader) = 0;
+        virtual void stage_frame(Frame& frame) = 0;
+        virtual void stage_frame_description(FrameDescription& frameDesc) = 0;
+        virtual void stage_stream_header(StreamHeader& streamHeader) = 0;
         virtual bool write_frame() = 0;
         virtual bool write_frame_description() = 0;
         virtual bool write_stream_header() = 0;
