@@ -92,11 +92,29 @@ namespace sensekit { namespace plugins { namespace hand {
         PROFILE_FUNC();
         auto scalingMapper = get_scaling_mapper(matrices);
 
+        //give priority updates to active points
         for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
         {
-            //TODO take this and make it a method on TrackedPoint
             TrackedPoint& trackedPoint = *iter;
-            updateTrackedPoint(matrices, scalingMapper, trackedPoint);
+            if (trackedPoint.pointType == TrackedPointType::ActivePoint)
+            {
+                updateTrackedPoint(matrices, scalingMapper, trackedPoint);
+            }
+        }
+
+        int numUpdatedPoints = 0;
+        for (auto iter = m_trackedPoints.begin(); iter != m_trackedPoints.end(); ++iter)
+        {
+            TrackedPoint& trackedPoint = *iter;
+            if (trackedPoint.pointType != TrackedPointType::ActivePoint)
+            {
+                updateTrackedPoint(matrices, scalingMapper, trackedPoint);
+            }
+            ++numUpdatedPoints;
+            if (numUpdatedPoints > m_settings.maxHandPointUpdatesPerFrame)
+            {
+                break;
+            }
         }
     }
 

@@ -88,6 +88,7 @@ namespace sensekit { namespace plugins { namespace hand {
         int maxFailedTestsInProbationActivePoints{ 3 };
         float secondChanceMinDistance{ 100 };
         float mergePointDistance { 100 }; //mm
+        int maxHandPointUpdatesPerFrame { 10 };
     };
 
     struct HandSettings
