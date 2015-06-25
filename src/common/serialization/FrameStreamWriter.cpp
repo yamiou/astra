@@ -35,7 +35,7 @@ namespace sensekit { namespace serialization {
         StreamHeader streamHeader;
         streamHeader.frameType = 1;
 
-        m_outputStream.stage_stream_header(&streamHeader);
+        m_outputStream.stage_stream_header(streamHeader);
 
         isSuccessful = m_outputStream.write_stream_header();
 
@@ -66,8 +66,11 @@ namespace sensekit { namespace serialization {
 
         m_swatch.stop(m_swatchName);
 
-        stage_frame(depthFrame);
-        stage_frame_description(depthFrame, m_swatch.get_time_so_far(m_swatchName));
+        sensekit_imageframe_t imageFrame = depthFrame.handle();
+        sensekit_frame_t* sensekitFrame = imageFrame->frame;
+
+        stage_frame(*sensekitFrame);
+        stage_frame_description(*sensekitFrame, 1 / m_swatch.get_time_so_far(m_swatchName));
             
         isSuccessful = m_outputStream.write_frame_description();
         isSuccessful = m_outputStream.write_frame();
@@ -77,33 +80,31 @@ namespace sensekit { namespace serialization {
         return isSuccessful;
     }
 
-    void FrameStreamWriter::stage_frame(DepthFrame& depthFrame)
+    void FrameStreamWriter::stage_frame(sensekit_frame_t& sensekitFrame)
     {
         Frame frame;
-        populate_frame(depthFrame, frame);
-        m_outputStream.stage_frame(&frame);
+        populate_frame(sensekitFrame, frame);
+        m_outputStream.stage_frame(frame);
     }
 
-    void FrameStreamWriter::stage_frame_description(DepthFrame& depthFrame, double fps)
+    void FrameStreamWriter::stage_frame_description(sensekit_frame_t& sensekitFrame, double fps)
     {
         FrameDescription frameDesc;
-        populate_frame_description(depthFrame, frameDesc, fps);
-        m_outputStream.stage_frame_description(&frameDesc);
+        populate_frame_description(sensekitFrame, frameDesc, fps);
+        m_outputStream.stage_frame_description(frameDesc);
     }
 
-    void FrameStreamWriter::populate_frame(DepthFrame& depthFrame, Frame& frame)
+    void FrameStreamWriter::populate_frame(sensekit_frame_t& sensekitFrame, Frame& frame)
     {
-        sensekit_imageframe_t imageFrame = depthFrame.handle();
-        sensekit_frame_t* sensekitFrame = imageFrame->frame;
 
-        frame.frameIndex = sensekitFrame->frameIndex;
-        frame.byteLength = sensekitFrame->byteLength;
-        frame.rawFrameWrapper = sensekitFrame->data;
+        frame.frameIndex = sensekitFrame.frameIndex;
+        frame.byteLength = sensekitFrame.byteLength;
+        frame.rawFrameWrapper = sensekitFrame.data;
     }
 
-    void FrameStreamWriter::populate_frame_description(DepthFrame& depthFrame, FrameDescription& frameDescription, double fps)
+    void FrameStreamWriter::populate_frame_description(sensekit_frame_t& sensekitFrame, FrameDescription& frameDescription, double fps)
     {
-        frameDescription.bufferLength = depthFrame.byteLength();
+        frameDescription.bufferLength = sensekitFrame.byteLength;
         frameDescription.framePeriod = fps;
     }
 }}

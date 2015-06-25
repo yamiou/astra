@@ -26,10 +26,10 @@ namespace sensekit { namespace serialization {
         bool write(DepthFrame& depthFrame);
 
     private:
-        void stage_frame(DepthFrame& depthFrame);
-        void stage_frame_description(DepthFrame& depthFrame, double fps);
-        void populate_frame(DepthFrame& depthFrame, Frame& frame);
-        void populate_frame_description(DepthFrame& depthFrame, FrameDescription& frameDescription, double fps);
+        void stage_frame(sensekit_frame_t& sensekitFrame);
+        void stage_frame_description(sensekit_frame_t& sensekitFrame, double fps);
+        void populate_frame(sensekit_frame_t& sensekitFrame, Frame& frame);
+        void populate_frame_description(sensekit_frame_t& sensekitFrame, FrameDescription& frameDescription, double fps);
 
         FrameOutputStream& m_outputStream;
         bool m_shouldWrite{ false };
