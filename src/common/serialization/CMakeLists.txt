@@ -39,7 +39,13 @@ set_target_properties(${_target} PROPERTIES FOLDER CMakeCopyTargets)
 
 ENDFOREACH()
 
-add_library(${_projname} SHARED ${${_projname}_SOURCES} ${PROTO_SRCS} ${PROTO_HDRS})
+if (MSVC)
+  add_library(${_projname} ${${_projname}_SOURCES} ${PROTO_SRCS} ${PROTO_HDRS})
+else()
+  add_library(${_projname} SHARED ${${_projname}_SOURCES} ${PROTO_SRCS} ${PROTO_HDRS})
+endif()
+
+
 
 set_target_properties(${_projname} PROPERTIES FOLDER "${COMMON_DIR_FOLDER}serialization")
 
