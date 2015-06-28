@@ -52,7 +52,7 @@ naturalEdgeBandwidth = 150.0 #mm #float
 minPercentNaturalEdges = 0.8 #float
 
 [circumferencetest]
-foregroundRadius1 = 100.0 #float
+foregroundRadius1 = 75.0 #float
 foregroundRadius2 = 150.0 #float
 foregroundRadiusMinPercent1 = 0.08 #float
 foregroundRadiusMinPercent2 = 0.04 #float
