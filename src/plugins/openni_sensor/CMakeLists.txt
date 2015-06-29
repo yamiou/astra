@@ -19,7 +19,7 @@ if (WIN32)
 elseif (APPLE)
   find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.dylib" HINTS "$ENV{OPENNI2_REDIST}" PATH_SUFFIXES lib)
 elseif (ANDROID)
-  find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.so" PATHS "${CMAKE_SOURCE_DIR}/android-lib" NO_CMAKE_FIND_ROOT_PATH)
+  find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.so" PATHS "${CMAKE_SOURCE_DIR}/vendor/openni-android" NO_CMAKE_FIND_ROOT_PATH)
 endif()
 
 include_directories ("$ENV{OPENNI2_INCLUDE}")
