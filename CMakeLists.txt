@@ -10,7 +10,7 @@ endif()
 string (TIMESTAMP BUILD_DATE "%Y%m%dT%H%M%SZ" UTC)
 set (SenseKit_VERSION_MAJOR 0)
 set (SenseKit_VERSION_MINOR 1)
-set (SenseKit_VERSION_PATCH 8)
+set (SenseKit_VERSION_PATCH 9)
 set (SenseKit_VERSION_BUILD 0)
 
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
