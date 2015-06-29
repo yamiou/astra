@@ -76,11 +76,15 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
     {
         PROFILE_FUNC();
         assert(matVisited.size() == data.matrices.depth.size());
+        const float referenceAreaSqrt = data.referenceAreaSqrt;
+        if (referenceAreaSqrt == 0)
+        {
+            return INVALID_POINT;
+        }
 
         const float minDepth = data.referenceWorldPosition.z - data.settings.segmentationBandwidthDepthNear;
         const float maxDepth = data.referenceWorldPosition.z + data.settings.segmentationBandwidthDepthFar;
         const float maxSegmentationDist = data.settings.maxSegmentationDist;
-        const float referenceAreaSqrt = data.referenceAreaSqrt;
         cv::Mat& depthMatrix = data.matrices.depth;
         cv::Mat& searchedMatrix = data.matrices.foregroundSearched;
 
