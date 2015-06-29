@@ -236,7 +236,6 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         const float pointInertiaFactor = data.settings.pointInertiaFactor;
         const float pointInertiaRadius = data.settings.pointInertiaRadius;
         const sensekit::Vector3f* worldPoints = data.matrices.worldPoints;
-        cv::Mat& testPassMatrix = data.matrices.layerTestPassMap;
 
         layerScoreMatrix = cv::Mat::zeros(data.matrices.depth.size(), CV_32FC1);
 
@@ -259,19 +258,12 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         {
             float* edgeDistanceRow = edgeDistanceMatrix.ptr<float>(y);
             float* layerScoreRow = layerScoreMatrix.ptr<float>(y);
-            char* testPassRow = testPassMatrix.ptr<char>(y);
 
             for (int x = 0; x < width; ++x,
                                        ++worldPoints,
                                        ++edgeDistanceRow,
-                                       ++layerScoreRow,
-                                       ++testPassRow)
+                                       ++layerScoreRow)
             {
-                if (*testPassRow != PixelType::Foreground)
-                {
-                    continue;
-                }
-
                 sensekit::Vector3f worldPosition = *worldPoints;
                 if (worldPosition.z != 0 && x > minX && x < maxX && y > minY && y < maxY)
                 {
@@ -659,6 +651,50 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         return integralAreaMatrix;
     }
 
+    bool test_single_point(TrackingData& data, cv::Point seedPosition)
+    {
+        auto matrices = data.matrices;
+
+        auto areaTestSettings = data.settings.areaTestSettings;
+        auto circumferenceTestSettings = data.settings.circumferenceTestSettings;
+        auto naturalEdgeTestSettings = data.settings.naturalEdgeTestSettings;
+        auto integralArea = matrices.layerIntegralArea;
+
+        TestPhase phase = data.phase;
+        TestBehavior outputTestLog = TEST_BEHAVIOR_NONE;
+
+        bool validPointArea = test_point_area_integral(matrices,
+                                                       integralArea,
+                                                       areaTestSettings,
+                                                       seedPosition,
+                                                       phase,
+                                                       outputTestLog);
+        bool validRadiusTest = false;
+
+        if (validPointArea)
+        {
+            validRadiusTest = test_foreground_radius_percentage(matrices,
+                                                                circumferenceTestSettings,
+                                                                seedPosition,
+                                                                phase,
+                                                                outputTestLog);
+        }
+
+        bool validNaturalEdgeTest = false;
+        if (validRadiusTest)
+        {
+            validNaturalEdgeTest = test_natural_edges(matrices,
+                                                      naturalEdgeTestSettings,
+                                                      seedPosition,
+                                                      phase,
+                                                      outputTestLog);
+        }
+
+        bool passesAllTests = (validPointArea && validRadiusTest && validNaturalEdgeTest);
+
+        return passesAllTests;
+    }
+
     ForegroundStatus create_test_pass_from_foreground(TrackingData& data)
     {
         PROFILE_FUNC();
@@ -675,7 +711,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         auto circumferenceTestSettings = data.settings.circumferenceTestSettings;
         auto naturalEdgeTestSettings = data.settings.naturalEdgeTestSettings;
 
-        auto integralArea = calculate_integral_area(matrices);
+        auto integralArea = matrices.layerIntegralArea;
 
         TestPhase phase = data.phase;
         TestBehavior outputTestLog = TEST_BEHAVIOR_NONE;
@@ -757,7 +793,37 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                 data.matrices.layerEdgeDistance,
                                 data.settings.targetEdgeDistance);
 
-        ForegroundStatus status = create_test_pass_from_foreground(data);
+        calculate_integral_area(data.matrices);
+
+        calculate_layer_score(data, layerAverageDepth);
+
+        double min, max;
+        cv::Point minLoc, maxLoc;
+
+        cv::minMaxLoc(matScore, &min, &max, &minLoc, &maxLoc, data.matrices.layerSegmentation);
+
+        bool foundPoint = maxLoc.x != -1 && maxLoc.y != -1;
+
+        if (foundPoint)
+        {
+            bool passesTests = test_single_point(data, maxLoc);
+
+            if (!passesTests)
+            {
+                //our initial point failed the tests, so now we will test all the points
+                //and find the max score with the testPassMap
+
+                ForegroundStatus status = create_test_pass_from_foreground(data);
+                if (status == FOREGROUND_EMPTY)
+                {
+                    foundPoint = false;
+                }
+                else
+                {
+                    cv::minMaxLoc(matScore, &min, &max, &minLoc, &maxLoc, data.matrices.layerTestPassMap);
+                }
+            }
+        }
 
         if (debugLayersEnabled)
         {
@@ -774,29 +840,14 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 data.matrices.debugTestPassMap,
                 data.matrices.debugTestPassMap,
                 data.matrices.layerTestPassMap);
-        }
 
-        if (status == FOREGROUND_EMPTY)
-        {
-            return INVALID_POINT;
-        }
-
-        calculate_layer_score(data, layerAverageDepth);
-
-        double min, max;
-        cv::Point minLoc, maxLoc;
-
-        cv::minMaxLoc(matScore, &min, &max, &minLoc, &maxLoc, data.matrices.layerSegmentation);
-
-        if (debugLayersEnabled)
-        {
             cv::Mat scoreMask;
             cv::inRange(matScore, 1, INT_MAX, scoreMask);
             matScore.copyTo(data.matrices.debugScoreValue, scoreMask);
             cv::normalize(matScore, data.matrices.debugScore, 0, 1, cv::NORM_MINMAX, -1, scoreMask);
         }
 
-        if (maxLoc.x == -1 && maxLoc.y == -1)
+        if (!foundPoint)
         {
             return INVALID_POINT;
         }
