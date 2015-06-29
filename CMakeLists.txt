@@ -79,6 +79,8 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples
   DESTINATION .
   PATTERN "build" EXCLUDE
   PATTERN ".gitignore" EXCLUDE
+  PATTERN "samples/plugins/orbbec_skeleton" EXCLUDE
+  PATTERN "samples/sfml/SimpleSkeletonViewer-SFML" EXCLUDE
   )
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
