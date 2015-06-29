@@ -443,24 +443,23 @@ namespace sensekit { namespace plugins { namespace hand {
         if (trackedPoint.isInProbation)
         {
             bool probationFailed = false;
-            if (trackedPoint.pointType == TrackedPointType::ActivePoint)
+            if (trackedPoint.pointType == TrackedPointType::ActivePoint &&
+                trackedPoint.failedTestCount >= m_settings.maxFailedTestsInProbationActivePoints)
             {
-                if (trackedPoint.failedTestCount >= m_settings.maxFailedTestsInProbationActivePoints)
-                {
-                    //had valid in range points but must have failed the real tests
+                //had valid in range points but must have failed the real tests
 
-                    //failed N consecutive tests within the probation period
-                    //gave the active point a few extra frames to recover
-                    trackedPoint.trackingStatus = TrackingStatus::Lost;
-                    probationFailed = true;
-                    STRACE("PointProcessor", "lost an active point: %d", trackedPoint.trackingId);
-                }
+                //failed N consecutive tests within the probation period
+                //gave the active point a few extra frames to recover
+                trackedPoint.trackingStatus = TrackingStatus::Lost;
+                probationFailed = true;
+                STRACE("PointProcessor", "lost an active point: %d", trackedPoint.trackingId);
             }
-            else if (trackedPoint.failedTestCount >= m_settings.maxFailedTestsInProbation)
+            else if (trackedPoint.pointType == TrackedPointType::CandidatePoint &&
+                     trackedPoint.failedTestCount >= m_settings.maxFailedTestsInProbation)
             {
                 //failed N tests total (non-consecutive) within the probation period
                 //too many failed tests, so long...
-                trackedPoint.trackingStatus = TrackingStatus::Lost;
+                trackedPoint.trackingStatus = TrackingStatus::Dead;
                 probationFailed = true;
             }
 
