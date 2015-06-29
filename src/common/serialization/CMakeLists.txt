@@ -15,21 +15,27 @@ set (${_projname}_SOURCES
   ../../../include/common/serialization/StreamFileModels.h
   ../../../include/common/serialization/FrameStreamWriter.h
   FrameStreamWriter.cpp
-)
+  )
 
 find_package(Protobuf REQUIRED)
 
 include_directories(${PROTOBUF_INCLUDE_DIRS})
 
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS "proto/StreamHeader.proto" "proto/FrameDescription.proto" "proto/Frame.proto")
-add_custom_target(autogen_pb_serialization DEPENDS ${PROTO_SRCS} ${PROTO_HDRS})
-set_target_properties(autogen_pb_serialization PROPERTIES FOLDER "${COMMON_DIR_FOLDER}serialization")
+set(PROTOBUF_DEFINITIONS
+  proto/StreamHeader.proto
+  proto/FrameDescription.proto
+  proto/Frame.proto
+  )
+
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTOBUF_DEFINITIONS})
+add_custom_target(autogen_pb_frame_serialization DEPENDS ${PROTO_SRCS} ${PROTO_HDRS})
+set_target_properties(autogen_pb_frame_serialization PROPERTIES FOLDER "${COMMON_DIR_FOLDER}serialization")
 
 set(${_projname}_SOURCES
   ${${_projname}_SOURCES}
   ${PROTO_SRCS}
   ${PROTO_HDRS}
-)
+  )
 
 if (MSVC)
   add_library(${_projname} STATIC ${${_projname}_SOURCES})
@@ -38,7 +44,5 @@ else()
 endif()
 
 set_target_properties(${_projname} PROPERTIES FOLDER "${COMMON_DIR_FOLDER}serialization")
-
 target_link_libraries(${_projname} ${PROTOBUF_LIBRARIES} ClockUtil)
-
-set_debug_working_dir(${_projname} "$(TargetDir)")
+add_dependencies(${_projname} autogen_pb_frame_serialization)
