@@ -22,30 +22,20 @@ find_package(Protobuf REQUIRED)
 include_directories(${PROTOBUF_INCLUDE_DIRS})
 
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS "proto/StreamHeader.proto" "proto/FrameDescription.proto" "proto/Frame.proto")
+add_custom_target(autogen_pb_serialization DEPENDS PROTO_SRCS PROTO_HDRS)
+set_target_properties(autogen_pb_serialization PROPERTIES FOLDER "${COMMON_DIR_FOLDER}serialization")
 
-FOREACH (_srcFile ${PROTO_SRCS})
-  get_filename_component(_target ${_srcFile} NAME_WE)
-  get_filename_component(_path ${_srcFile} DIRECTORY)
-
-  add_custom_target(${_target} ALL
-    COMMAND ${CMAKE_COMMAND} -E copy
-      "${_path}/${_target}.pb.cc"
-      "${CMAKE_CURRENT_LIST_DIR}/gensrc/"
-    COMMAND ${CMAKE_COMMAND} -E copy
-      "${_path}/${_target}.pb.h"
-      "${CMAKE_CURRENT_LIST_DIR}/gensrc/")
-
-set_target_properties(${_target} PROPERTIES FOLDER CMakeCopyTargets)
-
-ENDFOREACH()
+set(${_projname}_SOURCES
+  ${${_projname}_SOURCES}
+  ${PROTO_SRCS}
+  ${PROTO_HDRS}
+)
 
 if (MSVC)
-  add_library(${_projname} ${${_projname}_SOURCES} ${PROTO_SRCS} ${PROTO_HDRS})
+  add_library(${_projname} STATIC ${${_projname}_SOURCES})
 else()
-  add_library(${_projname} SHARED ${${_projname}_SOURCES} ${PROTO_SRCS} ${PROTO_HDRS})
+  add_library(${_projname} SHARED ${${_projname}_SOURCES})
 endif()
-
-
 
 set_target_properties(${_projname} PROPERTIES FOLDER "${COMMON_DIR_FOLDER}serialization")
 
