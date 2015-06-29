@@ -22,7 +22,7 @@ find_package(Protobuf REQUIRED)
 include_directories(${PROTOBUF_INCLUDE_DIRS})
 
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS "proto/StreamHeader.proto" "proto/FrameDescription.proto" "proto/Frame.proto")
-add_custom_target(autogen_pb_serialization DEPENDS PROTO_SRCS PROTO_HDRS)
+add_custom_target(autogen_pb_serialization DEPENDS ${PROTO_SRCS} ${PROTO_HDRS})
 set_target_properties(autogen_pb_serialization PROPERTIES FOLDER "${COMMON_DIR_FOLDER}serialization")
 
 set(${_projname}_SOURCES
