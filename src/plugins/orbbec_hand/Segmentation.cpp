@@ -682,20 +682,14 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         ForegroundStatus status = FOREGROUND_EMPTY;
 
-        const int xskip = 2;
-        const int yskip = 2;
-        const int maxY = height - yskip;
-
-        for (int y = 0; y <= maxY; y += yskip)
+        for (int y = 0; y < height; ++y)
         {
             char* segmentationRow = segmentationMatrix.ptr<char>(y);
             char* testPassRow = testPassMatrix.ptr<char>(y);
-            char* testPassRowNext = testPassMatrix.ptr<char>(y+1);
 
-            for (int x = 0; x < width; x += xskip,
-                                       segmentationRow += xskip,
-                                       testPassRow += xskip,
-                                       testPassRowNext += xskip)
+            for (int x = 0; x < width; ++x,
+                                       ++segmentationRow,
+                                       ++testPassRow)
             {
                 if (*segmentationRow != PixelType::Foreground)
                 {
@@ -734,9 +728,6 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 {
                     status = FOREGROUND_HAS_POINTS;
                     *testPassRow = PixelType::Foreground;
-                    *(testPassRow+1) = PixelType::Foreground;
-                    *testPassRowNext = PixelType::Foreground;
-                    *(testPassRowNext+1) = PixelType::Foreground;
                 }
             }
         }
