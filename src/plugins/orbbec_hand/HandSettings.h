@@ -61,12 +61,12 @@ namespace sensekit { namespace plugins { namespace hand {
         float segmentationBandwidthDepthNear{ 500 };
         float segmentationBandwidthDepthFar{ 100 };
         float maxSegmentationDist{ 250 }; //mm
-        float heightScoreFactor{ 0.125 };
+        float heightScoreFactor{ 0.25 };
         float depthScoreFactor{ 1000.0 };
         float targetEdgeDistance{ 40 }; //mm
         float edgeDistanceScoreFactor{ 100.0 };
-        float pointInertiaFactor{ 100.0 };
-        float pointInertiaRadius{ 100.0 }; //mm
+        float pointInertiaFactor{ 20.0 };
+        float pointInertiaRadius{ 30.0 }; //mm
     };
 
     struct PointProcessorSettings
