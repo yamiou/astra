@@ -55,9 +55,9 @@ namespace sensekit { namespace plugins { namespace hand {
                             }
                             else if (isActivePoint)
                             {
-                                r = 128;
-                                g = 138;
-                                b = 0;
+                                r = 0;
+                                g = 139;
+                                b = 69;
                             }
                             else
                             {

@@ -259,7 +259,7 @@ public:
         float radius = 16;
         sf::Color candidateColor(255, 255, 0);
         sf::Color lostColor(255, 0, 0);
-        sf::Color trackingColor(128, 138, 0);
+        sf::Color trackingColor(0, 139, 69);
 
         for (auto handPoint : m_handPoints)
         {
