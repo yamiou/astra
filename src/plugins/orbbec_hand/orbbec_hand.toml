@@ -15,7 +15,7 @@ maxDepth = 4000.0 #float
 
 [pointprocessor]
 maxMatchDistLostActive = 500.0 #mm #float
-maxMatchDistDefault = 200.0 #mm #float
+maxMatchDistDefault = 500.0 #mm #float
 steadyDeadBandRadius = 75.0 #mm #float
 maxInactiveFramesForCandidatePoints = 60
 maxInactiveFramesForLostPoints = 15
@@ -34,12 +34,12 @@ maxHandPointUpdatesPerFrame = 10
 segmentationBandwidthDepthNear = 500.0 #mm #float
 segmentationBandwidthDepthFar = 100.0 #mm #float
 maxSegmentationDist = 250.0 #mm #float
-heightScoreFactor = 0.25 #float
+heightScoreFactor = 0.5 #float
 depthScoreFactor = 1000.0 #float
 targetEdgeDistance = 40.0 #mm #float
 edgeDistanceScoreFactor = 100.0 #float
-pointInertiaFactor = 20.0 #float
-pointInertiaRadius = 30.0 #mm #float
+pointInertiaFactor = 40.0 #float
+pointInertiaRadius = 40.0 #mm #float
 
 [areatest]
 areaBandwidth = 150.0 #mm #float
