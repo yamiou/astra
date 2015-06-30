@@ -1,14 +1,14 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
-#ifdef __ANDROID__
-#define ELPP_DISABLE_DEFAULT_CRASH_HANDLING
-#else // not android
-#define ELPP_STACKTRACE_ON_CRASH
-#endif
-
+// TODO valgrind will go bananas with the default crash handler enabled
+// #define ELPP_DISABLE_DEFAULT_CRASH_HANDLING
 #define ELPP_NO_DEFAULT_LOG_FILE
 
+// enable stacktraces for GCC/Clang on *nixes
+#if ! defined(__ANDROID__) && ! defined(_MSC_VER)
+#define ELPP_STACKTRACE_ON_CRASH
+#endif
 
 #include "vendor/easylogging++.h"
 #include <SenseKit/sensekit_types.h>
