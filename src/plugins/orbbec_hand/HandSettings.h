@@ -81,7 +81,7 @@ namespace sensekit { namespace plugins { namespace hand {
         int maxInactiveFramesForCandidatePoints{ 60 };
         int maxInactiveFramesForLostPoints{ 15 };
         int maxInactiveFramesForActivePoints{ 480 };
-        float pointSmoothingFactor{ 0.75 };
+        float pointSmoothingFactor{ 0.5 };
         float pointDeadBandSmoothingFactor{ 0.05 };
         float pointSmoothingDeadZone{ 50 }; //mm
         int maxFailedTestsInProbation{ 5 };
