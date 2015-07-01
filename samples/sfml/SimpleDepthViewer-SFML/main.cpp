@@ -96,7 +96,7 @@ private:
     samples::common::LitDepthVisualizer m_visualizer;
 
     using duration_type = std::chrono::duration<double>;
-    duration_type m_frameDuration;
+    duration_type m_frameDuration{0.0};
 
     using clock_type = std::chrono::system_clock;
     std::chrono::time_point<clock_type> m_lastTimepoint;

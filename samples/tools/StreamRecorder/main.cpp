@@ -27,7 +27,7 @@ public:
 
     ~PointFrameListener()
     {
-        
+
     }
 
     void init_texture(int width, int height)
@@ -121,7 +121,7 @@ private:
     samples::common::LitDepthVisualizer m_visualizer;
 
     using duration_type = std::chrono::duration<double>;
-    duration_type m_frameDuration;
+    duration_type m_frameDuration{0.0};
 
     using clock_type = std::chrono::system_clock;
     std::chrono::time_point<clock_type> m_lastTimepoint;
@@ -143,12 +143,12 @@ public:
     DepthFrameListener(sensekit::DepthStream& depthStream, FrameStreamWriter& serializer)
         : m_frameStreamWriter(serializer)
     {
-        
+
     }
 
     ~DepthFrameListener()
     {
-        
+
     }
 
     virtual void on_frame_ready(sensekit::StreamReader& reader,
@@ -172,7 +172,7 @@ int main(int argc, char** argv)
 
     FILE* outputFile = fopen("test.df", "wb");;
 
-    std::unique_ptr<FrameOutputStream> outputStream = 
+    std::unique_ptr<FrameOutputStream> outputStream =
         std::unique_ptr<FrameOutputStream>(open_frame_output_stream(outputFile));
     FrameStreamWriter streamWriter(*outputStream.get());
 
