@@ -67,6 +67,7 @@ namespace sensekit { namespace plugins { namespace hand {
         float edgeDistanceScoreFactor{ 100.0 };
         float pointInertiaFactor{ 40.0 };
         float pointInertiaRadius{ 40.0 }; //mm
+        float maxDepthToDownscaleTestPass { 1300.0 }; //mm
     };
 
     struct PointProcessorSettings

@@ -130,6 +130,7 @@ namespace sensekit { namespace plugins { namespace hand {
         settings.edgeDistanceScoreFactor = get_float_from_table(t, "segmentation.edgeDistanceScoreFactor", settings.edgeDistanceScoreFactor);
         settings.pointInertiaFactor = get_float_from_table(t, "segmentation.pointInertiaFactor", settings.pointInertiaFactor);
         settings.pointInertiaRadius = get_float_from_table(t, "segmentation.pointInertiaRadius", settings.pointInertiaRadius);
+        settings.maxDepthToDownscaleTestPass = get_float_from_table(t, "segmentation.maxDepthToDownscaleTestPass", settings.maxDepthToDownscaleTestPass);
 
         settings.areaTestSettings = parse_area_test_settings(t);
         settings.circumferenceTestSettings = parse_circumference_test_settings(t);

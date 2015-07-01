@@ -718,14 +718,30 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         ForegroundStatus status = FOREGROUND_EMPTY;
 
-        for (int y = 0; y < height; ++y)
+        int xskip = 1;
+        int yskip = 1;
+        bool downscale = false;
+        if (data.phase == TEST_PHASE_CREATE ||
+            data.referenceWorldPosition.z < data.settings.maxDepthToDownscaleTestPass)
+        {
+            //during create cycle or if our point is close enough,
+            //downscale test pass map by 2 to save computation
+            downscale = true;
+            xskip = 2;
+            yskip = 2;
+        }
+        const int maxY = height - yskip;
+
+        for (int y = 0; y <= maxY; y += yskip)
         {
             char* segmentationRow = segmentationMatrix.ptr<char>(y);
             char* testPassRow = testPassMatrix.ptr<char>(y);
+            char* testPassRowNext = testPassMatrix.ptr<char>(y+1);
 
-            for (int x = 0; x < width; ++x,
-                                       ++segmentationRow,
-                                       ++testPassRow)
+            for (int x = 0; x < width; x += xskip,
+                                       segmentationRow += xskip,
+                                       testPassRow += xskip,
+                                       testPassRowNext += xskip)
             {
                 if (*segmentationRow != PixelType::Foreground)
                 {
@@ -764,6 +780,12 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 {
                     status = FOREGROUND_HAS_POINTS;
                     *testPassRow = PixelType::Foreground;
+                    if (downscale)
+                    {
+                        *(testPassRow+1) = PixelType::Foreground;
+                        *testPassRowNext = PixelType::Foreground;
+                        *(testPassRowNext+1) = PixelType::Foreground;
+                    }
                 }
             }
         }
