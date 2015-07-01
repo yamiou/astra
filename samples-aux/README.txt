@@ -1,4 +1,4 @@
-SenseKit SDK v0.1.9 for Windows
+SenseKit SDK v0.2.0 for Windows
 Copyright (c) 2015 Orbbec
 
 ALPHA - NOT FOR PUBLIC DISTRIBUTION
@@ -7,6 +7,8 @@ josh@orbbec3d.com
 
 What's New
 ==========
+
+v0.2.0 ...
 
 v0.1.9 2015/06/29 Numerous improvements to hand tracker behavior and performance, StreamCore bug fixes, multiple streamset support, depth recorder and playback, Android support, improved build system.
 
