@@ -71,11 +71,11 @@ To run the samples:
 1) Copy all the files from sdk/samples/vs2013/thirdparty/copy_to_bin_dir/ to
 your build folder (bin/Debug/ or bin/Release/).
 
-2) Copy all the files from sdk/bin/ your build folder.
+2) From the sdk/bin/ folder, copy SenseKit.dll, SenseKitAPI.dll, SenseKitUL.dll, 
+and the entire Plugin folder to your build folder.
+The plugins should still be in a Plugins subfolder under your sample .exe files.
 
 3) Run the samples!
-
-The plugins should still be in a Plugins subfolder under your sample .exe files.
 
 The .pdb files are not necessary for running the applications, but if you find a crash
 then you can load the symbols in Visual Studio using these .pdb files and give a useful
