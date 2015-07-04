@@ -8,7 +8,7 @@ josh@orbbec3d.com
 What's New
 ==========
 
-v0.2.0 ...
+v0.2.0 2015/07/03 First version ready for external use. Hand tracking is high quality on Windows and Android. Sample app binaries added to SDK distributable.
 
 v0.1.9 2015/06/29 Numerous improvements to hand tracker behavior and performance, StreamCore bug fixes, multiple streamset support, depth recorder and playback, Android support, improved build system.
 
