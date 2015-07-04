@@ -11,6 +11,7 @@ set(${_projname}_SOURCES
   ../../include/SenseKit/sensekit_capi.h
   ../../include/SenseKit/sensekit_defines.h
   ../../include/SenseKit/sensekit_types.h
+  ../../include/SenseKit/host_events.h
   ../../include/SenseKit/Plugins/PluginKit.h
   ../../include/SenseKit/Plugins/plugin_capi.h
   ../../include/SenseKit/Plugins/plugin_callbacks.h
@@ -28,6 +29,8 @@ set(${_projname}_SOURCES
   SenseKitContext.cpp
   CreateStreamProxy.h
   CreatePluginProxy.h
+  Configuration.h
+  Configuration.cpp
   SenseKit.cpp
   Stream.h
   Stream.cpp
@@ -36,21 +39,35 @@ set(${_projname}_SOURCES
   PluginService.cpp
   PluginService.h
   PluginServiceDelegate.h
+  PluginManager.h
+  PluginManager.cpp
   ParameterBin.h
   StreamServiceDelegate.h
+  StreamSetCatalog.h
+  StreamSetCatalog.cpp
   StreamSet.cpp
   StreamSet.h
+  StreamSetConnection.h
+  StreamSetConnection.cpp
+  StreamRegisteredEventArgs.h
+  StreamUnregisteringEventArgs.h
   Logger.h
+  Logger.cpp
   Logging.h
+  Logging.cpp
   StreamConnection.h
   StreamConnection.cpp
   StreamBin.h
   StreamBin.cpp
   StreamReader.h
   StreamReader.cpp
+  Core/OSProcesses.h
+  Core/OSProcesses.cpp
   Core/shared_library.h
   Core/shared_library_linux.cpp
   Core/shared_library_windows.cpp
+  Registry.h
+  Registry.cpp
   )
 
 set(${_projname}_SOURCES_GEN
@@ -74,6 +91,10 @@ source_group(templates FILES ${${_projname}_SOURCES_GEN})
 
 add_definitions(-DSENSEKIT_BUILD)
 
+if (ANDROID)
+  add_definitions(-DSENSEKIT_ANDROID)
+endif()
+
 add_library(${_projname} SHARED ${${_projname}_SOURCES} ${${_projname}_SOURCES_GEN})
 
 include_directories(${PROJECT_SOURCE_DIR}/src/SenseKitAPI)
@@ -84,7 +105,7 @@ add_subdirectory(Core/tests)
 
 install(TARGETS ${_projname}
         RUNTIME DESTINATION bin/
-        LIBRARY DESTINATION bin/
+        LIBRARY DESTINATION lib/
         ARCHIVE DESTINATION lib/
         )
 

@@ -12,44 +12,66 @@ namespace sensekit {
     {
     public:
 
-        static sensekit_status_t register_stream_added_callback(void* pluginService,
-                                                                stream_added_callback_t callback,
-                                                                void* clientTag,
-                                                                sensekit_callback_id_t* callbackId)
+        static sensekit_status_t register_stream_registered_callback(void* pluginService,
+                                                                     stream_registered_callback_t callback,
+                                                                     void* clientTag,
+                                                                     sensekit_callback_id_t* callbackId)
         {
-            return static_cast<PluginService*>(pluginService)->register_stream_added_callback(callback, clientTag, *callbackId);
+            return static_cast<PluginService*>(pluginService)->register_stream_registered_callback(callback, clientTag, *callbackId);
         }
 
-        static sensekit_status_t register_stream_removing_callback(void* pluginService,
-                                                                   stream_removing_callback_t callback,
-                                                                   void* clientTag,
-                                                                   sensekit_callback_id_t* callbackId)
+        static sensekit_status_t register_stream_unregistering_callback(void* pluginService,
+                                                                        stream_unregistering_callback_t callback,
+                                                                        void* clientTag,
+                                                                        sensekit_callback_id_t* callbackId)
         {
-            return static_cast<PluginService*>(pluginService)->register_stream_removing_callback(callback, clientTag, *callbackId);
+            return static_cast<PluginService*>(pluginService)->register_stream_unregistering_callback(callback, clientTag, *callbackId);
         }
 
-        static sensekit_status_t unregister_stream_added_callback(void* pluginService,
-                                                                  sensekit_callback_id_t callback)
+        static sensekit_status_t register_host_event_callback(void* pluginService,
+                                                              host_event_callback_t callback,
+                                                              void* clientTag,
+                                                              sensekit_callback_id_t* callbackId)
         {
-            return static_cast<PluginService*>(pluginService)->unregister_stream_added_callback(callback);
+            return static_cast<PluginService*>(pluginService)->register_host_event_callback(callback, clientTag, *callbackId);
         }
 
-        static sensekit_status_t unregister_stream_removing_callback(void* pluginService,
-                                                                     sensekit_callback_id_t callback)
+        static sensekit_status_t unregister_host_event_callback(void* pluginService,
+                                                                sensekit_callback_id_t callback)
         {
-            return static_cast<PluginService*>(pluginService)->unregister_stream_removing_callback(callback);
+            return static_cast<PluginService*>(pluginService)->unregister_host_event_callback(callback);
+        }
+
+        static sensekit_status_t unregister_stream_registered_callback(void* pluginService,
+                                                                       sensekit_callback_id_t callback)
+        {
+            return static_cast<PluginService*>(pluginService)->unregister_stream_registered_callback(callback);
+        }
+
+        static sensekit_status_t unregister_stream_unregistering_callback(void* pluginService,
+                                                                          sensekit_callback_id_t callback)
+        {
+            return static_cast<PluginService*>(pluginService)->unregister_stream_unregistering_callback(callback);
         }
 
         static sensekit_status_t create_stream_set(void* pluginService,
+                                                   const char* setUri,
                                                    sensekit_streamset_t& setHandle)
         {
-            return static_cast<PluginService*>(pluginService)->create_stream_set(setHandle);
+            return static_cast<PluginService*>(pluginService)->create_stream_set(setUri, setHandle);
         }
 
         static sensekit_status_t destroy_stream_set(void* pluginService,
                                                     sensekit_streamset_t& setHandle)
         {
             return static_cast<PluginService*>(pluginService)->destroy_stream_set(setHandle);
+        }
+
+        static sensekit_status_t get_streamset_uri(void* pluginService,
+                                                   sensekit_streamset_t setHandle,
+                                                   const char** uri)
+        {
+            return static_cast<PluginService*>(pluginService)->get_streamset_uri(setHandle, *uri);
         }
 
         static sensekit_status_t create_stream(void* pluginService,
@@ -114,11 +136,15 @@ namespace sensekit {
         }
 
         static sensekit_status_t log(void* pluginService,
+                                     const char* channel,
                                      sensekit_log_severity_t logLevel,
+                                     const char* fileName,
+                                     int lineNo,
+                                     const char* func,
                                      const char* format,
                                      va_list args)
         {
-            return static_cast<PluginService*>(pluginService)->log(logLevel, format, args);
+            return static_cast<PluginService*>(pluginService)->log(channel, logLevel, fileName, lineNo, func, format, args);
         }
     };
 }

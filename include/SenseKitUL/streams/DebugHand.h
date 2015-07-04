@@ -31,7 +31,17 @@ namespace sensekit {
 
         void set_mouse_position(Vector2f position)
         {
-            sensekit_debug_handstream_set_mouse_position(m_debugHandStream, vector_to_cvector(position));
+            sensekit_debug_handstream_set_mouse_position(m_debugHandStream, position);
+        }
+
+        void set_pause_input(bool pauseInput)
+        {
+            sensekit_debug_handstream_set_pause_input(m_debugHandStream, pauseInput);
+        }
+
+        void set_lock_spawn_point(bool lockSpawnPoint)
+        {
+            sensekit_debug_handstream_set_lock_spawn_point(m_debugHandStream, lockSpawnPoint);
         }
 
         DebugHandViewType get_view_type()
@@ -45,12 +55,12 @@ namespace sensekit {
         sensekit_debug_handstream_t m_debugHandStream;
     };
 
-    class DebugHandFrame : public ImageFrame<RGBPixel>
+    class DebugHandFrame : public ImageFrame<RGBPixel, SENSEKIT_STREAM_DEBUG_HAND>
     {
     public:
-        DebugHandFrame(sensekit_reader_frame_t readerFrame, sensekit_stream_subtype_t subtype)
-            : ImageFrame(readerFrame, SENSEKIT_STREAM_DEBUG_HAND, subtype)
-        { }
+        DebugHandFrame(sensekit_imageframe_t frame)
+            : ImageFrame(frame)
+        {}
     };
 }
 

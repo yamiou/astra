@@ -19,6 +19,12 @@ namespace sensekit { namespace plugins { namespace hand {
         case SENSEKIT_PARAMETER_DEBUG_HAND_MOUSE_NORM_POSITION:
             set_mouse_norm_position(inByteLength, inData);
             break;
+        case SENSEKIT_PARAMETER_DEBUG_HAND_PAUSE_INPUT:
+            set_pause_input(inByteLength, inData);
+            break;
+        case SENSEKIT_PARAMETER_DEBUG_HAND_LOCK_SPAWN_POINT:
+            set_lock_spawn_point(inByteLength, inData);
+            break;
         }
     }
 
@@ -85,7 +91,33 @@ namespace sensekit { namespace plugins { namespace hand {
             sensekit_vector2f_t newMousePosition;
             memcpy(&newMousePosition, inData, sizeof(sensekit_vector2f_t));
 
-            m_mouseNormPosition = cvector_to_vector(newMousePosition);
+            m_mouseNormPosition = Vector2f::from_cvector(newMousePosition);
+        }
+    }
+
+    void DebugHandStream::set_pause_input(size_t inByteLength, sensekit_parameter_data_t& inData)
+    {
+        if (inByteLength >= sizeof(bool))
+        {
+            bool newPauseInput;
+            memcpy(&newPauseInput, inData, sizeof(bool));
+
+            m_pauseInput = newPauseInput;
+        }
+    }
+
+    void DebugHandStream::set_lock_spawn_point(size_t inByteLength, sensekit_parameter_data_t& inData)
+    {
+        if (inByteLength >= sizeof(bool))
+        {
+            bool newLockSpawnPoint;
+            memcpy(&newLockSpawnPoint, inData, sizeof(bool));
+
+            if (newLockSpawnPoint && !m_lockSpawnPoint)
+            {
+                m_spawnNormPosition = m_mouseNormPosition;
+            }
+            m_lockSpawnPoint = newLockSpawnPoint;
         }
     }
 }}}

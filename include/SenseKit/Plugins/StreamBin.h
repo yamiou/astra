@@ -14,8 +14,8 @@ namespace sensekit { namespace plugins {
         StreamBin(PluginServiceProxy& pluginService,
                   sensekit_stream_t streamHandle,
                   size_t dataSize)
-            : m_pluginService(pluginService),
-              m_streamHandle(streamHandle)
+            : m_streamHandle(streamHandle),
+              m_pluginService(pluginService)
         {
             size_t dataWrapperSize = dataSize + sizeof(TFrameType);
             m_pluginService.create_stream_bin(streamHandle,
@@ -50,6 +50,17 @@ namespace sensekit { namespace plugins {
             m_locked = true;
             m_currentBuffer->frameIndex = frameIndex;
             return reinterpret_cast<TFrameType*>(m_currentBuffer->data);
+        }
+
+        std::pair<sensekit_frame_t*, TFrameType*> begin_write_ex(size_t frameIndex)
+        {
+            if (m_locked)
+                std::make_pair(m_currentBuffer, reinterpret_cast<TFrameType*>(m_currentBuffer->data));
+
+            m_locked = true;
+            m_currentBuffer->frameIndex = frameIndex;
+
+            return std::make_pair(m_currentBuffer, reinterpret_cast<TFrameType*>(m_currentBuffer->data));
         }
 
         void end_write()

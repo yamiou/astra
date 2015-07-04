@@ -4,7 +4,7 @@
 #include <SenseKit/sensekit_capi.h>
 #include <SenseKit/Plugins/plugin_capi.h>
 #include <cassert>
-#include <string.h>
+#include <cstring>
 
 template<typename TFrameWrapperType, typename TFrameType>
 sensekit_status_t sensekit_generic_frame_get(sensekit_reader_frame_t readerFrame,
@@ -12,12 +12,12 @@ sensekit_status_t sensekit_generic_frame_get(sensekit_reader_frame_t readerFrame
                                              sensekit_stream_subtype_t subtype,
                                              TFrameType** frame)
 {
-    sensekit_frame_ref_t* frameRef;
-    sensekit_reader_get_frame(readerFrame, type, subtype, &frameRef);
+    sensekit_frame_t* subFrame;
+    sensekit_reader_get_frame(readerFrame, type, subtype, &subFrame);
 
-    TFrameWrapperType* wrapper = reinterpret_cast<TFrameWrapperType*>(frameRef->frame->data);
+    TFrameWrapperType* wrapper = reinterpret_cast<TFrameWrapperType*>(subFrame->data);
     *frame = reinterpret_cast<TFrameType*>(&(wrapper->frame));
-    (*frame)->frameRef = frameRef;
+    (*frame)->frame = subFrame;
 
     return SENSEKIT_STATUS_SUCCESS;
 }
@@ -28,11 +28,11 @@ sensekit_status_t sensekit_generic_frame_get(sensekit_reader_frame_t readerFrame
                                              sensekit_stream_subtype_t subtype,
                                              TFrameType** frame)
 {
-    sensekit_frame_ref_t* frameRef;
-    sensekit_reader_get_frame(readerFrame, type, subtype, &frameRef);
+    sensekit_frame_t* subFrame;
+    sensekit_reader_get_frame(readerFrame, type, subtype, &subFrame);
 
-    *frame = reinterpret_cast<TFrameType*>(frameRef->frame->data);
-    (*frame)->frameRef = frameRef;
+    *frame = reinterpret_cast<TFrameType*>(subFrame->data);
+    (*frame)->frame = subFrame;
 
     return SENSEKIT_STATUS_SUCCESS;
 }
@@ -41,7 +41,7 @@ template<typename TFrameType>
 sensekit_status_t sensekit_generic_frame_get_frameindex(TFrameType* frame,
                                                         sensekit_frame_index_t* index)
 {
-    *index = frame->frameRef->frame->frameIndex;
+    *index = frame->frame->frameIndex;
 
     return SENSEKIT_STATUS_SUCCESS;
 }

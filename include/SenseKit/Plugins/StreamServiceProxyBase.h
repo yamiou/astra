@@ -8,22 +8,15 @@ struct StreamServiceProxyBase
 {
     void* streamService;
 
-    sensekit_status_t (*initialize)(void*);
-
-    sensekit_status_t (*terminate)(void*);
-
     sensekit_status_t (*streamset_open)(void*,
                                         const char*,
-                                        sensekit_streamset_t*);
+                                        sensekit_streamsetconnection_t*);
 
     sensekit_status_t (*streamset_close)(void*,
-                                         sensekit_streamset_t*);
-
-    char* (*get_status_string)(void*,
-                               sensekit_status_t);
+                                         sensekit_streamsetconnection_t*);
 
     sensekit_status_t (*reader_create)(void*,
-                                       sensekit_streamset_t,
+                                       sensekit_streamsetconnection_t,
                                        sensekit_reader_t*);
 
     sensekit_status_t (*reader_destroy)(void*,
@@ -66,7 +59,7 @@ struct StreamServiceProxyBase
                                           sensekit_reader_frame_t,
                                           sensekit_stream_type_t,
                                           sensekit_stream_subtype_t,
-                                          sensekit_frame_ref_t**);
+                                          sensekit_frame_t**);
 
     sensekit_status_t (*stream_set_parameter)(void*,
                                               sensekit_streamconnection_t,

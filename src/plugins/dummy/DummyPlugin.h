@@ -10,7 +10,7 @@ namespace sensekit {
     {
     public:
         DummyPlugin(PluginServiceProxy* pluginService)
-            : PluginBase(pluginService) { }
+            : PluginBase(pluginService, "dummy_plugin") { }
     };
 }
 

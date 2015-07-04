@@ -86,6 +86,15 @@ namespace sensekit {
 
         static const sensekit_stream_type_t id = SENSEKIT_STREAM_DEPTH;
 
+        conversion_cache_t depth_to_world_data()
+        {
+            conversion_cache_t data;
+
+            sensekit_depthstream_get_depth_to_world_data(m_depthStream, &data);
+
+            return data;
+        }
+
         float horizontalFieldOfView()
         {
             float hFov;
@@ -109,13 +118,12 @@ namespace sensekit {
         CoordinateMapper m_coordinateMapper;
     };
 
-    class DepthFrame : public ImageFrame<int16_t>
+    class DepthFrame : public ImageFrame<int16_t, SENSEKIT_STREAM_DEPTH>
     {
     public:
-        DepthFrame(sensekit_reader_frame_t readerFrame,
-                   sensekit_stream_subtype_t subtype)
-            : ImageFrame(readerFrame, SENSEKIT_STREAM_DEPTH, subtype)
-        { }
+        DepthFrame(sensekit_imageframe_t frame)
+            : ImageFrame(frame)
+        {}
 
     };
 }

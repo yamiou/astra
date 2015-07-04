@@ -183,8 +183,6 @@ public:
 
     void drawHandPoints(sf::RenderWindow& window, float depthScale)
     {
-        float radius = 16;
-        auto size = window.getSize();
         sf::Color candidateColor(255, 255, 0);
         sf::Color lostColor(255, 0, 0);
         sf::Color trackingColor(128, 138, 0);
@@ -206,12 +204,15 @@ public:
 
             float circleX = (p.x + 0.5) * depthScale;
             float circleY = (p.y + 0.5) * depthScale;
-            drawCircle(window, radius, circleX, circleY, color);
-
-            drawHandLabel(window, radius, circleX, circleY, handPoint);
+            if (m_showCircles)
+            {
+                drawCircle(window, m_circleRadius, circleX, circleY, color);
+            }
+            
+            drawHandLabel(window, m_circleRadius, circleX, circleY, handPoint);
             if (status == HAND_STATUS_TRACKING)
             {
-                drawHandPosition(window, radius, circleX, circleY, handPoint);
+                drawHandPosition(window, m_circleRadius, circleX, circleY, handPoint);
             }
         }
     }
@@ -256,6 +257,9 @@ public:
         case DEBUG_HAND_VIEW_HANDWINDOW:
             return "Hand window";
             break;
+        case DEBUG_HAND_VIEW_TEST_PASS_MAP:
+            return "Test pass map";
+            break;
         default:
             return "Unknown view";
             break;
@@ -297,6 +301,12 @@ public:
     {
         m_outputFPS = !m_outputFPS;
     }
+
+    void toggle_circles()
+    {
+        m_showCircles = !m_showCircles;
+    }
+
 private:
     long double m_frameDuration{ 0 };
     std::clock_t m_lastTimepoint{ 0 };
@@ -315,6 +325,8 @@ private:
     int m_displayWidth{ 1 };
     int m_displayHeight{ 1 };
     bool m_outputFPS{ false };
+    float m_circleRadius { 16 };
+    bool m_showCircles { true };
 };
 
 void request_view_mode(sensekit::StreamReader& reader, sensekit::DebugHandViewType view)
@@ -334,11 +346,25 @@ void process_mouse_move(sf::RenderWindow& window, sensekit::StreamReader& reader
 }
 
 static bool g_mouseProbe = false;
+static bool g_pauseInput = false;
+static bool g_lockSpawnPoint = false;
 
 void toggle_mouse_probe(sensekit::StreamReader& reader)
 {
     g_mouseProbe = !g_mouseProbe;
     reader.stream<sensekit::DebugHandStream>().set_use_mouse_probe(g_mouseProbe);
+}
+
+void toggle_pause_input(sensekit::StreamReader& reader)
+{
+    g_pauseInput = !g_pauseInput;
+    reader.stream<sensekit::DebugHandStream>().set_pause_input(g_pauseInput);
+}
+
+void toggle_spawn_lock(sensekit::StreamReader& reader)
+{
+    g_lockSpawnPoint = !g_lockSpawnPoint;
+    reader.stream<sensekit::DebugHandStream>().set_lock_spawn_point(g_lockSpawnPoint);
 }
 
 void process_key_input(sensekit::StreamReader& reader, HandDebugFrameListener& listener, sf::Event::KeyEvent key)
@@ -347,7 +373,8 @@ void process_key_input(sensekit::StreamReader& reader, HandDebugFrameListener& l
     {
         listener.toggle_output_fps();
     }
-    if (key.code == sf::Keyboard::Tilde)
+    if (key.code == sf::Keyboard::Tilde ||
+        key.code == sf::Keyboard::Dash)
     {
         request_view_mode(reader, DEBUG_HAND_VIEW_DEPTH);
     }
@@ -391,13 +418,25 @@ void process_key_input(sensekit::StreamReader& reader, HandDebugFrameListener& l
     {
         request_view_mode(reader, DEBUG_HAND_VIEW_HANDWINDOW);
     }
-    else if (key.code == sf::Keyboard::Dash)
+    else if (key.code == sf::Keyboard::W)
     {
         request_view_mode(reader, DEBUG_HAND_VIEW_DEPTH_AVG);
+    }
+    else if (key.code == sf::Keyboard::E)
+    {
+        request_view_mode(reader, DEBUG_HAND_VIEW_TEST_PASS_MAP);
     }
     else if (key.code == sf::Keyboard::M)
     {
         toggle_mouse_probe(reader);
+    }
+    else if (key.code == sf::Keyboard::P)
+    {
+        toggle_pause_input(reader);
+    }
+    else if (key.code == sf::Keyboard::C)
+    {
+        listener.toggle_circles();
     }
 }
 
@@ -416,7 +455,7 @@ int main(int argc, char** argv)
     auto handStream = reader.stream<sensekit::HandStream>();
     handStream.start();
     handStream.set_include_candidate_points(true);
-    
+
     reader.stream<sensekit::DebugHandStream>().start();
     reader.addListener(listener);
 
@@ -445,6 +484,18 @@ int main(int argc, char** argv)
             else if (event.type == sf::Event::MouseMoved)
             {
                 process_mouse_move(window, reader);
+            }
+            else if (event.type == sf::Event::MouseButtonPressed)
+            {
+                if (event.mouseButton.button == sf::Mouse::Right)
+                {
+                    toggle_pause_input(reader);
+                }
+                else
+                {
+                    process_mouse_move(window, reader);
+                    toggle_spawn_lock(reader);
+                }
             }
         }
 

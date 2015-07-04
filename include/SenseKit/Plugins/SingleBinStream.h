@@ -12,7 +12,7 @@ namespace sensekit { namespace plugins {
     {
     public:
         SingleBinStream(PluginServiceProxy& pluginService,
-                        Sensor streamSet,
+                        sensekit_streamset_t streamSet,
                         StreamDescription description,
                         size_t bufferSize)
             : Stream(pluginService,
@@ -22,6 +22,7 @@ namespace sensekit { namespace plugins {
             m_bin = std::make_unique<bin_type>(get_pluginService(),
                                                get_handle(),
                                                sizeof(TFrameType) + bufferSize);
+            enable_callbacks();
         }
 
         using frame_type = TFrameType;

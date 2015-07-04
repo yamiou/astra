@@ -2,46 +2,84 @@
 #include "SenseKitContext.h"
 #include <SenseKit/Plugins/StreamServiceProxyBase.h>
 #include <SenseKitAPI.h>
+#include <SenseKit/host_events.h>
+#include <memory>
 
-static sensekit::SenseKitContext g_Context;
+static std::unique_ptr<sensekit::SenseKitContext> g_ContextPtr(nullptr);
+static bool g_Initialized = false;
 
 SENSEKIT_BEGIN_DECLS
 
 SENSEKIT_API sensekit_status_t sensekit_initialize()
 {
-    return g_Context.initialize();
+    if (g_Initialized)
+        return SENSEKIT_STATUS_SUCCESS;
+
+    g_Initialized = true;
+    g_ContextPtr = std::make_unique<sensekit::SenseKitContext>();
+
+    return g_ContextPtr->initialize();
 }
 
 SENSEKIT_API sensekit_status_t sensekit_terminate()
 {
-    return g_Context.terminate();
+    if (!g_Initialized)
+        return SENSEKIT_STATUS_SUCCESS;
+
+    sensekit_status_t rc =  g_ContextPtr->terminate();
+    g_Initialized = false;
+
+    return rc;
 }
 
 SENSEKIT_API sensekit_status_t sensekit_streamset_open(const char* connectionString,
-                                                       sensekit_streamset_t* streamSet)
+                                                       sensekit_streamsetconnection_t* streamSet)
 {
-    return g_Context.streamset_open(connectionString, *streamSet);
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->streamset_open(connectionString, *streamSet);
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
 }
 
-SENSEKIT_API sensekit_status_t sensekit_streamset_close(sensekit_streamset_t* streamSet)
+SENSEKIT_API sensekit_status_t sensekit_streamset_close(sensekit_streamsetconnection_t* streamSet)
 {
-    return g_Context.streamset_close(*streamSet);
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->streamset_close(*streamSet);
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
 }
 
-SENSEKIT_API char* sensekit_get_status_string(sensekit_status_t status)
-{
-    return g_Context.get_status_string(status);
-}
-
-SENSEKIT_API sensekit_status_t sensekit_reader_create(sensekit_streamset_t streamSet,
+SENSEKIT_API sensekit_status_t sensekit_reader_create(sensekit_streamsetconnection_t streamSet,
                                                       sensekit_reader_t* reader)
 {
-    return g_Context.reader_create(streamSet, *reader);
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->reader_create(streamSet, *reader);
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
 }
 
 SENSEKIT_API sensekit_status_t sensekit_reader_destroy(sensekit_reader_t* reader)
 {
-    return g_Context.reader_destroy(*reader);
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->reader_destroy(*reader);
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
 }
 
 SENSEKIT_API sensekit_status_t sensekit_reader_get_stream(sensekit_reader_t reader,
@@ -49,35 +87,77 @@ SENSEKIT_API sensekit_status_t sensekit_reader_get_stream(sensekit_reader_t read
                                                           sensekit_stream_subtype_t subtype,
                                                           sensekit_streamconnection_t* connection)
 {
-    return g_Context.reader_get_stream(reader, type, subtype, *connection);
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->reader_get_stream(reader, type, subtype, *connection);
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
 }
 
 SENSEKIT_API sensekit_status_t sensekit_stream_get_description(sensekit_streamconnection_t connection,
                                                                sensekit_stream_desc_t* description)
 {
-    return g_Context.stream_get_description(connection, description);
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->stream_get_description(connection, description);
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
 }
 
 SENSEKIT_API sensekit_status_t sensekit_stream_start(sensekit_streamconnection_t connection)
 {
-    return g_Context.stream_start(connection);
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->stream_start(connection);
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
 }
 
 SENSEKIT_API sensekit_status_t sensekit_stream_stop(sensekit_streamconnection_t connection)
 {
-    return g_Context.stream_stop(connection);
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->stream_stop(connection);
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
 }
 
 SENSEKIT_API sensekit_status_t sensekit_reader_open_frame(sensekit_reader_t reader,
                                                           int timeoutMillis,
                                                           sensekit_reader_frame_t* frame)
 {
-    return g_Context.reader_open_frame(reader, timeoutMillis, *frame);
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->reader_open_frame(reader, timeoutMillis, *frame);
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
 }
 
 SENSEKIT_API sensekit_status_t sensekit_reader_close_frame(sensekit_reader_frame_t* frame)
 {
-    return g_Context.reader_close_frame(*frame);
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->reader_close_frame(*frame);
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
 }
 
 SENSEKIT_API sensekit_status_t sensekit_reader_register_frame_ready_callback(sensekit_reader_t reader,
@@ -85,20 +165,41 @@ SENSEKIT_API sensekit_status_t sensekit_reader_register_frame_ready_callback(sen
                                                                              void* clientTag,
                                                                              sensekit_reader_callback_id_t* callbackId)
 {
-    return g_Context.reader_register_frame_ready_callback(reader, callback, clientTag, *callbackId);
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->reader_register_frame_ready_callback(reader, callback, clientTag, *callbackId);
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
 }
 
 SENSEKIT_API sensekit_status_t sensekit_reader_unregister_frame_ready_callback(sensekit_reader_callback_id_t* callbackId)
 {
-    return g_Context.reader_unregister_frame_ready_callback(*callbackId);
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->reader_unregister_frame_ready_callback(*callbackId);
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
 }
 
 SENSEKIT_API sensekit_status_t sensekit_reader_get_frame(sensekit_reader_frame_t frame,
                                                          sensekit_stream_type_t type,
                                                          sensekit_stream_subtype_t subtype,
-                                                         sensekit_frame_ref_t** frameRef)
+                                                         sensekit_frame_t** subFrame)
 {
-    return g_Context.reader_get_frame(frame, type, subtype, *frameRef);
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->reader_get_frame(frame, type, subtype, *subFrame);
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
 }
 
 SENSEKIT_API sensekit_status_t sensekit_stream_set_parameter(sensekit_streamconnection_t connection,
@@ -106,7 +207,14 @@ SENSEKIT_API sensekit_status_t sensekit_stream_set_parameter(sensekit_streamconn
                                                              size_t inByteLength,
                                                              sensekit_parameter_data_t inData)
 {
-    return g_Context.stream_set_parameter(connection, parameterId, inByteLength, inData);
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->stream_set_parameter(connection, parameterId, inByteLength, inData);
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
 }
 
 SENSEKIT_API sensekit_status_t sensekit_stream_get_parameter(sensekit_streamconnection_t connection,
@@ -114,7 +222,14 @@ SENSEKIT_API sensekit_status_t sensekit_stream_get_parameter(sensekit_streamconn
                                                              size_t* resultByteLength,
                                                              sensekit_result_token_t* token)
 {
-    return g_Context.stream_get_parameter(connection, parameterId, *resultByteLength, *token);
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->stream_get_parameter(connection, parameterId, *resultByteLength, *token);
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
 }
 
 SENSEKIT_API sensekit_status_t sensekit_stream_get_result(sensekit_streamconnection_t connection,
@@ -122,7 +237,14 @@ SENSEKIT_API sensekit_status_t sensekit_stream_get_result(sensekit_streamconnect
                                                           size_t dataByteLength,
                                                           sensekit_parameter_data_t dataDestination)
 {
-    return g_Context.stream_get_result(connection, token, dataByteLength, dataDestination);
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->stream_get_result(connection, token, dataByteLength, dataDestination);
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
 }
 
 SENSEKIT_API sensekit_status_t sensekit_stream_invoke(sensekit_streamconnection_t connection,
@@ -132,12 +254,48 @@ SENSEKIT_API sensekit_status_t sensekit_stream_invoke(sensekit_streamconnection_
                                                       size_t* resultByteLength,
                                                       sensekit_result_token_t* token)
 {
-    return g_Context.stream_invoke(connection, commandId, inByteLength, inData, *resultByteLength, *token);
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->stream_invoke(connection, commandId, inByteLength, inData, *resultByteLength, *token);
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
 }
 
 SENSEKIT_API sensekit_status_t sensekit_temp_update()
 {
-    return g_Context.temp_update();
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->temp_update();
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
+}
+
+SENSEKIT_API sensekit_status_t sensekit_notify_host_event(sensekit_event_id id, const void* data, size_t dataSize)
+{
+    if (g_ContextPtr)
+    {
+        return g_ContextPtr->notify_host_event(id, data, dataSize);
+    }
+    else
+    {
+        return SENSEKIT_STATUS_UNINITIALIZED;
+    }
+}
+
+SENSEKIT_API sensekit_status_t sensekit_notify_resource_available(const char* resourceURI)
+{
+    return sensekit_notify_host_event(SENSEKIT_EVENT_RESOURCE_AVAILABLE, resourceURI, strlen(resourceURI));
+}
+
+SENSEKIT_API sensekit_status_t sensekit_notify_resource_unavailable(const char* resourceURI)
+{
+    return sensekit_notify_host_event(SENSEKIT_EVENT_RESOURCE_UNAVAILABLE, resourceURI, strlen(resourceURI));
 }
 
 SENSEKIT_END_DECLS

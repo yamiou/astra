@@ -6,6 +6,7 @@
 #include <SenseKitUL/Plugins/stream_types.h>
 #include <SenseKitUL/skul_ctypes.h>
 #include <cmath>
+#include <Shiny.h>
 
 namespace sensekit { namespace plugins {
 
@@ -14,7 +15,7 @@ namespace sensekit { namespace plugins {
     {
     public:
         OniDepthStream(PluginServiceProxy& pluginService,
-                       Sensor streamSet,
+                       sensekit_streamset_t streamSet,
                        ::openni::Device& oniDevice)
             : OniDeviceStream(pluginService,
                               streamSet,
@@ -25,18 +26,25 @@ namespace sensekit { namespace plugins {
                               ::openni::SENSOR_DEPTH,
                               1)
         {
+            PROFILE_FUNC();
+        }
+
+    private:
+        virtual void on_open() override
+        {
+            PROFILE_FUNC();
             refresh_conversion_cache(m_oniStream.getHorizontalFieldOfView(),
                                      m_oniStream.getVerticalFieldOfView(),
                                      m_oniVideoMode.getResolutionX(),
                                      m_oniVideoMode.getResolutionY());
         }
 
-    private:
         void refresh_conversion_cache(float horizontalFov,
                                       float verticalFov,
                                       int resolutionX,
                                       int resolutionY)
         {
+            PROFILE_FUNC();
             m_conversionCache.xzFactor = tan(horizontalFov / 2) * 2;
             m_conversionCache.yzFactor = tan(verticalFov / 2) * 2;
             m_conversionCache.resolutionX = resolutionX;
@@ -50,6 +58,19 @@ namespace sensekit { namespace plugins {
         virtual void on_get_parameter(sensekit_streamconnection_t connection,
                                       sensekit_parameter_id id,
                                       sensekit_parameter_bin_t& parameterBin) override;
+
+        virtual void on_connection_removed(sensekit_bin_t bin,
+                                           sensekit_streamconnection_t connection) override
+        {
+            PROFILE_FUNC();
+
+            OniDeviceStream::on_connection_removed(bin, connection);
+
+            #ifdef __ANDROID__
+                PROFILE_UPDATE();
+                PROFILE_OUTPUT("/sdcard/profile_openni_sensor.txt");
+            #endif
+        }
 
         conversion_cache_t m_conversionCache;
     };

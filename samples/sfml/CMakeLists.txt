@@ -1,3 +1,5 @@
 add_subdirectory(SimpleDepthViewer-SFML)
 add_subdirectory(SimpleHandViewer-SFML)
-add_subdirectory(SimpleSkeletonViewer-SFML)
+if(SENSEKIT_SKELETON)
+    add_subdirectory(SimpleSkeletonViewer-SFML)
+endif()

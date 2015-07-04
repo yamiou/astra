@@ -27,6 +27,37 @@
 #include <map>
 #include <vector>
 
+#ifdef __ANDROID__
+
+namespace std {
+
+    template <typename T>
+    std::string to_string(T value)
+    {
+        std::ostringstream os ;
+        os << value ;
+        return os.str() ;
+    }
+
+    long long stoll(std::string s)
+    {
+        std::stringstream ss(s);
+        long long value;
+        ss >> value;
+        return value;
+    }
+
+    long double stold(std::string s)
+    {
+        std::stringstream ss(s);
+        long double value;
+        ss >> value;
+        return value;
+    }
+}
+
+#endif
+
 namespace cpptoml
 {
 
@@ -35,9 +66,9 @@ namespace cpptoml
     // a std::map will ensure that entries a sorted, albeit at a slight
     // performance penalty relative to the (default) unordered_map
     using string_to_base_map = std::map<std::string, std::shared_ptr<base>>;
-#else 
+#else
     // by default an unordered_map is used for best performance as the
-    // toml specification does not require entries to be sorted 
+    // toml specification does not require entries to be sorted
     using string_to_base_map = std::unordered_map<std::string, std::shared_ptr<base>>;
 #endif
 
@@ -272,6 +303,20 @@ inline std::shared_ptr<value<T>> base::as()
 {
     if (auto v = std::dynamic_pointer_cast<value<T>>(shared_from_this()))
         return v;
+    return nullptr;
+}
+
+// special case value<double> to allow getting an integer parameter as a
+// double value
+template <>
+inline std::shared_ptr<value<double>> base::as()
+{
+    if (auto v = std::dynamic_pointer_cast<value<double>>(shared_from_this()))
+        return v;
+
+    if (auto v = std::dynamic_pointer_cast<value<int64_t>>(shared_from_this()))
+        return std::make_shared<value<double>>(v->get());
+
     return nullptr;
 }
 

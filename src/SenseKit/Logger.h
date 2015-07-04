@@ -2,129 +2,76 @@
 #define LOGGER_H
 
 #include <SenseKit/sensekit_types.h>
-#include "vendor/easylogging++.h"
-#include <cstdarg>
-#include <memory>
-#include <cstdio>
+#include "Logging.h"
+#include <string>
+
+#if defined(_MSC_VER)  // Visual C++
+#   define LOG_FUNC __FUNCSIG__
+#elif defined(__GNUC__)  // GCC
+#   define LOG_FUNC __PRETTY_FUNCTION__
+#elif defined(__INTEL_COMPILER)  // Intel C++
+#   define LOG_FUNC __PRETTY_FUNCTION__
+#elif defined(__clang__)  // Clang++
+#   define LOG_FUNC __PRETTY_FUNCTION__
+#else
+#   if defined(__func__)
+#      define LOG_FUNC __func__
+#   else
+#      define LOG_FUNC ""
+#   endif  // defined(__func__)
+#endif  // defined(_MSC_VER)
+
+#define STRACE(channel, format, ...) ::sensekit::log(channel, SK_TRACE, __FILE__, __LINE__, LOG_FUNC, format , ##__VA_ARGS__)
+
+
+#define SINFO(channel, format, ...) ::sensekit::log(channel, SK_INFO, __FILE__, __LINE__, LOG_FUNC, format , ##__VA_ARGS__)
+
+
+#define SDEBUG(channel, format, ...) ::sensekit::log(channel, SK_DEBUG, __FILE__, __LINE__, LOG_FUNC, format , ##__VA_ARGS__)
+
+
+#define SERROR(channel, format, ...) ::sensekit::log(channel, SK_ERROR, __FILE__, __LINE__, LOG_FUNC, format , ##__VA_ARGS__)
+
+#define SFATAL(channel, format, ...) ::sensekit::log(channel, SK_FATAL, __FILE__, __LINE__, LOG_FUNC, format , ##__VA_ARGS__)
+
+
+#define SWARN(channel, format, ...) ::sensekit::log(channel, SK_WARN, __FILE__, __LINE__, LOG_FUNC, format , ##__VA_ARGS__)
 
 namespace sensekit {
 
-    class Logger
+    void log(const char* channel,
+             sensekit_log_severity_t logLevel,
+             const char* fileName,
+             int lineNo,
+             const char* func,
+             const char* format, ...);
+
+
+    void log_vargs(const char* channel,
+                   sensekit_log_severity_t logLevel,
+                   const char* fileName,
+                   int lineNo,
+                   const char* func,
+                   const char* format,
+                   va_list args);
+
+    inline void log_nyan()
     {
-    public:
-        Logger(const char* loggerName)
-            : m_loggerName(loggerName)
-        {
-            el::Loggers::getLogger(loggerName);
-            el::Loggers::addFlag(el::LoggingFlag::HierarchicalLogging);
-            el::Loggers::setLoggingLevel(el::Level::Fatal);
-        }
-
-        Logger()
-            : Logger("default")
-        {}
-
-        void log(sensekit_log_severity_t logLevel, const char* format, ...)
-        {
-            va_list args;
-            va_start(args, format);
-            log(logLevel, format, args);
-            va_end(args);
-        }
-
-        void log_vargs(sensekit_log_severity_t logLevel, const char* format, va_list args)
-        {
-
-#ifdef _WIN32
-            int len = _vscprintf(format, args);
-#else
-            va_list argsCopy;
-            va_copy(argsCopy, args);
-            int len = vsnprintf(nullptr, 0, format, argsCopy);
-            va_end(argsCopy);
-#endif
-            std::unique_ptr<char[]> buffer(new char[len + 1]);
-            vsnprintf(buffer.get(), len + 1, format, args);
-
-            log_internal(logLevel, buffer.get());
-        }
-
-        inline void trace(const char* format, ...)
-        {
-            va_list args;
-            va_start(args, format);
-            log_vargs(sensekit_log_severity_t::TRACE, format, args);
-            va_end(args);
-        }
-
-        inline void info(const char* format, ...)
-        {
-            va_list args;
-            va_start(args, format);
-            log_vargs(sensekit_log_severity_t::INFO, format, args);
-            va_end(args);
-        }
-
-        inline void debug(const char* format, ...)
-        {
-            va_list args;
-            va_start(args, format);
-            log_vargs(sensekit_log_severity_t::DEBUG, format, args);
-            va_end(args);
-        }
-
-        inline void warn(const char* format, ...)
-        {
-            va_list args;
-            va_start(args, format);
-            log_vargs(sensekit_log_severity_t::WARN, format, args);
-            va_end(args);
-        }
-
-        inline void error(const char* format, ...)
-        {
-            va_list args;
-            va_start(args, format);
-            log_vargs(sensekit_log_severity_t::ERROR, format, args);
-            va_end(args);
-        }
-
-        inline void fatal(const char* format, ...)
-        {
-            va_list args;
-            va_start(args, format);
-            log_vargs(sensekit_log_severity_t::FATAL, format, args);
-            va_end(args);
-        }
-
-    private:
-        void log_internal(sensekit_log_severity_t logLevel, const char* message)
-        {
-            switch(logLevel)
-            {
-            case TRACE:
-                CLOG(TRACE, m_loggerName.c_str()) << message;
-                break;
-            case DEBUG:
-                CLOG(DEBUG, m_loggerName.c_str()) << message;
-                break;
-            case INFO:
-                CLOG(INFO, m_loggerName.c_str()) << message;
-                break;
-            case WARN:
-                CLOG(WARNING, m_loggerName.c_str()) << message;
-                break;
-            case ERROR:
-                CLOG(ERROR, m_loggerName.c_str()) << message;
-                break;
-            case FATAL:
-                CLOG(FATAL, m_loggerName.c_str()) << message;
-                break;
-            }
-        }
-
-        std::string m_loggerName;
-    };
+        SINFO("Nyan", "+      o     +              o");
+        SINFO("Nyan", "    +             o      +       +");
+        SINFO("Nyan", "o          +");
+        SINFO("Nyan", "    o  +           +        +");
+        SINFO("Nyan", "+        o     o       +        o");
+        SINFO("Nyan", "-_-_-_-_-_-_-_,------,      o");
+        SINFO("Nyan", "_-_-_-_-_-_-_-|   /\\_/\\");
+        SINFO("Nyan", "-_-_-_-_-_-_-~|__( ^ .^)  +     +");
+        SINFO("Nyan", "_-_-_-_-_-_-_-\"\"  \"\"");
+        SINFO("Nyan", "+      o         o   +       o");
+        SINFO("Nyan", "    +         +");
+        SINFO("Nyan", "o        o         o      o     +");
+        SINFO("Nyan", "    o           +");
+        SINFO("Nyan", "+      +     o        o      +");
+    }
 }
 
 #endif /* LOGGER_H */

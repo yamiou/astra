@@ -32,15 +32,20 @@ typedef void(*connection_removed_callback_t)(void*,
                                              sensekit_streamconnection_t);
 
 
-typedef void(*stream_added_callback_t)(void*,
-                                       sensekit_streamset_t,
-                                       sensekit_stream_t,
-                                       sensekit_stream_desc_t);
+typedef void(*stream_registered_callback_t)(void*,
+                                            sensekit_streamset_t,
+                                            sensekit_stream_t,
+                                            sensekit_stream_desc_t);
 
-typedef void(*stream_removing_callback_t)(void*,
-                                          sensekit_streamset_t,
-                                          sensekit_stream_t,
-                                          sensekit_stream_desc_t);
+typedef void(*stream_unregistering_callback_t)(void*,
+                                               sensekit_streamset_t,
+                                               sensekit_stream_t,
+                                               sensekit_stream_desc_t);
+
+typedef void(*host_event_callback_t)(void*,
+                                     sensekit_event_id,
+                                     const void*,
+                                     size_t);
 
 struct stream_callbacks_t {
     void* context;

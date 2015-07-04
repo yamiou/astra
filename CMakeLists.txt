@@ -2,25 +2,40 @@ cmake_minimum_required (VERSION 3.2)
 
 project (SenseKit)
 
+if (ANDROID)
+  set(SENSEKIT_ANDROID TRUE)
+endif()
+
 # Version
 string (TIMESTAMP BUILD_DATE "%Y%m%dT%H%M%SZ" UTC)
 set (SenseKit_VERSION_MAJOR 0)
-set (SenseKit_VERSION_MINOR 1)
-set (SenseKit_VERSION_PATCH 8)
+set (SenseKit_VERSION_MINOR 2)
+set (SenseKit_VERSION_PATCH 0)
 set (SenseKit_VERSION_BUILD 0)
 
-if (NOT WIN32)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+  set(SENSEKIT_CLANG ON)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  set(SENSEKIT_GCC ON)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+  set(SENSEKIT_INTELC ON)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  set(SENSEKIT_MSVC ON)
 endif()
 
-if (ANDROID)
-  set(ANDROID_CXX_FLAGS "${ANDROID_CXX_FLAGS} -std=c++14")
+if(SENSEKIT_GCC OR SENSEKIT_CLANG)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
+
+  if(SENSEKIT_ANDROID)
+    set(ANDROID_CXX_FLAGS "${ANDROID_CXX_FLAGS} -std=c++14 -Wall")
+  endif()
+
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-if (ANDROID)
+if(SENSEKIT_ANDROID)
   find_host_package(CLISP REQUIRED)
 else()
   find_package(CLISP REQUIRED)
@@ -38,7 +53,7 @@ set(SENSEKIT_INCLUDE_DIR
   )
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 set(SAMPLE_DIR_FOLDER "samples/")
@@ -46,11 +61,10 @@ set(SAMPLE_DIR_FOLDER "samples/")
 set (SDK_DEPENDENT_TARGET "SDK_dependent")
 add_custom_target(${SDK_DEPENDENT_TARGET})
 
+set(SHINY_INCLUDE "${PROJECT_SOURCE_DIR}/vendor/shinyprofiler/include")
+add_subdirectory(vendor)
 add_subdirectory(src)
-
-if (NOT ANDROID)
-  add_subdirectory(samples)
-endif()
+add_subdirectory(samples)
 
 set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/sdk")
 MESSAGE("CMAKE_INSTALL_PREFIX : ${CMAKE_INSTALL_PREFIX}")
@@ -58,7 +72,6 @@ MESSAGE("CMAKE_INSTALL_PREFIX : ${CMAKE_INSTALL_PREFIX}")
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include
   DESTINATION .
   FILES_MATCHING PATTERN "*.h"
-  #  PATTERN "include/SenseKit/Plugins" EXCLUDE
   PATTERN "include/SenseKitUL/Plugins" EXCLUDE
   )
 
@@ -66,6 +79,10 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples
   DESTINATION .
   PATTERN "build" EXCLUDE
   PATTERN ".gitignore" EXCLUDE
+  PATTERN "samples/plugins/orbbec_skeleton" EXCLUDE
+  PATTERN "samples/sfml/SimpleSkeletonViewer-SFML" EXCLUDE
+  PATTERN "samples/tools/StreamRecorder" EXCLUDE
+  PATTERN "samples/gl" EXCLUDE
   )
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
@@ -74,12 +91,28 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
   PATTERN ".gitignore" EXCLUDE
   )
 
-if (MSVC)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/android/
+  DESTINATION android
+  USE_SOURCE_PERMISSIONS
+  PATTERN ".gitignore" EXCLUDE
+  PATTERN ".git" EXCLUDE
+  PATTERN ".gitmodules" EXCLUDE
+  )
 
+if (MSVC)
   install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013
     DESTINATION samples
     PATTERN "build" EXCLUDE
     PATTERN ".gitignore" EXCLUDE
+    PATTERN "thirdparty/.git" EXCLUDE
+    PATTERN "thirdparty/glut_windows" EXCLUDE
+    PATTERN "thirdparty/copy_to_bin_dir/glut*.dll" EXCLUDE
+    )
+
+  file(GLOB_RECURSE THIRD_PARTY_FILES "${PROJECT_SOURCE_DIR}/samples-aux/vs2013/thirdparty/copy_to_bin_dir/*.*")
+  install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013/thirdparty/copy_to_bin_dir/
+    DESTINATION bin
+    PATTERN "glut*.dll" EXCLUDE
     )
 
   set(SAMPLES_SOURCE_DIR "${PROJECT_BINARY_DIR}/sdk/samples")
@@ -126,4 +159,5 @@ if (WIN32)
 else()
   set(CPACK_GENERATOR "ZIP;TGZ")
 endif()
+
 INCLUDE(CPack)

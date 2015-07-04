@@ -21,7 +21,9 @@ void print_hand_frame(sensekit_handframe_t handFrame)
     int activeHandCount = 0;
 
     sensekit_handpoint_t* point = handPoints;
-    for (int i = 0; i < handCount; i++)
+
+    int i;
+    for (i = 0; i < handCount; i++)
     {
         if (point->status == HAND_STATUS_TRACKING)
         {
@@ -69,9 +71,9 @@ int main(int argc, char* argv[])
 
     sensekit_initialize();
 
-    sensekit_streamset_t sensor;
+    sensekit_streamsetconnection_t sensor;
 
-    sensekit_streamset_open("localhost/device0", &sensor);
+    sensekit_streamset_open("device/default", &sensor);
 
     sensekit_reader_t reader;
     sensekit_reader_create(sensor, &reader);

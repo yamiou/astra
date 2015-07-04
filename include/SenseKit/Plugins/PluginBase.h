@@ -2,18 +2,26 @@
 #define PLUGINBASE_H
 
 #include <SenseKit/sensekit_types.h>
+#include <SenseKit/host_events.h>
 #include "PluginServiceProxy.h"
-#include <SenseKit/Plugins/PluginLogger.h>
 #include <cassert>
+#include <SenseKit/Plugins/PluginLogger.h>
 
 namespace sensekit {
+
+    inline const char* get_uri_for_streamset(PluginServiceProxy& pluginService, sensekit_streamset_t streamSet)
+    {
+        const char* uri;
+        pluginService.get_streamset_uri(streamSet, &uri);
+
+        return uri;
+    }
 
     class PluginBase
     {
     public:
-        PluginBase(PluginServiceProxy* pluginService)
-            :  m_pluginService(pluginService),
-               m_logger(*pluginService)
+        PluginBase(PluginServiceProxy* pluginService, const char* pluginName)
+            :  m_pluginService(pluginService)
         {
             assert(pluginService != nullptr);
         }
@@ -26,33 +34,45 @@ namespace sensekit {
 
     protected:
         inline PluginServiceProxy& get_pluginService() const  { return *m_pluginService; }
-        inline sensekit::plugins::PluginLogger& get_logger() { return m_logger; }
 
         virtual void on_initialize() { };
 
         void register_for_stream_events()
         {
             get_pluginService().
-                register_stream_added_callback(&PluginBase::stream_added_handler_thunk,
-                                               this,
-                                               &m_streamAddedCallbackId);
+                register_stream_registered_callback(&PluginBase::stream_added_handler_thunk,
+                                                    this,
+                                                    &m_streamAddedCallbackId);
 
             get_pluginService().
-                register_stream_removing_callback(&PluginBase::stream_removing_handler_thunk,
-                                                  this,
-                                                  &m_streamRemovingCallbackId);
+                register_stream_unregistering_callback(&PluginBase::stream_removing_handler_thunk,
+                                                       this,
+                                                       &m_streamRemovingCallbackId);
+        }
+
+        void register_for_host_events()
+        {
+
+            get_pluginService().
+                register_host_event_callback(&PluginBase::host_event_handler_thunk,
+                                             this,
+                                             &m_hostEventCallbackId);
         }
 
         void unregister_for_stream_events()
         {
-            get_pluginService().unregister_stream_added_callback(m_streamAddedCallbackId);
-            get_pluginService().unregister_stream_removing_callback(m_streamRemovingCallbackId);
+            get_pluginService().unregister_stream_registered_callback(m_streamAddedCallbackId);
+            get_pluginService().unregister_stream_unregistering_callback(m_streamRemovingCallbackId);
+        }
+
+        void unregister_for_host_events()
+        {
+            get_pluginService().unregister_host_event_callback(m_hostEventCallbackId);
         }
 
     private:
 
         PluginServiceProxy* m_pluginService{nullptr};
-        sensekit::plugins::PluginLogger m_logger;
 
         static void stream_added_handler_thunk(void* clientTag,
                                                sensekit_streamset_t setHandle,
@@ -73,6 +93,15 @@ namespace sensekit {
             plugin->stream_removing_handler(setHandle, streamHandle, desc);
         }
 
+        static void host_event_handler_thunk(void* clientTag,
+                                             sensekit_event_id id,
+                                             const void* data,
+                                             size_t dataSize)
+        {
+            PluginBase* plugin = static_cast<PluginBase*>(clientTag);
+            plugin->host_event_handler(id, data, dataSize);
+        }
+
         void stream_added_handler(sensekit_streamset_t setHandle,
                                   sensekit_stream_t streamHandle,
                                   sensekit_stream_desc_t desc)
@@ -87,6 +116,13 @@ namespace sensekit {
             on_stream_removed(setHandle, streamHandle, desc);
         }
 
+        void host_event_handler(sensekit_event_id id,
+                                const void* data,
+                                size_t dataSize)
+        {
+            on_host_event(id, data, dataSize);
+        }
+
         virtual void on_stream_added(sensekit_streamset_t setHandle,
                                      sensekit_stream_t streamHandle,
                                      sensekit_stream_desc_t desc)
@@ -97,19 +133,24 @@ namespace sensekit {
                                        sensekit_stream_desc_t desc)
         {}
 
+        virtual void on_host_event(sensekit_event_id id, const void* data, size_t dataSize) {}
+
         sensekit_callback_id_t m_streamAddedCallbackId;
         sensekit_callback_id_t m_streamRemovingCallbackId;
+        sensekit_callback_id_t m_hostEventCallbackId;
     };
 }
 
 #define EXPORT_PLUGIN(className)                                                         \
                                                                                          \
     static className* g_plugin;                                                          \
+    sensekit::PluginServiceProxy* __g_serviceProxy;                                      \
                                                                                          \
     SENSEKIT_BEGIN_DECLS                                                                 \
                                                                                          \
     SENSEKIT_EXPORT void sensekit_plugin_initialize(PluginServiceProxyBase* pluginProxy) \
     {                                                                                    \
+        __g_serviceProxy = static_cast<sensekit::PluginServiceProxy*>(pluginProxy);      \
         g_plugin = new className(                                                        \
             static_cast<sensekit::PluginServiceProxy*>(pluginProxy));                    \
         g_plugin->initialize();                                                          \
@@ -124,10 +165,9 @@ namespace sensekit {
     {                                                                                    \
         delete g_plugin;                                                                 \
         g_plugin = nullptr;                                                              \
+        __g_serviceProxy = nullptr;                                                      \
     }                                                                                    \
                                                                                          \
-    SENSEKIT_END_DECLS                                                                   \
-                                                                                         \
-    struct missing_semicolon ## __LINE__ {}
+    SENSEKIT_END_DECLS
 
 #endif /* PLUGINBASE_H */

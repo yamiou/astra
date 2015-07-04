@@ -148,4 +148,22 @@ SENSEKIT_API_EX sensekit_status_t sensekit_debug_handstream_set_use_mouse_probe(
                                          reinterpret_cast<sensekit_parameter_data_t>(&useMouseProbe));
 }
 
+SENSEKIT_API_EX sensekit_status_t sensekit_debug_handstream_set_pause_input(sensekit_debug_handstream_t debugHandStream,
+                                                                            bool pauseInput)
+{
+    return sensekit_stream_set_parameter(debugHandStream,
+                                         SENSEKIT_PARAMETER_DEBUG_HAND_PAUSE_INPUT,
+                                         sizeof(bool),
+                                         reinterpret_cast<sensekit_parameter_data_t>(&pauseInput));
+}
+
+SENSEKIT_API_EX sensekit_status_t sensekit_debug_handstream_set_lock_spawn_point(sensekit_debug_handstream_t debugHandStream,
+                                                                                 bool lockSpawnPoint)
+{
+    return sensekit_stream_set_parameter(debugHandStream,
+        SENSEKIT_PARAMETER_DEBUG_HAND_LOCK_SPAWN_POINT,
+                                         sizeof(bool),
+                                         reinterpret_cast<sensekit_parameter_data_t>(&lockSpawnPoint));
+}
+
 SENSEKIT_END_DECLS

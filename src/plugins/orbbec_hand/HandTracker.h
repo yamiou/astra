@@ -3,18 +3,18 @@
 
 #include <opencv2/imgproc/imgproc.hpp>
 #include <SenseKitUL/SenseKitUL.h>
+#include <SenseKitUL/Plugins/stream_types.h>
+#include <SenseKit/Plugins/PluginKit.h>
 
 #include "DepthUtility.h"
 #include "TrackedPoint.h"
 #include "PointProcessor.h"
-#include <SenseKitUL/Plugins/stream_types.h>
 #include "ScalingCoordinateMapper.h"
-#include <SenseKit/Plugins/PluginKit.h>
 #include "HandStream.h"
 #include "DebugHandStream.h"
 #include "DebugVisualizer.h"
-#include <memory>
 #include "HandSettings.h"
+#include <memory>
 
 namespace sensekit { namespace plugins { namespace hand {
 
@@ -22,14 +22,14 @@ namespace sensekit { namespace plugins { namespace hand {
     {
     public:
         HandTracker(PluginServiceProxy& pluginService,
-                    Sensor& streamset,
+                    sensekit_streamset_t streamSet,
                     StreamDescription& depthDesc,
-                    PluginLogger& pluginLogger,
                     HandSettings& settings);
+
         virtual ~HandTracker();
         virtual void on_frame_ready(StreamReader& reader, Frame& frame) override;
     private:
-        void create_streams(PluginServiceProxy& pluginService, Sensor streamset);
+        void create_streams(PluginServiceProxy& pluginService, sensekit_streamset_t streamSet);
         void reset();
         void generate_hand_frame(sensekit_frame_index_t frameIndex);
         static void copy_position(cv::Point3f& source, sensekit_vector3f_t& target);
@@ -39,39 +39,45 @@ namespace sensekit { namespace plugins { namespace hand {
         void overlay_circle(_sensekit_imageframe& imageFrame);
         void update_debug_image_frame(_sensekit_imageframe& sensekitColorframe);
         void generate_hand_debug_image_frame(sensekit_frame_index_t frameIndex);
-        void update_tracking(DepthFrame& depthFrame);
+        void update_tracking(DepthFrame& depthFrame, PointFrame& pointFrame);
         void update_hand_frame(std::vector<TrackedPoint>& internalTrackedPoints, _sensekit_handframe& frame);
 
-        void track_points(cv::Mat& matDepth, cv::Mat& matDepthFullSize, cv::Mat& matForeground);
-        
+        void debug_probe_point(TrackingMatrices& matrices);
+        void debug_spawn_point(TrackingMatrices& matrices);
+
+        void track_points(cv::Mat& matDepth,
+                          cv::Mat& matDepthFullSize,
+                          cv::Mat& matForeground,
+                          const Vector3f* worldPoints);
+        cv::Point get_mouse_probe_position();
+        cv::Point get_spawn_position();
+
         //fields
 
+        HandSettings& m_settings;
         PluginServiceProxy& m_pluginService;
-        PluginLogger& m_logger;
         DepthUtility m_depthUtility;
         PointProcessor m_pointProcessor;
+        Sensor m_sensor;
         StreamReader m_reader;
         float m_processingSizeWidth;
         float m_processingSizeHeight;
 
         DepthStream m_depthStream;
 
-        using ColorStreamPtr = std::unique_ptr <DebugHandStream> ;
+        using ColorStreamPtr = std::unique_ptr<DebugHandStream>;
         ColorStreamPtr m_debugImageStream;
 
         using HandStreamPtr = std::unique_ptr<HandStream>;
         HandStreamPtr m_handStream;
 
-        int m_width;
-        int m_height;
-
         cv::Mat m_matDepth;
         cv::Mat m_matDepthFullSize;
         cv::Mat m_matDepthWindow;
         cv::Mat m_matVelocitySignal;
-        cv::Mat m_matBasicScore;
         cv::Mat m_matArea;
         cv::Mat m_matAreaSqrt;
+        cv::Mat m_layerIntegralArea;
         cv::Mat m_debugUpdateSegmentation;
         cv::Mat m_debugCreateSegmentation;
         cv::Mat m_debugRefineSegmentation;
@@ -80,15 +86,25 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat m_debugUpdateScore;
         cv::Mat m_debugCreateScore;
         cv::Mat m_debugRefineScore;
+        cv::Mat m_debugUpdateScoreValue;
+        cv::Mat m_debugCreateScoreValue;
+        cv::Mat m_debugRefineScoreValue;
+        cv::Mat m_debugCreateTestPassMap;
+        cv::Mat m_debugUpdateTestPassMap;
+        cv::Mat m_debugRefineTestPassMap;
 
         cv::Mat m_layerSegmentation;
         cv::Mat m_layerScore;
         cv::Mat m_layerEdgeDistance;
+        cv::Mat m_layerTestPassMap;
 
         cv::Mat m_refineForegroundSearched;
         cv::Mat m_refineSegmentation;
         cv::Mat m_refineScore;
         cv::Mat m_refineEdgeDistance;
+
+        sensekit::Vector3f* m_worldPoints { nullptr };
+        int m_numWorldPoints { 0 };
 
         DebugVisualizer m_debugVisualizer;
     };

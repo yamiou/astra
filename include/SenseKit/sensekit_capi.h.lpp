@@ -7,6 +7,9 @@
 
 SENSEKIT_BEGIN_DECLS
 
+SENSEKIT_API sensekit_status_t sensekit_initialize();
+SENSEKIT_API sensekit_status_t sensekit_terminate();
+
 ^^^BEGINREPLACE:stream^^^
 SENSEKIT_API ^RETURN^ sensekit_^FUNC^(^PARAMS^);
 

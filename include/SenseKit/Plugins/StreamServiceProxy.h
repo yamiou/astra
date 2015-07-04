@@ -10,33 +10,18 @@ namespace sensekit {
     {
     public:
 
-        sensekit_status_t initialize()
-        {
-            return StreamServiceProxyBase::initialize(streamService);
-        }
-
-        sensekit_status_t terminate()
-        {
-            return StreamServiceProxyBase::terminate(streamService);
-        }
-
         sensekit_status_t streamset_open(const char* connectionString,
-                                         sensekit_streamset_t* streamSet)
+                                         sensekit_streamsetconnection_t* streamSet)
         {
             return StreamServiceProxyBase::streamset_open(streamService, connectionString, streamSet);
         }
 
-        sensekit_status_t streamset_close(sensekit_streamset_t* streamSet)
+        sensekit_status_t streamset_close(sensekit_streamsetconnection_t* streamSet)
         {
             return StreamServiceProxyBase::streamset_close(streamService, streamSet);
         }
 
-        char* get_status_string(sensekit_status_t status)
-        {
-            return StreamServiceProxyBase::get_status_string(streamService, status);
-        }
-
-        sensekit_status_t reader_create(sensekit_streamset_t streamSet,
+        sensekit_status_t reader_create(sensekit_streamsetconnection_t streamSet,
                                         sensekit_reader_t* reader)
         {
             return StreamServiceProxyBase::reader_create(streamService, streamSet, reader);
@@ -99,9 +84,9 @@ namespace sensekit {
         sensekit_status_t reader_get_frame(sensekit_reader_frame_t frame,
                                            sensekit_stream_type_t type,
                                            sensekit_stream_subtype_t subtype,
-                                           sensekit_frame_ref_t** frameRef)
+                                           sensekit_frame_t** subFrame)
         {
-            return StreamServiceProxyBase::reader_get_frame(streamService, frame, type, subtype, frameRef);
+            return StreamServiceProxyBase::reader_get_frame(streamService, frame, type, subtype, subFrame);
         }
 
         sensekit_status_t stream_set_parameter(sensekit_streamconnection_t connection,

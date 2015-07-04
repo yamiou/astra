@@ -1,68 +1,86 @@
 #include "HandSettings.h"
 #include "HandPlugin.h"
 #include "HandTracker.h"
+#include <Shiny.h>
 
 EXPORT_PLUGIN(sensekit::plugins::hand::HandPlugin);
 
 namespace sensekit { namespace plugins { namespace hand {
 
+    const char HANDPLUGIN_CONFIG_FILE[] = "plugins/orbbec_hand.toml";
+
     HandPlugin::HandPlugin(PluginServiceProxy* pluginProxy)
-        : PluginBase(pluginProxy)
-    { 
-        m_settings = parse_settings("plugins/orbbec_hand.toml");
+        : PluginBase(pluginProxy, "orbbec_hand")
+    {
+        m_settings = parse_settings(HANDPLUGIN_CONFIG_FILE);
     }
 
     HandPlugin::~HandPlugin()
-    { }
+    {
+        #ifndef __ANDROID__
+            PROFILE_UPDATE();
+            PROFILE_OUTPUT("profile_orbbec_hand.txt");
+        #endif
+
+        get_pluginService().unregister_stream_registered_callback(m_streamAddedCallbackId);
+        get_pluginService().unregister_stream_unregistering_callback(m_streamRemovingCallbackId);
+    }
 
     void HandPlugin::on_initialize()
     {
-        get_pluginService().register_stream_added_callback(&HandPlugin::stream_added_handler_thunk,
-                                                           this,
-                                                           &m_streamAddedCallbackId);
+        get_pluginService().register_stream_registered_callback(&HandPlugin::stream_registered_handler_thunk,
+                                                                this,
+                                                                &m_streamAddedCallbackId);
 
-        get_pluginService().register_stream_removing_callback(&HandPlugin::stream_removing_handler_thunk,
-                                                              this,
-                                                              &m_streamRemovingCallbackId);
+        get_pluginService().register_stream_unregistering_callback(&HandPlugin::stream_unregistering_handler_thunk,
+                                                                   this,
+                                                                   &m_streamRemovingCallbackId);
     }
 
-    void HandPlugin::stream_added_handler_thunk(void* clientTag,
-                                                 sensekit_streamset_t setHandle,
-                                                 sensekit_stream_t streamHandle,
-                                                 sensekit_stream_desc_t desc)
+    void HandPlugin::stream_registered_handler_thunk(void* clientTag,
+                                                     sensekit_streamset_t setHandle,
+                                                     sensekit_stream_t streamHandle,
+                                                     sensekit_stream_desc_t desc)
     {
         HandPlugin* plugin = static_cast<HandPlugin*>(clientTag);
-        plugin->stream_added_handler(setHandle, streamHandle, desc);
+        plugin->stream_registered_handler(setHandle, streamHandle, desc);
     }
 
-    void HandPlugin::stream_removing_handler_thunk(void* clientTag,
-                                                    sensekit_streamset_t setHandle,
-                                                    sensekit_stream_t streamHandle,
-                                                    sensekit_stream_desc_t desc)
+    void HandPlugin::stream_unregistering_handler_thunk(void* clientTag,
+                                                        sensekit_streamset_t setHandle,
+                                                        sensekit_stream_t streamHandle,
+                                                        sensekit_stream_desc_t desc)
 
     {
         HandPlugin* plugin = static_cast<HandPlugin*>(clientTag);
-        plugin->stream_removing_handler(setHandle, streamHandle, desc);
+        plugin->stream_unregistering_handler(setHandle, streamHandle, desc);
     }
 
-    void HandPlugin::stream_added_handler(sensekit_streamset_t setHandle,
-                                           sensekit_stream_t streamHandle,
-                                           sensekit_stream_desc_t streamDesc)
+    void HandPlugin::stream_registered_handler(sensekit_streamset_t setHandle,
+                                               sensekit_stream_t streamHandle,
+                                               sensekit_stream_desc_t streamDesc)
     {
         if (streamDesc.type == SENSEKIT_STREAM_DEPTH &&
             m_streamTrackerMap.find(streamHandle) == m_streamTrackerMap.end())
         {
-            Sensor sensor(setHandle);
+            const char* uri;
+            get_pluginService().get_streamset_uri(setHandle, &uri);
+
+            Sensor sensor(uri);
             StreamDescription depthDescription = streamDesc;
 
-            HandTracker* tracker = new HandTracker(get_pluginService(), sensor, depthDescription, get_logger(), m_settings);
+            HandTracker* tracker = new HandTracker(get_pluginService(),
+                                                   setHandle,
+                                                   depthDescription,
+                                                   m_settings);
+
             m_streamTrackerMap[streamHandle] = tracker;
         }
     }
 
-    void HandPlugin::stream_removing_handler(sensekit_streamset_t setHandle,
-                                              sensekit_stream_t streamHandle,
-                                              sensekit_stream_desc_t desc)
+    void HandPlugin::stream_unregistering_handler(sensekit_streamset_t setHandle,
+                                                  sensekit_stream_t streamHandle,
+                                                  sensekit_stream_desc_t desc)
     {
         auto it = m_streamTrackerMap.find(streamHandle);
         if (it != m_streamTrackerMap.end())

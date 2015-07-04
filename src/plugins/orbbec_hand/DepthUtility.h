@@ -1,7 +1,7 @@
 #ifndef DEPTHUTILITY_H
 #define DEPTHUTILITY_H
 
-#include <opencv2/opencv.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <SenseKitUL/SenseKitUL.h>
 #include "HandSettings.h"
 
@@ -76,6 +76,8 @@ namespace sensekit { namespace plugins { namespace hand {
         float m_maxDepthJumpPercent;
         int m_erodeSize;
         float m_depthAdjustmentFactor;
+        float m_minDepth;
+        float m_maxDepth;
 
         static const int NUM_DEPTH_VEL_CHUNKS = 8;
         const float MIN_CHUNK_DEPTH = 0;

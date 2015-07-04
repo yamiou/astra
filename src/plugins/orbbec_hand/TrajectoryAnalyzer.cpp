@@ -7,9 +7,8 @@ namespace sensekit { namespace plugins { namespace hand {
     using namespace std;
 
 
-    TrajectoryAnalyzer::TrajectoryAnalyzer(int trackingId, PluginLogger& pluginLogger, TrajectoryAnalyzerSettings& settings) :
+    TrajectoryAnalyzer::TrajectoryAnalyzer(int trackingId, TrajectoryAnalyzerSettings& settings) :
         m_trackingId(trackingId),
-        m_logger(pluginLogger),
         m_pointSteady(false),
         m_numSteadyFrames(0),
         m_accumulatedDeltaHeading(),
@@ -47,8 +46,8 @@ namespace sensekit { namespace plugins { namespace hand {
 
     void TrajectoryAnalyzer::reset_wave()
     {
-        m_logger.info("Reset wave gesture for point #%d", m_trackingId);
-        
+        SINFO("TrajectoryAnalyzer", "Reset wave gesture for point #%d", m_trackingId);
+
         m_isWaveGesture = false;
         m_isInflecting = false;
         m_lastAccumulatedDeltaHeading = cv::Point3f();
@@ -77,20 +76,20 @@ namespace sensekit { namespace plugins { namespace hand {
         ++m_framesSinceInflection;
         if (m_framesSinceInflection == m_maxFramesBetweenInflections)
         {
-            m_logger.info("Wave gesture timed out for point #%d", m_trackingId);
+            SINFO("TrajectoryAnalyzer", "Wave gesture timed out for point #%d", m_trackingId);
 
             reset_wave();
         }
 
         cv::Point3f deltaPosition = point.fullSizeWorldDeltaPosition;
-        
+
         float delta = cv::norm(deltaPosition);
-        
+
         if (delta > m_maxSteadyDelta)
         {
             cv::Point3f deltaPositionNullY = deltaPosition;
             deltaPositionNullY.y = 0;
-            
+
             if (!m_isTrackingHeading)
             {
                 m_isTrackingHeading = true;
@@ -104,10 +103,10 @@ namespace sensekit { namespace plugins { namespace hand {
                 m_recentDeltaHeading = deltaPositionNullY * (1 - m_deltaHeadingFactor) + deltaPositionNullY * m_deltaHeadingFactor;
 
                 m_avgDeltaHeadingValid = is_valid_heading_dist(point.fullSizeWorldPosition);
-                
+
                 float headingDist = cv::norm(point.fullSizeWorldPosition - m_headingTrackStart);
-                
-                m_logger.trace("#%d dist %f v1: %d v2: %d", m_trackingId, headingDist, m_avgDeltaHeadingValid, m_lastAvgDeltaHeadingValid);
+
+                STRACE("TrajectoryAnalyzer", "#%d dist %f v1: %d v2: %d", m_trackingId, headingDist, m_avgDeltaHeadingValid, m_lastAvgDeltaHeadingValid);
 
                 if (m_avgDeltaHeadingValid && m_lastAvgDeltaHeadingValid)
                 {
@@ -122,10 +121,10 @@ namespace sensekit { namespace plugins { namespace hand {
                             ++m_numWaveInflections;
                             if (!m_isWaveGesture)
                             {
-                                m_logger.info("Wave count %d for point #%d", m_numWaveInflections, m_trackingId);
+                                SINFO("TrajectoryAnalyzer", "Wave count %d for point #%d", m_numWaveInflections, m_trackingId);
                                 if (m_numWaveInflections == m_minWaveInflectionsForGesture)
                                 {
-                                    m_logger.info("Wave gesture detected for point #%d", m_trackingId);
+                                    SINFO("TrajectoryAnalyzer", "Wave gesture detected for point #%d", m_trackingId);
                                     m_isWaveGesture = true;
                                 }
                             }
@@ -159,7 +158,7 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 m_pointSteady = true;
 
-                m_logger.info("Steady gesture detected for point #%d", m_trackingId);
+                SINFO("TrajectoryAnalyzer", "Steady gesture detected for point #%d", m_trackingId);
 
                 if (m_isWaveGesture)
                 {
@@ -199,10 +198,10 @@ namespace sensekit { namespace plugins { namespace hand {
 
         float invLen1 = 1.0 / len1;
         float invLen2 = 1.0 / len2;
-        
+
         auto norm1 = v1 * invLen1;
         auto norm2 = v2 * invLen2;
-        
+
         float angleBetween = std::acos(norm1.dot(norm2));
         float degreeBetween = angleBetween * RAD_TO_DEG;
         return degreeBetween;

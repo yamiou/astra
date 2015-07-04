@@ -36,6 +36,8 @@ namespace sensekit { namespace plugins { namespace hand {
         settings.maxDepthJumpPercent = get_float_from_table(t, "depthutility.maxDepthJumpPercent", settings.maxDepthJumpPercent);
         settings.erodeSize = get_int_from_table(t, "depthutility.erodeSize", settings.erodeSize);
         settings.depthAdjustmentFactor = get_float_from_table(t, "depthutility.depthAdjustmentFactor", settings.depthAdjustmentFactor);
+        settings.minDepth = get_float_from_table(t, "depthutility.minDepth", settings.minDepth);
+        settings.maxDepth = get_float_from_table(t, "depthutility.maxDepth", settings.maxDepth);
 
         return settings;
     }
@@ -44,39 +46,21 @@ namespace sensekit { namespace plugins { namespace hand {
     {
         PointProcessorSettings settings;
 
-        settings.segmentationBandwidthDepthNear = get_float_from_table(t, "pointprocessor.segmentationBandwidthDepthNear", settings.segmentationBandwidthDepthNear);
-        settings.segmentationBandwidthDepthFar = get_float_from_table(t, "pointprocessor.segmentationBandwidthDepthFar", settings.segmentationBandwidthDepthFar);
         settings.maxMatchDistLostActive = get_float_from_table(t, "pointprocessor.maxMatchDistLostActive", settings.maxMatchDistLostActive);
         settings.maxMatchDistDefault = get_float_from_table(t, "pointprocessor.maxMatchDistDefault", settings.maxMatchDistDefault);
-        settings.iterationMaxInitial = get_int_from_table(t, "pointprocessor.iterationMaxInitial", settings.iterationMaxInitial);
-        settings.iterationMaxTracking = get_int_from_table(t, "pointprocessor.iterationMaxTracking", settings.iterationMaxTracking);
-        settings.iterationMaxRefinement = get_int_from_table(t, "pointprocessor.iterationMaxRefinement", settings.iterationMaxRefinement);
-        settings.minArea = get_float_from_table(t, "pointprocessor.minArea", settings.minArea);
-        settings.maxArea = get_float_from_table(t, "pointprocessor.maxArea", settings.maxArea);
-        settings.areaBandwidth = get_float_from_table(t, "pointprocessor.areaBandwidth", settings.areaBandwidth);
-        settings.areaBandwidthDepth = get_float_from_table(t, "pointprocessor.areaBandwidthDepth", settings.areaBandwidthDepth);
-        settings.maxSegmentationDist = get_float_from_table(t, "pointprocessor.maxSegmentationDist", settings.maxSegmentationDist);
         settings.steadyDeadBandRadius = get_float_from_table(t, "pointprocessor.steadyDeadBandRadius", settings.steadyDeadBandRadius);
-        settings.targetEdgeDistance = get_float_from_table(t, "pointprocessor.targetEdgeDistance", settings.targetEdgeDistance);
-        settings.heightScoreFactor = get_float_from_table(t, "pointprocessor.heightScoreFactor", settings.heightScoreFactor);
-        settings.depthScoreFactor = get_float_from_table(t, "pointprocessor.depthScoreFactor", settings.depthScoreFactor);
-        settings.edgeDistanceScoreFactor = get_float_from_table(t, "pointprocessor.edgeDistanceScoreFactor", settings.edgeDistanceScoreFactor);
-        settings.pointInertiaFactor = get_float_from_table(t, "pointprocessor.pointInertiaFactor", settings.pointInertiaFactor);
-        settings.pointInertiaRadius = get_float_from_table(t, "pointprocessor.pointInertiaRadius", settings.pointInertiaRadius);
         settings.maxInactiveFramesForCandidatePoints = get_int_from_table(t, "pointprocessor.maxInactiveFramesForCandidatePoints", settings.maxInactiveFramesForCandidatePoints);
         settings.maxInactiveFramesForLostPoints = get_int_from_table(t, "pointprocessor.maxInactiveFramesForLostPoints", settings.maxInactiveFramesForLostPoints);
         settings.maxInactiveFramesForActivePoints = get_int_from_table(t, "pointprocessor.maxInactiveFramesForActivePoints", settings.maxInactiveFramesForActivePoints);
         settings.pointSmoothingFactor = get_float_from_table(t, "pointprocessor.pointSmoothingFactor", settings.pointSmoothingFactor);
         settings.pointDeadBandSmoothingFactor = get_float_from_table(t, "pointprocessor.pointDeadBandSmoothingFactor", settings.pointDeadBandSmoothingFactor);
         settings.pointSmoothingDeadZone = get_float_from_table(t, "pointprocessor.pointSmoothingDeadZone", settings.pointSmoothingDeadZone);
-        settings.foregroundRadius1 = get_float_from_table(t, "pointprocessor.foregroundRadius1", settings.foregroundRadius1);
-        settings.foregroundRadius2 = get_float_from_table(t, "pointprocessor.foregroundRadius2", settings.foregroundRadius2);
-        settings.foregroundRadiusMaxPercent1 = get_float_from_table(t, "pointprocessor.foregroundRadiusMaxPercent1", settings.foregroundRadiusMaxPercent1);
-        settings.foregroundRadiusMaxPercent2 = get_float_from_table(t, "pointprocessor.foregroundRadiusMaxPercent2", settings.foregroundRadiusMaxPercent2);
         settings.maxFailedTestsInProbation = get_int_from_table(t, "pointprocessor.maxFailedTestsInProbation", settings.maxFailedTestsInProbation);
         settings.probationFrameCount = get_int_from_table(t, "pointprocessor.probationFrameCount", settings.probationFrameCount);
         settings.maxFailedTestsInProbationActivePoints = get_int_from_table(t, "pointprocessor.maxFailedTestsInProbationActivePoints", settings.maxFailedTestsInProbationActivePoints);
         settings.secondChanceMinDistance = get_float_from_table(t, "pointprocessor.secondChanceMinDistance", settings.secondChanceMinDistance);
+        settings.mergePointDistance = get_float_from_table(t, "pointprocessor.mergePointDistance", settings.mergePointDistance);
+        settings.maxHandPointUpdatesPerFrame = get_int_from_table(t, "pointprocessor.maxHandPointUpdatesPerFrame", settings.maxHandPointUpdatesPerFrame);
 
         return settings;
     }
@@ -93,6 +77,64 @@ namespace sensekit { namespace plugins { namespace hand {
         settings.maxHeadingDiffForContinuation = get_float_from_table(t, "trajectoryanalyzer.maxHeadingDiffForContinuation", settings.maxHeadingDiffForContinuation);
         settings.minWaveInflectionsForGesture = get_int_from_table(t, "trajectoryanalyzer.minWaveInflectionsForGesture", settings.minWaveInflectionsForGesture);
         settings.maxFramesBetweenInflections = get_int_from_table(t, "trajectoryanalyzer.maxFramesBetweenInflections", settings.maxFramesBetweenInflections);
+
+        return settings;
+    }
+
+    AreaTestSettings parse_area_test_settings(cpptoml::table t)
+    {
+        AreaTestSettings settings;
+
+        settings.areaBandwidth = get_float_from_table(t, "areatest.areaBandwidth", settings.areaBandwidth);
+        settings.areaBandwidthDepth = get_float_from_table(t, "areatest.areaBandwidthDepth", settings.areaBandwidthDepth);
+        settings.minArea = get_float_from_table(t, "areatest.minArea", settings.minArea);
+        settings.maxArea = get_float_from_table(t, "areatest.maxArea", settings.maxArea);
+
+        return settings;
+    }
+
+    CircumferenceTestSettings parse_circumference_test_settings(cpptoml::table t)
+    {
+        CircumferenceTestSettings settings;
+
+        settings.foregroundRadius1 = get_float_from_table(t, "circumferencetest.foregroundRadius1", settings.foregroundRadius1);
+        settings.foregroundRadius2 = get_float_from_table(t, "circumferencetest.foregroundRadius2", settings.foregroundRadius2);
+        settings.foregroundRadiusMinPercent1 = get_float_from_table(t, "circumferencetest.foregroundRadiusMinPercent1", settings.foregroundRadiusMinPercent1);
+        settings.foregroundRadiusMinPercent2 = get_float_from_table(t, "circumferencetest.foregroundRadiusMinPercent2", settings.foregroundRadiusMinPercent2);
+        settings.foregroundRadiusMaxPercent1 = get_float_from_table(t, "circumferencetest.foregroundRadiusMaxPercent1", settings.foregroundRadiusMaxPercent1);
+        settings.foregroundRadiusMaxPercent2 = get_float_from_table(t, "circumferencetest.foregroundRadiusMaxPercent2", settings.foregroundRadiusMaxPercent2);
+
+        return settings;
+    }
+
+    NaturalEdgeTestSettings parse_natural_edge_test_settings(cpptoml::table t)
+    {
+        NaturalEdgeTestSettings settings;
+
+        settings.naturalEdgeBandwidth = get_float_from_table(t, "naturaledgetest.naturalEdgeBandwidth", settings.naturalEdgeBandwidth);
+        settings.minPercentNaturalEdges = get_float_from_table(t, "naturaledgetest.minPercentNaturalEdges", settings.minPercentNaturalEdges);
+
+        return settings;
+    }
+
+    SegmentationSettings parse_segmentation_settings(cpptoml::table t)
+    {
+        SegmentationSettings settings;
+
+        settings.segmentationBandwidthDepthNear = get_float_from_table(t, "segmentation.segmentationBandwidthDepthNear", settings.segmentationBandwidthDepthNear);
+        settings.segmentationBandwidthDepthFar = get_float_from_table(t, "segmentation.segmentationBandwidthDepthFar", settings.segmentationBandwidthDepthFar);
+        settings.maxSegmentationDist = get_float_from_table(t, "segmentation.maxSegmentationDist", settings.maxSegmentationDist);
+        settings.heightScoreFactor = get_float_from_table(t, "segmentation.heightScoreFactor", settings.heightScoreFactor);
+        settings.depthScoreFactor = get_float_from_table(t, "segmentation.depthScoreFactor", settings.depthScoreFactor);
+        settings.targetEdgeDistance = get_float_from_table(t, "segmentation.targetEdgeDistance", settings.targetEdgeDistance);
+        settings.edgeDistanceScoreFactor = get_float_from_table(t, "segmentation.edgeDistanceScoreFactor", settings.edgeDistanceScoreFactor);
+        settings.pointInertiaFactor = get_float_from_table(t, "segmentation.pointInertiaFactor", settings.pointInertiaFactor);
+        settings.pointInertiaRadius = get_float_from_table(t, "segmentation.pointInertiaRadius", settings.pointInertiaRadius);
+        settings.maxDepthToDownscaleTestPass = get_float_from_table(t, "segmentation.maxDepthToDownscaleTestPass", settings.maxDepthToDownscaleTestPass);
+
+        settings.areaTestSettings = parse_area_test_settings(t);
+        settings.circumferenceTestSettings = parse_circumference_test_settings(t);
+        settings.naturalEdgeTestSettings = parse_natural_edge_test_settings(t);
 
         return settings;
     }
@@ -118,6 +160,7 @@ namespace sensekit { namespace plugins { namespace hand {
         settings.depthUtilitySettings = parse_depth_utility_settings(t);
         settings.pointProcessorSettings = parse_point_processor_settings(t);
         settings.pointProcessorSettings.trajectoryAnalyzerSettings = parse_trajectory_analyzer_settings(t);
+        settings.pointProcessorSettings.segmentationSettings = parse_segmentation_settings(t);
 
         return settings;
     }

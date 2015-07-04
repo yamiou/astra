@@ -61,7 +61,6 @@ namespace sensekit {
         }
 
     private:
-
         class ReaderRef;
         using ReaderRefPtr = std::shared_ptr<ReaderRef>;
 
@@ -162,7 +161,10 @@ namespace sensekit {
                     return;
                 }
 
-                Frame frameWrapper(readerFrame);
+                //we didn't open the frame, so don't auto close it.
+                //the StreamReader internals will close it automatically
+                const bool autoCloseFrame = false;
+                Frame frameWrapper(readerFrame, autoCloseFrame);
 
                 m_isNotifying = true;
                 StreamReader reader(shared_from_this());

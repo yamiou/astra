@@ -27,9 +27,18 @@ set(${_projname}_SOURCES
   constants.h
   ../../SenseKit/vendor/cpptoml.h
   orbbec_hand.toml
-)
+  )
 
-find_package( OpenCV REQUIRED core imgproc)
+if (ANDROID)
+  if (NOT OpenCV_ANDROID_SDK_ROOT)
+    message(FATAL_ERROR "OpenCV_ANDROID_SDK_ROOT must be set if building for Android.")
+  endif()
+  set(OpenCV_DIR "${OpenCV_ANDROID_SDK_ROOT}/sdk/native/jni")
+  find_package(OpenCV REQUIRED core imgproc NO_DEFAULT_PATH)
+else()
+  find_package(OpenCV REQUIRED core imgproc)
+endif()
+
 #maps relwithbedinfo to release, so don't include debug version of opencv
 set_target_properties(${OpenCV_LIBS} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO RELEASE)
 set_target_properties(${OpenCV_LIBS} PROPERTIES MAP_IMPORTED_CONFIG_MINSIZEREL RELEASE)
@@ -38,23 +47,27 @@ add_library(${_projname} SHARED ${${_projname}_SOURCES})
 
 set_target_properties(${_projname} PROPERTIES FOLDER "plugins")
 
-target_link_libraries(${_projname} SenseKitAPI SenseKitUL ${OpenCV_LIBS})
+target_link_libraries(${_projname} SenseKitAPI SenseKitUL Shiny ${OpenCV_LIBS})
 
 include_directories(${_projname} ${OpenCV_INCLUDE_DIRS})
 
+include_directories(${_projname} ${SHINY_INCLUDE})
+
 install(TARGETS ${_projname}
-        RUNTIME DESTINATION bin/Plugins/
-        LIBRARY DESTINATION bin/Plugins/
-        )
+  RUNTIME DESTINATION bin/Plugins/
+  LIBRARY DESTINATION lib/Plugins/
+  )
 
 add_custom_target(copytoml ALL
-	#orbbec_hand.toml
-	COMMAND ${CMAKE_COMMAND} -E copy
-		"${PROJECT_SOURCE_DIR}/src/plugins/orbbec_hand/orbbec_hand.toml"
-		"$<TARGET_FILE_DIR:${_projname}>/")
+  #orbbec_hand.toml
+  COMMAND ${CMAKE_COMMAND} -E copy
+  "${PROJECT_SOURCE_DIR}/src/plugins/orbbec_hand/orbbec_hand.toml"
+  "$<TARGET_FILE_DIR:${_projname}>/")
+
+  set_target_properties(copytoml PROPERTIES FOLDER CMakeCopyTargets)
 
 install(FILES ${PROJECT_SOURCE_DIR}/src/plugins/orbbec_hand/orbbec_hand.toml
-		DESTINATION bin/Plugins/
-)
+  DESTINATION bin/Plugins/
+  )
 
 install_pdb(${_projname} bin/Plugins/)

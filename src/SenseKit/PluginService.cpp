@@ -4,6 +4,8 @@
 #include "PluginServiceDelegate.h"
 #include <SenseKit/Plugins/PluginServiceProxyBase.h>
 #include <SenseKit/sensekit_types.h>
+#include "StreamRegisteredEventArgs.h"
+#include "StreamUnregisteringEventArgs.h"
 #include "CreatePluginProxy.h"
 #include "ParameterBin.h"
 #include "Logging.h"
@@ -17,75 +19,77 @@ namespace sensekit
         return create_plugin_proxy(this);
     }
 
-    sensekit_status_t PluginService::create_stream_set(sensekit_streamset_t& streamSet)
+    void PluginService::notify_host_event(sensekit_event_id id, const void* data, size_t dataSize)
     {
-        //TODO: normally would create a new streamset
+        m_hostEventSignal.raise(id, data, dataSize);
+    }
 
-        streamSet = m_context.get_rootSet().get_handle();
-        
-        m_logger.info("creating streamset: %x (placeholder)", streamSet);
+    sensekit_status_t PluginService::create_stream_set(const char* streamUri, sensekit_streamset_t& streamSet)
+    {
+        StreamSet& set = m_context.get_setCatalog().get_or_add(streamUri, true);
+        streamSet = set.get_handle();
+
+        SINFO("PluginService", "creating streamset: %s %x", streamUri, streamSet);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
     sensekit_status_t PluginService::destroy_stream_set(sensekit_streamset_t& streamSet)
     {
-        //TODO: if we were not hard coding the rootset in create_stream_set...
-        //if streamset has direct child streams, return error
-        //if streamset has child streamsets, reparent them to this streamset's parent (or null parent)
-        //then delete the streamset
+        StreamSet* actualSet = StreamSet::get_ptr(streamSet);
 
-        m_logger.info("destroying streamset: %x (placeholder)", streamSet);
+        SINFO("PluginService", "destroying streamset: %s %x", actualSet->get_uri().c_str(), streamSet);
+        m_context.get_setCatalog().destroy_set(actualSet);
 
         streamSet = nullptr;
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::register_stream_added_callback(stream_added_callback_t callback,
+    sensekit_status_t PluginService::register_stream_registered_callback(stream_registered_callback_t callback,
                                                                     void* clientTag,
                                                                     CallbackId& callbackId)
     {
-        auto thunk = [clientTag, callback](sensekit_streamset_t ss,
-                                           sensekit_stream_t s,
-                                           sensekit_stream_desc_t d)
+        auto thunk = [clientTag, callback](StreamRegisteredEventArgs args)
             {
-                callback(clientTag, ss, s, d);
+                callback(clientTag,
+                         args.streamSet->get_handle(),
+                         args.stream->get_handle(),
+                         args.description);
             };
 
-        callbackId = m_streamAddedSignal += thunk;
-
-        m_context.raise_existing_streams_added(callback, clientTag);
+        callbackId = m_context.get_setCatalog().register_for_stream_registered_event(thunk);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::register_stream_removing_callback(stream_removing_callback_t callback,
+    sensekit_status_t PluginService::register_stream_unregistering_callback(stream_unregistering_callback_t callback,
                                                                        void* clientTag,
                                                                        CallbackId& callbackId)
     {
-        auto thunk = [clientTag, callback](sensekit_streamset_t ss,
-                                           sensekit_stream_t s,
-                                           sensekit_stream_desc_t d)
+        auto thunk = [clientTag, callback](StreamUnregisteringEventArgs args)
             {
-                callback(clientTag, ss, s, d);
+                callback(clientTag,
+                         args.streamSet->get_handle(),
+                         args.stream->get_handle(),
+                         args.description);
             };
 
-        callbackId = m_streamRemovingSignal += thunk;
+        callbackId = m_context.get_setCatalog().register_for_stream_unregistering_event(thunk);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::unregister_stream_added_callback(CallbackId callbackId)
+    sensekit_status_t PluginService::unregister_stream_registered_callback(CallbackId callbackId)
     {
-        m_streamAddedSignal -= callbackId;
+        m_context.get_setCatalog().unregister_for_stream_registered_event(callbackId);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::unregister_stream_removing_callback(CallbackId callbackId)
+    sensekit_status_t PluginService::unregister_stream_unregistering_callback(CallbackId callbackId)
     {
-        m_streamRemovingSignal -= callbackId;
+        m_context.get_setCatalog().unregister_form_stream_unregistering_event(callbackId);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -96,12 +100,11 @@ namespace sensekit
                                                    sensekit_stream_t& handle)
     {
         // TODO add to specific stream set
-        Stream* stream = m_context.get_rootSet().create_stream(desc, pluginCallbacks);
+        StreamSet* set = StreamSet::get_ptr(setHandle);
+        Stream* stream = set->register_stream(desc, pluginCallbacks);
         handle = stream->get_handle();
 
-        m_logger.info("created stream -- handle %x type: %d", handle, desc.type);
-
-        m_streamAddedSignal.raise(setHandle, handle, desc);
+        SINFO("PluginService", "registered stream -- handle %x type: %d", handle, desc.type);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -111,21 +114,33 @@ namespace sensekit
         if (streamHandle == nullptr)
             return SENSEKIT_STATUS_INVALID_PARAMETER;
 
-        //TODO refactor this mess
-
-        StreamSet& set = m_context.get_rootSet();
-        sensekit_streamset_t setHandle = set.get_handle();
-
         Stream* stream = Stream::get_ptr(streamHandle);
+
+        assert(stream != nullptr);
+
+        StreamSet* set =
+            m_context.get_setCatalog().find_streamset_for_stream(stream);
+
+        assert(set != nullptr);
+
         const sensekit_stream_desc_t& desc = stream->get_description();
 
-        m_logger.info("destroying stream -- handle: %x type: %d", stream->get_handle(), desc.type);
+        SINFO("PluginService", "destroying stream -- handle: %x type: %d", stream->get_handle(), desc.type);
 
-        m_streamRemovingSignal.raise(setHandle, streamHandle, desc);
-
-        set.destroy_stream(stream);
+        set->destroy_stream(stream);
 
         streamHandle = nullptr;
+
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t PluginService::get_streamset_uri(sensekit_streamset_t setHandle,
+                                                       const char*& uri)
+    {
+        assert(setHandle != nullptr);
+
+        StreamSet* actualSet = StreamSet::get_ptr(setHandle);
+        uri = actualSet->get_uri().c_str();
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -141,7 +156,7 @@ namespace sensekit
         binHandle = bin->get_handle();
         binBuffer = bin->get_backBuffer();
 
-        m_logger.info("creating bin -- handle: %x stream: %x type: %d size: %u",
+        SINFO("PluginService", "creating bin -- handle: %x stream: %x type: %d size: %u",
                       binHandle,
                       streamHandle,
                       actualStream->get_description().type,
@@ -157,7 +172,7 @@ namespace sensekit
         Stream* actualStream = Stream::get_ptr(streamHandle);
         StreamBin* bin = StreamBin::get_ptr(binHandle);
 
-        m_logger.info("destroying bin -- %x stream: %x type: %d size: %u",
+        SINFO("PluginService", "destroying bin -- %x stream: %x type: %d size: %u",
                       binHandle,
                       streamHandle,
                       actualStream->get_description().type,
@@ -199,7 +214,7 @@ namespace sensekit
         Stream* stream = underlyingConnection->get_stream();
         if (binHandle != nullptr)
         {
-            m_logger.info("linking connection to bin -- stream: %x type: %d conn: %x bin: %x",
+            SINFO("PluginService", "linking connection to bin -- stream: %x type: %d conn: %x bin: %x",
                           stream->get_handle(),
                           stream->get_description().type,
                           connection,
@@ -207,7 +222,7 @@ namespace sensekit
         }
         else
         {
-            m_logger.info("unlinking connection to bin -- stream: %x type: %d conn: %x",
+            SINFO("PluginService", "unlinking connection to bin -- stream: %x type: %d conn: %x",
                           stream->get_handle(),
                           stream->get_description().type,
                           connection);
@@ -231,11 +246,38 @@ namespace sensekit
         return SENSEKIT_STATUS_SUCCESS;
     }
 
-    sensekit_status_t PluginService::log(sensekit_log_severity_t logLevel,
-                                         const char* format,
-                                         va_list args)
+    sensekit_status_t PluginService::log(const char* channel,
+                              sensekit_log_severity_t logLevel,
+                              const char* fileName,
+                              int lineNo,
+                              const char* func,
+                              const char* format,
+                              va_list args)
     {
-        m_logger.log_vargs(logLevel, format, args);
+        sensekit::log_vargs(channel, logLevel, fileName, lineNo, func, format, args);
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t PluginService::register_host_event_callback(host_event_callback_t callback,
+                                                                  void* clientTag,
+                                                                  CallbackId& callbackId)
+    {
+        auto thunk = [clientTag, callback](sensekit_event_id id, const void* data, size_t dataSize)
+            {
+                callback(clientTag, id, data, dataSize);
+            };
+
+        callbackId = m_hostEventSignal += thunk;
+
+        //m_context.raise_existing_device_unavailable(callback, clientTag);
+
+        return SENSEKIT_STATUS_SUCCESS;
+    }
+
+    sensekit_status_t PluginService::unregister_host_event_callback(CallbackId callbackId)
+    {
+        m_hostEventSignal -= callbackId;
+
         return SENSEKIT_STATUS_SUCCESS;
     }
 }

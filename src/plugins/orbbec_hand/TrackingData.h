@@ -3,6 +3,7 @@
 
 #include <opencv2/core/core.hpp>
 #include "ScalingCoordinateMapper.h"
+#include "HandSettings.h"
 
 namespace sensekit { namespace plugins { namespace hand {
 
@@ -12,6 +13,8 @@ namespace sensekit { namespace plugins { namespace hand {
         Foreground = 1,
         Searched = 2,
         SearchedFromOutOfRange = 3,
+        ForegroundNaturalEdge = 4,
+        ForegroundOutOfRangeEdge = 5
     };
 
     enum TrackedPointType
@@ -26,6 +29,18 @@ namespace sensekit { namespace plugins { namespace hand {
         Tracking,
         Lost,
         Dead
+    };
+
+    enum TestBehavior
+    {
+        TEST_BEHAVIOR_NONE = 0,
+        TEST_BEHAVIOR_LOG = 1
+    };
+
+    enum TestPhase
+    {
+        TEST_PHASE_CREATE = 0,
+        TEST_PHASE_UPDATE = 1
     };
 
     inline std::string tracking_status_to_string(TrackingStatus status)
@@ -57,49 +72,71 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat& depth;
         cv::Mat& area;
         cv::Mat& areaSqrt;
-        cv::Mat& basicScore;
         cv::Mat& velocitySignal;
         cv::Mat& layerSegmentation;
         cv::Mat& layerScore;
         cv::Mat& layerEdgeDistance;
+        cv::Mat& layerIntegralArea;
+        cv::Mat& layerTestPassMap;
         cv::Mat& foregroundSearched;
         cv::Mat& debugSegmentation;
         cv::Mat& debugScore;
+        cv::Mat& debugScoreValue;
+        cv::Mat& debugTestPassMap;
+        bool enableTestPassMap;
+        const sensekit::Vector3f* fullSizeWorldPoints;
+        sensekit::Vector3f* worldPoints;
         bool debugLayersEnabled;
         int layerCount;
         const sensekit::CoordinateMapper& fullSizeMapper;
+        const conversion_cache_t depthToWorldData;
+        std::vector<sensekit::Vector2i> layerCirclePoints;
 
         TrackingMatrices(cv::Mat& depthFullSize,
                          cv::Mat& depth,
                          cv::Mat& area,
                          cv::Mat& areaSqrt,
-                         cv::Mat& basicScore,
                          cv::Mat& velocitySignal,
                          cv::Mat& foregroundSearched,
                          cv::Mat& layerSegmentation,
                          cv::Mat& layerScore,
                          cv::Mat& layerEdgeDistance,
+                         cv::Mat& layerIntegralArea,
+                         cv::Mat& layerTestPassMap,
                          cv::Mat& debugSegmentation,
                          cv::Mat& debugScore,
+                         cv::Mat& debugScoreValue,
+                         cv::Mat& debugTestPassMap,
+                         bool enableTestPassMap,
+                         const sensekit::Vector3f* fullSizeWorldPoints,
+                         sensekit::Vector3f* worldPoints,
                          bool debugLayersEnabled,
-                         const sensekit::CoordinateMapper& fullSizeMapper)
+                         const sensekit::CoordinateMapper& fullSizeMapper,
+                         const conversion_cache_t depthToWorldData)
             :
             depthFullSize(depthFullSize),
             depth(depth),
             area(area),
             areaSqrt(areaSqrt),
-            basicScore(basicScore),
             velocitySignal(velocitySignal),
             layerSegmentation(layerSegmentation),
             layerScore(layerScore),
             layerEdgeDistance(layerEdgeDistance),
+            layerIntegralArea(layerIntegralArea),
+            layerTestPassMap(layerTestPassMap),
             foregroundSearched(foregroundSearched),
             debugSegmentation(debugSegmentation),
             debugScore(debugScore),
+            debugScoreValue(debugScoreValue),
+            debugTestPassMap(debugTestPassMap),
+            enableTestPassMap(enableTestPassMap),
+            fullSizeWorldPoints(fullSizeWorldPoints),
+            worldPoints(worldPoints),
             debugLayersEnabled(debugLayersEnabled),
             layerCount(0),
-            fullSizeMapper(fullSizeMapper)
-            {}
+            fullSizeMapper(fullSizeMapper),
+            depthToWorldData(depthToWorldData)
+            { }
     };
 
     inline float get_resize_factor(TrackingMatrices& matrices)
@@ -113,54 +150,33 @@ namespace sensekit { namespace plugins { namespace hand {
     {
         const float resizeFactor = get_resize_factor(matrices);
 
-        return ScalingCoordinateMapper(matrices.fullSizeMapper, resizeFactor);
+        return ScalingCoordinateMapper(matrices.depthToWorldData, resizeFactor);
     }
 
     struct TrackingData
     {
         TrackingMatrices& matrices;
         const cv::Point& seedPosition;
-        const float referenceDepth;
+        const cv::Point3f referenceWorldPosition;
         const float referenceAreaSqrt;
-        const float bandwidthDepthNear;
-        const float bandwidthDepthFar;
-        const TrackedPointType pointType;
-        const int iterationMax;
-        const float maxSegmentationDist;
         const SegmentationVelocityPolicy velocityPolicy;
-        const float edgeDistanceFactor;
-        const float targetEdgeDistance;
-        const float pointInertiaFactor;
-        const float pointInertiaRadius;
+        const SegmentationSettings settings;
+        const TestPhase phase;
 
         TrackingData(TrackingMatrices& matrices,
                      const cv::Point& seedPosition,
-                     const float referenceDepth,
+                     const cv::Point3f referenceWorldPosition,
                      const float referenceAreaSqrt,
-                     const float bandwidthDepthNear,
-                     const float bandwidthDepthFar,
-                     const TrackedPointType pointType,
-                     const int iterationMax,
-                     const float maxSegmentationDist,
                      const SegmentationVelocityPolicy velocityPolicy,
-                     const float edgeDistanceFactor,
-                     const float targetEdgeDistance,
-                     const float pointInertiaFactor,
-                     const float pointInertiaRadius)
+                     const SegmentationSettings settings,
+                     const TestPhase phase)
             : matrices(matrices),
               seedPosition(seedPosition),
-              referenceDepth(referenceDepth),
+              referenceWorldPosition(referenceWorldPosition),
               referenceAreaSqrt(referenceAreaSqrt),
-              bandwidthDepthNear(bandwidthDepthNear),
-              bandwidthDepthFar(bandwidthDepthFar),
-              pointType(pointType),
-              iterationMax(iterationMax),
-              maxSegmentationDist(maxSegmentationDist),
               velocityPolicy(velocityPolicy),
-              edgeDistanceFactor(edgeDistanceFactor),
-              targetEdgeDistance(targetEdgeDistance),
-              pointInertiaFactor(pointInertiaFactor),
-              pointInertiaRadius(pointInertiaRadius)
+              settings(settings),
+              phase(phase)
         {}
     };
 }}}

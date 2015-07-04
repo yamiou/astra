@@ -5,6 +5,7 @@
 #include <SenseKitUL/streams/hand_types.h>
 #include <SenseKitUL/skul_ctypes.h>
 #include <SenseKitUL/Plugins/stream_types.h>
+#include <Shiny.h>
 
 namespace sensekit { namespace plugins { namespace hand {
 
@@ -14,7 +15,7 @@ namespace sensekit { namespace plugins { namespace hand {
     {
     public:
         HandStream(PluginServiceProxy& pluginService,
-                   Sensor& streamSet,
+                   sensekit_streamset_t streamSet,
                    size_t maxHandCount)
             : SingleBinStream(pluginService,
                               streamSet,
@@ -40,6 +41,17 @@ namespace sensekit { namespace plugins { namespace hand {
     private:
         void get_include_candidates(sensekit_parameter_bin_t& parameterBin);
         void set_include_candidates(size_t inByteLength, sensekit_parameter_data_t& inData);
+
+        virtual void on_connection_removed(sensekit_bin_t bin,
+                                           sensekit_streamconnection_t connection) override
+        {
+            SingleBinStream::on_connection_removed(bin, connection);
+
+            #ifdef __ANDROID__
+                PROFILE_UPDATE();
+                PROFILE_OUTPUT("/sdcard/profile_orbbec_hand.txt");
+            #endif
+        }
 
         bool m_includeCandidatePoints{ false };
     };

@@ -9,8 +9,7 @@
 class DepthFrameListener : public sensekit::FrameReadyListener
 {
 public:
-    DepthFrameListener(sensekit::DepthStream& depthStream)
-        : m_visualizerPtr(new samples::common::LitDepthVisualizer(depthStream))
+    DepthFrameListener()
     {
         m_lastTimepoint = clock_type::now();
     }
@@ -59,14 +58,16 @@ public:
     virtual void on_frame_ready(sensekit::StreamReader& reader,
                                 sensekit::Frame& frame) override
     {
-        sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
+        sensekit::PointFrame pointFrame = frame.get<sensekit::PointFrame>();
 
-        int width = depthFrame.resolutionX();
-        int height = depthFrame.resolutionY();
+        int width = pointFrame.resolutionX();
+        int height = pointFrame.resolutionY();
 
         init_texture(width, height);
-        m_visualizerPtr->update(depthFrame);
-        sensekit_rgb_pixel_t* vizBuffer = m_visualizerPtr->get_output();
+
+        m_visualizer.update(pointFrame);
+
+        sensekit_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
         for(int i = 0; i < width * height; i++)
         {
             int rgbaOffset = i *4;
@@ -92,11 +93,10 @@ public:
     }
 
 private:
-    using VizPtr = std::unique_ptr<samples::common::LitDepthVisualizer>;
-    VizPtr m_visualizerPtr;
+    samples::common::LitDepthVisualizer m_visualizer;
 
     using duration_type = std::chrono::duration<double>;
-    duration_type m_frameDuration;
+    duration_type m_frameDuration{0.0};
 
     using clock_type = std::chrono::system_clock;
     std::chrono::time_point<clock_type> m_lastTimepoint;
@@ -105,8 +105,8 @@ private:
 
     using BufferPtr = std::unique_ptr < uint8_t[] > ;
     BufferPtr m_displayBuffer { nullptr };
-    int m_displayWidth { 0 };
-    int m_displayHeight { 0 };
+    int m_displayWidth{0};
+    int m_displayHeight{0};
 };
 
 int main(int argc, char** argv)
@@ -118,10 +118,9 @@ int main(int argc, char** argv)
     sensekit::Sensor sensor;
     sensekit::StreamReader reader = sensor.create_reader();
 
-    auto ds = reader.stream<sensekit::DepthStream>();
-    ds.start();
+    reader.stream<sensekit::PointStream>().start();
 
-    DepthFrameListener listener(ds);
+    DepthFrameListener listener;
 
     reader.addListener(listener);
 
@@ -146,6 +145,5 @@ int main(int argc, char** argv)
     }
 
     sensekit::SenseKit::terminate();
-
     return 0;
 }

@@ -42,20 +42,29 @@ typedef struct _sensekit_skeleton {
 } sensekit_skeleton_t;
 
 struct _sensekit_skeletonframe {
-    sensekit_frame_ref_t* frameRef;
+    sensekit_frame_t* frame;
     size_t skeletonCount;
     sensekit_skeleton_t* skeletons;
 };
 
+#if defined(_MSC_VER)
 #pragma warning( push )
 #pragma warning( disable : 4200 )
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wc99-extensions"
+#endif
 
 typedef struct _sensekit_skeletonframe_wrapper {
     _sensekit_skeletonframe frame;
     char frame_data[];
 } sensekit_skeletonframe_wrapper_t;
 
-#pragma  warning( pop )
+#if defined(_MSC_VER)
+#pragma warning( pop )
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 
 typedef struct _sensekit_skeletonframe* sensekit_skeletonframe_t;
 typedef sensekit_streamconnection_t sensekit_skeletonstream_t;

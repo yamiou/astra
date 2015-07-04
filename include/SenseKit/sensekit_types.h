@@ -25,13 +25,13 @@ typedef struct {
 typedef struct _sensekit_streamset* sensekit_streamset_t;
 typedef struct _sensekit_streamconnection_handle* sensekit_streamconnection_handle_t;
 
+typedef struct _sensekit_streamsetconnection* sensekit_streamsetconnection_t;
 typedef struct _sensekit_streamconnection* sensekit_streamconnection_t;
 
-typedef struct _sensekit_frame_ref sensekit_frame_ref_t;
 typedef struct _sensekit_frame sensekit_frame_t;
 
 typedef struct _sensekit_reader* sensekit_reader_t;
-typedef sensekit_reader_t sensekit_reader_frame_t;
+typedef struct _sensekit_reader_frame* sensekit_reader_frame_t;
 
 typedef void* sensekit_parameter_data_t;
 typedef int32_t sensekit_parameter_id;
@@ -47,7 +47,10 @@ typedef enum {
     SENSEKIT_STATUS_INVALID_PARAMETER = 1,
     SENSEKIT_STATUS_DEVICE_ERROR = 2,
     SENSEKIT_STATUS_TIMEOUT = 3,
-    SENSEKIT_STATUS_INVALID_PARAMETER_TOKEN = 4
+    SENSEKIT_STATUS_INVALID_PARAMETER_TOKEN = 4,
+    SENSEKIT_STATUS_INVALID_OPERATION = 5,
+    SENSEKIT_STATUS_INTERNAL_ERROR = 6,
+    SENSEKIT_STATUS_UNINITIALIZED = 7
 } sensekit_status_t;
 
 typedef size_t sensekit_callback_id_t;
@@ -59,12 +62,15 @@ typedef void(*sensekit_frame_ready_callback_t)(void* clientTag,
                                                sensekit_reader_frame_t frame);
 
 typedef enum {
-    FATAL,
-    ERROR,
-    WARN,
-    INFO,
-    DEBUG,
-    TRACE
+    SK_UNKNOWN,
+    SK_FATAL,
+    SK_ERROR,
+    SK_WARN,
+    SK_INFO,
+    SK_DEBUG,
+    SK_TRACE
 } sensekit_log_severity_t;
+
+typedef uint32_t sensekit_event_id;
 
 #endif /* SENSEKIT_TYPES_H */

@@ -10,9 +10,8 @@
 class sfLine : public sf::Drawable
 {
 public:
-    sfLine(const sf::Vector2f& point1, const sf::Vector2f& point2, sf::Color color, float thickness) :
-        color(color), 
-        thickness(thickness)
+    sfLine(const sf::Vector2f& point1, const sf::Vector2f& point2, sf::Color color, float thickness)
+        : color(color)
     {
         sf::Vector2f direction = point2 - point1;
         sf::Vector2f unitDirection = direction / std::sqrt(direction.x*direction.x + direction.y*direction.y);
@@ -34,10 +33,8 @@ public:
         target.draw(vertices, 4, sf::Quads);
     }
 
-
 private:
     sf::Vertex vertices[4];
-    float thickness;
     sf::Color color;
 };
 
@@ -47,8 +44,7 @@ public:
     using PointList = std::deque < sensekit::Vector2i >;
     using PointMap = std::unordered_map < int, PointList >;
 
-    HandFrameListener(sensekit::DepthStream& depthStream)
-        : m_visualizerPtr(new samples::common::LitDepthVisualizer(depthStream))
+    HandFrameListener()
     {
         m_font.loadFromFile("Inconsolata.otf");
     }
@@ -89,15 +85,15 @@ public:
 
     void processDepth(sensekit::Frame& frame)
     {
-        sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
+        sensekit::PointFrame pointFrame = frame.get<sensekit::PointFrame>();
 
-        int width = depthFrame.resolutionX();
-        int height = depthFrame.resolutionY();
+        int width = pointFrame.resolutionX();
+        int height = pointFrame.resolutionY();
 
         init_texture(width, height);
 
-        m_visualizerPtr->update(depthFrame);
-        sensekit_rgb_pixel_t* vizBuffer = m_visualizerPtr->get_output();
+        m_visualizer.update(pointFrame);
+        sensekit_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
 
         for (int i = 0; i < width * height; i++)
         {
@@ -241,7 +237,7 @@ public:
 
         float thickness = 4;
         auto it = pointList.begin();
-        
+
         sensekit::Vector2i lastPoint = *it;
         while (it != pointList.end())
         {
@@ -261,10 +257,9 @@ public:
     void drawHandPoints(sf::RenderWindow& window, float depthScale)
     {
         float radius = 16;
-        auto size = window.getSize();
         sf::Color candidateColor(255, 255, 0);
         sf::Color lostColor(255, 0, 0);
-        sf::Color trackingColor(128, 138, 0);
+        sf::Color trackingColor(0, 139, 69);
 
         for (auto handPoint : m_handPoints)
         {
@@ -315,8 +310,7 @@ public:
     }
 
 private:
-    using VizPtr = std::unique_ptr<samples::common::LitDepthVisualizer>;
-    VizPtr m_visualizerPtr;
+    samples::common::LitDepthVisualizer m_visualizer;
 
     long double m_frameDuration{ 0 };
     std::clock_t m_lastTimepoint { 0 };
@@ -345,11 +339,10 @@ int main(int argc, char** argv)
     sensekit::Sensor sensor;
     sensekit::StreamReader reader = sensor.create_reader();
 
-    auto ds = reader.stream<sensekit::DepthStream>();
-    ds.start();
+    reader.stream<sensekit::PointStream>().start();
     reader.stream<sensekit::HandStream>().start();
 
-    HandFrameListener listener(ds);
+    HandFrameListener listener;
 
     reader.addListener(listener);
 

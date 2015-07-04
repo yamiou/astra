@@ -66,45 +66,73 @@
                               (make-param :type "sensekit_bin_t" :name "bin")
                               (make-param :type "sensekit_streamconnection_t" :name "connection")))
 
-;; sensekit_status_t register_stream_added_callback(stream_added_callback_t callback, void* clientTag, sensekit_callback_id_t* callbackId)
+;; sensekit_status_t register_stream_added_callback(stream_added_callback_t callback,
+;;                                                  void* clientTag,
+;;                                                  sensekit_callback_id_t* callbackId)
 (add-func       :funcset "plugin"
                 :returntype "sensekit_status_t"
-                :funcname "register_stream_added_callback"
-                :params (list (make-param :type "stream_added_callback_t" :name "callback")
+                :funcname "register_stream_registered_callback"
+                :params (list (make-param :type "stream_registered_callback_t" :name "callback")
                               (make-param :type "void*" :name "clientTag")
                               (make-param :type "sensekit_callback_id_t*" :name "callbackId" :deref T)))
 
 ;; sensekit_status_t register_stream_removing_callback(stream_removing_callback_t callback, void* clientTag, sensekit_callback_id_t* callbackId)
 (add-func       :funcset "plugin"
                 :returntype "sensekit_status_t"
-                :funcname "register_stream_removing_callback"
-                :params (list (make-param :type "stream_removing_callback_t" :name "callback")
+                :funcname "register_stream_unregistering_callback"
+                :params (list (make-param :type "stream_unregistering_callback_t" :name "callback")
                               (make-param :type "void*" :name "clientTag")
                               (make-param :type "sensekit_callback_id_t*" :name "callbackId" :deref T)))
+
+;; sensekit_status_t register_host_event_callback(host_event_callback_t callback,
+;;                                                void* clientTag,
+;;                                                sensekit_callback_id_t* callbackId)
+(add-func       :funcset "plugin"
+                :returntype "sensekit_status_t"
+                :funcname "register_host_event_callback"
+                :params (list (make-param :type "host_event_callback_t" :name "callback")
+                              (make-param :type "void*" :name "clientTag")
+                              (make-param :type "sensekit_callback_id_t*" :name "callbackId" :deref T)))
+
+;; sensekit_status_t unregister_host_event_callback(sensekit_callback_id_t callbackId)
+(add-func       :funcset "plugin"
+                :returntype "sensekit_status_t"
+                :funcname "unregister_host_event_callback"
+                :params (list (make-param :type "sensekit_callback_id_t" :name "callback")))
 
 ;; sensekit_status_t unregister_stream_added_callback(sensekit_callback_id_t callbackId)
 (add-func       :funcset "plugin"
                 :returntype "sensekit_status_t"
-                :funcname "unregister_stream_added_callback"
+                :funcname "unregister_stream_registered_callback"
                 :params (list (make-param :type "sensekit_callback_id_t" :name "callback")))
 
 ;; sensekit_status_t unregister_stream_removing_callback(sensekit_callback_id_t callbackId)
 (add-func       :funcset "plugin"
                 :returntype "sensekit_status_t"
-                :funcname "unregister_stream_removing_callback"
+                :funcname "unregister_stream_unregistering_callback"
                 :params (list (make-param :type "sensekit_callback_id_t" :name "callback")))
 
 ;; sensekit_status_t create_stream_set(sensekit_streamset_t& setHandle)
 (add-func       :funcset "plugin"
                 :returntype "sensekit_status_t"
                 :funcname "create_stream_set"
-                :params (list (make-param :type "sensekit_streamset_t&" :name "setHandle")))
+                :params (list (make-param :type "const char*" :name "setUri")
+                              (make-param :type "sensekit_streamset_t&" :name "setHandle")))
 
 ;; sensekit_status_t destroy_stream_set(sensekit_streamset_t& setHandle)
 (add-func       :funcset "plugin"
                 :returntype "sensekit_status_t"
                 :funcname "destroy_stream_set"
                 :params (list (make-param :type "sensekit_streamset_t&" :name "setHandle")))
+
+;; sensekit_status_t get_streamset_uri(sensekit_streamset_t setHandle,
+;;                                     const char* uri)
+(add-func       :funcset "plugin"
+                :returntype "sensekit_status_t"
+                :funcname "get_streamset_uri"
+                :params (list
+                         (make-param :type "sensekit_streamset_t" :name "setHandle")
+                         (make-param :type "const char**" :name "uri" :deref T)))
 
 ;; sensekit_status_t create_stream(sensekit_streamset_t setHandle,
 ;;                                 sensekit_stream_desc_t desc,
@@ -186,48 +214,52 @@
 (add-func       :funcset "plugin"
                 :returntype "sensekit_status_t"
                 :funcname "log"
-                :params (list (make-param :type "sensekit_log_severity_t" :name "logLevel")
+                :params (list (make-param :type "const char*" :name "channel")
+                              (make-param :type "sensekit_log_severity_t" :name "logLevel")
+                              (make-param :type "const char*" :name "fileName")
+                              (make-param :type "int" :name "lineNo")
+                              (make-param :type "const char*" :name "func")
                               (make-param :type "const char*" :name "format")
                               (make-param :type "va_list" :name "args")))
 
 ;; SENSEKIT_API sensekit_status_t sensekit_initialize();
-(add-func       :funcset "stream"
-                :returntype "sensekit_status_t"
-                :funcname "initialize"
-                :params '())
+;; (add-func       :funcset "stream"
+;;                 :returntype "sensekit_status_t"
+;;                 :funcname "initialize"
+;;                 :params '())
 
 ;; SENSEKIT_API sensekit_status_t sensekit_terminate();
-(add-func       :funcset "stream"
-                :returntype "sensekit_status_t"
-                :funcname "terminate"
-                :params '())
+;; (add-func       :funcset "stream"
+;;                 :returntype "sensekit_status_t"
+;;                 :funcname "terminate"
+;;                 :params '())
 
 ;;SENSEKIT_API sensekit_status_t sensekit_streamset_open(const char* connectionString,
-;;                                                       sensekit_streamset_t** streamSet);
+;;                                                       sensekit_streamsetconnection_t* streamSet);
 (add-func       :funcset "stream"
                 :returntype "sensekit_status_t"
                 :funcname "streamset_open"
                 :params (list (make-param :type "const char*" :name "connectionString")
-                              (make-param :type "sensekit_streamset_t*" :name "streamSet" :deref T)))
+                              (make-param :type "sensekit_streamsetconnection_t*" :name "streamSet" :deref T)))
 
-;; SENSEKIT_API sensekit_status_t sensekit_streamset_close(sensekit_streamset_t** streamSet);
+;; SENSEKIT_API sensekit_status_t sensekit_streamset_close(sensekit_streamset_connection_t* streamSet);
 (add-func       :funcset "stream"
                 :returntype "sensekit_status_t"
                 :funcname "streamset_close"
-                :params (list (make-param :type "sensekit_streamset_t*" :name "streamSet" :deref T)))
+                :params (list (make-param :type "sensekit_streamsetconnection_t*" :name "streamSet" :deref T)))
 
 ;; SENSEKIT_API char* sensekit_get_status_string(sensekit_status_t status);
-(add-func       :funcset "stream"
-                :returntype "char*"
-                :funcname "get_status_string"
-                :params (list (make-param :type "sensekit_status_t" :name "status")))
+;; (add-func       :funcset "stream"
+;;                 :returntype "sensekit_status_t"
+;;                 :funcname "get_status_string"
+;;                 :params (list (make-param :type "sensekit_status_t" :name "status")))
 
-;; SENSEKIT_API sensekit_status_t sensekit_reader_create(sensekit_streamset_t streamSet,
+;; SENSEKIT_API sensekit_status_t sensekit_reader_create(sensekit_streamsetconnection_t streamSet,
 ;;                                                       sensekit_reader_t* reader);
 (add-func       :funcset "stream"
                 :returntype "sensekit_status_t"
                 :funcname "reader_create"
-                :params (list (make-param :type "sensekit_streamset_t" :name "streamSet")
+                :params (list (make-param :type "sensekit_streamsetconnection_t" :name "streamSet")
                               (make-param :type "sensekit_reader_t*" :name "reader" :deref T)))
 
 ;; SENSEKIT_API sensekit_status_t sensekit_reader_destroy(sensekit_reader_t* reader);
@@ -305,14 +337,14 @@
 ;; SENSEKIT_API sensekit_status_t sensekit_reader_get_frame(sensekit_reader_frame_t frame,
 ;;                                                          sensekit_stream_type_t type,
 ;;                                                          sensekit_stream_subtype_t subtype,
-;;                                                          sensekit_frame_ref_t** frameRef);
+;;                                                          sensekit_frame_t** frame);
 (add-func       :funcset "stream"
                 :returntype "sensekit_status_t"
                 :funcname "reader_get_frame"
                 :params (list (make-param :type "sensekit_reader_frame_t" :name "frame")
                               (make-param :type "sensekit_stream_type_t" :name "type")
                               (make-param :type "sensekit_stream_subtype_t" :name "subtype")
-                              (make-param :type "sensekit_frame_ref_t**" :name "frameRef" :deref T)))
+                              (make-param :type "sensekit_frame_t**" :name "subFrame" :deref T)))
 
 ;; SENSEKIT_API sensekit_status_t sensekit_stream_set_parameter(sensekit_streamconnection_t connection,
 ;;                                                              sensekit_parameter_id parameterId,

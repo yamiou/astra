@@ -88,7 +88,7 @@ SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_copy_data(sensekit_colorfr
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_colorframe_get_metadata(sensekit_colorframe_t colorFrame,
-                                                                   sensekit_image_metadata_t* metadata )
+                                                                   sensekit_image_metadata_t* metadata)
 {
     return sensekit_imageframe_get_metadata(colorFrame, metadata);
 }

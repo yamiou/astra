@@ -15,7 +15,7 @@ namespace sensekit { namespace plugins { namespace hand {
     {
     public:
         DebugHandStream(PluginServiceProxy& pluginService,
-                        Sensor& streamSet,
+                        sensekit_streamset_t streamSet,
                         uint32_t width,
                         uint32_t height,
                         uint32_t bytesPerPixel)
@@ -23,8 +23,7 @@ namespace sensekit { namespace plugins { namespace hand {
                               streamSet,
                               StreamDescription(SENSEKIT_STREAM_DEBUG_HAND,
                                                 DEFAULT_SUBTYPE),
-                              width * height * bytesPerPixel),
-              m_mouseNormPosition()
+                              width * height * bytesPerPixel)
         { }
 
         DebugHandViewType view_type() const { return m_viewType; }
@@ -32,6 +31,9 @@ namespace sensekit { namespace plugins { namespace hand {
 
         bool use_mouse_probe() const { return m_useMouseProbe; }
         const Vector2f& mouse_norm_position() const { return m_mouseNormPosition; }
+        bool pause_input() const { return m_pauseInput; }
+        bool spawn_point_locked() const { return m_lockSpawnPoint; }
+        const Vector2f& spawn_norm_position() const { return m_spawnNormPosition; }
 
     protected:
         virtual void on_set_parameter(sensekit_streamconnection_t connection,
@@ -54,10 +56,15 @@ namespace sensekit { namespace plugins { namespace hand {
                                 sensekit_parameter_data_t& inData);
         void set_use_mouse_probe(size_t inByteLength, sensekit_parameter_data_t& inData);
         void set_mouse_norm_position(size_t inByteLength, sensekit_parameter_data_t& inData);
+        void set_pause_input(size_t inByteLength, sensekit_parameter_data_t& inData);
+        void set_lock_spawn_point(size_t inByteLength, sensekit_parameter_data_t& inData);
 
         DebugHandViewType m_viewType{ DEBUG_HAND_VIEW_DEPTH };
         bool m_useMouseProbe { false };
         Vector2f m_mouseNormPosition;
+        Vector2f m_spawnNormPosition;
+        bool m_pauseInput { false };
+        bool m_lockSpawnPoint { false };
     };
 
 }}}

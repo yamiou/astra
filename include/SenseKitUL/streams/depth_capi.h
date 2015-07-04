@@ -18,6 +18,9 @@ SENSEKIT_API_EX sensekit_status_t sensekit_convert_world_to_depth(sensekit_depth
 SENSEKIT_API_EX sensekit_status_t sensekit_reader_get_depthstream(sensekit_reader_t reader,
                                                                   sensekit_depthstream_t* depthStream);
 
+SENSEKIT_API_EX sensekit_status_t sensekit_depthstream_get_depth_to_world_data(sensekit_depthstream_t depthStream,
+                                                                               conversion_cache_t* conversion_data);
+
 SENSEKIT_API_EX sensekit_status_t sensekit_depthstream_get_hfov(sensekit_depthstream_t depthStream,
                                                                 float* hFov);
 

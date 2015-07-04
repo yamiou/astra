@@ -19,7 +19,6 @@ namespace sensekit { namespace plugins { namespace hand {
         int trackingId;
         int inactiveFrameCount;
         int failedTestCount;
-        int failedInRangeTestCount;
         bool isInProbation;
         int probationFrameCount;
         TrackedPointType pointType;
@@ -37,7 +36,6 @@ namespace sensekit { namespace plugins { namespace hand {
             trackingId(trackingId),
             inactiveFrameCount(0),
             failedTestCount(0),
-            failedInRangeTestCount(0),
             isInProbation(true),
             probationFrameCount(0),
             pointType(TrackedPointType::CandidatePoint),

@@ -3,16 +3,16 @@
 
 #include <SenseKit/sensekit_types.h>
 #include <SenseKit/Plugins/plugin_capi.h>
-#include "StreamBin.h"
 #include "ParameterBin.h"
+#include "StreamBin.h"
+#include "Logger.h"
+#include "Registry.h"
 
 namespace sensekit {
 
-    class StreamBin;
     class Stream;
-    class StreamConnection;
 
-    class StreamConnection
+    class StreamConnection : public TrackedInstance<StreamConnection>
     {
     public:
         using FrameReadyCallback = std::function<void(StreamConnection*, sensekit_frame_index_t)>;
@@ -25,7 +25,7 @@ namespace sensekit {
 
         void start();
         void stop();
-        sensekit_frame_ref_t* lock();
+        sensekit_frame_t* lock();
         void unlock();
 
         void set_bin(StreamBin* bin);
@@ -39,7 +39,7 @@ namespace sensekit {
 
         static StreamConnection* get_ptr(sensekit_streamconnection_t conn)
         {
-            return reinterpret_cast<StreamConnection*>(conn->handle);
+            return Registry::get<StreamConnection>(conn->handle);
         }
 
         const sensekit_stream_desc_t& get_description() const;
@@ -61,26 +61,28 @@ namespace sensekit {
 
         void invoke(sensekit_command_id commandId,
                     size_t inByteLength,
-                    sensekit_parameter_data_t    inData,
+                    sensekit_parameter_data_t inData,
                     size_t& resultByteLength,
-                    sensekit_result_token_t token);
+                    sensekit_result_token_t& token);
 
     private:
         void on_bin_front_buffer_ready(StreamBin* bin, sensekit_frame_index_t frameIndex);
         void clear_pending_parameter_result();
+        void cache_parameter_bin_token(sensekit_parameter_bin_t parameterBinHandle,
+                                       size_t& resultByteLength,
+                                       sensekit_result_token_t& token);
 
         _sensekit_streamconnection m_connection;
-        sensekit_frame_ref_t m_currentFrame;
+        sensekit_frame_t* m_currentFrame{nullptr};
 
         bool m_locked{false};
         bool m_started{false};
 
         Stream* m_stream{nullptr};
         StreamBin* m_bin{nullptr};
-        sensekit_stream_t m_handle{nullptr};
-        ParameterBin* m_pendingParameterResult{ nullptr };
+        ParameterBin* m_pendingParameterResult{nullptr};
 
-        FrontBufferReadyCallback m_binFrontBufferReadyCallback;
+        StreamBin::FrontBufferReadyCallback m_binFrontBufferReadyCallback;
         sensekit_callback_id_t m_binFrontBufferReadyCallbackId;
 
         Signal<StreamConnection*, sensekit_frame_index_t> m_frameReadySignal;

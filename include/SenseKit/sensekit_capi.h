@@ -8,17 +8,14 @@
 SENSEKIT_BEGIN_DECLS
 
 SENSEKIT_API sensekit_status_t sensekit_initialize();
-
 SENSEKIT_API sensekit_status_t sensekit_terminate();
 
 SENSEKIT_API sensekit_status_t sensekit_streamset_open(const char* connectionString,
-                                                       sensekit_streamset_t* streamSet);
+                                                       sensekit_streamsetconnection_t* streamSet);
 
-SENSEKIT_API sensekit_status_t sensekit_streamset_close(sensekit_streamset_t* streamSet);
+SENSEKIT_API sensekit_status_t sensekit_streamset_close(sensekit_streamsetconnection_t* streamSet);
 
-SENSEKIT_API char* sensekit_get_status_string(sensekit_status_t status);
-
-SENSEKIT_API sensekit_status_t sensekit_reader_create(sensekit_streamset_t streamSet,
+SENSEKIT_API sensekit_status_t sensekit_reader_create(sensekit_streamsetconnection_t streamSet,
                                                       sensekit_reader_t* reader);
 
 SENSEKIT_API sensekit_status_t sensekit_reader_destroy(sensekit_reader_t* reader);
@@ -51,7 +48,7 @@ SENSEKIT_API sensekit_status_t sensekit_reader_unregister_frame_ready_callback(s
 SENSEKIT_API sensekit_status_t sensekit_reader_get_frame(sensekit_reader_frame_t frame,
                                                          sensekit_stream_type_t type,
                                                          sensekit_stream_subtype_t subtype,
-                                                         sensekit_frame_ref_t** frameRef);
+                                                         sensekit_frame_t** subFrame);
 
 SENSEKIT_API sensekit_status_t sensekit_stream_set_parameter(sensekit_streamconnection_t connection,
                                                              sensekit_parameter_id parameterId,

@@ -12,38 +12,57 @@ namespace sensekit {
     {
     public:
 
-    sensekit_status_t register_stream_added_callback(stream_added_callback_t callback,
-                                                     void* clientTag,
-                                                     sensekit_callback_id_t* callbackId)
+    sensekit_status_t register_stream_registered_callback(stream_registered_callback_t callback,
+                                                          void* clientTag,
+                                                          sensekit_callback_id_t* callbackId)
     {
-        return PluginServiceProxyBase::register_stream_added_callback(pluginService, callback, clientTag, callbackId);
+        return PluginServiceProxyBase::register_stream_registered_callback(pluginService, callback, clientTag, callbackId);
     }
 
-    sensekit_status_t register_stream_removing_callback(stream_removing_callback_t callback,
-                                                        void* clientTag,
-                                                        sensekit_callback_id_t* callbackId)
+    sensekit_status_t register_stream_unregistering_callback(stream_unregistering_callback_t callback,
+                                                             void* clientTag,
+                                                             sensekit_callback_id_t* callbackId)
     {
-        return PluginServiceProxyBase::register_stream_removing_callback(pluginService, callback, clientTag, callbackId);
+        return PluginServiceProxyBase::register_stream_unregistering_callback(pluginService, callback, clientTag, callbackId);
     }
 
-    sensekit_status_t unregister_stream_added_callback(sensekit_callback_id_t callback)
+    sensekit_status_t register_host_event_callback(host_event_callback_t callback,
+                                                   void* clientTag,
+                                                   sensekit_callback_id_t* callbackId)
     {
-        return PluginServiceProxyBase::unregister_stream_added_callback(pluginService, callback);
+        return PluginServiceProxyBase::register_host_event_callback(pluginService, callback, clientTag, callbackId);
     }
 
-    sensekit_status_t unregister_stream_removing_callback(sensekit_callback_id_t callback)
+    sensekit_status_t unregister_host_event_callback(sensekit_callback_id_t callback)
     {
-        return PluginServiceProxyBase::unregister_stream_removing_callback(pluginService, callback);
+        return PluginServiceProxyBase::unregister_host_event_callback(pluginService, callback);
     }
 
-    sensekit_status_t create_stream_set(sensekit_streamset_t& setHandle)
+    sensekit_status_t unregister_stream_registered_callback(sensekit_callback_id_t callback)
     {
-        return PluginServiceProxyBase::create_stream_set(pluginService, setHandle);
+        return PluginServiceProxyBase::unregister_stream_registered_callback(pluginService, callback);
+    }
+
+    sensekit_status_t unregister_stream_unregistering_callback(sensekit_callback_id_t callback)
+    {
+        return PluginServiceProxyBase::unregister_stream_unregistering_callback(pluginService, callback);
+    }
+
+    sensekit_status_t create_stream_set(const char* setUri,
+                                        sensekit_streamset_t& setHandle)
+    {
+        return PluginServiceProxyBase::create_stream_set(pluginService, setUri, setHandle);
     }
 
     sensekit_status_t destroy_stream_set(sensekit_streamset_t& setHandle)
     {
         return PluginServiceProxyBase::destroy_stream_set(pluginService, setHandle);
+    }
+
+    sensekit_status_t get_streamset_uri(sensekit_streamset_t setHandle,
+                                        const char** uri)
+    {
+        return PluginServiceProxyBase::get_streamset_uri(pluginService, setHandle, uri);
     }
 
     sensekit_status_t create_stream(sensekit_streamset_t setHandle,
@@ -99,11 +118,15 @@ namespace sensekit {
         return PluginServiceProxyBase::get_parameter_bin(pluginService, byteSize, binHandle, parameterData);
     }
 
-    sensekit_status_t log(sensekit_log_severity_t logLevel,
+    sensekit_status_t log(const char* channel,
+                          sensekit_log_severity_t logLevel,
+                          const char* fileName,
+                          int lineNo,
+                          const char* func,
                           const char* format,
                           va_list args)
     {
-        return PluginServiceProxyBase::log(pluginService, logLevel, format, args);
+        return PluginServiceProxyBase::log(pluginService, channel, logLevel, fileName, lineNo, func, format, args);
     }
     };
 }

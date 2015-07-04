@@ -2,6 +2,7 @@
 #include <SenseKitUL/SenseKitUL.h>
 #include "TrackingData.h"
 #include <cmath>
+#include <Shiny.h>
 
 namespace sensekit { namespace plugins { namespace hand {
 
@@ -12,8 +13,11 @@ namespace sensekit { namespace plugins { namespace hand {
         m_velocityThresholdFactor(settings.velocityThresholdFactor),
         m_maxDepthJumpPercent(settings.maxDepthJumpPercent),
         m_erodeSize(settings.erodeSize),
-        m_depthAdjustmentFactor(settings.depthAdjustmentFactor)
+        m_depthAdjustmentFactor(settings.depthAdjustmentFactor),
+        m_minDepth(settings.minDepth),
+        m_maxDepth(settings.maxDepth)
     {
+        PROFILE_FUNC();
         m_rectElement = cv::getStructuringElement(cv::MORPH_RECT,
                                                   cv::Size(m_erodeSize * 2 + 1, m_erodeSize * 2 + 1),
                                                   cv::Point(m_erodeSize, m_erodeSize));
@@ -23,10 +27,12 @@ namespace sensekit { namespace plugins { namespace hand {
 
     DepthUtility::~DepthUtility()
     {
+        PROFILE_FUNC();
     }
 
     void DepthUtility::reset()
     {
+        PROFILE_FUNC();
         m_matDepthFilled = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_32FC1);
         m_matDepthFilledMask = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_8UC1);
         m_matDepthPrevious = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_32FC1);
@@ -45,17 +51,25 @@ namespace sensekit { namespace plugins { namespace hand {
                                                     cv::Mat& matDepthFullSize,
                                                     cv::Mat& matVelocitySignal)
     {
+        PROFILE_FUNC();
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
 
-        matDepth.create(m_processingHeight, m_processingWidth, CV_32FC1);
-        matVelocitySignal = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_8UC1);
-
         depthFrameToMat(depthFrame, width, height, matDepthFullSize);
 
-        //convert to the target processing size with nearest neighbor
+        if (width == m_processingWidth && height == m_processingHeight)
+        {
+            //target size is original size, just use the same data
+            matDepth = matDepthFullSize;
+        }
+        else
+        {
+            matDepth.create(m_processingHeight, m_processingWidth, CV_32FC1);
+            //convert to the target processing size with nearest neighbor
+            cv::resize(matDepthFullSize, matDepth, matDepth.size(), 0, 0, CV_INTER_NN);
+        }
 
-        cv::resize(matDepthFullSize, matDepth, matDepth.size(), 0, 0, CV_INTER_NN);
+        matVelocitySignal = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_8UC1);
 
         //fill 0 depth pixels with the value from the previous frame
         fillZeroValues(matDepth, m_matDepthFilled, m_matDepthFilledMask, m_matDepthPrevious);
@@ -79,7 +93,7 @@ namespace sensekit { namespace plugins { namespace hand {
         //erode to eliminate single pixel velocity artifacts
         m_matDepthVelErode = cv::abs(m_matDepthVel);
         cv::erode(m_matDepthVelErode, m_matDepthVelErode, m_rectElement);
-        cv::dilate(m_matDepthVelErode, m_matDepthVelErode, m_rectElement);
+        //cv::dilate(m_matDepthVelErode, m_matDepthVelErode, m_rectElement);
 
         thresholdVelocitySignal(m_matDepthVelErode,
                                 matVelocitySignal,
@@ -88,11 +102,12 @@ namespace sensekit { namespace plugins { namespace hand {
         //analyze_velocities(matDepth, m_matDepthVelErode);
     }
 
-    void DepthUtility::depthFrameToMat(DepthFrame& depthFrameSrc, 
-                                       const int width, 
-                                       const int height, 
+    void DepthUtility::depthFrameToMat(DepthFrame& depthFrameSrc,
+                                       const int width,
+                                       const int height,
                                        cv::Mat& matTarget)
     {
+        PROFILE_FUNC();
         //ensure initialized
         matTarget.create(height, width, CV_32FC1);
 
@@ -116,6 +131,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                       cv::Mat& matDepthFilledMask,
                                       cv::Mat& matDepthPrevious)
     {
+        PROFILE_FUNC();
         int width = matDepth.cols;
         int height = matDepth.rows;
 
@@ -129,8 +145,6 @@ namespace sensekit { namespace plugins { namespace hand {
             for (int x = 0; x < width; ++x)
             {
                 float depth = *depthRow;
-
-                uint8_t fillType = *filledDepthMaskRow;
 
                 if (depth == 0)
                 {
@@ -158,6 +172,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                 cv::Mat& matDepthFilledMask,
                                                 const float maxDepthJumpPercent)
     {
+        PROFILE_FUNC();
         int width = matDepth.cols;
         int height = matDepth.rows;
 
@@ -187,7 +202,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
                 //suppress signal when a pixel jumps a long distance from near to far
                 bool isJumpingAway = (absDeltaPercent > maxDepthJumpPercent && movingAway);
-                
+
                 if (isZeroDepth || isFilled || isJumpingAway)
                 {
                     //set the average to the current depth, and set velocity to zero
@@ -204,6 +219,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                                cv::Mat& matVelocitySignal,
                                                const float velocityThresholdFactor)
     {
+        PROFILE_FUNC();
         int width = matVelocitySignal.cols;
         int height = matVelocitySignal.rows;
 
@@ -231,6 +247,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
     void DepthUtility::adjust_velocities_for_depth(cv::Mat& matDepth, cv::Mat& matVelocityFiltered)
     {
+        PROFILE_FUNC();
         if (m_depthAdjustmentFactor == 0)
         {
             return;
@@ -247,10 +264,18 @@ namespace sensekit { namespace plugins { namespace hand {
             for (int x = 0; x < width; ++x, ++depthRow, ++velFilteredRow)
             {
                 float depth = *depthRow;
-                if (depth != 0)
+                if (depth != 0.0f)
                 {
                     float& velFiltered = *velFilteredRow;
-                    velFiltered /= depth * m_depthAdjustmentFactor;
+                    if (depth > m_minDepth && depth < m_maxDepth)
+                    {
+                        float depthM = depth / 1000.0f;
+                        velFiltered /= depthM * m_depthAdjustmentFactor;
+                    }
+                    else
+                    {
+                        velFiltered = 0;
+                    }
                 }
             }
         }
@@ -258,6 +283,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
     int DepthUtility::depth_to_chunk_index(float depth)
     {
+        PROFILE_FUNC();
         if (depth == 0 || depth < MIN_CHUNK_DEPTH || depth > MAX_CHUNK_DEPTH)
         {
             return -1;
@@ -270,6 +296,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
     void DepthUtility::analyze_velocities(cv::Mat& matDepth, cv::Mat& matVelocityFiltered)
     {
+        PROFILE_FUNC();
         int width = matDepth.cols;
         int height = matDepth.rows;
 
@@ -287,7 +314,7 @@ namespace sensekit { namespace plugins { namespace hand {
             for (int x = 0; x < width; ++x, ++depthRow, ++velFilteredRow)
             {
                 //matVelocityFiltered is already abs(vel)
-                
+
                 float depth = *depthRow;
                 int chunkIndex = depth_to_chunk_index(depth);
                 if (chunkIndex >= 0 && depth != 0)
@@ -307,16 +334,17 @@ namespace sensekit { namespace plugins { namespace hand {
 
         const float chunkRange = MAX_CHUNK_DEPTH - MIN_CHUNK_DEPTH;
         const float chunk_size = chunkRange / NUM_DEPTH_VEL_CHUNKS;
-        
+
         for (int i = 0; i < NUM_DEPTH_VEL_CHUNKS; i++)
         {
             float maxVel = m_maxVel[i];
             int count = m_depthCount[i];
             float startDepth = (MIN_CHUNK_DEPTH + i * chunk_size) / 1000.0f;
+            float endDepth = (MIN_CHUNK_DEPTH + (1 + i) * chunk_size) / 1000.0f;
             float ratio = 0;
-            if (startDepth > 0)
+            if (endDepth != 0.0f)
             {
-                ratio = maxVel / startDepth;
+                ratio = maxVel / endDepth;
             }
 
             printf("[%.1fm %d,%f,%f] ", startDepth, count, maxVel, ratio);

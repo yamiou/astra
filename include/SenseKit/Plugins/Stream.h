@@ -2,24 +2,44 @@
 #define PLUGINSTREAM_H
 
 #include <SenseKit/SenseKit.h>
+#include <SenseKit/Plugins/PluginLogger.h>
 #include <SenseKit/Plugins/PluginServiceProxy.h>
 #include <SenseKit/Plugins/StreamCallbackListener.h>
-#include <SenseKit/Plugins/PluginLogger.h>
 #include <system_error>
 #include <cassert>
+#include <unordered_set>
 
 namespace sensekit { namespace plugins {
+
+    class StreamHandleHash
+    {
+    public:
+        std::size_t operator()(const sensekit_stream_t streamHandle) const
+        {
+            return std::hash<sensekit_stream_t>()(streamHandle);
+        }
+    };
+
+    class StreamHandleEqualTo
+    {
+    public:
+        std::size_t operator()(const sensekit_stream_t& lhs,
+                               const sensekit_stream_t& rhs) const
+        {
+            return lhs == rhs;
+        }
+    };
 
     class Stream : public StreamCallbackListener
     {
     public:
         Stream(PluginServiceProxy& pluginService,
-               Sensor streamSet,
-               StreamDescription description) :
-            m_pluginService(pluginService),
-            m_streamSet(streamSet),
-            m_description(description),
-            m_logger(pluginService)
+               sensekit_streamset_t streamSet,
+               StreamDescription description)
+            : m_pluginService(pluginService),
+              m_streamSet(streamSet),
+              m_description(description),
+              m_inhibitCallbacks(true)
         {
             create_stream(description);
         }
@@ -33,12 +53,10 @@ namespace sensekit { namespace plugins {
         inline sensekit_stream_t get_handle() { return m_streamHandle; }
 
     protected:
-        inline sensekit::plugins::PluginLogger& get_logger() { return m_logger; }
         inline PluginServiceProxy& get_pluginService() const { return m_pluginService; }
+        inline void enable_callbacks();
 
     private:
-        sensekit::plugins::PluginLogger m_logger;
-
         virtual void connection_added(sensekit_stream_t stream,
                                       sensekit_streamconnection_t connection) override final;
 
@@ -81,8 +99,6 @@ namespace sensekit { namespace plugins {
                                sensekit_parameter_data_t inData,
                                sensekit_parameter_bin_t& parameterBin) {};
 
-        virtual void on_new_buffer(sensekit_frame_t* newBuffer) { }
-
         void create_stream(StreamDescription& description)
         {
             assert(m_streamHandle == nullptr);
@@ -91,19 +107,19 @@ namespace sensekit { namespace plugins {
 
             sensekit_stream_desc_t desc = description.get_desc_t();
 
-            m_pluginService.create_stream(m_streamSet.get_handle(),
+            m_pluginService.create_stream(m_streamSet,
                                           desc,
                                           pluginCallbacks,
                                           &m_streamHandle);
         }
 
         PluginServiceProxy& m_pluginService;
-        Sensor m_streamSet;
+        sensekit_streamset_t m_streamSet{nullptr};
         StreamDescription m_description;
         sensekit_stream_t m_streamHandle{nullptr};
 
-    protected:
-
+        bool m_inhibitCallbacks;
+        std::unordered_set<sensekit_streamconnection_t> m_savedConnections;
     };
 
     inline void Stream::set_parameter(sensekit_streamconnection_t connection,
@@ -133,16 +149,50 @@ namespace sensekit { namespace plugins {
     inline void Stream::connection_added(sensekit_stream_t stream,
                                          sensekit_streamconnection_t connection)
     {
-        assert(stream == m_streamHandle);
-        on_connection_added(connection);
+        if (m_inhibitCallbacks)
+        {
+            SINFO("Stream", "Saving a connection_added for later");
+            m_savedConnections.insert(connection);
+        }
+        else
+        {
+            assert(stream == m_streamHandle);
+            on_connection_added(connection);
+        }
     }
 
     inline void Stream::connection_removed(sensekit_stream_t stream,
                                            sensekit_bin_t bin,
                                            sensekit_streamconnection_t connection)
     {
-        assert(stream == m_streamHandle);
-        on_connection_removed(bin, connection);
+        if (m_inhibitCallbacks)
+        {
+            m_savedConnections.erase(connection);
+        }
+        else
+        {
+            assert(stream == m_streamHandle);
+            on_connection_removed(bin, connection);
+        }
+    }
+
+    inline void Stream::enable_callbacks()
+    {
+        if (!m_inhibitCallbacks)
+        {
+            return;
+        }
+        m_inhibitCallbacks = false;
+
+        if (m_savedConnections.size() > 0)
+        {
+            SINFO("Stream", "Flushing saved connection_added connections");
+            for (auto connection : m_savedConnections)
+            {
+                on_connection_added(connection);
+            }
+            m_savedConnections.clear();
+        }
     }
 }}
 

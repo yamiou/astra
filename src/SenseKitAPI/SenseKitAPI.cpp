@@ -1,6 +1,6 @@
 /* THIS FILE AUTO-GENERATED FROM SenseKitAPI.cpp.lpp. DO NOT EDIT. */
 #include "SenseKitAPI.h"
-#include <SenseKit/Plugins/PluginKit.h>
+#include <SenseKit/Plugins/StreamServiceProxy.h>
 #include <cassert>
 
 SENSEKIT_BEGIN_DECLS
@@ -22,33 +22,18 @@ SENSEKIT_API_PROXY void sensekit_api_set_proxy(StreamServiceProxyBase* proxy)
     __sensekit_api_proxy_ptr = proxy;
 }
 
-SENSEKIT_API sensekit_status_t sensekit_initialize()
-{
-    return get_api_proxy()->initialize();
-}
-
-SENSEKIT_API sensekit_status_t sensekit_terminate()
-{
-    return get_api_proxy()->terminate();
-}
-
 SENSEKIT_API sensekit_status_t sensekit_streamset_open(const char* connectionString,
-                                                       sensekit_streamset_t* streamSet)
+                                                       sensekit_streamsetconnection_t* streamSet)
 {
     return get_api_proxy()->streamset_open(connectionString, streamSet);
 }
 
-SENSEKIT_API sensekit_status_t sensekit_streamset_close(sensekit_streamset_t* streamSet)
+SENSEKIT_API sensekit_status_t sensekit_streamset_close(sensekit_streamsetconnection_t* streamSet)
 {
     return get_api_proxy()->streamset_close(streamSet);
 }
 
-SENSEKIT_API char* sensekit_get_status_string(sensekit_status_t status)
-{
-    return get_api_proxy()->get_status_string(status);
-}
-
-SENSEKIT_API sensekit_status_t sensekit_reader_create(sensekit_streamset_t streamSet,
+SENSEKIT_API sensekit_status_t sensekit_reader_create(sensekit_streamsetconnection_t streamSet,
                                                       sensekit_reader_t* reader)
 {
     return get_api_proxy()->reader_create(streamSet, reader);
@@ -111,9 +96,9 @@ SENSEKIT_API sensekit_status_t sensekit_reader_unregister_frame_ready_callback(s
 SENSEKIT_API sensekit_status_t sensekit_reader_get_frame(sensekit_reader_frame_t frame,
                                                          sensekit_stream_type_t type,
                                                          sensekit_stream_subtype_t subtype,
-                                                         sensekit_frame_ref_t** frameRef)
+                                                         sensekit_frame_t** subFrame)
 {
-    return get_api_proxy()->reader_get_frame(frame, type, subtype, frameRef);
+    return get_api_proxy()->reader_get_frame(frame, type, subtype, subFrame);
 }
 
 SENSEKIT_API sensekit_status_t sensekit_stream_set_parameter(sensekit_streamconnection_t connection,

@@ -1,6 +1,6 @@
 /* ^^^AUTOGENHEADER^^^ */
 #include "SenseKitAPI.h"
-#include <SenseKit/Plugins/PluginKit.h>
+#include <SenseKit/Plugins/StreamServiceProxy.h>
 #include <cassert>
 
 SENSEKIT_BEGIN_DECLS

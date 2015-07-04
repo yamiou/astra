@@ -17,7 +17,7 @@ namespace sensekit {
 
         inline sensekit_joint_status status() { return m_joint.status; }
         inline sensekit_joint_type type() { return m_joint.jointType; }
-        inline Vector3f position() { return cvector_to_vector(m_joint.position); }
+        inline const Vector3f& position() { return Vector3f::from_cvector(m_joint.position); }
 
     private:
         sensekit_skeleton_joint_t m_joint;
@@ -47,7 +47,7 @@ namespace sensekit {
             }
 
             m_jointsInitialized = true;
-            for (int i = 0; i < m_skeleton.jointCount; ++i)
+            for (size_t i = 0; i < m_skeleton.jointCount; ++i)
             {
                 if (m_skeleton.joints[i].status ==
                     SENSEKIT_JOINT_STATUS_TRACKED)
@@ -78,11 +78,26 @@ namespace sensekit {
     class SkeletonFrame
     {
     public:
-        SkeletonFrame(sensekit_reader_frame_t readerFrame, sensekit_stream_subtype_t subtype)
+        template<typename TFrameType>
+        static TFrameType acquire(sensekit_reader_frame_t readerFrame,
+                                  sensekit_stream_subtype_t subtype)
         {
             if (readerFrame != nullptr)
             {
-                sensekit_frame_get_skeletonframe(readerFrame, &m_skeletonFrame);
+                sensekit_skeletonframe_t skeletonFrame;
+                sensekit_frame_get_skeletonframe(readerFrame, &skeletonFrame);
+                return TFrameType(skeletonFrame);
+            }
+
+            return TFrameType(nullptr);
+        }
+
+        SkeletonFrame(sensekit_skeletonframe_t skeletonFrame)
+        {
+            m_skeletonFrame = skeletonFrame;
+
+            if (m_skeletonFrame)
+            {
                 sensekit_skeletonframe_get_frameindex(m_skeletonFrame, &m_frameIndex);
 
                 size_t maxSkeletonCount;
@@ -93,6 +108,7 @@ namespace sensekit {
         }
 
         bool is_valid() { return m_skeletonFrame != nullptr; }
+        sensekit_skeletonframe_t handle() { return m_skeletonFrame; }
 
         size_t skeleton_count()
         {
@@ -133,7 +149,7 @@ namespace sensekit {
 
             sensekit_skeletonframe_get_skeletons_ptr(m_skeletonFrame, &skeletonPtr, &skeletonCount);
 
-            for (int i = 0; i < skeletonCount; ++i, ++skeletonPtr)
+            for (size_t i = 0; i < skeletonCount; ++i, ++skeletonPtr)
             {
                 sensekit_skeleton_t& p = *skeletonPtr;
                 if (p.status != sensekit_skeleton_status::SENSEKIT_SKELETON_STATUS_NOT_TRACKED)

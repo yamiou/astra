@@ -70,7 +70,6 @@ public:
     void processSkeletons(sensekit::Frame& frame)
     {
         sensekit::SkeletonFrame skeletonFrame = frame.get<sensekit::SkeletonFrame>();
-        sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
 
         m_skeletons = skeletonFrame.skeletons();
         m_jointPositions.clear();
@@ -116,7 +115,6 @@ public:
     void drawSkeletons(sf::RenderWindow& window, float depthScale)
     {
         float radius = 16;
-        auto size = window.getSize();
         sf::Color trackingColor(10, 10, 200);
 
         for (auto position : m_jointPositions)

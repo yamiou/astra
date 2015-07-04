@@ -16,9 +16,10 @@ foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
 endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
 
 add_subdirectory(openni_sensor)
+add_subdirectory(orbbec_hand)
+add_subdirectory(orbbec_xs)
 
-if (NOT ANDROID)
-  add_subdirectory(orbbec_hand)
-  add_subdirectory(orbbec_depth)
+if (NOT SENSEKIT_ANDROID)
+  add_subdirectory(orbbec_streamplayer)
   add_subdirectory(dummy)
 endif()

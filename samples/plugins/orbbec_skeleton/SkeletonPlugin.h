@@ -15,7 +15,7 @@ namespace sensekit { namespace plugins { namespace skeleton {
         static const size_t MAX_SKELETONS = 5;
 
         SkeletonPlugin(PluginServiceProxy* pluginProxy)
-            : PluginBase(pluginProxy)
+            : PluginBase(pluginProxy, "orbbec_skeleton")
         {
             register_for_stream_events();
         }

@@ -2,13 +2,18 @@
 #define STREAMREADER_H
 
 #include <SenseKit/sensekit_types.h>
-#include "StreamSet.h"
-#include "StreamConnection.h"
+#include "Registry.h"
 #include <unordered_map>
+#include <vector>
 #include <cassert>
 #include "Core/Signal.h"
+#include "sensekit_private.h"
+#include "StreamConnection.h"
 
 namespace sensekit {
+
+    class StreamSetConnection;
+    //class StreamConnection;
 
     class StreamDescHash
     {
@@ -40,59 +45,83 @@ namespace sensekit {
         sensekit_frame_index_t currentFrameIndex;
     };
 
-    class StreamReader
+    class StreamReader : public TrackedInstance<StreamReader>
     {
     public:
-        explicit StreamReader(StreamSet& streamSet);
+        StreamReader(StreamSetConnection& connection);
         ~StreamReader();
 
         StreamReader& operator=(const StreamReader& rhs) = delete;
         StreamReader(const StreamReader& reader) = delete;
 
-        StreamSet& get_streamSet() const { return m_streamSet; }
+        inline StreamSetConnection& get_connection() const { return m_connection; }
+
+        inline sensekit_reader_t get_handle() { return reinterpret_cast<sensekit_reader_t>(this); }
 
         StreamConnection* get_stream(sensekit_stream_desc_t& desc);
-        sensekit_frame_ref_t* get_subframe(sensekit_stream_desc_t& desc);
+        sensekit_frame_t* get_subframe(sensekit_stream_desc_t& desc);
 
         sensekit_callback_id_t register_frame_ready_callback(sensekit_frame_ready_callback_t callback, void* clientTag);
         void unregister_frame_ready_callback(sensekit_callback_id_t& callbackId);
 
         //TODO: locking currently not threadsafe
 
-        sensekit_status_t lock(int timeoutMillis);
-        void unlock();
+        sensekit_status_t lock(int timeoutMillis, sensekit_reader_frame_t& readerFrame);
+        sensekit_status_t unlock(sensekit_reader_frame_t& readerFrame);
 
-        sensekit_reader_t get_handle() { return reinterpret_cast<sensekit_reader_t>(this); }
-        static StreamReader* get_ptr(sensekit_reader_t reader) { return reinterpret_cast<StreamReader*>(reader); }
-        static StreamReader* from_frame(sensekit_reader_frame_t frame) { return reinterpret_cast<StreamReader*>(frame); }
+        static inline StreamReader* get_ptr(sensekit_reader_t reader) { return Registry::get<StreamReader>(reader); }
+        static inline StreamReader* from_frame(sensekit_reader_frame_t& frame)
+        {
+            if (frame == nullptr)
+            {
+                return nullptr;
+            }
+
+            return get_ptr(frame->reader);
+        }
 
     private:
-        enum class blockresult
+        enum class block_result
         {
-            BLOCKRESULT_TIMEOUT = 0,
-            BLOCKRESULT_FRAMEREADY = 1
+            TIMEOUT,
+            FRAMEREADY
         };
 
-        blockresult block_until_frame_ready_or_timeout(int timeoutMillis);
-        void check_for_all_frames_ready();
-        void raise_frame_ready();
-        void lock_private();
+        block_result block_until_frame_ready_or_timeout(int timeoutMillis);
+
+        sensekit_reader_frame_t lock_frame_for_event_callback();
+        sensekit_reader_frame_t lock_frame_for_poll();
+        sensekit_reader_frame_t acquire_available_reader_frame();
+
+        sensekit_status_t unlock_frame_and_check_connections(sensekit_reader_frame_t& readerFrame);
+        sensekit_status_t return_locked_frame(sensekit_reader_frame_t& readerFrame);
+
+        void ensure_connections_locked();
+        sensekit_status_t unlock_connections_if_able();
 
         StreamConnection* find_stream_of_type(sensekit_stream_desc_t& desc);
         StreamConnection::FrameReadyCallback get_sc_frame_ready_callback();
         void on_connection_frame_ready(StreamConnection* connection, sensekit_frame_index_t frameIndex);
+        void check_for_all_frames_ready();
+        void raise_frame_ready();
+
+        bool m_locked{false};
+        bool m_isFrameReadyForLock{false};
+        sensekit_frame_index_t m_lastFrameIndex{-1};
+        StreamSetConnection& m_connection;
 
         using ConnectionMap = std::unordered_map<sensekit_stream_desc_t,
                                                  ReaderConnectionData*,
                                                  StreamDescHash,
                                                  StreamDescEqualTo>;
-
-        bool m_locked{false};
-        bool m_isFrameReadyForLock{ false };
-        sensekit_frame_index_t m_lastFrameIndex{ -1 };
-        sensekit_reader_frame_t* m_currentFrame{nullptr};
-        StreamSet& m_streamSet;
         ConnectionMap m_streamMap;
+
+        using FramePtr  = std::unique_ptr<_sensekit_reader_frame>;
+        using FrameList = std::vector<FramePtr>;
+
+        FrameList m_frameList;
+        int32_t m_lockedFrameCount{0};
+
         Signal<sensekit_reader_t, sensekit_reader_frame_t> m_frameReadySignal;
 
         StreamConnection::FrameReadyCallback m_scFrameReadyCallback;

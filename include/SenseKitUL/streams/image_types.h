@@ -3,17 +3,32 @@
 
 #include <stdint.h>
 
+#if ! defined(__ANDROID__) && (defined(__GNUC__) || defined(__clang__))
+#define PACK_STRUCT __attribute__((packed))
+#else
+#define PACK_STRUCT
+#endif
+
+#ifdef _MSC_VER
+#pragma pack(push, 1)
+#endif
+
+
 typedef struct {
     uint8_t r;
     uint8_t g;
     uint8_t b;
-} sensekit_rgb_pixel_t;
+} PACK_STRUCT sensekit_rgb_pixel_t;
 
 typedef struct {
     uint32_t width;
     uint32_t height;
     uint8_t bytesPerPixel;
-} sensekit_image_metadata_t;
+} PACK_STRUCT sensekit_image_metadata_t;
+
+#ifdef _MSC_VER
+#pragma pack(pop)
+#endif
 
 typedef struct _sensekit_imageframe* sensekit_imageframe_t;
 

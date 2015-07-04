@@ -1,0 +1,3 @@
+[logging]
+# trace, debug, info, warn, error, fatal
+level = "trace"

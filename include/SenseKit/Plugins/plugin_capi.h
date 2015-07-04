@@ -6,6 +6,12 @@
 #include <SenseKit/Plugins/StreamServiceProxyBase.h>
 #include <SenseKit/Plugins/PluginServiceProxyBase.h>
 
+#if ! defined(__ANDROID__) && (defined(__GNUC__) || defined(__clang__))
+#define PACK_STRUCT __attribute__((packed))
+#else
+#define PACK_STRUCT
+#endif
+
 struct _sensekit_streamconnection {
     sensekit_streamconnection_handle_t handle;
     sensekit_stream_desc_t desc;
@@ -16,15 +22,22 @@ struct _sensekit_reader_callback_id {
     sensekit_callback_id_t callbackId;
 };
 
+
+#ifdef _MSC_VER
+#pragma pack(push, 1)
+#endif
+
 struct _sensekit_frame {
     size_t byteLength;
     sensekit_frame_index_t frameIndex;
-    void* data;
-};
+    union {
+        void* data;
+        uint64_t pad0;
+    };
+} PACK_STRUCT;
 
-struct _sensekit_frame_ref {
-    sensekit_streamconnection_t streamConnection;
-    sensekit_frame_t* frame;
-};
+#ifdef _MSC_VER
+#pragma pack(pop)
+#endif
 
 #endif /* PLUGIN_CAPI_H */

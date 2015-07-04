@@ -15,7 +15,7 @@ namespace sensekit { namespace plugins {
         using bin_type = StreamBin<TFrameType>;
 
         MultiBinStream(PluginServiceProxy& pluginService,
-                       Sensor streamSet,
+                       sensekit_streamset_t streamSet,
                        StreamDescription description)
             : Stream(pluginService, streamSet, description)
         {}

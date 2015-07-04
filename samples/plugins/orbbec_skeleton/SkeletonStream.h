@@ -13,7 +13,7 @@ namespace sensekit { namespace plugins { namespace skeleton {
     {
     public:
         SkeletonStream(sensekit::PluginServiceProxy& pluginService,
-                       sensekit::Sensor streamSet,
+                       sensekit_streamset_t streamSet,
                        sensekit_stream_t sourceStream,
                        size_t skeletonCount)
             : SingleBinStream(pluginService,
@@ -22,7 +22,9 @@ namespace sensekit { namespace plugins { namespace skeleton {
                                                           DEFAULT_SUBTYPE),
                               sizeof(sensekit_skeleton_t) * skeletonCount)
 
-        {}
+        {
+            enable_callbacks();
+        }
     };
 }}}
 

@@ -40,10 +40,10 @@ int main(int argc, char* argv[])
 
     sensekit_initialize();
 
-    sensekit_streamset_t sensor;
+    sensekit_streamsetconnection_t sensor;
 
     //client connects to daemon host, registers interest in certain sensor URI
-    sensekit_streamset_open("localhost/device0", &sensor);
+    sensekit_streamset_open("device/default", &sensor);
 
     sensekit_reader_t reader;
     sensekit_reader_create(sensor, &reader);

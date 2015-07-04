@@ -10,7 +10,6 @@ set(${_projname}_SOURCES
   OniColorStream.cpp
   OniDeviceStreamSet.h
   OniDeviceStreamSet.cpp
-
   )
 
 add_definitions(-DSENSEKIT_BUILD)
@@ -20,20 +19,22 @@ if (WIN32)
 elseif (APPLE)
   find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.dylib" HINTS "$ENV{OPENNI2_REDIST}" PATH_SUFFIXES lib)
 elseif (ANDROID)
-  find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.so" PATHS "${CMAKE_SOURCE_DIR}/android-lib" NO_CMAKE_FIND_ROOT_PATH)
+  find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.so" PATHS "${CMAKE_SOURCE_DIR}/vendor/openni-android" NO_CMAKE_FIND_ROOT_PATH)
 endif()
 
 include_directories ("$ENV{OPENNI2_INCLUDE}")
+
+include_directories(${_projname} ${SHINY_INCLUDE})
 
 add_library(${_projname} SHARED ${${_projname}_SOURCES})
 
 set_target_properties(${_projname} PROPERTIES FOLDER "plugins")
 
-target_link_libraries(${_projname} SenseKitAPI ${OpenNI2_LIBRARY})
+target_link_libraries(${_projname} SenseKitAPI Shiny ${OpenNI2_LIBRARY})
 
 install(TARGETS ${_projname}
   RUNTIME DESTINATION bin/Plugins/
-  LIBRARY DESTINATION bin/Plugins/
+  LIBRARY DESTINATION lib/Plugins/
   )
 
 install_pdb(${_projname} bin/Plugins/)

@@ -14,9 +14,9 @@ namespace sensekit {
     public:
         explicit HandPoint(sensekit_handpoint_t handPoint) :
             m_handPoint(handPoint),
-            m_depthPosition(cvector_to_vector(handPoint.depthPosition)),
-            m_worldPosition(cvector_to_vector(handPoint.worldPosition)),
-            m_worldDeltaPosition(cvector_to_vector(handPoint.worldDeltaPosition))
+            m_depthPosition(Vector2i::from_cvector(handPoint.depthPosition)),
+            m_worldPosition(Vector3f::from_cvector(handPoint.worldPosition)),
+            m_worldDeltaPosition(Vector3f::from_cvector(handPoint.worldDeltaPosition))
         { }
 
         inline int32_t trackingId() const { return m_handPoint.trackingId; }
@@ -62,11 +62,25 @@ namespace sensekit {
     class HandFrame
     {
     public:
-        HandFrame(sensekit_reader_frame_t readerFrame, sensekit_stream_subtype_t subtype)
+        template<typename TFrameType>
+        static TFrameType acquire(sensekit_reader_frame_t readerFrame,
+                                  sensekit_stream_subtype_t subtype)
         {
             if (readerFrame != nullptr)
             {
-                sensekit_frame_get_handframe_with_subtype(readerFrame, subtype, &m_handFrame);
+                sensekit_handframe_t handFrame;
+                sensekit_frame_get_handframe_with_subtype(readerFrame, subtype, &handFrame);
+                return TFrameType(handFrame);
+            }
+
+            return TFrameType(nullptr);
+        }
+
+        HandFrame(sensekit_handframe_t handFrame)
+        {
+            m_handFrame = handFrame;
+            if (m_handFrame)
+            {
                 sensekit_handframe_get_frameindex(m_handFrame, &m_frameIndex);
 
                 size_t maxHandCount;
@@ -77,6 +91,7 @@ namespace sensekit {
         }
 
         bool is_valid() { return m_handFrame != nullptr; }
+        sensekit_handframe_t handle() { return m_handFrame; }
 
         size_t handpoint_count()
         {
@@ -117,7 +132,7 @@ namespace sensekit {
 
             sensekit_handframe_get_shared_hand_array(m_handFrame, &handPtr, &maxHandCount);
 
-            for (int i = 0; i < maxHandCount; ++i, ++handPtr)
+            for (size_t i = 0; i < maxHandCount; ++i, ++handPtr)
             {
                 sensekit_handpoint_t& p = *handPtr;
                 if (p.status != sensekit_handstatus_t::HAND_STATUS_NOTTRACKING)

@@ -5,6 +5,7 @@
 #include <SenseKit/Plugins/plugin_capi.h>
 #include <SenseKitUL/skul_ctypes.h>
 #include <SenseKitUL/Plugins/stream_types.h>
+#include <Shiny.h>
 
 namespace sensekit { namespace plugins {
 
@@ -13,7 +14,7 @@ namespace sensekit { namespace plugins {
         {
         public:
             OniColorStream(PluginServiceProxy& pluginService,
-                           Sensor streamSet,
+                           sensekit_streamset_t streamSet,
                            ::openni::Device& oniDevice)
                 : OniDeviceStream(pluginService,
                                   streamSet,
@@ -23,7 +24,9 @@ namespace sensekit { namespace plugins {
                                   oniDevice,
                                   ::openni::SENSOR_COLOR,
                                   3)
-                { }
+                {
+                    PROFILE_FUNC();
+                }
         };
     }}
 

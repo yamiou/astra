@@ -7,6 +7,7 @@ namespace sensekit { namespace plugins {
                                           sensekit_parameter_id id,
                                           sensekit_parameter_bin_t& parameterBin)
     {
+        PROFILE_FUNC();
         switch (id)
         {
         case SENSEKIT_PARAMETER_DEPTH_CONVERSION_CACHE:
@@ -21,10 +22,11 @@ namespace sensekit { namespace plugins {
             {
                 memcpy(parameterData, &m_conversionCache, resultByteLength);
             }
-            return;
+            break;
         }
+        default:
+            OniDeviceStream::on_get_parameter(connection, id, parameterBin);
+            break;
         }
-
-        OniDeviceStream::on_get_parameter(connection, id, parameterBin);
     }
 }}
