@@ -16,9 +16,11 @@ target_link_libraries(${_projname} SenseKitAPI SenseKitUL FrameSerialization Clo
 
 include_directories(${_projname})
 
+set(DF_FILES "${PROJECT_SOURCE_DIR}/src/plugins/orbbec_streamplayer/test.df")
+
 add_custom_target(testpb ALL
 COMMAND ${CMAKE_COMMAND} -E copy
-"${PROJECT_SOURCE_DIR}/src/plugins/orbbec_streamplayer/test.df"
+"${DF_FILES}"
 "$<TARGET_FILE_DIR:${_projname}>/")
 set_target_properties(testpb PROPERTIES FOLDER CMakeCopyTargets)
 
@@ -27,4 +29,8 @@ install(TARGETS ${_projname}
   LIBRARY DESTINATION lib/Plugins/
   )
 
+install(FILES "${DF_FILES}"
+        DESTINATION bin/Plugins/
+  )
+  
 install_pdb(${_projname} bin/Plugins/)
