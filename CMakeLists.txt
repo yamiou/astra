@@ -89,12 +89,18 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
   PATTERN ".gitignore" EXCLUDE
   )
 
+
 if (MSVC)
   install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013
     DESTINATION samples
     PATTERN "build" EXCLUDE
     PATTERN ".gitignore" EXCLUDE
     PATTERN "thirdparty/.git" EXCLUDE
+    )
+
+  file(GLOB_RECURSE THIRD_PARTY_FILES "${PROJECT_SOURCE_DIR}/samples-aux/vs2013/thirdparty/copy_to_bin_dir/*.*")
+  install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013/thirdparty/copy_to_bin_dir/
+    DESTINATION bin
     )
 
   set(SAMPLES_SOURCE_DIR "${PROJECT_BINARY_DIR}/sdk/samples")
