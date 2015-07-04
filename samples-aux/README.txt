@@ -1,7 +1,6 @@
-SenseKit SDK v0.2.0 for Windows
+SenseKit SDK v0.2.0 Preview for Windows and Android
 Copyright (c) 2015 Orbbec
-
-ALPHA - NOT FOR PUBLIC DISTRIBUTION
+www.orbbec3d.com
 
 josh@orbbec3d.com
 
