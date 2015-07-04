@@ -133,12 +133,12 @@ public class SensorDeviceManager {
         knownDeviceTypes.add(new UsbDeviceInfo(0x1d27, 0x0601));
 
         //Orbbec Astra
-        knownDeviceTypes.add(new UsbDeviceInfo(0x1d28, 0x0400));
-        knownDeviceTypes.add(new UsbDeviceInfo(0x1d28, 0x0401));
-        knownDeviceTypes.add(new UsbDeviceInfo(0x1d28, 0x0402));
-        knownDeviceTypes.add(new UsbDeviceInfo(0x1d28, 0x0403));
-        knownDeviceTypes.add(new UsbDeviceInfo(0x1d28, 0x0404));
-        knownDeviceTypes.add(new UsbDeviceInfo(0x1d28, 0x0405));
+        knownDeviceTypes.add(new UsbDeviceInfo(0x2bc5, 0x0400));
+        knownDeviceTypes.add(new UsbDeviceInfo(0x2bc5, 0x0401));
+        knownDeviceTypes.add(new UsbDeviceInfo(0x2bc5, 0x0402));
+        knownDeviceTypes.add(new UsbDeviceInfo(0x2bc5, 0x0403));
+        knownDeviceTypes.add(new UsbDeviceInfo(0x2bc5, 0x0404));
+        knownDeviceTypes.add(new UsbDeviceInfo(0x2bc5, 0x0405));
 
         return knownDeviceTypes;
     }
