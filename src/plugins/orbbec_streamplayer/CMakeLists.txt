@@ -24,13 +24,13 @@ COMMAND ${CMAKE_COMMAND} -E copy
 "$<TARGET_FILE_DIR:${_projname}>/")
 set_target_properties(testpb PROPERTIES FOLDER CMakeCopyTargets)
 
-install(TARGETS ${_projname}
-  RUNTIME DESTINATION bin/Plugins/
-  LIBRARY DESTINATION lib/Plugins/
-  )
+#install(TARGETS ${_projname}
+#  RUNTIME DESTINATION bin/Plugins/
+#  LIBRARY DESTINATION lib/Plugins/
+#  )
 
-install(FILES "${DF_FILES}"
-        DESTINATION bin/Plugins/
-  )
+#install(FILES "${DF_FILES}"
+#        DESTINATION bin/Plugins/
+#  )
   
-install_pdb(${_projname} bin/Plugins/)
+#install_pdb(${_projname} bin/Plugins/)

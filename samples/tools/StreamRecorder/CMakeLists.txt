@@ -18,6 +18,6 @@ set_debug_working_dir(${_projname} "$(TargetDir)")
 
 add_sensekit_sdk_dependency(${_projname})
 
-if (MSVC)
-    install(TARGETS ${_projname} DESTINATION bin/)
-endif()
+#if (MSVC)
+#    install(TARGETS ${_projname} DESTINATION bin/)
+#endif()

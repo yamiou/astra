@@ -81,6 +81,7 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples
   PATTERN ".gitignore" EXCLUDE
   PATTERN "samples/plugins" EXCLUDE #skeleton plugin
   PATTERN "samples/sfml/SimpleSkeletonViewer-SFML" EXCLUDE
+  PATTERN "samples/tools/StreamRecorder" EXCLUDE
   )
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
