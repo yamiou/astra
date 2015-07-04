@@ -7,3 +7,6 @@
 [submodule "vendor/openni-android"]
 	path = vendor/openni-android
 	url = git@bitbucket.org:orbicsoft/openni-android-binaries.git
+[submodule "android/sensekitapktest"]
+	path = android/sensekitapktest
+	url = git@bitbucket.org:orbicsoft/sensekitapktest.git
