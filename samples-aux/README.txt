@@ -50,6 +50,15 @@ http://www.microsoft.com/en-us/download/details.aspx?id=40784
 
 Tested on Windows 8.1, but would probably work on Windows 7 as well.
 
+Pre-built samples
+==========
+
+Pre-built samples are included in the bin/ directory.
+Simply plug in your sensor and then run any of the executable files in the bin/ directory.
+
+We recommend starting with SimpleDepthViewer-SFML and SimpleHandViewer-SFML.
+In the hand viewer, wave left and right at the sensor a few times to start hand tracking.
+
 Building the samples
 ==========
 
