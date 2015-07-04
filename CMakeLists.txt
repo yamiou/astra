@@ -82,6 +82,7 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples
   PATTERN "samples/plugins/orbbec_skeleton" EXCLUDE
   PATTERN "samples/sfml/SimpleSkeletonViewer-SFML" EXCLUDE
   PATTERN "samples/tools/StreamRecorder" EXCLUDE
+  PATTERN "samples/gl" EXCLUDE
   )
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
@@ -104,6 +105,8 @@ if (MSVC)
     PATTERN "build" EXCLUDE
     PATTERN ".gitignore" EXCLUDE
     PATTERN "thirdparty/.git" EXCLUDE
+    PATTERN "thirdparty/glut_windows" EXCLUDE
+    PATTERN "thirdparty/copy_to_bin_dir/glut*.dll" EXCLUDE
     )
 
   file(GLOB_RECURSE THIRD_PARTY_FILES "${PROJECT_SOURCE_DIR}/samples-aux/vs2013/thirdparty/copy_to_bin_dir/*.*")
