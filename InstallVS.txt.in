@@ -25,7 +25,9 @@ set(CMAKE_GEN_FILES_TO_DELETE
   "${SAMPLES_BUILD_TEMP_DIR}/ZERO_CHECK.vcxproj.filters"
   )
 
-file(GLOB_RECURSE FOUND_FILES_TO_DELETE "${SAMPLES_BUILD_TEMP_DIR}/cmake_install.cmake")
+file(GLOB_RECURSE FOUND_FILES_TO_DELETE "${SAMPLES_BUILD_TEMP_DIR}/cmake_install.cmake"
+                                        "${SAMPLES_BUILD_TEMP_DIR}/INSTALL.vcxproj"
+                                        "${SAMPLES_BUILD_TEMP_DIR}/INSTALL.vcxproj.filters")
 
 FILE(GLOB_RECURSE cmake_stamp_list "${SAMPLES_BUILD_TEMP_DIR}/generate.stamp")
 SET(FOUND_DIRS_TO_DELETE "")

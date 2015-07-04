@@ -209,7 +209,7 @@ is replaced with replacement."
               :replacement-callback lambda-remove
               :include-markers T)
               
-(add-slndata  :start-marker "Project([^,]*\\(ALL_BUILD\\|CMakePredefinedTargets\\|ZERO_CHECK\\)"
+(add-slndata  :start-marker "Project([^,]*\\(ALL_BUILD\\|CMakePredefinedTargets\\|ZERO_CHECK\\|INSTALL\\)"
               :end-marker "EndProject"
               :replacement-callback lambda-remove
               :include-markers T)
