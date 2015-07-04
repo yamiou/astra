@@ -89,6 +89,13 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
   PATTERN ".gitignore" EXCLUDE
   )
 
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/android/
+  DESTINATION android
+  USE_SOURCE_PERMISSIONS
+  PATTERN ".gitignore" EXCLUDE
+  PATTERN ".git" EXCLUDE
+  PATTERN ".gitmodules" EXCLUDE
+  )
 
 if (MSVC)
   install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013
