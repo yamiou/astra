@@ -1,4 +1,4 @@
-SenseKit SDK v0.2.0 Preview for Windows and Android
+SenseKit SDK v0.2.1 Preview for Windows and Android
 Copyright (c) 2015 Orbbec
 www.orbbec3d.com
 
@@ -7,27 +7,9 @@ josh@orbbec3d.com
 What's New
 ==========
 
-v0.2.0 2015/07/03 First version ready for external use. Hand tracking is high quality on Windows and Android. Sample app binaries added to SDK distributable.
+v0.2.1 2015/07/04 Updated Android and Windows app for new sensor USB IDs.
 
-v0.1.9 2015/06/29 Numerous improvements to hand tracker behavior and performance, StreamCore bug fixes, multiple streamset support, depth recorder and playback, Android support, improved build system.
-
-v0.1.8 2015/05/13 Added orbbec_hand.toml which contains every configurable setting for the hand tracker. This file can be found in the Plugins folder along with orbbec_hand.dll. Adjusted pointSmoothingFactor for better hand trajectories.
-
-v0.1.7 2015/05/11 The hand tracker now uses a wave focus gesture and the recovery of points has been modified so that the system stops tracking points that go out of range or fail certain tests much quicker than before. Hand tracker also has much improved model for filtering background noise. Integrated a more optimized LitDepthVisualizer into SimpleDepthViewer-SFML and SimpleHandViewer-SFML. SimpleHandViewer-SFML now has hand traces. Refactored all HandTracker settings in preparation for reading settings from disk. (Loading from disk didn't make this release.) Fixed a bug that caused some samples to crash on exit. Fixed other possible internal bugs.
-
-v0.1.6 2015/05/07 Further improvement in hand tracking. Should have fewer false positive hands and much easier to lock hand tracking: simply hold your hand up for a second. (If farther away, may need to move the hand a little bit.) Hand tracking colors have been updated to be green for tracking and red for lost points.
-
-v0.1.5 2015/04/28 Significant improvement in the hand tracker, now including full resolution depth refinement, hand point smoothing, and text id labels in the hand viewer apps. All of the hand tracker parameters have been tuned for better performance. Hand points now are near the center or upper-center of the hand. Note - to lock on to hands, the hand tracker currently requires your hand to move consistently for about two seconds. The easiest way is to move your hand forward and back a few times. Note - hand viewer samples now require Inconsolata.otf, which is included in the vs2013/thirdparty/copy_to_bin_dir/ directory.
-
-v0.1.4 2015/04/24 Internal reorganization, bug fixes, consistency. Improved debug hand viewer visualizations. Initial re-work of coordinate mapper. Arranged files to support additional plugin development.
-
-v0.1.3 2015/04/21 More fixes in VS2013 project generation - should be good now. Hand tracker now works, and there is now a debug hand viewer sample/tool. Push number keys (above the letters, not numpad) 1-5 to see different visualization modes: Depth, Velocity, Filtered velocity, Segmentation, Score. Various clean up of the SDK header files. Various bug fixes. Get/set parameter mechanism is working. Preliminary logging has been added. A log file is generated in the logs/ directory under the exe working directory.
-
-v0.1.2 2015/04/15 Fixed absolute paths in VS2013 projects. Moved sample folders around. Fixed hand tracker so it gets data, but hand tracking plugin still is not working. Improved SFML samples. Added HandViewer-SFML, but it again hand plugin is not working yet. Various internal improvements to SDK and plugins. The pre-compiled sample binaries will be Release mode, so hopefully won't require VS2013 to be installed.
-
-v0.1.1 2015/04/14 Fixed SimpleColorViewer. Added VS2013 projects (auto-generated via SDK CMake install process). Samples now includes dependencies and have a much better out-of-the-box experience. Fixed minor bugs. HandReader very broken.
-
-v0.1.0 2015/04/12 Initial internal release
+v0.2.0 2015/07/03 First version ready for external use.
 
 Sample pre-requisites
 ==========
@@ -71,7 +53,7 @@ To run the samples:
 1) Copy all the files from sdk/samples/vs2013/thirdparty/copy_to_bin_dir/ to
 your build folder (bin/Debug/ or bin/Release/).
 
-2) From the sdk/bin/ folder, copy SenseKit.dll, SenseKitAPI.dll, SenseKitUL.dll, 
+2) From the sdk/bin/ folder, copy SenseKit.dll, SenseKitAPI.dll, SenseKitUL.dll,
 and the entire Plugin folder to your build folder.
 The plugins should still be in a Plugins subfolder under your sample .exe files.
 
@@ -91,8 +73,9 @@ Known issues
 plug in a sensor after the program starts and it should detect it and continue.
 Repeated hotplugging (in and out) does not work though.
 
-2) The color sample will only display a blank white window for sensors that do have a color stream.
-
-3) If a sample crashes or you stop debugging before it cleans itself up nicely, the sensor driver
+2) If a sample crashes or you stop debugging before it cleans itself up nicely, the sensor driver
 may be put into a weird state. Before the next run you may need to replug the sensor or turn the sensor
 off and then on first. (This is primarily an OpenNI driver issue.)
+
+3) If you close a sample's console window without cleanly exiting the program, it may crash. For console
+samples, press control-c to exit cleanly. For GUI apps, press escape to exit cleanly.
