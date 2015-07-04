@@ -79,7 +79,7 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples
   DESTINATION .
   PATTERN "build" EXCLUDE
   PATTERN ".gitignore" EXCLUDE
-  PATTERN "samples/plugins" EXCLUDE #skeleton plugin
+  PATTERN "samples/plugins/orbbec_skeleton" EXCLUDE
   PATTERN "samples/sfml/SimpleSkeletonViewer-SFML" EXCLUDE
   PATTERN "samples/tools/StreamRecorder" EXCLUDE
   )

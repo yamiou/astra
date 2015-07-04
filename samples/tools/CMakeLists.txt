@@ -1,2 +1,4 @@
 add_subdirectory(DebugHandViewer)
-add_subdirectory(StreamRecorder)
+if (SENSEKIT_SDK_BUILD)
+  add_subdirectory(StreamRecorder)
+endif()
