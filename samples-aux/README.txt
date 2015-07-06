@@ -7,7 +7,7 @@ josh@orbbec3d.com
 What's New
 ==========
 
-v0.2.1 2015/07/04 Updated Android and Windows app for new sensor USB IDs.
+v0.2.1 2015/07/06 Updated Android and Windows drivers for new sensor USB IDs. Add Android test app .apk.
 
 v0.2.0 2015/07/03 First version ready for external use.
 
