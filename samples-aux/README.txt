@@ -21,15 +21,14 @@ The provided Visual Studio 2013 solution is already configured to run out of the
 
 For reference, some of the samples have dependencies, which are provided in this archive.
 See sdk/samples/vs2013/thirdparty/
-1) GLUT 3.7
-2) SFML 2.2 - From http://www.sfml-dev.org/download/sfml/2.2/ Windows | Visual C++ 12 (2013) - 32-bit
+* SFML 2.2 - From http://www.sfml-dev.org/download/sfml/2.2/ Windows | Visual C++ 12 (2013) - 32-bit
 
 If you want to run the pre-compiled samples and don't have VS2013 installed,
 you must install the Visual C++ Redistributable Packages for Visual Studio 2013 from
 http://www.microsoft.com/en-us/download/details.aspx?id=40784
 (Not required if VS2013 is installed.)
 
-Tested on Windows 8.1, but would probably work on Windows 7 as well.
+Tested on Windows 8.1, Windows 7, and Android 4.4.2.
 
 Pre-built samples
 ==========
