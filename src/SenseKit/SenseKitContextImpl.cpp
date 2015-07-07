@@ -32,8 +32,8 @@ namespace sensekit {
         std::unique_ptr<Configuration> config(Configuration::load_from_file(configPath.c_str()));
         initialize_logging(logPath.c_str(), config->severityLevel());
 
-        SWARN("SenseKitContextImpl", "Hold on to yer butts");
-        SINFO("SenseKitContextImpl", "logger file: %s", logPath.c_str());
+        SWARN("SenseKitContext", "Hold on to yer butts");
+        SINFO("SenseKitContext", "logger file: %s", logPath.c_str());
 
         m_pluginManager = std::make_unique<PluginManager>(m_setCatalog);
 
@@ -47,7 +47,7 @@ namespace sensekit {
 
         if (m_pluginManager->plugin_count() == 0)
         {
-            SWARN("SenseKitContextImpl", "SenseKit found no plugins. Is there a Plugins folder? Is the working directory correct?");
+            SWARN("SenseKitContext", "SenseKit found no plugins. Is there a Plugins folder? Is the working directory correct?");
         }
 
         m_initialized = true;
@@ -64,14 +64,14 @@ namespace sensekit {
 
         m_initialized = false;
 
-        SINFO("SenseKitContextImpl", "SenseKit terminated.");
+        SINFO("SenseKitContext", "SenseKit terminated.");
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
     sensekit_status_t SenseKitContextImpl::streamset_open(const char* uri, sensekit_streamsetconnection_t& streamSet)
     {
-        SINFO("SenseKitContextImpl", "client opening streamset: %s", uri);
+        SINFO("SenseKitContext", "client opening streamset: %s", uri);
 
         StreamSetConnection& conn = m_setCatalog.open_set_connection(uri);
         streamSet = conn.get_handle();
@@ -95,7 +95,7 @@ namespace sensekit {
         }
         else
         {
-            SWARN("SenseKitContextImpl", "attempt to close a non-existent stream set");
+            SWARN("SenseKitContext", "attempt to close a non-existent stream set");
         }
 
         streamSet = nullptr;
@@ -127,7 +127,7 @@ namespace sensekit {
         }
         else
         {
-            SWARN("SenseKitContextImpl", "attempt to create reader from non-existent stream set");
+            SWARN("SenseKitContext", "attempt to create reader from non-existent stream set");
             return SENSEKIT_STATUS_INVALID_PARAMETER;
         }
     }
@@ -145,7 +145,7 @@ namespace sensekit {
         }
         else
         {
-            SWARN("SenseKitContextImpl", "attempt to destroy a non-existent reader: %p", reader);
+            SWARN("SenseKitContext", "attempt to destroy a non-existent reader: %p", reader);
         }
 
         reader = nullptr;
@@ -172,7 +172,7 @@ namespace sensekit {
         }
         else
         {
-            SWARN("SenseKitContextImpl", "get_stream called on non-existent reader");
+            SWARN("SenseKitContext", "get_stream called on non-existent reader");
             connection = nullptr;
         }
 
@@ -190,7 +190,7 @@ namespace sensekit {
         }
         else
         {
-            SWARN("SenseKitContextImpl", "get_description called on non-existent stream");
+            SWARN("SenseKitContext", "get_description called on non-existent stream");
         }
 
         return SENSEKIT_STATUS_SUCCESS;
@@ -209,7 +209,7 @@ namespace sensekit {
         }
         else
         {
-            SWARN("SenseKitContextImpl", "start called on non-existent stream");
+            SWARN("SenseKitContext", "start called on non-existent stream");
         }
 
         return SENSEKIT_STATUS_SUCCESS;
@@ -228,7 +228,7 @@ namespace sensekit {
         }
         else
         {
-            SWARN("SenseKitContextImpl", "stop called on non-existent stream");
+            SWARN("SenseKitContext", "stop called on non-existent stream");
         }
 
         return SENSEKIT_STATUS_SUCCESS;
@@ -240,7 +240,7 @@ namespace sensekit {
     {
         if (reader == nullptr)
         {
-            SWARN("SenseKitContextImpl", "reader_open_frame called with null reader");
+            SWARN("SenseKitContext", "reader_open_frame called with null reader");
             assert(reader != nullptr);
             return SENSEKIT_STATUS_INVALID_OPERATION;
         }
@@ -253,7 +253,7 @@ namespace sensekit {
         }
         else
         {
-            SWARN("SenseKitContextImpl", "open_frame called on non-existent reader");
+            SWARN("SenseKitContext", "open_frame called on non-existent reader");
             return SENSEKIT_STATUS_INVALID_PARAMETER;
         }
     }
@@ -262,7 +262,7 @@ namespace sensekit {
     {
         if (frame == nullptr)
         {
-            SWARN("SenseKitContextImpl", "reader_close_frame called with null frame");
+            SWARN("SenseKitContext", "reader_close_frame called with null frame");
             assert(frame != nullptr);
             return SENSEKIT_STATUS_INVALID_OPERATION;
         }
@@ -271,7 +271,7 @@ namespace sensekit {
 
         if (!actualReader)
         {
-            SWARN("SenseKitContextImpl", "reader_close_frame couldn't retrieve StreamReader from frame");
+            SWARN("SenseKitContext", "reader_close_frame couldn't retrieve StreamReader from frame");
             assert(actualReader != nullptr);
             return SENSEKIT_STATUS_INTERNAL_ERROR;
         }
@@ -303,7 +303,7 @@ namespace sensekit {
         }
         else
         {
-            SWARN("SenseKitContextImpl", "register_frame_ready_callback called on non-existent reader");
+            SWARN("SenseKitContext", "register_frame_ready_callback called on non-existent reader");
             return SENSEKIT_STATUS_INVALID_PARAMETER;
         }
     }
@@ -330,7 +330,7 @@ namespace sensekit {
         }
         else
         {
-            SWARN("SenseKitContextImpl", "unregister_frame_ready_callback for non-existent reader: %p", cb->reader);
+            SWARN("SenseKitContext", "unregister_frame_ready_callback for non-existent reader: %p", cb->reader);
         }
 
         delete cb;
@@ -359,7 +359,7 @@ namespace sensekit {
         }
         else
         {
-            SWARN("SenseKitContextImpl", "get_frame called on non-existent reader/frame combo");
+            SWARN("SenseKitContext", "get_frame called on non-existent reader/frame combo");
             return SENSEKIT_STATUS_INVALID_PARAMETER;
         }
     }
@@ -388,7 +388,7 @@ namespace sensekit {
         }
         else
         {
-            SWARN("SenseKitContextImpl", "set_parameter called on non-existent stream");
+            SWARN("SenseKitContext", "set_parameter called on non-existent stream");
             return SENSEKIT_STATUS_INVALID_PARAMETER;
         }
     }
@@ -410,7 +410,7 @@ namespace sensekit {
         }
         else
         {
-            SWARN("SenseKitContextImpl", "get_parameter called on non-existent stream");
+            SWARN("SenseKitContext", "get_parameter called on non-existent stream");
             return SENSEKIT_STATUS_INVALID_PARAMETER;
         }
     }
@@ -430,7 +430,7 @@ namespace sensekit {
         }
         else
         {
-            SWARN("SenseKitContextImpl", "get_result called on non-existent stream");
+            SWARN("SenseKitContext", "get_result called on non-existent stream");
             return SENSEKIT_STATUS_INVALID_PARAMETER;
         }
     }
@@ -454,7 +454,7 @@ namespace sensekit {
         }
         else
         {
-            SWARN("SenseKitContextImpl", "invoke called on non-existent stream");
+            SWARN("SenseKitContext", "invoke called on non-existent stream");
             return SENSEKIT_STATUS_INVALID_PARAMETER;
         }
     }
