@@ -3,10 +3,8 @@
 #define PLUGINSERVICE_H
 
 #include <SenseKit/sensekit_types.h>
-#include "Stream.h"
-#include "StreamBin.h"
-#include "Core/Signal.h"
-#include "Logger.h"
+#include <SenseKit/Plugins/plugin_callbacks.h>
+#include <memory>
 
 using CallbackId = size_t;
 
@@ -16,18 +14,18 @@ namespace sensekit
 {
     class StreamSet;
     class StreamSetCatalog;
+    class PluginServiceImpl;
 
     class PluginService
     {
     public:
-        PluginService(StreamSetCatalog& catalog)
-            : m_setCatalog(catalog)
-            {}
+        PluginService(StreamSetCatalog& catalog);
+        ~PluginService();
 
         PluginService(const PluginService& service) = delete;
         PluginService& operator=(const PluginService& rhs) = delete;
 
-        PluginServiceProxyBase* create_proxy();
+        PluginServiceProxyBase* proxy();
         void notify_host_event(sensekit_event_id id, const void* data, size_t dataSize);
 
 ^^^BEGINREPLACE:plugin^^^
@@ -35,8 +33,8 @@ namespace sensekit
 ^^^ENDREPLACE^^^
 
     private:
-        StreamSetCatalog& m_setCatalog;
-        Signal<sensekit_event_id, const void*, size_t> m_hostEventSignal;
+        std::unique_ptr<PluginServiceImpl> m_impl;
+        std::unique_ptr<PluginServiceProxyBase> m_proxy;
     };
 }
 

@@ -4,15 +4,13 @@
 namespace sensekit {
 
     PluginManager::PluginManager(StreamSetCatalog& catalog)
-        : m_pluginService(std::make_unique<PluginService>(catalog))
-    {
-        m_pluginServiceProxy = m_pluginService->create_proxy();
-    }
+        : m_pluginService(std::make_unique<PluginService>(catalog)),
+          m_pluginServiceProxy(m_pluginService->proxy())
+    {}
 
     PluginManager::~PluginManager()
     {
         unload_all_plugins();
-        delete m_pluginServiceProxy;
     }
 
     void PluginManager::load_plugins(std::string searchPath)

@@ -1,0 +1,42 @@
+/* ^^^AUTOGENHEADER^^^ */
+#ifndef PLUGINSERVICEIMPL_H
+#define PLUGINSERVICEIMPL_H
+
+#include <SenseKit/sensekit_types.h>
+#include "Stream.h"
+#include "StreamBin.h"
+#include "Core/Signal.h"
+#include "Logger.h"
+
+using CallbackId = size_t;
+
+struct PluginServiceImplProxyBase;
+
+namespace sensekit
+{
+    class StreamSet;
+    class StreamSetCatalog;
+
+    class PluginServiceImpl
+    {
+    public:
+        PluginServiceImpl(StreamSetCatalog& catalog)
+            : m_setCatalog(catalog)
+            {}
+
+        PluginServiceImpl(const PluginServiceImpl& service) = delete;
+        PluginServiceImpl& operator=(const PluginServiceImpl& rhs) = delete;
+
+        void notify_host_event(sensekit_event_id id, const void* data, size_t dataSize);
+
+^^^BEGINREPLACE:plugin^^^
+        ^RETURN^ ^FUNC^(^PARAMS:ref^);
+^^^ENDREPLACE^^^
+
+    private:
+        StreamSetCatalog& m_setCatalog;
+        Signal<sensekit_event_id, const void*, size_t> m_hostEventSignal;
+    };
+}
+
+#endif /* PLUGINSERVICEIMPL_H */

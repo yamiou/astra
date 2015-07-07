@@ -1,31 +1,32 @@
-/* THIS FILE AUTO-GENERATED FROM PluginService.h.lpp. DO NOT EDIT. */
-#ifndef PLUGINSERVICE_H
-#define PLUGINSERVICE_H
+/* THIS FILE AUTO-GENERATED FROM PluginServiceImpl.h.lpp. DO NOT EDIT. */
+#ifndef PLUGINSERVICEIMPL_H
+#define PLUGINSERVICEIMPL_H
 
 #include <SenseKit/sensekit_types.h>
-#include <SenseKit/Plugins/plugin_callbacks.h>
-#include <memory>
+#include "Stream.h"
+#include "StreamBin.h"
+#include "Core/Signal.h"
+#include "Logger.h"
 
 using CallbackId = size_t;
 
-struct PluginServiceProxyBase;
+struct PluginServiceImplProxyBase;
 
 namespace sensekit
 {
     class StreamSet;
     class StreamSetCatalog;
-    class PluginServiceImpl;
 
-    class PluginService
+    class PluginServiceImpl
     {
     public:
-        PluginService(StreamSetCatalog& catalog);
-        ~PluginService();
+        PluginServiceImpl(StreamSetCatalog& catalog)
+            : m_setCatalog(catalog)
+            {}
 
-        PluginService(const PluginService& service) = delete;
-        PluginService& operator=(const PluginService& rhs) = delete;
+        PluginServiceImpl(const PluginServiceImpl& service) = delete;
+        PluginServiceImpl& operator=(const PluginServiceImpl& rhs) = delete;
 
-        PluginServiceProxyBase* proxy();
         void notify_host_event(sensekit_event_id id, const void* data, size_t dataSize);
 
         sensekit_status_t register_stream_registered_callback(stream_registered_callback_t callback,
@@ -75,9 +76,9 @@ namespace sensekit
                               va_list args);
 
     private:
-        std::unique_ptr<PluginServiceImpl> m_impl;
-        std::unique_ptr<PluginServiceProxyBase> m_proxy;
+        StreamSetCatalog& m_setCatalog;
+        Signal<sensekit_event_id, const void*, size_t> m_hostEventSignal;
     };
 }
 
-#endif /* PLUGINSERVICE_H */
+#endif /* PLUGINSERVICEIMPL_H */

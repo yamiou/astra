@@ -40,6 +40,8 @@ set(${_projname}_SOURCES
   StreamBackend.cpp
   PluginService.cpp
   PluginService.h
+  PluginServiceImpl.h
+  PluginServiceImpl.cpp
   PluginServiceDelegate.h
   PluginManager.h
   PluginManager.cpp
