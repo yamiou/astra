@@ -10,7 +10,7 @@ namespace sensekit {
 
     static inline StreamServiceProxyBase* create_stream_proxy(SenseKitContext* context)
     {
-        StreamServiceProxyBase* proxy = new StreamServiceProxyBase;
+        ::StreamServiceProxyBase* proxy = new ::StreamServiceProxyBase;
 
         proxy->streamset_open = &StreamServiceDelegate::streamset_open;
         proxy->streamset_close = &StreamServiceDelegate::streamset_close;

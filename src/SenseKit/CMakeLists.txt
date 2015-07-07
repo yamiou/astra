@@ -27,6 +27,8 @@ set(${_projname}_SOURCES
   ../../include/SenseKit/Plugins/StreamServiceProxyBase.h
   SenseKitContext.h
   SenseKitContext.cpp
+  SenseKitContextImpl.h
+  SenseKitContextImpl.cpp
   CreateStreamProxy.h
   CreatePluginProxy.h
   Configuration.h

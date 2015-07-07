@@ -1,6 +1,6 @@
 ﻿#include "PluginService.h"
 #include "Stream.h"
-#include "SenseKitContext.h"
+#include "StreamSetCatalog.h"
 #include "PluginServiceDelegate.h"
 #include <SenseKit/Plugins/PluginServiceProxyBase.h>
 #include <SenseKit/sensekit_types.h>
@@ -26,7 +26,7 @@ namespace sensekit
 
     sensekit_status_t PluginService::create_stream_set(const char* streamUri, sensekit_streamset_t& streamSet)
     {
-        StreamSet& set = m_context.get_setCatalog().get_or_add(streamUri, true);
+        StreamSet& set = m_setCatalog.get_or_add(streamUri, true);
         streamSet = set.get_handle();
 
         SINFO("PluginService", "creating streamset: %s %x", streamUri, streamSet);
@@ -39,7 +39,7 @@ namespace sensekit
         StreamSet* actualSet = StreamSet::get_ptr(streamSet);
 
         SINFO("PluginService", "destroying streamset: %s %x", actualSet->get_uri().c_str(), streamSet);
-        m_context.get_setCatalog().destroy_set(actualSet);
+        m_setCatalog.destroy_set(actualSet);
 
         streamSet = nullptr;
 
@@ -58,7 +58,7 @@ namespace sensekit
                          args.description);
             };
 
-        callbackId = m_context.get_setCatalog().register_for_stream_registered_event(thunk);
+        callbackId = m_setCatalog.register_for_stream_registered_event(thunk);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -75,21 +75,21 @@ namespace sensekit
                          args.description);
             };
 
-        callbackId = m_context.get_setCatalog().register_for_stream_unregistering_event(thunk);
+        callbackId = m_setCatalog.register_for_stream_unregistering_event(thunk);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
     sensekit_status_t PluginService::unregister_stream_registered_callback(CallbackId callbackId)
     {
-        m_context.get_setCatalog().unregister_for_stream_registered_event(callbackId);
+        m_setCatalog.unregister_for_stream_registered_event(callbackId);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
 
     sensekit_status_t PluginService::unregister_stream_unregistering_callback(CallbackId callbackId)
     {
-        m_context.get_setCatalog().unregister_form_stream_unregistering_event(callbackId);
+        m_setCatalog.unregister_form_stream_unregistering_event(callbackId);
 
         return SENSEKIT_STATUS_SUCCESS;
     }
@@ -119,7 +119,7 @@ namespace sensekit
         assert(stream != nullptr);
 
         StreamSet* set =
-            m_context.get_setCatalog().find_streamset_for_stream(stream);
+            m_setCatalog.find_streamset_for_stream(stream);
 
         assert(set != nullptr);
 

@@ -33,7 +33,7 @@ namespace sensekit {
     class PluginManager
     {
     public:
-        PluginManager(SenseKitContext& context);
+        PluginManager(StreamSetCatalog& setCatalog);
         ~PluginManager();
 
         void load_plugins(std::string searchPath);

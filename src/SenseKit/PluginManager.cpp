@@ -3,8 +3,8 @@
 
 namespace sensekit {
 
-    PluginManager::PluginManager(SenseKitContext& context)
-        : m_pluginService(std::make_unique<PluginService>(context))
+    PluginManager::PluginManager(StreamSetCatalog& catalog)
+        : m_pluginService(std::make_unique<PluginService>(catalog))
     {
         m_pluginServiceProxy = m_pluginService->create_proxy();
     }

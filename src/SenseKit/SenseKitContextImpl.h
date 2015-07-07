@@ -1,26 +1,30 @@
-/* THIS FILE AUTO-GENERATED FROM SenseKitContext.h.lpp. DO NOT EDIT. */
-#ifndef SENSEKITCONTEXT_H
-#define SENSEKITCONTEXT_H
+/* THIS FILE AUTO-GENERATED FROM SenseKitContextImpl.h.lpp. DO NOT EDIT. */
+#ifndef SENSEKITCONTEXTIMPL_H
+#define SENSEKITCONTEXTIMPL_H
 
 #include <SenseKit/sensekit_types.h>
+#include <atomic>
 #include <memory>
+#include <unordered_map>
+#include <string>
+
+#include "PluginManager.h"
+#include "StreamSet.h"
+#include "StreamReader.h"
+#include "Core/shared_library.h"
+#include "Logger.h"
+#include "StreamSetCatalog.h"
 
 struct StreamServiceProxyBase;
 
 namespace sensekit {
 
-    class StreamSet;
-    class StreamSetCatalog;
-    class SenseKitContextImpl;
-
-    class SenseKitContext
+    class SenseKitContextImpl
     {
     public:
-        SenseKitContext();
-        ~SenseKitContext();
-
-        SenseKitContext& operator=(const SenseKitContext& rhs) = delete;
-        SenseKitContext(const SenseKitContext& context) = delete;
+        SenseKitContextImpl() = default;
+        SenseKitContextImpl& operator=(const SenseKitContextImpl& rhs) = delete;
+        SenseKitContextImpl(const SenseKitContextImpl& context) = delete;
 
         sensekit_status_t initialize();
         sensekit_status_t terminate();
@@ -89,14 +93,19 @@ namespace sensekit {
 
         sensekit_status_t temp_update();
 
-        StreamServiceProxyBase* proxy();
-
         sensekit_status_t notify_host_event(sensekit_event_id id, const void* data, size_t dataSize);
 
     private:
-        std::unique_ptr<SenseKitContextImpl> m_impl;
-        std::unique_ptr<StreamServiceProxyBase> m_proxy;
+        bool m_initialized{false};
+
+        using PluginManagerPtr = std::unique_ptr<PluginManager>;
+        PluginManagerPtr m_pluginManager;
+
+        using ReaderList = std::vector<StreamReader*>;
+
+        ReaderList m_activeReaders;
+        StreamSetCatalog m_setCatalog;
     };
 }
 
-#endif /* SENSEKITCONTEXT_H */
+#endif /* SENSEKITCONTEXTIMPL_H */

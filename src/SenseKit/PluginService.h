@@ -14,14 +14,14 @@ struct PluginServiceProxyBase;
 
 namespace sensekit
 {
-    class SenseKitContext;
     class StreamSet;
+    class StreamSetCatalog;
 
     class PluginService
     {
     public:
-        PluginService(SenseKitContext& context)
-            : m_context(context)
+        PluginService(StreamSetCatalog& catalog)
+            : m_setCatalog(catalog)
             {}
 
         PluginService(const PluginService& service) = delete;
@@ -77,7 +77,7 @@ namespace sensekit
                               va_list args);
 
     private:
-        SenseKitContext& m_context;
+        StreamSetCatalog& m_setCatalog;
         Signal<sensekit_event_id, const void*, size_t> m_hostEventSignal;
     };
 }
