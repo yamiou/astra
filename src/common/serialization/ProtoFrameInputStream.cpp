@@ -11,6 +11,11 @@ namespace sensekit { namespace serialization {
     {
         m_file = fopen(path, "rb");
 
+        if (m_file == nullptr)
+        {
+            throw ResourceNotFoundException(path);
+        }
+
         m_fileDescriptor = get_file_descriptor(m_file);
 
         m_fileSize = get_file_size(m_fileDescriptor);
@@ -28,7 +33,6 @@ namespace sensekit { namespace serialization {
 
         return fileDescriptor;
     }
-
 
     long ProtoFrameInputStream::get_file_size(int fd)
     {

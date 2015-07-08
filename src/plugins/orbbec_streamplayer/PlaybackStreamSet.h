@@ -63,12 +63,19 @@ namespace sensekit { namespace plugins { namespace streamplayer {
                 return SENSEKIT_STATUS_SUCCESS;
             }
 
-            m_frameStream = std::unique_ptr<FrameInputStream>(open_frame_input_stream(STREAMPLAYERPLUGIN_FILE_PATH));
-            m_frameStreamReader = std::make_unique<FrameStreamReader>(m_frameStream.get());
+            try
+            {
+                m_frameStream = std::unique_ptr<FrameInputStream>(open_frame_input_stream(STREAMPLAYERPLUGIN_FILE_PATH));
+                m_frameStreamReader = std::make_unique<FrameStreamReader>(m_frameStream.get());
 
-            open_stream();
+                open_stream();
 
-            m_isOpen = true;
+                m_isOpen = true;
+            }
+            catch (ResourceNotFoundException)
+            {
+                return SENSEKIT_STATUS_DEVICE_ERROR;
+            }
 
             return SENSEKIT_STATUS_SUCCESS;
         }

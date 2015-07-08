@@ -3,8 +3,27 @@
 
 #include "StreamFileModels.h"
 #include <cstdint>
+#include <exception>
 
 namespace sensekit { namespace serialization {
+
+    class ResourceNotFoundException : std::exception
+    {
+    public:
+        ResourceNotFoundException(const char* uri)
+            : m_uri(uri)
+        {
+            
+        }
+
+        const char* what() const override
+        {
+            return "Resource";
+        }
+
+    private:
+        const char* m_uri;
+    };
 
     class FrameInputStream
     {

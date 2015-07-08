@@ -40,9 +40,9 @@ namespace sensekit { namespace serialization {
         int get_file_descriptor(FILE* file);
 
         FILE* m_file;
-        int m_fileDescriptor{ -1 };
+        int m_fileDescriptor{-1};
 
-        int m_positionOffset{ 0 };
+        int m_positionOffset{0};
 
         std::unique_ptr<ZeroCopyInputStream> m_inputStream;
         proto::Frame m_frameMessage;
@@ -52,7 +52,7 @@ namespace sensekit { namespace serialization {
         Frame m_frame;
         FrameDescription m_frameDescription;
         StreamHeader m_streamHeader;
-        long m_fileSize;
+        long m_fileSize{-1.0};
     };
 
 }}
