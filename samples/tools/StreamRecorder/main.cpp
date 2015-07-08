@@ -136,7 +136,6 @@ private:
     bool m_shouldCheckFps{false};
 };
 
-
 class DepthFrameListener : public sensekit::FrameReadyListener
 {
 public:
@@ -164,11 +163,92 @@ private:
     FrameStreamWriter& m_frameStreamWriter;
 };
 
+enum class AppState
+{
+    STANDBY,
+    PLAY,
+    RECORD
+};
+
+class AppStateManager
+{
+public:
+    AppStateManager()
+        : m_appState(AppState::STANDBY)
+    {
+
+    }
+
+    AppState get_app_state()
+    {
+        return m_appState;
+    }
+
+    void set_app_state(AppState appState)
+    {
+        m_appState = appState;
+    }
+
+private:
+    AppState m_appState;
+};
+
+void handle_escape_event(sf::Keyboard::Key key, sf::RenderWindow& window, AppStateManager& appStateManager)
+{
+    AppState appState = appStateManager.get_app_state();
+
+    if (key == sf::Keyboard::Escape)
+    {
+        window.close();
+    }
+}
+
+void handle_play_event(sf::Keyboard::Key key, PointFrameListener& streamPlayerPsListener, AppStateManager& appStateManager)
+{
+    AppState appState = appStateManager.get_app_state();
+
+    if (key == sf::Keyboard::P && appState == AppState::STANDBY)
+    {
+        streamPlayerPsListener.set_shouldcheckfps(true);
+        appStateManager.set_app_state(AppState::PLAY);
+    }
+}
+
+void handle_stop_event(sf::Keyboard::Key key, PointFrameListener& streamPlayerPsListener, AppStateManager& appStateManager)
+{
+    AppState appState = appStateManager.get_app_state();
+
+    if (key == sf::Keyboard::S && appState == AppState::PLAY)
+    {
+        streamPlayerPsListener.set_shouldcheckfps(false);
+        appStateManager.set_app_state(AppState::STANDBY);
+    }
+}
+
+void handle_record_event(sf::Keyboard::Key key, PointFrameListener& sensorPsListener, FrameStreamWriter& streamWriter, AppStateManager& appStateManager)
+{
+    AppState appState = appStateManager.get_app_state();
+
+    if (key == sf::Keyboard::R)
+    {
+        if (appState == AppState::STANDBY)
+        {
+            sensorPsListener.set_shouldcheckfps(true);
+            streamWriter.begin_write();
+            appStateManager.set_app_state(AppState::RECORD);
+        }
+        if (appState == AppState::RECORD)
+        {
+            sensorPsListener.set_shouldcheckfps(false);
+            streamWriter.end_write();
+            appStateManager.set_app_state(AppState::STANDBY);
+        }
+    }
+}
+
 int main(int argc, char** argv)
 {
-    bool isRecording = false;
-    bool isPlaying = false;
-    bool shouldBlockCommands = false;
+    AppStateManager appStateManager;
 
     FILE* outputFile = fopen("test.df", "wb");;
 
@@ -206,74 +286,33 @@ int main(int argc, char** argv)
         sensekit_temp_update();
 
         sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-            {
-                window.close();
-            }
-            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
-            {
-                window.close();
-            }
-
-            if (!shouldBlockCommands &&
-                !isPlaying &&
-                !isRecording &&
-                (event.type == sf::Event::KeyPressed) &&
-                (event.key.code == sf::Keyboard::R))
-            {
-                sensorPsListener.set_shouldcheckfps(true);
-                streamWriter.begin_write();
-                isRecording = true;
-                shouldBlockCommands = true;
-            }
-
-            if (!shouldBlockCommands &&
-                !isPlaying &&
-                isRecording &&
-                (event.type == sf::Event::KeyPressed) &&
-                (event.key.code == sf::Keyboard::R))
-            {
-                sensorPsListener.set_shouldcheckfps(false);
-                streamWriter.end_write();
-                isRecording = false;
-                shouldBlockCommands = true;
-            }
-
-            if (!shouldBlockCommands &&
-                !isRecording && !isPlaying &&
-                (event.type == sf::Event::KeyPressed) &&
-                (event.key.code == sf::Keyboard::P))
-            {
-                streamPlayerPsListener.set_shouldcheckfps(true);
-                isPlaying = true;
-                shouldBlockCommands = true;
-            }
-            if (!shouldBlockCommands &&
-                !isRecording &&
-                isPlaying &&
-                (event.type == sf::Event::KeyPressed) &&
-                (event.key.code == sf::Keyboard::S))
-            {
-                streamPlayerPsListener.set_shouldcheckfps(false);
-                isPlaying = false;
-                shouldBlockCommands = true;
-            }
-
-            if (shouldBlockCommands)
-            {
-                shouldBlockCommands = false;
-            }
-        }
 
         window.clear(sf::Color::Black);
 
-        if (isPlaying)
+        while (window.pollEvent(event))
+        {
+            switch (event.type)
+            {
+                case sf::Event::Closed:
+                    window.close();
+                    break;
+                case sf::Event::KeyPressed:
+                    sf::Keyboard::Key key = event.key.code;
+                    handle_escape_event(key, window, appStateManager);
+                    handle_stop_event(key, streamPlayerPsListener, appStateManager);
+                    handle_record_event(key, sensorPsListener, streamWriter, appStateManager);
+                    handle_play_event(key, streamPlayerPsListener, appStateManager);
+                    break;
+            }
+        }
+
+        AppState appState = appStateManager.get_app_state();
+
+        if (appState == AppState::PLAY)
         {
             streamPlayerPsListener.drawTo(window);
         }
-        else if (isRecording)
+        else if (appState == AppState::RECORD)
         {
             sensorPsListener.drawTo(window);
         }
