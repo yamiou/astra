@@ -193,10 +193,8 @@ private:
     AppState m_appState;
 };
 
-void handle_escape_event(sf::Keyboard::Key key, sf::RenderWindow& window, AppStateManager& appStateManager)
+void handle_escape_event(sf::Keyboard::Key key, sf::RenderWindow& window)
 {
-    AppState appState = appStateManager.get_app_state();
-
     if (key == sf::Keyboard::Escape)
     {
         window.close();
@@ -298,7 +296,7 @@ int main(int argc, char** argv)
                     break;
                 case sf::Event::KeyPressed:
                     sf::Keyboard::Key key = event.key.code;
-                    handle_escape_event(key, window, appStateManager);
+                    handle_escape_event(key, window);
                     handle_stop_event(key, streamPlayerPsListener, appStateManager);
                     handle_record_event(key, sensorPsListener, streamWriter, appStateManager);
                     handle_play_event(key, streamPlayerPsListener, appStateManager);
