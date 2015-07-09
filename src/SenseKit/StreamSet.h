@@ -27,12 +27,9 @@ namespace sensekit {
         StreamSet(const StreamSet& streamSet) = delete;
 
         StreamSetConnection* add_new_connection();
-
-        void link_existing_connection(StreamSetConnection* connection);
         void disconnect_streamset_connection(StreamSetConnection* connection);
 
         StreamConnection* create_stream_connection(const sensekit_stream_desc_t& desc);
-
         bool destroy_stream_connection(StreamConnection* connection);
 
         void claim();

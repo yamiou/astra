@@ -110,7 +110,7 @@ namespace sensekit {
     // }
 
     sensekit_status_t SenseKitContextImpl::reader_create(sensekit_streamsetconnection_t streamSet,
-                                                     sensekit_reader_t& reader)
+                                                         sensekit_reader_t& reader)
     {
         assert(streamSet != nullptr);
 
@@ -154,9 +154,9 @@ namespace sensekit {
     }
 
     sensekit_status_t SenseKitContextImpl::reader_get_stream(sensekit_reader_t reader,
-                                                         sensekit_stream_type_t type,
-                                                         sensekit_stream_subtype_t subtype,
-                                                         sensekit_streamconnection_t& connection)
+                                                             sensekit_stream_type_t type,
+                                                             sensekit_stream_subtype_t subtype,
+                                                             sensekit_streamconnection_t& connection)
     {
         assert(reader != nullptr);
 
@@ -180,7 +180,7 @@ namespace sensekit {
     }
 
     sensekit_status_t SenseKitContextImpl::stream_get_description(sensekit_streamconnection_t connection,
-                                                              sensekit_stream_desc_t* description)
+                                                                  sensekit_stream_desc_t* description)
     {
         StreamConnection* actualConnection = StreamConnection::get_ptr(connection);
 
@@ -235,8 +235,8 @@ namespace sensekit {
     }
 
     sensekit_status_t SenseKitContextImpl::reader_open_frame(sensekit_reader_t reader,
-                                                         int timeoutMillis,
-                                                         sensekit_reader_frame_t& frame)
+                                                             int timeoutMillis,
+                                                             sensekit_reader_frame_t& frame)
     {
         if (reader == nullptr)
         {
@@ -280,9 +280,9 @@ namespace sensekit {
     }
 
     sensekit_status_t SenseKitContextImpl::reader_register_frame_ready_callback(sensekit_reader_t reader,
-                                                                            sensekit_frame_ready_callback_t callback,
-                                                                            void* clientTag,
-                                                                            sensekit_reader_callback_id_t& callbackId)
+                                                                                sensekit_frame_ready_callback_t callback,
+                                                                                void* clientTag,
+                                                                                sensekit_reader_callback_id_t& callbackId)
     {
         assert(reader != nullptr);
         callbackId = nullptr;
@@ -340,9 +340,9 @@ namespace sensekit {
     }
 
     sensekit_status_t SenseKitContextImpl::reader_get_frame(sensekit_reader_frame_t frame,
-                                                        sensekit_stream_type_t type,
-                                                        sensekit_stream_subtype_t subtype,
-                                                        sensekit_frame_t*& subFrame)
+                                                            sensekit_stream_type_t type,
+                                                            sensekit_stream_subtype_t subtype,
+                                                            sensekit_frame_t*& subFrame)
     {
         assert(frame != nullptr);
 
@@ -372,9 +372,9 @@ namespace sensekit {
     }
 
     sensekit_status_t SenseKitContextImpl::stream_set_parameter(sensekit_streamconnection_t connection,
-                                                            sensekit_parameter_id parameterId,
-                                                            size_t inByteLength,
-                                                            sensekit_parameter_data_t inData)
+                                                                sensekit_parameter_id parameterId,
+                                                                size_t inByteLength,
+                                                                sensekit_parameter_data_t inData)
     {
         assert(connection != nullptr);
         assert(connection->handle != nullptr);
@@ -394,9 +394,9 @@ namespace sensekit {
     }
 
     sensekit_status_t SenseKitContextImpl::stream_get_parameter(sensekit_streamconnection_t connection,
-                                                            sensekit_parameter_id parameterId,
-                                                            size_t& resultByteLength,
-                                                            sensekit_result_token_t& token)
+                                                                sensekit_parameter_id parameterId,
+                                                                size_t& resultByteLength,
+                                                                sensekit_result_token_t& token)
     {
         assert(connection != nullptr);
         assert(connection->handle != nullptr);
@@ -416,9 +416,9 @@ namespace sensekit {
     }
 
     sensekit_status_t SenseKitContextImpl::stream_get_result(sensekit_streamconnection_t connection,
-                                                         sensekit_result_token_t token,
-                                                         size_t dataByteLength,
-                                                         sensekit_parameter_data_t dataDestination)
+                                                             sensekit_result_token_t token,
+                                                             size_t dataByteLength,
+                                                             sensekit_parameter_data_t dataDestination)
     {
         assert(connection != nullptr);
         assert(connection->handle != nullptr);
@@ -436,11 +436,11 @@ namespace sensekit {
     }
 
     sensekit_status_t SenseKitContextImpl::stream_invoke(sensekit_streamconnection_t connection,
-                                                     sensekit_command_id commandId,
-                                                     size_t inByteLength,
-                                                     sensekit_parameter_data_t inData,
-                                                     size_t& resultByteLength,
-                                                     sensekit_result_token_t& token)
+                                                         sensekit_command_id commandId,
+                                                         size_t inByteLength,
+                                                         sensekit_parameter_data_t inData,
+                                                         size_t& resultByteLength,
+                                                         sensekit_result_token_t& token)
     {
         assert(connection != nullptr);
         assert(connection->handle != nullptr);
