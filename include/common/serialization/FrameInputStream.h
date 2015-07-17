@@ -13,12 +13,12 @@ namespace sensekit { namespace serialization {
         ResourceNotFoundException(const char* uri)
             : m_uri(uri)
         {
-            
+
         }
 
-        const char* what() const override
+        const char* what() const noexcept override
         {
-            return "Resource";
+            return m_uri;
         }
 
     private:

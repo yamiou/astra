@@ -48,11 +48,11 @@ namespace sensekit { namespace serialization {
         proto::Frame m_frameMessage;
         proto::FrameDescription m_frameDescriptionMessage;
         proto::StreamHeader m_streamHeaderMessage;
-        
+
         Frame m_frame;
         FrameDescription m_frameDescription;
         StreamHeader m_streamHeader;
-        long m_fileSize{-1.0};
+        long m_fileSize{-1};
     };
 
 }}
