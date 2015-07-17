@@ -5,7 +5,17 @@
 #include <cstdint>
 #include <exception>
 
+// Is noexcept supported?
+#if defined(__clang__) && __has_feature(cxx_noexcept) ||                \
+    defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46 || \
+    defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180021114
+#  define NOEXCEPT noexcept
+#else
+#  define NOEXCEPT
+#endif
+
 namespace sensekit { namespace serialization {
+
 
     class ResourceNotFoundException : std::exception
     {
@@ -16,7 +26,7 @@ namespace sensekit { namespace serialization {
 
         }
 
-        const char* what() const noexcept override
+        const char* what() const NOEXCEPT override
         {
             return m_uri;
         }
