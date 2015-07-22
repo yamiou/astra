@@ -62,9 +62,12 @@ set (SDK_DEPENDENT_TARGET "SDK_dependent")
 add_custom_target(${SDK_DEPENDENT_TARGET})
 
 set(SHINY_INCLUDE "${PROJECT_SOURCE_DIR}/vendor/shinyprofiler/include")
+set(CATCH_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/vendor/catch/include" CACHE INTERNAL "Path to include folder for Catch")
+
 add_subdirectory(vendor)
 add_subdirectory(src)
 add_subdirectory(samples)
+add_subdirectory(tests)
 
 set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/sdk")
 MESSAGE("CMAKE_INSTALL_PREFIX : ${CMAKE_INSTALL_PREFIX}")

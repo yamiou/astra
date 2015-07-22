@@ -10,3 +10,6 @@
 [submodule "android/sensekitapktest"]
 	path = android/sensekitapktest
 	url = git@bitbucket.org:orbicsoft/sensekitapktest.git
+[submodule "vendor/catch"]
+	path = vendor/catch
+	url = git@github.com:philsquared/Catch.git
