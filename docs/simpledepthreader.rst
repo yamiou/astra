@@ -1,8 +1,8 @@
 .. |sdkname| replace:: Astra
 
-*******************
-Simple Depth Reader
-*******************
+***********************
+4.2 Simple Depth Reader
+***********************
 *Time Required: ~10 minutes*
 
 Thirsting for more knowledge after finishing the Hello World Tutorial? Now that you've mastered some of the basic concepts of |sdkname|, let's read the depth stream from our Astra using another |sdkname| feature.
