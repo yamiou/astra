@@ -38,10 +38,39 @@ The design goals for the SDK are straightforward and lofty - to create the world
 Low Ceremony Design
 ===================
 
-- API consistency
-- 80% of commonly used functionality is put to the front, along with the remainder
+The designers of the SDK are also experienced 3D sensor developers themselves, and recognize the features that are most commonly used when developing 3D sensor applications. To this end, the |sdkname| SDK reduces the boilerplate code required to obtain sensor data by exposing high-level stream types in addition to low-level stream types through a consistent, easy-to-understand API. This can be best shown with some example code:
 
-The |sdkname| SDK reduces the boilerplate code required to obtain sensor data by exposing high-level stream types in addition to low-level stream types.
+.. code-block:: c++
+   :linenos:
+
+   sensekit::SenseKit::initialize();
+
+   sensekit::Sensor sensor; //By default, a Sensor will address the Astra
+   sensekit::StreamReader reader = sensor.create_reader();
+
+   // Low-Level Streams
+   reader.stream<sensekit::DepthStream>().start();
+   reader.stream<sensekit::ColorStream>().start();
+
+   //High-Level Streams
+   reader.stream<sensekit::HandStream>().start();
+   reader.stream<sensekit::PointStream>().start();
+
+   sensekit::Frame frame = reader.get_latest_frame();
+   
+   //Low-Level Streams
+   auto depthFrame = frame.get<sensekit::DepthFrame>();
+   auto colorFrame = frame.get<sensekit::ColorFrame>();
+
+   //High-Level Streams
+   auto handFrame = frame.get<sensekit::HandFrame>();
+   auto pointFrame = frame.get<sensekit::PointFrame>();
+
+   sensekit::Sensekit::terminate();
+
+First, take note where we create our ``Sensor`` object on line 1. Without any additional configuration, it will default to addressing the Astra sensor. In the lines below, you can see that, regardless of the stream type, the same API calls are made to interact with each stream.
+
+If you're an advanced 3D sensor developer and worried that this SDK is designed for simple applications only, rest assured that the |sdkname| SDK also handles less-common cases, often simply by passing different parameters to object constructors. In short, no matter how complicated your application might be, the |sdkname| SDK can handle it.
 
 Cross-Everything
 ================
@@ -68,9 +97,9 @@ Mobile devices are becoming more powerful and smaller each passing year, but are
 Extensibility
 =============
 
-- plugins
+Perhaps the most powerful feature of the |sdkname| SDK is its plugin layer. Plugins afford advanced developers a method to extend the SDK's functionality with the same consistency and level of support as the rest of the platform. In fact, all of the "stock" stream types included with the SDK are actually supported through plugins themselves.
 
-Perhaps one of its more exciting features, the |sdkname| SDK can support a full network of sensors. Additionally, even if different sensors provide different types of streams, |sdkname| can use data flowing from different sensors to compose higher-level stream types.
+Plugins aren't limited to adding additional stream type support, though. Imagine adding support to address a network of sensors through the same consistent API as a single sensor. The possibilities are truly innumerable, and will allow exciting first and third party additions as the SDK matures.
 
 :doc:`2 Getting Started <gettingstarted>`
 
