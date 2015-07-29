@@ -53,37 +53,71 @@ Polling
 The polling method for getting frame data is the most direct method for getting stream data, and is also the method used in the Hello World tutorial. To use this method, you only need to call the ``get_latest_frame`` function on the ``StreamReader``, then use the templated ``get<T>`` function on the returned frame to retrieve specific frame types. "``T``" in this case must be a valid frame type. The ``get_latest_frame`` function is blocking, so application execution will suspend until a new frame is returned. A ``timeout`` can be passed as a parameter to the ``get_latest_frame`` function if you want to limit the amount of time that the SDK will wait for a new frame to arrive.
 
 .. code-block:: c++
-   :linenos:
-   :lineno-start: 7
-   :emphasize-lines: 10,11
+   :emphasize-lines: 8,9
 
-   int main(int argc, char** argv)
-   {
-      astra::Astra::initialize();
+   astra::Astra::initialize();
 
-      astra::Sensor sensor;
-      astra::StreamReader reader = sensor.create_reader();
+   astra::Sensor sensor;
+   astra::StreamReader reader = sensor.create_reader();
 
-      reader.stream<astra::DepthStream>().start();
+   reader.stream<astra::DepthStream>().start();
 
-      astra::Frame frame = reader.get_latest_frame();
-      auto depthFrame = frame.get<astra::DepthFrame>();
+   astra::Frame frame = reader.get_latest_frame();
+   auto depthFrame = frame.get<astra::DepthFrame>();
 
-      astra::Astra::terminate();
+   astra::Astra::terminate();
 
-      std::cout << "hit enter to exit program" << std::endl;
-      std::cin.get();
-      return 0;
-   }
-- Line 16 - Retrieves the latest frame
-- Line 17 - Gets the depth frame from the latest frame
+
+- Retrieving a depth frame using the polling method
 
 Listening
 ---------
 
-The listening method for getting frame data requires a small amount of additional setup, but allows the developer to delegate the handling of a frame to one or more separate classes. The |sdkname| SDK provides an abstract class called ``FrameReadyListener`` which implements a single function called ``on_frame_ready``. ``on_frame_ready`` is called and passed a reference to a frame as soon as the frame is ready for processing.
+The listening method for getting frame data requires a small amount of additional setup, but allows the developer to delegate the handling of a frame to one or more separate classes. The |sdkname| SDK provides an abstract class called ``FrameReadyListener`` which implements a single function called ``FrameReadyListener::on_frame_ready``. ``FrameReadyListener::on_frame_ready`` is called as soon as the frame is ready for processing and passed a reference to that frame.
 
-You must derive your own listener class from ``FrameReadyListener``, instantiate the derived listener object in your application and add it to the ``StreamReader`` using the ``StreamReader::addListener`` function. To see this method in action, check out the Simple Depth Viewer tutorial below.
+.. code-block:: c++
 
-Simple Depth Viewer
-===================
+   class DepthFrameListener : public astra::FrameReadyListener
+   {
+      virtual void on_frame_ready(astra::StreamReader& reader,
+                                astra::Frame& frame) override
+      {
+         astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
+
+         if (depthFrame.is_valid())
+         {
+            // do all the things
+         }
+      }
+   };
+
+- An example of a listener class derived from ``FrameReadyListener``
+
+After defining a listener class, in order to use it you must instantiate the listener in your application and add it to the ``StreamReader`` using the ``StreamReader::addListener`` function.
+
+.. code-block:: c++
+   :emphasize-lines: 8,9
+
+   astra::Astra::initialize();
+
+   astra::Sensor sensor;
+   astra::StreamReader reader = sensor.create_reader();
+
+   reader.stream<astra::DepthStream>().start();
+
+   DepthFrameListener listener;
+   reader.addListener(listener);
+
+   while(true)
+   {
+      astra_temp_update();
+   }
+
+- Example usage of a listener. In practice, the loop over ``astra_temp_update`` should only execute until the application is closed or another application-specific event takes place.
+
+Once the listener is added, we need to pump the SDK's event loop using the ``astra_temp_update`` function. Doing this allows the SDK to check if a frame is available, and if so will, in this case, call the ``DepthFrameListener::on_frame_ready`` function and pass along a reference to the latest frame.
+
+For a more practical example of a listener, continue on to our Simple Depth Reader tutorial.
+
+:doc:`3 Concepts <concepts>`
+:doc:`4.2 Simple Depth Reader <simpledepthreader>`
