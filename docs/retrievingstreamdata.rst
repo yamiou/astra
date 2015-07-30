@@ -3,7 +3,6 @@
 ************************
 4 Retrieving Stream Data
 ************************
-
 Stream Types
 ============
 
@@ -11,7 +10,6 @@ The |sdkname| SDK comes "stock" with a variety of stream types. Low-level stream
 
 Low Level
 ---------
-
 +----------------+------------------------------------------------------------------------+
 |Stream Type     |Description                                                             |
 +================+========================================================================+
@@ -26,7 +24,6 @@ Low Level
 
 Higher-Level
 ------------
-
 +----------------+------------------------------------------------------------------------+
 |Stream Type     |Description                                                             |
 +================+========================================================================+
@@ -44,12 +41,10 @@ Higher-Level
 
 Getting the Data
 ================
-
 Two methods are provided by the |sdkname| SDK to get stream data. Depending on your particular use case and the complexity of your application, one method may be better suited than the other.
 
 Polling
 -------
-
 The polling method for getting frame data is the most direct method for getting stream data, and is also the method used in the Hello World tutorial. To use this method, you only need to call the ``get_latest_frame`` function on the ``StreamReader``, then use the templated ``get<T>`` function on the returned frame to retrieve specific frame types. "``T``" in this case must be a valid frame type. The ``get_latest_frame`` function is blocking, so application execution will suspend until a new frame is returned. A ``timeout`` can be passed as a parameter to the ``get_latest_frame`` function if you want to limit the amount of time that the SDK will wait for a new frame to arrive.
 
 .. code-block:: c++
@@ -117,7 +112,9 @@ After defining a listener class, in order to use it you must instantiate the lis
 
 Once the listener is added, we need to pump the SDK's event loop using the ``astra_temp_update`` function. Doing this allows the SDK to check if a frame is available, and if so will, in this case, call the ``DepthFrameListener::on_frame_ready`` function and pass along a reference to the latest frame.
 
-For a more practical example of a listener, continue on to our Simple Depth Reader tutorial.
+For a more practical example of a listener, continue on to our :doc:`Simple Depth Reader Tutorial <simpledepthreader>`.
 
-:doc:`3 Concepts <concepts>`
-:doc:`4.2 Simple Depth Reader <simpledepthreader>`
+.. toctree::
+   :hidden:
+
+   Simple Depth Reader <simpledepthreader>

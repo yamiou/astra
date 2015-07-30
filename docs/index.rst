@@ -8,7 +8,6 @@
 
 The |sdkname| SDK
 ====================================
-
 Welcome to the book on the |sdkname| SDK! The |sdkname| SDK's exposes to the developer a comprehensive set of functionality to utilize all of the Astra's capabilities through a simple yet powerful API.
 
 This book will be a vital resource to any developer who wants to:
@@ -22,22 +21,20 @@ This book will be a vital resource to any developer who wants to:
 .. toctree::
    :titlesonly:
    :maxdepth: 1
+   :includehidden:
 
-   gettingstarted
-   concepts
-   retrievingstreamdata
-
+   Getting Started <gettingstarted>
+   Concepts <concepts>
+   Retrieving Stream Data <retrievingstreamdata>
 
 Once you've read the introduction, jump over to the :doc:`Getting Started <gettingstarted>` section to explore an introductory project.
 
 Introduction
 ============
-
 The design goals for the SDK are straightforward and lofty - to create the world's best 3D sensor development experience. To facilitate this, the best ideas from many other modern device and sensor SDKs, along with many original ideas from Orbbec's development team, were combined to put emphasis on developer creativity, remove needless complexity, and generally make |sdkname| SDK development a joyful, unintrusive process.
 
 Low Ceremony Design
 ===================
-
 The designers of the SDK are also experienced 3D sensor developers themselves, and recognize the features that are most commonly used when developing 3D sensor applications. To this end, the |sdkname| SDK reduces the boilerplate code required to obtain sensor data by exposing high-level stream types in addition to low-level stream types through a consistent, easy-to-understand API. This can be best shown with some example code:
 
 .. code-block:: c++
@@ -74,34 +71,27 @@ If you're an advanced 3D sensor developer and worried that this SDK is designed 
 
 Cross-Everything
 ================
-
 The |sdkname| SDK exposes its functionality through a core C API and also provides a modern C++11 API. From this foundation, the SDK is able to support a number of languages and platforms:
 
 Currently Supported
 -------------------
-
 - Languages: C, C++11, Java
 - Platforms: Windows, Android
 
 Planned Support
 ---------------
-
 - Languages: C#, Unity
 - Platforms: Linux, OSX
 
 Mobile
 ======
-
 Mobile devices are becoming more powerful and smaller each passing year, but are comparatively resource contrained to desktop PCs. With this in mind, the |sdkname| SDK has been carefully engineered to minimize CPU and memory overhead to keep mobile devices running smoothly while economizing battery usage.
 
 Extensibility
 =============
-
 Perhaps the most powerful feature of the |sdkname| SDK is its plugin layer. Plugins afford advanced developers a method to extend the SDK's functionality with the same consistency and level of support as the rest of the platform. In fact, all of the "stock" stream types included with the SDK are actually supported through plugins themselves.
 
 Plugins aren't limited to adding additional stream type support, though. Imagine adding support to address a network of sensors through the same consistent API as a single sensor. The possibilities are truly innumerable, and will allow exciting first and third party additions as the SDK matures.
-
-:doc:`2 Getting Started <gettingstarted>`
 
 .. Indices and tables
    ==================

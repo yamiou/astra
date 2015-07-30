@@ -3,12 +3,10 @@
 **********
 3 Concepts
 **********
-
 Now that you've installed the |sdkname| SDK and ran through a brief tutorial on its basic use, let's focus our lens on three core SDK concepts - streams, streamsets and readers. Understanding these concepts is vital to harnessing the power of the SDK with finesse and confidence. Furthermore, possessing a solid understanding of these concepts will help you to quickly pick up both more advanced and new SDK features as they are introduced in the future.
 
 3.1 Streams
 ===========
-
 A stream is the sequential flow of frames from a particular data source. Imagine an old-time movie reel, with the video recorded as individual image snapshots in sequence on a long stripe of film. Each image snapshot is a frame, and you can imagine the full film as a stream, with the distinction that a stream doesn't necessarily have a definite end.
 
 .. figure:: images\USN16mmSoundtrack.jpg
@@ -24,7 +22,6 @@ Streams come in a variety of flavors. For instance, a color stream produces colo
 
 3.2 StreamSets
 ==============
-
 A streamset is a group of closely related streams. Continuing with the analogy above, modern movies aren't only sequenced image frames - they have sound as well. The audio and video for a film are packaged together as a movie, since they are inextricably related to each other. In our terms, this combined package of audio and video can be thought of as a streamset.
 
 While a streamset could be entirely composed of streams arriving from a physical sensor, it can also contain streams created through the SDK plugins. As an example, the Astra camera is represented by a streamset containing a depth stream, a color stream, as well as middleware-generated streams such as the hand stream.
@@ -33,7 +30,6 @@ Streamsets are addressed by a string-based unique identifier (URI) which allows 
 
 3.3 Readers
 ===========
-
 A reader is our window to the frames in the stream. Before we can actually look at each individual frame of any given type coming from our streamsets, we use the streamset to create a reader in order to access the frames of that stream. To help with understanding what a reader does, let's continue with the film analogy one more time. While the audio/video film contains all of the information that we need to playback a movie,  the film alone isn't sufficient to presenting the movie. Another device is needed - a reel-to-reel projector. The projector not only advances the film and projects the images onto a screen, but also synchronizes the film's audio to the video for a smooth, seamless performance.
 
 .. figure:: images\Projector_running.jpg
@@ -49,10 +45,6 @@ A reader is functionally similar to a reel-to-reel projector. It consumes specif
 
 3.4 A Flexible, Scalable Pattern
 ================================
-
 By now, you should understand how the |sdkname| SDK delivers data from the sensor to your application. As a quick review, individual packets of any type of data coming from a sensor are stored in frames, and these frames are delivered in streams that are grouped in streamsets and accessed by a reader.
 
 Why this pattern, though? Two words - flexibility and scalability. Since streams can be of any type, even types that aren't currently supported or aren't even provided by sensors yet, the architecture can easily be extended through the addition of plugins to add new stream types. Even better, the new stream types will obey all of the same conventions as existing stream types, so no need to learn a new pattern every time new stream types are introduced.
-
-:doc:`2.2 Hello World <helloworld>`
-:doc:`4 Retrieving Stream Data <retrievingstreamdata>`

@@ -3,7 +3,6 @@
 ***************
 2.2 Hello World
 ***************
-
 *Time Required: ~10 minutes*
 
 Want to get a taste of our SDK before diving deeper? Then let's get our hands dirty and write some code!
@@ -16,12 +15,10 @@ By the end of this tutorial you should be familiar with:
 
 Before We Begin
 ===============
-
 If you skipped over the section where we install the SDK and build the sample applications provided by the SDK, make sure you've at least downloaded and extracted |sdkname| to a folder you can easily access.
 
 Getting Down to Business!
 =========================
-
 Our first step will be to set up a skeleton application as a starting point for progressively adding new functionality.
 
 #. Using your favorite IDE, set up a new console application project and create a new source file called "main.cpp".
@@ -49,7 +46,6 @@ Our first step will be to set up a skeleton application as a starting point for 
 
 Initializing and Terminating |sdkname|
 ======================================
-
 To prepare |sdkname| to do our bidding, we must first initialize |sdkname|, which is unsurprisingly done via the ``initialize`` function. When we're ready to end our session with the SDK, we then need to give |sdkname| an opportunity to cleanly shutdown. This is accomplished by calling the ``terminate`` function, which will, among other things, properly turn off attached devices.
 
 Add the two new lines below:
@@ -74,7 +70,6 @@ Add the two new lines below:
 
 Trust But Verify
 ================
-
 Before we get ahead of ourselves, let's take a moment to make sure that everything is as we expect it. Compile and run the application. The application should start up, print out a series of diagnostic messages to the console, and then patiently wait for you to press the "Enter" key. Once pressed, the application should gracefully exit.
 
 .. note::
@@ -85,7 +80,6 @@ Next up: Talking to Astra.
 
 Connecting to the Astra
 =======================
-
 Now that we know how to properly initialize and terminate |sdkname|, it's time to actually communicate with the Astra sensor. For this, we use the ``Sensor`` class, which broadly encapsulates the idea of a group of related data sources (think: video and audio from a 2D video camera). For now, however, it's sufficient to think of a sensor as a physical device like the Astra, and the ``Sensor`` class, your portal to its functionality.
 
 Between our initialization and termination bookends, let's declare a ``Sensor`` variable.
@@ -118,7 +112,6 @@ Now that we're connected, we're ready to do what we came here to do - see throug
 
 Retrieving Sensor Data
 ======================
-
 Time to put our ``Sensor`` object to good use and get some data. To do this, we'll need to read one of the streams that the Astra is providing. Streams contain the data coming from our camera packaged in packets of data called "frames". |sdkname| currently supports a number of types of streams, including depth, color, hand, and point streams.
 
 In order to access streams from the Astra and get to the frames, we'll need a ``StreamReader`` to tap into one of the streams. For the purposes of our application,we're going to focus on the depth stream. This stream gives us the distances of anything that our camera sees in pixels, and those pixels are packaged in a frame.
@@ -143,6 +136,7 @@ In order to access streams from the Astra and get to the frames, we'll need a ``
       std::cin.get();
       return 0;
    }
+
 - Line 12 - Creates a ``StreamReader``
 
 2. Next we start the depth stream using the ``StreamReader`` that we created in the previous step. Starting the depth stream tells |sdkname| that we're interested in getting depth data from our ``Sensor``.
@@ -167,6 +161,7 @@ In order to access streams from the Astra and get to the frames, we'll need a ``
       std::cin.get();
       return 0;
    }
+
 - Line 14 - Starts the depth stream
 
 3. With our depth stream stared, let's pull the latest depth frame from our depth stream. To do this, we'll need to first retrieve the latest ``Frame`` through our ``StreamReader``, then call ``get<T>`` to get the depth frame data from our frame.
@@ -194,6 +189,7 @@ In order to access streams from the Astra and get to the frames, we'll need a ``
       std::cin.get();
       return 0;
    }
+
 - Line 16 - Retrieves the latest frame
 - Line 17 - Gets the depth frame from the latest frame
 
@@ -231,6 +227,7 @@ In order to access streams from the Astra and get to the frames, we'll need a ``
       std::cin.get();
       return 0;
    }
+
 - Line 19 - Gets a copy of the frame index from our depth frame
 - Line 20 - Gets a copy of the value within the first pixel of our depth frame's data
 - Line 22-26 - Prints the two aforementioned values to the console
@@ -242,7 +239,6 @@ You just retrieved your first frame from |sdkname|! There's one more task before
 
 Consuming a Sensor Stream
 =========================
-
 Now that you know how to create a ``StreamReader`` and get a frame from it, you're ready to work with a stream of frames. To do this, we only need to make a small change and loop over our call to the ``StreamReader``'s ``get_latest_frame`` function. In this particular case, we're going to get the first 100 frames from our depth stream and print the value of each frame's first pixel to the console.
 
 The following code is highly similar to the code from our last example, except we've added a ``do while`` loop around our frame processing code, in addition to some variables that store the number of times we've looped and the maximum number of frames we want to process.
@@ -290,6 +286,7 @@ The following code is highly similar to the code from our last example, except w
       std::cin.get();
       return 0;
    }
+
 - Line 16 - Stores the maximum number of frames we're going to process in the loop
 - Line 17 - Sentinel to count the number of frames that we've processed
 - Line 19-34 - The frame processing loop
@@ -297,6 +294,3 @@ The following code is highly similar to the code from our last example, except w
 Compile and run. While the program is running and the Astra is focused on you, move around a bit and watch the data values on the frames change.
 
 Achievement get! You've just made your first |sdkname| application! If you haven't had your fill of fun with |sdkname| yet, continue on to our Simple Depth Viewer Tutorial.
-
-:doc:`2.1 Installation <installation>`
-:doc:`3 Concepts <concepts>`
