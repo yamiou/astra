@@ -42,6 +42,12 @@ message(${CMAKE_CXX_FLAGS})
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+set(ASTRA_DOCS FALSE CACHE BOOL "Build Astra Documentation")
+
+if (ASTRA_DOCS)
+  add_subdirectory(docs)
+endif()
+
 if(ASTRA_ANDROID)
   find_host_package(CLISP REQUIRED)
 else()
