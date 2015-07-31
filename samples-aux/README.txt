@@ -75,6 +75,11 @@ You can exit samples by pressing Control-C.
 They will catch this signal and exit cleanly.
 To exit samples with a GUI window, press Control-C, escape, or simply close the window.
 
+Documentation
+==========
+
+Preliminary documentation in HTML format can be found in the sdk/docs directory. 
+
 Known issues
 ==========
 1) There is no error message if no sensor is found or plugged in. (But, it doesn't crash!) You can plug in a sensor after the program starts and it should detect it and continue. Repeated hotplugging (in and out) does not work though.
