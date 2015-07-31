@@ -22,13 +22,10 @@ configure_file(
   @ONLY)
 
 set(BUILD_HTML_DOCS false)
-set(BUILD_PDF_DOCS false)
 
 foreach(_builder ${ASTRA_DOCS_BUILDERS})
    if(${_builder} STREQUAL "html")
       set(BUILD_HTML_DOCS true)
-   elseif(${_builder} STREQUAL "pdf")
-      set(BUILD_PDF_DOCS true)
    else()
       message(WARNING "${_builder} is not a supported documentation builder type. Ignoring.")
    endif()
@@ -43,14 +40,10 @@ set(SPHINX_HTML_COMMAND
     "${SPHINX_HTML_DIR}"
 )
 
-if(${BUILD_HTML_DOCS} AND ${BUILD_PDF_DOCS})
-  message(FATAL_ERROR "Building PDF Documentation is not yet supported")
-elseif(${BUILD_HTML_DOCS})
+if(${BUILD_HTML_DOCS})
   add_custom_target(AstraSDKDocumentation ALL
     COMMAND ${SPHINX_HTML_COMMAND}
     COMMENT "Building HTML documentation with Sphinx")
-elseif(${BUILD_PDF_DOCS})
-  message(FATAL_ERROR "Building PDF Documentation is not yet supported")
 endif()
 
 set_target_properties(AstraSDKDocumentation PROPERTIES FOLDER "documentation")
