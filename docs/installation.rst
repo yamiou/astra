@@ -1,4 +1,5 @@
 .. |sdkname| replace:: Astra
+
 ****************
 2.1 Installation
 ****************
@@ -12,18 +13,18 @@ Windows
 - USB 2.0 Port
 - Microsoft® Visual Studio 2013 Community Edition and up
 
-.. 
+..
   Mac OS X
   ^^^^^^^^
   - Mac® OS X® 10.8.5 or higher, up to 10.9 (Mavericks)
   - 150 MB hard disk space
   - USB 2.0 Port
-  
+
   Linux
   ^^^^^
   - GNOME or KDE desktop
   - 150 MB hard disk space
-  - 
+  -
 
 Android
 -------
@@ -34,7 +35,7 @@ Android
 Sensor Requirements
 ===================
 - Astra
-  
+
 Installing the SDK
 ======================
 In order to begin installing the |sdkname| SDK, we'll need to grab the latest copy. You can do so `here <http://www.sdkaddress.com>`_. Once you've downloaded the SDK archive, extract it to a folder on your disk that you'll remember.

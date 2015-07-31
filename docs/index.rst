@@ -31,41 +31,41 @@ Once you've read the introduction, jump over to the :doc:`Getting Started <getti
 
 Introduction
 ============
-The design goals for the SDK are straightforward and lofty - to create the world's best 3D sensor development experience. To facilitate this, the best ideas from many other modern device and sensor SDKs, along with many original ideas from Orbbec's development team, were combined to put emphasis on developer creativity, remove needless complexity, and generally make |sdkname| SDK development a joyful, unintrusive process.
+The design goals for the SDK are straightforward and lofty - to create the world's best 3D sensor development experience. To facilitate this, the best ideas from many other modern device and streamSet SDKs, along with many original ideas from Orbbec's development team, were combined to put emphasis on developer creativity, remove needless complexity, and generally make |sdkname| SDK development a joyful, unintrusive process.
 
 Low Ceremony Design
 ===================
-The designers of the SDK are also experienced 3D sensor developers themselves, and recognize the features that are most commonly used when developing 3D sensor applications. To this end, the |sdkname| SDK reduces the boilerplate code required to obtain sensor data by exposing high-level stream types in addition to low-level stream types through a consistent, easy-to-understand API. This can be best shown with some example code:
+The designers of the SDK are also experienced 3D sensor developers themselves, and recognize the features that are most commonly used when developing 3D streamSet applications. To this end, the |sdkname| SDK reduces the boilerplate code required to obtain streamSet data by exposing high-level stream types in addition to low-level stream types through a consistent, easy-to-understand API. This can be best shown with some example code:
 
 .. code-block:: c++
    :linenos:
 
-   sensekit::SenseKit::initialize();
+   astra::Astra::initialize();
 
-   sensekit::Sensor sensor; //By default, a Sensor will address the Astra
-   sensekit::StreamReader reader = sensor.create_reader();
+   astra::StreamSet streamSet; //By default, a StreamSet will address the Astra
+   astra::StreamReader reader = streamSet.create_reader();
 
    // Low-Level Streams
-   reader.stream<sensekit::DepthStream>().start();
-   reader.stream<sensekit::ColorStream>().start();
+   reader.stream<astra::DepthStream>().start();
+   reader.stream<astra::ColorStream>().start();
 
    //High-Level Streams
-   reader.stream<sensekit::HandStream>().start();
-   reader.stream<sensekit::PointStream>().start();
+   reader.stream<astra::HandStream>().start();
+   reader.stream<astra::PointStream>().start();
 
-   sensekit::Frame frame = reader.get_latest_frame();
-   
+   astra::Frame frame = reader.get_latest_frame();
+
    //Low-Level Streams
-   auto depthFrame = frame.get<sensekit::DepthFrame>();
-   auto colorFrame = frame.get<sensekit::ColorFrame>();
+   auto depthFrame = frame.get<astra::DepthFrame>();
+   auto colorFrame = frame.get<astra::ColorFrame>();
 
    //High-Level Streams
-   auto handFrame = frame.get<sensekit::HandFrame>();
-   auto pointFrame = frame.get<sensekit::PointFrame>();
+   auto handFrame = frame.get<astra::HandFrame>();
+   auto pointFrame = frame.get<astra::PointFrame>();
 
-   sensekit::Sensekit::terminate();
+   astra::Astra::terminate();
 
-First, take note where we create our ``Sensor`` object on line 1. Without any additional configuration, it will default to addressing the Astra sensor. In the lines below, you can see that, regardless of the stream type, the same API calls are made to interact with each stream.
+First, take note where we create our ``StreamSet`` object on line 1. Without any additional configuration, it will default to addressing the Astra streamSet. In the lines below, you can see that, regardless of the stream type, the same API calls are made to interact with each stream.
 
 If you're an advanced 3D sensor developer and worried that this SDK is designed for simple applications only, rest assured that the |sdkname| SDK also handles less-common cases, often simply by passing different parameters to object constructors. In short, no matter how complicated your application might be, the |sdkname| SDK can handle it.
 
@@ -91,7 +91,7 @@ Extensibility
 =============
 Perhaps the most powerful feature of the |sdkname| SDK is its plugin layer. Plugins afford advanced developers a method to extend the SDK's functionality with the same consistency and level of support as the rest of the platform. In fact, all of the "stock" stream types included with the SDK are actually supported through plugins themselves.
 
-Plugins aren't limited to adding additional stream type support, though. Imagine adding support to address a network of sensors through the same consistent API as a single sensor. The possibilities are truly innumerable, and will allow exciting first and third party additions as the SDK matures.
+Plugins aren't limited to adding additional stream type support, though. Imagine adding support to address a network of sensors through the same consistent API as a single streamSet. The possibilities are truly innumerable, and will allow exciting first and third party additions as the SDK matures.
 
 .. Indices and tables
    ==================

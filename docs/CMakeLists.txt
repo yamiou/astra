@@ -5,7 +5,7 @@ if(NOT DEFINED SPHINX_THEME)
 endif()
 
 if (NOT DEFINED SPHINX_THEME_DIR)
-  set(SPHINX_THEME_DIR)
+  set(SPHINX_THEME_DIR "_themes")
 endif()
 
 set(ASTRA_DOCS_BUILDERS "html" CACHE STRING "Build Astra Documentation")

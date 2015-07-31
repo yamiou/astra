@@ -32,8 +32,8 @@ Before We Begin
    {
       astra::Astra::initialize();
 
-      astra::Sensor sensor;
-      astra::StreamReader reader = sensor.create_reader();
+      astra::StreamSet streamSet;
+      astra::StreamReader reader = streamSet.create_reader();
 
       reader.stream<astra::DepthStream>().start();
 
@@ -43,15 +43,16 @@ Before We Begin
 
       return 0;
    }
+
 - Line 9 - Initializes |sdkname|
-- Line 11 - Constructs a ``Sensor``
+- Line 11 - Constructs a ``StreamSet``
 - Line 12 - Creates a ``StreamReader``
 - Line 14 - Starts a depth stream
 - Line 18 - Terminates |sdkname|
 
 Listening to Streams
 ====================
-In the Hello World tutorial, we processed a stream of frames by looping over a call to our ``StreamReader``'s ``get_latest_frame`` function. This solution works perfectly fine in a simple case such as our Hello World application. But, what if we wanted to register for a number of streams and work with them? Or, what if we were working with more than one ``Sensor``, or possibly more than one ``StreamReader`` per ``Sensor``? In all of those cases, the code within the loop could quickly become complex, cluttered and cumbersome.
+In the Hello World tutorial, we processed a stream of frames by looping over a call to our ``StreamReader``'s ``get_latest_frame`` function. This solution works perfectly fine in a simple case such as our Hello World application. But, what if we wanted to register for a number of streams and work with them? Or, what if we were working with more than one ``StreamSet``, or possibly more than one ``StreamReader`` per ``StreamSet``? In all of those cases, the code within the loop could quickly become complex, cluttered and cumbersome.
 
 To alleviate these issues, |sdkname| provides us with a framework to define and create ``FrameReadyListener`` s. A ``FrameReadyListener`` has one function called ``on_frame_ready`` that (you guessed it!) is called when a new frame of a specific type is ready for processing. So, instead of looping over our ``StreamReader``'s ``get_latest_frame`` function, our listener will have the latest frame automatically delivered to it as soon as the frame is ready. Neato!
 
@@ -123,6 +124,7 @@ In order to use a ``FrameReadyListener`` with our example...
 
    int main(int argc, char** argv)
    {
+
 - Line 10 - Constructor parameter specifies the total number of frames we're going to process before exiting our loop
 - Line 16 - ``is_finished`` will be used in a later step to check whether we've looped the maximum number of times or not
 - Line 25 - Gets the depth frame data from our frame
@@ -146,8 +148,8 @@ In order to use a ``FrameReadyListener`` with our example...
    {
       astra::Astra::initialize();
 
-      astra::Sensor sensor;
-      astra::StreamReader reader = sensor.create_reader();
+      astra::StreamSet streamSet;
+      astra::StreamReader reader = streamSet.create_reader();
 
       reader.stream<astra::DepthStream>().start();
 
@@ -164,6 +166,7 @@ In order to use a ``FrameReadyListener`` with our example...
 
       return 0;
    }
+
 - Line 75 - Constructs a ``DepthFrameListener`` that will loop 100 times
 - Line 77 - Adds the listener to our reader
 - Line 81 - Removes the listener from our reader
@@ -171,7 +174,7 @@ In order to use a ``FrameReadyListener`` with our example...
 Updating the Listeners
 ======================
 
-We've got |sdkname| and the ``Sensor`` running, and we're listening to depth frames as they stream in through the ``Sensor``'s ``StreamReader``. We don't know when frames are going to arrive from our Astra, so we need to continuously update those listeners by calling ``astra_temp_update`` in a loop.
+We've got |sdkname| and the ``StreamSet`` running, and we're listening to depth frames as they stream in through the ``StreamSet``'s ``StreamReader``. We don't know when frames are going to arrive from our Astra, so we need to continuously update those listeners by calling ``astra_temp_update`` in a loop.
 
 .. code-block:: c++
    :linenos:
@@ -182,8 +185,8 @@ We've got |sdkname| and the ``Sensor`` running, and we're listening to depth fra
    {
       astra::Astra::initialize();
 
-      astra::Sensor sensor;
-      astra::StreamReader reader = sensor.create_reader();
+      astra::StreamSet streamSet;
+      astra::StreamReader reader = streamSet.create_reader();
 
       reader.stream<astra::DepthStream>().start();
 
@@ -203,6 +206,7 @@ We've got |sdkname| and the ``Sensor`` running, and we're listening to depth fra
 
       return 0;
    }
+
 - Line 79-82 - The |sdkname| update loop.
 
 Let's compile and run our solution. After you've watched some depth frame information print to the console, revel in the knowledge that you've mastered the listener along with other core |sdkname| functionality. Now, go forth, let your imagination run wild and use |sdkname| to do all sorts of innovative things!
