@@ -7,6 +7,7 @@
 #include <cassert>
 #include <SenseKitUL/streams/image_capi.h>
 #include <SenseKitUL/streams/image_parameters.h>
+#include <stdbool.h>
 
 SENSEKIT_BEGIN_DECLS
 
@@ -18,24 +19,6 @@ SENSEKIT_API_EX sensekit_status_t sensekit_reader_get_colorstream(sensekit_reade
                                       SENSEKIT_STREAM_COLOR,
                                       DEFAULT_SUBTYPE,
                                       colorStream);
-}
-
-SENSEKIT_API_EX sensekit_status_t sensekit_colorstream_get_hfov(sensekit_colorstream_t colorStream,
-                                                                float* hFov)
-{
-    return sensekit_stream_get_parameter_fixed(colorStream,
-                                               SENSEKIT_PARAMETER_IMAGE_HFOV,
-                                               sizeof(float),
-                                               reinterpret_cast<sensekit_parameter_data_t*>(hFov));
-}
-
-SENSEKIT_API_EX sensekit_status_t sensekit_colorstream_get_vfov(sensekit_colorstream_t colorStream,
-                                                                float* vFov)
-{
-    return sensekit_stream_get_parameter_fixed(colorStream,
-                                               SENSEKIT_PARAMETER_IMAGE_VFOV,
-                                               sizeof(float),
-                                               reinterpret_cast<sensekit_parameter_data_t*>(vFov));
 }
 
 SENSEKIT_API_EX sensekit_status_t sensekit_frame_get_colorframe(sensekit_reader_frame_t readerFrame,

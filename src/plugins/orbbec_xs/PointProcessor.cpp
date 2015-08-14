@@ -6,15 +6,15 @@ namespace sensekit { namespace plugins { namespace xs {
     PointProcessor::PointProcessor(PluginServiceProxy& pluginService,
                                    sensekit_streamset_t streamset,
                                    StreamDescription& depthDesc)
-        : m_pluginService(pluginService),
-          m_sensor(get_uri_for_streamset(pluginService, streamset)),
-          m_streamSet(streamset)
+        : m_sensor(get_uri_for_streamset(pluginService, streamset)),
+          m_streamSet(streamset),
+          m_reader(m_sensor.create_reader()),
+          m_depthStream(m_reader.stream<DepthStream>(depthDesc.get_subtype())),
+          m_pluginService(pluginService)
     {
         PROFILE_FUNC();
         SINFO("PointerProcessor", "PointProcessor ctor");
-        m_reader = m_sensor.create_reader();
 
-        m_depthStream = m_reader.stream<DepthStream>(depthDesc.get_subtype());
         m_depthStream.start();
 
         m_reader.addListener(*this);

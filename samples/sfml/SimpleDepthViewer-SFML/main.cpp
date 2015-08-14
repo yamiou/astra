@@ -119,6 +119,8 @@ int main(int argc, char** argv)
     sensekit::StreamReader reader = sensor.create_reader();
 
     reader.stream<sensekit::PointStream>().start();
+    auto ds = reader.stream<sensekit::DepthStream>();
+    ds.start();
 
     DepthFrameListener listener;
 
@@ -135,6 +137,9 @@ int main(int argc, char** argv)
                 window.close();
             if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
                 window.close();
+            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Space))
+                ds.set_mirroring(!ds.mirroring());
+
         }
 
         // clear the window with black color

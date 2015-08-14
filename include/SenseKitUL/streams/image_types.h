@@ -2,6 +2,7 @@
 #define IMAGE_TYPES_H
 
 #include <stdint.h>
+#include <SenseKit/sensekit_types.h>
 
 #if ! defined(__ANDROID__) && (defined(__GNUC__) || defined(__clang__))
 #define PACK_STRUCT __attribute__((packed))
@@ -31,5 +32,6 @@ typedef struct {
 #endif
 
 typedef struct _sensekit_imageframe* sensekit_imageframe_t;
+typedef sensekit_streamconnection_t sensekit_imagestream_t;
 
 #endif // IMAGE_TYPES_H

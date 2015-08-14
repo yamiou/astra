@@ -54,16 +54,17 @@ namespace sensekit { namespace plugins { namespace hand {
 
         //fields
 
+        Sensor m_sensor;
+        StreamReader m_reader;
+        DepthStream m_depthStream;
+
         HandSettings& m_settings;
         PluginServiceProxy& m_pluginService;
         DepthUtility m_depthUtility;
         PointProcessor m_pointProcessor;
-        Sensor m_sensor;
-        StreamReader m_reader;
+
         float m_processingSizeWidth;
         float m_processingSizeHeight;
-
-        DepthStream m_depthStream;
 
         using ColorStreamPtr = std::unique_ptr<DebugHandStream>;
         ColorStreamPtr m_debugImageStream;

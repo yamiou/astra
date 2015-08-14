@@ -23,11 +23,11 @@ namespace sensekit { namespace plugins { namespace xs {
         void calculate_point_frame(DepthFrame& depthFrame,
                                    Vector3f* p_points);
 
-        PluginServiceProxy& m_pluginService;
         Sensor m_sensor;
         sensekit_streamset_t m_streamSet;
         StreamReader m_reader;
         DepthStream m_depthStream;
+        PluginServiceProxy& m_pluginService;
 
         using PointStreamPtr = std::unique_ptr<PointStream>;
         PointStreamPtr m_pointStream;

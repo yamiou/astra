@@ -7,6 +7,18 @@
 
 SENSEKIT_BEGIN_DECLS
 
+SENSEKIT_API_EX sensekit_status_t sensekit_imagestream_get_mirroring(sensekit_imagestream_t imageStream,
+                                                                     bool* mirroring);
+
+SENSEKIT_API_EX sensekit_status_t sensekit_imagestream_set_mirroring(sensekit_imagestream_t imageStream,
+                                                                     bool mirroring);
+
+SENSEKIT_API_EX sensekit_status_t sensekit_imagestream_get_hfov(sensekit_imagestream_t imageStream,
+                                                                float* hFov);
+
+SENSEKIT_API_EX sensekit_status_t sensekit_imagestream_get_vfov(sensekit_imagestream_t imageStream,
+                                                                float* vFov);
+
 SENSEKIT_API_EX sensekit_status_t sensekit_reader_get_imageframe(sensekit_reader_frame_t readerFrame,
                                                                  sensekit_stream_type_t type,
                                                                  sensekit_stream_subtype_t subtype,
@@ -30,6 +42,8 @@ SENSEKIT_API_EX sensekit_status_t sensekit_imageframe_copy_data(sensekit_imagefr
 
 SENSEKIT_API_EX sensekit_status_t sensekit_imageframe_get_metadata(sensekit_imageframe_t imageFrame,
                                                                    sensekit_image_metadata_t* metadata );
+
+
 
 SENSEKIT_END_DECLS
 

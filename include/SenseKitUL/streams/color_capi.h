@@ -3,17 +3,12 @@
 
 #include <SenseKit/sensekit_types.h>
 #include "color_types.h"
+#include <stdbool.h>
 
 SENSEKIT_BEGIN_DECLS
 
 SENSEKIT_API_EX sensekit_status_t sensekit_reader_get_colorstream(sensekit_reader_t reader,
                                                                   sensekit_colorstream_t* colorStream);
-
-SENSEKIT_API_EX sensekit_status_t sensekit_colorstream_get_hfov(sensekit_colorstream_t colorStream,
-                                                                float* hFov);
-
-SENSEKIT_API_EX sensekit_status_t sensekit_colorstream_get_vfov(sensekit_colorstream_t colorStream,
-                                                                float* vFov);
 
 SENSEKIT_API_EX sensekit_status_t sensekit_frame_get_colorframe(sensekit_reader_frame_t readerFrame,
                                                                 sensekit_colorframe_t* colorFrame);

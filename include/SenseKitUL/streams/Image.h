@@ -22,6 +22,47 @@ namespace sensekit {
         }
     };
 
+    class ImageStream : public DataStream
+    {
+    public:
+        explicit ImageStream(sensekit_streamconnection_t connection)
+            : DataStream(connection),
+              m_imageStream(reinterpret_cast<sensekit_imagestream_t>(connection))
+        {}
+
+        float horizontalFieldOfView()
+        {
+            float hFov = 0.0f;
+            sensekit_imagestream_get_hfov(m_imageStream, &hFov);
+
+            return hFov;
+        }
+
+        float verticalFieldOfView()
+        {
+            float vFov = 0.0f;
+            sensekit_imagestream_get_vfov(m_imageStream, &vFov);
+
+            return vFov;
+        }
+
+        bool mirroring()
+        {
+            bool mirroring = false;
+            sensekit_imagestream_get_mirroring(m_imageStream, &mirroring);
+
+            return mirroring;
+        }
+
+        void set_mirroring(bool mirroring)
+        {
+            sensekit_imagestream_set_mirroring(m_imageStream, mirroring);
+        }
+
+    private:
+        sensekit_imagestream_t m_imageStream;
+    };
+
     template<typename TDataType, sensekit_stream_type_t TStreamType>
     class ImageFrame
     {

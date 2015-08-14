@@ -106,19 +106,19 @@ namespace sensekit { namespace plugins {
                 }
 
                 SINFO("OniDeviceStream", "- w: %d h: %d fps: %d pf: %d",
-                                  mode.getResolutionX(),
-                                  mode.getResolutionY(),
-                                  mode.getFps(),
-                                  mode.getPixelFormat());
+                      mode.getResolutionX(),
+                      mode.getResolutionY(),
+                      mode.getFps(),
+                      mode.getPixelFormat());
             }
 
             m_oniVideoMode = m_oniStream.getVideoMode();
 
             SINFO("OniDeviceStream", "Selected mode: w: %d h: %d fps: %d pf: %d",
-                              m_oniVideoMode.getResolutionX(),
-                              m_oniVideoMode.getResolutionY(),
-                              m_oniVideoMode.getFps(),
-                              m_oniVideoMode.getPixelFormat());
+                  m_oniVideoMode.getResolutionX(),
+                  m_oniVideoMode.getResolutionY(),
+                  m_oniVideoMode.getFps(),
+                  m_oniVideoMode.getPixelFormat());
             m_bufferLength =
                 m_oniVideoMode.getResolutionX() *
                 m_oniVideoMode.getResolutionY() *
@@ -224,6 +224,36 @@ namespace sensekit { namespace plugins {
                 }
                 break;
             }
+            case SENSEKIT_PARAMETER_IMAGE_MIRRORING:
+            {
+                size_t resultByteLength = sizeof(bool);
+
+                sensekit_parameter_data_t parameterData;
+                sensekit_status_t rc = get_pluginService().get_parameter_bin(resultByteLength,
+                                                                             &parameterBin,
+                                                                             &parameterData);
+                if (rc == SENSEKIT_STATUS_SUCCESS)
+                {
+                    bool mirroring = m_oniStream.getMirroringEnabled();
+                    std::memcpy(parameterData, &mirroring, resultByteLength);
+                }
+
+                break;
+            }
+            }
+        }
+
+        void on_set_parameter(sensekit_streamconnection_t connection,
+                              sensekit_parameter_id id,
+                              size_t inByteLength,
+                              sensekit_parameter_data_t inData) override
+        {
+            switch (id)
+            {
+            case SENSEKIT_PARAMETER_IMAGE_MIRRORING:
+                bool enable = *static_cast<bool*>(inData);
+                m_oniStream.setMirroringEnabled(enable);
+                break;
             }
         }
 

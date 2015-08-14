@@ -70,16 +70,11 @@ namespace sensekit {
         sensekit_depthstream_t m_depthStream;
     };
 
-    class DepthStream : public DataStream
+    class DepthStream : public ImageStream
     {
     public:
-        DepthStream() :
-            m_depthStream(nullptr),
-            m_coordinateMapper(nullptr)
-        { }
-
         explicit DepthStream(sensekit_streamconnection_t connection)
-            : DataStream(connection),
+            : ImageStream(connection),
               m_depthStream(reinterpret_cast<sensekit_depthstream_t>(connection)),
               m_coordinateMapper(reinterpret_cast<sensekit_depthstream_t>(connection))
         { }
@@ -93,22 +88,6 @@ namespace sensekit {
             sensekit_depthstream_get_depth_to_world_data(m_depthStream, &data);
 
             return data;
-        }
-
-        float horizontalFieldOfView()
-        {
-            float hFov;
-            sensekit_depthstream_get_hfov(m_depthStream, &hFov);
-
-            return hFov;
-        }
-
-        float verticalFieldOfView()
-        {
-            float vFov;
-            sensekit_depthstream_get_vfov(m_depthStream, &vFov);
-
-            return vFov;
         }
 
         const CoordinateMapper& coordinateMapper() { return m_coordinateMapper; };

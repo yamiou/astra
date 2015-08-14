@@ -8,35 +8,18 @@
 
 namespace sensekit {
 
-    class ColorStream : public DataStream
+    class ColorStream : public ImageStream
     {
     public:
-        ColorStream()
-        {}
 
         explicit ColorStream(sensekit_streamconnection_t connection)
-            : DataStream(connection)
+            : ImageStream(connection)
         {
             m_colorStream = reinterpret_cast<sensekit_colorstream_t>(connection);
         }
 
         static const sensekit_stream_type_t id = SENSEKIT_STREAM_COLOR;
 
-        float horizontalFieldOfView()
-        {
-            float hFov;
-            sensekit_colorstream_get_hfov(m_colorStream, &hFov);
-
-            return hFov;
-        }
-
-        float verticalFieldOfView()
-        {
-            float vFov;
-            sensekit_colorstream_get_vfov(m_colorStream, &vFov);
-
-            return vFov;
-        }
 
     private:
         sensekit_colorstream_t m_colorStream;
