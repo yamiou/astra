@@ -139,7 +139,6 @@ int main(int argc, char** argv)
                 window.close();
             if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Space))
                 ds.set_mirroring(!ds.mirroring());
-
         }
 
         // clear the window with black color
