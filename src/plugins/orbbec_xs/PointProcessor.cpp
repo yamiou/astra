@@ -13,17 +13,14 @@ namespace sensekit { namespace plugins { namespace xs {
           m_pluginService(pluginService)
     {
         PROFILE_FUNC();
-        SINFO("PointerProcessor", "PointProcessor ctor");
 
         m_depthStream.start();
-
         m_reader.addListener(*this);
     }
 
     PointProcessor::~PointProcessor()
     {
         PROFILE_FUNC();
-        SINFO("PointerProcessor", "PointProcessor dtor");
     }
 
     void PointProcessor::on_frame_ready(StreamReader& reader, Frame& frame)
@@ -119,4 +116,4 @@ namespace sensekit { namespace plugins { namespace xs {
         }
     }
 
-} } }
+}}}
