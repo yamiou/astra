@@ -68,6 +68,18 @@ set(SAMPLE_DIR_FOLDER "samples/")
 set (SDK_DEPENDENT_TARGET "SDK_dependent")
 add_custom_target(${SDK_DEPENDENT_TARGET})
 
+function(add_astra_sdk_dependency _targetname)
+  if(NOT TARGET ${_targetname})
+    message("add_sdk_dependency: There is no target named '${_targetname}'")
+    return()
+  endif()
+  if(TARGET ${SDK_DEPENDENT_TARGET})
+    add_dependencies(${_targetname} ${SDK_DEPENDENT_TARGET})
+  endif()
+endfunction()
+
+include(ConfigUserFile)
+
 set(SHINY_INCLUDE "${PROJECT_SOURCE_DIR}/vendor/shinyprofiler/include")
 set(CATCH_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/vendor/catch/include" CACHE INTERNAL "Path to include folder for Catch")
 

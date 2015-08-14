@@ -18,16 +18,6 @@ get_filename_component(SAMPLE_COMMON_DIR "./common" ABSOLUTE)
 
 include_directories(${SAMPLE_COMMON_DIR})
 
-function(add_astra_sdk_dependency _targetname)
-  if(NOT TARGET ${_targetname})
-    message("add_sdk_dependency: There is no target named '${_targetname}'")
-    return()
-  endif()
-  if(TARGET ${SDK_DEPENDENT_TARGET})
-    add_dependencies(${_targetname} ${SDK_DEPENDENT_TARGET})
-  endif()
-endfunction()
-
 add_subdirectory(c-api)
 add_subdirectory(cpp-api)
 if(NOT ASTRA_ANDROID)
