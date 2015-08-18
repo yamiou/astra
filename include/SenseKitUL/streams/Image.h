@@ -31,12 +31,7 @@ namespace sensekit {
 
         ImageStreamMode(const sensekit_imagestream_mode_t& mode)
         {
-            sensekit_imagestream_mode_t::id = mode.id;
-            sensekit_imagestream_mode_t::width = mode.width;
-            sensekit_imagestream_mode_t::height = mode.height;
-            sensekit_imagestream_mode_t::fps = mode.fps;
-            sensekit_imagestream_mode_t::bytesPerPixel = mode.bytesPerPixel;
-            sensekit_imagestream_mode_t::pixelFormat = mode.pixelFormat;
+            *this = mode;
         }
 
         operator ::sensekit_imagestream_mode_t*() { return this; }
