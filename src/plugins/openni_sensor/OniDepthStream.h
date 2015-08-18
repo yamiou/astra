@@ -23,8 +23,7 @@ namespace sensekit { namespace plugins {
                                   SENSEKIT_STREAM_DEPTH,
                                   DEFAULT_SUBTYPE),
                               oniDevice,
-                              ::openni::SENSOR_DEPTH,
-                              1)
+                              ::openni::SENSOR_DEPTH)
         {
             PROFILE_FUNC();
         }

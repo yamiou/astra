@@ -10,6 +10,9 @@
 #include <SenseKitUL/streams/image_types.h>
 #include <memory>
 #include <Shiny.h>
+#include <cstring>
+#include <vector>
+#include "oni_mappers.hpp"
 
 #ifndef MIN
 #define MIN(a,b) (((a)<(b))?(a):(b))
@@ -53,15 +56,12 @@ namespace sensekit { namespace plugins {
                         sensekit_streamset_t streamSet,
                         StreamDescription desc,
                         openni::Device& oniDevice,
-                        openni::SensorType oniSensorType,
-                        size_t numComponentPerPixel)
+                        openni::SensorType oniSensorType)
             : OniDeviceStreamBase(pluginService,
                                   streamSet,
                                   desc),
               m_oniDevice(oniDevice),
-              m_oniSensorType(oniSensorType),
-              m_bytesPerPixel(sizeof(block_type) * numComponentPerPixel),
-              m_numComponentPerPixel(numComponentPerPixel)
+              m_oniSensorType(oniSensorType)
         {
             PROFILE_FUNC();
         }
@@ -95,34 +95,37 @@ namespace sensekit { namespace plugins {
 
             for(int i = 0; i < modes.getSize(); i++)
             {
-                const openni::VideoMode& mode = modes[i];
+                const openni::VideoMode& oniMode = modes[i];
 
-                if (mode.getResolutionX() == 320 &&
-                    mode.getResolutionY() == 240 &&
-                    mode.getFps() == 30 &&
-                    mode.getPixelFormat() == openni::PIXEL_FORMAT_DEPTH_1_MM)
+                if (std::get<0>(convert_format(oniMode.getPixelFormat())) != 0)
                 {
-                    m_oniStream.setVideoMode(mode);
+                    sensekit_imagestream_mode_t mode = convert_mode(oniMode);
+                    mode.id = i+1;
+                    m_modes.push_back(mode);
                 }
 
                 SINFO("OniDeviceStream", "- w: %d h: %d fps: %d pf: %d",
-                      mode.getResolutionX(),
-                      mode.getResolutionY(),
-                      mode.getFps(),
-                      mode.getPixelFormat());
+                      oniMode.getResolutionX(),
+                      oniMode.getResolutionY(),
+                      oniMode.getFps(),
+                      oniMode.getPixelFormat());
             }
 
             m_oniVideoMode = m_oniStream.getVideoMode();
+            m_mode = convert_mode(m_oniVideoMode);
 
             SINFO("OniDeviceStream", "Selected mode: w: %d h: %d fps: %d pf: %d",
-                  m_oniVideoMode.getResolutionX(),
-                  m_oniVideoMode.getResolutionY(),
-                  m_oniVideoMode.getFps(),
-                  m_oniVideoMode.getPixelFormat());
+                  m_mode.width,
+                  m_mode.height,
+                  m_mode.fps,
+                  m_mode.pixelFormat);
+
+            assert(m_mode.pixelFormat != 0);
+
             m_bufferLength =
-                m_oniVideoMode.getResolutionX() *
-                m_oniVideoMode.getResolutionY() *
-                m_bytesPerPixel;
+                m_mode.width *
+                m_mode.height *
+                m_mode.bytesPerPixel;
 
             m_bin = std::make_unique<StreamBin<wrapper_type> >(get_pluginService(),
                                                                get_handle(),
@@ -235,7 +238,28 @@ namespace sensekit { namespace plugins {
                 if (rc == SENSEKIT_STATUS_SUCCESS)
                 {
                     bool mirroring = m_oniStream.getMirroringEnabled();
-                    std::memcpy(parameterData, &mirroring, resultByteLength);
+                    *reinterpret_cast<bool*>(parameterData) = mirroring;
+                }
+
+                break;
+            }
+            case SENSEKIT_PARAMETER_IMAGE_MODES:
+            {
+                std::size_t resultSize = sizeof(sensekit_imagestream_mode_t) * m_modes.size();
+
+                sensekit_parameter_data_t parameterData;
+                sensekit_status_t rc = get_pluginService().get_parameter_bin(resultSize,
+                                                                             &parameterBin,
+                                                                             &parameterData);
+
+                sensekit_imagestream_mode_t* result = static_cast<sensekit_imagestream_mode_t*>(parameterData);
+
+                if (rc == SENSEKIT_STATUS_SUCCESS)
+                {
+                    for(int i = 0; i < m_modes.size(); i++)
+                    {
+                        result[i] = m_modes[i];
+                    }
                 }
 
                 break;
@@ -251,8 +275,22 @@ namespace sensekit { namespace plugins {
             switch (id)
             {
             case SENSEKIT_PARAMETER_IMAGE_MIRRORING:
+            {
                 bool enable = *static_cast<bool*>(inData);
                 m_oniStream.setMirroringEnabled(enable);
+                break;
+            }
+            case SENSEKIT_PARAMETER_IMAGE_MODE:
+                sensekit_imagestream_mode_t* mode = static_cast<sensekit_imagestream_mode_t*>(inData);
+                auto oniMode = convert_mode(*mode);
+                auto rc = m_oniStream.setVideoMode(oniMode);
+
+                if (rc == ::openni::STATUS_OK)
+                {
+                    SINFO("OniDeviceStream", "stream mode changed");
+                    m_oniVideoMode = oniMode;
+                    m_mode = *mode;
+                }
                 break;
             }
         }
@@ -263,13 +301,12 @@ namespace sensekit { namespace plugins {
             if (wrapper == nullptr)
                 return;
 
-            sensekit_image_metadata_t metadata;
+            auto& md = wrapper->frame.metadata;
 
-            metadata.width = m_oniVideoMode.getResolutionX();
-            metadata.height = m_oniVideoMode.getResolutionY();
-            metadata.bytesPerPixel = m_bytesPerPixel;
-
-            wrapper->frame.metadata = metadata;
+            md.pixelFormat = m_mode.pixelFormat;
+            md.width = m_mode.width;
+            md.height = m_mode.height;
+            md.bytesPerPixel = m_mode.bytesPerPixel;
         }
 
         virtual sensekit_status_t read_frame() override;
@@ -285,6 +322,7 @@ namespace sensekit { namespace plugins {
         openni::SensorType m_oniSensorType;
         openni::VideoStream m_oniStream;
         openni::VideoMode m_oniVideoMode;
+        sensekit_imagestream_mode_t m_mode;
 
     private:
         virtual void on_open() {}
@@ -297,11 +335,11 @@ namespace sensekit { namespace plugins {
         std::unique_ptr<BinType> m_bin;
 
         size_t m_bufferLength{0};
-        size_t m_bytesPerPixel{0};
-        size_t m_numComponentPerPixel{0};
 
         sensekit_stream_t m_streamHandle{nullptr};
         sensekit_frame_index_t m_frameIndex{0};
+
+        std::vector<sensekit_imagestream_mode_t> m_modes;
     };
 
     template<typename TFrameWrapper, typename TBufferBlockType>
@@ -351,7 +389,7 @@ namespace sensekit { namespace plugins {
 
             on_new_buffer(wrapper);
 
-            memcpy(wrapper->frame.data, oniFrameData, byteSize);
+            std::memcpy(wrapper->frame.data, oniFrameData, byteSize);
 
             PROFILE_BEGIN(oni_stream_end_write);
             m_bin->end_write();

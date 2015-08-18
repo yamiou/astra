@@ -14,6 +14,19 @@
 #pragma pack(push, 1)
 #endif
 
+typedef uint32_t sensekit_pixel_format_t;
+
+typedef enum {
+    SENSEKIT_PIXEL_FORMAT_UNKNOWN = 0,
+    SENSEKIT_PIXEL_FORMAT_DEPTH_MM = 100,
+
+    // color layouts
+    SENSEKIT_PIXEL_FORMAT_RGB888 = 200,
+    SENSEKIT_PIXEL_FORMAT_YUV422 = 201,
+    SENSEKIT_PIXEL_FORMAT_YUYV = 202,
+    SENSEKIT_PIXEL_FORMAT_GRAY8 = 300,
+    SENSEKIT_PIXEL_FORMAT_GRAY16 = 301
+} sensekit_pixel_formats;
 
 typedef struct {
     uint8_t r;
@@ -24,8 +37,18 @@ typedef struct {
 typedef struct {
     uint32_t width;
     uint32_t height;
+    sensekit_pixel_format_t pixelFormat;
     uint8_t bytesPerPixel;
 } PACK_STRUCT sensekit_image_metadata_t;
+
+typedef struct {
+    uint32_t id;
+    uint32_t width;
+    uint32_t height;
+    sensekit_pixel_format_t pixelFormat;
+    uint8_t bytesPerPixel;
+    uint8_t fps;
+} sensekit_imagestream_mode_t;
 
 #ifdef _MSC_VER
 #pragma pack(pop)

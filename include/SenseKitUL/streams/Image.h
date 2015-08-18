@@ -22,6 +22,41 @@ namespace sensekit {
         }
     };
 
+    class ImageStreamMode : private ::sensekit_imagestream_mode_t
+    {
+    public:
+        ImageStreamMode()
+        {}
+
+        ImageStreamMode(const sensekit_imagestream_mode_t& mode)
+        {
+            sensekit_imagestream_mode_t::id = mode.id;
+            sensekit_imagestream_mode_t::width = mode.width;
+            sensekit_imagestream_mode_t::height = mode.height;
+            sensekit_imagestream_mode_t::fps = mode.fps;
+            sensekit_imagestream_mode_t::bytesPerPixel = mode.bytesPerPixel;
+            sensekit_imagestream_mode_t::pixelFormat = mode.pixelFormat;
+        }
+
+        operator ::sensekit_imagestream_mode_t*() { return this; }
+        operator const ::sensekit_imagestream_mode_t*() const { return this; }
+
+        std::uint8_t fps() const { return sensekit_imagestream_mode_t::fps; }
+        void set_fps(std::uint8_t fps) { sensekit_imagestream_mode_t::fps = fps; }
+
+        std::uint8_t bytesPerPixel() const { return sensekit_imagestream_mode_t::bytesPerPixel; }
+        void set_bytesPerPixel(std::uint8_t bytesPerPixel) { sensekit_imagestream_mode_t::bytesPerPixel = bytesPerPixel; }
+
+        std::uint32_t width() const { return sensekit_imagestream_mode_t::width; }
+        void set_width(std::uint32_t width) { sensekit_imagestream_mode_t::width = width; }
+
+        std::uint32_t height() const { return sensekit_imagestream_mode_t::height; }
+        void set_height(std::uint32_t height) { sensekit_imagestream_mode_t::height = height; }
+
+        sensekit_pixel_format_t pixelFormat() const { return sensekit_imagestream_mode_t::pixelFormat; }
+        void set_pixelFormat(sensekit_pixel_format_t format) { sensekit_imagestream_mode_t::pixelFormat = format; }
+    };
+
     class ImageStream : public DataStream
     {
     public:
@@ -57,6 +92,28 @@ namespace sensekit {
         void set_mirroring(bool mirroring)
         {
             sensekit_imagestream_set_mirroring(m_imageStream, mirroring);
+        }
+
+        std::vector<ImageStreamMode> available_modes()
+        {
+            sensekit_result_token_t token;
+            std::size_t count = 0;
+            sensekit_imagestream_request_modes(m_imageStream, &token, &count);
+
+            std::vector<ImageStreamMode> result;
+            result.resize(count);
+
+            sensekit_imagestream_get_modes_result(m_imageStream,
+                                                  token,
+                                                  reinterpret_cast<sensekit_imagestream_mode_t*>(&result[0]),
+                                                  count);
+
+            return result;
+        }
+
+        void set_mode(const ImageStreamMode& mode)
+        {
+            sensekit_imagestream_set_mode(m_imageStream, mode);
         }
 
     private:

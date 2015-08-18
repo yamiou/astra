@@ -10,6 +10,8 @@ set(${_projname}_SOURCES
   OniColorStream.cpp
   OniDeviceStreamSet.h
   OniDeviceStreamSet.cpp
+  oni_mappers.hpp
+  oni_mappers.cpp
   )
 
 add_definitions(-DSENSEKIT_BUILD)

@@ -22,8 +22,7 @@ namespace sensekit { namespace plugins {
                                   SENSEKIT_STREAM_COLOR,
                                   DEFAULT_SUBTYPE),
                               oniDevice,
-                              ::openni::SENSOR_COLOR,
-                              3)
+                              ::openni::SENSOR_COLOR)
         {
             PROFILE_FUNC();
         }

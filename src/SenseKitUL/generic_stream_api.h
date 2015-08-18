@@ -47,6 +47,37 @@ sensekit_status_t sensekit_generic_frame_get_frameindex(TFrameType* frame,
 }
 
 
+template<typename TElementType>
+sensekit_status_t sensekit_generic_stream_request_array(sensekit_streamconnection_t connection,
+                                                        sensekit_parameter_id parameterId,
+                                                        sensekit_result_token_t* token,
+                                                        size_t* count)
+{
+    size_t paramSize;
+    sensekit_status_t rc = sensekit_stream_get_parameter(connection,
+                                                         parameterId,
+                                                         &paramSize,
+                                                         token);
+
+    *count = paramSize / sizeof(TElementType);
+
+    return rc;
+}
+
+template<typename TElementType>
+sensekit_status_t sensekit_generic_stream_get_result_array(sensekit_streamconnection_t connection,
+                                                           sensekit_result_token_t token,
+                                                           void* array,
+                                                           size_t count)
+{
+    size_t resultSize = count * sizeof(TElementType);
+
+    return sensekit_stream_get_result(connection,
+                                      token,
+                                      resultSize,
+                                      array);
+}
+
 inline sensekit_status_t sensekit_stream_get_parameter_fixed(sensekit_streamconnection_t connection,
                                                              sensekit_parameter_id parameterId,
                                                              size_t byteLength,
@@ -72,5 +103,7 @@ inline sensekit_status_t sensekit_stream_get_parameter_fixed(sensekit_streamconn
                                       byteLength,
                                       data);
 }
+
+
 
 #endif /* GENERIC_STREAM_API_H */

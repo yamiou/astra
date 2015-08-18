@@ -19,6 +19,18 @@ SENSEKIT_API_EX sensekit_status_t sensekit_imagestream_get_hfov(sensekit_imagest
 SENSEKIT_API_EX sensekit_status_t sensekit_imagestream_get_vfov(sensekit_imagestream_t imageStream,
                                                                 float* vFov);
 
+SENSEKIT_API_EX sensekit_status_t sensekit_imagestream_request_modes(sensekit_imagestream_t imageStream,
+                                                                     sensekit_result_token_t* token,
+                                                                     size_t* count);
+
+SENSEKIT_API_EX sensekit_status_t sensekit_imagestream_get_modes_result(sensekit_imagestream_t imageStream,
+                                                                        sensekit_result_token_t token,
+                                                                        sensekit_imagestream_mode_t* modes,
+                                                                        size_t count);
+
+SENSEKIT_API_EX sensekit_status_t sensekit_imagestream_set_mode(sensekit_imagestream_t imageStream,
+                                                                const sensekit_imagestream_mode_t* mode);
+
 SENSEKIT_API_EX sensekit_status_t sensekit_reader_get_imageframe(sensekit_reader_frame_t readerFrame,
                                                                  sensekit_stream_type_t type,
                                                                  sensekit_stream_subtype_t subtype,

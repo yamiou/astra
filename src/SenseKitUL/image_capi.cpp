@@ -46,6 +46,37 @@ SENSEKIT_API_EX sensekit_status_t sensekit_imagestream_get_vfov(sensekit_imagest
                                                reinterpret_cast<sensekit_parameter_data_t*>(vFov));
 }
 
+SENSEKIT_API_EX sensekit_status_t sensekit_imagestream_request_modes(sensekit_imagestream_t imageStream,
+                                                                     sensekit_result_token_t* token,
+                                                                     size_t* count)
+{
+    return sensekit_generic_stream_request_array<sensekit_imagestream_mode_t>(imageStream,
+                                                                              SENSEKIT_PARAMETER_IMAGE_MODES,
+                                                                              token,
+                                                                              count);
+}
+
+SENSEKIT_API_EX sensekit_status_t sensekit_imagestream_get_modes_result(sensekit_imagestream_t imageStream,
+                                                                        sensekit_result_token_t token,
+                                                                        sensekit_imagestream_mode_t* modes,
+                                                                        size_t modeCount)
+{
+
+    return sensekit_generic_stream_get_result_array<sensekit_imagestream_mode_t>(imageStream,
+                                                                                 token,
+                                                                                 modes,
+                                                                                 modeCount);
+}
+
+SENSEKIT_API_EX sensekit_status_t sensekit_imagestream_set_mode(sensekit_imagestream_t imageStream,
+                                                                const sensekit_imagestream_mode_t* mode)
+{
+    return sensekit_stream_set_parameter(imageStream,
+                                         SENSEKIT_PARAMETER_IMAGE_MODE,
+                                         sizeof(sensekit_imagestream_mode_t),
+                                         const_cast<sensekit_imagestream_mode_t*>(mode));
+}
+
 SENSEKIT_API_EX sensekit_status_t sensekit_reader_get_imageframe(sensekit_reader_frame_t readerFrame,
                                                                  sensekit_stream_type_t type,
                                                                  sensekit_stream_subtype_t subtype,
