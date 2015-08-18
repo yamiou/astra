@@ -4,6 +4,7 @@
 #include <tuple>
 #include <OpenNI.h>
 #include <SenseKitUL/streams/image_types.h>
+#include <cstdint>
 
 namespace sensekit { namespace plugins {
 
