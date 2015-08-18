@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <SenseKitUL/skul_ctypes.h>
 #include <SenseKitUL/streams/image_capi.h>
+#include <cstdint>
 
 namespace sensekit {
 
