@@ -44,7 +44,7 @@ namespace sensekit { namespace plugins { namespace depth {
 
         }
 
-        virtual void on_connection_added(sensekit_streamconnection_t connection)
+        virtual void on_connection_added(sensekit_streamconnection_t connection) override
         {
             /*
               if !bin create default bin
@@ -53,22 +53,22 @@ namespace sensekit { namespace plugins { namespace depth {
         }
 
         virtual void on_connection_removed(sensekit_bin_t bin,
-                                           sensekit_streamconnection_t connection) { }
+                                           sensekit_streamconnection_t connection) override { }
 
         virtual void on_set_parameter(sensekit_streamconnection_t connection,
                                       sensekit_parameter_id id,
                                       size_t inByteLength,
-                                      sensekit_parameter_data_t inData) {}
+                                      sensekit_parameter_data_t inData) override {}
 
         virtual void on_get_parameter(sensekit_streamconnection_t connection,
                                       sensekit_parameter_id id,
-                                      sensekit_parameter_bin_t& parameterBin) {}
+                                      sensekit_parameter_bin_t& parameterBin) override {}
 
         virtual void on_invoke(sensekit_streamconnection_t connection,
                                sensekit_command_id commandId,
                                size_t inByteLength,
                                sensekit_parameter_data_t inData,
-                               sensekit_parameter_bin_t& parameterBin) {};
+                               sensekit_parameter_bin_t& parameterBin) override {};
 
     private:
         DepthStream m_depthStream{nullptr};
