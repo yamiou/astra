@@ -140,6 +140,11 @@ int main(int argc, char** argv)
                 break;
             case sf::Event::KeyPressed:
             {
+                if (event.key.code == sf::Keyboard::C && event.key.control)
+                {
+                    window.close();
+                }
+
                 switch(event.key.code)
                 {
                 case sf::Keyboard::Escape:
