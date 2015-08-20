@@ -26,7 +26,7 @@
 #include <google/protobuf/unknown_field_set.h>
 // @@protoc_insertion_point(includes)
 
-namespace sensekit {
+namespace astra {
 namespace serialization {
 namespace proto {
 
@@ -106,7 +106,7 @@ class FrameDescription : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 bufferlength() const;
   inline void set_bufferlength(::google::protobuf::uint32 value);
 
-  // @@protoc_insertion_point(class_scope:sensekit.serialization.proto.FrameDescription)
+  // @@protoc_insertion_point(class_scope:astra.serialization.proto.FrameDescription)
  private:
   inline void set_has_frameperiod();
   inline void clear_has_frameperiod();
@@ -148,13 +148,13 @@ inline void FrameDescription::clear_frameperiod() {
   clear_has_frameperiod();
 }
 inline double FrameDescription::frameperiod() const {
-  // @@protoc_insertion_point(field_get:sensekit.serialization.proto.FrameDescription.framePeriod)
+  // @@protoc_insertion_point(field_get:astra.serialization.proto.FrameDescription.framePeriod)
   return frameperiod_;
 }
 inline void FrameDescription::set_frameperiod(double value) {
   set_has_frameperiod();
   frameperiod_ = value;
-  // @@protoc_insertion_point(field_set:sensekit.serialization.proto.FrameDescription.framePeriod)
+  // @@protoc_insertion_point(field_set:astra.serialization.proto.FrameDescription.framePeriod)
 }
 
 // optional uint32 bufferLength = 2;
@@ -172,13 +172,13 @@ inline void FrameDescription::clear_bufferlength() {
   clear_has_bufferlength();
 }
 inline ::google::protobuf::uint32 FrameDescription::bufferlength() const {
-  // @@protoc_insertion_point(field_get:sensekit.serialization.proto.FrameDescription.bufferLength)
+  // @@protoc_insertion_point(field_get:astra.serialization.proto.FrameDescription.bufferLength)
   return bufferlength_;
 }
 inline void FrameDescription::set_bufferlength(::google::protobuf::uint32 value) {
   set_has_bufferlength();
   bufferlength_ = value;
-  // @@protoc_insertion_point(field_set:sensekit.serialization.proto.FrameDescription.bufferLength)
+  // @@protoc_insertion_point(field_set:astra.serialization.proto.FrameDescription.bufferLength)
 }
 
 
@@ -186,7 +186,7 @@ inline void FrameDescription::set_bufferlength(::google::protobuf::uint32 value)
 
 }  // namespace proto
 }  // namespace serialization
-}  // namespace sensekit
+}  // namespace astra
 
 #ifndef SWIG
 namespace google {

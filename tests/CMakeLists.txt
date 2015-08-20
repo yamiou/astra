@@ -1,6 +1,6 @@
 set(PROJECT_NAME "test-harness")
 
-include_directories(${CATCH_INCLUDE_DIR} ${SENSEKIT_INCLUDE_DIR})
+include_directories(${CATCH_INCLUDE_DIR} ${ASTRA_INCLUDE_DIR})
 
 set(${PROJECT_NAME}_SOURCES
   main.cpp
@@ -9,6 +9,6 @@ set(${PROJECT_NAME}_SOURCES
   )
 
 add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES})
-target_link_libraries(${PROJECT_NAME} SenseKit)
+target_link_libraries(${PROJECT_NAME} Astra)
 set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "tests")
-set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "sensekit-tests")
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "astra-tests")

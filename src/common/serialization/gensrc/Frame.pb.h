@@ -26,7 +26,7 @@
 #include <google/protobuf/unknown_field_set.h>
 // @@protoc_insertion_point(includes)
 
-namespace sensekit {
+namespace astra {
 namespace serialization {
 namespace proto {
 
@@ -118,7 +118,7 @@ class Frame : public ::google::protobuf::Message {
   inline ::std::string* release_rawframewrapper();
   inline void set_allocated_rawframewrapper(::std::string* rawframewrapper);
 
-  // @@protoc_insertion_point(class_scope:sensekit.serialization.proto.Frame)
+  // @@protoc_insertion_point(class_scope:astra.serialization.proto.Frame)
  private:
   inline void set_has_bytelength();
   inline void clear_has_bytelength();
@@ -163,13 +163,13 @@ inline void Frame::clear_bytelength() {
   clear_has_bytelength();
 }
 inline ::google::protobuf::uint32 Frame::bytelength() const {
-  // @@protoc_insertion_point(field_get:sensekit.serialization.proto.Frame.byteLength)
+  // @@protoc_insertion_point(field_get:astra.serialization.proto.Frame.byteLength)
   return bytelength_;
 }
 inline void Frame::set_bytelength(::google::protobuf::uint32 value) {
   set_has_bytelength();
   bytelength_ = value;
-  // @@protoc_insertion_point(field_set:sensekit.serialization.proto.Frame.byteLength)
+  // @@protoc_insertion_point(field_set:astra.serialization.proto.Frame.byteLength)
 }
 
 // optional uint32 frameIndex = 2;
@@ -187,13 +187,13 @@ inline void Frame::clear_frameindex() {
   clear_has_frameindex();
 }
 inline ::google::protobuf::uint32 Frame::frameindex() const {
-  // @@protoc_insertion_point(field_get:sensekit.serialization.proto.Frame.frameIndex)
+  // @@protoc_insertion_point(field_get:astra.serialization.proto.Frame.frameIndex)
   return frameindex_;
 }
 inline void Frame::set_frameindex(::google::protobuf::uint32 value) {
   set_has_frameindex();
   frameindex_ = value;
-  // @@protoc_insertion_point(field_set:sensekit.serialization.proto.Frame.frameIndex)
+  // @@protoc_insertion_point(field_set:astra.serialization.proto.Frame.frameIndex)
 }
 
 // optional bytes rawFrameWrapper = 3;
@@ -213,7 +213,7 @@ inline void Frame::clear_rawframewrapper() {
   clear_has_rawframewrapper();
 }
 inline const ::std::string& Frame::rawframewrapper() const {
-  // @@protoc_insertion_point(field_get:sensekit.serialization.proto.Frame.rawFrameWrapper)
+  // @@protoc_insertion_point(field_get:astra.serialization.proto.Frame.rawFrameWrapper)
   return *rawframewrapper_;
 }
 inline void Frame::set_rawframewrapper(const ::std::string& value) {
@@ -222,7 +222,7 @@ inline void Frame::set_rawframewrapper(const ::std::string& value) {
     rawframewrapper_ = new ::std::string;
   }
   rawframewrapper_->assign(value);
-  // @@protoc_insertion_point(field_set:sensekit.serialization.proto.Frame.rawFrameWrapper)
+  // @@protoc_insertion_point(field_set:astra.serialization.proto.Frame.rawFrameWrapper)
 }
 inline void Frame::set_rawframewrapper(const char* value) {
   set_has_rawframewrapper();
@@ -230,7 +230,7 @@ inline void Frame::set_rawframewrapper(const char* value) {
     rawframewrapper_ = new ::std::string;
   }
   rawframewrapper_->assign(value);
-  // @@protoc_insertion_point(field_set_char:sensekit.serialization.proto.Frame.rawFrameWrapper)
+  // @@protoc_insertion_point(field_set_char:astra.serialization.proto.Frame.rawFrameWrapper)
 }
 inline void Frame::set_rawframewrapper(const void* value, size_t size) {
   set_has_rawframewrapper();
@@ -238,14 +238,14 @@ inline void Frame::set_rawframewrapper(const void* value, size_t size) {
     rawframewrapper_ = new ::std::string;
   }
   rawframewrapper_->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:sensekit.serialization.proto.Frame.rawFrameWrapper)
+  // @@protoc_insertion_point(field_set_pointer:astra.serialization.proto.Frame.rawFrameWrapper)
 }
 inline ::std::string* Frame::mutable_rawframewrapper() {
   set_has_rawframewrapper();
   if (rawframewrapper_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     rawframewrapper_ = new ::std::string;
   }
-  // @@protoc_insertion_point(field_mutable:sensekit.serialization.proto.Frame.rawFrameWrapper)
+  // @@protoc_insertion_point(field_mutable:astra.serialization.proto.Frame.rawFrameWrapper)
   return rawframewrapper_;
 }
 inline ::std::string* Frame::release_rawframewrapper() {
@@ -269,7 +269,7 @@ inline void Frame::set_allocated_rawframewrapper(::std::string* rawframewrapper)
     clear_has_rawframewrapper();
     rawframewrapper_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   }
-  // @@protoc_insertion_point(field_set_allocated:sensekit.serialization.proto.Frame.rawFrameWrapper)
+  // @@protoc_insertion_point(field_set_allocated:astra.serialization.proto.Frame.rawFrameWrapper)
 }
 
 
@@ -277,7 +277,7 @@ inline void Frame::set_allocated_rawframewrapper(::std::string* rawframewrapper)
 
 }  // namespace proto
 }  // namespace serialization
-}  // namespace sensekit
+}  // namespace astra
 
 #ifndef SWIG
 namespace google {

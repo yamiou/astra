@@ -1,17 +1,17 @@
 #ifndef POINTPROCESSOR_H
 #define POINTPROCESSOR_H
 
-#include <SenseKit/Plugins/PluginKit.h>
-#include <SenseKitUL/SenseKitUL.h>
+#include <Astra/Plugins/PluginKit.h>
+#include <AstraUL/AstraUL.h>
 #include "PointStream.h"
 
-namespace sensekit { namespace plugins { namespace xs {
+namespace astra { namespace plugins { namespace xs {
 
     class PointProcessor : public FrameReadyListener
     {
     public:
         PointProcessor(PluginServiceProxy& pluginService,
-                       sensekit_streamset_t streamset,
+                       astra_streamset_t streamset,
                        StreamDescription& depthDesc);
         virtual ~PointProcessor();
         virtual void on_frame_ready(StreamReader& reader, Frame& frame) override;
@@ -24,7 +24,7 @@ namespace sensekit { namespace plugins { namespace xs {
                                    Vector3f* p_points);
 
         Sensor m_sensor;
-        sensekit_streamset_t m_streamSet;
+        astra_streamset_t m_streamSet;
         StreamReader m_reader;
         DepthStream m_depthStream;
         PluginServiceProxy& m_pluginService;

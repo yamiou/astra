@@ -1,3 +1,3 @@
 #include "DummyPlugin.h"
 
-EXPORT_PLUGIN(sensekit::DummyPlugin);
+EXPORT_PLUGIN(astra::DummyPlugin);

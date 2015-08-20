@@ -3,9 +3,9 @@
 
 #include "TrackedPoint.h"
 #include "HandSettings.h"
-#include <SenseKit/Plugins/PluginLogger.h>
+#include <Astra/Plugins/PluginLogger.h>
 
-namespace sensekit { namespace plugins { namespace hand {
+namespace astra { namespace plugins { namespace hand {
 
     class TrajectoryAnalyzer
     {

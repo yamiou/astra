@@ -2,25 +2,25 @@
 #define ONIDEPTHSTREAM_H
 
 #include "OniDeviceStream.h"
-#include <SenseKit/Plugins/plugin_capi.h>
-#include <SenseKitUL/Plugins/stream_types.h>
-#include <SenseKitUL/skul_ctypes.h>
+#include <Astra/Plugins/plugin_capi.h>
+#include <AstraUL/Plugins/stream_types.h>
+#include <AstraUL/skul_ctypes.h>
 #include <cmath>
 #include <Shiny.h>
 
-namespace sensekit { namespace plugins {
+namespace astra { namespace plugins {
 
-    class OniDepthStream : public OniDeviceStream<sensekit_imageframe_wrapper_t,
+    class OniDepthStream : public OniDeviceStream<astra_imageframe_wrapper_t,
                                                   int16_t>
     {
     public:
         OniDepthStream(PluginServiceProxy& pluginService,
-                       sensekit_streamset_t streamSet,
+                       astra_streamset_t streamSet,
                        ::openni::Device& oniDevice)
             : OniDeviceStream(pluginService,
                               streamSet,
                               StreamDescription(
-                                  SENSEKIT_STREAM_DEPTH,
+                                  ASTRA_STREAM_DEPTH,
                                   DEFAULT_SUBTYPE),
                               oniDevice,
                               ::openni::SENSOR_DEPTH)
@@ -54,12 +54,12 @@ namespace sensekit { namespace plugins {
             m_conversionCache.coeffY = m_conversionCache.resolutionY / m_conversionCache.yzFactor;
         }
 
-        virtual void on_get_parameter(sensekit_streamconnection_t connection,
-                                      sensekit_parameter_id id,
-                                      sensekit_parameter_bin_t& parameterBin) override;
+        virtual void on_get_parameter(astra_streamconnection_t connection,
+                                      astra_parameter_id id,
+                                      astra_parameter_bin_t& parameterBin) override;
 
-        virtual void on_connection_removed(sensekit_bin_t bin,
-                                           sensekit_streamconnection_t connection) override
+        virtual void on_connection_removed(astra_bin_t bin,
+                                           astra_streamconnection_t connection) override
         {
             PROFILE_FUNC();
 

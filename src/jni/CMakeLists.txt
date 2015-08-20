@@ -1,12 +1,12 @@
 set(C_SOURCES
-  sensekit_wrapper.h
-  sensekit_wrapper.cpp
+  astra_wrapper.h
+  astra_wrapper.cpp
   )
 
-add_library(sensekit_jni SHARED ${C_SOURCES})
-target_link_libraries(sensekit_jni ${SENSEKIT_LIBRARIES})
+add_library(astra_jni SHARED ${C_SOURCES})
+target_link_libraries(astra_jni ${ASTRA_LIBRARIES})
 
-install(TARGETS sensekit_jni
+install(TARGETS astra_jni
         RUNTIME DESTINATION bin/
         LIBRARY DESTINATION lib/
         ARCHIVE DESTINATION lib/

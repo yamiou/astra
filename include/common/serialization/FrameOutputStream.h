@@ -4,7 +4,7 @@
 #include "StreamFileModels.h"
 #include <cstdint>
 
-namespace sensekit { namespace serialization {
+namespace astra { namespace serialization {
 
     class FrameOutputStream
     {

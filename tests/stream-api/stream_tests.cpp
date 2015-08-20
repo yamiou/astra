@@ -1,9 +1,9 @@
 #include "catch.hpp"
-#include <SenseKit/SenseKit.h>
-#include <SenseKitUL/SenseKitUL.h>
+#include <Astra/Astra.h>
+#include <AstraUL/AstraUL.h>
 
 TEST_CASE("Can start a DepthStream", "[c++-stream-api-ul]") {
-    sensekit::Sensor sensor;
-    sensekit::StreamReader reader = sensor.create_reader();
-    reader.stream<sensekit::DepthStream>().start();
+    astra::Sensor sensor;
+    astra::StreamReader reader = sensor.create_reader();
+    reader.stream<astra::DepthStream>().start();
 }

@@ -5,13 +5,13 @@ set (${_projname}_SOURCES
   DummyPlugin.cpp
   )
 
-add_definitions(-DSENSEKIT_BUILD)
+add_definitions(-DASTRA_BUILD)
 
 add_library(${_projname} SHARED ${${_projname}_SOURCES})
 
 set_target_properties(${_projname} PROPERTIES FOLDER "plugins")
 
-target_link_libraries(${_projname} SenseKitUL)
+target_link_libraries(${_projname} AstraUL)
 
 install(TARGETS ${_projname}
         RUNTIME DESTINATION bin/Plugins/

@@ -1,8 +1,8 @@
-#include <SensekitUL/streams/Depth.h>
-#include <SenseKit/Plugins/plugin_capi.h>
-#include <SenseKit/sensekit_capi.h>
-#include <Sensekit/SenseKit.h>
-#include <SenseKit/sensekit_types.h>
+#include <AstraUL/streams/Depth.h>
+#include <Astra/Plugins/plugin_capi.h>
+#include <Astra/astra_capi.h>
+#include <Astra/Astra.h>
+#include <Astra/astra_types.h>
 
 #include <memory>
 #include <chrono>
@@ -15,12 +15,12 @@
 #include <common/serialization/FrameStreamWriter.h>
 #include <common/serialization/FrameOutputStream.h>
 
-using namespace sensekit::serialization;
+using namespace astra::serialization;
 
-class PointFrameListener : public sensekit::FrameReadyListener
+class PointFrameListener : public astra::FrameReadyListener
 {
 public:
-    PointFrameListener(sensekit::PointStream& pointStream)
+    PointFrameListener(astra::PointStream& pointStream)
     {
         m_lastTimepoint = clock_type::now();
     }
@@ -71,10 +71,10 @@ public:
             << std::endl;
     }
 
-    virtual void on_frame_ready(sensekit::StreamReader& reader,
-                                sensekit::Frame& frame) override
+    virtual void on_frame_ready(astra::StreamReader& reader,
+                                astra::Frame& frame) override
     {
-        sensekit::PointFrame pointFrame = frame.get<sensekit::PointFrame>();
+        astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
 
         int width = pointFrame.resolutionX();
         int height = pointFrame.resolutionY();
@@ -83,7 +83,7 @@ public:
 
         m_visualizer.update(pointFrame);
 
-        sensekit_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
+        astra_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
         for (int i = 0; i < width * height; i++)
         {
             int rgbaOffset = i * 4;
@@ -136,10 +136,10 @@ private:
     bool m_shouldCheckFps{false};
 };
 
-class DepthFrameListener : public sensekit::FrameReadyListener
+class DepthFrameListener : public astra::FrameReadyListener
 {
 public:
-    DepthFrameListener(sensekit::DepthStream& depthStream, FrameStreamWriter& serializer)
+    DepthFrameListener(astra::DepthStream& depthStream, FrameStreamWriter& serializer)
         : m_frameStreamWriter(serializer)
     {
 
@@ -150,10 +150,10 @@ public:
 
     }
 
-    virtual void on_frame_ready(sensekit::StreamReader& reader,
-                                sensekit::Frame& frame) override
+    virtual void on_frame_ready(astra::StreamReader& reader,
+                                astra::Frame& frame) override
     {
-        sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
+        astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
 
         m_frameStreamWriter.write(depthFrame);
     }
@@ -254,19 +254,19 @@ int main(int argc, char** argv)
         std::unique_ptr<FrameOutputStream>(open_frame_output_stream(outputFile));
     FrameStreamWriter streamWriter(*outputStream.get());
 
-    sensekit::SenseKit::initialize();
+    astra::Astra::initialize();
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Stream Recorder");
 
-    sensekit::Sensor sensor;
-    sensekit::StreamReader sensorReader = sensor.create_reader();
+    astra::Sensor sensor;
+    astra::StreamReader sensorReader = sensor.create_reader();
 
-    sensekit::Sensor streamPlayer("stream_player");
-    sensekit::StreamReader streamPlayerReader = streamPlayer.create_reader();
+    astra::Sensor streamPlayer("stream_player");
+    astra::StreamReader streamPlayerReader = streamPlayer.create_reader();
 
-    auto sensorDs = sensorReader.stream<sensekit::DepthStream>();
-    auto sensorPs = sensorReader.stream<sensekit::PointStream>();
-    auto streamPlayerPs = streamPlayerReader.stream<sensekit::PointStream>();
+    auto sensorDs = sensorReader.stream<astra::DepthStream>();
+    auto sensorPs = sensorReader.stream<astra::PointStream>();
+    auto streamPlayerPs = streamPlayerReader.stream<astra::PointStream>();
 
     sensorDs.start();
     sensorPs.start();
@@ -281,7 +281,7 @@ int main(int argc, char** argv)
 
     while (window.isOpen())
     {
-        sensekit_temp_update();
+        astra_temp_update();
 
         sf::Event event;
 
@@ -318,7 +318,7 @@ int main(int argc, char** argv)
         window.display();
     }
 
-    sensekit::SenseKit::terminate();
+    astra::Astra::terminate();
 
     outputStream.reset();
     fclose(outputFile);

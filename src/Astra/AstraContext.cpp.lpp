@@ -1,0 +1,44 @@
+#include "AstraContext.h"
+#include "AstraContextImpl.h"
+#include "CreateStreamProxy.h"
+#include <Astra/Plugins/StreamServiceProxyBase.h>
+#include <AstraAPI.h>
+
+namespace astra {
+
+    AstraContext::AstraContext()
+          : m_impl(std::make_unique<AstraContextImpl>()),
+            m_proxy(create_stream_proxy(this))
+            {}
+
+    AstraContext::~AstraContext() {}
+
+    astra_status_t AstraContext::initialize()
+    {
+        astra_api_set_proxy(proxy());
+        return m_impl->initialize();
+    }
+
+    astra_status_t AstraContext::terminate()
+    {
+        return m_impl->terminate();
+    }
+
+    StreamServiceProxyBase* AstraContext::proxy()
+    {
+        return m_proxy.get();
+    }
+
+^^^BEGINREPLACE:stream^^^
+    ^RETURN^ AstraContext::^FUNC^(^PARAMS:ref^)
+    {
+        return m_impl->^FUNC^(^PARAMS:names^);
+    }
+
+^^^ENDREPLACE^^^
+
+    astra_status_t AstraContext::notify_host_event(astra_event_id id, const void* data, size_t dataSize)
+    {
+        return notify_host_event(id, data, dataSize);
+    }
+}

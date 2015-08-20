@@ -1,10 +1,10 @@
 #include <SFML/Graphics.hpp>
-#include <Sensekit/SenseKit.h>
-#include <SensekitUL/SenseKitUL.h>
+#include <Astra/Astra.h>
+#include <AstraUL/AstraUL.h>
 #include <sstream>
 #include <iomanip>
 
-class HandDebugFrameListener : public sensekit::FrameReadyListener
+class HandDebugFrameListener : public astra::FrameReadyListener
 {
 public:
     HandDebugFrameListener()
@@ -49,9 +49,9 @@ public:
         }
     }
 
-    void processDepth(sensekit::Frame& frame)
+    void processDepth(astra::Frame& frame)
     {
-        sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
+        astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
 
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
@@ -79,30 +79,30 @@ public:
         */
     }
 
-    void processHandFrame(sensekit::Frame& frame)
+    void processHandFrame(astra::Frame& frame)
     {
-        sensekit::HandFrame handFrame = frame.get<sensekit::HandFrame>();
+        astra::HandFrame handFrame = frame.get<astra::HandFrame>();
 
         m_handPoints = handFrame.handpoints();
     }
 
-    void processDebugHandFrame(sensekit::Frame& frame)
+    void processDebugHandFrame(astra::Frame& frame)
     {
-        sensekit::DebugHandFrame handFrame = frame.get<sensekit::DebugHandFrame>();
+        astra::DebugHandFrame handFrame = frame.get<astra::DebugHandFrame>();
 
         int width = handFrame.resolutionX();
         int height = handFrame.resolutionY();
 
         init_texture(width, height);
 
-        const sensekit::RGBPixel* imagePtr = handFrame.data();
+        const astra::RGBPixel* imagePtr = handFrame.data();
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
             {
                 int index = (x + y * width);
                 int index4 = index * 4;
-                sensekit::RGBPixel rgb = imagePtr[index];
+                astra::RGBPixel rgb = imagePtr[index];
 
                 m_displayBuffer[index4] = rgb.r;
                 m_displayBuffer[index4 + 1] = rgb.g;
@@ -114,14 +114,14 @@ public:
         m_texture.update(m_displayBuffer.get());
     }
 
-    virtual void on_frame_ready(sensekit::StreamReader& reader,
-        sensekit::Frame& frame) override
+    virtual void on_frame_ready(astra::StreamReader& reader,
+        astra::Frame& frame) override
     {
         processDepth(frame);
         processHandFrame(frame);
         processDebugHandFrame(frame);
 
-        m_viewType = reader.stream<sensekit::DebugHandStream>().get_view_type();
+        m_viewType = reader.stream<astra::DebugHandStream>().get_view_type();
 
         check_fps();
     }
@@ -148,7 +148,7 @@ public:
         window.draw(text);
     }
 
-    void drawHandLabel(sf::RenderWindow& window, float radius, float x, float y, sensekit::HandPoint& handPoint)
+    void drawHandLabel(sf::RenderWindow& window, float radius, float x, float y, astra::HandPoint& handPoint)
     {
         int32_t trackingId = handPoint.trackingId();
         std::stringstream str;
@@ -166,7 +166,7 @@ public:
         drawShadowText(window, label, sf::Color::White, x, y - radius - 10);
     }
 
-    void drawHandPosition(sf::RenderWindow& window, float radius, float x, float y, sensekit::HandPoint& handPoint)
+    void drawHandPosition(sf::RenderWindow& window, float radius, float x, float y, astra::HandPoint& handPoint)
     {
         auto worldPosition = handPoint.worldPosition();
         std::stringstream str;
@@ -190,7 +190,7 @@ public:
         for (auto handPoint : m_handPoints)
         {
             sf::Color color = trackingColor;
-            sensekit_handstatus_t status = handPoint.status();
+            astra_handstatus_t status = handPoint.status();
             if (status == HAND_STATUS_LOST)
             {
                 color = lostColor;
@@ -200,7 +200,7 @@ public:
                 color = candidateColor;
             }
 
-            const sensekit::Vector2i& p = handPoint.depthPosition();
+            const astra::Vector2i& p = handPoint.depthPosition();
 
             float circleX = (p.x + 0.5) * depthScale;
             float circleY = (p.y + 0.5) * depthScale;
@@ -208,7 +208,7 @@ public:
             {
                 drawCircle(window, m_circleRadius, circleX, circleY, color);
             }
-            
+
             drawHandLabel(window, m_circleRadius, circleX, circleY, handPoint);
             if (status == HAND_STATUS_TRACKING)
             {
@@ -217,7 +217,7 @@ public:
         }
     }
 
-    std::string getViewName(sensekit::DebugHandViewType viewType)
+    std::string getViewName(astra::DebugHandViewType viewType)
     {
         switch (viewType)
         {
@@ -318,8 +318,8 @@ private:
     using BufferPtr = std::unique_ptr < uint8_t[] > ;
     BufferPtr m_displayBuffer;
 
-    std::vector<sensekit::HandPoint> m_handPoints;
-    sensekit::DebugHandViewType m_viewType;
+    std::vector<astra::HandPoint> m_handPoints;
+    astra::DebugHandViewType m_viewType;
     int m_depthWidth{ 1 };
     int m_depthHeight{ 1 };
     int m_displayWidth{ 1 };
@@ -329,45 +329,45 @@ private:
     bool m_showCircles { true };
 };
 
-void request_view_mode(sensekit::StreamReader& reader, sensekit::DebugHandViewType view)
+void request_view_mode(astra::StreamReader& reader, astra::DebugHandViewType view)
 {
-    reader.stream<sensekit::DebugHandStream>().set_view_type(view);
+    reader.stream<astra::DebugHandStream>().set_view_type(view);
 }
 
-void process_mouse_move(sf::RenderWindow& window, sensekit::StreamReader& reader)
+void process_mouse_move(sf::RenderWindow& window, astra::StreamReader& reader)
 {
     sf::Vector2i position = sf::Mouse::getPosition(window);
-    sensekit::Vector2f normPosition;
+    astra::Vector2f normPosition;
     auto windowSize = window.getSize();
     normPosition.x = position.x / (float)windowSize.x;
     normPosition.y = position.y / (float)windowSize.y;
 
-    reader.stream<sensekit::DebugHandStream>().set_mouse_position(normPosition);
+    reader.stream<astra::DebugHandStream>().set_mouse_position(normPosition);
 }
 
 static bool g_mouseProbe = false;
 static bool g_pauseInput = false;
 static bool g_lockSpawnPoint = false;
 
-void toggle_mouse_probe(sensekit::StreamReader& reader)
+void toggle_mouse_probe(astra::StreamReader& reader)
 {
     g_mouseProbe = !g_mouseProbe;
-    reader.stream<sensekit::DebugHandStream>().set_use_mouse_probe(g_mouseProbe);
+    reader.stream<astra::DebugHandStream>().set_use_mouse_probe(g_mouseProbe);
 }
 
-void toggle_pause_input(sensekit::StreamReader& reader)
+void toggle_pause_input(astra::StreamReader& reader)
 {
     g_pauseInput = !g_pauseInput;
-    reader.stream<sensekit::DebugHandStream>().set_pause_input(g_pauseInput);
+    reader.stream<astra::DebugHandStream>().set_pause_input(g_pauseInput);
 }
 
-void toggle_spawn_lock(sensekit::StreamReader& reader)
+void toggle_spawn_lock(astra::StreamReader& reader)
 {
     g_lockSpawnPoint = !g_lockSpawnPoint;
-    reader.stream<sensekit::DebugHandStream>().set_lock_spawn_point(g_lockSpawnPoint);
+    reader.stream<astra::DebugHandStream>().set_lock_spawn_point(g_lockSpawnPoint);
 }
 
-void process_key_input(sensekit::StreamReader& reader, HandDebugFrameListener& listener, sf::Event::KeyEvent key)
+void process_key_input(astra::StreamReader& reader, HandDebugFrameListener& listener, sf::Event::KeyEvent key)
 {
     if (key.code == sf::Keyboard::F)
     {
@@ -442,26 +442,26 @@ void process_key_input(sensekit::StreamReader& reader, HandDebugFrameListener& l
 
 int main(int argc, char** argv)
 {
-    sensekit::SenseKit::initialize();
+    astra::Astra::initialize();
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Hand Debug Viewer");
 
-    sensekit::Sensor sensor;
-    sensekit::StreamReader reader = sensor.create_reader();
+    astra::Sensor sensor;
+    astra::StreamReader reader = sensor.create_reader();
 
     HandDebugFrameListener listener;
 
-    reader.stream<sensekit::DepthStream>().start();
-    auto handStream = reader.stream<sensekit::HandStream>();
+    reader.stream<astra::DepthStream>().start();
+    auto handStream = reader.stream<astra::HandStream>();
     handStream.start();
     handStream.set_include_candidate_points(true);
 
-    reader.stream<sensekit::DebugHandStream>().start();
+    reader.stream<astra::DebugHandStream>().start();
     reader.addListener(listener);
 
     while (window.isOpen())
     {
-        sensekit_temp_update();
+        astra_temp_update();
 
         sf::Event event;
         while (window.pollEvent(event))
@@ -506,7 +506,7 @@ int main(int argc, char** argv)
         window.display();
     }
 
-    sensekit::SenseKit::terminate();
+    astra::Astra::terminate();
 
     return 0;
 }

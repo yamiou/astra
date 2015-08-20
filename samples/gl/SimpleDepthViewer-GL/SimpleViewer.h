@@ -3,8 +3,8 @@
 
 #define MAX_DEPTH 10000
 
-#include <SenseKit/SenseKit.h>
-#include <SenseKitUL/SenseKitUL.h>
+#include <Astra/Astra.h>
+#include <AstraUL/AstraUL.h>
 #include <stddef.h>
 #include <math.h>
 
@@ -94,10 +94,10 @@ private:
 
     static SampleViewer* ms_self;
     void initTextMap(int width, int height);
-    void calculateNormals(sensekit_depthframe_t& frame, sensekit_image_metadata_t metadata);
+    void calculateNormals(astra_depthframe_t& frame, astra_image_metadata_t metadata);
     void showTex(int depthWidth, int depthHeight);
-    void updateTex(sensekit_depthframe_t depthFrame, sensekit_image_metadata_t metadata);
-    void CalculateHistogram(float* pHistogram, int histogramSize, sensekit_depthframe_t frame, sensekit_image_metadata_t metadata);
+    void updateTex(astra_depthframe_t depthFrame, astra_image_metadata_t metadata);
+    void CalculateHistogram(float* pHistogram, int histogramSize, astra_depthframe_t frame, astra_image_metadata_t metadata);
     static void glutIdle();
     static void glutDisplay();
     static void glutKeyboard(unsigned char key, int x, int y);
@@ -115,9 +115,9 @@ private:
     RGB888Pixel             m_lightColor;
     RGB888Pixel             m_ambientColor;
 
-    sensekit_streamsetconnection_t m_sensor;
-    sensekit_reader_t m_reader;
-    sensekit_depthstream_t m_depthStream;
+    astra_streamsetconnection_t m_sensor;
+    astra_reader_t m_reader;
+    astra_depthstream_t m_depthStream;
 };
 
 

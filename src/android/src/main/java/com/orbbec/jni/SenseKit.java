@@ -1,11 +1,11 @@
 package com.orbbec.jni;
 
-public class SenseKit {
+public class Astra {
     static {
-        System.loadLibrary("SenseKit");
-        System.loadLibrary("SenseKitAPI");
-        System.loadLibrary("SenseKitUL");
-        System.loadLibrary("sensekit_jni");
+        System.loadLibrary("Astra");
+        System.loadLibrary("AstraAPI");
+        System.loadLibrary("AstraUL");
+        System.loadLibrary("astra_jni");
     }
     public static native void initialize();
     public static native void terminate();

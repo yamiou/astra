@@ -3,16 +3,16 @@
 
 #include <tuple>
 #include <OpenNI.h>
-#include <SenseKitUL/streams/image_types.h>
+#include <AstraUL/streams/image_types.h>
 #include <cstdint>
 
-namespace sensekit { namespace plugins {
+namespace astra { namespace plugins {
 
-    std::tuple<sensekit_pixel_format_t, uint8_t> convert_format(const openni::PixelFormat& oniFormat);
-    std::tuple<openni::PixelFormat, uint8_t> convert_format(const sensekit_pixel_format_t& format);
+    std::tuple<astra_pixel_format_t, uint8_t> convert_format(const openni::PixelFormat& oniFormat);
+    std::tuple<openni::PixelFormat, uint8_t> convert_format(const astra_pixel_format_t& format);
 
-    sensekit_imagestream_mode_t convert_mode(const openni::VideoMode& oniMode);
-    openni::VideoMode convert_mode(const sensekit_imagestream_mode_t& mode);
+    astra_imagestream_mode_t convert_mode(const openni::VideoMode& oniMode);
+    openni::VideoMode convert_mode(const astra_imagestream_mode_t& mode);
 }}
 
 #endif /* ONI_MAPPERS_H */

@@ -5,7 +5,7 @@
 
 #include "pb_util.h"
 
-namespace sensekit { namespace serialization {
+namespace astra { namespace serialization {
     ProtoFrameInputStream::ProtoFrameInputStream(const char* path) :
         FrameInputStream()
     {

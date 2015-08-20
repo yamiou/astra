@@ -59,7 +59,7 @@ m_pTexMap(NULL)
 
 SimpleColorViewer::~SimpleColorViewer()
 {
-    sensekit::SenseKit::terminate();
+    astra::Astra::terminate();
 
     delete[] m_pTexMap;
 
@@ -69,7 +69,7 @@ SimpleColorViewer::~SimpleColorViewer()
 void SimpleColorViewer::init(int argc, char **argv)
 {
     m_reader = m_sensor.create_reader();
-    m_reader.stream<sensekit::ColorStream>().start();
+    m_reader.stream<astra::ColorStream>().start();
 
     int colorWidth = 320;
     int colorHeight = 240;
@@ -91,13 +91,13 @@ void SimpleColorViewer::run()      //Does not return
 
 void SimpleColorViewer::display()
 {
-    sensekit_temp_update();
-    sensekit::Frame frame(m_reader.get_latest_frame(15));
+    astra_temp_update();
+    astra::Frame frame(m_reader.get_latest_frame(15));
 
     if (!frame.is_valid())
         return;
 
-    sensekit::ColorFrame colorFrame = frame.get<sensekit::ColorFrame>();
+    astra::ColorFrame colorFrame = frame.get<astra::ColorFrame>();
 
     auto colorData = colorFrame.data();
 
@@ -168,8 +168,8 @@ void SimpleColorViewer::onKey(unsigned char key, int /*x*/, int /*y*/)
     switch (key)
     {
     case 27:
-        //shutdown sensekit
-        sensekit::SenseKit::terminate();
+        //shutdown astra
+        astra::Astra::terminate();
         exit(1);
     }
 }

@@ -1,26 +1,26 @@
 #ifndef SKELETONSTREAM_H
 #define SKELETONSTREAM_H
 
-#include <SenseKit/Plugins/PluginKit.h>
-#include <SenseKit/SenseKit.h>
-#include <SenseKitUL/skul_ctypes.h>
-#include <SenseKitUL/streams/skeleton_types.h>
+#include <Astra/Plugins/PluginKit.h>
+#include <Astra/Astra.h>
+#include <AstraUL/skul_ctypes.h>
+#include <AstraUL/streams/skeleton_types.h>
 
-namespace sensekit { namespace plugins { namespace skeleton {
+namespace astra { namespace plugins { namespace skeleton {
 
-    class SkeletonStream : public sensekit::plugins::SingleBinStream<sensekit_skeletonframe_wrapper_t,
-                                                                     sensekit_skeleton_joint_t>
+    class SkeletonStream : public astra::plugins::SingleBinStream<astra_skeletonframe_wrapper_t,
+                                                                     astra_skeleton_joint_t>
     {
     public:
-        SkeletonStream(sensekit::PluginServiceProxy& pluginService,
-                       sensekit_streamset_t streamSet,
-                       sensekit_stream_t sourceStream,
+        SkeletonStream(astra::PluginServiceProxy& pluginService,
+                       astra_streamset_t streamSet,
+                       astra_stream_t sourceStream,
                        size_t skeletonCount)
             : SingleBinStream(pluginService,
                               streamSet,
-                              sensekit::StreamDescription(SENSEKIT_STREAM_SKELETON,
+                              astra::StreamDescription(ASTRA_STREAM_SKELETON,
                                                           DEFAULT_SUBTYPE),
-                              sizeof(sensekit_skeleton_t) * skeletonCount)
+                              sizeof(astra_skeleton_t) * skeletonCount)
 
         {
             enable_callbacks();

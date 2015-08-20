@@ -3,7 +3,7 @@
 
 #include "Stopwatch.h"
 
-namespace sensekit { namespace clock {
+namespace astra { namespace clock {
 
     class Pulser
     {
@@ -18,7 +18,7 @@ namespace sensekit { namespace clock {
         }
         ~Pulser()
         {
-            
+
         }
 
         void set_period(double period)

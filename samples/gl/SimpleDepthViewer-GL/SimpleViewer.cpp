@@ -59,9 +59,9 @@ m_pTexMap(nullptr)
 
 SampleViewer::~SampleViewer()
 {
-    sensekit_reader_destroy(&m_reader);
-    sensekit_streamset_close(&m_sensor);
-    sensekit_terminate();
+    astra_reader_destroy(&m_reader);
+    astra_streamset_close(&m_sensor);
+    astra_terminate();
 
     delete[] m_pTexMap;
 
@@ -86,12 +86,12 @@ void SampleViewer::initTextMap(int width, int height)
 
 void SampleViewer::init(int argc, char **argv)
 {
-    sensekit_initialize();
+    astra_initialize();
 
-    sensekit_streamset_open("1d27/0601@20/30", &m_sensor);
-    sensekit_reader_create(m_sensor, &m_reader);
+    astra_streamset_open("1d27/0601@20/30", &m_sensor);
+    astra_reader_create(m_sensor, &m_reader);
 
-    sensekit_reader_get_depthstream(m_reader, &m_depthStream);
+    astra_reader_get_depthstream(m_reader, &m_depthStream);
 
     m_lightVector = Vector3::Normalize(Vector3(.5, -0.2, 1));
     //m_lightVector = Vector3::Normalize(Vector3(0, 0, 1));
@@ -111,12 +111,12 @@ void SampleViewer::run()      //Does not return
     glutMainLoop();
 }
 
-void SampleViewer::calculateNormals(sensekit_depthframe_t& frame,
-                                    sensekit_image_metadata_t metadata)
+void SampleViewer::calculateNormals(astra_depthframe_t& frame,
+                                    astra_image_metadata_t metadata)
 {
     int16_t* depthData;
     size_t depthLength;
-    sensekit_depthframe_get_data_ptr(frame, &depthData, &depthLength);
+    astra_depthframe_get_data_ptr(frame, &depthData, &depthLength);
 
     int depthWidth = metadata.width;
     int depthHeight = metadata.height;
@@ -164,9 +164,9 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame,
                 float worldX1, worldY1, worldZ1;
                 float worldX2, worldY2, worldZ2;
                 float worldX3, worldY3, worldZ3;
-                sensekit_convert_depth_to_world(m_depthStream, x, y, depth, &worldX1, &worldY1, &worldZ1);
-                sensekit_convert_depth_to_world(m_depthStream, x + 1, y, depthRight, &worldX2, &worldY2, &worldZ2);
-                sensekit_convert_depth_to_world(m_depthStream, x, y + 1, depthDown, &worldX3, &worldY3, &worldZ3);
+                astra_convert_depth_to_world(m_depthStream, x, y, depth, &worldX1, &worldY1, &worldZ1);
+                astra_convert_depth_to_world(m_depthStream, x + 1, y, depthRight, &worldX2, &worldY2, &worldZ2);
+                astra_convert_depth_to_world(m_depthStream, x, y + 1, depthDown, &worldX3, &worldY3, &worldZ3);
 
                 Vector3 v1 = Vector3(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
                 Vector3 v2 = Vector3(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
@@ -182,9 +182,9 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame,
                 float worldX1, worldY1, worldZ1;
                 float worldX2, worldY2, worldZ2;
                 float worldX3, worldY3, worldZ3;
-                sensekit_convert_depth_to_world(m_depthStream, x, y, depth, &worldX1, &worldY1, &worldZ1);
-                sensekit_convert_depth_to_world(m_depthStream, x, y - 1, depthUp, &worldX2, &worldY2, &worldZ2);
-                sensekit_convert_depth_to_world(m_depthStream, x + 1, y, depthRight, &worldX3, &worldY3, &worldZ3);
+                astra_convert_depth_to_world(m_depthStream, x, y, depth, &worldX1, &worldY1, &worldZ1);
+                astra_convert_depth_to_world(m_depthStream, x, y - 1, depthUp, &worldX2, &worldY2, &worldZ2);
+                astra_convert_depth_to_world(m_depthStream, x + 1, y, depthRight, &worldX3, &worldY3, &worldZ3);
 
                 Vector3 v1 = Vector3(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
                 Vector3 v2 = Vector3(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
@@ -202,9 +202,9 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame,
                 float worldX1, worldY1, worldZ1;
                 float worldX2, worldY2, worldZ2;
                 float worldX3, worldY3, worldZ3;
-                sensekit_convert_depth_to_world(m_depthStream, x, y, depth, &worldX1, &worldY1, &worldZ1);
-                sensekit_convert_depth_to_world(m_depthStream, x - 1, y, depthLeft, &worldX2, &worldY2, &worldZ2);
-                sensekit_convert_depth_to_world(m_depthStream, x, y - 1, depthUp, &worldX3, &worldY3, &worldZ3);
+                astra_convert_depth_to_world(m_depthStream, x, y, depth, &worldX1, &worldY1, &worldZ1);
+                astra_convert_depth_to_world(m_depthStream, x - 1, y, depthLeft, &worldX2, &worldY2, &worldZ2);
+                astra_convert_depth_to_world(m_depthStream, x, y - 1, depthUp, &worldX3, &worldY3, &worldZ3);
 
                 Vector3 v1 = Vector3(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
                 Vector3 v2 = Vector3(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
@@ -221,9 +221,9 @@ void SampleViewer::calculateNormals(sensekit_depthframe_t& frame,
                 float worldX1, worldY1, worldZ1;
                 float worldX2, worldY2, worldZ2;
                 float worldX3, worldY3, worldZ3;
-                sensekit_convert_depth_to_world(m_depthStream, x, y, depth, &worldX1, &worldY1, &worldZ1);
-                sensekit_convert_depth_to_world(m_depthStream, x, y + 1, depthDown, &worldX2, &worldY2, &worldZ2);
-                sensekit_convert_depth_to_world(m_depthStream, x - 1, y, depthLeft, &worldX3, &worldY3, &worldZ3);
+                astra_convert_depth_to_world(m_depthStream, x, y, depth, &worldX1, &worldY1, &worldZ1);
+                astra_convert_depth_to_world(m_depthStream, x, y + 1, depthDown, &worldX2, &worldY2, &worldZ2);
+                astra_convert_depth_to_world(m_depthStream, x - 1, y, depthLeft, &worldX3, &worldY3, &worldZ3);
 
                 Vector3 v1 = Vector3(worldX2 - worldX1, worldY2 - worldY1, worldZ2 - worldZ1);
                 Vector3 v2 = Vector3(worldX3 - worldX1, worldY3 - worldY1, worldZ3 - worldZ1);
@@ -334,7 +334,7 @@ void SampleViewer::showTex(int depthWidth, int depthHeight)
     glEnd();
 }
 
-void SampleViewer::updateTex(sensekit_depthframe_t depthFrame, sensekit_image_metadata_t metadata)
+void SampleViewer::updateTex(astra_depthframe_t depthFrame, astra_image_metadata_t metadata)
 {
     int depthWidth = metadata.width;
     int depthHeight = metadata.height;
@@ -344,7 +344,7 @@ void SampleViewer::updateTex(sensekit_depthframe_t depthFrame, sensekit_image_me
 
     int16_t* pDepthRow;
     size_t depthLength;
-    sensekit_depthframe_get_data_ptr(depthFrame, &pDepthRow, &depthLength);
+    astra_depthframe_get_data_ptr(depthFrame, &pDepthRow, &depthLength);
 
     RGB888Pixel* pTexRow = m_pTexMap;
     int rowSize = depthWidth;
@@ -409,11 +409,11 @@ void SampleViewer::updateTex(sensekit_depthframe_t depthFrame, sensekit_image_me
 }
 
 
-void SampleViewer::CalculateHistogram(float* pHistogram, int histogramSize, sensekit_depthframe_t frame, sensekit_image_metadata_t metadata)
+void SampleViewer::CalculateHistogram(float* pHistogram, int histogramSize, astra_depthframe_t frame, astra_image_metadata_t metadata)
 {
     int16_t* pDepth;
     size_t length;
-    sensekit_depthframe_get_data_ptr(frame, &pDepth, &length);
+    astra_depthframe_get_data_ptr(frame, &pDepth, &length);
 
     // Calculate the accumulative histogram (the yellow display...)
     memset(pHistogram, 0, histogramSize*sizeof(float));
@@ -448,31 +448,31 @@ void SampleViewer::CalculateHistogram(float* pHistogram, int histogramSize, sens
 
 void SampleViewer::display()
 {
-    sensekit_temp_update();
-    sensekit_reader_frame_t frame;
-    sensekit_status_t rc = sensekit_reader_open_frame(m_reader, 30, &frame);
-    if (rc != SENSEKIT_STATUS_SUCCESS)
+    astra_temp_update();
+    astra_reader_frame_t frame;
+    astra_status_t rc = astra_reader_open_frame(m_reader, 30, &frame);
+    if (rc != ASTRA_STATUS_SUCCESS)
     {
         return;
     }
 
-    sensekit_depthframe_t depthFrame;
-    rc = sensekit_frame_get_depthframe(frame, &depthFrame);
+    astra_depthframe_t depthFrame;
+    rc = astra_frame_get_depthframe(frame, &depthFrame);
 
-    if (rc != SENSEKIT_STATUS_SUCCESS)
+    if (rc != ASTRA_STATUS_SUCCESS)
     {
         return;
     }
 
-    sensekit_image_metadata_t metadata;
-    sensekit_depthframe_get_metadata(depthFrame, &metadata);
+    astra_image_metadata_t metadata;
+    astra_depthframe_get_metadata(depthFrame, &metadata);
 
     int depthWidth = metadata.width;
     int depthHeight = metadata.height;
 
     int16_t* depthData;
     size_t depthLength;
-    sensekit_depthframe_get_data_ptr(depthFrame, &depthData, &depthLength);
+    astra_depthframe_get_data_ptr(depthFrame, &depthData, &depthLength);
 
     CalculateHistogram(m_pDepthHist, MAX_DEPTH, depthFrame, metadata);
 
@@ -480,7 +480,7 @@ void SampleViewer::display()
 
     updateTex(depthFrame, metadata);
 
-    sensekit_reader_close_frame(&frame);
+    astra_reader_close_frame(&frame);
 
     showTex(depthWidth, depthHeight);
 
@@ -493,10 +493,10 @@ void SampleViewer::onKey(unsigned char key, int /*x*/, int /*y*/)
     switch (key)
     {
     case 27:
-        //shutdown sensekit
-        sensekit_reader_destroy(&m_reader);
-        sensekit_streamset_close(&m_sensor);
-        sensekit_terminate();
+        //shutdown astra
+        astra_reader_destroy(&m_reader);
+        astra_streamset_close(&m_sensor);
+        astra_terminate();
         exit(1);
     }
 

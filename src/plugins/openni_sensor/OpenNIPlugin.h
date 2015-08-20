@@ -1,19 +1,19 @@
 ﻿#ifndef OPENNIPLUGIN_H
 #define OPENNIPLUGIN_H
 
-#include <SenseKit/SenseKit.h>
-#include <SenseKit/Plugins/PluginBase.h>
-#include <SenseKit/Plugins/PluginLogger.h>
+#include <Astra/Astra.h>
+#include <Astra/Plugins/PluginBase.h>
+#include <Astra/Plugins/PluginLogger.h>
 #include "OniDeviceStream.h"
 #include "OniDeviceStreamSet.h"
 #include <memory>
 #include <vector>
 #include <OpenNI.h>
-#include <SenseKitUL/streams/depth_types.h>
-#include <SenseKitUL/streams/color_types.h>
-#include <SenseKitUL/Plugins/stream_types.h>
+#include <AstraUL/streams/depth_types.h>
+#include <AstraUL/streams/color_types.h>
+#include <AstraUL/Plugins/stream_types.h>
 
-namespace sensekit
+namespace astra
 {
     namespace plugins
     {
@@ -36,7 +36,7 @@ namespace sensekit
             OpenNIPlugin& operator=(const OpenNIPlugin&) = delete;
 
         private:
-            virtual void on_host_event(sensekit_event_id id, const void* data, size_t dataSize) override;
+            virtual void on_host_event(astra_event_id id, const void* data, size_t dataSize) override;
 
             void init_openni();
 
@@ -46,7 +46,7 @@ namespace sensekit
             OniDeviceStreamSet* add_or_get_device(const char* oniUri);
             OniDeviceStreamSet* find_device(const char* oniUri);
 
-            sensekit_status_t read_streams();
+            astra_status_t read_streams();
 
             using SetPtr = std::unique_ptr<OniDeviceStreamSet>;
             using SetList = std::vector<SetPtr>;

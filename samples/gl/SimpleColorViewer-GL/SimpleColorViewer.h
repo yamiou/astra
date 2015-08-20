@@ -3,8 +3,8 @@
 
 #define MAX_DEPTH 10000
 
-#include <SenseKit/SenseKit.h>
-#include <SenseKitUL/SenseKitUL.h>
+#include <Astra/Astra.h>
+#include <AstraUL/AstraUL.h>
 #include <stddef.h>
 #include <math.h>
 
@@ -52,8 +52,8 @@ private:
     int                     m_width;
     int                     m_height;
 
-    sensekit::Sensor m_sensor;
-    sensekit::StreamReader m_reader;
+    astra::Sensor m_sensor;
+    astra::StreamReader m_reader;
 };
 
 

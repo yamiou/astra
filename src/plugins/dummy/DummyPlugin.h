@@ -1,10 +1,10 @@
 #ifndef DUMMYPLUGIN_H
 #define DUMMYPLUGIN_H
 
-#include <SenseKit/Plugins/PluginKit.h>
-#include <SenseKitUL/SenseKitUL.h>
+#include <Astra/Plugins/PluginKit.h>
+#include <AstraUL/AstraUL.h>
 
-namespace sensekit {
+namespace astra {
 
     class DummyPlugin : public PluginBase
     {

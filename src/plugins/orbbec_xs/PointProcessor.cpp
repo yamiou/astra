@@ -1,10 +1,10 @@
 #include "PointProcessor.h"
 #include <Shiny.h>
 
-namespace sensekit { namespace plugins { namespace xs {
+namespace astra { namespace plugins { namespace xs {
 
     PointProcessor::PointProcessor(PluginServiceProxy& pluginService,
-                                   sensekit_streamset_t streamset,
+                                   astra_streamset_t streamset,
                                    StreamDescription& depthDesc)
         : m_sensor(get_uri_for_streamset(pluginService, streamset)),
           m_streamSet(streamset),
@@ -62,20 +62,20 @@ namespace sensekit { namespace plugins { namespace xs {
         PROFILE_FUNC();
 
         //use same frameIndex as source depth frame
-        sensekit_frame_index_t frameIndex = depthFrame.frameIndex();
+        astra_frame_index_t frameIndex = depthFrame.frameIndex();
 
-        sensekit_imageframe_wrapper_t* pointFrameWrapper = m_pointStream->begin_write(frameIndex);
+        astra_imageframe_wrapper_t* pointFrameWrapper = m_pointStream->begin_write(frameIndex);
 
         if (pointFrameWrapper != nullptr)
         {
             pointFrameWrapper->frame.frame = nullptr;
             pointFrameWrapper->frame.data = &pointFrameWrapper->frame_data[0];
 
-            sensekit_image_metadata_t metadata;
+            astra_image_metadata_t metadata;
 
             metadata.width = depthFrame.resolutionX();
             metadata.height = depthFrame.resolutionY();
-            metadata.bytesPerPixel = sizeof(sensekit_vector3f_t);
+            metadata.bytesPerPixel = sizeof(astra_vector3f_t);
 
             pointFrameWrapper->frame.metadata = metadata;
 

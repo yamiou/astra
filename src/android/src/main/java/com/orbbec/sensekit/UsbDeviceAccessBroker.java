@@ -1,4 +1,4 @@
-package com.orbbec.sensekit;
+package com.orbbec.astra;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;

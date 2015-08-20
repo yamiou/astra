@@ -12,7 +12,7 @@ add_library(${_projname} SHARED ${${_projname}_SOURCES})
 
 set_target_properties(${_projname} PROPERTIES FOLDER "plugins")
 
-target_link_libraries(${_projname} SenseKitAPI SenseKitUL FrameSerialization ClockUtil)
+target_link_libraries(${_projname} AstraAPI AstraUL FrameSerialization ClockUtil)
 
 include_directories(${_projname})
 

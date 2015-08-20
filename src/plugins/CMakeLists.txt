@@ -1,6 +1,6 @@
 # add subdirs
 
-include_directories(${SENSEKIT_INCLUDE_DIR})
+include_directories(${ASTRA_INCLUDE_DIR})
 
 # First for the generic no-config case (e.g. with mingw)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/Plugins)
@@ -19,7 +19,7 @@ add_subdirectory(openni_sensor)
 add_subdirectory(orbbec_hand)
 add_subdirectory(orbbec_xs)
 
-if (NOT SENSEKIT_ANDROID)
+if (NOT ASTRA_ANDROID)
   add_subdirectory(orbbec_streamplayer)
   add_subdirectory(dummy)
 endif()

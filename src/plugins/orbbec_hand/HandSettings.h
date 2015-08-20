@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace sensekit { namespace plugins { namespace hand {
+namespace astra { namespace plugins { namespace hand {
 
     struct DepthUtilitySettings
     {

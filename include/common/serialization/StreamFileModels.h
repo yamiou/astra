@@ -1,8 +1,8 @@
 #ifndef STREAMFILEMODELS_H
 #define STREAMFILEMODELS_H
 
-namespace sensekit { namespace serialization {
-    
+namespace astra { namespace serialization {
+
     struct StreamHeader
     {
         int frameType;

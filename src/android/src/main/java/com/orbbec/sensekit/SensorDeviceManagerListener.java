@@ -1,4 +1,4 @@
-package com.orbbec.sensekit;
+package com.orbbec.astra;
 
 import android.hardware.usb.UsbDevice;
 

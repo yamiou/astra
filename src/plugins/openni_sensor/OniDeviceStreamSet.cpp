@@ -1,7 +1,7 @@
 #include "OniDeviceStreamSet.h"
 #include <Shiny.h>
 
-namespace sensekit { namespace plugins {
+namespace astra { namespace plugins {
 
     OniDeviceStreamSet::OniDeviceStreamSet(std::string name,
                                            PluginServiceProxy& pluginService,
@@ -21,11 +21,11 @@ namespace sensekit { namespace plugins {
         m_pluginService.destroy_stream_set(m_streamSetHandle);
     }
 
-    sensekit_status_t OniDeviceStreamSet::open()
+    astra_status_t OniDeviceStreamSet::open()
     {
         PROFILE_FUNC();
         if (m_isOpen)
-            return SENSEKIT_STATUS_SUCCESS;
+            return ASTRA_STATUS_SUCCESS;
 
         SINFO("OniDeviceStreamSet", "opening device: %s", m_uri.c_str());
         openni::Status rc =  m_oniDevice.open(m_uri.c_str());
@@ -33,7 +33,7 @@ namespace sensekit { namespace plugins {
         if (rc != openni::STATUS_OK)
         {
             SWARN("OniDeviceStreamSet", "failed to open device: %s", openni::OpenNI::getExtendedError());
-            return SENSEKIT_STATUS_DEVICE_ERROR;
+            return ASTRA_STATUS_DEVICE_ERROR;
         }
 
         SINFO("OniDeviceStreamSet", "opened device: %s", m_uri.c_str());
@@ -42,14 +42,14 @@ namespace sensekit { namespace plugins {
 
         m_isOpen = true;
 
-        return SENSEKIT_STATUS_SUCCESS;
+        return ASTRA_STATUS_SUCCESS;
     }
 
-    sensekit_status_t OniDeviceStreamSet::close()
+    astra_status_t OniDeviceStreamSet::close()
     {
         PROFILE_FUNC();
         if (!m_isOpen)
-            return SENSEKIT_STATUS_SUCCESS;
+            return ASTRA_STATUS_SUCCESS;
 
         close_sensor_streams();
 
@@ -58,14 +58,14 @@ namespace sensekit { namespace plugins {
 
         m_isOpen = false;
 
-        return SENSEKIT_STATUS_SUCCESS;
+        return ASTRA_STATUS_SUCCESS;
     }
 
-    sensekit_status_t OniDeviceStreamSet::read()
+    astra_status_t OniDeviceStreamSet::read()
     {
         PROFILE_BLOCK(streamset_read);
         if (!m_isOpen || m_streams.size() == 0)
-            return SENSEKIT_STATUS_SUCCESS;
+            return ASTRA_STATUS_SUCCESS;
 
         int streamIndex = -1;
         int timeout = openni::TIMEOUT_NONE;
@@ -76,18 +76,18 @@ namespace sensekit { namespace plugins {
                                              timeout)
             == openni::STATUS_TIME_OUT)
         {
-            return SENSEKIT_STATUS_TIMEOUT;
+            return ASTRA_STATUS_TIMEOUT;
         }
 
         if (streamIndex == -1)
-            return SENSEKIT_STATUS_TIMEOUT;
+            return ASTRA_STATUS_TIMEOUT;
 
         m_streams[streamIndex]->read_frame();
 
-        return SENSEKIT_STATUS_SUCCESS;
+        return ASTRA_STATUS_SUCCESS;
     }
 
-    sensekit_status_t OniDeviceStreamSet::open_sensor_streams()
+    astra_status_t OniDeviceStreamSet::open_sensor_streams()
     {
         PROFILE_FUNC();
 
@@ -98,20 +98,20 @@ namespace sensekit { namespace plugins {
                                                         m_streamSetHandle,
                                                         m_oniDevice);
 
-            sensekit_status_t rc = SENSEKIT_STATUS_SUCCESS;
+            astra_status_t rc = ASTRA_STATUS_SUCCESS;
             rc = stream->open();
 
-            if (rc == SENSEKIT_STATUS_SUCCESS)
+            if (rc == ASTRA_STATUS_SUCCESS)
             {
                 rc = stream->start();
-                if (rc == SENSEKIT_STATUS_SUCCESS)
+                if (rc == ASTRA_STATUS_SUCCESS)
                 {
                     m_streams.push_back (StreamPtr(stream));
                     m_oniStreams [m_streams.size() - 1] = stream->get_oni_stream();
                 }
             }
 
-            if ( rc != SENSEKIT_STATUS_SUCCESS)
+            if ( rc != ASTRA_STATUS_SUCCESS)
                 SWARN("OniDeviceStreamSet", "unable to open openni color stream.");
         }
 
@@ -121,32 +121,32 @@ namespace sensekit { namespace plugins {
                                                         m_streamSetHandle,
                                                         m_oniDevice);
 
-            sensekit_status_t rc = SENSEKIT_STATUS_SUCCESS;
+            astra_status_t rc = ASTRA_STATUS_SUCCESS;
             rc = stream->open();
 
-            if (rc == SENSEKIT_STATUS_SUCCESS)
+            if (rc == ASTRA_STATUS_SUCCESS)
             {
                 rc = stream->start();
-                if (rc == SENSEKIT_STATUS_SUCCESS)
+                if (rc == ASTRA_STATUS_SUCCESS)
                 {
                     m_streams.push_back (StreamPtr(stream));
                     m_oniStreams [m_streams.size() - 1] = stream->get_oni_stream();
                 }
             }
 
-            if ( rc != SENSEKIT_STATUS_SUCCESS)
+            if ( rc != ASTRA_STATUS_SUCCESS)
                 SWARN("OniDeviceStreamSet", "unable to open openni depth stream.");
         }
 
-        return SENSEKIT_STATUS_SUCCESS;
+        return ASTRA_STATUS_SUCCESS;
     }
 
-    sensekit_status_t OniDeviceStreamSet::close_sensor_streams()
+    astra_status_t OniDeviceStreamSet::close_sensor_streams()
     {
         PROFILE_FUNC();
         m_streams.clear();
         m_oniStreams.fill(nullptr);
 
-        return SENSEKIT_STATUS_SUCCESS;
+        return ASTRA_STATUS_SUCCESS;
     }
 }}

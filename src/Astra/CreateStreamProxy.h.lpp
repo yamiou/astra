@@ -1,0 +1,24 @@
+/* ^^^AUTOGENHEADER^^^ */
+#ifndef CREATESTREAMPROXY_H
+#define CREATESTREAMPROXY_H
+
+#include "AstraContext.h"
+#include "StreamServiceDelegate.h"
+#include <Astra/Plugins/StreamServiceProxyBase.h>
+
+namespace astra {
+
+    static inline StreamServiceProxyBase* create_stream_proxy(AstraContext* context)
+    {
+        StreamServiceProxyBase* proxy = new StreamServiceProxyBase;
+
+^^^BEGINREPLACE:stream^^^
+        proxy->^FUNC^ = &StreamServiceDelegate::^FUNC^;
+^^^ENDREPLACE^^^
+        proxy->streamService = context;
+
+        return proxy;
+    }
+}
+
+#endif /* CREATESTREAMPROXY_H */

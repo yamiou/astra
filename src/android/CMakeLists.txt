@@ -1,10 +1,9 @@
-
 set(JNI_LIB_ROOT "${CMAKE_CURRENT_BINARY_DIR}/lib/")
 set(JNI_LIB_DESTINATION "${JNI_LIB_ROOT}/armeabi-v7a/")
 
 make_directory(${JNI_LIB_DESTINATION})
 
-add_custom_target(SenseKitAndroid ALL
+add_custom_target(AstraAndroid ALL
   COMMAND ${CMAKE_COMMAND}
   -D"INPATH=${CMAKE_SOURCE_DIR}/vendor/openni-android/"
   -D"OUTPATH=${JNI_LIB_DESTINATION}"
@@ -28,6 +27,6 @@ add_custom_target(SenseKitAndroid ALL
   "-PnativeLibPath=${JNI_LIB_ROOT}"
   WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_dependencies(SenseKitAndroid sensekit_jni ${SDK_DEPENDENT_TARGET})
+add_dependencies(AstraAndroid astra_jni ${SDK_DEPENDENT_TARGET})
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/build/outputs/aar/sensekit-android-release.aar DESTINATION aar/)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/build/outputs/aar/astra-android-release.aar DESTINATION aar/)

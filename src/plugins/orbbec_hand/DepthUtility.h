@@ -2,10 +2,10 @@
 #define DEPTHUTILITY_H
 
 #include <opencv2/imgproc/imgproc.hpp>
-#include <SenseKitUL/SenseKitUL.h>
+#include <AstraUL/AstraUL.h>
 #include "HandSettings.h"
 
-namespace sensekit { namespace plugins { namespace hand {
+namespace astra { namespace plugins { namespace hand {
 
     class DepthUtility
     {

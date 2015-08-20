@@ -2,18 +2,18 @@
 
 #include "pb_util.h"
 
-namespace sensekit { namespace serialization {
+namespace astra { namespace serialization {
 
-    ProtoFrameOutputStream::ProtoFrameOutputStream(ZeroCopyOutputStream* outputStream): 
+    ProtoFrameOutputStream::ProtoFrameOutputStream(ZeroCopyOutputStream* outputStream):
         FrameOutputStream(),
             m_outputStream(outputStream)
     {
-            
+
     }
 
     ProtoFrameOutputStream::~ProtoFrameOutputStream()
     {
-            
+
     }
 
     void ProtoFrameOutputStream::stage_frame(Frame& frame)
@@ -22,7 +22,7 @@ namespace sensekit { namespace serialization {
         populate_frame_message(frame.byteLength, frame.frameIndex, frame.rawFrameWrapper, frameMessage);
 
         m_frameMessage = frameMessage;
-           
+
     }
 
     void ProtoFrameOutputStream::stage_frame_description(FrameDescription& frameDesc)

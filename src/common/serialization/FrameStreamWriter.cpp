@@ -1,7 +1,7 @@
 #include <common/serialization/FrameStreamWriter.h>
 #include "ProtoFrameOutputStream.h"
 
-namespace sensekit { namespace serialization {
+namespace astra { namespace serialization {
 
     FrameOutputStream* open_frame_output_stream(FILE* file)
     {
@@ -25,7 +25,7 @@ namespace sensekit { namespace serialization {
 
     FrameStreamWriter::~FrameStreamWriter()
     {
-            
+
     }
 
     bool FrameStreamWriter::begin_write()
@@ -66,12 +66,12 @@ namespace sensekit { namespace serialization {
 
         m_swatch.stop(m_swatchName);
 
-        sensekit_imageframe_t imageFrame = depthFrame.handle();
-        sensekit_frame_t* sensekitFrame = imageFrame->frame;
+        astra_imageframe_t imageFrame = depthFrame.handle();
+        astra_frame_t* astraFrame = imageFrame->frame;
 
-        stage_frame(*sensekitFrame);
-        stage_frame_description(*sensekitFrame, 1 / m_swatch.get_time_so_far(m_swatchName));
-            
+        stage_frame(*astraFrame);
+        stage_frame_description(*astraFrame, 1 / m_swatch.get_time_so_far(m_swatchName));
+
         isSuccessful = m_outputStream.write_frame_description();
         isSuccessful = m_outputStream.write_frame();
 
@@ -80,31 +80,31 @@ namespace sensekit { namespace serialization {
         return isSuccessful;
     }
 
-    void FrameStreamWriter::stage_frame(sensekit_frame_t& sensekitFrame)
+    void FrameStreamWriter::stage_frame(astra_frame_t& astraFrame)
     {
         Frame frame;
-        populate_frame(sensekitFrame, frame);
+        populate_frame(astraFrame, frame);
         m_outputStream.stage_frame(frame);
     }
 
-    void FrameStreamWriter::stage_frame_description(sensekit_frame_t& sensekitFrame, double fps)
+    void FrameStreamWriter::stage_frame_description(astra_frame_t& astraFrame, double fps)
     {
         FrameDescription frameDesc;
-        populate_frame_description(sensekitFrame, frameDesc, fps);
+        populate_frame_description(astraFrame, frameDesc, fps);
         m_outputStream.stage_frame_description(frameDesc);
     }
 
-    void FrameStreamWriter::populate_frame(sensekit_frame_t& sensekitFrame, Frame& frame)
+    void FrameStreamWriter::populate_frame(astra_frame_t& astraFrame, Frame& frame)
     {
 
-        frame.frameIndex = sensekitFrame.frameIndex;
-        frame.byteLength = sensekitFrame.byteLength;
-        frame.rawFrameWrapper = sensekitFrame.data;
+        frame.frameIndex = astraFrame.frameIndex;
+        frame.byteLength = astraFrame.byteLength;
+        frame.rawFrameWrapper = astraFrame.data;
     }
 
-    void FrameStreamWriter::populate_frame_description(sensekit_frame_t& sensekitFrame, FrameDescription& frameDescription, double fps)
+    void FrameStreamWriter::populate_frame_description(astra_frame_t& astraFrame, FrameDescription& frameDescription, double fps)
     {
-        frameDescription.bufferLength = sensekitFrame.byteLength;
+        frameDescription.bufferLength = astraFrame.byteLength;
         frameDescription.framePeriod = fps;
     }
 }}

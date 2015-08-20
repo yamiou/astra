@@ -12,7 +12,7 @@ By the end of this tutorial you should be familiar with:
 - The purpose of the ``FrameReadyListener`` class
 - How to define a ``FrameReadyListener``
 - Using a ``FrameReadyListener`` to process a depth stream
-  
+
 Before We Begin
 ===============
 #. Download and decompress the latest |sdkname| SDK, if you haven't already.
@@ -22,25 +22,25 @@ Before We Begin
 .. code-block:: c++
    :linenos:
 
-   #include <Sensekit\SenseKit.h>
-   #include <SensekitUL\SenseKitUL.h>
-  
+   #include <Astra\Astra.h>
+   #include <AstraUL\AstraUL.h>
+
    #include <cstdio>
    #include <iostream>
- 
+
    int main(int argc, char** arvg)
    {
-      sensekit::SenseKit::initialize();
-  
-      sensekit::Sensor sensor;
-      sensekit::StreamReader reader = sensor.create_reader();
-  
-      reader.stream<sensekit::DepthStream>().start();
-  
+      astra::Astra::initialize();
+
+      astra::Sensor sensor;
+      astra::StreamReader reader = sensor.create_reader();
+
+      reader.stream<astra::DepthStream>().start();
+
       // Your code will go here
-  
-      sensekit::SenseKit::terminate();
-  
+
+      astra::Astra::terminate();
+
       return 0;
    }
 - Line 9 - Initializes |sdkname|
@@ -63,64 +63,64 @@ In order to use a ``FrameReadyListener`` with our example...
    :linenos:
    :lineno-start: 7
 
-   class DepthFrameListener : public sensekit::FrameReadyListener
+   class DepthFrameListener : public astra::FrameReadyListener
    {
    public:
       DepthFrameListener(int maxFramesToProcess) :
           m_maxFramesToProcess(maxFramesToProcess)
       {
-         
+
       }
-  
+
       bool is_finished()
       {
           return m_isFinished;
       }
-  
+
    private:
-      virtual void on_frame_ready(sensekit::StreamReader& reader,
-                                  sensekit::Frame& frame) override
+      virtual void on_frame_ready(astra::StreamReader& reader,
+                                  astra::Frame& frame) override
       {
-          sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
-  
+          astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
+
           if (depthFrame.is_valid())
           {
               print_depth_frame(depthFrame);
               ++m_framesProcessed;
           }
-  
+
           if (m_framesProcessed >= m_maxFramesToProcess)
           {
               m_isFinished = true;
           }
       }
-  
-      void print_depth_frame(sensekit::DepthFrame& depthFrame)
+
+      void print_depth_frame(astra::DepthFrame& depthFrame)
       {
           int frameIndex = depthFrame.frameIndex();
           short middleValue = get_middle_value(depthFrame);
-  
+
          std::printf("Depth frameIndex: %d value: %d \n", frameIndex, middleValue);
       }
-  
-      int16_t get_middle_value(sensekit::DepthFrame& depthFrame)
+
+      int16_t get_middle_value(astra::DepthFrame& depthFrame)
       {
           int width = depthFrame.resolutionX();
           int height = depthFrame.resolutionY();
-  
+
           size_t middleIndex = ((width * (height / 2.0f)) + (width / 2.0f));
-         
+
           const int16_t* frameData = depthFrame.data();
           int16_t middleValue = frameData[middleIndex];
-  
+
           return middleValue;
       }
-  
+
       bool m_isFinished{false};
       int m_framesProcessed{0};
       int m_maxFramesToProcess{0};
    };
- 
+
    int main(int argc, char** argv)
    {
 - Line 10 - Constructor parameter specifies the total number of frames we're going to process before exiting our loop
@@ -129,7 +129,7 @@ In order to use a ``FrameReadyListener`` with our example...
 - Line 27 - Check to verify that we received a valid frame
 - Line 29 - Prints depth frame information to the console
 - Line 52 - Calculates the index of the middle pixel in our depth frame's data
-- Line 55 - Gets the value of the middle depth frame pixel 
+- Line 55 - Gets the value of the middle depth frame pixel
 
 .. note::
 
@@ -144,34 +144,34 @@ In order to use a ``FrameReadyListener`` with our example...
 
    int main(int argc, char** arvg)
    {
-      sensekit::SenseKit::initialize();
- 
-      sensekit::Sensor sensor;
-      sensekit::StreamReader reader = sensor.create_reader();
- 
-      reader.stream<sensekit::DepthStream>().start();
- 
+      astra::Astra::initialize();
+
+      astra::Sensor sensor;
+      astra::StreamReader reader = sensor.create_reader();
+
+      reader.stream<astra::DepthStream>().start();
+
       int maxFramesToProcess = 100;
       DepthFrameListener listener(maxFramesToProcess);
-    
+
       reader.addListener(listener);
- 
+
       // More of your code will go here
- 
+
       reader.removeListener(listener);
- 
-      sensekit::SenseKit::terminate();
- 
+
+      astra::Astra::terminate();
+
       return 0;
    }
 - Line 75 - Constructs a ``DepthFrameListener`` that will loop 100 times
 - Line 77 - Adds the listener to our reader
 - Line 81 - Removes the listener from our reader
-  
+
 Updating the Listeners
 ======================
 
-We've got |sdkname| and the ``Sensor`` running, and we're listening to depth frames as they stream in through the ``Sensor``'s ``StreamReader``. We don't know when frames are going to arrive from our Astra, so we need to continuously update those listeners by calling ``sensekit_temp_update`` in a loop.
+We've got |sdkname| and the ``Sensor`` running, and we're listening to depth frames as they stream in through the ``Sensor``'s ``StreamReader``. We don't know when frames are going to arrive from our Astra, so we need to continuously update those listeners by calling ``astra_temp_update`` in a loop.
 
 .. code-block:: c++
    :linenos:
@@ -180,27 +180,27 @@ We've got |sdkname| and the ``Sensor`` running, and we're listening to depth fra
 
    int main(int argc, char** arvg)
    {
-      sensekit::SenseKit::initialize();
- 
-      sensekit::Sensor sensor;
-      sensekit::StreamReader reader = sensor.create_reader();
- 
-      reader.stream<sensekit::DepthStream>().start();
- 
+      astra::Astra::initialize();
+
+      astra::Sensor sensor;
+      astra::StreamReader reader = sensor.create_reader();
+
+      reader.stream<astra::DepthStream>().start();
+
       int maxFramesToProcess = 100;
       DepthFrameListener listener(maxFramesToProcess);
-  
+
       reader.addListener(listener);
- 
+
       do
       {
-         sensekit_temp_update();
+         astra_temp_update();
       } while (!listener.is_finished());
- 
+
       reader.removeListener(listener);
- 
-      sensekit::SenseKit::terminate();
- 
+
+      astra::Astra::terminate();
+
       return 0;
    }
 - Line 79-82 - The |sdkname| update loop.

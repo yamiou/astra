@@ -1,13 +1,13 @@
 #ifndef ONIDEVICESTREAM_H
 #define ONIDEVICESTREAM_H
 
-#include <SenseKit/SenseKit.h>
-#include <SenseKit/Plugins/plugin_capi.h>
-#include <SenseKit/Plugins/Stream.h>
-#include <SenseKit/Plugins/StreamBin.h>
-#include <SenseKitUL/streams/image_parameters.h>
+#include <Astra/Astra.h>
+#include <Astra/Plugins/plugin_capi.h>
+#include <Astra/Plugins/Stream.h>
+#include <Astra/Plugins/StreamBin.h>
+#include <AstraUL/streams/image_parameters.h>
 #include <OpenNI.h>
-#include <SenseKitUL/streams/image_types.h>
+#include <AstraUL/streams/image_types.h>
 #include <memory>
 #include <Shiny.h>
 #include <cstring>
@@ -22,13 +22,13 @@
 #define MAX(a,b) (((a)>(b))?(a):(b))
 #endif
 
-namespace sensekit { namespace plugins {
+namespace astra { namespace plugins {
 
     class OniDeviceStreamBase : public Stream
     {
     public:
         OniDeviceStreamBase(PluginServiceProxy& pluginService,
-                            sensekit_streamset_t streamSet,
+                            astra_streamset_t streamSet,
                             StreamDescription desc)
             : Stream(pluginService,
                      streamSet,
@@ -37,12 +37,12 @@ namespace sensekit { namespace plugins {
             PROFILE_FUNC();
         }
 
-        virtual sensekit_status_t read_frame() = 0;
-        virtual sensekit_status_t open() = 0;
-        virtual sensekit_status_t close() = 0;
+        virtual astra_status_t read_frame() = 0;
+        virtual astra_status_t open() = 0;
+        virtual astra_status_t close() = 0;
         virtual openni::VideoStream* get_oni_stream() = 0;
-        virtual sensekit_status_t start() = 0;
-        virtual sensekit_status_t stop() = 0;
+        virtual astra_status_t start() = 0;
+        virtual astra_status_t stop() = 0;
     };
 
     template<typename TFrameWrapper, typename TBufferBlockType>
@@ -53,7 +53,7 @@ namespace sensekit { namespace plugins {
         using block_type = TBufferBlockType;
 
         OniDeviceStream(PluginServiceProxy& pluginService,
-                        sensekit_streamset_t streamSet,
+                        astra_streamset_t streamSet,
                         StreamDescription desc,
                         openni::Device& oniDevice,
                         openni::SensorType oniSensorType)
@@ -72,18 +72,18 @@ namespace sensekit { namespace plugins {
             close();
         }
 
-        virtual sensekit_status_t open() override final
+        virtual astra_status_t open() override final
         {
             PROFILE_FUNC();
             if (m_isOpen)
-                return SENSEKIT_STATUS_SUCCESS;
+                return ASTRA_STATUS_SUCCESS;
 
             SINFO("OniDeviceStream", "creating oni stream of type: %d", get_description().get_type());
             openni::Status rc = m_oniStream.create(m_oniDevice, m_oniSensorType);
 
             if (rc != openni::STATUS_OK)
             {
-                return SENSEKIT_STATUS_DEVICE_ERROR;
+                return ASTRA_STATUS_DEVICE_ERROR;
             }
 
             SINFO("OniDeviceStream", "created oni stream of type: %d", get_description().get_type());
@@ -99,7 +99,7 @@ namespace sensekit { namespace plugins {
 
                 if (std::get<0>(convert_format(oniMode.getPixelFormat())) != 0)
                 {
-                    sensekit_imagestream_mode_t mode = convert_mode(oniMode);
+                    astra_imagestream_mode_t mode = convert_mode(oniMode);
                     mode.id = i+1;
                     m_modes.push_back(mode);
                 }
@@ -136,14 +136,14 @@ namespace sensekit { namespace plugins {
             m_isOpen = true;
 
             enable_callbacks();
-            return SENSEKIT_STATUS_SUCCESS;
+            return ASTRA_STATUS_SUCCESS;
         }
 
-        virtual sensekit_status_t close() override final
+        virtual astra_status_t close() override final
         {
             PROFILE_FUNC();
             if (!m_isOpen)
-                return SENSEKIT_STATUS_SUCCESS;
+                return ASTRA_STATUS_SUCCESS;
 
             stop();
 
@@ -154,14 +154,14 @@ namespace sensekit { namespace plugins {
 
             m_isOpen = m_isStreaming = false;
 
-            return SENSEKIT_STATUS_SUCCESS;
+            return ASTRA_STATUS_SUCCESS;
         }
 
-        virtual sensekit_status_t start() override final
+        virtual astra_status_t start() override final
         {
             PROFILE_FUNC();
             if (!m_isOpen || m_isStreaming)
-                return SENSEKIT_STATUS_SUCCESS;
+                return ASTRA_STATUS_SUCCESS;
 
             SINFO("OniDeviceStream", "starting oni stream of type: %d", get_description().get_type());
             m_oniStream.start();
@@ -169,14 +169,14 @@ namespace sensekit { namespace plugins {
 
             m_isStreaming = true;
 
-            return SENSEKIT_STATUS_SUCCESS;
+            return ASTRA_STATUS_SUCCESS;
         }
 
-        virtual sensekit_status_t stop() override final
+        virtual astra_status_t stop() override final
         {
             PROFILE_FUNC();
             if (!m_isOpen || !m_isStreaming)
-                return SENSEKIT_STATUS_SUCCESS;
+                return ASTRA_STATUS_SUCCESS;
 
             SINFO("OniDeviceStream", "stopping oni stream of type: %d", get_description().get_type());
             m_oniStream.stop();
@@ -184,58 +184,58 @@ namespace sensekit { namespace plugins {
 
             m_isStreaming = false;
 
-            return SENSEKIT_STATUS_SUCCESS;
+            return ASTRA_STATUS_SUCCESS;
         }
 
         inline bool is_streaming() const { return m_isOpen && m_isStreaming; }
 
-        virtual void on_get_parameter(sensekit_streamconnection_t connection,
-                                      sensekit_parameter_id id,
-                                      sensekit_parameter_bin_t& parameterBin) override
+        virtual void on_get_parameter(astra_streamconnection_t connection,
+                                      astra_parameter_id id,
+                                      astra_parameter_bin_t& parameterBin) override
         {
             PROFILE_FUNC();
 
             switch (id)
             {
-            case SENSEKIT_PARAMETER_IMAGE_HFOV:
+            case ASTRA_PARAMETER_IMAGE_HFOV:
             {
                 size_t resultByteLength = sizeof(float);
 
-                sensekit_parameter_data_t parameterData;
-                sensekit_status_t rc = get_pluginService().get_parameter_bin(resultByteLength,
+                astra_parameter_data_t parameterData;
+                astra_status_t rc = get_pluginService().get_parameter_bin(resultByteLength,
                                                                              &parameterBin,
                                                                              &parameterData);
-                if (rc == SENSEKIT_STATUS_SUCCESS)
+                if (rc == ASTRA_STATUS_SUCCESS)
                 {
                     float* hFov = reinterpret_cast<float*>(parameterData);
                     *hFov = m_oniStream.getHorizontalFieldOfView();
                 }
                 break;
             }
-            case SENSEKIT_PARAMETER_IMAGE_VFOV:
+            case ASTRA_PARAMETER_IMAGE_VFOV:
             {
                 size_t resultByteLength = sizeof(float);
 
-                sensekit_parameter_data_t parameterData;
-                sensekit_status_t rc = get_pluginService().get_parameter_bin(resultByteLength,
+                astra_parameter_data_t parameterData;
+                astra_status_t rc = get_pluginService().get_parameter_bin(resultByteLength,
                                                                              &parameterBin,
                                                                              &parameterData);
-                if (rc == SENSEKIT_STATUS_SUCCESS)
+                if (rc == ASTRA_STATUS_SUCCESS)
                 {
                     float* vFov = reinterpret_cast<float*>(parameterData);
                     *vFov = m_oniStream.getVerticalFieldOfView();
                 }
                 break;
             }
-            case SENSEKIT_PARAMETER_IMAGE_MIRRORING:
+            case ASTRA_PARAMETER_IMAGE_MIRRORING:
             {
                 size_t resultByteLength = sizeof(bool);
 
-                sensekit_parameter_data_t parameterData;
-                sensekit_status_t rc = get_pluginService().get_parameter_bin(resultByteLength,
+                astra_parameter_data_t parameterData;
+                astra_status_t rc = get_pluginService().get_parameter_bin(resultByteLength,
                                                                              &parameterBin,
                                                                              &parameterData);
-                if (rc == SENSEKIT_STATUS_SUCCESS)
+                if (rc == ASTRA_STATUS_SUCCESS)
                 {
                     bool mirroring = m_oniStream.getMirroringEnabled();
                     *reinterpret_cast<bool*>(parameterData) = mirroring;
@@ -243,18 +243,18 @@ namespace sensekit { namespace plugins {
 
                 break;
             }
-            case SENSEKIT_PARAMETER_IMAGE_MODES:
+            case ASTRA_PARAMETER_IMAGE_MODES:
             {
-                std::size_t resultSize = sizeof(sensekit_imagestream_mode_t) * m_modes.size();
+                std::size_t resultSize = sizeof(astra_imagestream_mode_t) * m_modes.size();
 
-                sensekit_parameter_data_t parameterData;
-                sensekit_status_t rc = get_pluginService().get_parameter_bin(resultSize,
+                astra_parameter_data_t parameterData;
+                astra_status_t rc = get_pluginService().get_parameter_bin(resultSize,
                                                                              &parameterBin,
                                                                              &parameterData);
 
-                sensekit_imagestream_mode_t* result = static_cast<sensekit_imagestream_mode_t*>(parameterData);
+                astra_imagestream_mode_t* result = static_cast<astra_imagestream_mode_t*>(parameterData);
 
-                if (rc == SENSEKIT_STATUS_SUCCESS)
+                if (rc == ASTRA_STATUS_SUCCESS)
                 {
                     for(int i = 0; i < m_modes.size(); i++)
                     {
@@ -267,21 +267,21 @@ namespace sensekit { namespace plugins {
             }
         }
 
-        void on_set_parameter(sensekit_streamconnection_t connection,
-                              sensekit_parameter_id id,
+        void on_set_parameter(astra_streamconnection_t connection,
+                              astra_parameter_id id,
                               size_t inByteLength,
-                              sensekit_parameter_data_t inData) override
+                              astra_parameter_data_t inData) override
         {
             switch (id)
             {
-            case SENSEKIT_PARAMETER_IMAGE_MIRRORING:
+            case ASTRA_PARAMETER_IMAGE_MIRRORING:
             {
                 bool enable = *static_cast<bool*>(inData);
                 m_oniStream.setMirroringEnabled(enable);
                 break;
             }
-            case SENSEKIT_PARAMETER_IMAGE_MODE:
-                sensekit_imagestream_mode_t* mode = static_cast<sensekit_imagestream_mode_t*>(inData);
+            case ASTRA_PARAMETER_IMAGE_MODE:
+                astra_imagestream_mode_t* mode = static_cast<astra_imagestream_mode_t*>(inData);
                 auto oniMode = convert_mode(*mode);
                 auto rc = m_oniStream.setVideoMode(oniMode);
 
@@ -309,20 +309,20 @@ namespace sensekit { namespace plugins {
             md.bytesPerPixel = m_mode.bytesPerPixel;
         }
 
-        virtual sensekit_status_t read_frame() override;
+        virtual astra_status_t read_frame() override;
 
         virtual openni::VideoStream* get_oni_stream() override { return &m_oniStream; }
 
-        virtual void on_connection_added(sensekit_streamconnection_t connection) override;
-        virtual void on_connection_removed(sensekit_bin_t bin,
-                                           sensekit_streamconnection_t connection) override;
+        virtual void on_connection_added(astra_streamconnection_t connection) override;
+        virtual void on_connection_removed(astra_bin_t bin,
+                                           astra_streamconnection_t connection) override;
 
     protected:
         openni::Device& m_oniDevice;
         openni::SensorType m_oniSensorType;
         openni::VideoStream m_oniStream;
         openni::VideoMode m_oniVideoMode;
-        sensekit_imagestream_mode_t m_mode;
+        astra_imagestream_mode_t m_mode;
 
     private:
         virtual void on_open() {}
@@ -336,15 +336,15 @@ namespace sensekit { namespace plugins {
 
         size_t m_bufferLength{0};
 
-        sensekit_stream_t m_streamHandle{nullptr};
-        sensekit_frame_index_t m_frameIndex{0};
+        astra_stream_t m_streamHandle{nullptr};
+        astra_frame_index_t m_frameIndex{0};
 
-        std::vector<sensekit_imagestream_mode_t> m_modes;
+        std::vector<astra_imagestream_mode_t> m_modes;
     };
 
     template<typename TFrameWrapper, typename TBufferBlockType>
     void OniDeviceStream<TFrameWrapper,
-                         TBufferBlockType>::on_connection_added(sensekit_streamconnection_t connection)
+                         TBufferBlockType>::on_connection_added(astra_streamconnection_t connection)
     {
         PROFILE_FUNC();
         assert(m_bin != nullptr);
@@ -353,8 +353,8 @@ namespace sensekit { namespace plugins {
 
     template<typename TFrameWrapper, typename TBufferBlockType>
     void OniDeviceStream<TFrameWrapper,
-                         TBufferBlockType>::on_connection_removed(sensekit_bin_t bin,
-                                                                  sensekit_streamconnection_t connection)
+                         TBufferBlockType>::on_connection_removed(astra_bin_t bin,
+                                                                  astra_streamconnection_t connection)
     {
         PROFILE_FUNC();
         m_bin->unlink_connection(connection);
@@ -366,10 +366,10 @@ namespace sensekit { namespace plugins {
     }
 
     template<typename TFrameWrapper, typename TBufferBlockType>
-    sensekit_status_t OniDeviceStream<TFrameWrapper, TBufferBlockType>::read_frame()
+    astra_status_t OniDeviceStream<TFrameWrapper, TBufferBlockType>::read_frame()
     {
         PROFILE_FUNC();
-        if (!is_streaming()) return SENSEKIT_STATUS_SUCCESS;
+        if (!is_streaming()) return ASTRA_STATUS_SUCCESS;
 
         openni::VideoFrameRef ref;
         PROFILE_BEGIN(oni_stream_readFrame);
@@ -398,7 +398,7 @@ namespace sensekit { namespace plugins {
             ++m_frameIndex;
         }
 
-        return SENSEKIT_STATUS_SUCCESS;
+        return ASTRA_STATUS_SUCCESS;
     }
 }}
 

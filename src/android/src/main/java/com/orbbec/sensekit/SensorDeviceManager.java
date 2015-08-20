@@ -1,4 +1,4 @@
-package com.orbbec.sensekit;
+package com.orbbec.astra;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -62,11 +62,11 @@ public class SensorDeviceManager {
 
         knownDeviceTypes = getKnownDeviceTypes();
 
-        IntentFilter filter = new IntentFilter(SenseKitDeviceMonitorActivity.ACTION_USB_DEVICE_ATTACHED);
+        IntentFilter filter = new IntentFilter(AstraDeviceMonitorActivity.ACTION_USB_DEVICE_ATTACHED);
         androidContext.registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (!intent.getAction().equals(SenseKitDeviceMonitorActivity.ACTION_USB_DEVICE_ATTACHED))
+                if (!intent.getAction().equals(AstraDeviceMonitorActivity.ACTION_USB_DEVICE_ATTACHED))
                     return;
 
                 UsbDevice usbDevice = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);

@@ -3,7 +3,7 @@
 #include "Segmentation.h"
 #include <Shiny.h>
 
-namespace sensekit { namespace plugins { namespace hand {
+namespace astra { namespace plugins { namespace hand {
 
     PointProcessor::PointProcessor(PointProcessorSettings& settings) :
         m_settings(settings)
@@ -20,8 +20,8 @@ namespace sensekit { namespace plugins { namespace hand {
     {
         PROFILE_FUNC();
 
-        const sensekit::Vector3f* fullSizeWorldPoints = matrices.fullSizeWorldPoints;
-        sensekit::Vector3f* worldPoints = matrices.worldPoints;
+        const astra::Vector3f* fullSizeWorldPoints = matrices.fullSizeWorldPoints;
+        astra::Vector3f* worldPoints = matrices.worldPoints;
         auto depthToWorldData = matrices.depthToWorldData;
         cv::Mat& areaMatrix = matrices.area;
         cv::Mat& areaSqrtMatrix = matrices.areaSqrt;

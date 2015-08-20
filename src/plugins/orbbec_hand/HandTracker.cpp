@@ -5,17 +5,17 @@
 
 #include "HandTracker.h"
 #include "Segmentation.h"
-#include <SenseKitUL/streams/hand_types.h>
-#include <SenseKitUL/skul_ctypes.h>
-#include <SenseKit/Plugins/PluginKit.h>
+#include <AstraUL/streams/hand_types.h>
+#include <AstraUL/skul_ctypes.h>
+#include <Astra/Plugins/PluginKit.h>
 #include <Shiny.h>
 
-namespace sensekit { namespace plugins { namespace hand {
+namespace astra { namespace plugins { namespace hand {
 
         using namespace std;
 
         HandTracker::HandTracker(PluginServiceProxy& pluginService,
-                                 sensekit_streamset_t streamSet,
+                                 astra_streamset_t streamSet,
                                  StreamDescription& depthDesc,
                                  HandSettings& settings) :
             m_sensor(get_uri_for_streamset(pluginService, streamSet)),
@@ -48,11 +48,11 @@ namespace sensekit { namespace plugins { namespace hand {
             }
         }
 
-        void HandTracker::create_streams(PluginServiceProxy& pluginService, sensekit_streamset_t streamSet)
+        void HandTracker::create_streams(PluginServiceProxy& pluginService, astra_streamset_t streamSet)
         {
             PROFILE_FUNC();
             SINFO("HandTracker", "creating hand streams");
-            m_handStream = make_unique<HandStream>(pluginService, streamSet, SENSEKIT_HANDS_MAX_HAND_COUNT);
+            m_handStream = make_unique<HandStream>(pluginService, streamSet, ASTRA_HANDS_MAX_HAND_COUNT);
 
             const int bytesPerPixel = 3;
 
@@ -95,7 +95,7 @@ namespace sensekit { namespace plugins { namespace hand {
             track_points(m_matDepth, m_matDepthFullSize, m_matVelocitySignal, pointFrame.data());
 
             //use same frameIndex as source depth frame
-            sensekit_frame_index_t frameIndex = depthFrame.frameIndex();
+            astra_frame_index_t frameIndex = depthFrame.frameIndex();
 
             if (m_handStream->has_connections())
             {
@@ -147,7 +147,7 @@ namespace sensekit { namespace plugins { namespace hand {
                 }
 
                 m_numWorldPoints = numPoints;
-                m_worldPoints = new sensekit::Vector3f[numPoints];
+                m_worldPoints = new astra::Vector3f[numPoints];
             }
 
             const conversion_cache_t depthToWorldData = m_depthStream.depth_to_world_data();
@@ -351,16 +351,16 @@ namespace sensekit { namespace plugins { namespace hand {
             return cv::Point(x, y);
         }
 
-        void HandTracker::generate_hand_frame(sensekit_frame_index_t frameIndex)
+        void HandTracker::generate_hand_frame(astra_frame_index_t frameIndex)
         {
             PROFILE_FUNC();
 
-            sensekit_handframe_wrapper_t* handFrame = m_handStream->begin_write(frameIndex);
+            astra_handframe_wrapper_t* handFrame = m_handStream->begin_write(frameIndex);
 
             if (handFrame != nullptr)
             {
-                handFrame->frame.handpoints = reinterpret_cast<sensekit_handpoint_t*>(&(handFrame->frame_data));
-                handFrame->frame.handCount = SENSEKIT_HANDS_MAX_HAND_COUNT;
+                handFrame->frame.handpoints = reinterpret_cast<astra_handpoint_t*>(&(handFrame->frame_data));
+                handFrame->frame.handCount = ASTRA_HANDS_MAX_HAND_COUNT;
 
                 update_hand_frame(m_pointProcessor.get_trackedPoints(), handFrame->frame);
 
@@ -370,16 +370,16 @@ namespace sensekit { namespace plugins { namespace hand {
             }
         }
 
-        void HandTracker::generate_hand_debug_image_frame(sensekit_frame_index_t frameIndex)
+        void HandTracker::generate_hand_debug_image_frame(astra_frame_index_t frameIndex)
         {
             PROFILE_FUNC();
-            sensekit_imageframe_wrapper_t* debugImageFrame = m_debugImageStream->begin_write(frameIndex);
+            astra_imageframe_wrapper_t* debugImageFrame = m_debugImageStream->begin_write(frameIndex);
 
             if (debugImageFrame != nullptr)
             {
                 debugImageFrame->frame.data = reinterpret_cast<uint8_t *>(&(debugImageFrame->frame_data));
 
-                sensekit_image_metadata_t metadata;
+                astra_image_metadata_t metadata;
 
                 metadata.width = m_processingSizeWidth;
                 metadata.height = m_processingSizeHeight;
@@ -392,7 +392,7 @@ namespace sensekit { namespace plugins { namespace hand {
             }
         }
 
-        void HandTracker::update_hand_frame(vector<TrackedPoint>& internalTrackedPoints, _sensekit_handframe& frame)
+        void HandTracker::update_hand_frame(vector<TrackedPoint>& internalTrackedPoints, _astra_handframe& frame)
         {
             PROFILE_FUNC();
             int handIndex = 0;
@@ -413,7 +413,7 @@ namespace sensekit { namespace plugins { namespace hand {
                                      (pointType == CandidatePoint && includeCandidates);
                 if (includeByStatus && includeByType && handIndex < maxHandCount)
                 {
-                    sensekit_handpoint_t& point = frame.handpoints[handIndex];
+                    astra_handpoint_t& point = frame.handpoints[handIndex];
                     ++handIndex;
 
                     point.trackingId = internalPoint.trackingId;
@@ -429,12 +429,12 @@ namespace sensekit { namespace plugins { namespace hand {
             }
             for (int i = handIndex; i < maxHandCount; ++i)
             {
-                sensekit_handpoint_t& point = frame.handpoints[i];
+                astra_handpoint_t& point = frame.handpoints[i];
                 reset_hand_point(point);
             }
         }
 
-        void HandTracker::copy_position(cv::Point3f& source, sensekit_vector3f_t& target)
+        void HandTracker::copy_position(cv::Point3f& source, astra_vector3f_t& target)
         {
             PROFILE_FUNC();
             target.x = source.x;
@@ -442,7 +442,7 @@ namespace sensekit { namespace plugins { namespace hand {
             target.z = source.z;
         }
 
-        sensekit_handstatus_t HandTracker::convert_hand_status(TrackingStatus status, TrackedPointType type)
+        astra_handstatus_t HandTracker::convert_hand_status(TrackingStatus status, TrackedPointType type)
         {
             PROFILE_FUNC();
             if (type == TrackedPointType::CandidatePoint)
@@ -465,19 +465,19 @@ namespace sensekit { namespace plugins { namespace hand {
             }
         }
 
-        void HandTracker::reset_hand_point(sensekit_handpoint_t& point)
+        void HandTracker::reset_hand_point(astra_handpoint_t& point)
         {
             PROFILE_FUNC();
             point.trackingId = -1;
             point.status = HAND_STATUS_NOTTRACKING;
-            point.depthPosition = sensekit_vector2i_t();
-            point.worldPosition = sensekit_vector3f_t();
-            point.worldDeltaPosition = sensekit_vector3f_t();
+            point.depthPosition = astra_vector2i_t();
+            point.worldPosition = astra_vector3f_t();
+            point.worldDeltaPosition = astra_vector3f_t();
         }
 
-        void mark_image_pixel(_sensekit_imageframe& imageFrame,
+        void mark_image_pixel(_astra_imageframe& imageFrame,
                               RGBPixel color,
-                              sensekit::Vector2i p)
+                              astra::Vector2i p)
         {
             PROFILE_FUNC();
             RGBPixel* colorData = static_cast<RGBPixel*>(imageFrame.data);
@@ -485,7 +485,7 @@ namespace sensekit { namespace plugins { namespace hand {
             colorData[index] = color;
         }
 
-        void HandTracker::overlay_circle(_sensekit_imageframe& imageFrame)
+        void HandTracker::overlay_circle(_astra_imageframe& imageFrame)
         {
             PROFILE_FUNC();
 
@@ -500,7 +500,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
             cv::Point probePosition = get_mouse_probe_position();
 
-            std::vector<sensekit::Vector2i> points;
+            std::vector<astra::Vector2i> points;
 
             segmentation::get_circumference_points(m_matDepth, probePosition, foregroundRadius1, mapper, points);
 
@@ -522,7 +522,7 @@ namespace sensekit { namespace plugins { namespace hand {
             mark_image_pixel(imageFrame, spawnColor, Vector2i(spawnPosition.x, spawnPosition.y));
         }
 
-        void HandTracker::update_debug_image_frame(_sensekit_imageframe& colorFrame)
+        void HandTracker::update_debug_image_frame(_astra_imageframe& colorFrame)
         {
             PROFILE_FUNC();
             float m_maxVelocity = 0.1;

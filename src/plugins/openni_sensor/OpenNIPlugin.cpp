@@ -1,14 +1,14 @@
 ﻿#include "OpenNIPlugin.h"
-#include <SenseKitUL/skul_ctypes.h>
+#include <AstraUL/skul_ctypes.h>
 #include "OniDepthStream.h"
 #include "OniColorStream.h"
 #include <Shiny.h>
 #include <cstdio>
 #include <sstream>
 
-EXPORT_PLUGIN(sensekit::plugins::OpenNIPlugin)
+EXPORT_PLUGIN(astra::plugins::OpenNIPlugin)
 
-namespace sensekit
+namespace astra
 {
     namespace plugins
     {
@@ -46,13 +46,13 @@ namespace sensekit
             }
         }
 
-        void OpenNIPlugin::on_host_event(sensekit_event_id id, const void* data, size_t dataSize)
+        void OpenNIPlugin::on_host_event(astra_event_id id, const void* data, size_t dataSize)
         {
             PROFILE_FUNC();
 #ifdef __ANDROID__
             switch (id)
             {
-            case SENSEKIT_EVENT_RESOURCE_AVAILABLE:
+            case ASTRA_EVENT_RESOURCE_AVAILABLE:
                 const char* resourceUri = static_cast<const char*>(data);
 
                 SINFO("OpenNIPlugin", "resource uri received: %s", resourceUri);
@@ -170,7 +170,7 @@ namespace sensekit
             PROFILE_UPDATE();
         }
 
-        sensekit_status_t OpenNIPlugin::read_streams()
+        astra_status_t OpenNIPlugin::read_streams()
         {
             PROFILE_FUNC();
             for(auto& set : m_sets)
@@ -178,7 +178,7 @@ namespace sensekit
                 set->read();
             }
 
-            return SENSEKIT_STATUS_SUCCESS;
+            return ASTRA_STATUS_SUCCESS;
         }
     }
 }

@@ -1,27 +1,27 @@
 #ifndef STYLIZEDDEPTHSTREAM_H
 #define STYLIZEDDEPTHSTREAM_H
 
-#include <SenseKit/Plugins/PluginKit.h>
-#include <SenseKit/sensekit_types.h>
-#include <SenseKit/Plugins/plugin_capi.h>
-#include <SenseKitUL/skul_ctypes.h>
-#include <SenseKitUL/Plugins/stream_types.h>
-#include <SenseKitUL/streams/Depth.h>
+#include <Astra/Plugins/PluginKit.h>
+#include <Astra/astra_types.h>
+#include <Astra/Plugins/plugin_capi.h>
+#include <AstraUL/skul_ctypes.h>
+#include <AstraUL/Plugins/stream_types.h>
+#include <AstraUL/streams/Depth.h>
 
-namespace sensekit { namespace plugins { namespace depth {
+namespace astra { namespace plugins { namespace depth {
 
     class StylizedDepthStream
-        : public SingleBinStream<sensekit_imageframe_wrapper_t, uint8_t>,
-          public sensekit::FrameReadyListener
+        : public SingleBinStream<astra_imageframe_wrapper_t, uint8_t>,
+          public astra::FrameReadyListener
     {
     public:
 
         StylizedDepthStream(PluginServiceProxy& pluginService,
-                            sensekit_streamset_t streamSet,
-                            sensekit_stream_t sourceStream)
+                            astra_streamset_t streamSet,
+                            astra_stream_t sourceStream)
             : SingleBinStream(pluginService,
                               streamSet,
-                              StreamDescription(SENSEKIT_STREAM_STYLIZED_DEPTH,
+                              StreamDescription(ASTRA_STREAM_STYLIZED_DEPTH,
                                                 DEFAULT_SUBTYPE), 0),
               m_sourceStream(sourceStream)
         {
@@ -31,20 +31,20 @@ namespace sensekit { namespace plugins { namespace depth {
             m_sensor = Sensor(uri);
             m_reader = m_sensor.create_reader();
 
-            m_depthStream = m_reader.stream<sensekit::DepthStream>();
+            m_depthStream = m_reader.stream<astra::DepthStream>();
             m_depthStream.start();
 
             m_reader.addListener(*this);
         }
 
-        sensekit_stream_t get_source_stream() { return m_sourceStream; }
+        astra_stream_t get_source_stream() { return m_sourceStream; }
 
-        virtual void on_frame_ready(sensekit::StreamReader& reader, sensekit::Frame& frame) override
+        virtual void on_frame_ready(astra::StreamReader& reader, astra::Frame& frame) override
         {
 
         }
 
-        virtual void on_connection_added(sensekit_streamconnection_t connection) override
+        virtual void on_connection_added(astra_streamconnection_t connection) override
         {
             /*
               if !bin create default bin
@@ -52,27 +52,27 @@ namespace sensekit { namespace plugins { namespace depth {
             */
         }
 
-        virtual void on_connection_removed(sensekit_bin_t bin,
-                                           sensekit_streamconnection_t connection) override { }
+        virtual void on_connection_removed(astra_bin_t bin,
+                                           astra_streamconnection_t connection) override { }
 
-        virtual void on_set_parameter(sensekit_streamconnection_t connection,
-                                      sensekit_parameter_id id,
+        virtual void on_set_parameter(astra_streamconnection_t connection,
+                                      astra_parameter_id id,
                                       size_t inByteLength,
-                                      sensekit_parameter_data_t inData) override {}
+                                      astra_parameter_data_t inData) override {}
 
-        virtual void on_get_parameter(sensekit_streamconnection_t connection,
-                                      sensekit_parameter_id id,
-                                      sensekit_parameter_bin_t& parameterBin) override {}
+        virtual void on_get_parameter(astra_streamconnection_t connection,
+                                      astra_parameter_id id,
+                                      astra_parameter_bin_t& parameterBin) override {}
 
-        virtual void on_invoke(sensekit_streamconnection_t connection,
-                               sensekit_command_id commandId,
+        virtual void on_invoke(astra_streamconnection_t connection,
+                               astra_command_id commandId,
                                size_t inByteLength,
-                               sensekit_parameter_data_t inData,
-                               sensekit_parameter_bin_t& parameterBin) override {};
+                               astra_parameter_data_t inData,
+                               astra_parameter_bin_t& parameterBin) override {};
 
     private:
         DepthStream m_depthStream{nullptr};
-        sensekit_stream_t m_sourceStream{nullptr};
+        astra_stream_t m_sourceStream{nullptr};
         StreamReader m_reader;
         Sensor m_sensor;
     };

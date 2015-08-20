@@ -1,9 +1,9 @@
 #include <SFML/Graphics.hpp>
-#include <Sensekit/SenseKit.h>
-#include <SensekitUL/SenseKitUL.h>
+#include <Astra/Astra.h>
+#include <AstraUL/AstraUL.h>
 #include <iostream>
 
-class SkeletonFrameListener : public sensekit::FrameReadyListener
+class SkeletonFrameListener : public astra::FrameReadyListener
 {
 public:
     void init_texture(int width, int height)
@@ -37,9 +37,9 @@ public:
         printf("FPS: %3.1f (%3.4Lf ms)\n", fps, m_frameDuration * 1000);
     }
 
-    void processDepth(sensekit::Frame& frame)
+    void processDepth(astra::Frame& frame)
     {
-        sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
+        astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
 
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
@@ -67,9 +67,9 @@ public:
         m_texture.update(m_displayBuffer.get());
     }
 
-    void processSkeletons(sensekit::Frame& frame)
+    void processSkeletons(astra::Frame& frame)
     {
-        sensekit::SkeletonFrame skeletonFrame = frame.get<sensekit::SkeletonFrame>();
+        astra::SkeletonFrame skeletonFrame = frame.get<astra::SkeletonFrame>();
 
         m_skeletons = skeletonFrame.skeletons();
         m_jointPositions.clear();
@@ -86,13 +86,13 @@ public:
         }
     }
 
-    virtual void on_frame_ready(sensekit::StreamReader& reader,
-                                sensekit::Frame& frame) override
+    virtual void on_frame_ready(astra::StreamReader& reader,
+                                astra::Frame& frame) override
     {
         if (m_mapper == nullptr)
         {
-            auto& mapper = reader.stream<sensekit::DepthStream>().coordinateMapper();
-            m_mapper = std::make_unique<sensekit::CoordinateMapper>(mapper);
+            auto& mapper = reader.stream<astra::DepthStream>().coordinateMapper();
+            m_mapper = std::make_unique<astra::CoordinateMapper>(mapper);
         }
 
         processDepth(frame);
@@ -150,9 +150,9 @@ private:
     using BufferPtr = std::unique_ptr < uint8_t[] >;
     BufferPtr m_displayBuffer{ nullptr };
 
-    std::unique_ptr<sensekit::CoordinateMapper> m_mapper;
-    std::vector<sensekit::Skeleton> m_skeletons;
-    std::vector<sensekit::Vector3f> m_jointPositions;
+    std::unique_ptr<astra::CoordinateMapper> m_mapper;
+    std::vector<astra::Skeleton> m_skeletons;
+    std::vector<astra::Vector3f> m_jointPositions;
 
     int m_depthWidth{0};
     int m_depthHeight{0};
@@ -160,22 +160,22 @@ private:
 
 int main(int argc, char** argv)
 {
-    sensekit::SenseKit::initialize();
+    astra::Astra::initialize();
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Skeleton Viewer");
 
-    sensekit::Sensor sensor;
-    sensekit::StreamReader reader = sensor.create_reader();
+    astra::Sensor sensor;
+    astra::StreamReader reader = sensor.create_reader();
 
     SkeletonFrameListener listener;
 
-    reader.stream<sensekit::DepthStream>().start();
-    reader.stream<sensekit::SkeletonStream>().start();
+    reader.stream<astra::DepthStream>().start();
+    reader.stream<astra::SkeletonStream>().start();
     reader.addListener(listener);
 
     while (window.isOpen())
     {
-        sensekit_temp_update();
+        astra_temp_update();
 
         sf::Event event;
         while (window.pollEvent(event))
@@ -193,7 +193,7 @@ int main(int argc, char** argv)
         window.display();
     }
 
-    sensekit::SenseKit::terminate();
+    astra::Astra::terminate();
 
     return 0;
 }

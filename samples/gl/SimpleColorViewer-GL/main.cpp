@@ -2,7 +2,7 @@
 
 int main(int argc, char** argv)
 {
-    sensekit::SenseKit::initialize();
+    astra::Astra::initialize();
     SimpleColorViewer colorViewer("Color Viewer");
 
     colorViewer.init(argc, argv);

@@ -1,10 +1,10 @@
 #include "StreamPlayerPlugin.h"
-#include <SenseKit/SenseKit.h>
+#include <Astra/Astra.h>
 #include "PlaybackStreamSet.h"
 
-EXPORT_PLUGIN(sensekit::plugins::streamplayer::StreamPlayerPlugin)
+EXPORT_PLUGIN(astra::plugins::streamplayer::StreamPlayerPlugin)
 
-namespace sensekit { namespace plugins { namespace streamplayer {
+namespace astra { namespace plugins { namespace streamplayer {
 
     StreamPlayerPlugin::StreamPlayerPlugin(PluginServiceProxy* pluginService)
         : PluginBase(pluginService, "orbbec_streamplayer")
@@ -30,14 +30,14 @@ namespace sensekit { namespace plugins { namespace streamplayer {
         read_streams();
     }
 
-    sensekit_status_t StreamPlayerPlugin::read_streams()
+    astra_status_t StreamPlayerPlugin::read_streams()
     {
         for (auto& set : m_sets)
         {
             set->read();
         }
 
-        return SENSEKIT_STATUS_SUCCESS;
+        return ASTRA_STATUS_SUCCESS;
     }
 
 }}}

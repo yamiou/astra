@@ -1,7 +1,7 @@
-#include "../../SenseKit/vendor/cpptoml.h"
+#include "../../Astra/vendor/cpptoml.h"
 #include "HandSettings.h"
 
-namespace sensekit { namespace plugins { namespace hand {
+namespace astra { namespace plugins { namespace hand {
 
     template<typename T>
     T get_from_table(cpptoml::table& t, std::string key, T defaultValue)

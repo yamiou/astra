@@ -1,4 +1,4 @@
-package com.orbbec.sensekit;
+package com.orbbec.astra;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,11 +7,11 @@ import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.util.Log;
 
-import com.orbbec.jni.SenseKit;
+import com.orbbec.jni.Astra;
 
-public class SenseKitContext {
+public class AstraContext {
 
-    private static final String LOG_TAG = "SenseKitContext";
+    private static final String LOG_TAG = "AstraContext";
     private static final String RESOURCE_URI = "RESOURCE_URI";
 
     private final Context androidContext;
@@ -19,7 +19,7 @@ public class SenseKitContext {
     private final String RESOURCE_AVAILABLE_INTENT;
 
 
-    public SenseKitContext(Context androidContext) {
+    public AstraContext(Context androidContext) {
         this.androidContext = androidContext;
         this.RESOURCE_AVAILABLE_INTENT = androidContext.getPackageName() + ".RESOURCE_AVAILABLE";
         this.deviceManager = new SensorDeviceManager(androidContext,
@@ -58,27 +58,27 @@ public class SenseKitContext {
                 int bus = Integer.parseInt(pathComponents[3], 10);
                 int address = Integer.parseInt(pathComponents[4], 10);
 
-                String resourceUri = createSenseKitResourceUri(
+                String resourceUri = createAstraResourceUri(
                         device.getVendorId(),
                         device.getProductId(),
                         bus,
                         address);
 
                 Log.d(LOG_TAG, "device URI: " + resourceUri);
-                SenseKit.notify_resource_available(resourceUri);
+                Astra.notify_resource_available(resourceUri);
             }
         }
         Log.d(LOG_TAG, "Finished initialization");
     }
 
-    private String createSenseKitResourceUri(int vendorId, int productId, int bus, int address)
+    private String createAstraResourceUri(int vendorId, int productId, int bus, int address)
     {
         return "usb/" + vendorId + "/" + productId + "/" + bus + "/" + address;
     }
 
     public void initialize() {
         Log.d(LOG_TAG, "initializing");
-        SenseKit.initialize();
+        Astra.initialize();
         deviceManager.openAllDevices();
     }
 
@@ -89,7 +89,7 @@ public class SenseKitContext {
 
             if (!RESOURCE_AVAILABLE_INTENT.equals(action)) return;
 
-            String resourceUri = intent.getStringExtra(SenseKitContext.RESOURCE_URI);
+            String resourceUri = intent.getStringExtra(AstraContext.RESOURCE_URI);
 
             synchronized (this) {
                 Log.d(LOG_TAG, "Resource Available: " + resourceUri);

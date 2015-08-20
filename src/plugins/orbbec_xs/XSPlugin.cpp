@@ -1,17 +1,17 @@
 #include "XSPlugin.h"
-#include <SenseKit/SenseKit.h>
+#include <Astra/Astra.h>
 #include <Shiny.h>
 
-EXPORT_PLUGIN(sensekit::plugins::xs::XSPlugin);
+EXPORT_PLUGIN(astra::plugins::xs::XSPlugin);
 
-namespace sensekit { namespace plugins { namespace xs {
+namespace astra { namespace plugins { namespace xs {
 
-    void XSPlugin::on_stream_added(sensekit_streamset_t setHandle,
-                                   sensekit_stream_t streamHandle,
-                                   sensekit_stream_desc_t streamDesc)
+    void XSPlugin::on_stream_added(astra_streamset_t setHandle,
+                                   astra_stream_t streamHandle,
+                                   astra_stream_desc_t streamDesc)
     {
         PROFILE_FUNC();
-        if (streamDesc.type == SENSEKIT_STREAM_DEPTH &&
+        if (streamDesc.type == ASTRA_STREAM_DEPTH &&
             m_pointProcessorMap.find(streamHandle) == m_pointProcessorMap.end())
         {
             SINFO("XSPlugin", "XS creating point processor");
@@ -26,9 +26,9 @@ namespace sensekit { namespace plugins { namespace xs {
         }
     }
 
-    void XSPlugin::on_stream_removed(sensekit_streamset_t setHandle,
-                                     sensekit_stream_t streamHandle,
-                                     sensekit_stream_desc_t streamDesc)
+    void XSPlugin::on_stream_removed(astra_streamset_t setHandle,
+                                     astra_stream_t streamHandle,
+                                     astra_stream_desc_t streamDesc)
     {
         PROFILE_FUNC();
         auto it = m_pointProcessorMap.find(streamHandle);

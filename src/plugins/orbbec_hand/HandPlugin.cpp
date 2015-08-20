@@ -3,9 +3,9 @@
 #include "HandTracker.h"
 #include <Shiny.h>
 
-EXPORT_PLUGIN(sensekit::plugins::hand::HandPlugin);
+EXPORT_PLUGIN(astra::plugins::hand::HandPlugin);
 
-namespace sensekit { namespace plugins { namespace hand {
+namespace astra { namespace plugins { namespace hand {
 
     const char HANDPLUGIN_CONFIG_FILE[] = "plugins/orbbec_hand.toml";
 
@@ -38,29 +38,29 @@ namespace sensekit { namespace plugins { namespace hand {
     }
 
     void HandPlugin::stream_registered_handler_thunk(void* clientTag,
-                                                     sensekit_streamset_t setHandle,
-                                                     sensekit_stream_t streamHandle,
-                                                     sensekit_stream_desc_t desc)
+                                                     astra_streamset_t setHandle,
+                                                     astra_stream_t streamHandle,
+                                                     astra_stream_desc_t desc)
     {
         HandPlugin* plugin = static_cast<HandPlugin*>(clientTag);
         plugin->stream_registered_handler(setHandle, streamHandle, desc);
     }
 
     void HandPlugin::stream_unregistering_handler_thunk(void* clientTag,
-                                                        sensekit_streamset_t setHandle,
-                                                        sensekit_stream_t streamHandle,
-                                                        sensekit_stream_desc_t desc)
+                                                        astra_streamset_t setHandle,
+                                                        astra_stream_t streamHandle,
+                                                        astra_stream_desc_t desc)
 
     {
         HandPlugin* plugin = static_cast<HandPlugin*>(clientTag);
         plugin->stream_unregistering_handler(setHandle, streamHandle, desc);
     }
 
-    void HandPlugin::stream_registered_handler(sensekit_streamset_t setHandle,
-                                               sensekit_stream_t streamHandle,
-                                               sensekit_stream_desc_t streamDesc)
+    void HandPlugin::stream_registered_handler(astra_streamset_t setHandle,
+                                               astra_stream_t streamHandle,
+                                               astra_stream_desc_t streamDesc)
     {
-        if (streamDesc.type == SENSEKIT_STREAM_DEPTH &&
+        if (streamDesc.type == ASTRA_STREAM_DEPTH &&
             m_streamTrackerMap.find(streamHandle) == m_streamTrackerMap.end())
         {
             const char* uri;
@@ -78,9 +78,9 @@ namespace sensekit { namespace plugins { namespace hand {
         }
     }
 
-    void HandPlugin::stream_unregistering_handler(sensekit_streamset_t setHandle,
-                                                  sensekit_stream_t streamHandle,
-                                                  sensekit_stream_desc_t desc)
+    void HandPlugin::stream_unregistering_handler(astra_streamset_t setHandle,
+                                                  astra_stream_t streamHandle,
+                                                  astra_stream_desc_t desc)
     {
         auto it = m_streamTrackerMap.find(streamHandle);
         if (it != m_streamTrackerMap.end())

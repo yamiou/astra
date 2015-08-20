@@ -15,7 +15,7 @@
 
 using namespace google::protobuf::io;
 
-namespace sensekit { namespace serialization {
+namespace astra { namespace serialization {
 
     class ProtoFrameInputStream : public FrameInputStream
     {

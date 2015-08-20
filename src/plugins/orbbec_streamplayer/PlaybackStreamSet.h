@@ -1,7 +1,7 @@
 #ifndef PLAYBACKSTREAMSET_H
 #define PLAYBACKSTREAMSET_H
 
-#include <SenseKit/Plugins/plugin_capi.h>
+#include <Astra/Plugins/plugin_capi.h>
 #include <memory>
 #include <vector>
 #include <string>
@@ -10,8 +10,8 @@
 #include <common/serialization/FrameStreamReader.h>
 #include <common/serialization/FrameInputStream.h>
 
-namespace sensekit { namespace plugins { namespace streamplayer {
-    
+namespace astra { namespace plugins { namespace streamplayer {
+
     const char STREAMPLAYERPLUGIN_FILE_PATH[] = "plugins/test.df";
 
     class PlaybackStreamSetBase
@@ -28,18 +28,18 @@ namespace sensekit { namespace plugins { namespace streamplayer {
             m_pluginService.destroy_stream_set(m_streamSetHandle);
         }
 
-        virtual sensekit_status_t open() = 0;
-        virtual sensekit_status_t close() = 0;
-        virtual sensekit_status_t read() = 0;
+        virtual astra_status_t open() = 0;
+        virtual astra_status_t close() = 0;
+        virtual astra_status_t read() = 0;
     protected:
         PluginServiceProxy& m_pluginService;
-        sensekit_streamset_t m_streamSetHandle;
+        astra_streamset_t m_streamSetHandle;
         std::string m_uri;
 
         using StreamPtr = std::unique_ptr<PlaybackStreamBase>;
         using StreamPtrList = std::vector<StreamPtr>;
 
-        StreamPtrList m_streams;        
+        StreamPtrList m_streams;
     };
 
     class PlaybackStreamSet : public PlaybackStreamSetBase
@@ -48,7 +48,7 @@ namespace sensekit { namespace plugins { namespace streamplayer {
         PlaybackStreamSet(PluginServiceProxy& pluginService, std::string uri) :
             PlaybackStreamSetBase(pluginService, uri)
         {
-            
+
         }
 
         virtual ~PlaybackStreamSet()
@@ -56,11 +56,11 @@ namespace sensekit { namespace plugins { namespace streamplayer {
             close();
         }
 
-        virtual sensekit_status_t open() override
+        virtual astra_status_t open() override
         {
             if (m_isOpen)
             {
-                return SENSEKIT_STATUS_SUCCESS;
+                return ASTRA_STATUS_SUCCESS;
             }
 
             try
@@ -74,17 +74,17 @@ namespace sensekit { namespace plugins { namespace streamplayer {
             }
             catch (ResourceNotFoundException)
             {
-                return SENSEKIT_STATUS_DEVICE_ERROR;
+                return ASTRA_STATUS_DEVICE_ERROR;
             }
 
-            return SENSEKIT_STATUS_SUCCESS;
+            return ASTRA_STATUS_SUCCESS;
         }
 
-        virtual sensekit_status_t close() override final
+        virtual astra_status_t close() override final
         {
             if (!m_isOpen)
             {
-                return SENSEKIT_STATUS_SUCCESS;
+                return ASTRA_STATUS_SUCCESS;
             }
 
             for (StreamPtr& s : m_streams)
@@ -96,14 +96,14 @@ namespace sensekit { namespace plugins { namespace streamplayer {
 
             m_isOpen = false;
 
-            return SENSEKIT_STATUS_SUCCESS;
+            return ASTRA_STATUS_SUCCESS;
         }
 
-        virtual sensekit_status_t read() override
+        virtual astra_status_t read() override
         {
             if (!m_isOpen || m_streams.size() == 0)
             {
-                return SENSEKIT_STATUS_SUCCESS;
+                return ASTRA_STATUS_SUCCESS;
             }
 
             for (StreamPtr& s : m_streams)
@@ -111,15 +111,15 @@ namespace sensekit { namespace plugins { namespace streamplayer {
                 s->read();
             }
 
-            return SENSEKIT_STATUS_SUCCESS;
+            return ASTRA_STATUS_SUCCESS;
         }
 
     private:
-        sensekit_status_t open_stream()
+        astra_status_t open_stream()
         {
             switch (m_frameStreamReader->get_stream_type())
             {
-                case SENSEKIT_STREAM_DEPTH:
+                case ASTRA_STREAM_DEPTH:
                 {
                     DepthStream* stream = new DepthStream(*m_frameStreamReader, m_pluginService, m_streamSetHandle);
                     stream->open();
@@ -128,11 +128,11 @@ namespace sensekit { namespace plugins { namespace streamplayer {
                 }
                 default:
                 {
-                    return SENSEKIT_STATUS_DEVICE_ERROR;
+                    return ASTRA_STATUS_DEVICE_ERROR;
                 }
             }
 
-            return SENSEKIT_STATUS_SUCCESS;
+            return ASTRA_STATUS_SUCCESS;
         }
 
 

@@ -32,15 +32,15 @@ Higher-Level
 +================+========================================================================+
 |PointStream     | World coordinates (XYZ) computed from the depth data.                  |
 |                | The ``data`` array included in each ``PointFrame`` is an               |
-|                | array of ``sensekit:Vector3f`` elements to more easily                 |
+|                | array of ``astra:Vector3f`` elements to more easily                 |
 |                | access the ``x``, ``y`` and ``z`` values for each pixel.               |
 +----------------+------------------------------------------------------------------------+
 |HandStream      | Hand points computed from the depth data. On each ``HandFrame``,       |
 |                | the number of points detected at any given time can be retrieved       |
 |                | through the ``HandFrame::handpoint_count`` function, and a             |
-|                | ``sensekit::HandPointList`` can be retrieved through the               |
+|                | ``astra::HandPointList`` can be retrieved through the               |
 |                | ``HandFrame::handpoints`` function.                                    |
-+----------------+------------------------------------------------------------------------+ 
++----------------+------------------------------------------------------------------------+
 
 Getting the Data
 ================
@@ -59,17 +59,17 @@ The polling method for getting frame data is the most direct method for getting 
 
    int main(int argc, char** argv)
    {
-      sensekit::SenseKit::initialize();
+      astra::Astra::initialize();
 
-      sensekit::Sensor sensor;
-      sensekit::StreamReader reader = sensor.create_reader();
+      astra::Sensor sensor;
+      astra::StreamReader reader = sensor.create_reader();
 
-      reader.stream<sensekit::DepthStream>().start();
+      reader.stream<astra::DepthStream>().start();
 
-      sensekit::Frame frame = reader.get_latest_frame();
-      auto depthFrame = frame.get<sensekit::DepthFrame>();
+      astra::Frame frame = reader.get_latest_frame();
+      auto depthFrame = frame.get<astra::DepthFrame>();
 
-      sensekit::Sensekit::terminate();
+      astra::Astra::terminate();
 
       std::cout << "hit enter to exit program" << std::endl;
       std::cin.get();
@@ -81,7 +81,7 @@ The polling method for getting frame data is the most direct method for getting 
 Listening
 ---------
 
-The listening method for getting frame data requires a small amount of additional setup, but allows the developer to delegate the handling of a frame to one or more separate classes. The |sdkname| SDK provides an abstract class called ``FrameReadyListener`` which implements a single function called ``on_frame_ready``. ``on_frame_ready`` is called and passed a reference to a frame as soon as the frame is ready for processing. 
+The listening method for getting frame data requires a small amount of additional setup, but allows the developer to delegate the handling of a frame to one or more separate classes. The |sdkname| SDK provides an abstract class called ``FrameReadyListener`` which implements a single function called ``on_frame_ready``. ``on_frame_ready`` is called and passed a reference to a frame as soon as the frame is ready for processing.
 
 You must derive your own listener class from ``FrameReadyListener``, instantiate the derived listener object in your application and add it to the ``StreamReader`` using the ``StreamReader::addListener`` function. To see this method in action, check out the Simple Depth Viewer tutorial below.
 

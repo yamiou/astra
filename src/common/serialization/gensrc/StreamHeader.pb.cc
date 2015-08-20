@@ -16,7 +16,7 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 
-namespace sensekit {
+namespace astra {
 namespace serialization {
 namespace proto {
 
@@ -80,7 +80,7 @@ void protobuf_AddDesc_StreamHeader_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\022StreamHeader.proto\022\034sensekit.serializa"
+    "\n\022StreamHeader.proto\022\034astra.serializa"
     "tion.proto\"!\n\014StreamHeader\022\021\n\tframeType\030"
     "\001 \001(\r", 85);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
@@ -106,7 +106,7 @@ const int StreamHeader::kFrameTypeFieldNumber;
 StreamHeader::StreamHeader()
   : ::google::protobuf::Message() {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:sensekit.serialization.proto.StreamHeader)
+  // @@protoc_insertion_point(constructor:astra.serialization.proto.StreamHeader)
 }
 
 void StreamHeader::InitAsDefaultInstance() {
@@ -116,7 +116,7 @@ StreamHeader::StreamHeader(const StreamHeader& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
-  // @@protoc_insertion_point(copy_constructor:sensekit.serialization.proto.StreamHeader)
+  // @@protoc_insertion_point(copy_constructor:astra.serialization.proto.StreamHeader)
 }
 
 void StreamHeader::SharedCtor() {
@@ -126,7 +126,7 @@ void StreamHeader::SharedCtor() {
 }
 
 StreamHeader::~StreamHeader() {
-  // @@protoc_insertion_point(destructor:sensekit.serialization.proto.StreamHeader)
+  // @@protoc_insertion_point(destructor:astra.serialization.proto.StreamHeader)
   SharedDtor();
 }
 
@@ -166,7 +166,7 @@ bool StreamHeader::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:sensekit.serialization.proto.StreamHeader)
+  // @@protoc_insertion_point(parse_start:astra.serialization.proto.StreamHeader)
   for (;;) {
     ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
     tag = p.first;
@@ -200,17 +200,17 @@ bool StreamHeader::MergePartialFromCodedStream(
     }
   }
 success:
-  // @@protoc_insertion_point(parse_success:sensekit.serialization.proto.StreamHeader)
+  // @@protoc_insertion_point(parse_success:astra.serialization.proto.StreamHeader)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:sensekit.serialization.proto.StreamHeader)
+  // @@protoc_insertion_point(parse_failure:astra.serialization.proto.StreamHeader)
   return false;
 #undef DO_
 }
 
 void StreamHeader::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:sensekit.serialization.proto.StreamHeader)
+  // @@protoc_insertion_point(serialize_start:astra.serialization.proto.StreamHeader)
   // optional uint32 frameType = 1;
   if (has_frametype()) {
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->frametype(), output);
@@ -220,12 +220,12 @@ void StreamHeader::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
   }
-  // @@protoc_insertion_point(serialize_end:sensekit.serialization.proto.StreamHeader)
+  // @@protoc_insertion_point(serialize_end:astra.serialization.proto.StreamHeader)
 }
 
 ::google::protobuf::uint8* StreamHeader::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:sensekit.serialization.proto.StreamHeader)
+  // @@protoc_insertion_point(serialize_to_array_start:astra.serialization.proto.StreamHeader)
   // optional uint32 frameType = 1;
   if (has_frametype()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(1, this->frametype(), target);
@@ -235,7 +235,7 @@ void StreamHeader::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:sensekit.serialization.proto.StreamHeader)
+  // @@protoc_insertion_point(serialize_to_array_end:astra.serialization.proto.StreamHeader)
   return target;
 }
 
@@ -323,6 +323,6 @@ void StreamHeader::Swap(StreamHeader* other) {
 
 }  // namespace proto
 }  // namespace serialization
-}  // namespace sensekit
+}  // namespace astra
 
 // @@protoc_insertion_point(global_scope)

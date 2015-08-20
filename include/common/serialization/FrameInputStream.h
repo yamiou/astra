@@ -14,7 +14,7 @@
 #  define NOEXCEPT
 #endif
 
-namespace sensekit { namespace serialization {
+namespace astra { namespace serialization {
 
 
     class ResourceNotFoundException : std::exception

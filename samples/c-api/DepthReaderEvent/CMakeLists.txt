@@ -9,13 +9,13 @@ add_executable(${_projname} ${${_projname}_SOURCES})
 
 set_target_properties(${_projname} PROPERTIES FOLDER "${SAMPLE_DIR_FOLDER}c-api")
 
-include_directories(${SENSEKIT_INCLUDE_DIR})
+include_directories(${ASTRA_INCLUDE_DIR})
 
-target_link_libraries(${_projname} ${SENSEKIT_LIBRARIES})
+target_link_libraries(${_projname} ${ASTRA_LIBRARIES})
 
 set_debug_working_dir(${_projname} "$(TargetDir)")
 
-add_sensekit_sdk_dependency(${_projname})
+add_astra_sdk_dependency(${_projname})
 
 if (MSVC)
     install(TARGETS ${_projname} DESTINATION bin/)

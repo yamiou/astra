@@ -26,7 +26,7 @@
 #include <google/protobuf/unknown_field_set.h>
 // @@protoc_insertion_point(includes)
 
-namespace sensekit {
+namespace astra {
 namespace serialization {
 namespace proto {
 
@@ -99,7 +99,7 @@ class StreamHeader : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 frametype() const;
   inline void set_frametype(::google::protobuf::uint32 value);
 
-  // @@protoc_insertion_point(class_scope:sensekit.serialization.proto.StreamHeader)
+  // @@protoc_insertion_point(class_scope:astra.serialization.proto.StreamHeader)
  private:
   inline void set_has_frametype();
   inline void clear_has_frametype();
@@ -138,13 +138,13 @@ inline void StreamHeader::clear_frametype() {
   clear_has_frametype();
 }
 inline ::google::protobuf::uint32 StreamHeader::frametype() const {
-  // @@protoc_insertion_point(field_get:sensekit.serialization.proto.StreamHeader.frameType)
+  // @@protoc_insertion_point(field_get:astra.serialization.proto.StreamHeader.frameType)
   return frametype_;
 }
 inline void StreamHeader::set_frametype(::google::protobuf::uint32 value) {
   set_has_frametype();
   frametype_ = value;
-  // @@protoc_insertion_point(field_set:sensekit.serialization.proto.StreamHeader.frameType)
+  // @@protoc_insertion_point(field_set:astra.serialization.proto.StreamHeader.frameType)
 }
 
 
@@ -152,7 +152,7 @@ inline void StreamHeader::set_frametype(::google::protobuf::uint32 value) {
 
 }  // namespace proto
 }  // namespace serialization
-}  // namespace sensekit
+}  // namespace astra
 
 #ifndef SWIG
 namespace google {

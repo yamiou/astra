@@ -30,23 +30,23 @@ Our first step will be to set up a skeleton application as a starting point for 
 .. code-block:: c++
    :linenos:
 
-   #include <Sensekit/SenseKit.h>
-   #include <SensekitUL/SenseKitUL.h>
+   #include <Astra/Astra.h>
+   #include <AstraUL/AstraUL.h>
 
    #include <cstdio>
    #include <iostream>
-    
+
    int main(int argc, char** argv)
    {
       std::cout << "hit enter to exit program" << std::endl;
       std::cin.get();
       return 0;
-   }	
+   }
 
-- Line 1 - SenseKit.h must be included in all applications. It is the core of |sdkname| and is required for all C++ based |sdkname| applications.
-- Line 2 - Most applications will also require SenseKitUL.h, which defines convenient ways to read and manipulate the most common types of sensor data like color, depth, and hand positions.
+- Line 1 - Astra.h must be included in all applications. It is the core of |sdkname| and is required for all C++ based |sdkname| applications.
+- Line 2 - Most applications will also require AstraUL.h, which defines convenient ways to read and manipulate the most common types of sensor data like color, depth, and hand positions.
 - Lines 9-10 - We'll use `std::cin.get() <http://en.cppreference.com/w/cpp/io/basic_istream/get>`_ to make sure we have an opportunity to see our handiwork before our application closes its window.
-  
+
 Initializing and Terminating |sdkname|
 ======================================
 
@@ -61,11 +61,11 @@ Add the two new lines below:
 
    int main(int argc, char** argv)
    {
-      sensekit::SenseKit::initialize();
+      astra::Astra::initialize();
 
       // what will go here? you'll find out soon!
 
-      sensekit::SenseKit::terminate();
+      astra::Astra::terminate();
 
       std::cout << "hit enter to exit program" << std::endl;
       std::cin.get();
@@ -97,11 +97,11 @@ Between our initialization and termination bookends, let's declare a ``Sensor`` 
 
    int main(int argc, char** argv)
    {
-      sensekit::SenseKit::initialize();
+      astra::Astra::initialize();
 
-      sensekit::Sensor sensor;
+      astra::Sensor sensor;
 
-      sensekit::Sensekit::terminate();
+      astra::Astra::terminate();
 
       std::cout << "hit enter to exit program" << std::endl;
       std::cin.get();
@@ -132,12 +132,12 @@ In order to access streams from the Astra and get to the frames, we'll need a ``
 
    int main(int argc, char** argv)
    {
-      sensekit::SenseKit::initialize();
+      astra::Astra::initialize();
 
-      sensekit::Sensor sensor;
-      sensekit::StreamReader reader = sensor.create_reader();
+      astra::Sensor sensor;
+      astra::StreamReader reader = sensor.create_reader();
 
-      sensekit::Sensekit::terminate();
+      astra::Astra::terminate();
 
       std::cout << "hit enter to exit program" << std::endl;
       std::cin.get();
@@ -146,7 +146,7 @@ In order to access streams from the Astra and get to the frames, we'll need a ``
 - Line 12 - Creates a ``StreamReader``
 
 2. Next we start the depth stream using the ``StreamReader`` that we created in the previous step. Starting the depth stream tells |sdkname| that we're interested in getting depth data from our ``Sensor``.
-   
+
 .. code-block:: c++
    :linenos:
    :lineno-start: 7
@@ -154,14 +154,14 @@ In order to access streams from the Astra and get to the frames, we'll need a ``
 
    int main(int argc, char** argv)
    {
-      sensekit::SenseKit::initialize();
+      astra::Astra::initialize();
 
-      sensekit::Sensor sensor;
-      sensekit::StreamReader reader = sensor.create_reader();
+      astra::Sensor sensor;
+      astra::StreamReader reader = sensor.create_reader();
 
-      reader.stream<sensekit::DepthStream>().start();
+      reader.stream<astra::DepthStream>().start();
 
-      sensekit::Sensekit::terminate();
+      astra::Astra::terminate();
 
       std::cout << "hit enter to exit program" << std::endl;
       std::cin.get();
@@ -178,17 +178,17 @@ In order to access streams from the Astra and get to the frames, we'll need a ``
 
    int main(int argc, char** argv)
    {
-      sensekit::SenseKit::initialize();
+      astra::Astra::initialize();
 
-      sensekit::Sensor sensor;
-      sensekit::StreamReader reader = sensor.create_reader();
+      astra::Sensor sensor;
+      astra::StreamReader reader = sensor.create_reader();
 
-      reader.stream<sensekit::DepthStream>().start();
+      reader.stream<astra::DepthStream>().start();
 
-      sensekit::Frame frame = reader.get_latest_frame();
-      auto depthFrame = frame.get<sensekit::DepthFrame>();
+      astra::Frame frame = reader.get_latest_frame();
+      auto depthFrame = frame.get<astra::DepthFrame>();
 
-      sensekit::Sensekit::terminate();
+      astra::Astra::terminate();
 
       std::cout << "hit enter to exit program" << std::endl;
       std::cin.get();
@@ -206,26 +206,26 @@ In order to access streams from the Astra and get to the frames, we'll need a ``
 
    int main(int argc, char** argv)
    {
-      sensekit::SenseKit::initialize();
+      astra::Astra::initialize();
 
-      sensekit::Sensor sensor;
-      sensekit::StreamReader reader = sensor.create_reader();
+      astra::Sensor sensor;
+      astra::StreamReader reader = sensor.create_reader();
 
-      reader.stream<sensekit::DepthStream>().start();
+      reader.stream<astra::DepthStream>().start();
 
-      sensekit::Frame frame = reader.get_latest_frame();
-      auto depthFrame = frame.get<sensekit::DepthFrame>();
-  
+      astra::Frame frame = reader.get_latest_frame();
+      auto depthFrame = frame.get<astra::DepthFrame>();
+
       int frameIndex = depthFrame.frameIndex();
       int16_t pixelValue = depthFrame.data()[0];
-  
+
       std::cout << std::endl
                 << "Depth frameIndex: " << frameIndex
                 << " pixelValue: " << pixelValue
                 << std::endl
                 << std::endl;
 
-      sensekit::Sensekit::terminate();
+      astra::Astra::terminate();
 
       std::cout << "hit enter to exit program" << std::endl;
       std::cin.get();
@@ -234,7 +234,7 @@ In order to access streams from the Astra and get to the frames, we'll need a ``
 - Line 19 - Gets a copy of the frame index from our depth frame
 - Line 20 - Gets a copy of the value within the first pixel of our depth frame's data
 - Line 22-26 - Prints the two aforementioned values to the console
-- Line 28-29 - Pauses execution so we can soak in our success 
+- Line 28-29 - Pauses execution so we can soak in our success
 
 You can go ahead and run your application now to test that everything works. Just like before, a console window should pop up and display diagnostic information. Then, you should see a line with the frame data that we retrieved. Press enter when you're done.
 
@@ -254,37 +254,37 @@ The following code is highly similar to the code from our last example, except w
 
    int main(int argc, char** argv)
    {
-      sensekit::SenseKit::initialize();
+      astra::Astra::initialize();
 
-      sensekit::Sensor sensor;
-      sensekit::StreamReader reader = sensor.create_reader();
+      astra::Sensor sensor;
+      astra::StreamReader reader = sensor.create_reader();
 
-      reader.stream<sensekit::DepthStream>().start();
+      reader.stream<astra::DepthStream>().start();
 
       int maxFramesToProcess = 100;
       int count = 0;
- 
+
       do
       {
-         sensekit::Frame frame = reader.get_latest_frame();
-         auto depthFrame = frame.get<sensekit::DepthFrame>();
-  
+         astra::Frame frame = reader.get_latest_frame();
+         auto depthFrame = frame.get<astra::DepthFrame>();
+
          int frameIndex = depthFrame.frameIndex();
          int16_t pixelValue = depthFrame.data()[0];
-  
+
          std::cout << std::endl
                    << "Depth frameIndex: " << frameIndex
                    << " pixelValue: " << pixelValue
                    << std::endl
                    << std::endl;
- 
+
          count++;
       } while (count < maxFramesToProcess);
-  
+
       std::cout << "Press any key to continue...";
       std::cin.get();
-  
-      sensekit::SenseKit::terminate();
+
+      astra::Astra::terminate();
 
       std::cout << "hit enter to exit program" << std::endl;
       std::cin.get();
@@ -293,7 +293,7 @@ The following code is highly similar to the code from our last example, except w
 - Line 16 - Stores the maximum number of frames we're going to process in the loop
 - Line 17 - Sentinel to count the number of frames that we've processed
 - Line 19-34 - The frame processing loop
-  
+
 Compile and run. While the program is running and the Astra is focused on you, move around a bit and watch the data values on the frames change.
 
 Achievement get! You've just made your first |sdkname| application! If you haven't had your fill of fun with |sdkname| yet, continue on to our Simple Depth Viewer Tutorial.

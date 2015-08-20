@@ -1,8 +1,8 @@
 #include "TrajectoryAnalyzer.h"
 #include "constants.h"
-#include <SenseKit/Plugins/PluginLogger.h>
+#include <Astra/Plugins/PluginLogger.h>
 
-namespace sensekit { namespace plugins { namespace hand {
+namespace astra { namespace plugins { namespace hand {
 
     using namespace std;
 

@@ -1,13 +1,13 @@
 #include "catch.hpp"
-#include <SenseKit/SenseKit.h>
+#include <Astra/Astra.h>
 
 TEST_CASE("Can create a Sensor with default ctor", "[c++-stream-api]") {
-    sensekit::Sensor sensor;
+    astra::Sensor sensor;
     REQUIRE(sensor.is_valid());
 }
 
 TEST_CASE("Can create a reader from a sensor", "[c++-stream-api]") {
-    sensekit::Sensor sensor;
-    sensekit::StreamReader reader = sensor.create_reader();
+    astra::Sensor sensor;
+    astra::StreamReader reader = sensor.create_reader();
     REQUIRE(reader.is_valid());
 }

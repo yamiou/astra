@@ -3,9 +3,9 @@
 
 #include <vector>
 #include "TrackedPoint.h"
-#include <SenseKitUL/Plugins/stream_types.h>
+#include <AstraUL/Plugins/stream_types.h>
 
-namespace sensekit { namespace plugins { namespace hand {
+namespace astra { namespace plugins { namespace hand {
 
     using namespace std;
 
@@ -16,7 +16,7 @@ namespace sensekit { namespace plugins { namespace hand {
         ~DebugVisualizer() {}
 
         void overlayCrosshairs(const vector<TrackedPoint>& points,
-                               _sensekit_imageframe& imageFrame)
+                               _astra_imageframe& imageFrame)
         {
             int width = imageFrame.metadata.width;
             int height = imageFrame.metadata.height;
@@ -84,7 +84,7 @@ namespace sensekit { namespace plugins { namespace hand {
             }
         }
         void overlayMask(const cv::Mat& matMask,
-                         _sensekit_imageframe& imageFrame,
+                         _astra_imageframe& imageFrame,
                          const RGBPixel& maskColor,
                          const PixelType targetValue)
         {
@@ -113,7 +113,7 @@ namespace sensekit { namespace plugins { namespace hand {
         }
 
         void showDepthMat(const cv::Mat& matDepth,
-                          _sensekit_imageframe& imageFrame)
+                          _astra_imageframe& imageFrame)
         {
             assert(matDepth.cols == imageFrame.metadata.width);
             assert(matDepth.rows == imageFrame.metadata.height);
@@ -145,7 +145,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
         void showVelocityMat(const cv::Mat& matVelocity,
                              float maxScale,
-                             _sensekit_imageframe& imageFrame)
+                             _astra_imageframe& imageFrame)
         {
             assert(matVelocity.cols == imageFrame.metadata.width);
             assert(matVelocity.rows == imageFrame.metadata.height);
@@ -184,7 +184,7 @@ namespace sensekit { namespace plugins { namespace hand {
         template<typename T>
         void showNormArray(const cv::Mat& mat,
                            const cv::Mat& mask,
-                           _sensekit_imageframe& imageFrame)
+                           _astra_imageframe& imageFrame)
         {
             assert(mat.cols == imageFrame.metadata.width);
             assert(mat.rows == imageFrame.metadata.height);

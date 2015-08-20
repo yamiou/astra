@@ -1,13 +1,13 @@
 ﻿// Orbbec (c) 2015
 
-#include <Sensekit/SenseKit.h>
-#include <SensekitUL/SenseKitUL.h>
+#include <Astra/Astra.h>
+#include <AstraUL/AstraUL.h>
 #include <cstdio>
 #include <iostream>
 
 #include <key_handler.h>
 
-void print_color(sensekit::ColorFrame& colorFrame)
+void print_color(astra::ColorFrame& colorFrame)
 {
     if (colorFrame.is_valid())
     {
@@ -15,11 +15,11 @@ void print_color(sensekit::ColorFrame& colorFrame)
         int height = colorFrame.resolutionY();
         int frameIndex = colorFrame.frameIndex();
 
-        sensekit::RGBPixel* buffer = new sensekit::RGBPixel[colorFrame.numberOfPixels()];
+        astra::RGBPixel* buffer = new astra::RGBPixel[colorFrame.numberOfPixels()];
         colorFrame.copy_to(buffer);
 
         size_t index = ((width * (height / 2.0f)) + (width / 2.0f));
-        sensekit::RGBPixel middle = buffer[index];
+        astra::RGBPixel middle = buffer[index];
 
         std::cout << "color frameIndex: " << frameIndex
                   << " r: " << static_cast<int>(middle.r)
@@ -31,12 +31,12 @@ void print_color(sensekit::ColorFrame& colorFrame)
     }
 }
 
-class SampleFrameListener : public sensekit::FrameReadyListener
+class SampleFrameListener : public astra::FrameReadyListener
 {
-    virtual void on_frame_ready(sensekit::StreamReader& reader,
-                                sensekit::Frame& frame) override
+    virtual void on_frame_ready(astra::StreamReader& reader,
+                                astra::Frame& frame) override
     {
-        sensekit::ColorFrame colorFrame = frame.get<sensekit::ColorFrame>();
+        astra::ColorFrame colorFrame = frame.get<astra::ColorFrame>();
 
         if (colorFrame.is_valid())
         {
@@ -47,21 +47,21 @@ class SampleFrameListener : public sensekit::FrameReadyListener
 
 int main(int argc, char** argv)
 {
-    sensekit::SenseKit::initialize();
+    astra::Astra::initialize();
 
     set_key_handler();
 
-    sensekit::Sensor sensor;
-    sensekit::StreamReader reader = sensor.create_reader();
+    astra::Sensor sensor;
+    astra::StreamReader reader = sensor.create_reader();
 
     SampleFrameListener listener;
 
-    reader.stream<sensekit::ColorStream>().start();
+    reader.stream<astra::ColorStream>().start();
 
     std::cout << "colorStream -- hFov: "
-              << reader.stream<sensekit::ColorStream>().horizontalFieldOfView()
+              << reader.stream<astra::ColorStream>().horizontalFieldOfView()
               << " vFov: "
-              << reader.stream<sensekit::ColorStream>().verticalFieldOfView()
+              << reader.stream<astra::ColorStream>().verticalFieldOfView()
               << std::endl;
 
 
@@ -69,10 +69,10 @@ int main(int argc, char** argv)
 
     do
     {
-        sensekit_temp_update();
+        astra_temp_update();
     } while (shouldContinue);
 
     reader.removeListener(listener);
 
-    sensekit::SenseKit::terminate();
+    astra::Astra::terminate();
 }

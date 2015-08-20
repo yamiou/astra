@@ -1,4 +1,4 @@
-package com.orbbec.sensekit;
+package com.orbbec.astra;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,7 +6,7 @@ import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Parcelable;
 
-public class SenseKitDeviceMonitorActivity extends Activity {
+public class AstraDeviceMonitorActivity extends Activity {
 
     public static final String ACTION_USB_DEVICE_ATTACHED = "com.orbbec.ACTION_USB_DEVICE_ATTACHED";
 

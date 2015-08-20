@@ -1,4 +1,4 @@
-SenseKit SDK v0.2.1 Preview for Windows and Android
+Astra SDK v0.2.1 Preview for Windows and Android
 Copyright (c) 2015 Orbbec
 www.orbbec3d.com
 
@@ -42,7 +42,7 @@ In the hand viewer, wave left and right at the sensor a few times to start hand 
 Building the samples
 ==========
 
-In the sdk/samples/vs2013 folder, open sensekit-samples.sln. Build solution.
+In the sdk/samples/vs2013 folder, open astra-samples.sln. Build solution.
 
 The samples compile to sdk/samples/vs2013/bin/Debug/ or Release/, depending upon your configuration.
 
@@ -52,7 +52,7 @@ To run the samples:
 1) Copy all the files from sdk/samples/vs2013/thirdparty/copy_to_bin_dir/ to
 your build folder (bin/Debug/ or bin/Release/).
 
-2) From the sdk/bin/ folder, copy SenseKit.dll, SenseKitAPI.dll, SenseKitUL.dll,
+2) From the sdk/bin/ folder, copy Astra.dll, AstraAPI.dll, AstraUL.dll,
 and the entire Plugin folder to your build folder.
 The plugins should still be in a Plugins subfolder under your sample .exe files.
 

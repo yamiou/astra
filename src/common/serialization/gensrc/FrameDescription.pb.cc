@@ -16,7 +16,7 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 
-namespace sensekit {
+namespace astra {
 namespace serialization {
 namespace proto {
 
@@ -81,7 +81,7 @@ void protobuf_AddDesc_FrameDescription_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\026FrameDescription.proto\022\034sensekit.seria"
+    "\n\026FrameDescription.proto\022\034astra.seria"
     "lization.proto\"=\n\020FrameDescription\022\023\n\013fr"
     "amePeriod\030\001 \001(\001\022\024\n\014bufferLength\030\002 \001(\r", 117);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
@@ -108,7 +108,7 @@ const int FrameDescription::kBufferLengthFieldNumber;
 FrameDescription::FrameDescription()
   : ::google::protobuf::Message() {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:sensekit.serialization.proto.FrameDescription)
+  // @@protoc_insertion_point(constructor:astra.serialization.proto.FrameDescription)
 }
 
 void FrameDescription::InitAsDefaultInstance() {
@@ -118,7 +118,7 @@ FrameDescription::FrameDescription(const FrameDescription& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
-  // @@protoc_insertion_point(copy_constructor:sensekit.serialization.proto.FrameDescription)
+  // @@protoc_insertion_point(copy_constructor:astra.serialization.proto.FrameDescription)
 }
 
 void FrameDescription::SharedCtor() {
@@ -129,7 +129,7 @@ void FrameDescription::SharedCtor() {
 }
 
 FrameDescription::~FrameDescription() {
-  // @@protoc_insertion_point(destructor:sensekit.serialization.proto.FrameDescription)
+  // @@protoc_insertion_point(destructor:astra.serialization.proto.FrameDescription)
   SharedDtor();
 }
 
@@ -183,7 +183,7 @@ bool FrameDescription::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:sensekit.serialization.proto.FrameDescription)
+  // @@protoc_insertion_point(parse_start:astra.serialization.proto.FrameDescription)
   for (;;) {
     ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
     tag = p.first;
@@ -232,17 +232,17 @@ bool FrameDescription::MergePartialFromCodedStream(
     }
   }
 success:
-  // @@protoc_insertion_point(parse_success:sensekit.serialization.proto.FrameDescription)
+  // @@protoc_insertion_point(parse_success:astra.serialization.proto.FrameDescription)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:sensekit.serialization.proto.FrameDescription)
+  // @@protoc_insertion_point(parse_failure:astra.serialization.proto.FrameDescription)
   return false;
 #undef DO_
 }
 
 void FrameDescription::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:sensekit.serialization.proto.FrameDescription)
+  // @@protoc_insertion_point(serialize_start:astra.serialization.proto.FrameDescription)
   // optional double framePeriod = 1;
   if (has_frameperiod()) {
     ::google::protobuf::internal::WireFormatLite::WriteDouble(1, this->frameperiod(), output);
@@ -257,12 +257,12 @@ void FrameDescription::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
   }
-  // @@protoc_insertion_point(serialize_end:sensekit.serialization.proto.FrameDescription)
+  // @@protoc_insertion_point(serialize_end:astra.serialization.proto.FrameDescription)
 }
 
 ::google::protobuf::uint8* FrameDescription::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:sensekit.serialization.proto.FrameDescription)
+  // @@protoc_insertion_point(serialize_to_array_start:astra.serialization.proto.FrameDescription)
   // optional double framePeriod = 1;
   if (has_frameperiod()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(1, this->frameperiod(), target);
@@ -277,7 +277,7 @@ void FrameDescription::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:sensekit.serialization.proto.FrameDescription)
+  // @@protoc_insertion_point(serialize_to_array_end:astra.serialization.proto.FrameDescription)
   return target;
 }
 
@@ -374,6 +374,6 @@ void FrameDescription::Swap(FrameDescription* other) {
 
 }  // namespace proto
 }  // namespace serialization
-}  // namespace sensekit
+}  // namespace astra
 
 // @@protoc_insertion_point(global_scope)

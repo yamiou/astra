@@ -16,7 +16,7 @@ namespace google{namespace protobuf{namespace io{
     class ZeroCopyOutputStream;
 }}}
 
-namespace sensekit { namespace serialization { 
+namespace astra { namespace serialization {
 
     class ProtoFrameOutputStream : public FrameOutputStream
     {

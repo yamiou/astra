@@ -1,15 +1,15 @@
 #include "SkeletonPlugin.h"
-#include <SenseKit/SenseKit.h>
+#include <Astra/Astra.h>
 
-EXPORT_PLUGIN(sensekit::plugins::skeleton::SkeletonPlugin);
+EXPORT_PLUGIN(astra::plugins::skeleton::SkeletonPlugin);
 
-namespace sensekit { namespace plugins { namespace skeleton {
+namespace astra { namespace plugins { namespace skeleton {
 
-    void SkeletonPlugin::on_stream_added(sensekit_streamset_t setHandle,
-                                         sensekit_stream_t streamHandle,
-                                         sensekit_stream_desc_t desc)
+    void SkeletonPlugin::on_stream_added(astra_streamset_t setHandle,
+                                         astra_stream_t streamHandle,
+                                         astra_stream_desc_t desc)
     {
-        if (desc.type != SENSEKIT_STREAM_DEPTH)
+        if (desc.type != ASTRA_STREAM_DEPTH)
             return; // if new stream is not depth, we don't care.
 
         m_skeletonTrackers.push_back(std::make_unique<SkeletonTracker>(get_pluginService(),
@@ -17,9 +17,9 @@ namespace sensekit { namespace plugins { namespace skeleton {
                                                                      streamHandle));
     }
 
-    void SkeletonPlugin::on_stream_removed(sensekit_streamset_t setHandle,
-                                           sensekit_stream_t streamHandle,
-                                           sensekit_stream_desc_t desc)
+    void SkeletonPlugin::on_stream_removed(astra_streamset_t setHandle,
+                                           astra_stream_t streamHandle,
+                                           astra_stream_desc_t desc)
     {
         auto it = std::find_if(m_skeletonTrackers.cbegin(),
                                m_skeletonTrackers.cend(),

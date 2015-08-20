@@ -1,0 +1,23 @@
+/* ^^^AUTOGENHEADER^^^ */
+#ifndef CREATEPLUGINPROXY_H
+#define CREATEPLUGINPROXY_H
+
+#include "PluginService.h"
+#include "PluginServiceDelegate.h"
+#include <Astra/Plugins/PluginServiceProxyBase.h>
+
+namespace astra {
+PluginServiceProxyBase* create_plugin_proxy(PluginService* service)
+    {
+        PluginServiceProxyBase* proxy = new PluginServiceProxyBase;
+
+^^^BEGINREPLACE:plugin^^^
+        proxy->^FUNC^ = &PluginServiceDelegate::^FUNC^;
+^^^ENDREPLACE^^^
+        proxy->pluginService = service;
+
+        return proxy;
+    }
+}
+
+#endif /* CREATEPLUGINPROXY_H */

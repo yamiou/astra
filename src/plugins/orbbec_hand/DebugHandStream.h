@@ -1,27 +1,27 @@
 #ifndef DEBUGHANDSTREAM_H
 #define DEBUGHANDSTREAM_H
 
-#include <SenseKit/Plugins/SingleBinStream.h>
-#include <SenseKitUL/skul_ctypes.h>
-#include <SenseKitUL/Plugins/stream_types.h>
-#include <SensekitUL/Vector.h>
+#include <Astra/Plugins/SingleBinStream.h>
+#include <AstraUL/skul_ctypes.h>
+#include <AstraUL/Plugins/stream_types.h>
+#include <AstraUL/Vector.h>
 
-namespace sensekit { namespace plugins { namespace hand {
+namespace astra { namespace plugins { namespace hand {
 
-    using DebugHandViewType = sensekit_debug_hand_view_type_t;
+    using DebugHandViewType = astra_debug_hand_view_type_t;
 
-    class DebugHandStream : public SingleBinStream<sensekit_imageframe_wrapper_t, uint8_t>
+    class DebugHandStream : public SingleBinStream<astra_imageframe_wrapper_t, uint8_t>
 
     {
     public:
         DebugHandStream(PluginServiceProxy& pluginService,
-                        sensekit_streamset_t streamSet,
+                        astra_streamset_t streamSet,
                         uint32_t width,
                         uint32_t height,
                         uint32_t bytesPerPixel)
             : SingleBinStream(pluginService,
                               streamSet,
-                              StreamDescription(SENSEKIT_STREAM_DEBUG_HAND,
+                              StreamDescription(ASTRA_STREAM_DEBUG_HAND,
                                                 DEFAULT_SUBTYPE),
                               width * height * bytesPerPixel)
         { }
@@ -36,28 +36,28 @@ namespace sensekit { namespace plugins { namespace hand {
         const Vector2f& spawn_norm_position() const { return m_spawnNormPosition; }
 
     protected:
-        virtual void on_set_parameter(sensekit_streamconnection_t connection,
-                                      sensekit_parameter_id id,
+        virtual void on_set_parameter(astra_streamconnection_t connection,
+                                      astra_parameter_id id,
                                       size_t inByteLength,
-                                      sensekit_parameter_data_t inData) override;
+                                      astra_parameter_data_t inData) override;
 
-        virtual void on_get_parameter(sensekit_streamconnection_t connection,
-                                      sensekit_parameter_id id,
-                                      sensekit_parameter_bin_t& parameterBin) override;
+        virtual void on_get_parameter(astra_streamconnection_t connection,
+                                      astra_parameter_id id,
+                                      astra_parameter_bin_t& parameterBin) override;
 
-        virtual void on_invoke(sensekit_streamconnection_t connection,
-                               sensekit_command_id commandId,
+        virtual void on_invoke(astra_streamconnection_t connection,
+                               astra_command_id commandId,
                                size_t inByteLength,
-                               sensekit_parameter_data_t inData,
-                               sensekit_parameter_bin_t& parameterBin) override;
+                               astra_parameter_data_t inData,
+                               astra_parameter_bin_t& parameterBin) override;
     private:
-        void get_view_parameter(sensekit_parameter_bin_t& parameterBin);
+        void get_view_parameter(astra_parameter_bin_t& parameterBin);
         void set_view_parameter(size_t inByteLength,
-                                sensekit_parameter_data_t& inData);
-        void set_use_mouse_probe(size_t inByteLength, sensekit_parameter_data_t& inData);
-        void set_mouse_norm_position(size_t inByteLength, sensekit_parameter_data_t& inData);
-        void set_pause_input(size_t inByteLength, sensekit_parameter_data_t& inData);
-        void set_lock_spawn_point(size_t inByteLength, sensekit_parameter_data_t& inData);
+                                astra_parameter_data_t& inData);
+        void set_use_mouse_probe(size_t inByteLength, astra_parameter_data_t& inData);
+        void set_mouse_norm_position(size_t inByteLength, astra_parameter_data_t& inData);
+        void set_pause_input(size_t inByteLength, astra_parameter_data_t& inData);
+        void set_lock_spawn_point(size_t inByteLength, astra_parameter_data_t& inData);
 
         DebugHandViewType m_viewType{ DEBUG_HAND_VIEW_DEPTH };
         bool m_useMouseProbe { false };

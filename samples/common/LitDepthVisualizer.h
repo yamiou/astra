@@ -1,15 +1,15 @@
 #ifndef LITDEPTHVISUALIZER_H
 #define LITDEPTHVISUALIZER_H
 
-#include <SenseKit/sensekit_capi.h>
-#include <SenseKitUL/streams/Point.h>
-#include <SenseKitUL/Vector.h>
+#include <Astra/astra_capi.h>
+#include <AstraUL/streams/Point.h>
+#include <AstraUL/Vector.h>
 #include <cstring>
 #include <algorithm>
 
 namespace samples { namespace common {
 
-    using namespace sensekit;
+    using namespace astra;
 
     class LitDepthVisualizer
     {
@@ -21,17 +21,17 @@ namespace samples { namespace common {
             m_ambientColor = {30, 30, 30};
         }
 
-        void set_light_color(const sensekit_rgb_pixel_t& color)
+        void set_light_color(const astra_rgb_pixel_t& color)
         {
             m_lightColor = color;
         }
 
-        void set_light_direction(const sensekit_vector3f_t& direction)
+        void set_light_direction(const astra_vector3f_t& direction)
         {
             m_lightVector = Vector3f::from_cvector(direction);
         }
 
-        void set_ambient_color(const sensekit_rgb_pixel_t& color)
+        void set_ambient_color(const astra_rgb_pixel_t& color)
         {
             m_ambientColor = color;
         }
@@ -43,7 +43,7 @@ namespace samples { namespace common {
 
         void update(PointFrame& pointFrame);
 
-        sensekit_rgb_pixel_t* get_output() { return m_outputBuffer.get(); }
+        astra_rgb_pixel_t* get_output() { return m_outputBuffer.get(); }
 
     private:
         using VectorMapPtr = std::unique_ptr<Vector3f[]>;
@@ -53,13 +53,13 @@ namespace samples { namespace common {
 
         Vector3f m_lightVector;
         unsigned int m_blurRadius{1};
-        sensekit_rgb_pixel_t m_lightColor;
-        sensekit_rgb_pixel_t m_ambientColor;
+        astra_rgb_pixel_t m_lightColor;
+        astra_rgb_pixel_t m_ambientColor;
 
         size_t m_outputWidth;
         size_t m_outputHeight;
 
-        using BufferPtr = std::unique_ptr<sensekit_rgb_pixel_t[]>;
+        using BufferPtr = std::unique_ptr<astra_rgb_pixel_t[]>;
         BufferPtr m_outputBuffer{nullptr};
 
         void prepare_buffer(size_t width, size_t height);
@@ -222,13 +222,13 @@ namespace samples { namespace common {
         {
             m_outputWidth = width;
             m_outputHeight = height;
-            m_outputBuffer = std::make_unique<sensekit_rgb_pixel_t[]>(m_outputWidth * m_outputHeight);
+            m_outputBuffer = std::make_unique<astra_rgb_pixel_t[]>(m_outputWidth * m_outputHeight);
         }
 
-        std::fill(m_outputBuffer.get(), m_outputBuffer.get()+m_outputWidth*m_outputHeight, sensekit_rgb_pixel_t{0,0,0});
+        std::fill(m_outputBuffer.get(), m_outputBuffer.get()+m_outputWidth*m_outputHeight, astra_rgb_pixel_t{0,0,0});
     }
 
-    void LitDepthVisualizer::update(sensekit::PointFrame& pointFrame)
+    void LitDepthVisualizer::update(astra::PointFrame& pointFrame)
     {
         calculate_normals(pointFrame);
 
@@ -239,7 +239,7 @@ namespace samples { namespace common {
 
         const Vector3f* pointData = pointFrame.data();
 
-        sensekit_rgb_pixel_t* texturePtr = m_outputBuffer.get();
+        astra_rgb_pixel_t* texturePtr = m_outputBuffer.get();
 
         const Vector3f* normMap = m_blurNormalMap.get();
         const bool useNormalMap = normMap != nullptr;
@@ -262,7 +262,7 @@ namespace samples { namespace common {
                     const float fadeFactor = 1 - 0.6*std::max(0.0f, std::min(1.0f, ((depth - 400.0f) / 3200.0f)));
                     const float diffuseFactor = norm.dot(m_lightVector);
 
-                    sensekit_rgb_pixel_t diffuseColor;
+                    astra_rgb_pixel_t diffuseColor;
 
                     if (diffuseFactor > 0)
                     {

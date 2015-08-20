@@ -5,8 +5,8 @@
 #include "FrameInputStream.h"
 #include "../clock/Pulser.h"
 
-namespace sensekit { namespace serialization {
-    
+namespace astra { namespace serialization {
+
     FrameInputStream* open_frame_input_stream(const char* path);
 
     class FrameStreamReader

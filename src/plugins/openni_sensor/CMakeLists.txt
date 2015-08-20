@@ -14,7 +14,7 @@ set(${_projname}_SOURCES
   oni_mappers.cpp
   )
 
-add_definitions(-DSENSEKIT_BUILD)
+add_definitions(-DASTRA_BUILD)
 
 if (WIN32)
   find_library(OpenNI2_LIBRARY NAMES "OpenNI2.lib" HINTS "$ENV{OPENNI2_LIB}" PATH_SUFFIXES lib)
@@ -32,7 +32,7 @@ add_library(${_projname} SHARED ${${_projname}_SOURCES})
 
 set_target_properties(${_projname} PROPERTIES FOLDER "plugins")
 
-target_link_libraries(${_projname} SenseKitAPI Shiny ${OpenNI2_LIBRARY})
+target_link_libraries(${_projname} AstraAPI Shiny ${OpenNI2_LIBRARY})
 
 install(TARGETS ${_projname}
   RUNTIME DESTINATION bin/Plugins/

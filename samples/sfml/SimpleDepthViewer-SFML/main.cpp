@@ -1,12 +1,12 @@
 #include <SFML/Graphics.hpp>
-#include <Sensekit/SenseKit.h>
-#include <SensekitUL/SenseKitUL.h>
+#include <Astra/Astra.h>
+#include <AstraUL/AstraUL.h>
 #include "../../common/LitDepthVisualizer.h"
 #include <chrono>
 #include <iostream>
 #include <iomanip>
 
-class DepthFrameListener : public sensekit::FrameReadyListener
+class DepthFrameListener : public astra::FrameReadyListener
 {
 public:
     DepthFrameListener()
@@ -55,10 +55,10 @@ public:
                   << std::endl;
     }
 
-    virtual void on_frame_ready(sensekit::StreamReader& reader,
-                                sensekit::Frame& frame) override
+    virtual void on_frame_ready(astra::StreamReader& reader,
+                                astra::Frame& frame) override
     {
-        sensekit::PointFrame pointFrame = frame.get<sensekit::PointFrame>();
+        astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
 
         int width = pointFrame.resolutionX();
         int height = pointFrame.resolutionY();
@@ -67,7 +67,7 @@ public:
 
         m_visualizer.update(pointFrame);
 
-        sensekit_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
+        astra_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
         for(int i = 0; i < width * height; i++)
         {
             int rgbaOffset = i *4;
@@ -111,15 +111,15 @@ private:
 
 int main(int argc, char** argv)
 {
-    sensekit::SenseKit::initialize();
+    astra::Astra::initialize();
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Depth Viewer");
 
-    sensekit::Sensor sensor;
-    sensekit::StreamReader reader = sensor.create_reader();
+    astra::Sensor sensor;
+    astra::StreamReader reader = sensor.create_reader();
 
-    reader.stream<sensekit::PointStream>().start();
-    auto ds = reader.stream<sensekit::DepthStream>();
+    reader.stream<astra::PointStream>().start();
+    auto ds = reader.stream<astra::DepthStream>();
     ds.start();
 
     DepthFrameListener listener;
@@ -128,7 +128,7 @@ int main(int argc, char** argv)
 
     while (window.isOpen())
     {
-        sensekit_temp_update();
+        astra_temp_update();
 
         sf::Event event;
         while (window.pollEvent(event))
@@ -148,6 +148,6 @@ int main(int argc, char** argv)
         window.display();
     }
 
-    sensekit::SenseKit::terminate();
+    astra::Astra::terminate();
     return 0;
 }
