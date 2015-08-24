@@ -329,7 +329,7 @@ namespace astra {
             }
         }
 
-        for(auto pair : m_streamMap)
+        for(auto& pair : m_streamMap)
         {
             ReaderConnectionData* data = pair.second;
             data->isNewFrameReady = false;
@@ -343,7 +343,7 @@ namespace astra {
 
         //Do the connection unlock separately because unlock()
         //could call connection_frame_ready(...) again and we want to be ready
-        for(auto pair : m_streamMap)
+        for(auto& pair : m_streamMap)
         {
             ReaderConnectionData* data = pair.second;
             data->connection->unlock();
@@ -359,6 +359,7 @@ namespace astra {
         {
             auto& desc = connection->get_description();
 
+            //SDEBUG("StreamReader", "%x: new %u frame", this, desc.type);
             auto pair = m_streamMap.find(desc);
 
             if (pair != m_streamMap.end())
@@ -367,6 +368,10 @@ namespace astra {
                 ReaderConnectionData* data = pair->second;
                 data->isNewFrameReady = true;
                 data->currentFrameIndex = frameIndex;
+            }
+            else
+            {
+                SWARN("StreamReader", "Unknown frame readied!");
             }
 
             check_for_all_frames_ready();
@@ -377,7 +382,7 @@ namespace astra {
     {
         STRACE("StreamReader", "%x check_for_all_frames_ready", this);
         bool allReady = true;
-        for (auto pair : m_streamMap)
+        for (auto& pair : m_streamMap)
         {
             ReaderConnectionData* data = pair.second;
             if (!data->isNewFrameReady)
@@ -385,6 +390,7 @@ namespace astra {
                 //TODO the new frames may not be synced.
                 //We need matching frame indices in the future
                 allReady = false;
+                break;
             }
         }
 

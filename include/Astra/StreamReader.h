@@ -14,9 +14,6 @@ namespace astra {
     class StreamReader
     {
     public:
-        StreamReader()
-        {}
-
         StreamReader(astra_reader_t reader)
             : m_readerRef(std::make_shared<ReaderRef>(reader))
         {}

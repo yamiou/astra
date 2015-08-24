@@ -23,14 +23,10 @@ namespace astra { namespace plugins { namespace depth {
                               streamSet,
                               StreamDescription(ASTRA_STREAM_STYLIZED_DEPTH,
                                                 DEFAULT_SUBTYPE), 0),
-              m_sourceStream(sourceStream)
+              m_sourceStream(sourceStream),
+              m_sensor(get_uri_for_streamset(pluginService, streamSet)),
+              m_reader(m_sensor.create_reader())
         {
-            const char* uri;
-            get_pluginService().get_streamset_uri(streamSet, &uri);
-
-            m_sensor = Sensor(uri);
-            m_reader = m_sensor.create_reader();
-
             m_depthStream = m_reader.stream<astra::DepthStream>();
             m_depthStream.start();
 
@@ -73,8 +69,8 @@ namespace astra { namespace plugins { namespace depth {
     private:
         DepthStream m_depthStream{nullptr};
         astra_stream_t m_sourceStream{nullptr};
-        StreamReader m_reader;
         Sensor m_sensor;
+        StreamReader m_reader;
     };
 
 }}}
