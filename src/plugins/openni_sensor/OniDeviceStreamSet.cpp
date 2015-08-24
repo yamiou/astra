@@ -70,19 +70,23 @@ namespace astra { namespace plugins {
         int streamIndex = -1;
         int timeout = openni::TIMEOUT_NONE;
 
-        if (openni::OpenNI::waitForAnyStream(m_oniStreams.data(),
-                                             m_streams.size(),
-                                             &streamIndex,
-                                             timeout)
-            == openni::STATUS_TIME_OUT)
+        openni::Status rc;
+        int i = 0;
+
+        do
+        {
+            rc = openni::OpenNI::waitForAnyStream(m_oniStreams.data(),
+                                                  m_streams.size(),
+                                                  &streamIndex,
+                                                  timeout);
+
+            if (streamIndex != -1) m_streams[streamIndex]->read_frame();
+        } while (i++ < m_streams.size() && rc == openni::STATUS_OK);
+
+        if (rc == openni::STATUS_TIME_OUT)
         {
             return ASTRA_STATUS_TIMEOUT;
         }
-
-        if (streamIndex == -1)
-            return ASTRA_STATUS_TIMEOUT;
-
-        m_streams[streamIndex]->read_frame();
 
         return ASTRA_STATUS_SUCCESS;
     }
@@ -136,6 +140,11 @@ namespace astra { namespace plugins {
 
             if ( rc != ASTRA_STATUS_SUCCESS)
                 SWARN("OniDeviceStreamSet", "unable to open openni depth stream.");
+        }
+
+        if (m_oniStreams.size() > 1)
+        {
+            m_oniDevice.setDepthColorSyncEnabled(true);
         }
 
         return ASTRA_STATUS_SUCCESS;

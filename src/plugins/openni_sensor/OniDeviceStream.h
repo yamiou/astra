@@ -375,6 +375,7 @@ namespace astra { namespace plugins {
         PROFILE_BEGIN(oni_stream_readFrame);
         auto status = m_oniStream.readFrame(&ref);
         PROFILE_END();
+
         if (status == ::openni::STATUS_OK)
         {
             const block_type* oniFrameData = static_cast<const block_type*>(ref.getData());
