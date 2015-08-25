@@ -68,7 +68,7 @@ namespace orbbec { namespace ni {
             std::size_t resultByteLength = sizeof(conversion_cache_t);
 
             astra_parameter_data_t parameterData;
-            astra_status_t rc = get_pluginService().get_parameter_bin(resultByteLength,
+            astra_status_t rc = pluginService().get_parameter_bin(resultByteLength,
                                                                       &parameterBin,
                                                                       &parameterData);
             if (rc == ASTRA_STATUS_SUCCESS)

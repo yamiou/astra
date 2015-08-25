@@ -54,7 +54,7 @@ namespace orbbec { namespace ni {
             if (isOpen_)
                 return ASTRA_STATUS_SUCCESS;
 
-            SINFO("oni_devicestream", "creating oni stream of type: %d", get_description().get_type());
+            SINFO("orbbec.ni.devicestream", "creating oni stream of type: %d", get_description().get_type());
             openni::Status rc = oniStream_.create(oniDevice_, oniSensorType_);
 
             if (rc != openni::STATUS_OK)
@@ -62,12 +62,12 @@ namespace orbbec { namespace ni {
                 return ASTRA_STATUS_DEVICE_ERROR;
             }
 
-            SINFO("oni_devicestream", "created oni stream of type: %d", get_description().get_type());
+            SINFO("orbbec.ni.devicestream", "created oni stream of type: %d", get_description().get_type());
 
             const openni::SensorInfo& pInfo = oniStream_.getSensorInfo();
             auto& modes = pInfo.getSupportedVideoModes();
 
-            SINFO("oni_devicestream", "stream type %d supports modes:", get_description().get_type());
+            SINFO("orbbec.ni.devicestream", "stream type %d supports modes:", get_description().get_type());
 
             for(int i = 0; i < modes.getSize(); i++)
             {
@@ -80,7 +80,7 @@ namespace orbbec { namespace ni {
                     modes_.push_back(mode);
                 }
 
-                SINFO("oni_devicestream", "- w: %d h: %d fps: %d pf: %d",
+                SINFO("orbbec.ni.devicestream", "- w: %d h: %d fps: %d pf: %d",
                       oniMode.getResolutionX(),
                       oniMode.getResolutionY(),
                       oniMode.getFps(),
@@ -90,7 +90,7 @@ namespace orbbec { namespace ni {
             oniVideoMode_ = oniStream_.getVideoMode();
             mode_ = convert_mode(oniVideoMode_);
 
-            SINFO("oni_devicestream", "Selected mode: w: %d h: %d fps: %d pf: %d",
+            SINFO("orbbec.ni.devicestream", "Selected mode: w: %d h: %d fps: %d pf: %d",
                   mode_.width,
                   mode_.height,
                   mode_.fps,
@@ -103,7 +103,7 @@ namespace orbbec { namespace ni {
                 mode_.height *
                 mode_.bytesPerPixel;
 
-            bin_ = std::make_unique<bin_type>(get_pluginService(),
+            bin_ = std::make_unique<bin_type>(pluginService(),
                                               get_handle(),
                                               bufferLength_);
 
@@ -125,7 +125,7 @@ namespace orbbec { namespace ni {
 
             on_close();
 
-            SINFO("oni_devicestream", "destroying oni stream of type: %d", get_description().get_type());
+            SINFO("orbbec.ni.devicestream", "destroying oni stream of type: %d", get_description().get_type());
             oniStream_.destroy();
 
             isOpen_ = isStreaming_ = false;
@@ -139,9 +139,9 @@ namespace orbbec { namespace ni {
             if (!isOpen_ || isStreaming_)
                 return ASTRA_STATUS_SUCCESS;
 
-            SINFO("oni_devicestream", "starting oni stream of type: %d", get_description().get_type());
+            SINFO("orbbec.ni.devicestream", "starting oni stream of type: %d", get_description().get_type());
             oniStream_.start();
-            SINFO("oni_devicestream", "started oni stream of type: %d", get_description().get_type());
+            SINFO("orbbec.ni.devicestream", "started oni stream of type: %d", get_description().get_type());
 
             isStreaming_ = true;
 
@@ -154,9 +154,9 @@ namespace orbbec { namespace ni {
             if (!isOpen_ || !isStreaming_)
                 return ASTRA_STATUS_SUCCESS;
 
-            SINFO("oni_devicestream", "stopping oni stream of type: %d", get_description().get_type());
+            SINFO("orbbec.ni.devicestream", "stopping oni stream of type: %d", get_description().get_type());
             oniStream_.stop();
-            SINFO("oni_devicestream", "stopped oni stream of type: %d", get_description().get_type());
+            SINFO("orbbec.ni.devicestream", "stopped oni stream of type: %d", get_description().get_type());
 
             isStreaming_ = false;
 
@@ -178,7 +178,7 @@ namespace orbbec { namespace ni {
                 size_t resultByteLength = sizeof(float);
 
                 astra_parameter_data_t parameterData;
-                astra_status_t rc = get_pluginService().get_parameter_bin(resultByteLength,
+                astra_status_t rc = pluginService().get_parameter_bin(resultByteLength,
                                                                           &parameterBin,
                                                                           &parameterData);
                 if (rc == ASTRA_STATUS_SUCCESS)
@@ -193,7 +193,7 @@ namespace orbbec { namespace ni {
                 size_t resultByteLength = sizeof(float);
 
                 astra_parameter_data_t parameterData;
-                astra_status_t rc = get_pluginService().get_parameter_bin(resultByteLength,
+                astra_status_t rc = pluginService().get_parameter_bin(resultByteLength,
                                                                           &parameterBin,
                                                                           &parameterData);
                 if (rc == ASTRA_STATUS_SUCCESS)
@@ -208,7 +208,7 @@ namespace orbbec { namespace ni {
                 size_t resultByteLength = sizeof(bool);
 
                 astra_parameter_data_t parameterData;
-                astra_status_t rc = get_pluginService().get_parameter_bin(resultByteLength,
+                astra_status_t rc = pluginService().get_parameter_bin(resultByteLength,
                                                                           &parameterBin,
                                                                           &parameterData);
                 if (rc == ASTRA_STATUS_SUCCESS)
@@ -224,7 +224,7 @@ namespace orbbec { namespace ni {
                 std::size_t resultSize = sizeof(astra_imagestream_mode_t) * modes_.size();
 
                 astra_parameter_data_t parameterData;
-                astra_status_t rc = get_pluginService().get_parameter_bin(resultSize,
+                astra_status_t rc = pluginService().get_parameter_bin(resultSize,
                                                                           &parameterBin,
                                                                           &parameterData);
 
@@ -263,7 +263,7 @@ namespace orbbec { namespace ni {
 
                 if (rc == ::openni::STATUS_OK)
                 {
-                    SINFO("oni_devicestream", "stream mode changed");
+                    SINFO("orbbec.ni.devicestream", "stream mode changed");
                     oniVideoMode_ = oniMode;
                     mode_ = *mode;
                 }
