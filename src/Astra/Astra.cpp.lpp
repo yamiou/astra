@@ -1,33 +1,35 @@
 /* ^^^AUTOGENHEADER^^^ */
+
 #include "AstraContext.h"
 #include <Astra/Plugins/StreamServiceProxyBase.h>
 #include <AstraAPI.h>
 #include <Astra/host_events.h>
 #include <memory>
+#include <cstring>
 
-static std::unique_ptr<astra::AstraContext> g_ContextPtr(nullptr);
-static bool g_Initialized = false;
+static std::unique_ptr<astra::AstraContext> g_contextPtr(nullptr);
+static bool g_initialized = false;
 
 ASTRA_BEGIN_DECLS
 
 ASTRA_API astra_status_t astra_initialize()
 {
-    if (g_Initialized)
+    if (g_initialized)
         return ASTRA_STATUS_SUCCESS;
 
-    g_Initialized = true;
-    g_ContextPtr = std::make_unique<astra::AstraContext>();
+    g_initialized = true;
+    g_contextPtr = std::make_unique<astra::AstraContext>();
 
-    return g_ContextPtr->initialize();
+    return g_contextPtr->initialize();
 }
 
 ASTRA_API astra_status_t astra_terminate()
 {
-    if (!g_Initialized)
+    if (!g_initialized)
         return ASTRA_STATUS_SUCCESS;
 
-    astra_status_t rc =  g_ContextPtr->terminate();
-    g_Initialized = false;
+    astra_status_t rc =  g_contextPtr->terminate();
+    g_initialized = false;
 
     return rc;
 }
@@ -35,9 +37,9 @@ ASTRA_API astra_status_t astra_terminate()
 ^^^BEGINREPLACE:stream^^^
 ASTRA_API ^RETURN^ astra_^FUNC^(^PARAMS^)
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->^FUNC^(^PARAMS:names,deref^);
+        return g_contextPtr->^FUNC^(^PARAMS:names,deref^);
     }
     else
     {
@@ -48,9 +50,9 @@ ASTRA_API ^RETURN^ astra_^FUNC^(^PARAMS^)
 ^^^ENDREPLACE^^^
 ASTRA_API astra_status_t astra_notify_host_event(astra_event_id id, const void* data, size_t dataSize)
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->notify_host_event(id, data, dataSize);
+        return g_contextPtr->notify_host_event(id, data, dataSize);
     }
     else
     {
@@ -60,12 +62,12 @@ ASTRA_API astra_status_t astra_notify_host_event(astra_event_id id, const void* 
 
 ASTRA_API astra_status_t astra_notify_resource_available(const char* resourceURI)
 {
-    return astra_notify_host_event(ASTRA_EVENT_RESOURCE_AVAILABLE, resourceURI, strlen(resourceURI));
+    return astra_notify_host_event(ASTRA_EVENT_RESOURCE_AVAILABLE, resourceURI, std::strlen(resourceURI));
 }
 
 ASTRA_API astra_status_t astra_notify_resource_unavailable(const char* resourceURI)
 {
-    return astra_notify_host_event(ASTRA_EVENT_RESOURCE_UNAVAILABLE, resourceURI, strlen(resourceURI));
+    return astra_notify_host_event(ASTRA_EVENT_RESOURCE_UNAVAILABLE, resourceURI, std::strlen(resourceURI));
 }
 
 ASTRA_END_DECLS

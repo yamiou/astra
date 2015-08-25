@@ -1,33 +1,35 @@
 /* THIS FILE AUTO-GENERATED FROM Astra.cpp.lpp. DO NOT EDIT. */
+
 #include "AstraContext.h"
 #include <Astra/Plugins/StreamServiceProxyBase.h>
 #include <AstraAPI.h>
 #include <Astra/host_events.h>
 #include <memory>
+#include <cstring>
 
-static std::unique_ptr<astra::AstraContext> g_ContextPtr(nullptr);
-static bool g_Initialized = false;
+static std::unique_ptr<astra::AstraContext> g_contextPtr(nullptr);
+static bool g_initialized = false;
 
 ASTRA_BEGIN_DECLS
 
 ASTRA_API astra_status_t astra_initialize()
 {
-    if (g_Initialized)
+    if (g_initialized)
         return ASTRA_STATUS_SUCCESS;
 
-    g_Initialized = true;
-    g_ContextPtr = std::make_unique<astra::AstraContext>();
+    g_initialized = true;
+    g_contextPtr = std::make_unique<astra::AstraContext>();
 
-    return g_ContextPtr->initialize();
+    return g_contextPtr->initialize();
 }
 
 ASTRA_API astra_status_t astra_terminate()
 {
-    if (!g_Initialized)
+    if (!g_initialized)
         return ASTRA_STATUS_SUCCESS;
 
-    astra_status_t rc =  g_ContextPtr->terminate();
-    g_Initialized = false;
+    astra_status_t rc =  g_contextPtr->terminate();
+    g_initialized = false;
 
     return rc;
 }
@@ -35,9 +37,9 @@ ASTRA_API astra_status_t astra_terminate()
 ASTRA_API astra_status_t astra_streamset_open(const char* connectionString,
                                               astra_streamsetconnection_t* streamSet)
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->streamset_open(connectionString, *streamSet);
+        return g_contextPtr->streamset_open(connectionString, *streamSet);
     }
     else
     {
@@ -47,9 +49,9 @@ ASTRA_API astra_status_t astra_streamset_open(const char* connectionString,
 
 ASTRA_API astra_status_t astra_streamset_close(astra_streamsetconnection_t* streamSet)
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->streamset_close(*streamSet);
+        return g_contextPtr->streamset_close(*streamSet);
     }
     else
     {
@@ -60,9 +62,9 @@ ASTRA_API astra_status_t astra_streamset_close(astra_streamsetconnection_t* stre
 ASTRA_API astra_status_t astra_reader_create(astra_streamsetconnection_t streamSet,
                                              astra_reader_t* reader)
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->reader_create(streamSet, *reader);
+        return g_contextPtr->reader_create(streamSet, *reader);
     }
     else
     {
@@ -72,9 +74,9 @@ ASTRA_API astra_status_t astra_reader_create(astra_streamsetconnection_t streamS
 
 ASTRA_API astra_status_t astra_reader_destroy(astra_reader_t* reader)
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->reader_destroy(*reader);
+        return g_contextPtr->reader_destroy(*reader);
     }
     else
     {
@@ -87,9 +89,9 @@ ASTRA_API astra_status_t astra_reader_get_stream(astra_reader_t reader,
                                                  astra_stream_subtype_t subtype,
                                                  astra_streamconnection_t* connection)
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->reader_get_stream(reader, type, subtype, *connection);
+        return g_contextPtr->reader_get_stream(reader, type, subtype, *connection);
     }
     else
     {
@@ -100,9 +102,9 @@ ASTRA_API astra_status_t astra_reader_get_stream(astra_reader_t reader,
 ASTRA_API astra_status_t astra_stream_get_description(astra_streamconnection_t connection,
                                                       astra_stream_desc_t* description)
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->stream_get_description(connection, description);
+        return g_contextPtr->stream_get_description(connection, description);
     }
     else
     {
@@ -112,9 +114,9 @@ ASTRA_API astra_status_t astra_stream_get_description(astra_streamconnection_t c
 
 ASTRA_API astra_status_t astra_stream_start(astra_streamconnection_t connection)
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->stream_start(connection);
+        return g_contextPtr->stream_start(connection);
     }
     else
     {
@@ -124,9 +126,9 @@ ASTRA_API astra_status_t astra_stream_start(astra_streamconnection_t connection)
 
 ASTRA_API astra_status_t astra_stream_stop(astra_streamconnection_t connection)
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->stream_stop(connection);
+        return g_contextPtr->stream_stop(connection);
     }
     else
     {
@@ -138,9 +140,9 @@ ASTRA_API astra_status_t astra_reader_open_frame(astra_reader_t reader,
                                                  int timeoutMillis,
                                                  astra_reader_frame_t* frame)
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->reader_open_frame(reader, timeoutMillis, *frame);
+        return g_contextPtr->reader_open_frame(reader, timeoutMillis, *frame);
     }
     else
     {
@@ -150,9 +152,9 @@ ASTRA_API astra_status_t astra_reader_open_frame(astra_reader_t reader,
 
 ASTRA_API astra_status_t astra_reader_close_frame(astra_reader_frame_t* frame)
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->reader_close_frame(*frame);
+        return g_contextPtr->reader_close_frame(*frame);
     }
     else
     {
@@ -165,9 +167,9 @@ ASTRA_API astra_status_t astra_reader_register_frame_ready_callback(astra_reader
                                                                     void* clientTag,
                                                                     astra_reader_callback_id_t* callbackId)
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->reader_register_frame_ready_callback(reader, callback, clientTag, *callbackId);
+        return g_contextPtr->reader_register_frame_ready_callback(reader, callback, clientTag, *callbackId);
     }
     else
     {
@@ -177,9 +179,9 @@ ASTRA_API astra_status_t astra_reader_register_frame_ready_callback(astra_reader
 
 ASTRA_API astra_status_t astra_reader_unregister_frame_ready_callback(astra_reader_callback_id_t* callbackId)
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->reader_unregister_frame_ready_callback(*callbackId);
+        return g_contextPtr->reader_unregister_frame_ready_callback(*callbackId);
     }
     else
     {
@@ -192,9 +194,9 @@ ASTRA_API astra_status_t astra_reader_get_frame(astra_reader_frame_t frame,
                                                 astra_stream_subtype_t subtype,
                                                 astra_frame_t** subFrame)
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->reader_get_frame(frame, type, subtype, *subFrame);
+        return g_contextPtr->reader_get_frame(frame, type, subtype, *subFrame);
     }
     else
     {
@@ -207,9 +209,9 @@ ASTRA_API astra_status_t astra_stream_set_parameter(astra_streamconnection_t con
                                                     size_t inByteLength,
                                                     astra_parameter_data_t inData)
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->stream_set_parameter(connection, parameterId, inByteLength, inData);
+        return g_contextPtr->stream_set_parameter(connection, parameterId, inByteLength, inData);
     }
     else
     {
@@ -222,9 +224,9 @@ ASTRA_API astra_status_t astra_stream_get_parameter(astra_streamconnection_t con
                                                     size_t* resultByteLength,
                                                     astra_result_token_t* token)
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->stream_get_parameter(connection, parameterId, *resultByteLength, *token);
+        return g_contextPtr->stream_get_parameter(connection, parameterId, *resultByteLength, *token);
     }
     else
     {
@@ -237,9 +239,9 @@ ASTRA_API astra_status_t astra_stream_get_result(astra_streamconnection_t connec
                                                  size_t dataByteLength,
                                                  astra_parameter_data_t dataDestination)
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->stream_get_result(connection, token, dataByteLength, dataDestination);
+        return g_contextPtr->stream_get_result(connection, token, dataByteLength, dataDestination);
     }
     else
     {
@@ -254,9 +256,9 @@ ASTRA_API astra_status_t astra_stream_invoke(astra_streamconnection_t connection
                                              size_t* resultByteLength,
                                              astra_result_token_t* token)
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->stream_invoke(connection, commandId, inByteLength, inData, *resultByteLength, *token);
+        return g_contextPtr->stream_invoke(connection, commandId, inByteLength, inData, *resultByteLength, *token);
     }
     else
     {
@@ -266,9 +268,9 @@ ASTRA_API astra_status_t astra_stream_invoke(astra_streamconnection_t connection
 
 ASTRA_API astra_status_t astra_temp_update()
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->temp_update();
+        return g_contextPtr->temp_update();
     }
     else
     {
@@ -278,9 +280,9 @@ ASTRA_API astra_status_t astra_temp_update()
 
 ASTRA_API astra_status_t astra_notify_host_event(astra_event_id id, const void* data, size_t dataSize)
 {
-    if (g_ContextPtr)
+    if (g_contextPtr)
     {
-        return g_ContextPtr->notify_host_event(id, data, dataSize);
+        return g_contextPtr->notify_host_event(id, data, dataSize);
     }
     else
     {
@@ -290,12 +292,12 @@ ASTRA_API astra_status_t astra_notify_host_event(astra_event_id id, const void* 
 
 ASTRA_API astra_status_t astra_notify_resource_available(const char* resourceURI)
 {
-    return astra_notify_host_event(ASTRA_EVENT_RESOURCE_AVAILABLE, resourceURI, strlen(resourceURI));
+    return astra_notify_host_event(ASTRA_EVENT_RESOURCE_AVAILABLE, resourceURI, std::strlen(resourceURI));
 }
 
 ASTRA_API astra_status_t astra_notify_resource_unavailable(const char* resourceURI)
 {
-    return astra_notify_host_event(ASTRA_EVENT_RESOURCE_UNAVAILABLE, resourceURI, strlen(resourceURI));
+    return astra_notify_host_event(ASTRA_EVENT_RESOURCE_UNAVAILABLE, resourceURI, std::strlen(resourceURI));
 }
 
 ASTRA_END_DECLS
