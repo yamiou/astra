@@ -14,7 +14,7 @@ namespace astra {
         static Configuration* load_from_file(const char* tomlFilePath);
 
     private:
-        astra_log_severity_t m_severityLevel{SK_INFO};
+        astra_log_severity_t m_severityLevel{ASTRA_SEVERITY_INFO};
     };
 }
 

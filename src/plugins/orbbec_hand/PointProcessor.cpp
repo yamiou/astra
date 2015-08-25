@@ -178,7 +178,7 @@ namespace astra { namespace plugins { namespace hand {
 
             if (trackedPoint.trackingStatus == TrackingStatus::Tracking)
             {
-                STRACE("PointProcessor", "updateTrackedPoint 2nd chance recovered #%d",
+                LOG_TRACE("PointProcessor", "updateTrackedPoint 2nd chance recovered #%d",
                               trackedPoint.trackingId);
             }
         }
@@ -372,7 +372,7 @@ namespace astra { namespace plugins { namespace hand {
         PROFILE_FUNC();
         if (!trackedPoint.isInProbation)
         {
-            STRACE("PointProcessor", "started probation for: %d", trackedPoint.trackingId);
+            LOG_TRACE("PointProcessor", "started probation for: %d", trackedPoint.trackingId);
             trackedPoint.isInProbation = true;
             trackedPoint.probationFrameCount = 0;
             trackedPoint.failedTestCount = 0;
@@ -452,7 +452,7 @@ namespace astra { namespace plugins { namespace hand {
                 //gave the active point a few extra frames to recover
                 trackedPoint.trackingStatus = TrackingStatus::Lost;
                 probationFailed = true;
-                STRACE("PointProcessor", "lost an active point: %d", trackedPoint.trackingId);
+                LOG_TRACE("PointProcessor", "lost an active point: %d", trackedPoint.trackingId);
             }
             else if (trackedPoint.pointType == TrackedPointType::CandidatePoint &&
                      trackedPoint.failedTestCount >= m_settings.maxFailedTestsInProbation)
@@ -468,7 +468,7 @@ namespace astra { namespace plugins { namespace hand {
             {
                 //you're out of probation, but we're keeping an eye on you...
                 end_probation(trackedPoint);
-                STRACE("PointProcessor", "ended probation: %d count: %d/%d probationFailed: %d",
+                LOG_TRACE("PointProcessor", "ended probation: %d count: %d/%d probationFailed: %d",
                             trackedPoint.trackingId,
                             trackedPoint.probationFrameCount,
                             m_settings.probationFrameCount,
@@ -483,7 +483,7 @@ namespace astra { namespace plugins { namespace hand {
 
         if (trackedPoint.trackingStatus != oldStatus)
         {
-            STRACE("PointProcessor", "validateAndUpdateTrackedPoint: #%d status %s --> status %s",
+            LOG_TRACE("PointProcessor", "validateAndUpdateTrackedPoint: #%d status %s --> status %s",
                            trackedPoint.trackingId,
                            tracking_status_to_string(oldStatus).c_str(),
                            tracking_status_to_string(trackedPoint.trackingStatus).c_str());
@@ -622,7 +622,7 @@ namespace astra { namespace plugins { namespace hand {
                         trackedPoint.worldPosition = worldPosition;
                         trackedPoint.worldDeltaPosition = cv::Point3f();
 
-                        STRACE("PointProcessor", "createCycle: Recovered #%d",
+                        LOG_TRACE("PointProcessor", "createCycle: Recovered #%d",
                                         trackedPoint.trackingId);
 
                         //it could be faulty recovery, so start out in probation just like a new point
@@ -636,7 +636,7 @@ namespace astra { namespace plugins { namespace hand {
         }
         if (!existingPoint)
         {
-            STRACE("PointProcessor", "createCycle: Created new point #%d",
+            LOG_TRACE("PointProcessor", "createCycle: Created new point #%d",
                            m_nextTrackingId);
 
             TrackedPoint newPoint(targetPoint, worldPosition, m_nextTrackingId);

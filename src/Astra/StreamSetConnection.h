@@ -21,7 +21,7 @@ namespace astra {
 
         ~StreamSetConnection()
         {
-            STRACE("StreamSetConnection", "destroying StreamSetConnection: %p", this);
+            LOG_TRACE("StreamSetConnection", "destroying StreamSetConnection: %p", this);
         }
 
         StreamSetConnection& operator=(const StreamSetConnection& rhs) = delete;

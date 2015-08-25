@@ -32,8 +32,8 @@ namespace astra {
         std::unique_ptr<Configuration> config(Configuration::load_from_file(configPath.c_str()));
         initialize_logging(logPath.c_str(), config->severityLevel());
 
-        SWARN("AstraContext", "Hold on to yer butts");
-        SINFO("AstraContext", "logger file: %s", logPath.c_str());
+        LOG_WARN("AstraContext", "Hold on to yer butts");
+        LOG_INFO("AstraContext", "logger file: %s", logPath.c_str());
 
         m_pluginManager = std::make_unique<PluginManager>(m_setCatalog);
 
@@ -47,7 +47,7 @@ namespace astra {
 
         if (m_pluginManager->plugin_count() == 0)
         {
-            SWARN("AstraContext", "Astra found no plugins. Is there a Plugins folder? Is the working directory correct?");
+            LOG_WARN("AstraContext", "Astra found no plugins. Is there a Plugins folder? Is the working directory correct?");
         }
 
         m_initialized = true;
@@ -64,14 +64,14 @@ namespace astra {
 
         m_initialized = false;
 
-        SINFO("AstraContext", "Astra terminated.");
+        LOG_INFO("AstraContext", "Astra terminated.");
 
         return ASTRA_STATUS_SUCCESS;
     }
 
     astra_status_t AstraContextImpl::streamset_open(const char* uri, astra_streamsetconnection_t& streamSet)
     {
-        SINFO("AstraContext", "client opening streamset: %s", uri);
+        LOG_INFO("AstraContext", "client opening streamset: %s", uri);
 
         StreamSetConnection& conn = m_setCatalog.open_set_connection(uri);
         streamSet = conn.get_handle();
@@ -95,7 +95,7 @@ namespace astra {
         }
         else
         {
-            SWARN("AstraContext", "attempt to close a non-existent stream set");
+            LOG_WARN("AstraContext", "attempt to close a non-existent stream set");
         }
 
         streamSet = nullptr;
@@ -127,7 +127,7 @@ namespace astra {
         }
         else
         {
-            SWARN("AstraContext", "attempt to create reader from non-existent stream set");
+            LOG_WARN("AstraContext", "attempt to create reader from non-existent stream set");
             return ASTRA_STATUS_INVALID_PARAMETER;
         }
     }
@@ -145,7 +145,7 @@ namespace astra {
         }
         else
         {
-            SWARN("AstraContext", "attempt to destroy a non-existent reader: %p", reader);
+            LOG_WARN("AstraContext", "attempt to destroy a non-existent reader: %p", reader);
         }
 
         reader = nullptr;
@@ -172,7 +172,7 @@ namespace astra {
         }
         else
         {
-            SWARN("AstraContext", "get_stream called on non-existent reader");
+            LOG_WARN("AstraContext", "get_stream called on non-existent reader");
             connection = nullptr;
         }
 
@@ -190,7 +190,7 @@ namespace astra {
         }
         else
         {
-            SWARN("AstraContext", "get_description called on non-existent stream");
+            LOG_WARN("AstraContext", "get_description called on non-existent stream");
         }
 
         return ASTRA_STATUS_SUCCESS;
@@ -209,7 +209,7 @@ namespace astra {
         }
         else
         {
-            SWARN("AstraContext", "start called on non-existent stream");
+            LOG_WARN("AstraContext", "start called on non-existent stream");
         }
 
         return ASTRA_STATUS_SUCCESS;
@@ -228,7 +228,7 @@ namespace astra {
         }
         else
         {
-            SWARN("AstraContext", "stop called on non-existent stream");
+            LOG_WARN("AstraContext", "stop called on non-existent stream");
         }
 
         return ASTRA_STATUS_SUCCESS;
@@ -240,7 +240,7 @@ namespace astra {
     {
         if (reader == nullptr)
         {
-            SWARN("AstraContext", "reader_open_frame called with null reader");
+            LOG_WARN("AstraContext", "reader_open_frame called with null reader");
             assert(reader != nullptr);
             return ASTRA_STATUS_INVALID_OPERATION;
         }
@@ -253,7 +253,7 @@ namespace astra {
         }
         else
         {
-            SWARN("AstraContext", "open_frame called on non-existent reader");
+            LOG_WARN("AstraContext", "open_frame called on non-existent reader");
             return ASTRA_STATUS_INVALID_PARAMETER;
         }
     }
@@ -262,7 +262,7 @@ namespace astra {
     {
         if (frame == nullptr)
         {
-            SWARN("AstraContext", "reader_close_frame called with null frame");
+            LOG_WARN("AstraContext", "reader_close_frame called with null frame");
             assert(frame != nullptr);
             return ASTRA_STATUS_INVALID_OPERATION;
         }
@@ -271,7 +271,7 @@ namespace astra {
 
         if (!actualReader)
         {
-            SWARN("AstraContext", "reader_close_frame couldn't retrieve StreamReader from frame");
+            LOG_WARN("AstraContext", "reader_close_frame couldn't retrieve StreamReader from frame");
             assert(actualReader != nullptr);
             return ASTRA_STATUS_INTERNAL_ERROR;
         }
@@ -303,7 +303,7 @@ namespace astra {
         }
         else
         {
-            SWARN("AstraContext", "register_frame_ready_callback called on non-existent reader");
+            LOG_WARN("AstraContext", "register_frame_ready_callback called on non-existent reader");
             return ASTRA_STATUS_INVALID_PARAMETER;
         }
     }
@@ -330,7 +330,7 @@ namespace astra {
         }
         else
         {
-            SWARN("AstraContext", "unregister_frame_ready_callback for non-existent reader: %p", cb->reader);
+            LOG_WARN("AstraContext", "unregister_frame_ready_callback for non-existent reader: %p", cb->reader);
         }
 
         delete cb;
@@ -359,7 +359,7 @@ namespace astra {
         }
         else
         {
-            SWARN("AstraContext", "get_frame called on non-existent reader/frame combo");
+            LOG_WARN("AstraContext", "get_frame called on non-existent reader/frame combo");
             return ASTRA_STATUS_INVALID_PARAMETER;
         }
     }
@@ -388,7 +388,7 @@ namespace astra {
         }
         else
         {
-            SWARN("AstraContext", "set_parameter called on non-existent stream");
+            LOG_WARN("AstraContext", "set_parameter called on non-existent stream");
             return ASTRA_STATUS_INVALID_PARAMETER;
         }
     }
@@ -410,7 +410,7 @@ namespace astra {
         }
         else
         {
-            SWARN("AstraContext", "get_parameter called on non-existent stream");
+            LOG_WARN("AstraContext", "get_parameter called on non-existent stream");
             return ASTRA_STATUS_INVALID_PARAMETER;
         }
     }
@@ -430,7 +430,7 @@ namespace astra {
         }
         else
         {
-            SWARN("AstraContext", "get_result called on non-existent stream");
+            LOG_WARN("AstraContext", "get_result called on non-existent stream");
             return ASTRA_STATUS_INVALID_PARAMETER;
         }
     }
@@ -454,7 +454,7 @@ namespace astra {
         }
         else
         {
-            SWARN("AstraContext", "invoke called on non-existent stream");
+            LOG_WARN("AstraContext", "invoke called on non-existent stream");
             return ASTRA_STATUS_INVALID_PARAMETER;
         }
     }

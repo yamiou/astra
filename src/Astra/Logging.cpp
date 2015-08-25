@@ -8,17 +8,17 @@ namespace astra {
     {
         switch (severity)
         {
-        case SK_INFO:
+        case ASTRA_SEVERITY_INFO:
             return el::Level::Info;
-        case SK_WARN:
+        case ASTRA_SEVERITY_WARN:
             return el::Level::Warning;
-        case SK_ERROR:
+        case ASTRA_SEVERITY_ERROR:
             return el::Level::Error;
-        case SK_FATAL:
+        case ASTRA_SEVERITY_FATAL:
             return el::Level::Fatal;
-        case SK_DEBUG:
+        case ASTRA_SEVERITY_DEBUG:
             return el::Level::Debug;
-        case SK_TRACE:
+        case ASTRA_SEVERITY_TRACE:
             return el::Level::Trace;
         default:
             return el::Level::Unknown;

@@ -54,7 +54,7 @@ namespace orbbec { namespace ni {
             if (isOpen_)
                 return ASTRA_STATUS_SUCCESS;
 
-            SINFO("orbbec.ni.devicestream", "creating oni stream of type: %d", get_description().get_type());
+            LOG_INFO("orbbec.ni.devicestream", "creating oni stream of type: %d", get_description().get_type());
             openni::Status rc = oniStream_.create(oniDevice_, oniSensorType_);
 
             if (rc != openni::STATUS_OK)
@@ -62,12 +62,12 @@ namespace orbbec { namespace ni {
                 return ASTRA_STATUS_DEVICE_ERROR;
             }
 
-            SINFO("orbbec.ni.devicestream", "created oni stream of type: %d", get_description().get_type());
+            LOG_INFO("orbbec.ni.devicestream", "created oni stream of type: %d", get_description().get_type());
 
             const openni::SensorInfo& pInfo = oniStream_.getSensorInfo();
             auto& modes = pInfo.getSupportedVideoModes();
 
-            SINFO("orbbec.ni.devicestream", "stream type %d supports modes:", get_description().get_type());
+            LOG_INFO("orbbec.ni.devicestream", "stream type %d supports modes:", get_description().get_type());
 
             for(int i = 0; i < modes.getSize(); i++)
             {
@@ -80,7 +80,7 @@ namespace orbbec { namespace ni {
                     modes_.push_back(mode);
                 }
 
-                SINFO("orbbec.ni.devicestream", "- w: %d h: %d fps: %d pf: %d",
+                LOG_INFO("orbbec.ni.devicestream", "- w: %d h: %d fps: %d pf: %d",
                       oniMode.getResolutionX(),
                       oniMode.getResolutionY(),
                       oniMode.getFps(),
@@ -90,7 +90,7 @@ namespace orbbec { namespace ni {
             oniVideoMode_ = oniStream_.getVideoMode();
             mode_ = convert_mode(oniVideoMode_);
 
-            SINFO("orbbec.ni.devicestream", "Selected mode: w: %d h: %d fps: %d pf: %d",
+            LOG_INFO("orbbec.ni.devicestream", "Selected mode: w: %d h: %d fps: %d pf: %d",
                   mode_.width,
                   mode_.height,
                   mode_.fps,
@@ -125,7 +125,7 @@ namespace orbbec { namespace ni {
 
             on_close();
 
-            SINFO("orbbec.ni.devicestream", "destroying oni stream of type: %d", get_description().get_type());
+            LOG_INFO("orbbec.ni.devicestream", "destroying oni stream of type: %d", get_description().get_type());
             oniStream_.destroy();
 
             isOpen_ = isStreaming_ = false;
@@ -139,9 +139,9 @@ namespace orbbec { namespace ni {
             if (!isOpen_ || isStreaming_)
                 return ASTRA_STATUS_SUCCESS;
 
-            SINFO("orbbec.ni.devicestream", "starting oni stream of type: %d", get_description().get_type());
+            LOG_INFO("orbbec.ni.devicestream", "starting oni stream of type: %d", get_description().get_type());
             oniStream_.start();
-            SINFO("orbbec.ni.devicestream", "started oni stream of type: %d", get_description().get_type());
+            LOG_INFO("orbbec.ni.devicestream", "started oni stream of type: %d", get_description().get_type());
 
             isStreaming_ = true;
 
@@ -154,9 +154,9 @@ namespace orbbec { namespace ni {
             if (!isOpen_ || !isStreaming_)
                 return ASTRA_STATUS_SUCCESS;
 
-            SINFO("orbbec.ni.devicestream", "stopping oni stream of type: %d", get_description().get_type());
+            LOG_INFO("orbbec.ni.devicestream", "stopping oni stream of type: %d", get_description().get_type());
             oniStream_.stop();
-            SINFO("orbbec.ni.devicestream", "stopped oni stream of type: %d", get_description().get_type());
+            LOG_INFO("orbbec.ni.devicestream", "stopped oni stream of type: %d", get_description().get_type());
 
             isStreaming_ = false;
 
@@ -263,7 +263,7 @@ namespace orbbec { namespace ni {
 
                 if (rc == ::openni::STATUS_OK)
                 {
-                    SINFO("orbbec.ni.devicestream", "stream mode changed");
+                    LOG_INFO("orbbec.ni.devicestream", "stream mode changed");
                     oniVideoMode_ = oniMode;
                     mode_ = *mode;
                 }

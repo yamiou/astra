@@ -151,7 +151,7 @@ namespace astra { namespace plugins {
     {
         if (m_inhibitCallbacks)
         {
-            SINFO("Stream", "Saving a connection_added for later");
+            LOG_INFO("astra.plugins.Stream", "Saving a connection_added for later");
             m_savedConnections.insert(connection);
         }
         else
@@ -182,11 +182,12 @@ namespace astra { namespace plugins {
         {
             return;
         }
+
         m_inhibitCallbacks = false;
 
         if (m_savedConnections.size() > 0)
         {
-            SINFO("Stream", "Flushing saved connection_added connections");
+            LOG_INFO("astra.plugins.Stream", "Flushing saved connection_added connections");
             for (auto connection : m_savedConnections)
             {
                 on_connection_added(connection);

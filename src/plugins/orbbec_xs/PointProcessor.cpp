@@ -33,7 +33,7 @@ namespace astra { namespace plugins { namespace xs {
 
         if (m_pointStream->has_connections())
         {
-            STRACE("PointProcessor", "updating point frame");
+            LOG_TRACE("PointProcessor", "updating point frame");
             update_pointframe_from_depth(depthFrame);
         }
     }
@@ -47,12 +47,12 @@ namespace astra { namespace plugins { namespace xs {
             return;
         }
         //TODO check for changes in depthFrame width and height and update bin size
-        SINFO("PointerProcessor", "creating point stream");
+        LOG_INFO("PointerProcessor", "creating point stream");
 
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
         m_pointStream = std::make_unique<PointStream>(m_pluginService, m_streamSet, width, height);
-        SINFO("PointProcessor", "created point stream");
+        LOG_INFO("PointProcessor", "created point stream");
 
         m_depthConversionCache = m_depthStream.depth_to_world_data();
     }

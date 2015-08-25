@@ -27,16 +27,16 @@ namespace orbbec { namespace ni {
         if (isOpen_)
             return ASTRA_STATUS_SUCCESS;
 
-        SINFO("orbbec.ni.device_streamset", "opening device: %s", uri_.c_str());
+        LOG_INFO("orbbec.ni.device_streamset", "opening device: %s", uri_.c_str());
         openni::Status rc =  oniDevice_.open(uri_.c_str());
 
         if (rc != openni::STATUS_OK)
         {
-            SWARN("orbbec.ni.device_streamset", "failed to open device: %s", openni::OpenNI::getExtendedError());
+            LOG_WARN("orbbec.ni.device_streamset", "failed to open device: %s", openni::OpenNI::getExtendedError());
             return ASTRA_STATUS_DEVICE_ERROR;
         }
 
-        SINFO("orbbec.ni.device_streamset", "opened device: %s", uri_.c_str());
+        LOG_INFO("orbbec.ni.device_streamset", "opened device: %s", uri_.c_str());
 
         open_sensor_streams();
 
@@ -53,7 +53,7 @@ namespace orbbec { namespace ni {
 
         close_sensor_streams();
 
-        SINFO("orbbec.ni.device_streamset", "closing oni device: %s", uri_.c_str());
+        LOG_INFO("orbbec.ni.device_streamset", "closing oni device: %s", uri_.c_str());
         oniDevice_.close();
 
         isOpen_ = false;
@@ -116,7 +116,7 @@ namespace orbbec { namespace ni {
             }
 
             if ( rc != ASTRA_STATUS_SUCCESS)
-                SWARN("orbbec.ni.device_streamset", "unable to open openni color stream.");
+                LOG_WARN("orbbec.ni.device_streamset", "unable to open openni color stream.");
         }
 
         if (oniDevice_.hasSensor(openni::SENSOR_DEPTH))
@@ -139,7 +139,7 @@ namespace orbbec { namespace ni {
             }
 
             if (rc != ASTRA_STATUS_SUCCESS)
-                SWARN("orbbec.ni.device_streamset", "unable to open openni depth stream.");
+                LOG_WARN("orbbec.ni.device_streamset", "unable to open openni depth stream.");
         }
 
         if (oniStreams_.size() > 1)

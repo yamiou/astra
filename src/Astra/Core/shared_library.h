@@ -4,13 +4,13 @@
 using LibHandle = void*;
 using FarProc = void(*)(void*);
 
-#define SK_STRINGIFY(n) SK_STRINGIFY_HELPER(n)
-#define SK_STRINGIFY_HELPER(n) #n
+#define ASTRA_STRINGIFY(n) ASTRA_STRINGIFY_HELPER(n)
+#define ASTRA_STRINGIFY_HELPER(n) #n
 
 #ifdef _WIN32
-    #define SK_FILE_MAX_PATH MAX_PATH
+    #define ASTRA_FILE_MAX_PATH MAX_PATH
 #else
-    #define SK_FILE_MAX_PATH 256
+    #define ASTRA_FILE_MAX_PATH 256
 #endif
 
 void os_load_library(const char* fileName, LibHandle& libHandle);

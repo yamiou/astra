@@ -7,30 +7,30 @@ namespace astra {
     {
         if (s.find("trace") != std::string::npos)
         {
-            return SK_TRACE;
+            return ASTRA_SEVERITY_TRACE;
         }
         else if (s.find("warn") != std::string::npos)
         {
-            return SK_WARN;
+            return ASTRA_SEVERITY_WARN;
         }
         else if (s.find("debug") != std::string::npos)
         {
-            return SK_DEBUG;
+            return ASTRA_SEVERITY_DEBUG;
         }
         else if (s.find("fatal") != std::string::npos)
         {
-            return SK_FATAL;
+            return ASTRA_SEVERITY_FATAL;
         }
         else if (s.find("info") != std::string::npos)
         {
-            return SK_INFO;
+            return ASTRA_SEVERITY_INFO;
         }
         else if (s.find("error") != std::string::npos)
         {
-            return SK_ERROR;
+            return ASTRA_SEVERITY_ERROR;
         }
 
-        return SK_UNKNOWN;
+        return ASTRA_SEVERITY_UNKNOWN;
     }
 
     Configuration* Configuration::load_from_file(const char* tomlFilePath)
@@ -54,7 +54,7 @@ namespace astra {
             auto logLevel = t.get_qualified(loggingLevelKey)->as<std::string>()->get();
             auto severity = convert_string_to_severity(logLevel);
 
-            if (severity != SK_UNKNOWN)
+            if (severity != ASTRA_SEVERITY_UNKNOWN)
             {
                 config->set_severityLevel(severity);
             }

@@ -51,7 +51,7 @@ namespace astra { namespace plugins { namespace hand {
         void HandTracker::create_streams(PluginServiceProxy& pluginService, astra_streamset_t streamSet)
         {
             PROFILE_FUNC();
-            SINFO("HandTracker", "creating hand streams");
+            LOG_INFO("HandTracker", "creating hand streams");
             m_handStream = make_unique<HandStream>(pluginService, streamSet, ASTRA_HANDS_MAX_HAND_COUNT);
 
             const int bytesPerPixel = 3;
@@ -311,7 +311,7 @@ namespace astra { namespace plugins { namespace hand {
                                  validRadiusTest &&
                                  validNaturalEdges;
 
-            SINFO("HandTracker", "depth: %f score: %f edge %f tests: %s",
+            LOG_INFO("HandTracker", "depth: %f score: %f edge %f tests: %s",
                        depth,
                        score,
                        edgeDist,

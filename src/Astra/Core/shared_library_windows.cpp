@@ -6,10 +6,10 @@
 
 void os_load_library(const char* fileName, LibHandle& libHandle)
 {
-    char strFileName[SK_FILE_MAX_PATH];
-    GetFullPathName(fileName, SK_FILE_MAX_PATH, strFileName, nullptr);
+    char strFileName[ASTRA_FILE_MAX_PATH];
+    GetFullPathName(fileName, ASTRA_FILE_MAX_PATH, strFileName, nullptr);
     libHandle = LoadLibraryEx(strFileName, nullptr, LOAD_WITH_ALTERED_SEARCH_PATH);
-    
+
     if (libHandle == nullptr)
     {
         // error

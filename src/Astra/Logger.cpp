@@ -15,7 +15,7 @@ namespace astra {
     {
         switch(logLevel)
         {
-        case SK_TRACE:
+        case ASTRA_SEVERITY_TRACE:
             el::base::Writer(el::Level::Trace,
                              fileName,
                              lineNo,
@@ -24,7 +24,7 @@ namespace astra {
                 .construct(1, channel) << message;
 
             break;
-        case SK_DEBUG:
+        case ASTRA_SEVERITY_DEBUG:
             el::base::Writer(el::Level::Debug,
                              fileName,
                              lineNo,
@@ -33,7 +33,7 @@ namespace astra {
                 .construct(1, channel) << message;
 
             break;
-        case SK_INFO:
+        case ASTRA_SEVERITY_INFO:
             el::base::Writer(el::Level::Info,
                              fileName,
                              lineNo,
@@ -42,7 +42,7 @@ namespace astra {
                 .construct(1, channel) << message;
 
             break;
-        case SK_WARN:
+        case ASTRA_SEVERITY_WARN:
             el::base::Writer(el::Level::Warning,
                              fileName,
                              lineNo,
@@ -51,7 +51,7 @@ namespace astra {
                 .construct(1, channel) << message;
 
             break;
-        case SK_ERROR:
+        case ASTRA_SEVERITY_ERROR:
             el::base::Writer(el::Level::Error,
                              fileName,
                              lineNo,
@@ -60,7 +60,7 @@ namespace astra {
                 .construct(1, channel) << message;
 
             break;
-        case SK_FATAL:
+        case ASTRA_SEVERITY_FATAL:
             el::base::Writer(el::Level::Fatal,
                              fileName,
                              lineNo,
@@ -69,7 +69,7 @@ namespace astra {
                 .construct(1, channel) << message;
 
             break;
-        case SK_UNKNOWN:
+        case ASTRA_SEVERITY_UNKNOWN:
             el::base::Writer(el::Level::Unknown,
                              fileName,
                              lineNo,

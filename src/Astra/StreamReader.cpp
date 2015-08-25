@@ -10,15 +10,16 @@
 namespace astra {
     using namespace std::placeholders;
 
-    StreamReader::StreamReader(StreamSetConnection& connection) :
-        m_connection(connection),
-        m_scFrameReadyCallback(nullptr)
-    {}
+    StreamReader::StreamReader(StreamSetConnection& connection)
+        : m_connection(connection),
+          m_scFrameReadyCallback(nullptr)
+    {
+    }
 
     StreamReader::~StreamReader()
     {
-        STRACE("StreamReader", "destroying reader: %p", this);
-        for (auto pair : m_streamMap)
+        LOG_TRACE("StreamReader", "destroying reader: %p", this);
+        for (auto& pair : m_streamMap)
         {
             ReaderConnectionData* data = pair.second;
             data->connection->unregister_frame_ready_callback(data->scFrameReadyCallbackId);
@@ -87,7 +88,8 @@ namespace astra {
         return connection->lock();
     }
 
-    astra_callback_id_t StreamReader::register_frame_ready_callback(astra_frame_ready_callback_t callback, void* clientTag)
+    astra_callback_id_t StreamReader::register_frame_ready_callback(astra_frame_ready_callback_t callback,
+                                                                    void* clientTag)
     {
         auto thunk = [clientTag, callback](astra_reader_t reader, astra_reader_frame_t frame)
             { callback(clientTag, reader, frame); };
@@ -102,7 +104,7 @@ namespace astra {
 
     StreamReader::block_result StreamReader::block_until_frame_ready_or_timeout(int timeoutMillis)
     {
-        STRACE("StreamReader", "%x block_until_frame_ready_or_timeout", this);
+        LOG_TRACE("StreamReader", "%p block_until_frame_ready_or_timeout", this);
         if (m_isFrameReadyForLock)
         {
             return block_result::FRAMEREADY;
@@ -133,7 +135,7 @@ namespace astra {
 
     astra_status_t StreamReader::lock(int timeoutMillis, astra_reader_frame_t& readerFrame)
     {
-        STRACE("StreamReader", "%x lock", this);
+        LOG_TRACE("StreamReader", "%p lock", this);
         if (!m_locked)
         {
             StreamReader::block_result result = block_until_frame_ready_or_timeout(timeoutMillis);
@@ -154,24 +156,24 @@ namespace astra {
 
     astra_status_t StreamReader::unlock(astra_reader_frame_t& readerFrame)
     {
-        STRACE("StreamReader", "%x unlock", this);
+        LOG_TRACE("StreamReader", "%p unlock", this);
         if (readerFrame == nullptr)
         {
-            SWARN("StreamReader", "%x unlock with null frame parameter", this);
+            LOG_WARN("StreamReader", "%p unlock with null frame parameter", this);
             assert(readerFrame != nullptr);
             return ASTRA_STATUS_INVALID_PARAMETER;
         }
 
         if (readerFrame->status == ASTRA_FRAME_STATUS_AVAILABLE)
         {
-            SWARN("StreamReader", "%x readerFrame was closed more than once", this);
+            LOG_WARN("StreamReader", "%p readerFrame was closed more than once", this);
             assert(readerFrame->status != ASTRA_FRAME_STATUS_AVAILABLE);
             return ASTRA_STATUS_INVALID_OPERATION;
         }
 
         if (readerFrame->status == ASTRA_FRAME_STATUS_LOCKED_EVENT)
         {
-            SWARN("StreamReader", "%x readerFrame from FrameReady event was closed manually", this);
+            LOG_WARN("StreamReader", "%p readerFrame from FrameReady event was closed manually", this);
             assert(readerFrame->status != ASTRA_FRAME_STATUS_LOCKED_EVENT);
             return ASTRA_STATUS_INVALID_OPERATION;
         }
@@ -181,7 +183,7 @@ namespace astra {
 
     astra_status_t StreamReader::unlock_frame_and_check_connections(astra_reader_frame_t& readerFrame)
     {
-        STRACE("StreamReader", "%x unlock_frame_and_check_connections", this);
+        LOG_TRACE("StreamReader", "%p unlock_frame_and_check_connections", this);
         astra_status_t rc = return_locked_frame(readerFrame);
         if (rc != ASTRA_STATUS_SUCCESS)
         {
@@ -193,7 +195,7 @@ namespace astra {
 
     astra_reader_frame_t StreamReader::lock_frame_for_event_callback()
     {
-        STRACE("StreamReader", "%x lock_frame_for_event_callback", this);
+        LOG_TRACE("StreamReader", "%p lock_frame_for_event_callback", this);
         ensure_connections_locked();
 
         astra_reader_frame_t frame = acquire_available_reader_frame();
@@ -204,7 +206,7 @@ namespace astra {
 
     astra_reader_frame_t StreamReader::lock_frame_for_poll()
     {
-        STRACE("StreamReader", "%x lock_frame_for_poll", this);
+        LOG_TRACE("StreamReader", "%p lock_frame_for_poll", this);
         ensure_connections_locked();
 
         astra_reader_frame_t frame = acquire_available_reader_frame();
@@ -215,7 +217,7 @@ namespace astra {
 
     astra_reader_frame_t StreamReader::acquire_available_reader_frame()
     {
-        STRACE("StreamReader", "%x acquire_reader_frame", this);
+        LOG_TRACE("StreamReader", "%p acquire_reader_frame", this);
 
         for (auto& frame : m_frameList)
         {
@@ -240,34 +242,34 @@ namespace astra {
 
     astra_status_t StreamReader::return_locked_frame(astra_reader_frame_t& readerFrame)
     {
-        STRACE("StreamReader", "%x return_locked_frame", this);
+        LOG_TRACE("StreamReader", "%p return_locked_frame", this);
         if (m_lockedFrameCount == 0)
         {
-            SWARN("StreamReader", "%x return_locked_frame too many times (lockedFrameCount == 0)", this);
+            LOG_WARN("StreamReader", "%p return_locked_frame too many times (lockedFrameCount == 0)", this);
             assert(m_lockedFrameCount != 0);
             return ASTRA_STATUS_INVALID_OPERATION;
         }
         if (readerFrame == nullptr)
         {
-            SWARN("StreamReader", "%x return_locked_frame with null readerFrame parameter", this);
+            LOG_WARN("StreamReader", "%p return_locked_frame with null readerFrame parameter", this);
             assert(readerFrame != nullptr);
             return ASTRA_STATUS_INVALID_PARAMETER;
         }
         if (readerFrame->reader != get_handle())
         {
-            SWARN("StreamReader", "%x return_locked_frame readerFrame closed on wrong StreamReader", this);
+            LOG_WARN("StreamReader", "%p return_locked_frame readerFrame closed on wrong StreamReader", this);
             assert(readerFrame->reader == get_handle());
             return ASTRA_STATUS_INVALID_OPERATION;
         }
         if (readerFrame->id >= m_frameList.size())
         {
-            SWARN("StreamReader", "%x return_locked_frame readerFrame parameter with id greater than frameList size", this);
+            LOG_WARN("StreamReader", "%p return_locked_frame readerFrame parameter with id greater than frameList size", this);
             assert(readerFrame->id < m_frameList.size());
             return ASTRA_STATUS_INVALID_PARAMETER;
         }
         if (readerFrame->status == ASTRA_FRAME_STATUS_AVAILABLE)
         {
-            SWARN("StreamReader", "%x return_locked_frame frame status is already available", this);
+            LOG_WARN("StreamReader", "%p return_locked_frame frame status is already available", this);
             assert(readerFrame->status != ASTRA_FRAME_STATUS_AVAILABLE);
             return ASTRA_STATUS_INVALID_PARAMETER;
         }
@@ -275,7 +277,7 @@ namespace astra {
         astra_reader_frame_t checkFrame = m_frameList[readerFrame->id].get();
         if (readerFrame != checkFrame)
         {
-            SWARN("StreamReader", "%x return_locked_frame readerFrame parameter does not match pointer in frameList", this);
+            LOG_WARN("StreamReader", "%p return_locked_frame readerFrame parameter does not match pointer in frameList", this);
             assert(readerFrame == checkFrame);
             return ASTRA_STATUS_INVALID_PARAMETER;
         }
@@ -289,7 +291,7 @@ namespace astra {
 
     void StreamReader::ensure_connections_locked()
     {
-        STRACE("StreamReader", "%x ensure_connections_locked m_locked: %d", this, m_locked);
+        LOG_TRACE("StreamReader", "%p ensure_connections_locked m_locked: %d", this, m_locked);
 
         if (!m_locked)
         {
@@ -304,11 +306,11 @@ namespace astra {
 
     astra_status_t StreamReader::unlock_connections_if_able()
     {
-        STRACE("StreamReader", "%x unlock_connections_if_able m_lockedFrameCount: %d m_locked: %d",
-                            this, m_lockedFrameCount, m_locked);
+        LOG_TRACE("StreamReader", "%p unlock_connections_if_able m_lockedFrameCount: %d m_locked: %d",
+               this, m_lockedFrameCount, m_locked);
         if (!m_locked)
         {
-            SWARN("StreamReader", "%x unlock_connections_if_able called too many times (m_locked == false)", this);
+            LOG_WARN("StreamReader", "%p unlock_connections_if_able called too many times (m_locked == false)", this);
             assert(m_locked);
             return ASTRA_STATUS_INVALID_OPERATION;
         }
@@ -324,7 +326,7 @@ namespace astra {
         {
             if (frame->status != ASTRA_FRAME_STATUS_AVAILABLE)
             {
-                SWARN("StreamReader", "%x unlock_connections_if_able called but not all frames have been returned", this);
+                LOG_WARN("StreamReader", "%p unlock_connections_if_able called but not all frames have been returned", this);
                 assert(frame->status == ASTRA_FRAME_STATUS_AVAILABLE);
             }
         }
@@ -354,12 +356,11 @@ namespace astra {
 
     void StreamReader::on_connection_frame_ready(StreamConnection* connection, astra_frame_index_t frameIndex)
     {
-        STRACE("StreamReader", "%x connection_frame_ready fi: %d lfi: %d", this, frameIndex, m_lastFrameIndex);
+        LOG_TRACE("StreamReader", "%p connection_frame_ready fi: %d lfi: %d", this, frameIndex, m_lastFrameIndex);
         if (frameIndex > m_lastFrameIndex)
         {
             auto& desc = connection->get_description();
 
-            //SDEBUG("StreamReader", "%x: new %u frame", this, desc.type);
             auto pair = m_streamMap.find(desc);
 
             if (pair != m_streamMap.end())
@@ -371,7 +372,7 @@ namespace astra {
             }
             else
             {
-                SWARN("StreamReader", "Unknown frame readied!");
+                LOG_WARN("StreamReader", "Unknown frame readied!");
             }
 
             check_for_all_frames_ready();
@@ -380,7 +381,7 @@ namespace astra {
 
     void StreamReader::check_for_all_frames_ready()
     {
-        STRACE("StreamReader", "%x check_for_all_frames_ready", this);
+        LOG_TRACE("StreamReader", "%p check_for_all_frames_ready", this);
         bool allReady = true;
         for (auto& pair : m_streamMap)
         {
@@ -403,7 +404,7 @@ namespace astra {
 
     void StreamReader::raise_frame_ready()
     {
-        STRACE("StreamReader", "%x raise_frame_ready", this);
+        LOG_TRACE("StreamReader", "%p raise_frame_ready", this);
         if (m_frameReadySignal.slot_count() == 0)
         {
             //no clients to serve, don't bother locking and unlocking
@@ -413,17 +414,17 @@ namespace astra {
         astra_reader_t reader = get_handle();
         astra_reader_frame_t frame = lock_frame_for_event_callback();
 
-        STRACE("StreamReader", "%x raise_frame_ready raising frameReady signal", this);
+        LOG_TRACE("StreamReader", "%p raise_frame_ready raising frameReady signal", this);
 
         m_frameReadySignal.raise(reader, frame);
 
         if (frame->status == ASTRA_FRAME_STATUS_AVAILABLE)
         {
-            SWARN("StreamReader", "%x Frame was closed manually during StreamReader FrameReady callback", this);
+            LOG_WARN("StreamReader", "%p Frame was closed manually during StreamReader FrameReady callback", this);
         }
         else
         {
-            STRACE("StreamReader", "%x raise_frame_ready unlocking frame");
+            LOG_TRACE("StreamReader", "%p raise_frame_ready unlocking frame");
             unlock_frame_and_check_connections(frame);
         }
     }

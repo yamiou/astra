@@ -17,7 +17,7 @@ namespace astra {
         std::string finalUri = uri;
         if (uri == "device/default")
         {
-            SINFO("StreamSetCatalog", "default uri provided.");
+            LOG_INFO("StreamSetCatalog", "default uri provided.");
             finalUri = "device/sensor0";
         }
 

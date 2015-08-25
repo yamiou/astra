@@ -62,13 +62,13 @@ typedef void(*astra_frame_ready_callback_t)(void* clientTag,
                                                astra_reader_frame_t frame);
 
 typedef enum {
-    SK_UNKNOWN,
-    SK_FATAL,
-    SK_ERROR,
-    SK_WARN,
-    SK_INFO,
-    SK_DEBUG,
-    SK_TRACE
+    ASTRA_SEVERITY_UNKNOWN,
+    ASTRA_SEVERITY_FATAL,
+    ASTRA_SEVERITY_ERROR,
+    ASTRA_SEVERITY_WARN,
+    ASTRA_SEVERITY_INFO,
+    ASTRA_SEVERITY_DEBUG,
+    ASTRA_SEVERITY_TRACE
 } astra_log_severity_t;
 
 typedef uint32_t astra_event_id;

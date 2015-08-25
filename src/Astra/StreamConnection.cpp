@@ -48,7 +48,7 @@ namespace astra {
 
     astra_frame_t* StreamConnection::lock()
     {
-        STRACE("StreamConnection", "%x lock", this);
+        LOG_TRACE("StreamConnection", "%x lock", this);
         if (m_locked)
         {
             return m_currentFrame;
@@ -70,11 +70,11 @@ namespace astra {
 
     void StreamConnection::unlock()
     {
-        STRACE("StreamConnection", "%x unlock", this);
+        LOG_TRACE("StreamConnection", "%x unlock", this);
 
         if (!m_locked)
         {
-            SWARN("StreamConnection", "%x StreamConnection::unlock() not locked", this);
+            LOG_WARN("StreamConnection", "%x StreamConnection::unlock() not locked", this);
             assert(m_locked);
         }
 
@@ -172,7 +172,7 @@ namespace astra {
         {
             //Results are read-once-only, then they self destruct.
             //Client tried to get result in wrong order, or with duplicate or stale token
-            SWARN("StreamConnection", "no pending parameter result.", this);
+            LOG_WARN("StreamConnection", "no pending parameter result.", this);
             clear_pending_parameter_result();
             return ASTRA_STATUS_INVALID_PARAMETER_TOKEN;
         }

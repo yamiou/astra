@@ -312,7 +312,7 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
         {
             if (outputLog == TEST_BEHAVIOR_LOG)
             {
-                SINFO("PointProcessor", "test_point_in_range failed: position: (%d, %d)",
+                LOG_INFO("PointProcessor", "test_point_in_range failed: position: (%d, %d)",
                               targetPoint.x,
                               targetPoint.y);
             }
@@ -321,7 +321,7 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
 
         if (outputLog == TEST_BEHAVIOR_LOG)
         {
-            SINFO("PointProcessor", "test_point_in_range success: position: (%d, %d)",
+            LOG_INFO("PointProcessor", "test_point_in_range success: position: (%d, %d)",
                           targetPoint.x,
                           targetPoint.y);
         }
@@ -385,14 +385,14 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
         {
             if (validPointArea)
             {
-                SINFO("Segmentation", "test_point_area passed: area %f within [%f, %f]",
+                LOG_INFO("Segmentation", "test_point_area passed: area %f within [%f, %f]",
                               area,
                               minArea,
                               maxArea);
             }
             else
             {
-                SINFO("Segmentation", "test_point_area failed: area %f not within [%f, %f]",
+                LOG_INFO("Segmentation", "test_point_area failed: area %f not within [%f, %f]",
                               area,
                               minArea,
                               maxArea);
@@ -511,13 +511,13 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
         {
             if (passed)
             {
-                SINFO("Segmentation", "test_natural_edges passed: %f (minimum %f)",
+                LOG_INFO("Segmentation", "test_natural_edges passed: %f (minimum %f)",
                               percentNaturalEdges,
                               minPercentNaturalEdges);
             }
             else
             {
-                SINFO("Segmentation", "test_natural_edges failed: %f (minimum %f)",
+                LOG_INFO("Segmentation", "test_natural_edges failed: %f (minimum %f)",
                               percentNaturalEdges,
                               minPercentNaturalEdges);
             }
@@ -574,7 +574,7 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
         {
             if (passed)
             {
-                SINFO("Segmentation", "test_foreground_radius_percentage passed: perc1 %f [%f,%f] perc2 %f [%f,%f]",
+                LOG_INFO("Segmentation", "test_foreground_radius_percentage passed: perc1 %f [%f,%f] perc2 %f [%f,%f]",
                               percentForeground1,
                               minPercent1,
                               maxPercent1,
@@ -584,7 +584,7 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
             }
             else
             {
-                SINFO("Segmentation", "test_foreground_radius_percentage failed: perc1 %f [%f,%f] perc2 %f [%f,%f]",
+                LOG_INFO("Segmentation", "test_foreground_radius_percentage failed: perc1 %f [%f,%f] perc2 %f [%f,%f]",
                               percentForeground1,
                               minPercent1,
                               maxPercent1,

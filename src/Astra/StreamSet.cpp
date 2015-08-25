@@ -11,13 +11,13 @@ namespace astra {
 
     StreamConnection* StreamSet::create_stream_connection(const astra_stream_desc_t& desc)
     {
-        STRACE("StreamSet", "connecting to (%u,%u) on %s", desc.type,desc.subtype, m_uri.c_str());
+        LOG_TRACE("StreamSet", "connecting to (%u,%u) on %s", desc.type,desc.subtype, m_uri.c_str());
 
         Stream* stream = find_stream_by_type_subtype_impl(desc.type, desc.subtype);
 
         if (!stream)
         {
-            STRACE("StreamSet",
+            LOG_TRACE("StreamSet",
                    "registering orphan stream of type (%u,%u) on %s",
                    desc.type,
                    desc.subtype,
@@ -35,18 +35,18 @@ namespace astra {
 
         if (!connection)
         {
-            SWARN("StreamSet","destroy_stream_connection: attempt to destroy null connection on %s", m_uri.c_str());
+            LOG_WARN("StreamSet","destroy_stream_connection: attempt to destroy null connection on %s", m_uri.c_str());
             return false;
         }
 
         Stream* stream = connection->get_stream();
-        STRACE("StreamSet","destroying %p on %s", connection, m_uri.c_str());
+        LOG_TRACE("StreamSet","destroying %p on %s", connection, m_uri.c_str());
         stream->destroy_connection(connection);
 
         if (!stream->has_connections()
             && !stream->is_available())
         {
-            STRACE("StreamSet","removing unused/unavailable stream %p on %s",
+            LOG_TRACE("StreamSet","removing unused/unavailable stream %p on %s",
                    stream,
                    m_uri.c_str());
 
@@ -67,7 +67,7 @@ namespace astra {
             assert(!stream->is_available());
             if (stream->is_available())
             {
-                SWARN("StreamSet","register_stream: (%u,%u) already exists, already inflated on %s",
+                LOG_WARN("StreamSet","register_stream: (%u,%u) already exists, already inflated on %s",
                       desc.type,
                       desc.subtype,
                       m_uri.c_str());
@@ -75,14 +75,14 @@ namespace astra {
                 return nullptr;
             }
 
-            STRACE("StreamSet","(%u,%u) already exists, adopting orphan stream on %s",
+            LOG_TRACE("StreamSet","(%u,%u) already exists, adopting orphan stream on %s",
                    desc.type,
                    desc.subtype,
                    m_uri.c_str());
         }
         else
         {
-            STRACE("StreamSet","registering (%u,%u) on %s", desc.type, desc.subtype, m_uri.c_str());
+            LOG_TRACE("StreamSet","registering (%u,%u) on %s", desc.type, desc.subtype, m_uri.c_str());
             stream = new Stream(desc);
             m_streamCollection.insert(stream);
         }
@@ -96,7 +96,7 @@ namespace astra {
 
     Stream* StreamSet::register_orphan_stream(astra_stream_desc_t desc)
     {
-        STRACE("StreamSet","registering orphan (%u,%u) on %s", desc.type, desc.subtype, m_uri.c_str());
+        LOG_TRACE("StreamSet","registering orphan (%u,%u) on %s", desc.type, desc.subtype, m_uri.c_str());
         Stream* stream = new Stream(desc);
         m_streamCollection.insert(stream);
 
@@ -105,7 +105,7 @@ namespace astra {
 
     StreamSetConnection* StreamSet::add_new_connection()
     {
-        STRACE("StreamSet","new connection to %s", m_uri.c_str());
+        LOG_TRACE("StreamSet","new connection to %s", m_uri.c_str());
         StreamSetConnectionPtr ptr = std::make_unique<StreamSetConnection>(this);
         StreamSetConnection* conn = ptr.get();
         m_connections.push_back(std::move(ptr));
@@ -118,7 +118,7 @@ namespace astra {
         assert(connection != nullptr);
         if (!connection)
         {
-            SWARN("StreamSet","disconnect_streamset_connection: null connection on %s", m_uri.c_str());
+            LOG_WARN("StreamSet","disconnect_streamset_connection: null connection on %s", m_uri.c_str());
             return;
         }
 
@@ -130,7 +130,7 @@ namespace astra {
 
         if (it != m_connections.end())
         {
-            STRACE("StreamSet","disconnecting %p connection from %s",
+            LOG_TRACE("StreamSet","disconnecting %p connection from %s",
                    connection,
                    m_uri.c_str());
 
@@ -138,7 +138,7 @@ namespace astra {
         }
         else
         {
-            SWARN("StreamSet",
+            LOG_WARN("StreamSet",
                   "disconnect_streamset_connection: %p connection not found on %s",
                   connection,
                   m_uri.c_str());
@@ -150,13 +150,13 @@ namespace astra {
         assert(stream != nullptr);
         if (!stream)
         {
-            SWARN("StreamSet","destroy_stream: null parameter on %s", m_uri.c_str());
+            LOG_WARN("StreamSet","destroy_stream: null parameter on %s", m_uri.c_str());
         }
 
         auto it = m_streamCollection.find(stream);
         if (it != m_streamCollection.end())
         {
-            STRACE("StreamSet","destroying stream %p on %s", stream, m_uri.c_str());
+            LOG_TRACE("StreamSet","destroying stream %p on %s", stream, m_uri.c_str());
             if (stream->is_available())
             {
                 m_streamUnregisteringSignal.raise(
@@ -166,7 +166,7 @@ namespace astra {
         }
         else
         {
-            SWARN("StreamSet","destroy_stream: stream %p not found on %s", stream, m_uri.c_str());
+            LOG_WARN("StreamSet","destroy_stream: stream %p not found on %s", stream, m_uri.c_str());
         }
     }
 
@@ -175,7 +175,7 @@ namespace astra {
         assert(m_isClaimed != true);
         if (m_isClaimed)
         {
-            SWARN("StreamSet","claim: %s already claimed", m_uri.c_str());
+            LOG_WARN("StreamSet","claim: %s already claimed", m_uri.c_str());
             return;
         }
 

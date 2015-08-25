@@ -20,21 +20,23 @@
 #   endif  // defined(__func__)
 #endif  // defined(_MSC_VER)
 
-#define STRACE(channel, format, ...) astra::plugins::log(channel, SK_TRACE, __FILE__, __LINE__, LOG_FUNC, format, ##__VA_ARGS__)
+#define LOG_TRACE(channel, format, ...) \
+    ::astra::plugins::log(channel, ASTRA_SEVERITY_TRACE, __FILE__, __LINE__, LOG_FUNC, format, ##__VA_ARGS__)
 
+#define LOG_INFO(channel, format, ...) \
+    ::astra::plugins::log(channel, ASTRA_SEVERITY_INFO, __FILE__, __LINE__, LOG_FUNC, format, ##__VA_ARGS__)
 
-#define SINFO(channel, format, ...) astra::plugins::log(channel, SK_INFO, __FILE__, __LINE__, LOG_FUNC, format, ##__VA_ARGS__)
+#define LOG_DEBUG(channel, format, ...) \
+    ::astra::plugins::log(channel, ASTRA_SEVERITY_DEBUG, __FILE__, __LINE__, LOG_FUNC, format, ##__VA_ARGS__)
 
+#define LOG_ERROR(channel, format, ...) \
+    ::astra::plugins::log(channel, ASTRA_SEVERITY_ERROR, __FILE__, __LINE__, LOG_FUNC, format, ##__VA_ARGS__)
 
-#define SDEBUG(channel, format, ...) astra::plugins::log(channel, SK_DEBUG, __FILE__, __LINE__, LOG_FUNC, format, ##__VA_ARGS__)
+#define LOG_FATAL(channel, format, ...) \
+    ::astra::plugins::log(channel, ASTRA_SEVERITY_FATAL, __FILE__, __LINE__, LOG_FUNC, format, ##__VA_ARGS__)
 
-
-#define SERROR(channel, format, ...) astra::plugins::log(channel, SK_ERROR, __FILE__, __LINE__, LOG_FUNC, format, ##__VA_ARGS__)
-
-#define SFATAL(channel, format, ...) astra::plugins::log(channel, SK_FATAL, __FILE__, __LINE__, LOG_FUNC, format, ##__VA_ARGS__)
-
-
-#define SWARN(channel, format, ...) astra::plugins::log(channel, SK_WARN, __FILE__, __LINE__, LOG_FUNC, format, ##__VA_ARGS__)
+#define LOG_WARN(channel, format, ...) \
+    ::astra::plugins::log(channel, ASTRA_SEVERITY_WARN, __FILE__, __LINE__, LOG_FUNC, format, ##__VA_ARGS__)
 
 extern astra::PluginServiceProxy* __g_serviceProxy;
 

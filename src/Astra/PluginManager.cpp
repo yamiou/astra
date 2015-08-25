@@ -15,7 +15,7 @@ namespace astra {
 
     void PluginManager::load_plugins(std::string searchPath)
     {
-        STRACE("PluginManager", "load plugins");
+        LOG_TRACE("PluginManager", "load plugins");
         std::vector<std::string> pluginFiles = find_libraries(searchPath);
         for(auto pluginPath : pluginFiles)
         {
@@ -76,26 +76,26 @@ namespace astra {
     void PluginManager::try_load_plugin(const std::string& path)
     {
         LibHandle libHandle = nullptr;
-        STRACE("PluginManager", "try_load_plugin %s", path.c_str());
+        LOG_TRACE("PluginManager", "try_load_plugin %s", path.c_str());
 
         os_load_library(path.c_str(), libHandle);
 
         PluginFuncs pluginFuncs;
-        os_get_proc_address(libHandle, SK_STRINGIFY(astra_plugin_initialize), (FarProc&)pluginFuncs.initialize);
-        os_get_proc_address(libHandle, SK_STRINGIFY(astra_plugin_terminate), (FarProc&)pluginFuncs.terminate);
-        os_get_proc_address(libHandle, SK_STRINGIFY(astra_plugin_update), (FarProc&)pluginFuncs.update);
+        os_get_proc_address(libHandle, ASTRA_STRINGIFY(astra_plugin_initialize), (FarProc&)pluginFuncs.initialize);
+        os_get_proc_address(libHandle, ASTRA_STRINGIFY(astra_plugin_terminate), (FarProc&)pluginFuncs.terminate);
+        os_get_proc_address(libHandle, ASTRA_STRINGIFY(astra_plugin_update), (FarProc&)pluginFuncs.update);
         pluginFuncs.libHandle = libHandle;
 
         if (pluginFuncs.is_valid())
         {
-            STRACE("PluginManager", "try_load_plugin valid plugin");
+            LOG_TRACE("PluginManager", "try_load_plugin valid plugin");
             pluginFuncs.initialize(m_pluginServiceProxy);
-            STRACE("PluginManager", "try_load_plugin initialized plugin");
+            LOG_TRACE("PluginManager", "try_load_plugin initialized plugin");
             m_pluginList.push_back(pluginFuncs);
         }
         else
         {
-            STRACE("PluginManager", "try_load_plugin invalid lib: init: %p, term: %p, update: %p",
+            LOG_TRACE("PluginManager", "try_load_plugin invalid lib: init: %p, term: %p, update: %p",
                    pluginFuncs.initialize,
                    pluginFuncs.terminate,
                    pluginFuncs.update);

@@ -16,7 +16,7 @@ namespace orbbec { namespace ni {
             PROFILE_FUNC();
             openni::Version version = openni::OpenNI::getVersion();
 
-            SINFO("orbbec.ni.oni_adapter_plugin", "Initializing OpenNI v%d.%d.%d.%d",
+            LOG_INFO("orbbec.ni.oni_adapter_plugin", "Initializing OpenNI v%d.%d.%d.%d",
                   version.major,
                   version.minor,
                   version.maintenance,
@@ -33,11 +33,11 @@ namespace orbbec { namespace ni {
 
             if (!successful)
             {
-                SWARN("orbbec.ni.oni_adapter_plugin", "Failed to initialize OpenNI: %s", openni::OpenNI::getExtendedError());
+                LOG_WARN("orbbec.ni.oni_adapter_plugin", "Failed to initialize OpenNI: %s", openni::OpenNI::getExtendedError());
             }
             else
             {
-                SINFO("orbbec.ni.oni_adapter_plugin", "Initialized OpenNI v%d.%d.%d.%d",
+                LOG_INFO("orbbec.ni.oni_adapter_plugin", "Initialized OpenNI v%d.%d.%d.%d",
                       version.major,
                       version.minor,
                       version.maintenance,
@@ -54,7 +54,7 @@ namespace orbbec { namespace ni {
             case ASTRA_EVENT_RESOURCE_AVAILABLE:
                 const char* resourceUri = static_cast<const char*>(data);
 
-                SINFO("orbbec.ni.oni_adapter_plugin", "resource uri received: %s", resourceUri);
+                LOG_INFO("orbbec.ni.oni_adapter_plugin", "resource uri received: %s", resourceUri);
 
                 unsigned int vid = 0;
                 unsigned int pid = 0;
@@ -67,19 +67,19 @@ namespace orbbec { namespace ni {
                 {
                     char oniUri[1024];
                     snprintf(oniUri, 1024, "%04hx/%04hx@%hhu/%hhu", vid, pid, bus, address);
-                    SINFO("orbbec.ni.oni_adapter_plugin", "parsed oniUri: %s", oniUri);
+                    LOG_INFO("orbbec.ni.oni_adapter_plugin", "parsed oniUri: %s", oniUri);
 
                     openni::Array<openni::DeviceInfo> devices;
                     openni::OpenNI::enumerateDevices(&devices);
-                    SINFO("orbbec.ni.oni_adapter_plugin", "num devices: %d", devices.getSize());
+                    LOG_INFO("orbbec.ni.oni_adapter_plugin", "num devices: %d", devices.getSize());
 
                     for(int i = 0; i < devices.getSize(); i++)
                     {
                         const openni::DeviceInfo& info = devices[i];
-                        SINFO("orbbec.ni.oni_adapter_plugin", "found sensor: %s", info.getUri());
+                        LOG_INFO("orbbec.ni.oni_adapter_plugin", "found sensor: %s", info.getUri());
                         if (std::strcmp(oniUri, info.getUri()) == 0)
                         {
-                            SINFO("orbbec.ni.oni_adapter_plugin", "device connected: %s", info.getUri());
+                            LOG_INFO("orbbec.ni.oni_adapter_plugin", "device connected: %s", info.getUri());
                             add_or_get_device(info.getUri());
                             break;
                         }
@@ -87,7 +87,7 @@ namespace orbbec { namespace ni {
                 }
                 else
                 {
-                    SINFO("orbbec.ni.oni_adapter_plugin", "unknown resource uri: %s", resourceUri);
+                    LOG_INFO("orbbec.ni.oni_adapter_plugin", "unknown resource uri: %s", resourceUri);
                 }
             }
 #endif
@@ -129,7 +129,7 @@ namespace orbbec { namespace ni {
         {
             PROFILE_FUNC();
 #ifndef __ANDROID__
-            SINFO("orbbec.ni.oni_adapter_plugin", "device connected: %s", info->getUri());
+            LOG_INFO("orbbec.ni.oni_adapter_plugin", "device connected: %s", info->getUri());
             add_or_get_device(info->getUri());
 #endif
         }
@@ -137,7 +137,7 @@ namespace orbbec { namespace ni {
         void oni_adapter_plugin::onDeviceDisconnected(const openni::DeviceInfo* info)
         {
             PROFILE_FUNC();
-            SINFO("orbbec.ni.oni_adapter_plugin", "device disconnected: %s", info->getUri());
+            LOG_INFO("orbbec.ni.oni_adapter_plugin", "device disconnected: %s", info->getUri());
             auto it = std::find_if(streamsets_.begin(), streamsets_.end(),
                                    [&info] (streamset_ptr& setPtr)
                                    -> bool
@@ -157,7 +157,7 @@ namespace orbbec { namespace ni {
 #endif
 
             streamsets_.clear();
-            SINFO("orbbec.ni.oni_adapter_plugin", "shutting down openni");
+            LOG_INFO("orbbec.ni.oni_adapter_plugin", "shutting down openni");
             openni::OpenNI::shutdown();
         }
 

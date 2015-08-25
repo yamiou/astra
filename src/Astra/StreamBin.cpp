@@ -7,7 +7,7 @@ namespace astra {
     StreamBin::StreamBin(size_t bufferLengthInBytes)
         : m_bufferSize(bufferLengthInBytes)
     {
-        STRACE("StreamBin", "Created StreamBin %x", this);
+        LOG_TRACE("StreamBin", "Created StreamBin %x", this);
         init_buffers(bufferLengthInBytes);
     }
 
@@ -73,7 +73,7 @@ namespace astra {
 
     astra_frame_t* StreamBin::lock_front_buffer()
     {
-        STRACE("StreamBin", "%x locking front buffer. lock count: %u -> %u", this, m_frontBufferLockCount, m_frontBufferLockCount+1);
+        LOG_TRACE("StreamBin", "%x locking front buffer. lock count: %u -> %u", this, m_frontBufferLockCount, m_frontBufferLockCount+1);
 
         ++m_frontBufferLockCount;
         return get_frontBuffer();
@@ -81,11 +81,11 @@ namespace astra {
 
     void StreamBin::unlock_front_buffer()
     {
-        STRACE("StreamBin", "%x unlocking front buffer. lock count: %u -> %u", this, m_frontBufferLockCount, m_frontBufferLockCount-1);
+        LOG_TRACE("StreamBin", "%x unlocking front buffer. lock count: %u -> %u", this, m_frontBufferLockCount, m_frontBufferLockCount-1);
         if (m_frontBufferLockCount == 0)
         {
             //TODO: error, logging
-            SWARN("StreamBin", "%x StreamBin unlocked too many times!", this);
+            LOG_WARN("StreamBin", "%x StreamBin unlocked too many times!", this);
             assert(m_frontBufferLockCount != 0);
             return;
         }
@@ -95,7 +95,7 @@ namespace astra {
             //can't swap front buffers because there is still an outstanding lock
             return;
         }
-        STRACE("StreamBin", "%x unlock pre indices: f: %d m: %d b: %d",
+        LOG_TRACE("StreamBin", "%x unlock pre indices: f: %d m: %d b: %d",
             this,
             get_frontBuffer()->frameIndex,
             get_middleBuffer()->frameIndex,
@@ -113,7 +113,7 @@ namespace astra {
             m_middleBufferIndex = oldFrontBufferIndex;
 
 
-            STRACE("StreamBin", "%x unlock front/mid indices: f: %d m: %d b: %d",
+            LOG_TRACE("StreamBin", "%x unlock front/mid indices: f: %d m: %d b: %d",
                 this,
                 get_frontBuffer()->frameIndex,
                 get_middleBuffer()->frameIndex,
@@ -125,9 +125,9 @@ namespace astra {
 
     astra_frame_t* StreamBin::cycle_buffers()
     {
-        STRACE("StreamBin", "%x cycling buffer. lock count: %u produced frame index: %d",
+        LOG_TRACE("StreamBin", "%x cycling buffer. lock count: %u produced frame index: %d",
                             this, m_frontBufferLockCount, get_backBuffer()->frameIndex);
-        STRACE("StreamBin", "%x cycle pre indices: f: %d m: %d b: %d",
+        LOG_TRACE("StreamBin", "%x cycle pre indices: f: %d m: %d b: %d",
             this,
             get_frontBuffer()->frameIndex,
             get_middleBuffer()->frameIndex,
@@ -140,7 +140,7 @@ namespace astra {
             m_backBufferIndex = m_middleBufferIndex;
             m_middleBufferIndex = oldBackBufferIndex;
 
-            STRACE("StreamBin", "%x cycle back/mid indices: f: %d m: %d b: %d",
+            LOG_TRACE("StreamBin", "%x cycle back/mid indices: f: %d m: %d b: %d",
                 this,
                 get_frontBuffer()->frameIndex,
                 get_middleBuffer()->frameIndex,
@@ -161,13 +161,13 @@ namespace astra {
             astra_frame_index_t newFrameIndex = get_frontBuffer()->frameIndex;
             if (frameIndex != -1 && newFrameIndex <= oldFrameIndex)
             {
-                SWARN("StreamBin", "%x buffers cycled with out-of-order frame indices: %d->%d",
+                LOG_WARN("StreamBin", "%x buffers cycled with out-of-order frame indices: %d->%d",
                                 this, oldFrameIndex, newFrameIndex);
                 assert(frameIndex > oldFrameIndex);
             }
 #endif
 
-            STRACE("StreamBin", "%x cycle front/back indices: f: %d m: %d b: %d",
+            LOG_TRACE("StreamBin", "%x cycle front/back indices: f: %d m: %d b: %d",
                 this,
                 get_frontBuffer()->frameIndex,
                 get_middleBuffer()->frameIndex,
