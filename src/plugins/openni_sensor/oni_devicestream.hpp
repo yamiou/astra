@@ -371,8 +371,6 @@ namespace orbbec { namespace ni {
             PROFILE_BEGIN(oni_stream_end_write);
             bin_->end_write();
             PROFILE_END();
-
-            printf("sensor %d read frame %d\n", oniSensorType_, frameIndex);
         }
 
         return ASTRA_STATUS_SUCCESS;
