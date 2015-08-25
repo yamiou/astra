@@ -85,7 +85,7 @@ public:
         astra_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
         for(int i = 0; i < depthWidth * depthHeight; i++)
         {
-            int rgbaOffset = i *4;
+            int rgbaOffset = i * 4;
             m_depthView.buffer[rgbaOffset] = vizBuffer[i].r;
             m_depthView.buffer[rgbaOffset + 1] = vizBuffer[i].b;
             m_depthView.buffer[rgbaOffset + 2] = vizBuffer[i].g;
@@ -95,10 +95,10 @@ public:
         const astra::RGBPixel* color = colorFrame.data();
         for(int i = 0; i < colorWidth * colorHeight; i++)
         {
-            int rgbaOffset = i *4;
+            int rgbaOffset = i * 4;
             m_colorView.buffer[rgbaOffset] = color[i].r;
-            m_colorView.buffer[rgbaOffset + 1] = color[i].b;
-            m_colorView.buffer[rgbaOffset + 2] = color[i].g;
+            m_colorView.buffer[rgbaOffset + 1] = color[i].g;
+            m_colorView.buffer[rgbaOffset + 2] = color[i].b;
             m_colorView.buffer[rgbaOffset + 3] = 255;
         }
 
