@@ -51,7 +51,24 @@ namespace astra {
 
         astra_pixel_format_t pixelFormat() const { return astra_imagestream_mode_t::pixelFormat; }
         void set_pixelFormat(astra_pixel_format_t format) { astra_imagestream_mode_t::pixelFormat = format; }
+
+
     };
+
+    inline bool operator==(const ImageStreamMode& lhs, const ImageStreamMode& rhs)
+    {
+        return
+            lhs.width() == rhs.width() &&
+            lhs.height() == rhs.height() &&
+            lhs.pixelFormat() == rhs.pixelFormat() &&
+            lhs.fps() == rhs.fps() &&
+            lhs.bytesPerPixel() && rhs.bytesPerPixel();
+    }
+
+    inline bool operator!=(const ImageStreamMode& lhs, const ImageStreamMode& rhs)
+    {
+        return !(lhs == rhs);
+    }
 
     class ImageStream : public DataStream
     {
@@ -100,9 +117,9 @@ namespace astra {
             result.resize(count);
 
             astra_imagestream_get_modes_result(m_imageStream,
-                                                  token,
-                                                  reinterpret_cast<astra_imagestream_mode_t*>(&result[0]),
-                                                  count);
+                                               token,
+                                               reinterpret_cast<astra_imagestream_mode_t*>(&result[0]),
+                                               count);
 
             return result;
         }
