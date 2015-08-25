@@ -1,7 +1,7 @@
 #ifndef VECTOR3I_H
 #define VECTOR3I_H
 
-#include <math.h>
+#include <cmath>
 #include <AstraUL/skul_ctypes.h>
 
 namespace astra {
@@ -27,8 +27,8 @@ namespace astra {
             this->z = z;
         }
 
-        operator ::astra_vector3i_t*() { return this; }
-        operator const ::astra_vector3i_t*() const { return this; }
+        inline operator ::astra_vector3i_t*() { return this; }
+        inline operator const ::astra_vector3i_t*() const { return this; }
 
         float length() const;
         int length_squared() const;
@@ -61,7 +61,7 @@ namespace astra {
 
     inline float Vector3i::length() const
     {
-        return sqrtf(x * x + y * y + z * z);
+        return std::sqrtf(x * x + y * y + z * z);
     }
 
     inline int Vector3i::length_squared() const

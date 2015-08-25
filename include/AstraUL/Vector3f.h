@@ -27,8 +27,8 @@ namespace astra {
             this->z = z;
         }
 
-        operator ::astra_vector3f_t*() { return this; }
-        operator const ::astra_vector3f_t*() const { return this; }
+        inline operator ::astra_vector3f_t*() { return this; }
+        inline operator const ::astra_vector3f_t*() const { return this; }
 
         float length() const;
         float length_squared() const;
@@ -80,7 +80,7 @@ namespace astra {
 
     inline Vector3f Vector3f::normalize(Vector3f v)
     {
-        double length = sqrtf(v.x*v.x + v.y*v.y + v.z*v.z);
+        double length = std::sqrtf(v.x*v.x + v.y*v.y + v.z*v.z);
         if (length < 1e-9)
         {
             return Vector3f(0, 0, 0);

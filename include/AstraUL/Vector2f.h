@@ -1,7 +1,7 @@
 #ifndef VECTOR2F_H
 #define VECTOR2F_H
 
-#include <math.h>
+#include <cmath>
 #include <AstraUL/skul_ctypes.h>
 
 namespace astra
@@ -25,8 +25,8 @@ namespace astra
             this->y = y;
         }
 
-        operator ::astra_vector2f_t*() { return this; }
-        operator const ::astra_vector2f_t*() const { return this; }
+        inline operator ::astra_vector2f_t*() { return this; }
+        inline operator const ::astra_vector2f_t*() const { return this; }
 
         float length() const;
         float length_squared() const;
@@ -53,7 +53,7 @@ namespace astra
 
     inline Vector2f Vector2f::normalize(Vector2f v)
     {
-        double length = sqrtf(v.x*v.x + v.y*v.y);
+        double length = std::sqrtf(v.x*v.x + v.y*v.y);
         if (length < 1e-9)
         {
             return Vector2f(0, 0);
@@ -66,7 +66,7 @@ namespace astra
 
     inline float Vector2f::length() const
     {
-        return sqrtf(x * x + y * y);
+        return std::sqrtf(x * x + y * y);
     }
 
     inline float Vector2f::length_squared() const
