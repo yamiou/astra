@@ -7,9 +7,6 @@
 [submodule "vendor/openni-android"]
 	path = vendor/openni-android
 	url = git@bitbucket.org:orbicsoft/openni-android-binaries.git
-[submodule "android/sensekitapktest"]
-	path = android/astraapktest
-	url = git@bitbucket.org:orbicsoft/sensekitapktest.git
 [submodule "vendor/catch"]
 	path = vendor/catch
 	url = https://github.com/philsquared/Catch.git
