@@ -22,7 +22,7 @@ namespace orbbec { namespace ni {
             PROFILE_FUNC();
         }
 
-        virtual astra_status_t read_frame() = 0;
+        virtual astra_status_t read_frame(astra_frame_index_t frameIndex) = 0;
         virtual astra_status_t open() = 0;
         virtual astra_status_t close() = 0;
         virtual openni::VideoStream* get_stream() = 0;

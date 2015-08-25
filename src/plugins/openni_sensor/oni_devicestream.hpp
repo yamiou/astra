@@ -286,7 +286,7 @@ namespace orbbec { namespace ni {
             md.bytesPerPixel = mode_.bytesPerPixel;
         }
 
-        virtual astra_status_t read_frame() override;
+        virtual astra_status_t read_frame(astra_frame_index_t frameIndex) override;
 
         virtual openni::VideoStream* get_stream() override { return &oniStream_; }
 
@@ -314,7 +314,6 @@ namespace orbbec { namespace ni {
         size_t bufferLength_{0};
 
         astra_stream_t streamHandle_{nullptr};
-        astra_frame_index_t frameIndex_{0};
 
         std::vector<astra_imagestream_mode_t> modes_;
     };
@@ -343,7 +342,7 @@ namespace orbbec { namespace ni {
     }
 
     template<typename TFrameWrapper, typename TBufferBlockType>
-    astra_status_t devicestream<TFrameWrapper, TBufferBlockType>::read_frame()
+    astra_status_t devicestream<TFrameWrapper, TBufferBlockType>::read_frame(astra_frame_index_t frameIndex)
     {
         PROFILE_FUNC();
         if (!is_streaming()) return ASTRA_STATUS_SUCCESS;
@@ -359,7 +358,7 @@ namespace orbbec { namespace ni {
 
             size_t byteSize = MIN(ref.getDataSize(), bufferLength_);
 
-            wrapper_type* wrapper = bin_->begin_write(frameIndex_);
+            wrapper_type* wrapper = bin_->begin_write(frameIndex);
 
             wrapper->frame.frame = nullptr;
             wrapper->frame.data =
@@ -373,7 +372,7 @@ namespace orbbec { namespace ni {
             bin_->end_write();
             PROFILE_END();
 
-            ++frameIndex_;
+            printf("sensor %d read frame %d\n", oniSensorType_, frameIndex);
         }
 
         return ASTRA_STATUS_SUCCESS;

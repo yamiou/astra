@@ -45,6 +45,8 @@ namespace orbbec { namespace ni {
 
         const static size_t MAX_ONI_STREAMS = 4;
         std::array<openni::VideoStream*, MAX_ONI_STREAMS> oniStreams_;
+
+        astra_frame_index_t frameIndex_{ 0 };
     };
 }}
 

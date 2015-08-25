@@ -80,8 +80,15 @@ namespace orbbec { namespace ni {
                                                   &streamIndex,
                                                   timeout);
 
-            if (streamIndex != -1) streams_[streamIndex]->read_frame();
-        } while (i++ < streams_.size() && rc == openni::STATUS_OK);
+            if (streamIndex != -1) streams_[streamIndex]->read_frame(frameIndex_);
+            i++;
+            if (streamIndex == 0)
+            {
+                //only increment frameIndex with primary stream
+                //TODO this won't work when streams have different target FPS
+                frameIndex_++;
+            }
+        } while (i < streams_.size() && rc == openni::STATUS_OK);
 
         if (rc == openni::STATUS_TIME_OUT)
         {
@@ -140,11 +147,6 @@ namespace orbbec { namespace ni {
 
             if (rc != ASTRA_STATUS_SUCCESS)
                 LOG_WARN("orbbec.ni.device_streamset", "unable to open openni depth stream.");
-        }
-
-        if (oniStreams_.size() > 1)
-        {
-            oniDevice_.setDepthColorSyncEnabled(true);
         }
 
         return ASTRA_STATUS_SUCCESS;
