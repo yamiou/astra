@@ -17,7 +17,7 @@ namespace astra {
 
         inline astra_joint_status status() { return m_joint.status; }
         inline astra_joint_type type() { return m_joint.jointType; }
-        inline const Vector3f& position() { return Vector3f::from_cvector(m_joint.position); }
+        inline const Vector3f position() { return m_joint.position; }
 
     private:
         astra_skeleton_joint_t m_joint;

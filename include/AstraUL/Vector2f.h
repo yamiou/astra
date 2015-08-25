@@ -6,27 +6,17 @@
 
 namespace astra
 {
-    struct Vector2f : astra_vector2f_t
+    struct Vector2f : public astra_vector2f_t
     {
-        static inline Vector2f& from_cvector(astra_vector2f_t& cvector)
-        {
-            return *reinterpret_cast<Vector2f*>(&cvector);
-        }
-
-        static inline const Vector2f& from_cvector(const astra_vector2f_t& cvector)
-        {
-            return *reinterpret_cast<const Vector2f*>(&cvector);
-        }
-
-        static inline Vector2f* from_cvector_ptr(astra_vector2f_t* p_cvector)
-        {
-            return reinterpret_cast<Vector2f*>(p_cvector);
-        }
-
         Vector2f()
         {
             this->x = 0.0f;
             this->y = 0.0f;
+        }
+
+        Vector2f(const astra_vector2f_t& v)
+        {
+            *this = v;
         }
 
         Vector2f(float x, float y)
@@ -34,6 +24,9 @@ namespace astra
             this->x = x;
             this->y = y;
         }
+
+        operator ::astra_vector2f_t*() { return this; }
+        operator const ::astra_vector2f_t*() const { return this; }
 
         float length() const;
         float length_squared() const;

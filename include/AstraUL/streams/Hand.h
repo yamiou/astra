@@ -14,9 +14,9 @@ namespace astra {
     public:
         explicit HandPoint(astra_handpoint_t handPoint) :
             m_handPoint(handPoint),
-            m_depthPosition(Vector2i::from_cvector(handPoint.depthPosition)),
-            m_worldPosition(Vector3f::from_cvector(handPoint.worldPosition)),
-            m_worldDeltaPosition(Vector3f::from_cvector(handPoint.worldDeltaPosition))
+            m_depthPosition(handPoint.depthPosition),
+            m_worldPosition(handPoint.worldPosition),
+            m_worldDeltaPosition(handPoint.worldDeltaPosition)
         { }
 
         inline int32_t trackingId() const { return m_handPoint.trackingId; }

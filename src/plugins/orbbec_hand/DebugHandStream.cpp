@@ -91,7 +91,7 @@ namespace astra { namespace plugins { namespace hand {
             astra_vector2f_t newMousePosition;
             memcpy(&newMousePosition, inData, sizeof(astra_vector2f_t));
 
-            m_mouseNormPosition = Vector2f::from_cvector(newMousePosition);
+            m_mouseNormPosition = newMousePosition;
         }
     }
 

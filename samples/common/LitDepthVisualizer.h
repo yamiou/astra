@@ -28,7 +28,7 @@ namespace samples { namespace common {
 
         void set_light_direction(const astra_vector3f_t& direction)
         {
-            m_lightVector = Vector3f::from_cvector(direction);
+            m_lightVector = direction;
         }
 
         void set_ambient_color(const astra_rgb_pixel_t& color)

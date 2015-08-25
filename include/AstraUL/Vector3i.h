@@ -8,26 +8,16 @@ namespace astra {
 
     struct Vector3i : public astra_vector3i_t
     {
-        static inline Vector3i& from_cvector(astra_vector3i_t& cvector)
-        {
-            return *reinterpret_cast<Vector3i*>(&cvector);
-        }
-
-        static inline const Vector3i& from_cvector(const astra_vector3i_t& cvector)
-        {
-            return *reinterpret_cast<const Vector3i*>(&cvector);
-        }
-
-        static inline Vector3i* from_cvector_ptr(astra_vector3i_t* p_cvector)
-        {
-            return reinterpret_cast<Vector3i*>(p_cvector);
-        }
-
         Vector3i()
         {
             this->x = 0;
             this->y = 0;
             this->z = 0;
+        }
+
+        Vector3i(const astra_vector3i_t& v)
+        {
+            *this = v;
         }
 
         Vector3i(float x, float y, float z)
@@ -36,6 +26,9 @@ namespace astra {
             this->y = y;
             this->z = z;
         }
+
+        operator ::astra_vector3i_t*() { return this; }
+        operator const ::astra_vector3i_t*() const { return this; }
 
         float length() const;
         int length_squared() const;

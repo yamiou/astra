@@ -1,33 +1,23 @@
 #ifndef VECTOR3F_H
 #define VECTOR3F_H
 
-#include <math.h>
+#include <cmath>
 #include <AstraUL/skul_ctypes.h>
 
 namespace astra {
 
     struct Vector3f : public astra_vector3f_t
     {
-        static inline Vector3f& from_cvector(astra_vector3f_t& cvector)
-        {
-            return *reinterpret_cast<Vector3f*>(&cvector);
-        }
-
-        static inline const Vector3f& from_cvector(const astra_vector3f_t& cvector)
-        {
-            return *reinterpret_cast<const Vector3f*>(&cvector);
-        }
-
-        static inline Vector3f* from_cvector_ptr(astra_vector3f_t* p_cvector)
-        {
-            return reinterpret_cast<Vector3f*>(p_cvector);
-        }
-
         Vector3f()
         {
-            this->x = 0;
-            this->y = 0;
-            this->z = 0;
+            this->x = 0.0;
+            this->y = 0.0;
+            this->z = 0.0;
+        }
+
+        Vector3f(const astra_vector3f_t& v)
+        {
+            *this = v;
         }
 
         Vector3f(float x, float y, float z)
@@ -36,6 +26,9 @@ namespace astra {
             this->y = y;
             this->z = z;
         }
+
+        operator ::astra_vector3f_t*() { return this; }
+        operator const ::astra_vector3f_t*() const { return this; }
 
         float length() const;
         float length_squared() const;
@@ -67,7 +60,7 @@ namespace astra {
 
     inline float Vector3f::length() const
     {
-        return sqrtf(x * x + y * y + z * z);
+        return std::sqrtf(x * x + y * y + z * z);
     }
 
     inline float Vector3f::length_squared() const
