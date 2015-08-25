@@ -87,8 +87,8 @@ public:
         {
             int rgbaOffset = i * 4;
             m_depthView.buffer[rgbaOffset] = vizBuffer[i].r;
-            m_depthView.buffer[rgbaOffset + 1] = vizBuffer[i].b;
-            m_depthView.buffer[rgbaOffset + 2] = vizBuffer[i].g;
+            m_depthView.buffer[rgbaOffset + 1] = vizBuffer[i].g;
+            m_depthView.buffer[rgbaOffset + 2] = vizBuffer[i].b;
             m_depthView.buffer[rgbaOffset + 3] = 255;
         }
 
