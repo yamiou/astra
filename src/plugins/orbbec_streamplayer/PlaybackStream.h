@@ -105,7 +105,7 @@ namespace astra { namespace plugins { namespace streamplayer {
         }
 
         m_bin = std::make_unique<StreamBin<wrapper_type> >(
-            get_pluginService(),
+            pluginService(),
             get_handle(),
             m_frameStreamReader.get_buffer_length() - sizeof(wrapper_type));
 
@@ -166,7 +166,7 @@ namespace astra { namespace plugins { namespace streamplayer {
                 size_t resultByteLength = sizeof(float);
 
                 astra_parameter_data_t parameterData;
-                astra_status_t rc = get_pluginService().get_parameter_bin(resultByteLength,
+                astra_status_t rc = pluginService().get_parameter_bin(resultByteLength,
                                                                                 &parameterBin,
                                                                                 &parameterData);
                 if (rc == ASTRA_STATUS_SUCCESS)
@@ -181,7 +181,7 @@ namespace astra { namespace plugins { namespace streamplayer {
                 size_t resultByteLength = sizeof(float);
 
                 astra_parameter_data_t parameterData;
-                astra_status_t rc = get_pluginService().get_parameter_bin(resultByteLength,
+                astra_status_t rc = pluginService().get_parameter_bin(resultByteLength,
                                                                                 &parameterBin,
                                                                                 &parameterData);
                 if (rc == ASTRA_STATUS_SUCCESS)

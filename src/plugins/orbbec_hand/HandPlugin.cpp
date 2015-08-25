@@ -22,17 +22,17 @@ namespace astra { namespace plugins { namespace hand {
             PROFILE_OUTPUT("profile_orbbec_hand.txt");
         #endif
 
-        get_pluginService().unregister_stream_registered_callback(m_streamAddedCallbackId);
-        get_pluginService().unregister_stream_unregistering_callback(m_streamRemovingCallbackId);
+        pluginService().unregister_stream_registered_callback(m_streamAddedCallbackId);
+        pluginService().unregister_stream_unregistering_callback(m_streamRemovingCallbackId);
     }
 
     void HandPlugin::on_initialize()
     {
-        get_pluginService().register_stream_registered_callback(&HandPlugin::stream_registered_handler_thunk,
+        pluginService().register_stream_registered_callback(&HandPlugin::stream_registered_handler_thunk,
                                                                 this,
                                                                 &m_streamAddedCallbackId);
 
-        get_pluginService().register_stream_unregistering_callback(&HandPlugin::stream_unregistering_handler_thunk,
+        pluginService().register_stream_unregistering_callback(&HandPlugin::stream_unregistering_handler_thunk,
                                                                    this,
                                                                    &m_streamRemovingCallbackId);
     }
@@ -64,12 +64,12 @@ namespace astra { namespace plugins { namespace hand {
             m_streamTrackerMap.find(streamHandle) == m_streamTrackerMap.end())
         {
             const char* uri;
-            get_pluginService().get_streamset_uri(setHandle, &uri);
+            pluginService().get_streamset_uri(setHandle, &uri);
 
             Sensor sensor(uri);
             StreamDescription depthDescription = streamDesc;
 
-            HandTracker* tracker = new HandTracker(get_pluginService(),
+            HandTracker* tracker = new HandTracker(pluginService(),
                                                    setHandle,
                                                    depthDescription,
                                                    m_settings);

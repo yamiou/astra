@@ -19,7 +19,7 @@ namespace astra { namespace plugins { namespace streamplayer {
 
     void StreamPlayerPlugin::create_streamset()
     {
-        PlaybackStreamSetBase* set = new PlaybackStreamSet(get_pluginService(), "stream_player");
+        PlaybackStreamSetBase* set = new PlaybackStreamSet(pluginService(), "stream_player");
         set->open();
 
         m_sets.push_back(SetPtr(set));

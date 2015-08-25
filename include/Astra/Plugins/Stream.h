@@ -53,7 +53,7 @@ namespace astra { namespace plugins {
         inline astra_stream_t get_handle() { return m_streamHandle; }
 
     protected:
-        inline PluginServiceProxy& get_pluginService() const { return m_pluginService; }
+        inline PluginServiceProxy& pluginService() const { return m_pluginService; }
         inline void enable_callbacks();
 
     private:

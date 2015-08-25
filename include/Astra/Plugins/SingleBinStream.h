@@ -19,7 +19,7 @@ namespace astra { namespace plugins {
                      streamSet,
                      description)
         {
-            m_bin = std::make_unique<bin_type>(get_pluginService(),
+            m_bin = std::make_unique<bin_type>(pluginService,
                                                get_handle(),
                                                sizeof(TFrameType) + bufferSize);
             enable_callbacks();

@@ -18,7 +18,7 @@ namespace astra { namespace plugins { namespace xs {
 
             StreamDescription depthDescription = streamDesc;
 
-            auto pointProcessorPtr = std::make_unique<PointProcessor>(get_pluginService(),
+            auto pointProcessorPtr = std::make_unique<PointProcessor>(pluginService(),
                                                                       setHandle,
                                                                       depthDescription);
 
