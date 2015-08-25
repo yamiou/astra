@@ -1,16 +1,20 @@
 set (_projname "openni_sensor")
 
-set(${_projname}_SOURCES
-  OpenNIPlugin.cpp
-  OpenNIPlugin.h
-  OniDeviceStream.h
-  OniDepthStream.h
-  OniDepthStream.cpp
-  OniColorStream.h
-  OniColorStream.cpp
-  OniDeviceStreamSet.h
-  OniDeviceStreamSet.cpp
+set(${_projname}_HEADERS
+  oni_adapter_plugin.hpp
+  oni_colorstream.hpp
+  oni_depthstream.hpp
+  oni_device_streamset.hpp
+  oni_devicestream.hpp
   oni_mappers.hpp
+  oni_stream.hpp
+  )
+
+set(${_projname}_SOURCES
+  oni_adapter_plugin.cpp
+  oni_colorstream.cpp
+  oni_depthstream.cpp
+  oni_device_streamset.cpp
   oni_mappers.cpp
   )
 
@@ -28,7 +32,7 @@ include_directories ("$ENV{OPENNI2_INCLUDE}")
 
 include_directories(${_projname} ${SHINY_INCLUDE})
 
-add_library(${_projname} SHARED ${${_projname}_SOURCES})
+add_library(${_projname} SHARED ${${_projname}_SOURCES} ${${_projname}_HEADERS})
 
 set_target_properties(${_projname} PROPERTIES FOLDER "plugins")
 

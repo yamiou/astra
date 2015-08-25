@@ -1,6 +1,6 @@
 #include "oni_mappers.hpp"
 
-namespace astra { namespace plugins {
+namespace orbbec { namespace ni {
 
     std::tuple<astra_pixel_format_t, uint8_t> convert_format(const openni::PixelFormat& oniFormat)
     {
