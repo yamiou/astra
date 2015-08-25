@@ -5,7 +5,7 @@ namespace astra { namespace plugins { namespace hand {
 
     void DebugHandStream::on_set_parameter(astra_streamconnection_t connection,
                                            astra_parameter_id id,
-                                           size_t inByteLength,
+                                           std::size_t inByteLength,
                                            astra_parameter_data_t inData)
     {
         switch (id)
@@ -42,7 +42,7 @@ namespace astra { namespace plugins { namespace hand {
 
     void DebugHandStream::on_invoke(astra_streamconnection_t connection,
                                     astra_command_id commandId,
-                                    size_t inByteLength,
+                                    std::size_t inByteLength,
                                     astra_parameter_data_t inData,
                                     astra_parameter_bin_t& parameterBin)
     {
@@ -50,7 +50,7 @@ namespace astra { namespace plugins { namespace hand {
 
     void DebugHandStream::get_view_parameter(astra_parameter_bin_t& parameterBin)
     {
-        size_t resultByteLength = sizeof(DebugHandViewType);
+        std::size_t resultByteLength = sizeof(DebugHandViewType);
 
         astra_parameter_data_t parameterData;
         astra_status_t rc = pluginService().get_parameter_bin(resultByteLength,
@@ -58,60 +58,60 @@ namespace astra { namespace plugins { namespace hand {
                                                                      &parameterData);
         if (rc == ASTRA_STATUS_SUCCESS)
         {
-            memcpy(parameterData, &m_viewType, resultByteLength);
+            std::memcpy(parameterData, &m_viewType, resultByteLength);
         }
     }
 
-    void DebugHandStream::set_view_parameter(size_t inByteLength, astra_parameter_data_t& inData)
+    void DebugHandStream::set_view_parameter(std::size_t inByteLength, astra_parameter_data_t& inData)
     {
         if (inByteLength >= sizeof(DebugHandViewType))
         {
             DebugHandViewType newViewType;
-            memcpy(&newViewType, inData, sizeof(DebugHandViewType));
+            std::memcpy(&newViewType, inData, sizeof(DebugHandViewType));
 
             set_view_type(newViewType);
         }
     }
 
-    void DebugHandStream::set_use_mouse_probe(size_t inByteLength, astra_parameter_data_t& inData)
+    void DebugHandStream::set_use_mouse_probe(std::size_t inByteLength, astra_parameter_data_t& inData)
     {
         if (inByteLength >= sizeof(bool))
         {
             bool newUseMouseProbe;
-            memcpy(&newUseMouseProbe, inData, sizeof(bool));
+            std::memcpy(&newUseMouseProbe, inData, sizeof(bool));
 
             m_useMouseProbe = newUseMouseProbe;
         }
     }
 
-    void DebugHandStream::set_mouse_norm_position(size_t inByteLength, astra_parameter_data_t& inData)
+    void DebugHandStream::set_mouse_norm_position(std::size_t inByteLength, astra_parameter_data_t& inData)
     {
         if (inByteLength >= sizeof(astra_vector2f_t))
         {
             astra_vector2f_t newMousePosition;
-            memcpy(&newMousePosition, inData, sizeof(astra_vector2f_t));
+            std::memcpy(&newMousePosition, inData, sizeof(astra_vector2f_t));
 
             m_mouseNormPosition = newMousePosition;
         }
     }
 
-    void DebugHandStream::set_pause_input(size_t inByteLength, astra_parameter_data_t& inData)
+    void DebugHandStream::set_pause_input(std::size_t inByteLength, astra_parameter_data_t& inData)
     {
         if (inByteLength >= sizeof(bool))
         {
             bool newPauseInput;
-            memcpy(&newPauseInput, inData, sizeof(bool));
+            std::memcpy(&newPauseInput, inData, sizeof(bool));
 
             m_pauseInput = newPauseInput;
         }
     }
 
-    void DebugHandStream::set_lock_spawn_point(size_t inByteLength, astra_parameter_data_t& inData)
+    void DebugHandStream::set_lock_spawn_point(std::size_t inByteLength, astra_parameter_data_t& inData)
     {
         if (inByteLength >= sizeof(bool))
         {
             bool newLockSpawnPoint;
-            memcpy(&newLockSpawnPoint, inData, sizeof(bool));
+            std::memcpy(&newLockSpawnPoint, inData, sizeof(bool));
 
             if (newLockSpawnPoint && !m_lockSpawnPoint)
             {
