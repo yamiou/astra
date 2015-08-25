@@ -58,17 +58,17 @@ typedef size_t astra_callback_id_t;
 typedef struct _astra_reader_callback_id* astra_reader_callback_id_t;
 
 typedef void(*astra_frame_ready_callback_t)(void* clientTag,
-                                               astra_reader_t reader,
-                                               astra_reader_frame_t frame);
+                                            astra_reader_t reader,
+                                            astra_reader_frame_t frame);
 
 typedef enum {
-    ASTRA_SEVERITY_UNKNOWN,
-    ASTRA_SEVERITY_FATAL,
-    ASTRA_SEVERITY_ERROR,
-    ASTRA_SEVERITY_WARN,
-    ASTRA_SEVERITY_INFO,
-    ASTRA_SEVERITY_DEBUG,
-    ASTRA_SEVERITY_TRACE
+    ASTRA_SEVERITY_UNKNOWN = 0,
+    ASTRA_SEVERITY_FATAL   = 1,
+    ASTRA_SEVERITY_ERROR   = 2,
+    ASTRA_SEVERITY_WARN    = 3,
+    ASTRA_SEVERITY_INFO    = 4,
+    ASTRA_SEVERITY_DEBUG   = 5,
+    ASTRA_SEVERITY_TRACE   = 6
 } astra_log_severity_t;
 
 typedef uint32_t astra_event_id;
