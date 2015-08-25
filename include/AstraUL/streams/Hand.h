@@ -9,21 +9,35 @@
 
 namespace astra {
 
-    class HandPoint
+    class HandPoint : public astra_handpoint_t
     {
     public:
-        explicit HandPoint(astra_handpoint_t handPoint) :
-            m_handPoint(handPoint),
-            m_depthPosition(handPoint.depthPosition),
-            m_worldPosition(handPoint.worldPosition),
-            m_worldDeltaPosition(handPoint.worldDeltaPosition)
-        { }
+        HandPoint(std::int32_t trackingId,
+                  astra_handstatus_t status,
+                  Vector2i depthPosition,
+                  Vector3f worldPosition,
+                  Vector3f worldDeltaPosition)
+        {
+            astra_handpoint_t::trackingId = trackingId;
+            astra_handpoint_t::status = status;
+            astra_handpoint_t::depthPosition = depthPosition;
+            astra_handpoint_t::worldPosition = worldPosition;
+            astra_handpoint_t::worldDeltaPosition = worldDeltaPosition;
+        }
 
-        inline int32_t trackingId() const { return m_handPoint.trackingId; }
-        inline astra_handstatus_t status() const { return m_handPoint.status; }
-        inline const Vector2i& depthPosition() const { return m_depthPosition; }
-        inline const Vector3f& worldPosition() const { return m_worldPosition; }
-        inline const Vector3f& worldDeltaPosition() const { return m_worldDeltaPosition; }
+        HandPoint(const astra_handpoint_t& handPoint)
+        {
+            *this = handPoint;
+        }
+
+        inline operator ::astra_handpoint_t*() { return this; }
+        inline operator const ::astra_handpoint_t*() const { return this; }
+
+        inline int32_t trackingId() const { return astra_handpoint_t::trackingId; }
+        inline astra_handstatus_t status() const { return astra_handpoint_t::status; }
+        inline Vector2i depthPosition() const { return astra_handpoint_t::depthPosition; }
+        inline Vector3f worldPosition() const { return astra_handpoint_t::worldPosition; }
+        inline Vector3f worldDeltaPosition() const { return astra_handpoint_t::worldDeltaPosition; }
 
     private:
         astra_handpoint_t m_handPoint;
@@ -39,7 +53,7 @@ namespace astra {
     public:
         explicit HandStream(astra_streamconnection_t connection)
             : DataStream(connection),
-            m_handStream(connection)
+              m_handStream(connection)
         { }
 
         static const astra_stream_type_t id = ASTRA_STREAM_HAND;
