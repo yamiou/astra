@@ -110,20 +110,25 @@ public:
 
     void drawTo(sf::RenderWindow& window)
     {
-        int viewSize = (float)(window.getView().getSize().x / 2.0f);
+        int viewSize = (int)(window.getView().getSize().x / 2.0f);
+
         if (m_depthView.buffer != nullptr)
         {
-            float depthScale = viewSize / m_depthView.width;
+            float depthScale = viewSize / (float)m_depthView.width;
+            float height = m_depthView.height * depthScale;
+            int horzCenter = window.getView().getCenter().y - height / 2.0f;
             m_depthView.sprite.setScale(depthScale, depthScale);
-            m_depthView.sprite.setPosition(0,0);
+            m_depthView.sprite.setPosition(0, horzCenter);
             window.draw(m_depthView.sprite);
         }
 
         if (m_colorView.buffer != nullptr)
         {
-            float colorScale = viewSize / m_colorView.width;
+            float colorScale = viewSize / (float)m_colorView.width;
+            float height = m_depthView.height * colorScale;
+            int horzCenter = window.getView().getCenter().y - height / 2.0f;
             m_colorView.sprite.setScale(colorScale, colorScale);
-            m_colorView.sprite.setPosition(viewSize, 0);
+            m_colorView.sprite.setPosition(viewSize, horzCenter);
             window.draw(m_colorView.sprite);
         }
     }
@@ -145,13 +150,33 @@ int main(int argc, char** argv)
 {
     astra::Astra::initialize();
 
-    sf::RenderWindow window(sf::VideoMode(1280, 960), "Stream Viewer");
+    sf::VideoMode mode = sf::VideoMode::getFullscreenModes()[0];
+    sf::RenderWindow window(mode, "Stream Viewer", sf::Style::Fullscreen);
 
     astra::Sensor sensor;
     astra::StreamReader reader = sensor.create_reader();
 
     reader.stream<astra::PointStream>().start();
+    reader.stream<astra::DepthStream>().start();
+
+    astra::ImageStreamMode depthMode;
+
+    depthMode.set_height(320);
+    depthMode.set_width(240);
+    depthMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_DEPTH_MM);
+    depthMode.set_fps(30);
+
+    reader.stream<astra::DepthStream>().set_mode(depthMode);
     reader.stream<astra::ColorStream>().start();
+
+    astra::ImageStreamMode colorMode;
+
+    colorMode.set_height(320);
+    colorMode.set_width(240);
+    colorMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_RGB888);
+    colorMode.set_fps(30);
+
+    reader.stream<astra::ColorStream>().set_mode(colorMode);
 
     MultiFrameListener listener;
 
