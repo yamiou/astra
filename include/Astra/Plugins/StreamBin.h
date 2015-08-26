@@ -89,7 +89,6 @@ namespace astra { namespace plugins {
         astra_frame_t* m_currentBuffer{nullptr};
         PluginServiceProxy& m_pluginService;
         bool m_locked{false};
-
     };
 
 }}

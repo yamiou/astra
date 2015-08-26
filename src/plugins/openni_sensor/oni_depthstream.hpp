@@ -10,7 +10,7 @@
 
 namespace orbbec { namespace ni {
 
-    class depthstream : public devicestream<astra_imageframe_wrapper_t, int16_t>
+    class depthstream : public devicestream<astra_imageframe_wrapper_t>
     {
     public:
         depthstream(astra::PluginServiceProxy& pluginService,

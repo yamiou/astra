@@ -9,9 +9,7 @@
 
 namespace astra { namespace plugins { namespace hand {
 
-    class HandStream : public SingleBinStream<astra_handframe_wrapper_t,
-                                              astra_handpoint_t>
-
+    class HandStream : public SingleBinStream<astra_handframe_wrapper_t>
     {
     public:
         HandStream(PluginServiceProxy& pluginService,

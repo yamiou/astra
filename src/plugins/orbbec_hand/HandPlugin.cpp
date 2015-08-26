@@ -17,10 +17,10 @@ namespace astra { namespace plugins { namespace hand {
 
     HandPlugin::~HandPlugin()
     {
-        #ifndef __ANDROID__
-            PROFILE_UPDATE();
-            PROFILE_OUTPUT("profile_orbbec_hand.txt");
-        #endif
+#ifndef __ANDROID__
+        PROFILE_UPDATE();
+        PROFILE_OUTPUT("profile_orbbec_hand.txt");
+#endif
 
         pluginService().unregister_stream_registered_callback(m_streamAddedCallbackId);
         pluginService().unregister_stream_unregistering_callback(m_streamRemovingCallbackId);
@@ -29,12 +29,12 @@ namespace astra { namespace plugins { namespace hand {
     void HandPlugin::on_initialize()
     {
         pluginService().register_stream_registered_callback(&HandPlugin::stream_registered_handler_thunk,
-                                                                this,
-                                                                &m_streamAddedCallbackId);
+                                                            this,
+                                                            &m_streamAddedCallbackId);
 
         pluginService().register_stream_unregistering_callback(&HandPlugin::stream_unregistering_handler_thunk,
-                                                                   this,
-                                                                   &m_streamRemovingCallbackId);
+                                                               this,
+                                                               &m_streamRemovingCallbackId);
     }
 
     void HandPlugin::stream_registered_handler_thunk(void* clientTag,

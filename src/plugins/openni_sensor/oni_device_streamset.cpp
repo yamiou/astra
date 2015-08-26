@@ -4,8 +4,8 @@
 namespace orbbec { namespace ni {
 
     device_streamset::device_streamset(std::string name,
-                                               astra::PluginServiceProxy& pluginService,
-                                               const char* uri)
+                                       astra::PluginServiceProxy& pluginService,
+                                       const char* uri)
         : pluginService_(pluginService),
           uri_(uri)
     {
@@ -106,8 +106,8 @@ namespace orbbec { namespace ni {
         if (enableColor && oniDevice_.hasSensor(openni::SENSOR_COLOR))
         {
             colorstream* stream = new colorstream(pluginService_,
-                                                          streamSetHandle_,
-                                                          oniDevice_);
+                                                  streamSetHandle_,
+                                                  oniDevice_);
 
             astra_status_t rc = ASTRA_STATUS_SUCCESS;
             rc = stream->open();
@@ -129,8 +129,8 @@ namespace orbbec { namespace ni {
         if (oniDevice_.hasSensor(openni::SENSOR_DEPTH))
         {
             depthstream* stream = new depthstream(pluginService_,
-                                                          streamSetHandle_,
-                                                          oniDevice_);
+                                                  streamSetHandle_,
+                                                  oniDevice_);
 
             astra_status_t rc = ASTRA_STATUS_SUCCESS;
             rc = stream->open();

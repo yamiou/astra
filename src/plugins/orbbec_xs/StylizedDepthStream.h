@@ -11,7 +11,7 @@
 namespace astra { namespace plugins { namespace depth {
 
     class StylizedDepthStream
-        : public SingleBinStream<astra_imageframe_wrapper_t, uint8_t>,
+        : public SingleBinStream<astra_imageframe_wrapper_t>,
           public astra::FrameReadyListener
     {
     public:

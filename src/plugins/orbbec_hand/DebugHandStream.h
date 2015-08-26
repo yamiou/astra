@@ -10,7 +10,7 @@ namespace astra { namespace plugins { namespace hand {
 
     using DebugHandViewType = astra_debug_hand_view_type_t;
 
-    class DebugHandStream : public SingleBinStream<astra_imageframe_wrapper_t, uint8_t>
+    class DebugHandStream : public SingleBinStream<astra_imageframe_wrapper_t>
 
     {
     public:

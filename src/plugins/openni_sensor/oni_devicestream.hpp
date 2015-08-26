@@ -21,12 +21,11 @@
 
 namespace orbbec { namespace ni {
 
-    template<typename TFrameWrapper, typename TBufferBlockType>
+    template<typename TFrameWrapper>
     class devicestream : public stream
     {
     public:
         using wrapper_type = TFrameWrapper;
-        using block_type = TBufferBlockType;
 
         devicestream(astra::PluginServiceProxy& pluginService,
                      astra_streamset_t streamSet,
@@ -81,20 +80,20 @@ namespace orbbec { namespace ni {
                 }
 
                 LOG_INFO("orbbec.ni.devicestream", "- w: %d h: %d fps: %d pf: %d",
-                      oniMode.getResolutionX(),
-                      oniMode.getResolutionY(),
-                      oniMode.getFps(),
-                      oniMode.getPixelFormat());
+                         oniMode.getResolutionX(),
+                         oniMode.getResolutionY(),
+                         oniMode.getFps(),
+                         oniMode.getPixelFormat());
             }
 
             oniVideoMode_ = oniStream_.getVideoMode();
             mode_ = convert_mode(oniVideoMode_);
 
             LOG_INFO("orbbec.ni.devicestream", "Selected mode: w: %d h: %d fps: %d pf: %d",
-                  mode_.width,
-                  mode_.height,
-                  mode_.fps,
-                  mode_.pixelFormat);
+                     mode_.width,
+                     mode_.height,
+                     mode_.fps,
+                     mode_.pixelFormat);
 
             assert(mode_.pixelFormat != 0);
 
@@ -179,8 +178,8 @@ namespace orbbec { namespace ni {
 
                 astra_parameter_data_t parameterData;
                 astra_status_t rc = pluginService().get_parameter_bin(resultByteLength,
-                                                                          &parameterBin,
-                                                                          &parameterData);
+                                                                      &parameterBin,
+                                                                      &parameterData);
                 if (rc == ASTRA_STATUS_SUCCESS)
                 {
                     float* hFov = reinterpret_cast<float*>(parameterData);
@@ -194,8 +193,8 @@ namespace orbbec { namespace ni {
 
                 astra_parameter_data_t parameterData;
                 astra_status_t rc = pluginService().get_parameter_bin(resultByteLength,
-                                                                          &parameterBin,
-                                                                          &parameterData);
+                                                                      &parameterBin,
+                                                                      &parameterData);
                 if (rc == ASTRA_STATUS_SUCCESS)
                 {
                     float* vFov = reinterpret_cast<float*>(parameterData);
@@ -209,8 +208,8 @@ namespace orbbec { namespace ni {
 
                 astra_parameter_data_t parameterData;
                 astra_status_t rc = pluginService().get_parameter_bin(resultByteLength,
-                                                                          &parameterBin,
-                                                                          &parameterData);
+                                                                      &parameterBin,
+                                                                      &parameterData);
                 if (rc == ASTRA_STATUS_SUCCESS)
                 {
                     bool mirroring = oniStream_.getMirroringEnabled();
@@ -225,8 +224,8 @@ namespace orbbec { namespace ni {
 
                 astra_parameter_data_t parameterData;
                 astra_status_t rc = pluginService().get_parameter_bin(resultSize,
-                                                                          &parameterBin,
-                                                                          &parameterData);
+                                                                      &parameterBin,
+                                                                      &parameterData);
 
                 astra_imagestream_mode_t* result = static_cast<astra_imagestream_mode_t*>(parameterData);
 
@@ -318,19 +317,17 @@ namespace orbbec { namespace ni {
         std::vector<astra_imagestream_mode_t> modes_;
     };
 
-    template<typename TFrameWrapper, typename TBufferBlockType>
-    void devicestream<TFrameWrapper,
-                      TBufferBlockType>::on_connection_added(astra_streamconnection_t connection)
+    template<typename TFrameWrapper>
+    void devicestream<TFrameWrapper>::on_connection_added(astra_streamconnection_t connection)
     {
         PROFILE_FUNC();
         assert(bin_ != nullptr);
         bin_->link_connection(connection);
     }
 
-    template<typename TFrameWrapper, typename TBufferBlockType>
-    void devicestream<TFrameWrapper,
-                      TBufferBlockType>::on_connection_removed(astra_bin_t bin,
-                                                               astra_streamconnection_t connection)
+    template<typename TFrameWrapper>
+    void devicestream<TFrameWrapper>::on_connection_removed(astra_bin_t bin,
+                                                            astra_streamconnection_t connection)
     {
         PROFILE_FUNC();
         bin_->unlink_connection(connection);
@@ -341,8 +338,8 @@ namespace orbbec { namespace ni {
         }
     }
 
-    template<typename TFrameWrapper, typename TBufferBlockType>
-    astra_status_t devicestream<TFrameWrapper, TBufferBlockType>::read_frame(astra_frame_index_t frameIndex)
+    template<typename TFrameWrapper>
+    astra_status_t devicestream<TFrameWrapper>::read_frame(astra_frame_index_t frameIndex)
     {
         PROFILE_FUNC();
         if (!is_streaming()) return ASTRA_STATUS_SUCCESS;
@@ -354,15 +351,14 @@ namespace orbbec { namespace ni {
 
         if (status == ::openni::STATUS_OK)
         {
-            const block_type* oniFrameData = static_cast<const block_type*>(ref.getData());
+            const auto* oniFrameData = ref.getData();
 
             size_t byteSize = MIN(ref.getDataSize(), bufferLength_);
 
             wrapper_type* wrapper = bin_->begin_write(frameIndex);
 
             wrapper->frame.frame = nullptr;
-            wrapper->frame.data =
-                reinterpret_cast<block_type*>(&(wrapper->frame_data));
+            wrapper->frame.data = &(wrapper->frame_data);
 
             on_new_buffer(wrapper);
 

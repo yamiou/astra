@@ -9,7 +9,7 @@
 
 namespace orbbec { namespace ni {
 
-    class colorstream : public devicestream<astra_imageframe_wrapper_t, uint8_t>
+    class colorstream : public devicestream<astra_imageframe_wrapper_t>
     {
     public:
         colorstream(astra::PluginServiceProxy& pluginService,

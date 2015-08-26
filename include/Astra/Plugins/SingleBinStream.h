@@ -7,7 +7,7 @@
 
 namespace astra { namespace plugins {
 
-    template<typename TFrameType, typename TBlockType>
+    template<typename TFrameType>
     class SingleBinStream : public Stream
     {
     public:
@@ -26,7 +26,6 @@ namespace astra { namespace plugins {
         }
 
         using frame_type = TFrameType;
-        using block_type = TBlockType;
 
         bool has_connections()
         {

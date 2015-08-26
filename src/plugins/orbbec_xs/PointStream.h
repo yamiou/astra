@@ -9,8 +9,7 @@
 
 namespace astra { namespace plugins { namespace xs {
 
-    class PointStream : public SingleBinStream<astra_imageframe_wrapper_t,
-                                               astra_vector3f_t>
+    class PointStream : public SingleBinStream<astra_imageframe_wrapper_t>
 
     {
     public:

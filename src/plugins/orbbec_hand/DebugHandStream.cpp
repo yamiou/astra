@@ -54,8 +54,8 @@ namespace astra { namespace plugins { namespace hand {
 
         astra_parameter_data_t parameterData;
         astra_status_t rc = pluginService().get_parameter_bin(resultByteLength,
-                                                                     &parameterBin,
-                                                                     &parameterData);
+                                                              &parameterBin,
+                                                              &parameterData);
         if (rc == ASTRA_STATUS_SUCCESS)
         {
             std::memcpy(parameterData, &m_viewType, resultByteLength);

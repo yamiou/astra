@@ -8,7 +8,7 @@
 
 namespace astra { namespace plugins {
 
-    template<typename TFrameType, typename TBlockType>
+    template<typename TFrameType>
     class MultiBinStream : public Stream
     {
     public:
