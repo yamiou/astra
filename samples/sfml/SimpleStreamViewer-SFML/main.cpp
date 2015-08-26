@@ -125,7 +125,7 @@ public:
         if (m_colorView.buffer != nullptr)
         {
             float colorScale = viewSize / (float)m_colorView.width;
-            float height = m_depthView.height * colorScale;
+            float height = m_colorView.height * colorScale;
             int horzCenter = window.getView().getCenter().y - height / 2.0f;
             m_colorView.sprite.setScale(colorScale, colorScale);
             m_colorView.sprite.setPosition(viewSize, horzCenter);
