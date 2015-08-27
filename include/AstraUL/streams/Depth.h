@@ -31,10 +31,10 @@ namespace astra {
         {
             float worldX, worldY, worldZ;
             astra_convert_depth_to_world(m_depthStream,
-                                            depthPosition.x,
-                                            depthPosition.y,
-                                            depthPosition.z,
-                                            &worldX, &worldY, &worldZ);
+                                         depthPosition.x,
+                                         depthPosition.y,
+                                         depthPosition.z,
+                                         &worldX, &worldY, &worldZ);
 
             return Vector3f(worldX, worldY, worldZ);
         }
@@ -43,10 +43,10 @@ namespace astra {
         {
             float depthX, depthY, depthZ;
             astra_convert_world_to_depth(m_depthStream,
-                                            worldPosition.x,
-                                            worldPosition.y,
-                                            worldPosition.z,
-                                            &depthX, &depthY, &depthZ);
+                                         worldPosition.x,
+                                         worldPosition.y,
+                                         worldPosition.z,
+                                         &depthX, &depthY, &depthZ);
 
             return Vector3f(depthX, depthY, depthZ);
         }
@@ -55,15 +55,15 @@ namespace astra {
                                     float* worldX, float* worldY, float* worldZ) const
         {
             astra_convert_depth_to_world(m_depthStream, depthX, depthY, depthZ,
-                                            worldX, worldY, worldZ);
+                                         worldX, worldY, worldZ);
         }
 
         void convert_world_to_depth(float  worldX, float  worldY, float  worldZ,
                                     float* depthX, float* depthY, float* depthZ) const
         {
             astra_convert_world_to_depth(m_depthStream,
-                                            worldX, worldY, worldZ,
-                                            depthX, depthY, depthZ);
+                                         worldX, worldY, worldZ,
+                                         depthX, depthY, depthZ);
         }
 
     private:
