@@ -6,6 +6,7 @@
 #include <Astra/Plugins/Stream.h>
 #include <Astra/Plugins/StreamBin.h>
 #include <OpenNI.h>
+#include <Shiny.h>
 
 namespace orbbec { namespace ni {
 
@@ -28,6 +29,16 @@ namespace orbbec { namespace ni {
         virtual openni::VideoStream* get_stream() = 0;
         virtual astra_status_t start() = 0;
         virtual astra_status_t stop() = 0;
+
+        bool is_open() const { return isOpen_; }
+        bool is_started() const { return isStarted_; }
+
+    protected:
+        void set_open(bool isOpen) { isOpen_ = isOpen; }
+        void set_started(bool isStarted) { isStarted_ = isStarted; }
+    private:
+        bool isOpen_{false};
+        bool isStarted_{false};
     };
 }}
 

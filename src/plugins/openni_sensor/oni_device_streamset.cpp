@@ -1,4 +1,7 @@
 #include "oni_device_streamset.hpp"
+#include "oni_depthstream.hpp"
+#include "oni_colorstream.hpp"
+#include "oni_infrared_stream.hpp"
 #include <Shiny.h>
 
 namespace orbbec { namespace ni {
@@ -98,6 +101,23 @@ namespace orbbec { namespace ni {
         return ASTRA_STATUS_SUCCESS;
     }
 
+    astra_status_t device_streamset::start_stream(stream* stream)
+    {
+        astra_status_t rc = ASTRA_STATUS_SUCCESS;
+
+        if (rc == ASTRA_STATUS_SUCCESS)
+        {
+            rc = stream->start();
+            if (rc == ASTRA_STATUS_SUCCESS)
+            {
+                streams_.push_back(stream_ptr(stream));
+                oniStreams_[streams_.size() - 1] = stream->get_stream();
+            }
+        }
+
+        return rc;
+    }
+
     astra_status_t device_streamset::open_sensor_streams()
     {
         PROFILE_FUNC();
@@ -112,14 +132,9 @@ namespace orbbec { namespace ni {
             astra_status_t rc = ASTRA_STATUS_SUCCESS;
             rc = stream->open();
 
-            if (rc == ASTRA_STATUS_SUCCESS)
+            if (stream->is_open())
             {
-                rc = stream->start();
-                if (rc == ASTRA_STATUS_SUCCESS)
-                {
-                    streams_.push_back(stream_ptr(stream));
-                    oniStreams_[streams_.size() - 1] = stream->get_stream();
-                }
+                rc = start_stream(stream);
             }
 
             if ( rc != ASTRA_STATUS_SUCCESS)
@@ -135,18 +150,26 @@ namespace orbbec { namespace ni {
             astra_status_t rc = ASTRA_STATUS_SUCCESS;
             rc = stream->open();
 
-            if (rc == ASTRA_STATUS_SUCCESS)
+            if (stream->is_open())
             {
-                rc = stream->start();
-                if (rc == ASTRA_STATUS_SUCCESS)
-                {
-                    streams_.push_back (stream_ptr(stream));
-                    oniStreams_[streams_.size() - 1] = stream->get_stream();
-                }
+                rc = start_stream(stream);
             }
 
             if (rc != ASTRA_STATUS_SUCCESS)
                 LOG_WARN("orbbec.ni.device_streamset", "unable to open openni depth stream.");
+        }
+
+        if (oniDevice_.hasSensor(openni::SENSOR_IR))
+        {
+            infrared_stream* stream = new infrared_stream(pluginService_,
+                                                          streamSetHandle_,
+                                                          oniDevice_);
+
+            astra_status_t rc = ASTRA_STATUS_SUCCESS;
+            rc = stream->open();
+
+            if (rc != ASTRA_STATUS_SUCCESS)
+                LOG_WARN("orbbec.ni.device_streamset", "unable to open openni infrared stream.");
         }
 
         return ASTRA_STATUS_SUCCESS;

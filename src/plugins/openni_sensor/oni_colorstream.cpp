@@ -1,5 +1,4 @@
 #include "oni_colorstream.hpp"
-#include <cstring>
 
 namespace orbbec { namespace ni {
 
@@ -13,7 +12,5 @@ namespace orbbec { namespace ni {
                            DEFAULT_SUBTYPE),
                        oniDevice,
                        openni::SENSOR_COLOR)
-    {
-        PROFILE_FUNC();
-    }
+    {}
 }}

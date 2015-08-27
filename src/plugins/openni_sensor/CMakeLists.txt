@@ -6,6 +6,7 @@ set(${_projname}_HEADERS
   oni_depthstream.hpp
   oni_device_streamset.hpp
   oni_devicestream.hpp
+  oni_infrared_stream.hpp
   oni_mappers.hpp
   oni_stream.hpp
   )
@@ -15,6 +16,7 @@ set(${_projname}_SOURCES
   oni_colorstream.cpp
   oni_depthstream.cpp
   oni_device_streamset.cpp
+  oni_infrared_stream.cpp
   oni_mappers.cpp
   )
 

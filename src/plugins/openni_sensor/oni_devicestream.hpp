@@ -50,7 +50,7 @@ namespace orbbec { namespace ni {
         virtual astra_status_t open() override final
         {
             PROFILE_FUNC();
-            if (isOpen_)
+            if (is_open())
                 return ASTRA_STATUS_SUCCESS;
 
             LOG_INFO("orbbec.ni.devicestream", "creating oni stream of type: %d", get_description().get_type());
@@ -107,8 +107,7 @@ namespace orbbec { namespace ni {
                                               bufferLength_);
 
             on_open();
-
-            isOpen_ = true;
+            set_open(true);
 
             enable_callbacks();
             return ASTRA_STATUS_SUCCESS;
@@ -117,7 +116,7 @@ namespace orbbec { namespace ni {
         virtual astra_status_t close() override final
         {
             PROFILE_FUNC();
-            if (!isOpen_)
+            if (!is_open())
                 return ASTRA_STATUS_SUCCESS;
 
             stop();
@@ -127,7 +126,8 @@ namespace orbbec { namespace ni {
             LOG_INFO("orbbec.ni.devicestream", "destroying oni stream of type: %d", get_description().get_type());
             oniStream_.destroy();
 
-            isOpen_ = isStreaming_ = false;
+            set_open(false);
+            set_started(false);
 
             return ASTRA_STATUS_SUCCESS;
         }
@@ -135,34 +135,45 @@ namespace orbbec { namespace ni {
         virtual astra_status_t start() override final
         {
             PROFILE_FUNC();
-            if (!isOpen_ || isStreaming_)
+            if (!is_open() || is_started())
                 return ASTRA_STATUS_SUCCESS;
 
             LOG_INFO("orbbec.ni.devicestream", "starting oni stream of type: %d", get_description().get_type());
-            oniStream_.start();
-            LOG_INFO("orbbec.ni.devicestream", "started oni stream of type: %d", get_description().get_type());
+            auto rc = oniStream_.start();
 
-            isStreaming_ = true;
+            if (rc == openni::Status::STATUS_OK)
+            {
+                LOG_INFO("orbbec.ni.devicestream",
+                         "started oni stream of type: %d",
+                         get_description().get_type());
 
-            return ASTRA_STATUS_SUCCESS;
+                set_started(true);
+
+                return ASTRA_STATUS_SUCCESS;
+            }
+            else
+            {
+                set_started(false);
+                return ASTRA_STATUS_DEVICE_ERROR;
+            }
         }
 
         virtual astra_status_t stop() override final
         {
             PROFILE_FUNC();
-            if (!isOpen_ || !isStreaming_)
+            if (!is_open() || !is_started())
                 return ASTRA_STATUS_SUCCESS;
 
             LOG_INFO("orbbec.ni.devicestream", "stopping oni stream of type: %d", get_description().get_type());
             oniStream_.stop();
             LOG_INFO("orbbec.ni.devicestream", "stopped oni stream of type: %d", get_description().get_type());
 
-            isStreaming_ = false;
+            set_started(false);
 
             return ASTRA_STATUS_SUCCESS;
         }
 
-        inline bool is_streaming() const { return isOpen_ && isStreaming_; }
+        inline bool is_streaming() const { return is_open() && is_started(); }
 
         virtual void on_get_parameter(astra_streamconnection_t connection,
                                       astra_parameter_id id,
@@ -303,9 +314,6 @@ namespace orbbec { namespace ni {
     private:
         virtual void on_open() {}
         virtual void on_close() {}
-
-        bool isOpen_{false};
-        bool isStreaming_{false};
 
         using bin_type = astra::plugins::StreamBin<wrapper_type>;
         std::unique_ptr<bin_type> bin_;

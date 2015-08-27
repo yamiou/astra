@@ -20,6 +20,9 @@ set(${_projname}_SOURCES
   ../../include/AstraUL/streams/Color.h
   ../../include/AstraUL/streams/color_capi.h
   ../../include/AstraUL/streams/color_types.h
+  ../../include/AstraUL/streams/Infrared.h
+  ../../include/AstraUL/streams/infrared_capi.h
+  ../../include/AstraUL/streams/infrared_types.h
   ../../include/AstraUL/streams/Hand.h
   ../../include/AstraUL/streams/DebugHand.h
   ../../include/AstraUL/streams/Skeleton.h
@@ -34,6 +37,7 @@ set(${_projname}_SOURCES
   ../../include/AstraUL/streams/point_types.h
   depth_capi.cpp
   color_capi.cpp
+  infrared_capi.cpp
   image_capi.cpp
   hand_capi.cpp
   point_capi.cpp
