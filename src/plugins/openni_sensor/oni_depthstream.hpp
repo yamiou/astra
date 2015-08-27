@@ -34,6 +34,11 @@ namespace orbbec { namespace ni {
                                       astra_parameter_id id,
                                       astra_parameter_bin_t& parameterBin) override;
 
+        void on_set_parameter(astra_streamconnection_t connection,
+                              astra_parameter_id id,
+                              size_t inByteLength,
+                              astra_parameter_data_t inData) override;
+
         virtual void on_connection_removed(astra_bin_t bin,
                                            astra_streamconnection_t connection) override;
     };

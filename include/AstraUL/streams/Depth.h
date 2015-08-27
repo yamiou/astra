@@ -84,10 +84,22 @@ namespace astra {
         conversion_cache_t depth_to_world_data()
         {
             conversion_cache_t data;
-
             astra_depthstream_get_depth_to_world_data(m_depthStream, &data);
 
             return data;
+        }
+
+        bool registration_enabled()
+        {
+            bool enabled = false;
+            astra_depthstream_get_registration(m_depthStream, &enabled);
+
+            return enabled;
+        }
+
+        void enable_registration(bool enable)
+        {
+            astra_depthstream_set_registration(m_depthStream, enable);
         }
 
         const CoordinateMapper& coordinateMapper() { return m_coordinateMapper; };

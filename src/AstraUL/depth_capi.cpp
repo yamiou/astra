@@ -111,6 +111,21 @@ ASTRA_API_EX astra_status_t astra_depthstream_get_vfov(astra_depthstream_t depth
                                             reinterpret_cast<astra_parameter_data_t*>(vFov));
 }
 
+ASTRA_API_EX astra_status_t astra_depthstream_set_registration(astra_depthstream_t depthStream,
+                                                               bool enabled)
+{
+    return astra_stream_set_parameter(depthStream, ASTRA_PARAMETER_DEPTH_REGISTRATION, sizeof(bool), &enabled);
+}
+
+ASTRA_API_EX astra_status_t astra_depthstream_get_registration(astra_depthstream_t depthStream,
+                                                               bool* enabled)
+{
+    return astra_stream_get_parameter_fixed(depthStream,
+                                            ASTRA_PARAMETER_DEPTH_REGISTRATION,
+                                            sizeof(float),
+                                            reinterpret_cast<astra_parameter_data_t*>(enabled));
+}
+
 ASTRA_API_EX astra_status_t astra_frame_get_depthframe(astra_reader_frame_t readerFrame,
                                                        astra_depthframe_t* depthFrame)
 {

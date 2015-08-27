@@ -4,6 +4,7 @@
 #include <Astra/astra_defines.h>
 #include <Astra/astra_types.h>
 #include <AstraUL/streams/depth_types.h>
+#include <stdbool.h>
 
 ASTRA_BEGIN_DECLS
 
@@ -27,6 +28,12 @@ ASTRA_API_EX astra_status_t astra_depthstream_get_hfov(astra_depthstream_t depth
 ASTRA_API_EX astra_status_t astra_depthstream_get_vfov(astra_depthstream_t depthStream,
                                                        float* vFov);
 
+ASTRA_API_EX astra_status_t astra_depthstream_get_registration(astra_depthstream_t depthStream,
+                                                               bool* enabled);
+
+ASTRA_API_EX astra_status_t astra_depthstream_set_registration(astra_depthstream_t depthStream,
+                                                               bool enabled);
+
 ASTRA_API_EX astra_status_t astra_frame_get_depthframe(astra_reader_frame_t readerFrame,
                                                        astra_depthframe_t* depthFrame);
 
@@ -49,6 +56,8 @@ ASTRA_API_EX astra_status_t astra_depthframe_get_metadata(astra_depthframe_t dep
 
 ASTRA_API_EX astra_status_t astra_depthframe_get_frameindex(astra_depthframe_t depthFrame,
                                                             astra_frame_index_t* index);
+
+
 
 ASTRA_END_DECLS
 

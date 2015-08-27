@@ -145,9 +145,9 @@ int main(int argc, char** argv)
                 case sf::Keyboard::Escape:
                     window.close();
                     break;
-                // case sf::Keyboard::R:
-                //     ds.enable_registration(!ds.registration_enabled());
-                //     break;
+                case sf::Keyboard::R:
+                    ds.enable_registration(!ds.registration_enabled());
+                    break;
                 case sf::Keyboard::M:
                     ds.enable_mirroring(!ds.mirroring_enabled());
                     break;

@@ -69,16 +69,71 @@ namespace orbbec { namespace ni {
 
             astra_parameter_data_t parameterData;
             astra_status_t rc = pluginService().get_parameter_bin(resultByteLength,
-                                                                      &parameterBin,
-                                                                      &parameterData);
+                                                                  &parameterBin,
+                                                                  &parameterData);
             if (rc == ASTRA_STATUS_SUCCESS)
             {
                 std::memcpy(parameterData, &conversionCache_, resultByteLength);
             }
             break;
         }
+        case ASTRA_PARAMETER_DEPTH_REGISTRATION:
+        {
+            std::size_t resultByteLength = sizeof(bool);
+
+            astra_parameter_data_t parameterData;
+            astra_status_t rc = pluginService().get_parameter_bin(resultByteLength,
+                                                                  &parameterBin,
+                                                                  &parameterData);
+            bool* enable = static_cast<bool*>(parameterData);
+
+            openni::ImageRegistrationMode mode = oniDevice_.getImageRegistrationMode();
+
+            switch (mode)
+            {
+            case openni::ImageRegistrationMode::IMAGE_REGISTRATION_DEPTH_TO_COLOR:
+                *enable = true;
+                break;
+            case openni::ImageRegistrationMode::IMAGE_REGISTRATION_OFF:
+            default:
+                *enable = false;
+                break;
+            }
+        }
         default:
             devicestream::on_get_parameter(connection, id, parameterBin);
+            break;
+        }
+    }
+
+    void depthstream::on_set_parameter(astra_streamconnection_t connection,
+                                       astra_parameter_id id,
+                                       size_t inByteLength,
+                                       astra_parameter_data_t inData)
+    {
+        switch (id)
+        {
+        case ASTRA_PARAMETER_DEPTH_REGISTRATION:
+        {
+            bool enable = *static_cast<bool*>(inData);
+            openni::ImageRegistrationMode mode = enable
+                ? openni::ImageRegistrationMode::IMAGE_REGISTRATION_DEPTH_TO_COLOR
+                : openni::ImageRegistrationMode::IMAGE_REGISTRATION_OFF;
+
+            if (oniDevice_.isImageRegistrationModeSupported(mode))
+            {
+                openni::Status rc =
+                    oniDevice_.setImageRegistrationMode(mode);
+
+                LOG_INFO("orbbec.ni.depthstream",
+                         "depth registration: %s, successful: %s",
+                         enable ? "enabled" : "disabled",
+                         rc == openni::Status::STATUS_OK ? "yes" : "no");
+            }
+            break;
+        }
+        default:
+            devicestream::on_set_parameter(connection, id, inByteLength, inData);
             break;
         }
     }
