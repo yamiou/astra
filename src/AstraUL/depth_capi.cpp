@@ -122,7 +122,7 @@ ASTRA_API_EX astra_status_t astra_depthstream_get_registration(astra_depthstream
 {
     return astra_stream_get_parameter_fixed(depthStream,
                                             ASTRA_PARAMETER_DEPTH_REGISTRATION,
-                                            sizeof(float),
+                                            sizeof(bool),
                                             reinterpret_cast<astra_parameter_data_t*>(enabled));
 }
 
@@ -137,12 +137,12 @@ ASTRA_API_EX astra_status_t astra_frame_get_depthframe(astra_reader_frame_t read
 
 ASTRA_API_EX astra_status_t astra_frame_get_depthframe_with_subtype(astra_reader_frame_t readerFrame,
                                                                     astra_stream_subtype_t subtype,
-                                                                    astra_depthframe_t* colorFrame)
+                                                                    astra_depthframe_t* depthFrame)
 {
     return astra_reader_get_imageframe(readerFrame,
                                        ASTRA_STREAM_DEPTH,
                                        subtype,
-                                       colorFrame);
+                                       depthFrame);
 }
 
 ASTRA_API_EX astra_status_t astra_depthframe_get_frameindex(astra_depthframe_t depthFrame,

@@ -57,8 +57,6 @@ ASTRA_API_EX astra_status_t astra_depthframe_get_metadata(astra_depthframe_t dep
 ASTRA_API_EX astra_status_t astra_depthframe_get_frameindex(astra_depthframe_t depthFrame,
                                                             astra_frame_index_t* index);
 
-
-
 ASTRA_END_DECLS
 
 #endif // DEPTH_CAPI_H
