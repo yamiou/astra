@@ -94,7 +94,7 @@ namespace astra {
             return vFov;
         }
 
-        bool mirroring()
+        bool mirroring_enabled()
         {
             bool mirroring = false;
             astra_imagestream_get_mirroring(m_imageStream, &mirroring);
@@ -102,7 +102,7 @@ namespace astra {
             return mirroring;
         }
 
-        void set_mirroring(bool mirroring)
+        void enable_mirroring(bool mirroring)
         {
             astra_imagestream_set_mirroring(m_imageStream, mirroring);
         }

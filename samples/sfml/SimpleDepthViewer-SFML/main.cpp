@@ -133,12 +133,32 @@ int main(int argc, char** argv)
         sf::Event event;
         while (window.pollEvent(event))
         {
-            if (event.type == sf::Event::Closed)
+            switch (event.type)
+            {
+            case sf::Event::Closed:
                 window.close();
-            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
-                window.close();
-            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Space))
-                ds.set_mirroring(!ds.mirroring());
+                break;
+            case sf::Event::KeyPressed:
+            {
+                switch(event.key.code)
+                {
+                case sf::Keyboard::Escape:
+                    window.close();
+                    break;
+                // case sf::Keyboard::R:
+                //     ds.enable_registration(!ds.registration_enabled());
+                //     break;
+                case sf::Keyboard::M:
+                    ds.enable_mirroring(!ds.mirroring_enabled());
+                    break;
+                default:
+                    break;
+                }
+                break;
+            }
+            default:
+                break;
+            }
         }
 
         // clear the window with black color
