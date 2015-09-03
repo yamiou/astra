@@ -73,18 +73,18 @@ ASTRA_API_EX astra_status_t astra_infraredframe_get_data_byte_length(astra_infra
 }
 
 ASTRA_API_EX astra_status_t astra_infraredframe_get_data_ptr(astra_infraredframe_t infraredFrame,
-                                                             int16_t** data,
+                                                             uint8_t** data,
                                                              size_t* byteLength)
 {
     void* voidData = nullptr;
     astra_imageframe_get_data_ptr(infraredFrame, &voidData, byteLength);
-    *data = static_cast<int16_t*>(voidData);
+    *data = static_cast<uint8_t*>(voidData);
 
     return ASTRA_STATUS_SUCCESS;
 }
 
 ASTRA_API_EX astra_status_t astra_infraredframe_copy_data(astra_infraredframe_t infraredFrame,
-                                                          int16_t* data)
+                                                          uint8_t* data)
 {
     return astra_imageframe_copy_data(infraredFrame, data);
 }

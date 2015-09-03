@@ -4,6 +4,7 @@
 #include <AstraUL/AstraUL.h>
 #include <cstdio>
 #include <iostream>
+#include <iomanip>
 
 #include <key_handler.h>
 
@@ -52,8 +53,40 @@ class SampleFrameListener : public astra::FrameReadyListener
         {
             print_depth(depthFrame,
                 reader.stream<astra::DepthStream>().coordinateMapper());
+            check_fps();
         }
     }
+
+
+    void check_fps()
+    {
+        const double frameWeight = 0.2;
+
+        auto newTimepoint = clock_type::now();
+        auto frameDuration = std::chrono::duration_cast<duration_type>(newTimepoint - m_lastTimepoint);
+
+        m_frameDuration = frameDuration * frameWeight + m_frameDuration * (1 - frameWeight);
+        m_lastTimepoint = newTimepoint;
+
+        double fps = 1.0 / m_frameDuration.count();
+
+        auto precision = std::cout.precision();
+        std::cout << std::fixed
+                  << std::setprecision(1)
+                  << fps << " fps ("
+                  << std::setprecision(2)
+                  << frameDuration.count() * 1000 << " ms)"
+                  << std::setprecision(precision)
+                  << std::endl;
+    }
+
+
+private:
+    using duration_type = std::chrono::duration<double>;
+    duration_type m_frameDuration{0.0};
+
+    using clock_type = std::chrono::system_clock;
+    std::chrono::time_point<clock_type> m_lastTimepoint;
 };
 
 int main(int argc, char** argv)
@@ -62,7 +95,7 @@ int main(int argc, char** argv)
 
     set_key_handler();
 
-    astra::Sensor sensor;
+    astra::Sensor sensor("device/mock_sensor0");
     astra::StreamReader reader = sensor.create_reader();
 
     SampleFrameListener listener;

@@ -67,13 +67,13 @@ namespace astra {
         using StreamCollection = std::unordered_set<Stream*>;
         StreamCollection m_streamCollection;
 
-        bool m_isClaimed{false};
-
-        std::string m_uri;
-
         using StreamSetConnectionPtr = std::unique_ptr<StreamSetConnection>;
         using StreamSetConnectionList = std::vector<StreamSetConnectionPtr>;
         StreamSetConnectionList m_connections;
+
+        bool m_isClaimed{false};
+
+        std::string m_uri;
 
         Signal<StreamRegisteredEventArgs> m_streamRegisteredSignal;
         Signal<StreamUnregisteringEventArgs> m_streamUnregisteringSignal;

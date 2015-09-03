@@ -13,24 +13,18 @@ namespace astra {
     {
     public:
         explicit InfraredStream(astra_streamconnection_t connection)
-            : ImageStream(connection),
-              m_infraredStream(reinterpret_cast<astra_infraredstream_t>(connection)),
-              m_coordinateMapper(reinterpret_cast<astra_infraredstream_t>(connection))
+            : ImageStream(connection)
         { }
 
         static const astra_stream_type_t id = ASTRA_STREAM_INFRARED;
-
-    private:
-        astra_infraredstream_t m_infraredStream;
     };
 
-    class InfraredFrame : public ImageFrame<int16_t, ASTRA_STREAM_INFRARED>
+    class InfraredFrame : public ImageFrame<RGBPixel, ASTRA_STREAM_INFRARED>
     {
     public:
         InfraredFrame(astra_imageframe_t frame)
             : ImageFrame(frame)
         {}
-
     };
 }
 

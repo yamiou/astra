@@ -49,7 +49,7 @@ namespace astra { namespace plugins {
             m_pluginService.destroy_stream(m_streamHandle);
         }
 
-        inline const StreamDescription& get_description() { return m_description; }
+        inline const StreamDescription& description() { return m_description; }
         inline astra_stream_t get_handle() { return m_streamHandle; }
 
     protected:
@@ -62,6 +62,12 @@ namespace astra { namespace plugins {
 
         virtual void connection_removed(astra_stream_t stream,
                                         astra_bin_t bin,
+                                        astra_streamconnection_t connection) override final;
+
+        virtual void connection_started(astra_stream_t stream,
+                                        astra_streamconnection_t connection) override final;
+
+        virtual void connection_stopped(astra_stream_t stream,
                                         astra_streamconnection_t connection) override final;
 
         virtual void set_parameter(astra_streamconnection_t connection,
@@ -79,10 +85,14 @@ namespace astra { namespace plugins {
                             astra_parameter_data_t inData,
                             astra_parameter_bin_t& parameterBin) override final;
 
-        virtual void on_connection_added(astra_streamconnection_t connection) { }
+        virtual void on_connection_added(astra_streamconnection_t connection) {}
 
         virtual void on_connection_removed(astra_bin_t bin,
-                                           astra_streamconnection_t connection) { }
+                                           astra_streamconnection_t connection) {}
+
+        virtual void on_connection_started(astra_streamconnection_t connection) {}
+
+        virtual void on_connection_stopped(astra_streamconnection_t connection) {}
 
         virtual void on_set_parameter(astra_streamconnection_t connection,
                                       astra_parameter_id id,
@@ -105,10 +115,9 @@ namespace astra { namespace plugins {
 
             stream_callbacks_t pluginCallbacks = create_plugin_callbacks(this);
 
-            astra_stream_desc_t desc = description.get_desc_t();
-
+            astra_stream_desc_t* desc = static_cast<astra_stream_desc_t*>(m_description);
             m_pluginService.create_stream(m_streamSet,
-                                          desc,
+                                          *desc,
                                           pluginCallbacks,
                                           &m_streamHandle);
         }
@@ -174,6 +183,20 @@ namespace astra { namespace plugins {
             assert(stream == m_streamHandle);
             on_connection_removed(bin, connection);
         }
+    }
+
+    inline void Stream::connection_started(astra_stream_t stream,
+                                           astra_streamconnection_t connection)
+    {
+        assert(stream == m_streamHandle);
+        on_connection_started(connection);
+    }
+
+    inline void Stream::connection_stopped(astra_stream_t stream,
+                                           astra_streamconnection_t connection)
+    {
+        assert(stream == m_streamHandle);
+        on_connection_stopped(connection);
     }
 
     inline void Stream::enable_callbacks()

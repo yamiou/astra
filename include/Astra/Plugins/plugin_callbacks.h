@@ -31,6 +31,14 @@ typedef void(*connection_removed_callback_t)(void*,
                                              astra_bin_t,
                                              astra_streamconnection_t);
 
+typedef void(*connection_started_callback_t)(void*,
+                                             astra_stream_t,
+                                             astra_streamconnection_t);
+
+typedef void(*connection_stopped_callback_t)(void*,
+                                             astra_stream_t,
+                                             astra_streamconnection_t);
+
 
 typedef void(*stream_registered_callback_t)(void*,
                                             astra_streamset_t,
@@ -54,6 +62,8 @@ struct stream_callbacks_t {
     invoke_callback_t invoke_callback;
     connection_added_callback_t connection_added_callback;
     connection_removed_callback_t connection_removed_callback;
+    connection_started_callback_t connection_started_callback;
+    connection_stopped_callback_t connection_stopped_callback;
 };
 
 #endif /* PLUGIN_CALLBACKS_H */

@@ -38,7 +38,6 @@ typedef struct {
     uint32_t width;
     uint32_t height;
     astra_pixel_format_t pixelFormat;
-    uint8_t bytesPerPixel;
 } PACK_STRUCT astra_image_metadata_t;
 
 typedef struct {
@@ -46,7 +45,6 @@ typedef struct {
     uint32_t width;
     uint32_t height;
     astra_pixel_format_t pixelFormat;
-    uint8_t bytesPerPixel;
     uint8_t fps;
 } astra_imagestream_mode_t;
 

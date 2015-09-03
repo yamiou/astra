@@ -45,6 +45,9 @@ namespace astra {
         void on_connection_created(StreamConnection* connection, astra_stream_t stream);
         void on_connection_destroyed(StreamConnection* connection, astra_stream_t stream);
 
+        void on_connection_started(StreamConnection* connection, astra_stream_t stream);
+        void on_connection_stopped(StreamConnection* connection, astra_stream_t stream);
+
         void on_set_parameter(StreamConnection* connection,
                               astra_parameter_id id,
                               size_t inByteLength,

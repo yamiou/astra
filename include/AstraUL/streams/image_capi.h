@@ -53,9 +53,39 @@ ASTRA_API_EX astra_status_t astra_imageframe_copy_data(astra_imageframe_t imageF
                                                        void* data);
 
 ASTRA_API_EX astra_status_t astra_imageframe_get_metadata(astra_imageframe_t imageFrame,
-                                                          astra_image_metadata_t* metadata );
+                                                          astra_image_metadata_t* metadata);
 
-
+ASTRA_API_EX inline void astra_pixelformat_get_bytes_per_pixel(astra_pixel_format_t format,
+                                                               uint8_t* bpp)
+{
+    switch(format)
+    {
+    case astra_pixel_formats::ASTRA_PIXEL_FORMAT_RGB888:
+        *bpp = 3;
+        break;
+    case astra_pixel_formats::ASTRA_PIXEL_FORMAT_YUV422:
+        *bpp = 2;
+        break;
+    case astra_pixel_formats::ASTRA_PIXEL_FORMAT_GRAY8:
+        *bpp = 1;
+        break;
+    case astra_pixel_formats::ASTRA_PIXEL_FORMAT_GRAY16:
+        *bpp = 2;
+        break;
+    case astra_pixel_formats::ASTRA_PIXEL_FORMAT_DEPTH_MM:
+        *bpp = 2;
+        break;
+    case astra_pixel_formats::ASTRA_PIXEL_FORMAT_UNKNOWN:
+        *bpp = 1;
+        break;
+    case astra_pixel_formats::ASTRA_PIXEL_FORMAT_YUYV:
+        *bpp = 2;
+        break;
+    default:
+        *bpp = 1;
+        break;
+    }
+}
 
 ASTRA_END_DECLS
 

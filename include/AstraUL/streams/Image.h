@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <AstraUL/skul_ctypes.h>
 #include <AstraUL/streams/image_capi.h>
+#include <iostream>
 #include <cstdint>
 
 namespace astra {
@@ -17,9 +18,9 @@ namespace astra {
 
         RGBPixel(uint8_t r, uint8_t g, uint8_t b)
         {
-            this->r = r;
-            this->g = g;
-            this->b = b;
+            ::astra_rgb_pixel_t::r = r;
+            ::astra_rgb_pixel_t::g = g;
+            ::astra_rgb_pixel_t::b = b;
         }
     };
 
@@ -29,9 +30,27 @@ namespace astra {
         ImageStreamMode()
         {}
 
-        ImageStreamMode(const astra_imagestream_mode_t& mode)
+        ImageStreamMode(std::uint32_t width, std::uint32_t height, std::uint8_t fps, astra_pixel_format_t format)
+        {
+            set_width(width);
+            set_height(height);
+            set_fps(fps);
+            set_pixelFormat(format);
+        }
+
+        ImageStreamMode(const ::astra_imagestream_mode_t& mode)
         {
             *this = mode;
+        }
+
+        ImageStreamMode& operator=(const ::astra_imagestream_mode_t& mode)
+        {
+            set_width(mode.width);
+            set_height(mode.height);
+            set_fps(mode.fps);
+            set_pixelFormat(mode.pixelFormat);
+
+            return *this;
         }
 
         operator ::astra_imagestream_mode_t*() { return this; }
@@ -40,8 +59,12 @@ namespace astra {
         std::uint8_t fps() const { return astra_imagestream_mode_t::fps; }
         void set_fps(std::uint8_t fps) { astra_imagestream_mode_t::fps = fps; }
 
-        std::uint8_t bytesPerPixel() const { return astra_imagestream_mode_t::bytesPerPixel; }
-        void set_bytesPerPixel(std::uint8_t bytesPerPixel) { astra_imagestream_mode_t::bytesPerPixel = bytesPerPixel; }
+        std::uint8_t bytesPerPixel() const
+        {
+            std::uint8_t bpp;
+            astra_pixelformat_get_bytes_per_pixel(pixelFormat(), &bpp);
+            return bpp;
+        }
 
         std::uint32_t width() const { return astra_imagestream_mode_t::width; }
         void set_width(std::uint32_t width) { astra_imagestream_mode_t::width = width; }
@@ -52,7 +75,7 @@ namespace astra {
         astra_pixel_format_t pixelFormat() const { return astra_imagestream_mode_t::pixelFormat; }
         void set_pixelFormat(astra_pixel_format_t format) { astra_imagestream_mode_t::pixelFormat = format; }
 
-
+        friend std::ostream& operator<<(std::ostream& os, const ImageStreamMode& ism);
     };
 
     inline bool operator==(const ImageStreamMode& lhs, const ImageStreamMode& rhs)
@@ -68,6 +91,21 @@ namespace astra {
     inline bool operator!=(const ImageStreamMode& lhs, const ImageStreamMode& rhs)
     {
         return !(lhs == rhs);
+    }
+
+    inline std::ostream& operator<<(std::ostream& os, const ImageStreamMode& ism)
+    {
+        os << ism.width()
+           << "x"
+           << ism.height()
+           << "x"
+           << static_cast<int>(ism.bytesPerPixel())
+           << "@"
+           << static_cast<int>(ism.fps())
+           << " pf:"
+           << ism.pixelFormat();
+
+        return os;
     }
 
     class ImageStream : public DataStream
@@ -155,7 +193,15 @@ namespace astra {
 
         int resolutionX() { throwIfInvalidFrame(); return m_metadata.width; }
         int resolutionY() { throwIfInvalidFrame(); return m_metadata.height; }
-        int bytesPerPixel() { throwIfInvalidFrame(); return m_metadata.bytesPerPixel; }
+
+        std::uint8_t bytesPerPixel()
+        {
+            throwIfInvalidFrame();
+
+            std::uint8_t bpp;
+            astra_pixelformat_get_bytes_per_pixel(m_metadata.pixelFormat, &bpp);
+            return bpp;
+        }
 
         astra_frame_index_t frameIndex() { throwIfInvalidFrame(); return m_frameIndex; }
         astra_imageframe_t handle() { return m_imageFrame; }

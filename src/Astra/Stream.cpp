@@ -55,6 +55,24 @@ namespace astra {
         }
     }
 
+    void Stream::start_connection(StreamConnection* connection)
+    {
+        if (is_available())
+        {
+            //TODO check membership
+            on_connection_started(connection, get_handle());
+        }
+    }
+
+    void Stream::stop_connection(StreamConnection* connection)
+    {
+        if (is_available())
+        {
+            //TODO check membership
+            on_connection_stopped(connection, get_handle());
+        }
+    }
+
     void Stream::on_availability_changed()
     {
         if (is_available())

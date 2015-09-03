@@ -150,6 +150,6 @@ namespace astra {
 
     astra_status_t AstraContext::notify_host_event(astra_event_id id, const void* data, size_t dataSize)
     {
-        return m_impl->notify_host_event(id, data, dataSize);
+        return notify_host_event(id, data, dataSize);
     }
 }

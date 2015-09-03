@@ -48,13 +48,14 @@ namespace astra {
 
     astra_frame_t* StreamConnection::lock()
     {
-        LOG_TRACE("StreamConnection", "%x lock", this);
+        LOG_TRACE("astra.StreamConnection", "%x lock", this);
+
         if (m_locked)
         {
             return m_currentFrame;
         }
 
-        if (m_bin != nullptr)
+        if (is_started() && m_bin != nullptr)
         {
             m_currentFrame = m_bin->lock_front_buffer();
         }
@@ -70,20 +71,21 @@ namespace astra {
 
     void StreamConnection::unlock()
     {
-        LOG_TRACE("StreamConnection", "%x unlock", this);
+        LOG_TRACE("astra.StreamConnection", "%x unlock", this);
 
         if (!m_locked)
         {
-            LOG_WARN("StreamConnection", "%x StreamConnection::unlock() not locked", this);
+            LOG_WARN("astra.StreamConnection", "%x StreamConnection::unlock() not locked", this);
             assert(m_locked);
         }
 
-        if (m_currentFrame != nullptr && m_bin != nullptr)
+        if (is_started() && m_bin != nullptr)
         {
-            m_currentFrame = nullptr;
-            m_locked = false;
             m_bin->unlock_front_buffer();
         }
+
+        m_currentFrame = nullptr;
+        m_locked = false;
     }
 
     void StreamConnection::start()
@@ -91,6 +93,13 @@ namespace astra {
         if (m_started)
             return;
 
+        LOG_DEBUG("astra.StreamConnection",
+                  "%p starting (%d, %d)",
+                  this,
+                  get_description().type,
+                  get_description().subtype);
+
+        m_stream->start_connection(this);
         m_started = true;
     }
 
@@ -99,6 +108,13 @@ namespace astra {
         if (!m_started)
             return;
 
+        LOG_DEBUG("astra.StreamConnection",
+                  "%p stopping, stream = (%u, %u)",
+                  this,
+                  get_description().type,
+                  get_description().subtype);
+
+        m_stream->stop_connection(this);
         m_started = false;
     }
 
@@ -125,6 +141,7 @@ namespace astra {
     {
         assert(m_bin != nullptr);
         assert(m_bin == bin);
+
         m_frameReadySignal.raise(this, frameIndex);
     }
 
@@ -164,7 +181,7 @@ namespace astra {
         ParameterBin* parameterBin = ParameterBin::get_ptr(token);
         if (m_pendingParameterResult != nullptr && parameterBin == m_pendingParameterResult)
         {
-            memcpy(dataDestination, parameterBin->data(), dataByteLength);
+            std::memcpy(dataDestination, parameterBin->data(), dataByteLength);
             clear_pending_parameter_result();
             return ASTRA_STATUS_SUCCESS;
         }
@@ -172,7 +189,7 @@ namespace astra {
         {
             //Results are read-once-only, then they self destruct.
             //Client tried to get result in wrong order, or with duplicate or stale token
-            LOG_WARN("StreamConnection", "no pending parameter result.", this);
+            LOG_WARN("astra.StreamConnection", "%p no pending parameter result.", this);
             clear_pending_parameter_result();
             return ASTRA_STATUS_INVALID_PARAMETER_TOKEN;
         }

@@ -8,12 +8,12 @@
 #include <memory>
 #include <vector>
 #include <string>
-#include <array>
 #include "oni_stream.hpp"
+#include "oni_stream_listener.hpp"
 
 namespace orbbec { namespace ni {
 
-    class device_streamset
+    class device_streamset : public stream_listener
     {
     public:
         device_streamset(std::string name, astra::PluginServiceProxy& pluginService, const char* uri);
@@ -25,6 +25,9 @@ namespace orbbec { namespace ni {
 
         std::string get_uri() { return uri_; }
 
+        virtual void on_started(stream* stream) override;
+        virtual void on_stopped(stream* stream) override;
+
         device_streamset(const device_streamset&) = delete;
         device_streamset& operator=(const device_streamset&) = delete;
 
@@ -33,7 +36,7 @@ namespace orbbec { namespace ni {
 
         astra_status_t open_sensor_streams();
         astra_status_t close_sensor_streams();
-        astra_status_t start_stream(stream* stream);
+        void add_stream(stream* stream);
 
         astra::PluginServiceProxy& pluginService_;
         std::unique_ptr<astra::Sensor> sensor_;
@@ -44,8 +47,8 @@ namespace orbbec { namespace ni {
         using stream_ptr = std::unique_ptr<stream>;
         std::vector<stream_ptr> streams_;
 
-        const static size_t MAX_ONI_STREAMS = 4;
-        std::array<openni::VideoStream*, MAX_ONI_STREAMS> oniStreams_;
+        std::vector<openni::VideoStream*> niActiveStreams_;
+        std::vector<stream*> astraActiveStreams_;
 
         astra_frame_index_t frameIndex_{ 0 };
     };

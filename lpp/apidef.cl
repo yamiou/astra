@@ -66,6 +66,22 @@
                               (make-param :type "astra_bin_t" :name "bin")
                               (make-param :type "astra_streamconnection_t" :name "connection")))
 
+;; void connection_started(astra_stream_t stream,
+;;                         astra_streamconnection_t connection)
+(add-func       :funcset "plugincallbacks"
+                :returntype "void"
+                :funcname "connection_started"
+                :params (list (make-param :type "astra_stream_t" :name "stream")
+                              (make-param :type "astra_streamconnection_t" :name "connection")))
+
+;; void connection_stopped(astra_stream_t stream,
+;;                         astra_streamconnection_t connection)
+(add-func       :funcset "plugincallbacks"
+                :returntype "void"
+                :funcname "connection_stopped"
+                :params (list (make-param :type "astra_stream_t" :name "stream")
+                              (make-param :type "astra_streamconnection_t" :name "connection")))
+
 ;; astra_status_t register_stream_added_callback(stream_added_callback_t callback,
 ;;                                                  void* clientTag,
 ;;                                                  astra_callback_id_t* callbackId)

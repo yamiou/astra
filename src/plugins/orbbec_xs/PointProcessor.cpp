@@ -9,24 +9,19 @@ namespace astra { namespace plugins { namespace xs {
         : m_sensor(get_uri_for_streamset(pluginService, streamset)),
           m_streamSet(streamset),
           m_reader(m_sensor.create_reader()),
-          m_depthStream(m_reader.stream<DepthStream>(depthDesc.get_subtype())),
+          m_depthStream(m_reader.stream<DepthStream>(depthDesc.subtype())),
           m_pluginService(pluginService)
     {
-        PROFILE_FUNC();
-
         m_depthStream.start();
         m_reader.addListener(*this);
     }
 
     PointProcessor::~PointProcessor()
     {
-        PROFILE_FUNC();
     }
 
     void PointProcessor::on_frame_ready(StreamReader& reader, Frame& frame)
     {
-        PROFILE_FUNC();
-
         DepthFrame depthFrame = frame.get<DepthFrame>();
 
         create_point_stream_if_necessary(depthFrame);
@@ -40,8 +35,6 @@ namespace astra { namespace plugins { namespace xs {
 
     void PointProcessor::create_point_stream_if_necessary(DepthFrame& depthFrame)
     {
-        PROFILE_FUNC();
-
         if (m_pointStream != nullptr)
         {
             return;
@@ -59,8 +52,6 @@ namespace astra { namespace plugins { namespace xs {
 
     void PointProcessor::update_pointframe_from_depth(DepthFrame& depthFrame)
     {
-        PROFILE_FUNC();
-
         //use same frameIndex as source depth frame
         astra_frame_index_t frameIndex = depthFrame.frameIndex();
 
@@ -75,24 +66,20 @@ namespace astra { namespace plugins { namespace xs {
 
             metadata.width = depthFrame.resolutionX();
             metadata.height = depthFrame.resolutionY();
-            metadata.bytesPerPixel = sizeof(astra_vector3f_t);
+            //metadata.bytesPerPixel = sizeof(astra_vector3f_t);
 
             pointFrameWrapper->frame.metadata = metadata;
 
             Vector3f* p_points = reinterpret_cast<Vector3f*>(pointFrameWrapper->frame.data);
             calculate_point_frame(depthFrame, p_points);
 
-            PROFILE_BEGIN(pointframe_end_write);
             m_pointStream->end_write();
-            PROFILE_END();
         }
     }
 
     void PointProcessor::calculate_point_frame(DepthFrame& depthFrame,
                                                Vector3f* p_points)
     {
-        PROFILE_FUNC();
-
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
         const int16_t* p_depth = depthFrame.data();

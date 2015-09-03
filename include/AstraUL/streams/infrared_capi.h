@@ -28,11 +28,11 @@ ASTRA_API_EX astra_status_t astra_infraredframe_get_data_byte_length(astra_infra
                                                                      size_t* byteLength);
 
 ASTRA_API_EX astra_status_t astra_infraredframe_get_data_ptr(astra_infraredframe_t infraredframe,
-                                                             int16_t** data,
+                                                             uint8_t** data,
                                                              size_t* byteLength);
 
 ASTRA_API_EX astra_status_t astra_infraredframe_copy_data(astra_infraredframe_t infraredframe,
-                                                          int16_t* data);
+                                                          uint8_t* data);
 
 ASTRA_API_EX astra_status_t astra_infraredframe_get_metadata(astra_infraredframe_t infraredframe,
                                                              astra_image_metadata_t* metadata );

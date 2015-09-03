@@ -15,11 +15,12 @@ foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
   set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib/${OUTPUTCONFIG}/Plugins )
 endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
 
+add_subdirectory(device_sdk)
 add_subdirectory(openni_sensor)
+add_subdirectory(mock_sensor)
 add_subdirectory(orbbec_hand)
 add_subdirectory(orbbec_xs)
 
 if (NOT ASTRA_ANDROID)
   add_subdirectory(orbbec_streamplayer)
-  add_subdirectory(dummy)
 endif()

@@ -22,16 +22,12 @@ namespace astra { namespace plugins { namespace xs {
                               StreamDescription(ASTRA_STREAM_POINT,
                                                 DEFAULT_SUBTYPE),
                               width * height * sizeof(astra_vector3f_t))
-        {
-            PROFILE_FUNC();
-        }
+        {}
 
     private:
         virtual void on_connection_removed(astra_bin_t bin,
                                            astra_streamconnection_t connection) override
         {
-            PROFILE_FUNC();
-
             SingleBinStream::on_connection_removed(bin, connection);
         }
     };

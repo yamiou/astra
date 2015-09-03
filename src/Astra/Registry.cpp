@@ -7,5 +7,4 @@ namespace astra {
         static Registry::store store_;
         return store_;
     }
-
 }

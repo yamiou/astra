@@ -20,7 +20,7 @@ namespace astra { namespace plugins { namespace hand {
                                  HandSettings& settings) :
             m_sensor(get_uri_for_streamset(pluginService, streamSet)),
             m_reader(m_sensor.create_reader()),
-            m_depthStream(m_reader.stream<DepthStream>(depthDesc.get_subtype())),
+            m_depthStream(m_reader.stream<DepthStream>(depthDesc.subtype())),
             m_settings(settings),
             m_pluginService(pluginService),
             m_depthUtility(settings.processingSizeWidth, settings.processingSizeHeight, settings.depthUtilitySettings),
@@ -383,7 +383,7 @@ namespace astra { namespace plugins { namespace hand {
 
                 metadata.width = m_processingSizeWidth;
                 metadata.height = m_processingSizeHeight;
-                metadata.bytesPerPixel = 3;
+                metadata.pixelFormat = astra_pixel_formats::ASTRA_PIXEL_FORMAT_RGB888;
 
                 debugImageFrame->frame.metadata = metadata;
                 update_debug_image_frame(debugImageFrame->frame);

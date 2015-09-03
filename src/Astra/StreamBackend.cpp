@@ -39,6 +39,25 @@ namespace astra {
             m_callbacks->connection_added_callback(m_callbacks->context,
                                                    stream,
                                                    connection->get_handle());
+    }
+
+    void StreamBackend::on_connection_started(StreamConnection* connection, astra_stream_t stream)
+    {
+        if (m_callbacks &&
+            m_callbacks->connection_started_callback)
+            m_callbacks->connection_started_callback(m_callbacks->context,
+                                                     stream,
+                                                     connection->get_handle());
+
+    }
+
+    void StreamBackend::on_connection_stopped(StreamConnection* connection, astra_stream_t stream)
+    {
+        if (m_callbacks &&
+            m_callbacks->connection_stopped_callback)
+            m_callbacks->connection_stopped_callback(m_callbacks->context,
+                                                     stream,
+                                                     connection->get_handle());
 
     }
 

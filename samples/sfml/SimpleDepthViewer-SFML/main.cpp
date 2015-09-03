@@ -76,6 +76,7 @@ public:
             m_displayBuffer[rgbaOffset + 2] = vizBuffer[i].g;
             m_displayBuffer[rgbaOffset + 3] = 255;
         }
+
         m_texture.update(m_displayBuffer.get());
         check_fps();
     }
@@ -98,7 +99,7 @@ private:
     using duration_type = std::chrono::duration<double>;
     duration_type m_frameDuration{0.0};
 
-    using clock_type = std::chrono::system_clock;
+    using clock_type = std::chrono::high_resolution_clock;
     std::chrono::time_point<clock_type> m_lastTimepoint;
     sf::Texture m_texture;
     sf::Sprite m_sprite;
@@ -115,7 +116,7 @@ int main(int argc, char** argv)
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Depth Viewer");
 
-    astra::Sensor sensor;
+    astra::Sensor sensor("device/mock_sensor0");
     astra::StreamReader reader = sensor.create_reader();
 
     reader.stream<astra::PointStream>().start();

@@ -22,7 +22,9 @@ namespace astra { namespace plugins { namespace hand {
             int height = imageFrame.metadata.height;
 
             uint8_t* colorData = static_cast<uint8_t*>(imageFrame.data);
-            uint8_t bytesPerPixel = imageFrame.metadata.bytesPerPixel;
+
+            uint8_t bytesPerPixel;
+            astra_pixelformat_get_bytes_per_pixel(imageFrame.metadata.pixelFormat, &bytesPerPixel);
 
             for (auto iter = points.begin(); iter != points.end(); ++iter)
             {
@@ -212,7 +214,9 @@ namespace astra { namespace plugins { namespace hand {
             bool rangeZero = abs(range) < 0.00001;
 
             uint8_t* colorData = static_cast<uint8_t*>(imageFrame.data);
-            const uint8_t bytesPerPixel = imageFrame.metadata.bytesPerPixel;
+
+            uint8_t bytesPerPixel;
+            astra_pixelformat_get_bytes_per_pixel(imageFrame.metadata.pixelFormat, &bytesPerPixel);
 
             for (int y = 0; y < height; ++y)
             {

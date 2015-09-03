@@ -10,7 +10,6 @@ namespace astra { namespace plugins { namespace xs {
                                    astra_stream_t streamHandle,
                                    astra_stream_desc_t streamDesc)
     {
-        PROFILE_FUNC();
         if (streamDesc.type == ASTRA_STREAM_DEPTH &&
             m_pointProcessorMap.find(streamHandle) == m_pointProcessorMap.end())
         {
@@ -30,7 +29,6 @@ namespace astra { namespace plugins { namespace xs {
                                      astra_stream_t streamHandle,
                                      astra_stream_desc_t streamDesc)
     {
-        PROFILE_FUNC();
         auto it = m_pointProcessorMap.find(streamHandle);
         if (it != m_pointProcessorMap.end())
         {

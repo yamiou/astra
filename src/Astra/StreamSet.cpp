@@ -1,6 +1,5 @@
 ﻿#include "StreamSet.h"
 #include "StreamSetConnection.h"
-#include <iostream>
 #include <cassert>
 
 namespace astra {
@@ -18,10 +17,10 @@ namespace astra {
         if (!stream)
         {
             LOG_TRACE("StreamSet",
-                   "registering orphan stream of type (%u,%u) on %s",
-                   desc.type,
-                   desc.subtype,
-                   m_uri.c_str());
+                      "registering orphan stream of type (%u,%u) on %s",
+                      desc.type,
+                      desc.subtype,
+                      m_uri.c_str());
 
             stream = register_orphan_stream(desc);
         }
@@ -47,8 +46,8 @@ namespace astra {
             && !stream->is_available())
         {
             LOG_TRACE("StreamSet","removing unused/unavailable stream %p on %s",
-                   stream,
-                   m_uri.c_str());
+                      stream,
+                      m_uri.c_str());
 
             m_streamCollection.erase(stream);
             delete stream;
@@ -68,21 +67,21 @@ namespace astra {
             if (stream->is_available())
             {
                 LOG_WARN("StreamSet","register_stream: (%u,%u) already exists, already inflated on %s",
-                      desc.type,
-                      desc.subtype,
-                      m_uri.c_str());
+                         desc.type,
+                         desc.subtype,
+                         m_uri.c_str());
 
                 return nullptr;
             }
 
-            LOG_TRACE("StreamSet","(%u,%u) already exists, adopting orphan stream on %s",
-                   desc.type,
-                   desc.subtype,
-                   m_uri.c_str());
+            LOG_DEBUG("StreamSet","(%u,%u) already exists, adopting orphan stream on %s",
+                      desc.type,
+                      desc.subtype,
+                      m_uri.c_str());
         }
         else
         {
-            LOG_TRACE("StreamSet","registering (%u,%u) on %s", desc.type, desc.subtype, m_uri.c_str());
+            LOG_DEBUG("StreamSet","registering (%u,%u) on %s", desc.type, desc.subtype, m_uri.c_str());
             stream = new Stream(desc);
             m_streamCollection.insert(stream);
         }
@@ -96,7 +95,7 @@ namespace astra {
 
     Stream* StreamSet::register_orphan_stream(astra_stream_desc_t desc)
     {
-        LOG_TRACE("StreamSet","registering orphan (%u,%u) on %s", desc.type, desc.subtype, m_uri.c_str());
+        LOG_DEBUG("StreamSet","registering orphan (%u,%u) on %s", desc.type, desc.subtype, m_uri.c_str());
         Stream* stream = new Stream(desc);
         m_streamCollection.insert(stream);
 
@@ -130,18 +129,18 @@ namespace astra {
 
         if (it != m_connections.end())
         {
-            LOG_TRACE("StreamSet","disconnecting %p connection from %s",
-                   connection,
-                   m_uri.c_str());
+            LOG_DEBUG("StreamSet","disconnecting %p connection from %s",
+                      connection,
+                      m_uri.c_str());
 
             m_connections.erase(it);
         }
         else
         {
-            LOG_WARN("StreamSet",
-                  "disconnect_streamset_connection: %p connection not found on %s",
-                  connection,
-                  m_uri.c_str());
+            LOG_DEBUG("StreamSet",
+                      "disconnect_streamset_connection: %p connection not found on %s",
+                      connection,
+                      m_uri.c_str());
         }
     }
 
@@ -216,7 +215,7 @@ namespace astra {
     }
 
     astra_stream_t StreamSet::find_stream_by_type_subtype(astra_stream_type_t type,
-                                                             astra_stream_subtype_t subtype) const
+                                                          astra_stream_subtype_t subtype) const
     {
         Stream* stream = find_stream_by_type_subtype_impl(type, subtype);
 

@@ -25,6 +25,9 @@ namespace astra {
 
         void start();
         void stop();
+
+        bool is_started() const { return m_started; }
+
         astra_frame_t* lock();
         void unlock();
 

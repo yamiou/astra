@@ -233,7 +233,7 @@ namespace astra {
 
         if (actualConnection)
         {
-            actualConnection->start();
+            actualConnection->stop();
         }
         else
         {
@@ -364,6 +364,7 @@ namespace astra {
             desc.subtype = subtype;
 
             subFrame = actualReader->get_subframe(desc);
+
             return ASTRA_STATUS_SUCCESS;
         }
         else

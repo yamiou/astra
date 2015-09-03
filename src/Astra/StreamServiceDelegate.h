@@ -4,7 +4,6 @@
 
 #include <Astra/astra_types.h>
 #include "AstraContext.h"
-#include <iostream>
 
 namespace astra {
 

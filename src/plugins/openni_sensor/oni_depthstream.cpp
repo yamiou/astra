@@ -5,25 +5,36 @@ namespace orbbec { namespace ni {
 
     depthstream::depthstream(astra::PluginServiceProxy& pluginService,
                              astra_streamset_t streamSet,
-                             openni::Device& oniDevice)
+                             openni::Device& oniDevice,
+                             stream_listener& listener)
         : devicestream(pluginService,
                        streamSet,
                        astra::StreamDescription(
                            ASTRA_STREAM_DEPTH,
                            DEFAULT_SUBTYPE),
                        oniDevice,
-                       openni::SENSOR_DEPTH)
+                       openni::SENSOR_DEPTH,
+                       listener)
     {
         PROFILE_FUNC();
     }
 
-    void depthstream::on_open()
+    astra_status_t depthstream::on_open()
     {
+        auto rc = devicestream::on_open();
+
+        if (rc != astra_status_t::ASTRA_STATUS_SUCCESS)
+        {
+            return rc;
+        }
+
         PROFILE_FUNC();
         refresh_conversion_cache(oniStream_.getHorizontalFieldOfView(),
                                  oniStream_.getVerticalFieldOfView(),
-                                 oniVideoMode_.getResolutionX(),
-                                 oniVideoMode_.getResolutionY());
+                                 mode_.width(),
+                                 mode_.height());
+
+        return rc;
     }
 
     void depthstream::refresh_conversion_cache(float horizontalFov,

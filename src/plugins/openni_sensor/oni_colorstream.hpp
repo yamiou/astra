@@ -13,7 +13,8 @@ namespace orbbec { namespace ni {
     public:
         colorstream(astra::PluginServiceProxy& pluginService,
                     astra_streamset_t streamSet,
-                    openni::Device& oniDevice);
+                    openni::Device& oniDevice,
+                    stream_listener& listener);
 
         colorstream(const colorstream&) = delete;
         colorstream& operator=(const colorstream&) = delete;

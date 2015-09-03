@@ -49,33 +49,32 @@ namespace orbbec { namespace ni {
         }
     }
 
-    astra_imagestream_mode_t convert_mode(const openni::VideoMode& oniMode)
+    astra::ImageStreamMode convert_mode(const openni::VideoMode& oniMode)
     {
-        astra_imagestream_mode_t mode;
+        astra::ImageStreamMode mode;
 
-        mode.width = oniMode.getResolutionX();
-        mode.height = oniMode.getResolutionY();
-        mode.fps = oniMode.getFps();
+        mode.set_width(oniMode.getResolutionX());
+        mode.set_height(oniMode.getResolutionY());
+        mode.set_fps(oniMode.getFps());
 
         astra_pixel_format_t format;
         std::uint8_t bpp;
 
         std::tie(format, bpp) = convert_format(oniMode.getPixelFormat());
-        mode.pixelFormat = format;
-        mode.bytesPerPixel = bpp;
+        mode.set_pixelFormat(format);
 
         return mode;
     }
 
-    openni::VideoMode convert_mode(const astra_imagestream_mode_t& mode)
+    openni::VideoMode convert_mode(const astra::ImageStreamMode& mode)
     {
         openni::VideoMode oniMode;
-        oniMode.setResolution(mode.width, mode.height);
-        oniMode.setFps(mode.fps);
+        oniMode.setResolution(mode.width(), mode.height());
+        oniMode.setFps(mode.fps());
 
         openni::PixelFormat format;
 
-        std::tie(format, std::ignore) = convert_format(mode.pixelFormat);
+        std::tie(format, std::ignore) = convert_format(mode.pixelFormat());
         oniMode.setPixelFormat(format);
 
         return oniMode;

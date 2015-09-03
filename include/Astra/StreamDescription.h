@@ -2,40 +2,46 @@
 #define STREAMDESCRIPTION_H
 
 #include <Astra/astra_capi.h>
+#include <cassert>
 
 namespace astra {
 
-    class StreamDescription
+    class StreamDescription : private ::astra_stream_desc_t
     {
     public:
-        StreamDescription(astra_stream_type_t type,
-                          astra_stream_subtype_t subtype = DEFAULT_SUBTYPE)
-            {
-                m_desc.type = type;
-                m_desc.subtype = subtype;
-            }
+        StreamDescription(::astra_stream_type_t type,
+                          ::astra_stream_subtype_t subtype = DEFAULT_SUBTYPE)
+        {
+            ::astra_stream_desc_t::type = type;
+            ::astra_stream_desc_t::subtype = subtype;
+        }
 
-        StreamDescription(const astra_stream_desc_t& desc)
-            : m_desc(desc)
-            { }
+        StreamDescription(const ::astra_stream_desc_t& desc)
+        {
+            *this = desc;
+        }
 
-        StreamDescription operator=(const astra_stream_desc_t& desc)
-            {
-                return StreamDescription(desc);
-            }
+        StreamDescription& operator=(const ::astra_stream_desc_t& desc)
+        {
+            ::astra_stream_desc_t::type = desc.type;
+            ::astra_stream_desc_t::subtype = desc.subtype;
 
-        const astra_stream_desc_t& get_desc_t() const { return m_desc; }
+            return *this;
+        }
 
-        astra_stream_type_t get_type() const { return m_desc.type; }
-        astra_stream_subtype_t get_subtype() const { return m_desc.subtype; }
+        operator ::astra_stream_desc_t*() { return this; }
+        operator const ::astra_stream_desc_t*() const { return this; }
 
-    private:
-        astra_stream_desc_t m_desc;
+        astra_stream_type_t type() const { return ::astra_stream_desc_t::type; }
+        void set_type(astra_stream_type_t type) { ::astra_stream_desc_t::type = type; }
+
+        astra_stream_subtype_t subtype() const { return ::astra_stream_desc_t::subtype; }
+        void set_subtype(astra_stream_subtype_t subtype) { ::astra_stream_desc_t::subtype = subtype; }
     };
 
     inline bool operator==(const StreamDescription& lhs, const StreamDescription& rhs)
     {
-        return lhs.get_type() == rhs.get_type() && lhs.get_subtype() == rhs.get_subtype();
+        return lhs.type() == rhs.type() && lhs.subtype() == rhs.subtype();
     }
 
     inline bool operator!=(const StreamDescription& lhs, const StreamDescription& rhs)

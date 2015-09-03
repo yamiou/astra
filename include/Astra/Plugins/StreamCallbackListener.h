@@ -67,6 +67,22 @@ namespace astra {
                                                                                connection);
         }
 
+        static void connection_started_thunk(void* instance,
+                                             astra_stream_t stream,
+                                             astra_streamconnection_t connection)
+        {
+            static_cast<StreamCallbackListener*>(instance)->connection_started(stream,
+                                                                               connection);
+        }
+
+        static void connection_stopped_thunk(void* instance,
+                                             astra_stream_t stream,
+                                             astra_streamconnection_t connection)
+        {
+            static_cast<StreamCallbackListener*>(instance)->connection_stopped(stream,
+                                                                               connection);
+        }
+
         virtual void set_parameter(astra_streamconnection_t connection,
                                    astra_parameter_id id,
                                    size_t inByteLength,
@@ -89,6 +105,12 @@ namespace astra {
                                         astra_bin_t bin,
                                         astra_streamconnection_t connection) {}
 
+        virtual void connection_started(astra_stream_t stream,
+                                        astra_streamconnection_t connection) {}
+
+        virtual void connection_stopped(astra_stream_t stream,
+                                        astra_streamconnection_t connection) {}
+
         
         friend stream_callbacks_t create_plugin_callbacks(StreamCallbackListener* context);
     };
@@ -103,6 +125,8 @@ namespace astra {
         callbacks.invoke_callback = &StreamCallbackListener::invoke_thunk;
         callbacks.connection_added_callback = &StreamCallbackListener::connection_added_thunk;
         callbacks.connection_removed_callback = &StreamCallbackListener::connection_removed_thunk;
+        callbacks.connection_started_callback = &StreamCallbackListener::connection_started_thunk;
+        callbacks.connection_stopped_callback = &StreamCallbackListener::connection_stopped_thunk;
 
         return callbacks;
     }

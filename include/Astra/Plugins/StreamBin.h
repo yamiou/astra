@@ -55,7 +55,9 @@ namespace astra { namespace plugins {
         std::pair<astra_frame_t*, TFrameType*> begin_write_ex(size_t frameIndex)
         {
             if (m_locked)
-                std::make_pair(m_currentBuffer, reinterpret_cast<TFrameType*>(m_currentBuffer->data));
+            {
+                return std::make_pair(m_currentBuffer, reinterpret_cast<TFrameType*>(m_currentBuffer->data));
+            }
 
             m_locked = true;
             m_currentBuffer->frameIndex = frameIndex;
@@ -72,14 +74,31 @@ namespace astra { namespace plugins {
             m_locked = false;
         }
 
+        std::vector<astra_streamconnection_t> connections()
+        {
+            return connections_;
+        }
+
         void link_connection(astra_streamconnection_t connection)
         {
-            m_pluginService.link_connection_to_bin(connection, m_binHandle);
+            auto it = std::find(connections_.begin(), connections_.end(), connection);
+
+            if (it == connections_.end())
+            {
+                m_pluginService.link_connection_to_bin(connection, m_binHandle);
+                connections_.push_back(connection);
+            }
         }
 
         void unlink_connection(astra_streamconnection_t connection)
         {
-            m_pluginService.link_connection_to_bin(connection, nullptr);
+            auto it = std::find(connections_.begin(), connections_.end(), connection);
+
+            if (it != connections_.end())
+            {
+                m_pluginService.link_connection_to_bin(connection, nullptr);
+                connections_.erase(it);
+            }
         }
 
     private:
@@ -89,6 +108,7 @@ namespace astra { namespace plugins {
         astra_frame_t* m_currentBuffer{nullptr};
         PluginServiceProxy& m_pluginService;
         bool m_locked{false};
+        std::vector<astra_streamconnection_t> connections_;
     };
 
 }}

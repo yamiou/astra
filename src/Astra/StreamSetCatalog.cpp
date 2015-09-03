@@ -7,10 +7,7 @@
 
 namespace astra {
 
-    StreamSetCatalog::~StreamSetCatalog()
-    {
-        m_streamSets.clear();
-    }
+    StreamSetCatalog::~StreamSetCatalog() = default;
 
     StreamSetConnection& StreamSetCatalog::open_set_connection(std::string uri)
     {
@@ -70,6 +67,11 @@ namespace astra {
         return *streamSet;
     }
 
+    void StreamSetCatalog::clear()
+    {
+        m_streamSets.clear();
+    }
+
     void StreamSetCatalog::on_stream_registered(StreamRegisteredEventArgs args)
     {
         m_streamRegisteredSignal.raise(args);
@@ -91,11 +93,6 @@ namespace astra {
                                });
 
         return it != m_streamSets.end() ? it->second->streamSet.get() : nullptr;
-    }
-
-    void StreamSetCatalog::clear()
-    {
-        m_streamSets.clear();
     }
 
     void StreamSetCatalog::visit_sets(std::function<void(StreamSet*)> visitorMethod)

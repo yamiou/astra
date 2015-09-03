@@ -13,7 +13,6 @@ namespace astra {
     class Stream : public StreamBackend
     {
     public:
-
         Stream(astra_stream_desc_t description)
             : StreamBackend(description) {}
 
@@ -27,6 +26,9 @@ namespace astra {
 
         StreamConnection* create_connection();
         void destroy_connection(StreamConnection* connection);
+
+        void start_connection(StreamConnection* connection);
+        void stop_connection(StreamConnection* connection);
 
         void set_parameter(StreamConnection* connection,
                            astra_parameter_id id,

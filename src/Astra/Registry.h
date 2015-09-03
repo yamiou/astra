@@ -1,6 +1,7 @@
 #ifndef REGISTRY_H
 #define REGISTRY_H
 
+#include "Logger.h"
 #include <set>
 
 namespace astra {
@@ -11,8 +12,6 @@ namespace astra {
     class Registry
     {
     public:
-        Registry();
-        virtual ~Registry();
 
         template<typename T>
         static T* get(void* obj);
@@ -56,7 +55,10 @@ namespace astra {
         const tag_* tag = &TrackedInstance<T>::TAG;
         const void* object = instance;
 
-        get_store().erase(std::make_pair(tag, object));
+        auto& store = get_store();
+        auto pair = std::make_pair(tag, object);
+
+        store.erase(std::move(pair));
     }
 
     template<typename T>

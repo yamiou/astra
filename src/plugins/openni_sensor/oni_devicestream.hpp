@@ -3,8 +3,10 @@
 
 #include <Shiny.h>
 #include <OpenNI.h>
+#include <AstraUL/streams/Image.h>
 #include <AstraUL/streams/image_parameters.h>
 #include <AstraUL/streams/image_types.h>
+#include <AstraUL/streams/image_capi.h>
 #include <memory>
 #include <cstring>
 #include <vector>
@@ -31,10 +33,12 @@ namespace orbbec { namespace ni {
                      astra_streamset_t streamSet,
                      astra::StreamDescription desc,
                      openni::Device& oniDevice,
-                     openni::SensorType oniSensorType)
+                     openni::SensorType oniSensorType,
+                     stream_listener& listener)
             : stream(pluginService,
                      streamSet,
-                     desc),
+                     desc,
+                     listener),
               oniDevice_(oniDevice),
               oniSensorType_(oniSensorType)
         {
@@ -47,133 +51,24 @@ namespace orbbec { namespace ni {
             close();
         }
 
-        virtual astra_status_t open() override final
-        {
-            PROFILE_FUNC();
-            if (is_open())
-                return ASTRA_STATUS_SUCCESS;
-
-            LOG_INFO("orbbec.ni.devicestream", "creating oni stream of type: %d", get_description().get_type());
-            openni::Status rc = oniStream_.create(oniDevice_, oniSensorType_);
-
-            if (rc != openni::STATUS_OK)
-            {
-                return ASTRA_STATUS_DEVICE_ERROR;
-            }
-
-            LOG_INFO("orbbec.ni.devicestream", "created oni stream of type: %d", get_description().get_type());
-
-            const openni::SensorInfo& pInfo = oniStream_.getSensorInfo();
-            auto& modes = pInfo.getSupportedVideoModes();
-
-            LOG_INFO("orbbec.ni.devicestream", "stream type %d supports modes:", get_description().get_type());
-
-            for(int i = 0; i < modes.getSize(); i++)
-            {
-                const openni::VideoMode& oniMode = modes[i];
-
-                if (std::get<0>(convert_format(oniMode.getPixelFormat())) != 0)
-                {
-                    astra_imagestream_mode_t mode = convert_mode(oniMode);
-                    mode.id = i+1;
-                    modes_.push_back(mode);
-                }
-
-                LOG_INFO("orbbec.ni.devicestream", "- w: %d h: %d fps: %d pf: %d",
-                         oniMode.getResolutionX(),
-                         oniMode.getResolutionY(),
-                         oniMode.getFps(),
-                         oniMode.getPixelFormat());
-            }
-
-            oniVideoMode_ = oniStream_.getVideoMode();
-            mode_ = convert_mode(oniVideoMode_);
-
-            LOG_INFO("orbbec.ni.devicestream", "Selected mode: w: %d h: %d fps: %d pf: %d",
-                     mode_.width,
-                     mode_.height,
-                     mode_.fps,
-                     mode_.pixelFormat);
-
-            assert(mode_.pixelFormat != 0);
-
-            bufferLength_ =
-                mode_.width *
-                mode_.height *
-                mode_.bytesPerPixel;
-
-            bin_ = std::make_unique<bin_type>(pluginService(),
-                                              get_handle(),
-                                              bufferLength_);
-
-            on_open();
-            set_open(true);
-
-            enable_callbacks();
-            return ASTRA_STATUS_SUCCESS;
-        }
-
-        virtual astra_status_t close() override final
-        {
-            PROFILE_FUNC();
-            if (!is_open())
-                return ASTRA_STATUS_SUCCESS;
-
-            stop();
-
-            on_close();
-
-            LOG_INFO("orbbec.ni.devicestream", "destroying oni stream of type: %d", get_description().get_type());
-            oniStream_.destroy();
-
-            set_open(false);
-            set_started(false);
-
-            return ASTRA_STATUS_SUCCESS;
-        }
-
-        virtual astra_status_t start() override final
-        {
-            PROFILE_FUNC();
-            if (!is_open() || is_started())
-                return ASTRA_STATUS_SUCCESS;
-
-            LOG_INFO("orbbec.ni.devicestream", "starting oni stream of type: %d", get_description().get_type());
-            auto rc = oniStream_.start();
-
-            if (rc == openni::Status::STATUS_OK)
-            {
-                LOG_INFO("orbbec.ni.devicestream",
-                         "started oni stream of type: %d",
-                         get_description().get_type());
-
-                set_started(true);
-
-                return ASTRA_STATUS_SUCCESS;
-            }
-            else
-            {
-                set_started(false);
-                return ASTRA_STATUS_DEVICE_ERROR;
-            }
-        }
-
-        virtual astra_status_t stop() override final
-        {
-            PROFILE_FUNC();
-            if (!is_open() || !is_started())
-                return ASTRA_STATUS_SUCCESS;
-
-            LOG_INFO("orbbec.ni.devicestream", "stopping oni stream of type: %d", get_description().get_type());
-            oniStream_.stop();
-            LOG_INFO("orbbec.ni.devicestream", "stopped oni stream of type: %d", get_description().get_type());
-
-            set_started(false);
-
-            return ASTRA_STATUS_SUCCESS;
-        }
-
         inline bool is_streaming() const { return is_open() && is_started(); }
+
+        virtual void on_connection_started(astra_streamconnection_t connection) override
+        {
+            LOG_INFO("orbbec.ni.devicestream", "turn on stream %u", description().type());
+            if (is_open() && !is_started())
+            {
+                start();
+            }
+        }
+
+        virtual void on_connection_stopped(astra_streamconnection_t connection) override
+        {
+            if (is_open() && is_started())
+            {
+                stop();
+            }
+        }
 
         virtual void on_get_parameter(astra_streamconnection_t connection,
                                       astra_parameter_id id,
@@ -238,7 +133,7 @@ namespace orbbec { namespace ni {
                                                                       &parameterBin,
                                                                       &parameterData);
 
-                astra_imagestream_mode_t* result = static_cast<astra_imagestream_mode_t*>(parameterData);
+                astra::ImageStreamMode* result = static_cast<astra::ImageStreamMode*>(parameterData);
 
                 if (rc == ASTRA_STATUS_SUCCESS)
                 {
@@ -267,18 +162,63 @@ namespace orbbec { namespace ni {
                 break;
             }
             case ASTRA_PARAMETER_IMAGE_MODE:
-                astra_imagestream_mode_t* mode = static_cast<astra_imagestream_mode_t*>(inData);
-                auto oniMode = convert_mode(*mode);
+                astra::ImageStreamMode mode = *static_cast<astra::ImageStreamMode*>(inData);
+                auto oniMode = convert_mode(mode);
+
+                LOG_INFO("orbbec.ni.devicestream", "mode change requested: %ux%ux%u@%u pf:%u",
+                         mode.width(),
+                         mode.height(),
+                         mode.bytesPerPixel(),
+                         mode.fps(),
+                         mode.pixelFormat());
+
                 auto rc = oniStream_.setVideoMode(oniMode);
 
-                if (rc == ::openni::STATUS_OK)
+                if (rc == openni::Status::STATUS_OK)
                 {
                     LOG_INFO("orbbec.ni.devicestream", "stream mode changed");
-                    oniVideoMode_ = oniMode;
-                    mode_ = *mode;
+                }
+                else
+                {
+                    LOG_WARN("orbbec.ni.devicestream", "failed to change stream mode.");
                 }
                 break;
             }
+        }
+
+        void change_mode(const astra::ImageStreamMode& mode)
+        {
+            mode_ = mode;
+            oniMode_ = convert_mode(mode);
+
+            std::vector<astra_streamconnection_t> conns;
+
+            if (bin_ != nullptr)
+            {
+              conns = bin_->connections();
+            }
+
+            assert(mode_.pixelFormat() != 0);
+
+            bufferLength_ =
+                mode_.width() *
+                mode_.height() *
+                mode_.bytesPerPixel();
+
+            LOG_INFO("orbbec.ni.devicestream", "bin swap: %ux%ux%u len: %u",
+                     mode_.width(),
+                     mode_.height(),
+                     mode_.bytesPerPixel(),
+                     bufferLength_);
+
+            bin_ = std::make_unique<bin_type>(pluginService(),
+                                              get_handle(),
+                                              bufferLength_);
+
+            for(auto& conn : conns)
+            {
+                bin_->link_connection(conn);
+            };
         }
 
         virtual void on_new_buffer(wrapper_type* wrapper)
@@ -290,13 +230,12 @@ namespace orbbec { namespace ni {
 
             auto& md = wrapper->frame.metadata;
 
-            md.pixelFormat = mode_.pixelFormat;
-            md.width = mode_.width;
-            md.height = mode_.height;
-            md.bytesPerPixel = mode_.bytesPerPixel;
+            md.pixelFormat = mode_.pixelFormat();
+            md.width = mode_.width();
+            md.height = mode_.height();
         }
 
-        virtual astra_status_t read_frame(astra_frame_index_t frameIndex) override;
+        virtual astra_status_t on_read(astra_frame_index_t frameIndex) override;
 
         virtual openni::VideoStream* get_stream() override { return &oniStream_; }
 
@@ -308,21 +247,112 @@ namespace orbbec { namespace ni {
         openni::Device& oniDevice_;
         openni::SensorType oniSensorType_;
         openni::VideoStream oniStream_;
-        openni::VideoMode oniVideoMode_;
-        astra_imagestream_mode_t mode_;
+        openni::VideoMode oniMode_;
+        astra::ImageStreamMode mode_;
+
+        virtual astra_status_t on_open() override
+        {
+            PROFILE_FUNC();
+            if (is_open())
+                return ASTRA_STATUS_SUCCESS;
+
+            LOG_INFO("orbbec.ni.devicestream", "creating oni stream of type: %d", description().type());
+            openni::Status rc = oniStream_.create(oniDevice_, oniSensorType_);
+
+            if (rc != openni::STATUS_OK)
+            {
+                return ASTRA_STATUS_DEVICE_ERROR;
+            }
+
+            LOG_INFO("orbbec.ni.devicestream", "created oni stream of type: %d", description().type());
+
+            const openni::SensorInfo& pInfo = oniStream_.getSensorInfo();
+            auto& modes = pInfo.getSupportedVideoModes();
+
+            LOG_INFO("orbbec.ni.devicestream", "stream type %d supports modes:", description().type());
+
+            for(int i = 0; i < modes.getSize(); i++)
+            {
+                const openni::VideoMode& oniMode = modes[i];
+
+                if (std::get<0>(convert_format(oniMode.getPixelFormat())) != 0)
+                {
+                    astra::ImageStreamMode mode = convert_mode(oniMode);
+                    modes_.push_back(mode);
+                }
+
+                LOG_INFO("orbbec.ni.devicestream", "- w: %d h: %d fps: %d pf: %d",
+                         oniMode.getResolutionX(),
+                         oniMode.getResolutionY(),
+                         oniMode.getFps(),
+                         oniMode.getPixelFormat());
+            }
+
+            auto oniVideoMode = oniStream_.getVideoMode();
+            change_mode(convert_mode(oniVideoMode));
+
+            enable_callbacks();
+
+            return ASTRA_STATUS_SUCCESS;
+        }
+
+        virtual astra_status_t on_close() override
+        {
+            PROFILE_FUNC();
+
+            stop();
+
+            LOG_INFO("orbbec.ni.devicestream", "destroying oni stream of type: %d", description().type());
+            oniStream_.destroy();
+
+            return ASTRA_STATUS_SUCCESS;
+        }
+
+        virtual astra_status_t on_start() override
+        {
+            PROFILE_FUNC();
+
+            LOG_INFO("orbbec.ni.devicestream", "starting oni stream of type: %d", description().type());
+
+            auto rc = oniStream_.start();
+
+            if (rc == openni::Status::STATUS_OK)
+            {
+                LOG_INFO("orbbec.ni.devicestream",
+                         "started oni stream of type: %d",
+                         description().type());
+
+                return ASTRA_STATUS_SUCCESS;
+            }
+            else
+            {
+                LOG_INFO("orbbec.ni.devicestream",
+                         "unable to start oni stream of type: %d",
+                         description().type());
+
+                return ASTRA_STATUS_DEVICE_ERROR;
+            }
+        }
+
+        virtual astra_status_t on_stop() override
+        {
+            PROFILE_FUNC();
+
+            LOG_INFO("orbbec.ni.devicestream", "stopping oni stream of type: %d", description().type());
+            oniStream_.stop();
+            LOG_INFO("orbbec.ni.devicestream", "stopped oni stream of type: %d", description().type());
+
+            return ASTRA_STATUS_SUCCESS;
+        }
 
     private:
-        virtual void on_open() {}
-        virtual void on_close() {}
-
         using bin_type = astra::plugins::StreamBin<wrapper_type>;
         std::unique_ptr<bin_type> bin_;
 
         size_t bufferLength_{0};
-
         astra_stream_t streamHandle_{nullptr};
 
-        std::vector<astra_imagestream_mode_t> modes_;
+        std::vector<astra::ImageStreamMode> modes_;
     };
 
     template<typename TFrameWrapper>
@@ -346,10 +376,24 @@ namespace orbbec { namespace ni {
         }
     }
 
+    inline bool operator==(const openni::VideoMode& lhs, const openni::VideoMode& rhs)
+    {
+        return lhs.getResolutionX() == rhs.getResolutionX()
+            && lhs.getResolutionY() == rhs.getResolutionY()
+            && lhs.getPixelFormat() == rhs.getPixelFormat()
+            && lhs.getFps() == lhs.getFps();
+    }
+
+    inline bool operator!=(const openni::VideoMode& lhs, const openni::VideoMode& rhs)
+    {
+        return !(lhs == rhs);
+    }
+
     template<typename TFrameWrapper>
-    astra_status_t devicestream<TFrameWrapper>::read_frame(astra_frame_index_t frameIndex)
+    astra_status_t devicestream<TFrameWrapper>::on_read(astra_frame_index_t frameIndex)
     {
         PROFILE_FUNC();
+
         if (!is_streaming()) return ASTRA_STATUS_SUCCESS;
 
         openni::VideoFrameRef ref;
@@ -360,6 +404,19 @@ namespace orbbec { namespace ni {
         if (status == ::openni::STATUS_OK)
         {
             const auto* oniFrameData = ref.getData();
+
+            auto oniVideoMode = ref.getVideoMode();
+            // LOG_INFO("orbbec.ni.devicestream", "type: %u oniM: %ux%u",
+            //          description().type(),
+            //          oniVideoMode.getResolutionX(),
+            //          oniVideoMode.getResolutionY());
+
+            if (oniVideoMode != oniMode_)
+            {
+                change_mode(convert_mode(oniVideoMode));
+            }
+
+            assert(ref.getDataSize() == bufferLength_);
 
             size_t byteSize = MIN(ref.getDataSize(), bufferLength_);
 

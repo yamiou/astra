@@ -15,7 +15,8 @@ namespace orbbec { namespace ni {
     public:
         depthstream(astra::PluginServiceProxy& pluginService,
                     astra_streamset_t streamSet,
-                    openni::Device& oniDevice);
+                    openni::Device& oniDevice,
+                    stream_listener& listener);
 
         depthstream(const depthstream&) = delete;
         depthstream& operator=(const depthstream&) = delete;
@@ -28,7 +29,7 @@ namespace orbbec { namespace ni {
                                       int resolutionX,
                                       int resolutionY);
 
-        virtual void on_open() override;
+        virtual astra_status_t on_open() override;
 
         virtual void on_get_parameter(astra_streamconnection_t connection,
                                       astra_parameter_id id,
