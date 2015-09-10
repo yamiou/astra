@@ -3,6 +3,7 @@
 namespace astra {
 
 #if __ANDROID__
+
     std::string get_application_name()
     {
         FILE *file;
@@ -28,7 +29,7 @@ namespace astra {
         return std::string(path);
     }
 
-    std::string get_applictaion_libpath()
+    std::string get_application_libpath()
     {
         const size_t PATH_LENGTH = 1024;
         char path[PATH_LENGTH];
@@ -38,6 +39,7 @@ namespace astra {
 
         return std::string(path);
     }
+
 #endif
 
 }
