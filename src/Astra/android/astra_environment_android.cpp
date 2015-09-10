@@ -1,10 +1,8 @@
 #include "OSProcesses.h"
 
-namespace astra {
+namespace astra { namespace environment {
 
-#if __ANDROID__
-
-    std::string get_application_name()
+    std::string application_name()
     {
         FILE *file;
 
@@ -18,7 +16,7 @@ namespace astra {
         return std::string(appName);
     }
 
-    std::string get_application_filepath()
+    std::string application_path()
     {
         const size_t PATH_LENGTH = 1024;
         char path[PATH_LENGTH];
@@ -29,7 +27,7 @@ namespace astra {
         return std::string(path);
     }
 
-    std::string get_application_libpath()
+    std::string libpath()
     {
         const size_t PATH_LENGTH = 1024;
         char path[PATH_LENGTH];
@@ -40,6 +38,4 @@ namespace astra {
         return std::string(path);
     }
 
-#endif
-
-}
+}}

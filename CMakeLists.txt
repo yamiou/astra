@@ -4,6 +4,10 @@ project (Astra)
 
 if (ANDROID)
   set(ASTRA_ANDROID TRUE)
+elseif (WIN32)
+  set(ASTRA_WINDOWS TRUE)
+elseif (UNIX)
+  set(ASTRA_UNIX TRUE)
 endif()
 
 # Version

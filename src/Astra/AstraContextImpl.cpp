@@ -6,9 +6,10 @@
 #include "StreamConnection.h"
 #include "StreamSetConnection.h"
 #include "Logging.h"
-#include "Core/OSProcesses.h"
+#include "astra_environment.hpp"
 #include "astra_private.h"
-#include "Configuration.h"
+#include "astra_configuration.hpp"
+#include "astra_filesystem.hpp"
 
 INITIALIZE_LOGGING
 
@@ -22,23 +23,30 @@ namespace astra {
             return ASTRA_STATUS_SUCCESS;
 
 #if __ANDROID__
-        std::string logPath = get_application_filepath() + "astra.log";
-        std::string configPath = get_application_filepath() + "astra.toml";
+        std::string appPath = environment::application_path();
+        std::string logPath = filesystem::combine_paths(appPath, "astra.log");
+        std::string configPath = filesystem::combine_paths(appPath, "astra.toml");
 #else
-        std::string logPath = "logs/astra.log";
-        std::string configPath = "astra.toml";
+        std::string logPath = "astra.log";
+        std::string configPath = filesystem::combine_paths(environment::lib_path(), "astra.toml");
 #endif
 
-        std::unique_ptr<Configuration> config(Configuration::load_from_file(configPath.c_str()));
+        std::unique_ptr<configuration> config(configuration::load_from_file(configPath.c_str()));
         initialize_logging(logPath.c_str(), config->severityLevel());
 
         LOG_WARN("AstraContext", "Hold on to yer butts");
-        LOG_INFO("AstraContext", "logger file: %s", logPath.c_str());
+        LOG_INFO("AstraContext", "configuration path: %s", configPath.c_str());
+        LOG_INFO("AstraContext", "log file path: %s", logPath.c_str());
 
         m_pluginManager = std::make_unique<PluginManager>(m_setCatalog);
 
 #if !__ANDROID__
-        m_pluginManager->load_plugins(PLUGIN_DIRECTORY);
+        std::string pluginsPath = filesystem::combine_paths(environment::lib_path(),
+                                                            filesystem::append_path_separator(config->pluginsPath()));
+
+        LOG_INFO("AstraContext", "plugin path: %s", pluginsPath.c_str());
+
+        m_pluginManager->load_plugins(pluginsPath);
 #else
         m_pluginManager->load_plugin("libopenni_sensor.so");
         m_pluginManager->load_plugin("liborbbec_hand.so");
@@ -61,6 +69,7 @@ namespace astra {
             return ASTRA_STATUS_UNINITIALIZED;
 
         m_pluginManager.reset();
+        m_setCatalog.clear();
 
         m_initialized = false;
 
@@ -110,7 +119,7 @@ namespace astra {
     // }
 
     astra_status_t AstraContextImpl::reader_create(astra_streamsetconnection_t streamSet,
-                                                         astra_reader_t& reader)
+                                                   astra_reader_t& reader)
     {
         assert(streamSet != nullptr);
 
@@ -154,9 +163,9 @@ namespace astra {
     }
 
     astra_status_t AstraContextImpl::reader_get_stream(astra_reader_t reader,
-                                                             astra_stream_type_t type,
-                                                             astra_stream_subtype_t subtype,
-                                                             astra_streamconnection_t& connection)
+                                                       astra_stream_type_t type,
+                                                       astra_stream_subtype_t subtype,
+                                                       astra_streamconnection_t& connection)
     {
         assert(reader != nullptr);
 
@@ -180,7 +189,7 @@ namespace astra {
     }
 
     astra_status_t AstraContextImpl::stream_get_description(astra_streamconnection_t connection,
-                                                                  astra_stream_desc_t* description)
+                                                            astra_stream_desc_t* description)
     {
         StreamConnection* actualConnection = StreamConnection::get_ptr(connection);
 
@@ -235,8 +244,8 @@ namespace astra {
     }
 
     astra_status_t AstraContextImpl::reader_open_frame(astra_reader_t reader,
-                                                             int timeoutMillis,
-                                                             astra_reader_frame_t& frame)
+                                                       int timeoutMillis,
+                                                       astra_reader_frame_t& frame)
     {
         if (reader == nullptr)
         {
@@ -280,9 +289,9 @@ namespace astra {
     }
 
     astra_status_t AstraContextImpl::reader_register_frame_ready_callback(astra_reader_t reader,
-                                                                                astra_frame_ready_callback_t callback,
-                                                                                void* clientTag,
-                                                                                astra_reader_callback_id_t& callbackId)
+                                                                          astra_frame_ready_callback_t callback,
+                                                                          void* clientTag,
+                                                                          astra_reader_callback_id_t& callbackId)
     {
         assert(reader != nullptr);
         callbackId = nullptr;
@@ -340,9 +349,9 @@ namespace astra {
     }
 
     astra_status_t AstraContextImpl::reader_get_frame(astra_reader_frame_t frame,
-                                                            astra_stream_type_t type,
-                                                            astra_stream_subtype_t subtype,
-                                                            astra_frame_t*& subFrame)
+                                                      astra_stream_type_t type,
+                                                      astra_stream_subtype_t subtype,
+                                                      astra_frame_t*& subFrame)
     {
         assert(frame != nullptr);
 
@@ -372,9 +381,9 @@ namespace astra {
     }
 
     astra_status_t AstraContextImpl::stream_set_parameter(astra_streamconnection_t connection,
-                                                                astra_parameter_id parameterId,
-                                                                size_t inByteLength,
-                                                                astra_parameter_data_t inData)
+                                                          astra_parameter_id parameterId,
+                                                          size_t inByteLength,
+                                                          astra_parameter_data_t inData)
     {
         assert(connection != nullptr);
         assert(connection->handle != nullptr);
@@ -394,9 +403,9 @@ namespace astra {
     }
 
     astra_status_t AstraContextImpl::stream_get_parameter(astra_streamconnection_t connection,
-                                                                astra_parameter_id parameterId,
-                                                                size_t& resultByteLength,
-                                                                astra_result_token_t& token)
+                                                          astra_parameter_id parameterId,
+                                                          size_t& resultByteLength,
+                                                          astra_result_token_t& token)
     {
         assert(connection != nullptr);
         assert(connection->handle != nullptr);
@@ -416,9 +425,9 @@ namespace astra {
     }
 
     astra_status_t AstraContextImpl::stream_get_result(astra_streamconnection_t connection,
-                                                             astra_result_token_t token,
-                                                             size_t dataByteLength,
-                                                             astra_parameter_data_t dataDestination)
+                                                       astra_result_token_t token,
+                                                       size_t dataByteLength,
+                                                       astra_parameter_data_t dataDestination)
     {
         assert(connection != nullptr);
         assert(connection->handle != nullptr);
@@ -436,11 +445,11 @@ namespace astra {
     }
 
     astra_status_t AstraContextImpl::stream_invoke(astra_streamconnection_t connection,
-                                                         astra_command_id commandId,
-                                                         size_t inByteLength,
-                                                         astra_parameter_data_t inData,
-                                                         size_t& resultByteLength,
-                                                         astra_result_token_t& token)
+                                                   astra_command_id commandId,
+                                                   size_t inByteLength,
+                                                   astra_parameter_data_t inData,
+                                                   size_t& resultByteLength,
+                                                   astra_result_token_t& token)
     {
         assert(connection != nullptr);
         assert(connection->handle != nullptr);

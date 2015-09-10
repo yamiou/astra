@@ -4,7 +4,7 @@
 #include <exception>
 #include <array>
 #include <Astra/astra_types.h>
-#include "Core/Signal.h"
+#include "Signal.h"
 #include <Astra/Plugins/plugin_capi.h>
 #include "Logger.h"
 

@@ -5,7 +5,7 @@
 #include <Astra/astra_types.h>
 #include "Stream.h"
 #include "StreamBin.h"
-#include "Core/Signal.h"
+#include "Signal.h"
 #include "Logger.h"
 
 using CallbackId = size_t;

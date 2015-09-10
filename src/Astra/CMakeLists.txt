@@ -31,8 +31,8 @@ set(${_projname}_SOURCES
   AstraContextImpl.cpp
   CreateStreamProxy.h
   CreatePluginProxy.h
-  Configuration.h
-  Configuration.cpp
+  astra_configuration.hpp
+  astra_configuration.cpp
   Astra.cpp
   Stream.h
   Stream.cpp
@@ -65,14 +65,37 @@ set(${_projname}_SOURCES
   StreamBin.cpp
   StreamReader.h
   StreamReader.cpp
-  Core/OSProcesses.h
-  Core/OSProcesses.cpp
-  Core/shared_library.h
-  Core/shared_library_linux.cpp
-  Core/shared_library_windows.cpp
+  shared_library.h
+  shared_library_linux.cpp
+  shared_library_windows.cpp
   Registry.h
   Registry.cpp
+  astra_filesystem.cpp
+  astra_string.cpp
   )
+
+set(${_projname}_ANDROID_SOURCES
+  android/astra_environment_android.cpp
+  unix/astra_filesystem_unix.cpp
+  )
+
+set(${_projname}_WIN32_SOURCES
+  win32/astra_environment_win32.cpp
+  win32/astra_filesystem_win32.cpp
+  )
+
+set(${_projname}_UNIX_SOURCES
+  unix/astra_environment_unix.cpp
+  unix/astra_filesystem_unix.cpp
+  )
+
+if (ASTRA_ANDROID)
+  set(${_projname}_SOURCES ${${_projname}_SOURCES} ${${_projname}_ANDROID_SOURCES})
+elseif(ASTRA_WINDOWS)
+  set(${_projname}_SOURCES ${${_projname}_SOURCES} ${${_projname}_WIN32_SOURCES})
+elseif(ASTRA_UNIX)
+  set(${_projname}_SOURCES ${${_projname}_SOURCES} ${${_projname}_UNIX_SOURCES})
+endif()
 
 set(${_projname}_SOURCES_GEN
   AstraContext.h.lpp
@@ -105,12 +128,12 @@ include_directories(${PROJECT_SOURCE_DIR}/src/AstraAPI)
 
 target_link_libraries(${_projname} AstraAPI)
 
-add_subdirectory(Core/tests)
+add_subdirectory(tests)
 
 install(TARGETS ${_projname}
-        RUNTIME DESTINATION bin/
-        LIBRARY DESTINATION lib/
-        ARCHIVE DESTINATION lib/
-        )
+  RUNTIME DESTINATION bin/
+  LIBRARY DESTINATION lib/
+  ARCHIVE DESTINATION lib/
+  )
 
 install_pdb(${_projname} bin/)

@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 #include "PluginService.h"
-#include "Core/shared_library.h"
+#include "shared_library.h"
 #include <Astra/Plugins/PluginServiceProxyBase.h>
 #include "Logger.h"
 

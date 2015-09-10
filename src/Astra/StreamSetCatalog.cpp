@@ -2,7 +2,7 @@
 #include <cassert>
 #include "StreamSet.h"
 #include "StreamSetConnection.h"
-#include "Core/Signal.h"
+#include "Signal.h"
 #include "Logger.h"
 
 namespace astra {
@@ -91,6 +91,11 @@ namespace astra {
                                });
 
         return it != m_streamSets.end() ? it->second->streamSet.get() : nullptr;
+    }
+
+    void StreamSetCatalog::clear()
+    {
+        m_streamSets.clear();
     }
 
     void StreamSetCatalog::visit_sets(std::function<void(StreamSet*)> visitorMethod)

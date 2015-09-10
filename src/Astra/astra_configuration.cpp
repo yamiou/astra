@@ -1,5 +1,6 @@
-#include "Configuration.h"
+#include "astra_configuration.hpp"
 #include "vendor/cpptoml.h"
+#include <iostream>
 
 namespace astra {
 
@@ -33,9 +34,13 @@ namespace astra {
         return ASTRA_SEVERITY_UNKNOWN;
     }
 
-    Configuration* Configuration::load_from_file(const char* tomlFilePath)
+    configuration::configuration()
+        : pluginsPath_("Plugins/")
+    {}
+
+    configuration* configuration::load_from_file(const char* tomlFilePath)
     {
-        Configuration* config = new Configuration();
+        configuration* config = new configuration();
 
         cpptoml::table t;
 
@@ -57,6 +62,17 @@ namespace astra {
             if (severity != ASTRA_SEVERITY_UNKNOWN)
             {
                 config->set_severityLevel(severity);
+            }
+        }
+
+        const char* pluginsPathKey = "plugins.path";
+        if (t.contains_qualified(pluginsPathKey))
+        {
+            auto pluginsPath = t.get_qualified(pluginsPathKey)->as<std::string>()->get();
+
+            if (pluginsPath.length() > 0)
+            {
+                config->set_pluginsPath(pluginsPath);
             }
         }
 

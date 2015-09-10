@@ -3,7 +3,7 @@
 
 #include "Stream.h"
 #include "Logger.h"
-#include "Core/Signal.h"
+#include "Signal.h"
 #include "StreamRegisteredEventArgs.h"
 #include "StreamUnregisteringEventArgs.h"
 #include <unordered_set>

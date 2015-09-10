@@ -11,7 +11,7 @@
 #include "PluginManager.h"
 #include "StreamSet.h"
 #include "StreamReader.h"
-#include "Core/shared_library.h"
+#include "shared_library.h"
 #include "Logger.h"
 #include "StreamSetCatalog.h"
 

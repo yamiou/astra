@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <vector>
 #include <cassert>
-#include "Core/Signal.h"
+#include "Signal.h"
 #include "astra_private.h"
 #include "StreamConnection.h"
 
