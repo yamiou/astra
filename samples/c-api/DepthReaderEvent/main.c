@@ -1,9 +1,8 @@
 ﻿// Orbbec (c) 2015
 
-#include <Astra/Astra.h>
-#include <AstraUL/AstraUL.h>
-#include <cstdio>
-#include <iostream>
+#include <Astra/astra_capi.h>
+#include <AstraUL/skul_capi.h>
+#include <stdio.h>
 #include <key_handler.h>
 
 void print_depth(astra_depthframe_t depthFrame)
@@ -23,7 +22,8 @@ void print_depth(astra_depthframe_t depthFrame)
 
     astra_frame_index_t frameIndex;
     astra_depthframe_get_frameindex(depthFrame, &frameIndex);
-    std::cout << "index: " << frameIndex << " value: " << middle << std::endl;
+
+	printf("index:  %d  value:  %d \n", frameIndex, middle);
 }
 
 void frame_ready(void* clientTag, astra_reader_t reader, astra_reader_frame_t frame)
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
     astra_stream_start(depthStream);
 
     astra_reader_callback_id_t callbackId;
-    astra_reader_register_frame_ready_callback(reader, &frame_ready, nullptr, &callbackId);
+    astra_reader_register_frame_ready_callback(reader, &frame_ready, NULL, &callbackId);
 
     do
     {

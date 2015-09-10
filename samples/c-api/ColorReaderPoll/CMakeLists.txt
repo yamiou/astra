@@ -1,4 +1,4 @@
-set (_projname "DepthReaderEvent")
+set (_projname "ColorReaderPoll")
 
 set (${_projname}_SOURCES
   main.c
@@ -8,8 +8,6 @@ set (${_projname}_SOURCES
 add_executable(${_projname} ${${_projname}_SOURCES})
 
 set_target_properties(${_projname} PROPERTIES FOLDER "${SAMPLE_DIR_FOLDER}c-api")
-
-include_directories(${ASTRA_INCLUDE_DIR})
 
 target_link_libraries(${_projname} ${ASTRA_LIBRARIES})
 

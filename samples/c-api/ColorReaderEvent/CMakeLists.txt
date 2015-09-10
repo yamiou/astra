@@ -1,4 +1,4 @@
-set (_projname "DepthReaderEvent")
+set (_projname "ColorReaderEvent")
 
 set (${_projname}_SOURCES
   main.c
