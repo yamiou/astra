@@ -8,10 +8,14 @@
 void print_color(astra_colorframe_t colorFrame)
 {
 	astra_image_metadata_t metadata;
-	uint8_t* colorData;
+	uint8_t* colorData;	
+	//astra_rgb_pixel_t* colorData_rgb;
+
 	size_t colorLength;
 
 	astra_colorframe_get_data_ptr(colorFrame, &colorData, &colorLength);
+	//astra_colorframe_get_data_rgb_ptr(colorFrame, &colorData_rgb, &colorLength);	
+
 	astra_colorframe_get_metadata(colorFrame, &metadata);
 
 	int width = metadata.width;
@@ -27,6 +31,8 @@ void print_color(astra_colorframe_t colorFrame)
 	uint8_t b = *colorData++;
 
 	printf("color frameIndex: %d  r: %d    g: %d    b: %d \n", frameIndex, r, g, b);
+	//astra_rgb_pixel_t middle = colorData_rgb[index];	
+	//printf("color frameIndex: %d  r: %d    g: %d    b: %d \n", frameIndex, (int)(middle.r), (int)(middle.g), (int)(middle.b));
 }
 
 void frame_ready(void* clientTag, astra_reader_t reader, astra_reader_frame_t frame)

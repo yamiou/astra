@@ -61,7 +61,17 @@ ASTRA_API_EX astra_status_t astra_colorframe_get_data_ptr(astra_colorframe_t col
     *data = static_cast<uint8_t*>(voidData);
 
     return ASTRA_STATUS_SUCCESS;
+}
 
+ASTRA_API_EX astra_status_t astra_colorframe_get_data_rgb_ptr(astra_colorframe_t colorFrame,
+															  astra_image_metadata_t** data,
+															  size_t* byteLength)
+{
+	void* voidData = nullptr;
+	astra_imageframe_get_data_ptr(colorFrame, &voidData, byteLength);
+	*data = static_cast<astra_image_metadata_t*>(voidData);
+
+	return ASTRA_STATUS_SUCCESS;
 }
 
 ASTRA_API_EX astra_status_t astra_colorframe_copy_data(astra_colorframe_t colorFrame,
