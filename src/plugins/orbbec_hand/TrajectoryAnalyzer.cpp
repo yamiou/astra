@@ -83,7 +83,7 @@ namespace astra { namespace plugins { namespace hand {
 
         cv::Point3f deltaPosition = point.fullSizeWorldDeltaPosition;
 
-        float delta = cv::norm(deltaPosition);
+        float delta = static_cast<float>(cv::norm(deltaPosition));
 
         if (delta > m_maxSteadyDelta)
         {
@@ -104,7 +104,7 @@ namespace astra { namespace plugins { namespace hand {
 
                 m_avgDeltaHeadingValid = is_valid_heading_dist(point.fullSizeWorldPosition);
 
-                float headingDist = cv::norm(point.fullSizeWorldPosition - m_headingTrackStart);
+                float headingDist = static_cast<float>(cv::norm(point.fullSizeWorldPosition - m_headingTrackStart));
 
                 LOG_TRACE("TrajectoryAnalyzer", "#%d dist %f v1: %d v2: %d", m_trackingId, headingDist, m_avgDeltaHeadingValid, m_lastAvgDeltaHeadingValid);
 
@@ -182,18 +182,19 @@ namespace astra { namespace plugins { namespace hand {
 
     bool TrajectoryAnalyzer::is_valid_heading_dist(const cv::Point3f& currentWorldPosition)
     {
-        float headingDist = cv::norm(currentWorldPosition - m_headingTrackStart);
+        float headingDist = static_cast<float>(cv::norm(currentWorldPosition - m_headingTrackStart));
         bool validDist = headingDist > m_minHeadingDist;
         return validDist;
     }
 
     float TrajectoryAnalyzer::get_degree_difference(cv::Point3f& v1, cv::Point3f& v2)
     {
-        float len1 = cv::norm(v1);
-        float len2 = cv::norm(v2);
+        float len1 = static_cast<float>(cv::norm(v1));
+        float len2 = static_cast<float>(cv::norm(v2));
+
         if (len1 < EPSILON || len2 < EPSILON)
         {
-            return 0;
+            return 0.0f;
         }
 
         float invLen1 = 1.0 / len1;

@@ -2,6 +2,7 @@
 #define VECTOR2I_H
 
 #include <cmath>
+#include <cstdint>
 #include <AstraUL/skul_ctypes.h>
 
 namespace astra
@@ -68,7 +69,9 @@ namespace astra
         }
         else
         {
-            return Vector2i(v.x / length, v.y / length);
+            return Vector2i(
+                static_cast<std::int32_t>(v.x / length),
+                static_cast<std::int32_t>(v.y / length));
         }
     }
 
@@ -111,8 +114,9 @@ namespace astra
 
     inline Vector2i& Vector2i::operator/=(const float& rhs)
     {
-        this->x = this->x / rhs;
-        this->y = this->y / rhs;
+        this->x = static_cast<std::int32_t>(this->x / rhs);
+        this->y = static_cast<std::int32_t>(this->y / rhs);
+
         return *this;
     }
 
@@ -153,7 +157,9 @@ namespace astra
 
     inline Vector2i operator/(const Vector2i& lhs, const float& rhs)
     {
-        return Vector2i(lhs.x / rhs, lhs.y / rhs);
+        return Vector2i(
+            static_cast<std::int32_t>(lhs.x / rhs),
+            static_cast<std::int32_t>(lhs.y / rhs));
     }
 
     inline Vector2i Vector2i::zero()

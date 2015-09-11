@@ -97,7 +97,10 @@ namespace astra {
         }
         else
         {
-            return Vector3i(v.x / length, v.y / length, v.z / length);
+            return Vector3i(
+                static_cast<std::int32_t>(v.x / length),
+                static_cast<std::int32_t>(v.y / length),
+                static_cast<std::int32_t>(v.z / length));
         }
     }
 
@@ -133,9 +136,9 @@ namespace astra {
 
     inline Vector3i& Vector3i::operator/=(const float& rhs)
     {
-        this->x = this->x / rhs;
-        this->y = this->y / rhs;
-        this->z = this->z / rhs;
+        this->x = static_cast<std::int32_t>(this->x / rhs);
+        this->y = static_cast<std::int32_t>(this->y / rhs);
+        this->z = static_cast<std::int32_t>(this->z / rhs);
         return *this;
     }
 
@@ -176,7 +179,10 @@ namespace astra {
 
     inline Vector3i operator/(const Vector3i& lhs, const float& rhs)
     {
-        return Vector3i(lhs.x / rhs, lhs.y / rhs, lhs.z / rhs);
+        return Vector3i(
+            static_cast<std::int32_t>(lhs.x / rhs),
+            static_cast<std::int32_t>(lhs.y / rhs),
+            static_cast<std::int32_t>(lhs.z / rhs));
     }
 
     inline Vector3i Vector3i::zero()

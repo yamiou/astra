@@ -244,9 +244,9 @@ namespace samples { namespace common {
         const Vector3f* normMap = m_blurNormalMap.get();
         const bool useNormalMap = normMap != nullptr;
 
-        for (int y = 0; y < height; ++y)
+        for (unsigned y = 0; y < height; ++y)
         {
-            for (int x = 0; x < width; ++x, ++pointData, ++normMap, ++texturePtr)
+            for (unsigned x = 0; x < width; ++x, ++pointData, ++normMap, ++texturePtr)
             {
                 float depth = (*pointData).z;
 
@@ -267,9 +267,9 @@ namespace samples { namespace common {
                     if (diffuseFactor > 0)
                     {
                         //only add diffuse when mesh is facing the light
-                        diffuseColor.r = m_lightColor.r * diffuseFactor;
-                        diffuseColor.g = m_lightColor.g * diffuseFactor;
-                        diffuseColor.b = m_lightColor.b * diffuseFactor;
+                        diffuseColor.r = static_cast<uint8_t>(m_lightColor.r * diffuseFactor);
+                        diffuseColor.g = static_cast<uint8_t>(m_lightColor.g * diffuseFactor);
+                        diffuseColor.b = static_cast<uint8_t>(m_lightColor.b * diffuseFactor);
                     }
                     else
                     {

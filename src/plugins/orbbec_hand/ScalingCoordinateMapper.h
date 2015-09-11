@@ -44,8 +44,8 @@ namespace astra { namespace plugins { namespace hand {
         inline cv::Point3f convert_depth_to_world(int depthX, int depthY, float depthZ) const
         {
             PROFILE_FUNC();
-            depthX = (depthX + m_offsetX) * m_scale;
-            depthY = (depthY + m_offsetY) * m_scale;
+            depthX = static_cast<int>((depthX + m_offsetX) * m_scale);
+            depthY = static_cast<int>((depthY + m_offsetY) * m_scale);
 
             return cv_convert_depth_to_world(m_depthToWorldData, depthX, depthY, depthZ);
         }
@@ -54,11 +54,11 @@ namespace astra { namespace plugins { namespace hand {
                                            float& worldX, float& worldY, float& worldZ) const
         {
             PROFILE_FUNC();
-            depthX = (depthX + m_offsetX) * m_scale;
-            depthY = (depthY + m_offsetY) * m_scale;
+            depthX = static_cast<int>((depthX + m_offsetX) * m_scale);
+            depthY = static_cast<int>((depthY + m_offsetY) * m_scale);
 
             convert_depth_to_world_f(m_depthToWorldData,
-                                     depthX, depthY, depthZ,
+                                     depthX, depthY, static_cast<int>(depthZ),
                                      worldX, worldY, worldZ);
         }
 

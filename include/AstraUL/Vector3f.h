@@ -92,11 +92,14 @@ namespace astra {
         double length = std::sqrtf(v.x*v.x + v.y*v.y + v.z*v.z);
         if (length < 1e-9)
         {
-            return Vector3f(0, 0, 0);
+            return Vector3f(0.0f, 0.0f, 0.0f);
         }
         else
         {
-            return Vector3f(v.x / length, v.y / length, v.z / length);
+            return Vector3f(
+                static_cast<float>(v.x / length),
+                static_cast<float>(v.y / length),
+                static_cast<float>(v.z / length));
         }
     }
 
