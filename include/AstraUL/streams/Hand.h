@@ -30,6 +30,17 @@ namespace astra {
             *this = handPoint;
         }
 
+        HandPoint& operator=(const ::astra_handpoint_t& handPoint)
+        {
+            astra_handpoint_t::trackingId = handPoint.trackingId;
+            astra_handpoint_t::status = handPoint.status;
+            astra_handpoint_t::depthPosition = handPoint.depthPosition;
+            astra_handpoint_t::worldPosition = handPoint.worldPosition;
+            astra_handpoint_t::worldDeltaPosition = handPoint.worldDeltaPosition;
+
+            return *this;
+        }
+
         inline operator ::astra_handpoint_t*() { return this; }
         inline operator const ::astra_handpoint_t*() const { return this; }
 

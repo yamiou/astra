@@ -19,6 +19,14 @@ namespace astra
             *this = v;
         }
 
+        Vector2f& operator=(const astra_vector2f_t& rhs)
+        {
+            ::astra_vector2f_t::x = rhs.x;
+            ::astra_vector2f_t::y = rhs.y;
+
+            return *this;
+        }
+
         Vector2f(float x, float y)
         {
             this->x = x;

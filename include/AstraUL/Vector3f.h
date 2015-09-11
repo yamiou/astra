@@ -20,6 +20,15 @@ namespace astra {
             *this = v;
         }
 
+        Vector3f& operator=(const astra_vector3f_t& rhs)
+        {
+            ::astra_vector3f_t::x = rhs.x;
+            ::astra_vector3f_t::y = rhs.y;
+            ::astra_vector3f_t::z = rhs.z;
+
+            return *this;
+        }
+
         Vector3f(float x, float y, float z)
         {
             this->x = x;

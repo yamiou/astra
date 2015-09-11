@@ -15,9 +15,9 @@ namespace samples { namespace common {
     {
     public:
         LitDepthVisualizer()
+            : m_lightVector(0.44022f, -0.17609f, 0.88045f)
         {
             m_lightColor = {210, 210, 210};
-            m_lightVector = {0.44022f, -0.17609f, 0.88045f};
             m_ambientColor = {30, 30, 30};
         }
 
