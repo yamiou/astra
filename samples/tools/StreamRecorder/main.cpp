@@ -63,12 +63,12 @@ public:
 
         auto precision = std::cout.precision();
         std::cout << std::fixed
-            << std::setprecision(1)
-            << fps << " fps ("
-            << std::setprecision(2)
-            << frameDuration.count() * 1000 << " ms)"
-            << std::setprecision(precision)
-            << std::endl;
+                  << std::setprecision(1)
+                  << fps << " fps ("
+                  << std::setprecision(2)
+                  << frameDuration.count() * 1000 << " ms)"
+                  << std::setprecision(precision)
+                  << std::endl;
     }
 
     virtual void on_frame_ready(astra::StreamReader& reader,
@@ -291,16 +291,20 @@ int main(int argc, char** argv)
         {
             switch (event.type)
             {
-                case sf::Event::Closed:
-                    window.close();
-                    break;
-                case sf::Event::KeyPressed:
-                    sf::Keyboard::Key key = event.key.code;
-                    handle_escape_event(key, window);
-                    handle_stop_event(key, streamPlayerPsListener, appStateManager);
-                    handle_record_event(key, sensorPsListener, streamWriter, appStateManager);
-                    handle_play_event(key, streamPlayerPsListener, appStateManager);
-                    break;
+            case sf::Event::Closed:
+                window.close();
+                break;
+            case sf::Event::KeyPressed:
+            {
+                sf::Keyboard::Key key = event.key.code;
+                handle_escape_event(key, window);
+                handle_stop_event(key, streamPlayerPsListener, appStateManager);
+                handle_record_event(key, sensorPsListener, streamWriter, appStateManager);
+                handle_play_event(key, streamPlayerPsListener, appStateManager);
+                break;
+            }
+            default:
+                break;
             }
         }
 
