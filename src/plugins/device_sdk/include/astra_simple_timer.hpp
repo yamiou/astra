@@ -2,6 +2,7 @@
 #define ASTRA_SIMPLE_TIMER_H
 
 #include <chrono>
+#include <mutex>
 #include <thread>
 
 namespace astra { namespace utility {
