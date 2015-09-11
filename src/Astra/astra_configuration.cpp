@@ -35,7 +35,7 @@ namespace astra {
     }
 
     configuration::configuration()
-        : pluginsPath_("Plugins/")
+        : pluginsPath_("Plugins")
     {}
 
     configuration* configuration::load_from_file(const char* tomlFilePath)
