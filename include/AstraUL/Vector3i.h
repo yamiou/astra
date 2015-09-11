@@ -29,7 +29,7 @@ namespace astra {
             return *this;
         }
 
-        Vector3i(float x, float y, float z)
+        Vector3i(int x, int y, int z)
         {
             this->x = x;
             this->y = y;
