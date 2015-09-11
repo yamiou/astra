@@ -15,8 +15,6 @@ INITIALIZE_LOGGING
 
 namespace astra {
 
-    const char PLUGIN_DIRECTORY[] = "./Plugins/";
-
     astra_status_t AstraContextImpl::initialize()
     {
         if (m_initialized)
