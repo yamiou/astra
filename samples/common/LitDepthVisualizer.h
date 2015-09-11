@@ -259,7 +259,9 @@ namespace samples { namespace common {
 
                 if (!norm.is_zero())
                 {
-                    const float fadeFactor = 1 - 0.6*std::max(0.0f, std::min(1.0f, ((depth - 400.0f) / 3200.0f)));
+                    const float fadeFactor = static_cast<float>(
+                        1.0f - 0.6f * std::max(0.0f, std::min(1.0f, ((depth - 400.0f) / 3200.0f))));
+
                     const float diffuseFactor = norm.dot(m_lightVector);
 
                     astra_rgb_pixel_t diffuseColor;
