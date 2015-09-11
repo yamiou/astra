@@ -62,13 +62,16 @@ namespace astra
     inline Vector2f Vector2f::normalize(Vector2f v)
     {
         double length = std::sqrtf(v.x*v.x + v.y*v.y);
+
         if (length < 1e-9)
         {
-            return Vector2f(0, 0);
+            return Vector2f(0.0f, 0.0f);
         }
         else
         {
-            return Vector2f(v.x / length, v.y / length);
+            return Vector2f(
+                static_cast<float>(v.x / length),
+                static_cast<float>(v.y / length));
         }
     }
 

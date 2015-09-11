@@ -38,31 +38,34 @@ namespace astra
         inline operator const ::astra_vector2i_t*() const { return this; }
 
         float length() const;
-        int length_squared() const;
-        int dot(const Vector2i& v) const;
+        std::int32_t length_squared() const;
+        std::int32_t dot(const Vector2i& v) const;
 
-        static Vector2i normalize(Vector2i v);
+        static Vector2i normalize(const Vector2i& v);
 
-        static inline Vector2i zero();
+        static inline const Vector2i& zero();
+
         inline bool is_zero() const;
 
         friend bool operator==(const Vector2i& lhs, const Vector2i& rhs);
         friend Vector2i operator+(const Vector2i& lhs, const Vector2i& rhs);
         friend Vector2i operator-(const Vector2i& lhs, const Vector2i& rhs);
-        friend Vector2i operator*(const Vector2i& lhs, const float& rhs);
-        friend Vector2i operator*(const float& lhs, const Vector2i& rhs);
-        friend Vector2i operator/(const Vector2i& lhs, const float& rhs);
+        friend Vector2i operator*(const Vector2i& lhs, const std::int32_t rhs);
+        friend Vector2i operator*(const std::int32_t lhs, const Vector2i& rhs);
+        friend Vector2i operator/(const Vector2i& lhs, const std::int32_t rhs);
 
         Vector2i operator-();
         Vector2i& operator+=(const Vector2i& rhs);
         Vector2i& operator-=(const Vector2i& rhs);
-        Vector2i& operator*=(const float& rhs);
-        Vector2i& operator/=(const float& rhs);
+        Vector2i& operator*=(const std::int32_t rhs);
+        Vector2i& operator/=(const std::int32_t rhs);
     };
 
-    inline Vector2i Vector2i::normalize(Vector2i v)
+    inline Vector2i Vector2i::normalize(const Vector2i& v)
     {
-        double length = std::sqrtf(v.x*v.x + v.y*v.y);
+        double length = std::sqrtf(
+            static_cast<float>(v.x*v.x + v.y*v.y));
+
         if (length < 1e-9)
         {
             return Vector2i(0, 0);
@@ -77,16 +80,17 @@ namespace astra
 
     inline float Vector2i::length() const
     {
-        return std::sqrtf(x * x + y * y);
+        return std::sqrtf(
+            static_cast<float>(x * x + y * y));
     }
 
-    inline int Vector2i::length_squared() const
+    inline std::int32_t Vector2i::length_squared() const
     {
         return x * x + y * y;
     }
 
 
-    inline int Vector2i::dot(const Vector2i& v) const
+    inline std::int32_t Vector2i::dot(const Vector2i& v) const
     {
         return x * v.x + y * v.y;
     }
@@ -105,14 +109,14 @@ namespace astra
         return *this;
     }
 
-    inline Vector2i& Vector2i::operator*=(const float& rhs)
+    inline Vector2i& Vector2i::operator*=(const std::int32_t rhs)
     {
-        this->x = this->x * rhs;
-        this->y = this->y * rhs;
+        this->x = static_cast<std::int32_t>(this->x * rhs);
+        this->y = static_cast<std::int32_t>(this->y * rhs);
         return *this;
     }
 
-    inline Vector2i& Vector2i::operator/=(const float& rhs)
+    inline Vector2i& Vector2i::operator/=(const std::int32_t rhs)
     {
         this->x = static_cast<std::int32_t>(this->x / rhs);
         this->y = static_cast<std::int32_t>(this->y / rhs);
@@ -145,26 +149,28 @@ namespace astra
         return Vector2i(lhs.x - rhs.x, lhs.y - rhs.y);
     }
 
-    inline Vector2i operator*(const Vector2i& lhs, const float& rhs)
+    inline Vector2i operator*(const Vector2i& lhs, const std::int32_t rhs)
     {
-        return Vector2i(lhs.x * rhs, lhs.y * rhs);
+        return Vector2i(
+            static_cast<std::int32_t>(lhs.x * rhs),
+            static_cast<std::int32_t>(lhs.y * rhs));
     }
 
-    inline Vector2i operator*(const float& lhs, const Vector2i& rhs)
+    inline Vector2i operator*(const std::int32_t lhs, const Vector2i& rhs)
     {
         return rhs * lhs;
     }
 
-    inline Vector2i operator/(const Vector2i& lhs, const float& rhs)
+    inline Vector2i operator/(const Vector2i& lhs, const std::int32_t rhs)
     {
         return Vector2i(
             static_cast<std::int32_t>(lhs.x / rhs),
             static_cast<std::int32_t>(lhs.y / rhs));
     }
 
-    inline Vector2i Vector2i::zero()
+    inline const Vector2i& Vector2i::zero()
     {
-        Vector2i zero;
+        static Vector2i zero;
         return zero;
     }
 
