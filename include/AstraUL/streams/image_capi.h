@@ -54,9 +54,10 @@ ASTRA_API_EX astra_status_t astra_imageframe_copy_data(astra_imageframe_t imageF
 
 ASTRA_API_EX astra_status_t astra_imageframe_get_metadata(astra_imageframe_t imageFrame,
                                                           astra_image_metadata_t* metadata);
+ASTRA_END_DECLS
 
-ASTRA_API_EX inline void astra_pixelformat_get_bytes_per_pixel(astra_pixel_format_t format,
-                                                               uint8_t* bpp)
+inline void astra_pixelformat_get_bytes_per_pixel(astra_pixel_format_t format,
+                                                  uint8_t* bpp)
 {
     switch(format)
     {
@@ -86,7 +87,5 @@ ASTRA_API_EX inline void astra_pixelformat_get_bytes_per_pixel(astra_pixel_forma
         break;
     }
 }
-
-ASTRA_END_DECLS
 
 #endif // IMAGE_CAPI_H
