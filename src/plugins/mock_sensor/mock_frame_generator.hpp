@@ -2,6 +2,7 @@
 #define MOCK_FRAME_GENERATOR_H
 
 #include <SFML/Graphics.hpp>
+#include <cstdint>
 
 namespace orbbec { namespace mocks {
 
