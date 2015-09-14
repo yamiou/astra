@@ -11,8 +11,8 @@
 
 // Is noexcept supported?
 #if (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || \
-  (defined(__clang__) && defined(__has_feature) && __has_feature(cxx_noexcept)) || \
-  (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180021114)
+    (defined(__clang__) && defined(__has_feature) && __has_feature(cxx_noexcept)) || \
+    (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 190023026)
 #  define NOEXCEPT noexcept
 #else
 #  define NOEXCEPT
