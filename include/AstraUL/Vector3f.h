@@ -69,7 +69,7 @@ namespace astra {
 
     inline float Vector3f::length() const
     {
-        return std::sqrtf(x * x + y * y + z * z);
+        return std::sqrt(x * x + y * y + z * z);
     }
 
     inline float Vector3f::length_squared() const
@@ -89,7 +89,7 @@ namespace astra {
 
     inline Vector3f Vector3f::normalize(Vector3f v)
     {
-        double length = std::sqrtf(v.x*v.x + v.y*v.y + v.z*v.z);
+        double length = std::sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
         if (length < 1e-9)
         {
             return Vector3f(0.0f, 0.0f, 0.0f);

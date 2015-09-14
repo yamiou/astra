@@ -1,4 +1,4 @@
-#include "OSProcesses.h"
+#include "../astra_environment.hpp"
 
 namespace astra { namespace environment {
 
@@ -21,7 +21,7 @@ namespace astra { namespace environment {
         const size_t PATH_LENGTH = 1024;
         char path[PATH_LENGTH];
 
-        std::string appName = get_application_name();
+        std::string appName = application_name();
         snprintf(path, PATH_LENGTH, "/data/data/%s/files/", appName.c_str());
 
         return std::string(path);
@@ -32,7 +32,7 @@ namespace astra { namespace environment {
         const size_t PATH_LENGTH = 1024;
         char path[PATH_LENGTH];
 
-        std::string appName = get_application_name();
+        std::string appName = application_name();
         snprintf(path, PATH_LENGTH, "/data/data/%s/lib/", appName.c_str());
 
         return std::string(path);

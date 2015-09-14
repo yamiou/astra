@@ -61,7 +61,7 @@ namespace astra
 
     inline Vector2f Vector2f::normalize(Vector2f v)
     {
-        double length = std::sqrtf(v.x*v.x + v.y*v.y);
+        double length = std::sqrt(v.x*v.x + v.y*v.y);
 
         if (length < 1e-9)
         {
@@ -77,7 +77,7 @@ namespace astra
 
     inline float Vector2f::length() const
     {
-        return std::sqrtf(x * x + y * y);
+        return std::sqrt(x * x + y * y);
     }
 
     inline float Vector2f::length_squared() const

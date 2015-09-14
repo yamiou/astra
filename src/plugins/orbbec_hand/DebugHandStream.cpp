@@ -1,5 +1,6 @@
 #include "DebugHandStream.h"
 #include <AstraUL/streams/hand_parameters.h>
+#include <cstring>
 
 namespace astra { namespace plugins { namespace hand {
 

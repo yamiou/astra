@@ -71,7 +71,7 @@ namespace astra {
 
     inline float Vector3i::length() const
     {
-        return std::sqrtf(static_cast<float>(x * x + y * y + z * z));
+        return std::sqrt(static_cast<float>(x * x + y * y + z * z));
     }
 
     inline std::int32_t Vector3i::length_squared() const
@@ -94,7 +94,7 @@ namespace astra {
 
     inline Vector3i Vector3i::normalize(const Vector3i& v)
     {
-        double length = sqrtf(
+        double length = sqrt(
             static_cast<float>(v.x*v.x + v.y*v.y + v.z*v.z));
 
         if (length < 1e-9)

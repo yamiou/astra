@@ -63,7 +63,7 @@ namespace astra
 
     inline Vector2i Vector2i::normalize(const Vector2i& v)
     {
-        double length = std::sqrtf(
+        double length = std::sqrt(
             static_cast<float>(v.x*v.x + v.y*v.y));
 
         if (length < 1e-9)
@@ -80,7 +80,7 @@ namespace astra
 
     inline float Vector2i::length() const
     {
-        return std::sqrtf(
+        return std::sqrt(
             static_cast<float>(x * x + y * y));
     }
 
