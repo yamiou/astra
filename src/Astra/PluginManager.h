@@ -26,7 +26,8 @@ namespace astra {
         {
             return initialize != nullptr &&
                 terminate != nullptr &&
-                update != nullptr;
+                update != nullptr &&
+                libHandle != nullptr;
         }
     };
 
