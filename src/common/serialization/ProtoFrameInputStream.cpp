@@ -1,7 +1,7 @@
 #include "ProtoFrameInputStream.h"
 
-#include "gensrc/FrameDescription.pb.h"
-#include "gensrc/Frame.pb.h"
+#include "FrameDescription.pb.h"
+#include "Frame.pb.h"
 
 #include "pb_util.h"
 

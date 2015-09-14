@@ -2,6 +2,7 @@
 #define PARAMETERBIN_H
 #include <memory>
 #include <Astra/astra_types.h>
+#include <cstring>
 
 namespace astra {
 
@@ -13,7 +14,7 @@ namespace astra {
         {
             //TODO pooling
             m_data = DataPtr(new uint8_t[byteSize]);
-            memset(m_data.get(), 0, byteSize);
+	    std::memset(m_data.get(), 0, byteSize);
         }
 
         size_t byteLength() { return m_byteLength; }

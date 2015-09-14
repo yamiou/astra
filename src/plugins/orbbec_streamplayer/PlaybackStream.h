@@ -6,6 +6,7 @@
 #include <Astra/Plugins/plugin_capi.h>
 #include <AstraUL/streams/image_parameters.h>
 #include <common/serialization/FrameStreamReader.h>
+#include <cstring>
 
 using namespace astra::serialization;
 
@@ -211,7 +212,7 @@ namespace astra { namespace plugins { namespace streamplayer {
         wrapper_type* frameWrapper = framePair.second;
         astra_frame_t* frame = framePair.first;
 
-        memcpy(frame->data, decodedFrame.rawFrameWrapper, decodedFrame.byteLength);
+	std::memcpy(frame->data, decodedFrame.rawFrameWrapper, decodedFrame.byteLength);
         frameWrapper->frame.data = &(frameWrapper->frame_data);
         frameWrapper->frame.frame = frame;
 

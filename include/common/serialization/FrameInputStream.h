@@ -5,10 +5,14 @@
 #include <cstdint>
 #include <exception>
 
+#ifndef __has_feature
+#define __has_feature(x) 0
+#endif
+
 // Is noexcept supported?
-#if defined(__clang__) && __has_feature(cxx_noexcept) ||                \
-    defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46 || \
-    defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180021114
+#if (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || \
+  (defined(__clang__) && defined(__has_feature) && __has_feature(cxx_noexcept)) || \
+  (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180021114)
 #  define NOEXCEPT noexcept
 #else
 #  define NOEXCEPT

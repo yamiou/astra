@@ -80,6 +80,9 @@ namespace astra {
 
         os_load_library(path.c_str(), libHandle);
 
+	if (!libHandle)
+	  return;
+	
         PluginFuncs pluginFuncs;
         os_get_proc_address(libHandle, ASTRA_STRINGIFY(astra_plugin_initialize), (FarProc&)pluginFuncs.initialize);
         os_get_proc_address(libHandle, ASTRA_STRINGIFY(astra_plugin_terminate), (FarProc&)pluginFuncs.terminate);

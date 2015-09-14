@@ -4,7 +4,7 @@
 #include <Astra/Plugins/PluginKit.h>
 #include <AstraUL/AstraUL.h>
 #include <unordered_map>
-#include "handtracker.h"
+#include "HandTracker.h"
 #include "HandSettings.h"
 
 namespace astra { namespace plugins { namespace hand {

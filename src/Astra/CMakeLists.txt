@@ -126,7 +126,7 @@ add_library(${_projname} SHARED ${${_projname}_SOURCES} ${${_projname}_SOURCES_G
 
 include_directories(${PROJECT_SOURCE_DIR}/src/AstraAPI)
 
-target_link_libraries(${_projname} AstraAPI)
+target_link_libraries(${_projname} AstraAPI ${CMAKE_DL_LIBS})
 
 add_subdirectory(tests)
 

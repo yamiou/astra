@@ -2,6 +2,7 @@
 
 #include <AstraUL/streams/depth_parameters.h>
 #include <sstream>
+#include <cstring>
 
 namespace orbbec { namespace mocks {
 

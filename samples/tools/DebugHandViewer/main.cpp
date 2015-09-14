@@ -3,6 +3,7 @@
 #include <AstraUL/AstraUL.h>
 #include <sstream>
 #include <iomanip>
+#include <cstring>
 
 class HandDebugFrameListener : public astra::FrameReadyListener
 {
@@ -24,7 +25,7 @@ public:
             int byteLength = m_displayWidth * m_displayHeight * 4;
 
             m_displayBuffer = BufferPtr(new uint8_t[byteLength]);
-            memset(m_displayBuffer.get(), 0, byteLength);
+	    std::memset(m_displayBuffer.get(), 0, byteLength);
 
             m_texture.create(m_displayWidth, m_displayHeight);
             m_sprite.setTexture(m_texture);

@@ -7,6 +7,7 @@
 #include <common/serialization/FrameStreamReader.h>
 #include "PlaybackStream.h"
 #include <Astra/StreamDescription.h>
+#include <cstring>
 
 using namespace astra::serialization;
 
@@ -50,7 +51,7 @@ namespace astra { namespace plugins { namespace streamplayer
                                                                                  &parameterData);
                     if (rc == ASTRA_STATUS_SUCCESS)
                     {
-                        memcpy(parameterData, &m_conversionCache, resultByteLength);
+		      std::memcpy(parameterData, &m_conversionCache, resultByteLength);
                     }
 
                     break;
