@@ -20,7 +20,7 @@ namespace astra {
         static configuration* load_from_file(const char* tomlFilePath);
 
     private:
-        astra_log_severity_t severityLevel_{ASTRA_SEVERITY_INFO};
+        astra_log_severity_t severityLevel_{ASTRA_SEVERITY_FATAL};
         std::string pluginsPath_;
     };
 }
