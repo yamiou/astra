@@ -63,10 +63,6 @@ namespace astra { namespace plugins { namespace hand {
         if (streamDesc.type == ASTRA_STREAM_DEPTH &&
             m_streamTrackerMap.find(streamHandle) == m_streamTrackerMap.end())
         {
-            const char* uri;
-            pluginService().get_streamset_uri(setHandle, &uri);
-
-            Sensor sensor(uri);
             StreamDescription depthDescription = streamDesc;
 
             HandTracker* tracker = new HandTracker(pluginService(),

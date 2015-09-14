@@ -54,7 +54,7 @@ namespace astra { namespace plugins { namespace hand {
 
         //fields
 
-        Sensor m_sensor;
+        StreamSet m_streamset;
         StreamReader m_reader;
         DepthStream m_depthStream;
 

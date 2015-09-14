@@ -1,7 +1,7 @@
 #ifndef MOCK_DEVICE_STREAMSET_H
 #define MOCK_DEVICE_STREAMSET_H
 
-#include <Astra/Sensor.h>
+#include <Astra/StreamSet.h>
 #include <Astra/Plugins/plugin_capi.h>
 #include <Astra/Plugins/PluginLogger.h>
 
@@ -46,7 +46,6 @@ namespace orbbec { namespace mocks {
         void add_stream(stream* stream);
 
         astra::PluginServiceProxy& pluginService_;
-        std::unique_ptr<astra::Sensor> sensor_;
 
         astra_streamset_t streamSetHandle_;
 

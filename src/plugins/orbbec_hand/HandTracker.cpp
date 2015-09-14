@@ -18,8 +18,8 @@ namespace astra { namespace plugins { namespace hand {
                                  astra_streamset_t streamSet,
                                  StreamDescription& depthDesc,
                                  HandSettings& settings) :
-            m_sensor(get_uri_for_streamset(pluginService, streamSet)),
-            m_reader(m_sensor.create_reader()),
+            m_streamset(get_uri_for_streamset(pluginService, streamSet)),
+            m_reader(m_streamset.create_reader()),
             m_depthStream(m_reader.stream<DepthStream>(depthDesc.subtype())),
             m_settings(settings),
             m_pluginService(pluginService),

@@ -23,7 +23,7 @@ namespace astra { namespace plugins { namespace xs {
         void calculate_point_frame(DepthFrame& depthFrame,
                                    Vector3f* p_points);
 
-        Sensor m_sensor;
+        StreamSet m_streamset;
         astra_streamset_t m_streamSet;
         StreamReader m_reader;
         DepthStream m_depthStream;

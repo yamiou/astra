@@ -258,14 +258,14 @@ int main(int argc, char** argv)
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Stream Recorder");
 
-    astra::Sensor sensor;
-    astra::StreamReader sensorReader = sensor.create_reader();
+    astra::StreamSet streamset;
+    astra::StreamReader reader = streamset.create_reader();
 
-    astra::Sensor streamPlayer("stream_player");
+    astra::StreamSet streamPlayer("stream_player");
     astra::StreamReader streamPlayerReader = streamPlayer.create_reader();
 
-    auto sensorDs = sensorReader.stream<astra::DepthStream>();
-    auto sensorPs = sensorReader.stream<astra::PointStream>();
+    auto sensorDs = reader.stream<astra::DepthStream>();
+    auto sensorPs = reader.stream<astra::PointStream>();
     auto streamPlayerPs = streamPlayerReader.stream<astra::PointStream>();
 
     sensorDs.start();
@@ -275,8 +275,8 @@ int main(int argc, char** argv)
     PointFrameListener sensorPsListener(sensorPs);
     PointFrameListener streamPlayerPsListener(streamPlayerPs);
 
-    sensorReader.addListener(sensorDsListener);
-    sensorReader.addListener(sensorPsListener);
+    reader.addListener(sensorDsListener);
+    reader.addListener(sensorPsListener);
     streamPlayerReader.addListener(streamPlayerPsListener);
 
     while (window.isOpen())

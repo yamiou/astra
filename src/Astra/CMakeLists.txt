@@ -2,7 +2,7 @@ set (_projname "Astra")
 
 set(${_projname}_SOURCES
   ../../include/Astra/Astra.h
-  ../../include/Astra/Sensor.h
+  ../../include/Astra/StreamSet.h
   ../../include/Astra/StreamDescription.h
   ../../include/Astra/Frame.h
   ../../include/Astra/FrameReadyListener.h

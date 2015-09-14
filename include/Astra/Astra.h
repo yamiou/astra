@@ -1,7 +1,7 @@
 #ifndef ASTRA_H
 #define ASTRA_H
 
-#include <Astra/Sensor.h>
+#include <Astra/StreamSet.h>
 #include <Astra/StreamDescription.h>
 #include <Astra/Frame.h>
 #include <Astra/FrameReadyListener.h>

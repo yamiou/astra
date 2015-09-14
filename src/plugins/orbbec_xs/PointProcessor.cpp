@@ -6,9 +6,9 @@ namespace astra { namespace plugins { namespace xs {
     PointProcessor::PointProcessor(PluginServiceProxy& pluginService,
                                    astra_streamset_t streamset,
                                    StreamDescription& depthDesc)
-        : m_sensor(get_uri_for_streamset(pluginService, streamset)),
+        : m_streamset(get_uri_for_streamset(pluginService, streamset)),
           m_streamSet(streamset),
-          m_reader(m_sensor.create_reader()),
+          m_reader(m_streamset.create_reader()),
           m_depthStream(m_reader.stream<DepthStream>(depthDesc.subtype())),
           m_pluginService(pluginService)
     {

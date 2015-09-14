@@ -51,8 +51,8 @@ int main(int argc, char** argv)
 
     set_key_handler();
 
-    astra::Sensor sensor;
-    astra::StreamReader reader = sensor.create_reader();
+    astra::StreamSet streamset;
+    astra::StreamReader reader = streamset.create_reader();
 
     SampleFrameListener listener;
 

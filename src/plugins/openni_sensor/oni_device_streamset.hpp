@@ -1,7 +1,7 @@
 #ifndef ONI_DEVICE_STREAMSET_H
 #define ONI_DEVICE_STREAMSET_H
 
-#include <Astra/Sensor.h>
+#include <Astra/StreamSet.h>
 #include <Astra/Plugins/plugin_capi.h>
 #include <Astra/Plugins/PluginLogger.h>
 #include <OpenNI.h>
@@ -39,7 +39,6 @@ namespace orbbec { namespace ni {
         void add_stream(stream* stream);
 
         astra::PluginServiceProxy& pluginService_;
-        std::unique_ptr<astra::Sensor> sensor_;
         astra_streamset_t streamSetHandle_;
         openni::Device oniDevice_;
         std::string uri_;

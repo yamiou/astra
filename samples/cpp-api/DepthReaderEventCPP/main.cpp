@@ -96,8 +96,8 @@ int main(int argc, char** argv)
 
     set_key_handler();
 
-    astra::Sensor sensor("device/mock_sensor0");
-    astra::StreamReader reader = sensor.create_reader();
+    astra::StreamSet streamset("device/default");
+    astra::StreamReader reader = streamset.create_reader();
 
     SampleFrameListener listener;
 

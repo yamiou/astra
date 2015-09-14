@@ -446,8 +446,8 @@ int main(int argc, char** argv)
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Hand Debug Viewer");
 
-    astra::Sensor sensor;
-    astra::StreamReader reader = sensor.create_reader();
+    astra::StreamSet streamset;
+    astra::StreamReader reader = streamset.create_reader();
 
     HandDebugFrameListener listener;
 

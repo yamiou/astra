@@ -153,8 +153,8 @@ int main(int argc, char** argv)
     sf::VideoMode mode = sf::VideoMode::getFullscreenModes()[0];
     sf::RenderWindow window(mode, "Stream Viewer", sf::Style::Fullscreen);
 
-    astra::Sensor sensor;
-    astra::StreamReader reader = sensor.create_reader();
+    astra::StreamSet streamset;
+    astra::StreamReader reader = streamset.create_reader();
 
     reader.stream<astra::PointStream>().start();
     reader.stream<astra::DepthStream>().start();
