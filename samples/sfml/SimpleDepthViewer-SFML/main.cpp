@@ -68,9 +68,9 @@ public:
         m_visualizer.update(pointFrame);
 
         astra_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
-        for(int i = 0; i < width * height; i++)
+        for (int i = 0; i < width * height; i++)
         {
-            int rgbaOffset = i *4;
+            int rgbaOffset = i * 4;
             m_displayBuffer[rgbaOffset] = vizBuffer[i].r;
             m_displayBuffer[rgbaOffset + 1] = vizBuffer[i].b;
             m_displayBuffer[rgbaOffset + 2] = vizBuffer[i].g;
