@@ -14,7 +14,8 @@
 namespace astra { namespace serialization {
 
     FrameOutputStream* open_frame_output_stream(FILE* file);
-
+    void close_frame_output_stream(FrameOutputStream*& stream);
+    
     class FrameStreamWriter
     {
     public:

@@ -15,21 +15,79 @@
 #include <common/serialization/FrameStreamWriter.h>
 #include <common/serialization/FrameOutputStream.h>
 
-using namespace astra::serialization;
+using namespace astra;
 
-class PointFrameListener : public astra::FrameReadyListener
+class Recorder
 {
 public:
-    PointFrameListener(astra::PointStream& pointStream)
+    explicit Recorder(const char* filename) {
+        m_outputFile = fopen(filename, "wb");
+        m_frameOutputStream = serialization::open_frame_output_stream(m_outputFile);
+        m_frameStreamWriter = FrameStreamWriterPtr(new serialization::FrameStreamWriter(*m_frameOutputStream));
+    }
+
+    ~Recorder() {
+        serialization::close_frame_output_stream(m_frameOutputStream);
+        m_frameStreamWriter = nullptr;
+        fclose(m_outputFile);
+        printf("closed file\n");
+    }
+
+    void add_frame(DepthFrame& depthFrame) {
+        if (!depthFrame.is_valid()) {
+            return;
+        }
+        m_frameStreamWriter->write(depthFrame);
+        printf("Saving frame: %d\n", m_frameCount);
+        ++m_frameCount;
+    }
+
+private:
+    FILE* m_outputFile;
+    serialization::FrameOutputStream* m_frameOutputStream;
+    int m_frameCount { 0 };
+
+    using FrameStreamWriterPtr = std::unique_ptr<serialization::FrameStreamWriter>;
+    FrameStreamWriterPtr m_frameStreamWriter;
+};
+
+class Viewer : public FrameReadyListener
+{
+public:
+    Viewer(StreamSet& streamset) :
+        m_reader(streamset.create_reader())
     {
         m_lastTimepoint = clock_type::now();
+
+        m_reader.stream<DepthStream>().start();
+        m_reader.stream<PointStream>().start();
+
+        m_reader.addListener(*this);
     }
 
-    ~PointFrameListener()
+    void draw_to(sf::RenderWindow& window)
     {
+        if (m_displayBuffer != nullptr)
+        {
+            float depthScale = window.getView().getSize().x / m_displayWidth;
 
+            m_sprite.setScale(depthScale, depthScale);
+
+            window.draw(m_sprite);
+        }
     }
 
+    void start_recording()
+    {
+        m_recorder = RecorderPtr(new Recorder("test.df"));
+    }
+
+    void stop_recording()
+    {
+        m_recorder = nullptr;
+    }
+
+private:
     void init_texture(int width, int height)
     {
         if (m_displayBuffer == nullptr || width != m_displayWidth || height != m_displayHeight)
@@ -71,11 +129,11 @@ public:
                   << std::endl;
     }
 
-    virtual void on_frame_ready(astra::StreamReader& reader,
-                                astra::Frame& frame) override
+    void visualize_frame(PointFrame& pointFrame)
     {
-        astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
-
+        if (!pointFrame.is_valid()) {
+            return;
+        }
         int width = pointFrame.resolutionX();
         int height = pointFrame.resolutionY();
 
@@ -93,31 +151,23 @@ public:
             m_displayBuffer[rgbaOffset + 3] = 255;
         }
         m_texture.update(m_displayBuffer.get());
-
-        if (m_shouldCheckFps)
-        {
-            check_fps();
-        }
     }
 
-    void set_shouldcheckfps(bool shouldCheckFps)
+    virtual void on_frame_ready(StreamReader& reader,
+                                Frame& frame) override
     {
-        m_shouldCheckFps = shouldCheckFps;
-    }
+        PointFrame pointFrame = frame.get<PointFrame>();
+        DepthFrame depthFrame = frame.get<DepthFrame>();
 
-    void drawTo(sf::RenderWindow& window)
-    {
-        if (m_displayBuffer != nullptr)
-        {
-            float depthScale = window.getView().getSize().x / m_displayWidth;
-
-            m_sprite.setScale(depthScale, depthScale);
-
-            window.draw(m_sprite);
+        if (m_recorder != nullptr) {
+            m_recorder->add_frame(depthFrame);
         }
+
+        visualize_frame(pointFrame);
+
+        //check_fps();
     }
 
-private:
     samples::common::LitDepthVisualizer m_visualizer;
 
     using duration_type = std::chrono::duration<double>;
@@ -133,151 +183,42 @@ private:
     int m_displayWidth{0};
     int m_displayHeight{0};
 
-    bool m_shouldCheckFps{false};
+    StreamReader m_reader;
+    using RecorderPtr = std::unique_ptr<Recorder>;
+    RecorderPtr m_recorder;
 };
 
-class DepthFrameListener : public astra::FrameReadyListener
-{
-public:
-    DepthFrameListener(astra::DepthStream& depthStream, FrameStreamWriter& serializer)
-        : m_frameStreamWriter(serializer)
-    {
-
-    }
-
-    ~DepthFrameListener()
-    {
-
-    }
-
-    virtual void on_frame_ready(astra::StreamReader& reader,
-                                astra::Frame& frame) override
-    {
-        astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
-
-        m_frameStreamWriter.write(depthFrame);
-    }
-
-private:
-
-    FrameStreamWriter& m_frameStreamWriter;
-};
-
-enum class AppState
-{
-    STANDBY,
-    PLAY,
-    RECORD
-};
-
-class AppStateManager
-{
-public:
-    AppStateManager()
-        : m_appState(AppState::STANDBY)
-    {
-
-    }
-
-    AppState get_app_state()
-    {
-        return m_appState;
-    }
-
-    void set_app_state(AppState appState)
-    {
-        m_appState = appState;
-    }
-
-private:
-    AppState m_appState;
-};
-
-void handle_escape_event(sf::Keyboard::Key key, sf::RenderWindow& window)
+void handle_key(sf::Keyboard::Key key, sf::RenderWindow& window, Viewer& viewer)
 {
     if (key == sf::Keyboard::Escape)
     {
         window.close();
     }
-}
-
-void handle_play_event(sf::Keyboard::Key key, PointFrameListener& streamPlayerPsListener, AppStateManager& appStateManager)
-{
-    AppState appState = appStateManager.get_app_state();
-
-    if (key == sf::Keyboard::P && appState == AppState::STANDBY)
+    else if (key == sf::Keyboard::S)
     {
-        streamPlayerPsListener.set_shouldcheckfps(true);
-        appStateManager.set_app_state(AppState::PLAY);
+        viewer.stop_recording();
     }
-}
-
-void handle_stop_event(sf::Keyboard::Key key, PointFrameListener& streamPlayerPsListener, AppStateManager& appStateManager)
-{
-    AppState appState = appStateManager.get_app_state();
-
-    if (key == sf::Keyboard::S && appState == AppState::PLAY)
-    {
-        streamPlayerPsListener.set_shouldcheckfps(false);
-        appStateManager.set_app_state(AppState::STANDBY);
-    }
-}
-
-void handle_record_event(sf::Keyboard::Key key, PointFrameListener& sensorPsListener, FrameStreamWriter& streamWriter, AppStateManager& appStateManager)
-{
-    AppState appState = appStateManager.get_app_state();
-
     if (key == sf::Keyboard::R)
     {
-        if (appState == AppState::STANDBY)
-        {
-            sensorPsListener.set_shouldcheckfps(true);
-            streamWriter.begin_write();
-            appStateManager.set_app_state(AppState::RECORD);
-        }
-        if (appState == AppState::RECORD)
-        {
-            sensorPsListener.set_shouldcheckfps(false);
-            streamWriter.end_write();
-            appStateManager.set_app_state(AppState::STANDBY);
-        }
+        viewer.start_recording();
     }
 }
 
 int main(int argc, char** argv)
 {
-    AppStateManager appStateManager;
-
-    FILE* outputFile = fopen("test.df", "wb");;
-
-    std::unique_ptr<FrameOutputStream> outputStream =
-        std::unique_ptr<FrameOutputStream>(open_frame_output_stream(outputFile));
-    FrameStreamWriter streamWriter(*outputStream.get());
-
-    astra::Astra::initialize();
+    Astra::initialize();
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Stream Recorder");
 
-    astra::StreamSet streamset;
-    astra::StreamReader reader = streamset.create_reader();
+    StreamSet streamset;
 
-    astra::StreamSet streamPlayer("stream_player");
-    astra::StreamReader streamPlayerReader = streamPlayer.create_reader();
+/*
+    StreamSet streamPlayer("stream_player");
+    StreamReader streamPlayerReader = streamPlayer.create_reader();
 
-    auto sensorDs = reader.stream<astra::DepthStream>();
-    auto sensorPs = reader.stream<astra::PointStream>();
-    auto streamPlayerPs = streamPlayerReader.stream<astra::PointStream>();
-
-    sensorDs.start();
-    sensorPs.start();
-
-    DepthFrameListener sensorDsListener(sensorDs, streamWriter);
-    PointFrameListener sensorPsListener(sensorPs);
-    PointFrameListener streamPlayerPsListener(streamPlayerPs);
-
-    reader.addListener(sensorDsListener);
-    reader.addListener(sensorPsListener);
-    streamPlayerReader.addListener(streamPlayerPsListener);
+    auto streamPlayerPs = streamPlayerReader.stream<PointStream>();
+*/
+    Viewer viewer(streamset);
 
     while (window.isOpen())
     {
@@ -297,10 +238,7 @@ int main(int argc, char** argv)
             case sf::Event::KeyPressed:
             {
                 sf::Keyboard::Key key = event.key.code;
-                handle_escape_event(key, window);
-                handle_stop_event(key, streamPlayerPsListener, appStateManager);
-                handle_record_event(key, sensorPsListener, streamWriter, appStateManager);
-                handle_play_event(key, streamPlayerPsListener, appStateManager);
+                handle_key(key, window, viewer);
                 break;
             }
             default:
@@ -308,24 +246,12 @@ int main(int argc, char** argv)
             }
         }
 
-        AppState appState = appStateManager.get_app_state();
-
-        if (appState == AppState::PLAY)
-        {
-            streamPlayerPsListener.drawTo(window);
-        }
-        else if (appState == AppState::RECORD)
-        {
-            sensorPsListener.drawTo(window);
-        }
+        viewer.draw_to(window);
 
         window.display();
     }
 
-    astra::Astra::terminate();
-
-    outputStream.reset();
-    fclose(outputFile);
+    Astra::terminate();
 
     return 0;
 }

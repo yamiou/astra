@@ -16,6 +16,12 @@ namespace astra { namespace serialization {
         return new ProtoFrameOutputStream(outputStream);
     }
 
+    void close_frame_output_stream(FrameOutputStream*& stream)
+    {
+        delete stream;
+        stream = nullptr;
+    }
+
     FrameStreamWriter::FrameStreamWriter(FrameOutputStream& frameOutputStream):
         m_outputStream(frameOutputStream),
         m_swatchName("FrameStreamWriter")

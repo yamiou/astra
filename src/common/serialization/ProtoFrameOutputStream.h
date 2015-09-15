@@ -22,7 +22,7 @@ namespace astra { namespace serialization {
     {
     public:
         ProtoFrameOutputStream(ZeroCopyOutputStream* outputStream);
-        ~ProtoFrameOutputStream();
+        virtual ~ProtoFrameOutputStream() override;
 
         void stage_frame(Frame& frame) override;
         void stage_frame_description(FrameDescription& frameDesc) override;
