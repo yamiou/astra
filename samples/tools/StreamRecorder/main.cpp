@@ -24,9 +24,11 @@ public:
         m_outputFile = fopen(filename, "wb");
         m_frameOutputStream = serialization::open_frame_output_stream(m_outputFile);
         m_frameStreamWriter = FrameStreamWriterPtr(new serialization::FrameStreamWriter(*m_frameOutputStream));
+        m_frameStreamWriter->begin_write();
     }
 
     ~Recorder() {
+        m_frameStreamWriter->end_write();
         serialization::close_frame_output_stream(m_frameOutputStream);
         m_frameStreamWriter = nullptr;
         fclose(m_outputFile);
@@ -38,7 +40,7 @@ public:
             return;
         }
         bool result = m_frameStreamWriter->write(depthFrame);
-        printf("Saving frame: %d: %d\n", m_frameCount, result);
+        printf("Saving frame: %d %s\n", m_frameCount, result ? "" : "failure");
         ++m_frameCount;
     }
 
