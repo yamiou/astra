@@ -79,7 +79,7 @@ namespace astra { namespace serialization {
         stage_frame_description(*astraFrame, 1 / m_swatch.get_time_so_far(m_swatchName));
 
         isSuccessful = m_outputStream.write_frame_description();
-        isSuccessful = m_outputStream.write_frame();
+        isSuccessful = isSuccessful && m_outputStream.write_frame();
 
         m_swatch.start(m_swatchName);
 

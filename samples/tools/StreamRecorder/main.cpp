@@ -37,8 +37,8 @@ public:
         if (!depthFrame.is_valid()) {
             return;
         }
-        m_frameStreamWriter->write(depthFrame);
-        printf("Saving frame: %d\n", m_frameCount);
+        bool result = m_frameStreamWriter->write(depthFrame);
+        printf("Saving frame: %d: %d\n", m_frameCount, result);
         ++m_frameCount;
     }
 
