@@ -120,8 +120,8 @@ namespace samples { namespace common {
             const Vector3f* in_left = in_row - 1;
             const Vector3f* in_mid = in_row + 1;
 
-            Vector3f* out_up = out_row - width;
-            Vector3f* out_mid = out_row;
+            Vector3f* out_up = out_row;
+            Vector3f* out_mid = out_row + width;
 
             Vector3f xKernelTotal = *in_left + *in_row;
 
