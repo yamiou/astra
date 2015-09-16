@@ -45,6 +45,7 @@ add_dependencies(${SDK_DEPENDENT_TARGET} orbbec_xs)
 
 if (NOT ASTRA_ANDROID)
   add_dependencies(${SDK_DEPENDENT_TARGET} mock_sensor)
-  add_dependencies(${SDK_DEPENDENT_TARGET} copytoml)
+  add_dependencies(${SDK_DEPENDENT_TARGET} copytoml_astra)
+  add_dependencies(${SDK_DEPENDENT_TARGET} copytoml_hand)
   add_dependencies(${SDK_DEPENDENT_TARGET} FrameSerialization)
 endif()

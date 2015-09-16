@@ -17,4 +17,4 @@ target_link_libraries(${_projname} AstraAPI AstraUL Shiny)
 
 include_directories(${_projname} ${SHINY_INCLUDE})
 
-install_plugin_lib(${_projname})
+install_lib(${_projname} "Plugins")

@@ -42,4 +42,4 @@ set_target_properties(${_projname} PROPERTIES FOLDER "plugins")
 
 target_link_libraries(${_projname} AstraAPI Shiny ${OpenNI2_LIBRARY})
 
-install_plugin_lib(${_projname})
+install_lib(${_projname} "Plugins/")

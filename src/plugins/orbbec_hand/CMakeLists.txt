@@ -53,13 +53,12 @@ include_directories(${_projname} ${OpenCV_INCLUDE_DIRS})
 
 include_directories(${_projname} ${SHINY_INCLUDE})
 
-add_custom_target(copytoml ALL
+add_custom_target(copytoml_hand ALL
   #orbbec_hand.toml
   COMMAND ${CMAKE_COMMAND} -E copy
   "${PROJECT_SOURCE_DIR}/src/plugins/orbbec_hand/orbbec_hand.toml"
-  "$<TARGET_FILE_DIR:${_projname}>/")
+  "$<TARGET_FILE_DIR:${_projname}>")
+set_target_properties(copytoml_hand PROPERTIES FOLDER CMakeCopyTargets)
 
-  set_target_properties(copytoml PROPERTIES FOLDER CMakeCopyTargets)
-
-install_plugin_lib(${_projname})
-install_plugin_file(${PROJECT_SOURCE_DIR}/src/plugins/orbbec_hand/orbbec_hand.toml)
+install_lib(${_projname} "Plugins/")
+install_file("${PROJECT_SOURCE_DIR}/src/plugins/orbbec_hand/orbbec_hand.toml" "Plugins/")

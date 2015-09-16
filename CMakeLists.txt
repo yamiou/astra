@@ -72,17 +72,18 @@ set(SHINY_INCLUDE "${PROJECT_SOURCE_DIR}/vendor/shinyprofiler/include")
 set(CATCH_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/vendor/catch/include" CACHE INTERNAL "Path to include folder for Catch")
 
 function(install_lib _targetname)
+  set(extrapath ${ARGV1})
   install(TARGETS ${_targetname}
-    RUNTIME DESTINATION bin/
-    LIBRARY DESTINATION lib/
-    ARCHIVE DESTINATION lib/
+    RUNTIME DESTINATION bin/${extrapath}
+    LIBRARY DESTINATION lib/${extrapath}
+    ARCHIVE DESTINATION lib/${extrapath}
     )
   if (MSVC)
     install_pdb(${_targetname} bin/)
     set(INSTALL_PATHS 
-      samples/vs2013/copy_to_bin_dir/
-      samples/vs2013/bin/Debug/
-      samples/vs2013/bin/Release/
+      samples/vs2013/copy_to_bin_dir/${extrapath}
+      samples/vs2013/bin/Debug/${extrapath}
+      samples/vs2013/bin/Release/${extrapath}
     )
     foreach(INSTALL_PATH ${INSTALL_PATHS})
       install(TARGETS ${_targetname}
@@ -93,34 +94,14 @@ function(install_lib _targetname)
   endif()
 endfunction()
 
-function(install_plugin_lib _targetname)
-  install(TARGETS ${_targetname}
-    RUNTIME DESTINATION bin/Plugins/
-    LIBRARY DESTINATION lib/Plugins/
-    )
-  if (MSVC)
-    install_pdb(${_targetname} bin/Plugins/)
-    set(INSTALL_PATHS 
-      samples/vs2013/copy_to_bin_dir/Plugins/
-      samples/vs2013/bin/Debug/Plugins/
-      samples/vs2013/bin/Release/Plugins/
-    )
-    foreach(INSTALL_PATH ${INSTALL_PATHS})
-      install(TARGETS ${_targetname}
-        RUNTIME DESTINATION ${INSTALL_PATH}
-        )
-      install_pdb(${_targetname} ${INSTALL_PATH})
-    endforeach()
-  endif()
-endfunction()
-
-function(install_plugin_file _targetfile)
+function(install_file _targetfile)
+  set(extrapath ${ARGV1})
   if (MSVC)
     set(INSTALL_PATHS 
-      bin/Plugins/
-      samples/vs2013/copy_to_bin_dir/Plugins/
-      samples/vs2013/bin/Debug/Plugins/
-      samples/vs2013/bin/Release/Plugins/
+      bin/${extrapath}
+      samples/vs2013/copy_to_bin_dir/${extrapath}
+      samples/vs2013/bin/Debug/${extrapath}
+      samples/vs2013/bin/Release/${extrapath}
     )
     foreach(INSTALL_PATH ${INSTALL_PATHS})
       install(FILES ${_targetfile}
@@ -129,7 +110,7 @@ function(install_plugin_file _targetfile)
     endforeach()
   else()
     install(FILES ${_targetfile}
-      DESTINATION lib/Plugins/
+      DESTINATION lib/${extrapath}
     )
   endif()
 endfunction()
