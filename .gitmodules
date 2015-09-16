@@ -10,3 +10,6 @@
 [submodule "android/astraapktest"]
 	path = android/astraapktest
 	url = git@bitbucket.org:orbicsoft/sensekitapktest.git
+[submodule "samples-aux/vs2013"]
+	path = samples-aux/vs2013
+	url = git@bitbucket.org:orbicsoft/sdk-win-thirdparty-bin.git
