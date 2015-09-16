@@ -47,3 +47,9 @@ if(${BUILD_HTML_DOCS})
 endif()
 
 set_target_properties(AstraSDKDocumentation PROPERTIES FOLDER "documentation")
+
+install(DIRECTORY ${SPHINX_HTML_DIR}
+  DESTINATION docs
+  PATTERN ".buildinfo" EXCLUDE
+  PATTERN "objects.inv" EXCLUDE
+  )
