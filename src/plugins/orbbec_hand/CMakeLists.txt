@@ -66,8 +66,14 @@ add_custom_target(copytoml ALL
 
   set_target_properties(copytoml PROPERTIES FOLDER CMakeCopyTargets)
 
-install(FILES ${PROJECT_SOURCE_DIR}/src/plugins/orbbec_hand/orbbec_hand.toml
-  DESTINATION lib/Plugins/
-  )
+if (MSVC)
+  install(FILES ${PROJECT_SOURCE_DIR}/src/plugins/orbbec_hand/orbbec_hand.toml
+    DESTINATION bin/Plugins/
+    )
+else ()
+  install(FILES ${PROJECT_SOURCE_DIR}/src/plugins/orbbec_hand/orbbec_hand.toml
+    DESTINATION lib/Plugins/
+    )
+endif ()
 
 install_pdb(${_projname} bin/Plugins/)
