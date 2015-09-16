@@ -6,6 +6,13 @@
 #include <iostream>
 #include <iomanip>
 
+enum ColorMode
+{
+    MODE_COLOR,
+    MODE_IR_16,
+    MODE_IR_RGB,
+};
+
 class MultiFrameListener : public astra::FrameReadyListener
 {
 public:
@@ -81,6 +88,7 @@ public:
         if (!pointFrame.is_valid())
         {
             clear_view(m_depthView);
+            m_depthView.texture.update(m_depthView.buffer.get());
             return;
         }
 
@@ -112,6 +120,7 @@ public:
         if (!colorFrame.is_valid())
         {
             clear_view(m_colorView);
+            m_colorView.texture.update(m_colorView.buffer.get());
             return;
         }
 
@@ -134,13 +143,47 @@ public:
         m_colorView.texture.update(m_colorView.buffer.get());
     }
 
-    void update_ir(astra::Frame& frame)
+    void update_ir_16(astra::Frame& frame)
     {
-        astra::InfraredFrame irFrame = frame.get<astra::InfraredFrame>();
+        astra::InfraredFrame16 irFrame = frame.get<astra::InfraredFrame16>();
 
         if (!irFrame.is_valid())
         {
             clear_view(m_colorView);
+            m_colorView.texture.update(m_colorView.buffer.get());
+            return;
+        }
+
+        int irWidth = irFrame.resolutionX();
+        int irHeight = irFrame.resolutionY();
+
+        init_texture(irWidth, irHeight, m_colorView);
+
+        const uint16_t* ir_values = irFrame.data();
+        uint8_t* buffer = m_colorView.buffer.get();
+        for (int i = 0; i < irWidth * irHeight; i++)
+        {
+            int rgbaOffset = i * 4;
+            const uint16_t value = ir_values[i];
+            const uint8_t red = static_cast<uint8_t>(value >> 2);
+            const uint8_t blue = 0x66 - red / 2;
+            buffer[rgbaOffset] = red;
+            buffer[rgbaOffset + 1] = 0;
+            buffer[rgbaOffset + 2] = blue;
+            buffer[rgbaOffset + 3] = 255;
+        }
+
+        m_colorView.texture.update(m_colorView.buffer.get());
+    }
+
+    void update_ir_rgb(astra::Frame& frame)
+    {
+        astra::InfraredFrameRGB irFrame = frame.get<astra::InfraredFrameRGB>();
+
+        if (!irFrame.is_valid())
+        {
+            clear_view(m_colorView);
+            m_colorView.texture.update(m_colorView.buffer.get());
             return;
         }
 
@@ -168,9 +211,18 @@ public:
     {
         update_depth(frame);
 
-        update_color(frame);
-
-        update_ir(frame);
+        switch (m_colorMode)
+        {
+        case MODE_COLOR:
+            update_color(frame);
+            break;
+        case MODE_IR_16:
+            update_ir_16(frame);
+            break;
+        case MODE_IR_RGB:
+            update_ir_rgb(frame);
+            break;
+        }
 
         check_fps();
     }
@@ -200,6 +252,9 @@ public:
         }
     }
 
+    ColorMode get_mode() const { return m_colorMode; }
+    void set_mode(ColorMode mode) { m_colorMode = mode; }
+
 private:
     samples::common::LitDepthVisualizer m_visualizer;
 
@@ -211,6 +266,7 @@ private:
 
     stream_view m_depthView;
     stream_view m_colorView;
+    ColorMode m_colorMode;
 };
 
 astra::DepthStream configure_depth(astra::StreamReader& reader)
@@ -230,7 +286,7 @@ astra::DepthStream configure_depth(astra::StreamReader& reader)
     return depthStream;
 }
 
-astra::InfraredStream configure_ir(astra::StreamReader& reader)
+astra::InfraredStream configure_ir(astra::StreamReader& reader, bool useRGB)
 {
     auto irStream = reader.stream<astra::InfraredStream>();
 
@@ -238,7 +294,15 @@ astra::InfraredStream configure_ir(astra::StreamReader& reader)
 
     irMode.set_width(640);
     irMode.set_height(480);
-    irMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_RGB888);
+    if (useRGB)
+    {
+        irMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_RGB888);
+    }
+    else
+    {
+        irMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_GRAY16);
+    }
+
     irMode.set_fps(30);
 
     irStream.set_mode(irMode);
@@ -280,10 +344,11 @@ int main(int argc, char** argv)
     auto colorStream = configure_color(reader);
     colorStream.start();
 
-    auto irStream = configure_ir(reader);
+    auto irStream = configure_ir(reader, false);
     //irStream.start();
 
     MultiFrameListener listener;
+    listener.set_mode(MODE_COLOR);
 
     reader.addListener(listener);
 
@@ -317,12 +382,21 @@ int main(int argc, char** argv)
                         irStream.enable_mirroring(newMirroring);
                     }
                     break;
+                case sf::Keyboard::G:
+                    colorStream.stop();
+                    configure_ir(reader, false);
+                    listener.set_mode(MODE_IR_16);
+                    irStream.start();
+                    break;
                 case sf::Keyboard::I:
                     colorStream.stop();
+                    configure_ir(reader, true);
+                    listener.set_mode(MODE_IR_RGB);
                     irStream.start();
                     break;
                 case sf::Keyboard::C:
                     irStream.stop();
+                    listener.set_mode(MODE_COLOR);
                     colorStream.start();
                     break;
                 default:
