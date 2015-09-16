@@ -330,8 +330,10 @@ int main(int argc, char** argv)
 {
     astra::Astra::initialize();
 
-    sf::VideoMode mode = sf::VideoMode::getFullscreenModes()[0];
-    sf::RenderWindow window(mode, "Stream Viewer", sf::Style::Fullscreen);
+    sf::VideoMode fullscreen_mode = sf::VideoMode::getFullscreenModes()[0];
+    sf::VideoMode windowed_mode(1800, 650);
+    bool is_fullscreen = false;
+    sf::RenderWindow window(windowed_mode, "Stream Viewer");
 
     astra::StreamSet streamset;
     astra::StreamReader reader = streamset.create_reader();
@@ -345,7 +347,6 @@ int main(int argc, char** argv)
     colorStream.start();
 
     auto irStream = configure_ir(reader, false);
-    //irStream.start();
 
     MultiFrameListener listener;
     listener.set_mode(MODE_COLOR);
@@ -370,6 +371,18 @@ int main(int argc, char** argv)
                 {
                 case sf::Keyboard::Escape:
                     window.close();
+                    break;
+                case sf::Keyboard::F:
+                    if (is_fullscreen)
+                    {
+                        is_fullscreen = false;
+                        window.create(windowed_mode, "Stream Viewer");
+                    }
+                    else
+                    {
+                        is_fullscreen = true;
+                        window.create(fullscreen_mode, "Stream Viewer", sf::Style::Fullscreen);
+                    }
                     break;
                 case sf::Keyboard::R:
                     depthStream.enable_registration(!depthStream.registration_enabled());
