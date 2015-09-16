@@ -7,7 +7,15 @@ feedback@orbbec3d.com
 What's New
 ==========
 
-v0.3.0 2015/09/14 Rename to Astra SDK. Rename Sensor to StreamSet in C++ API. Various bug fixes and internal enhancements. New samples. Improved performance. Add IR stream, mirrored depth, and registered depth support. VS2013 samples solution no longer requires copying files - compiles and runs out of the box.
+v0.3.0 2015/09/14
+* Rename to Astra SDK.
+* Rename Sensor to StreamSet in C++ API.
+* Various bug fixes and internal enhancements.
+* New samples:  SimpleStreamViewer-SFML, SimpleColorViewer-SFML, ColorReaderEvent, ColorReaderPoll
+* Samples have improved performance.
+* Add IR stream, mirrored depth, and registered depth support.
+* VS2013 samples solution no longer requires copying files - compiles and runs out of the box.
+* StreamReader start() and stop() are functional now. See SimpleStreamViewer-SFML.
 
 v0.2.1 2015/07/06 Updated Android and Windows drivers for new sensor USB IDs. Add Android test app .apk.
 
@@ -52,6 +60,7 @@ SimpleStreamViewer-SFML:
 * C - enable color
 
 SimpleDepthViewer-SFML:
+* F - toggle fullscreen
 * R - toggle registered depth
 * M - toggle mirrored streams
 
@@ -60,7 +69,7 @@ Building the samples
 
 In the sdk/samples/vs2013 folder, open astra-samples.sln. Build solution.
 
-The samples compile to sdk/samples/vs2013/bin/Debug/ or Release/, depending upon your configuration.
+The samples compile to sdk/samples/vs2013/bin/Debug/ or Release/, depending upon your build configuration.
 
 You can exit samples by pressing Control-C.
 They will catch this signal and exit cleanly.

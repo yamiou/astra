@@ -116,6 +116,9 @@ int main(int argc, char** argv)
 
     set_key_handler();
 
+    sf::VideoMode fullscreen_mode = sf::VideoMode::getFullscreenModes()[0];
+    sf::VideoMode windowed_mode(1280, 960);
+    bool is_fullscreen = false;
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Depth Viewer");
 
     astra::StreamSet streamset;
@@ -152,6 +155,18 @@ int main(int argc, char** argv)
                     {
                     case sf::Keyboard::Escape:
                         window.close();
+                        break;
+                    case sf::Keyboard::F:
+                        if (is_fullscreen)
+                        {
+                            is_fullscreen = false;
+                            window.create(windowed_mode, "Depth Viewer");
+                        }
+                        else
+                        {
+                            is_fullscreen = true;
+                            window.create(fullscreen_mode, "Depth Viewer", sf::Style::Fullscreen);
+                        }
                         break;
                     case sf::Keyboard::R:
                         depthStream.enable_registration(!depthStream.registration_enabled());
