@@ -101,6 +101,8 @@ public:
             buffer[rgbaOffset + 2] = vizBuffer[i].b;
             buffer[rgbaOffset + 3] = 255;
         }
+
+        m_depthView.texture.update(m_depthView.buffer.get());
     }
 
     void update_color(astra::Frame& frame)
@@ -129,7 +131,6 @@ public:
             buffer[rgbaOffset + 3] = 255;
         }
 
-        m_depthView.texture.update(m_depthView.buffer.get());
         m_colorView.texture.update(m_colorView.buffer.get());
     }
 
