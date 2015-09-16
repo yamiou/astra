@@ -198,8 +198,8 @@ int main(int argc, char** argv)
 
     astra::ImageStreamMode depthMode;
 
-    depthMode.set_height(320);
-    depthMode.set_width(240);
+    depthMode.set_width(640);
+    depthMode.set_height(480);
     depthMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_DEPTH_MM);
     depthMode.set_fps(30);
 
@@ -210,8 +210,8 @@ int main(int argc, char** argv)
 
     astra::ImageStreamMode colorMode;
 
-    colorMode.set_height(320);
-    colorMode.set_width(240);
+    colorMode.set_width(640);
+    colorMode.set_height(480);
     colorMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_RGB888);
     colorMode.set_fps(30);
 
