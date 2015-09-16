@@ -36,12 +36,20 @@ public:
             int byteLength = width * height * 4;
 
             view.buffer = BufferPtr(new uint8_t[byteLength]);
-            memset(view.buffer.get(), 0, byteLength);
+
+            clear_view(view);
 
             view.texture.create(width, height);
             view.sprite.setTexture(view.texture);
             view.sprite.setPosition(0, 0);
         }
+    }
+
+    void clear_view(stream_view& view)
+    {
+        int byteLength = view.width * view.height * 4;
+
+        memset(view.buffer.get(), 0, byteLength);
     }
 
     void check_fps()
@@ -66,44 +74,71 @@ public:
                   << std::endl;
     }
 
-    virtual void on_frame_ready(astra::StreamReader& reader,
-                                astra::Frame& frame) override
+    void update_depth(astra::Frame& frame)
     {
         astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
-        astra::ColorFrame colorFrame = frame.get<astra::ColorFrame>();
+
+        if (!pointFrame.is_valid())
+        {
+            clear_view(m_depthView);
+            return;
+        }
 
         int depthWidth = pointFrame.resolutionX();
         int depthHeight = pointFrame.resolutionY();
-        int colorWidth = colorFrame.resolutionX();
-        int colorHeight = colorFrame.resolutionY();
 
         init_texture(depthWidth, depthHeight, m_depthView);
-        init_texture(colorWidth, colorHeight, m_colorView);
 
         m_visualizer.update(pointFrame);
 
         astra_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
-        for(int i = 0; i < depthWidth * depthHeight; i++)
+        uint8_t* buffer = m_depthView.buffer.get();
+        for (int i = 0; i < depthWidth * depthHeight; i++)
         {
             int rgbaOffset = i * 4;
-            m_depthView.buffer[rgbaOffset] = vizBuffer[i].r;
-            m_depthView.buffer[rgbaOffset + 1] = vizBuffer[i].g;
-            m_depthView.buffer[rgbaOffset + 2] = vizBuffer[i].b;
-            m_depthView.buffer[rgbaOffset + 3] = 255;
+            buffer[rgbaOffset] = vizBuffer[i].r;
+            buffer[rgbaOffset + 1] = vizBuffer[i].g;
+            buffer[rgbaOffset + 2] = vizBuffer[i].b;
+            buffer[rgbaOffset + 3] = 255;
+        }
+    }
+
+    void update_color(astra::Frame& frame)
+    {
+        astra::ColorFrame colorFrame = frame.get<astra::ColorFrame>();
+
+        if (!colorFrame.is_valid())
+        {
+            clear_view(m_colorView);
+            return;
         }
 
+        int colorWidth = colorFrame.resolutionX();
+        int colorHeight = colorFrame.resolutionY();
+
+        init_texture(colorWidth, colorHeight, m_colorView);
+
         const astra::RGBPixel* color = colorFrame.data();
+        uint8_t* buffer = m_colorView.buffer.get();
         for(int i = 0; i < colorWidth * colorHeight; i++)
         {
             int rgbaOffset = i * 4;
-            m_colorView.buffer[rgbaOffset] = color[i].r;
-            m_colorView.buffer[rgbaOffset + 1] = color[i].g;
-            m_colorView.buffer[rgbaOffset + 2] = color[i].b;
-            m_colorView.buffer[rgbaOffset + 3] = 255;
+            buffer[rgbaOffset] = color[i].r;
+            buffer[rgbaOffset + 1] = color[i].g;
+            buffer[rgbaOffset + 2] = color[i].b;
+            buffer[rgbaOffset + 3] = 255;
         }
 
         m_depthView.texture.update(m_depthView.buffer.get());
         m_colorView.texture.update(m_colorView.buffer.get());
+    }
+
+    virtual void on_frame_ready(astra::StreamReader& reader,
+                                astra::Frame& frame) override
+    {
+        update_depth(frame);
+
+        update_color(frame);
 
         check_fps();
     }
