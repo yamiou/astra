@@ -130,10 +130,4 @@ target_link_libraries(${_projname} AstraAPI ${CMAKE_DL_LIBS})
 
 add_subdirectory(tests)
 
-install(TARGETS ${_projname}
-  RUNTIME DESTINATION bin/
-  LIBRARY DESTINATION lib/
-  ARCHIVE DESTINATION lib/
-  )
-
-install_pdb(${_projname} bin/)
+install_lib(${_projname})

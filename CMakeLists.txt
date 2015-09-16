@@ -71,6 +71,69 @@ add_custom_target(${SDK_DEPENDENT_TARGET})
 set(SHINY_INCLUDE "${PROJECT_SOURCE_DIR}/vendor/shinyprofiler/include")
 set(CATCH_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/vendor/catch/include" CACHE INTERNAL "Path to include folder for Catch")
 
+function(install_lib _targetname)
+  install(TARGETS ${_targetname}
+    RUNTIME DESTINATION bin/
+    LIBRARY DESTINATION lib/
+    ARCHIVE DESTINATION lib/
+    )
+  if (MSVC)
+    install_pdb(${_targetname} bin/)
+    set(INSTALL_PATHS 
+      samples/vs2013/copy_to_bin_dir/
+      samples/vs2013/bin/Debug/
+      samples/vs2013/bin/Release/
+    )
+    foreach(INSTALL_PATH ${INSTALL_PATHS})
+      install(TARGETS ${_targetname}
+        RUNTIME DESTINATION ${INSTALL_PATH}
+        )
+      install_pdb(${_targetname} ${INSTALL_PATH})
+    endforeach()
+  endif()
+endfunction()
+
+function(install_plugin_lib _targetname)
+  install(TARGETS ${_targetname}
+    RUNTIME DESTINATION bin/Plugins/
+    LIBRARY DESTINATION lib/Plugins/
+    )
+  if (MSVC)
+    install_pdb(${_targetname} bin/Plugins/)
+    set(INSTALL_PATHS 
+      samples/vs2013/copy_to_bin_dir/Plugins/
+      samples/vs2013/bin/Debug/Plugins/
+      samples/vs2013/bin/Release/Plugins/
+    )
+    foreach(INSTALL_PATH ${INSTALL_PATHS})
+      install(TARGETS ${_targetname}
+        RUNTIME DESTINATION ${INSTALL_PATH}
+        )
+      install_pdb(${_targetname} ${INSTALL_PATH})
+    endforeach()
+  endif()
+endfunction()
+
+function(install_plugin_file _targetfile)
+  if (MSVC)
+    set(INSTALL_PATHS 
+      bin/Plugins/
+      samples/vs2013/copy_to_bin_dir/Plugins/
+      samples/vs2013/bin/Debug/Plugins/
+      samples/vs2013/bin/Release/Plugins/
+    )
+    foreach(INSTALL_PATH ${INSTALL_PATHS})
+      install(FILES ${_targetfile}
+        DESTINATION ${INSTALL_PATH}
+        )
+    endforeach()
+  else()
+    install(FILES ${_targetfile}
+      DESTINATION lib/Plugins/
+    )
+  endif()
+endfunction()
+
 add_subdirectory(vendor)
 add_subdirectory(src)
 add_subdirectory(samples)
@@ -102,20 +165,25 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
   )
 
 if (MSVC)
-  install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013
-    DESTINATION samples
+  #Lack of a trailing / is important here, ends up in samples/vs2013/
+  install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013/thirdparty
+    DESTINATION samples/vs2013/
     PATTERN "build" EXCLUDE
     PATTERN ".gitignore" EXCLUDE
-    PATTERN "thirdparty/.git" EXCLUDE
-    PATTERN "thirdparty/glut_windows" EXCLUDE
-    PATTERN "thirdparty/copy_to_bin_dir/glut*.dll" EXCLUDE
+    PATTERN ".git" EXCLUDE
     )
 
-  file(GLOB_RECURSE THIRD_PARTY_FILES "${PROJECT_SOURCE_DIR}/samples-aux/vs2013/thirdparty/copy_to_bin_dir/*.*")
-  install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013/thirdparty/copy_to_bin_dir/
-    DESTINATION bin
-    PATTERN "glut*.dll" EXCLUDE
-    )
+  set(INSTALL_PATHS
+    bin/
+    samples/vs2013/copy_to_bin_dir/
+    samples/vs2013/bin/Debug/
+    samples/vs2013/bin/Release/
+  )
+  foreach(INSTALL_PATH ${INSTALL_PATHS})
+   install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013/copy_to_bin_dir/
+     DESTINATION ${INSTALL_PATH}
+     )
+  endforeach()
 
   set(SAMPLES_SOURCE_DIR "${PROJECT_BINARY_DIR}/sdk/samples")
   set(SAMPLES_BUILD_TEMP_DIR "${PROJECT_BINARY_DIR}/temp/vs2013/")

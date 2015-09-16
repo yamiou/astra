@@ -17,9 +17,4 @@ target_link_libraries(${_projname} AstraAPI AstraUL Shiny)
 
 include_directories(${_projname} ${SHINY_INCLUDE})
 
-install(TARGETS ${_projname}
-  RUNTIME DESTINATION bin/Plugins/
-  LIBRARY DESTINATION lib/Plugins/
-  )
-
-install_pdb(${_projname} bin/Plugins/)
+install_plugin_lib(${_projname})

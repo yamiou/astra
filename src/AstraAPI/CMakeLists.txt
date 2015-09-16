@@ -16,10 +16,4 @@ source_group(templates FILES ${${_projname}_SOURCES_GEN})
 
 add_library(${_projname} SHARED ${${_projname}_SOURCES} ${${_projname}_SOURCES_GEN})
 
-install(TARGETS ${_projname}
-        RUNTIME DESTINATION bin/
-        LIBRARY DESTINATION lib/
-        ARCHIVE DESTINATION lib/
-        )
-
-install_pdb(${_projname} bin/)
+install_lib(${_projname})

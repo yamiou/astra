@@ -54,10 +54,4 @@ target_link_libraries(${_projname} AstraAPI Shiny)
 
 include_directories(${_projname} ${SHINY_INCLUDE})
 
-install(TARGETS ${_projname}
-  RUNTIME DESTINATION bin/
-  LIBRARY DESTINATION lib/
-  ARCHIVE DESTINATION lib/
-  )
-
-install_pdb(${_projname} bin/)
+install_lib(${_projname})
