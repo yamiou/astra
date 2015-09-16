@@ -41,10 +41,10 @@ int main(int argc, char* argv[])
     astra_reader_t reader;
     astra_reader_create(sensor, &reader);
 
-	astra_depthstream_t colorStream;
-	astra_reader_get_colorstream(reader, &colorStream);
+    astra_depthstream_t colorStream;
+    astra_reader_get_colorstream(reader, &colorStream);
 
-	astra_stream_start(colorStream);
+    astra_stream_start(colorStream);
 
     astra_frame_index_t lastFrameIndex = -1;
 
@@ -57,11 +57,11 @@ int main(int argc, char* argv[])
 
         if (rc == ASTRA_STATUS_SUCCESS)
         {
-			astra_colorframe_t colorFrame;
-			astra_frame_get_colorframe(frame, &colorFrame);
+            astra_colorframe_t colorFrame;
+            astra_frame_get_colorframe(frame, &colorFrame);
 
             astra_frame_index_t newFrameIndex;
-			astra_colorframe_get_frameindex(colorFrame, &newFrameIndex);
+            astra_colorframe_get_frameindex(colorFrame, &newFrameIndex);
 
             if (lastFrameIndex == newFrameIndex)
             {
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
             }
             lastFrameIndex = newFrameIndex;
 
-			print_color(colorFrame);
+            print_color(colorFrame);
 
             astra_reader_close_frame(&frame);
         }
