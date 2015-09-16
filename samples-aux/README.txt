@@ -16,6 +16,7 @@ v0.3.0 2015/09/14
 * Add IR stream, mirrored depth, and registered depth support.
 * VS2013 samples solution no longer requires copying files - compiles and runs out of the box.
 * StreamReader start() and stop() are functional now. See SimpleStreamViewer-SFML.
+* Add initial getting started documentation
 
 v0.2.1 2015/07/06 Updated Android and Windows drivers for new sensor USB IDs. Add Android test app .apk.
 
@@ -71,9 +72,9 @@ In the sdk/samples/vs2013 folder, open astra-samples.sln. Build solution.
 
 The samples compile to sdk/samples/vs2013/bin/Debug/ or Release/, depending upon your build configuration.
 
-You can exit samples by pressing Control-C.
-They will catch this signal and exit cleanly.
-To exit samples with a GUI window, press Control-C, escape, or simply close the window.
+You can exit samples by pressing Control-C. They will catch this signal and exit cleanly. To exit samples with a GUI window, press Control-C, escape, or simply close the window.
+
+When you start development, we highly recommend using the C++ API (or a higher level language wrapper.) The C API is meant for compatibility, so the C++ API is much more pleasant development experience.
 
 Documentation
 ==========
