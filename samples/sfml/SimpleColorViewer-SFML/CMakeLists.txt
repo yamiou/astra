@@ -1,7 +1,6 @@
 set (_projname "SimpleColorViewer-SFML")
 
 set (${_projname}_SOURCES
-  ../../common/LitColorVisualizer.h
   main.cpp
   )
 

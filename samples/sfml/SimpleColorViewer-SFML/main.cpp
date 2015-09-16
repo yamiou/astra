@@ -2,12 +2,9 @@
 #include <Astra/Astra.h>
 #include <AstraUL/AstraUL.h>
 
-#include "../../common/LitColorVisualizer.h"
 #include <chrono>
 #include <iostream>
 #include <iomanip>
-
-
 
 class ColorFrameListener : public astra::FrameReadyListener
 {
@@ -68,15 +65,14 @@ public:
 
 		init_texture(width, height);
 
-		m_visualizer.update(colorFrame);
+        const astra_rgb_pixel_t* colorData = colorFrame.data();
 
-		astra_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
-		for (int i = 0; i < width * height; i++)
+        for (int i = 0; i < width * height; i++)
 		{
 			int rgbaOffset = i * 4;
-			m_displayBuffer[rgbaOffset] = vizBuffer[i].r;
-			m_displayBuffer[rgbaOffset + 1] = vizBuffer[i].b;
-			m_displayBuffer[rgbaOffset + 2] = vizBuffer[i].g;
+			m_displayBuffer[rgbaOffset] = colorData[i].r;
+            m_displayBuffer[rgbaOffset + 1] = colorData[i].g;
+            m_displayBuffer[rgbaOffset + 2] = colorData[i].b;
 			m_displayBuffer[rgbaOffset + 3] = 255;
 		}
 		m_texture.update(m_displayBuffer.get());
@@ -96,8 +92,6 @@ public:
 	}
 
 private:
-	samples::common::LitColorVisualizer m_visualizer;
-
 	using duration_type = std::chrono::duration<double>;
 	duration_type m_frameDuration{ 0.0 };
 
