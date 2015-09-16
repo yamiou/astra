@@ -1,11 +1,11 @@
 find_package(Sphinx REQUIRED)
 
 if(NOT DEFINED SPHINX_THEME)
-  set(SPHINX_THEME sphinx_rtd_theme)
+  set(SPHINX_THEME custom_sphinx_rtd_theme)
 endif()
 
 if (NOT DEFINED SPHINX_THEME_DIR)
-  set(SPHINX_THEME_DIR "_themes")
+  set(SPHINX_THEME_DIR "${CMAKE_CURRENT_SOURCE_DIR}/_themes")
 endif()
 
 set(ASTRA_DOCS_BUILDERS "html" CACHE STRING "Build Astra Documentation")

@@ -50,7 +50,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'The Astra SDK Book'
-copyright = '2015, Orbbec'
+copyright = '2015 Orbbec'
 author = 'Orbbec'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -175,7 +175,7 @@ html_theme_path = ['@SPHINX_THEME_DIR@']
 #html_show_sourcelink = True
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
-#html_show_sphinx = True
+html_show_sphinx = False
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
 #html_show_copyright = True
