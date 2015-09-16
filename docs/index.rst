@@ -31,11 +31,11 @@ Once you've read the introduction, jump over to the :doc:`Getting Started <getti
 
 Introduction
 ============
-The design goals for the SDK are straightforward and lofty - to create the world's best 3D sensor development experience. To facilitate this, the best ideas from many other modern device and streamSet SDKs, along with many original ideas from Orbbec's development team, were combined to put emphasis on developer creativity, remove needless complexity, and generally make |sdkname| SDK development a joyful, unintrusive process.
+The design goals for the SDK are straightforward and lofty - to create the world's best 3D sensor development experience. To facilitate this, the best ideas from many other modern device and sensor SDKs, along with many original ideas from Orbbec's development team, were combined to put emphasis on developer creativity, remove needless complexity, and generally make |sdkname| SDK development a joyful, unintrusive process.
 
 Low Ceremony Design
 ===================
-The designers of the SDK are also experienced 3D sensor developers themselves, and recognize the features that are most commonly used when developing 3D streamSet applications. To this end, the |sdkname| SDK reduces the boilerplate code required to obtain streamSet data by exposing high-level stream types in addition to low-level stream types through a consistent, easy-to-understand API. This can be best shown with some example code:
+The designers of the SDK are also experienced 3D sensor developers themselves, and recognize the features that are most commonly used when developing 3D sensor applications. To this end, the |sdkname| SDK reduces the boilerplate code required to obtain sensor data by exposing high-level stream types in addition to low-level stream types through a consistent, easy-to-understand API. This can be best shown with some example code:
 
 .. code-block:: c++
    :linenos:
@@ -65,7 +65,7 @@ The designers of the SDK are also experienced 3D sensor developers themselves, a
 
    astra::Astra::terminate();
 
-First, take note where we create our ``StreamSet`` object on line 1. Without any additional configuration, it will default to addressing the Astra streamSet. In the lines below, you can see that, regardless of the stream type, the same API calls are made to interact with each stream.
+First, take note where we create our ``StreamSet`` object on line 1. Without any additional configuration, it will default to addressing the Astra sensor. In the lines below, you can see that, regardless of the stream type, the same API calls are made to interact with each stream.
 
 If you're an advanced 3D sensor developer and worried that this SDK is designed for simple applications only, rest assured that the |sdkname| SDK also handles less-common cases, often simply by passing different parameters to object constructors. In short, no matter how complicated your application might be, the |sdkname| SDK can handle it.
 
@@ -75,12 +75,13 @@ The |sdkname| SDK exposes its functionality through a core C API and also provid
 
 Currently Supported
 -------------------
-- Languages: C, C++11, Java
+- Languages: C, C++11
 - Platforms: Windows, Android
 
 Planned Support
 ---------------
-- Languages: C#, Unity
+- Languages: Java, C#
+- Frameworks: Processing, OpenFrameworks, Unity, Cinder
 - Platforms: Linux, OSX
 
 Mobile
@@ -91,7 +92,7 @@ Extensibility
 =============
 Perhaps the most powerful feature of the |sdkname| SDK is its plugin layer. Plugins afford advanced developers a method to extend the SDK's functionality with the same consistency and level of support as the rest of the platform. In fact, all of the "stock" stream types included with the SDK are actually supported through plugins themselves.
 
-Plugins aren't limited to adding additional stream type support, though. Imagine adding support to address a network of sensors through the same consistent API as a single streamSet. The possibilities are truly innumerable, and will allow exciting first and third party additions as the SDK matures.
+Plugins aren't limited to adding additional stream type support, though. Imagine adding support to address a network of sensors through the same consistent API as a single sensor. The possibilities are truly innumerable, and will allow exciting first and third party additions as the SDK matures.
 
 .. Indices and tables
    ==================

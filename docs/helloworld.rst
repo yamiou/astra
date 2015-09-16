@@ -10,7 +10,7 @@ Want to get a taste of our SDK before diving deeper? Then let's get our hands di
 By the end of this tutorial you should be familiar with:
 
 - Proper initialization and termination of the SDK
-- Reading data from the StreamSet
+- Reading data from the sensor
 - Examining the depth information provided by the Astra's depth camera
 
 Before We Begin
@@ -41,7 +41,7 @@ Our first step will be to set up a skeleton application as a starting point for 
    }
 
 - Line 1 - Astra.h must be included in all applications. It is the core of |sdkname| and is required for all C++ based |sdkname| applications.
-- Line 2 - Most applications will also require AstraUL.h, which defines convenient ways to read and manipulate the most common types of StreamSet data like color, depth, and hand positions.
+- Line 2 - Most applications will also require AstraUL.h, which defines convenient ways to read and manipulate the most common types of sensor data like color, depth, and hand positions.
 - Lines 9-10 - We'll use `std::cin.get() <http://en.cppreference.com/w/cpp/io/basic_istream/get>`_ to make sure we have an opportunity to see our handiwork before our application closes its window.
 
 Initializing and Terminating |sdkname|
@@ -80,7 +80,7 @@ Next up: Talking to Astra.
 
 Connecting to the Astra
 =======================
-Now that we know how to properly initialize and terminate |sdkname|, it's time to actually communicate with the Astra StreamSet. For this, we use the ``StreamSet`` class, which broadly encapsulates the idea of a group of related data sources (think: video and audio from a 2D video camera). For now, however, it's sufficient to think of a streamSet as a physical device like the Astra, and the ``StreamSet`` class, your portal to its functionality.
+Now that we know how to properly initialize and terminate |sdkname|, it's time to actually communicate with the Astra sensor. For this, we use the ``StreamSet`` class, which broadly encapsulates the idea of a group of related data sources (think: video and audio from a 2D video camera). For now, however, it's sufficient to think of a streamSet as a physical device like the Astra, and the ``StreamSet`` class, your portal to its functionality.
 
 Between our initialization and termination bookends, let's declare a ``StreamSet`` variable.
 
@@ -102,15 +102,15 @@ Between our initialization and termination bookends, let's declare a ``StreamSet
       return 0;
    }
 
-Now, sure, this seems like a small addition from our previous step, but this line is more significant than it appears. Just by declaring and constructing a ``StreamSet`` object, you are instructing |sdkname| to start the process of connecting to the first available Astra streamSet it can locate. Cool, right?
+Now, sure, this seems like a small addition from our previous step, but this line is more significant than it appears. Just by declaring and constructing a ``StreamSet`` object, you are instructing |sdkname| to start the process of connecting to the first available Astra sensor it can locate. Cool, right?
 
 .. note:
 
-   |sdkname| provides an additional constructor that will allow you to connect to a specific Astra StreamSet.
+   |sdkname| provides an additional constructor that will allow you to connect to a specific Astra sensor.
 
 Now that we're connected, we're ready to do what we came here to do - see through the eyes of the Astra!
 
-Retrieving StreamSet Data
+Retrieving Sensor Data
 =========================
 Time to put our ``StreamSet`` object to good use and get some data. To do this, we'll need to read one of the streams that the Astra is providing. Streams contain the data coming from our camera packaged in packets of data called "frames". |sdkname| currently supports a number of types of streams, including depth, color, hand, and point streams.
 
