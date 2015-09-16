@@ -5,29 +5,28 @@
 #include <stdio.h>
 #include <key_handler.h>
 
-void print_color(astra_depthframe_t colorFrame)
+void print_color(astra_colorframe_t colorFrame)
 {
-	astra_image_metadata_t metadata;
-	uint8_t* colorData;
-	size_t colorLength;
+    astra_image_metadata_t metadata;
+    astra_rgb_pixel_t* colorData_rgb;
 
-	astra_colorframe_get_data_ptr(colorFrame, &colorData, &colorLength);
-	astra_colorframe_get_metadata(colorFrame, &metadata);
+    size_t colorByteLength;
 
-	int width = metadata.width;
-	int height = metadata.height;
-	size_t index = ((width * (height / 2)) + (width / 2));
+    astra_colorframe_get_data_rgb_ptr(colorFrame, &colorData_rgb, &colorByteLength);
 
-	astra_frame_index_t frameIndex;
-	astra_colorframe_get_frameindex(colorFrame, &frameIndex);
+    astra_colorframe_get_metadata(colorFrame, &metadata);
 
-	colorData = colorData + index * sizeof(uint8_t) * 3;
-	uint8_t r = *colorData++;
-	uint8_t g = *colorData++;
-	uint8_t b = *colorData++;
+    int width = metadata.width;
+    int height = metadata.height;
+    size_t index = ((width * (height / 2)) + (width / 2));
 
-	printf("color frameIndex: %d  r: %d    g: %d    b: %d \n", frameIndex, r, g, b);	
+    astra_frame_index_t frameIndex;
+    astra_colorframe_get_frameindex(colorFrame, &frameIndex);
+
+    astra_rgb_pixel_t middle = colorData_rgb[index];
+    printf("color frameIndex: %d  r: %d    g: %d    b: %d \n", frameIndex, (int)(middle.r), (int)(middle.g), (int)(middle.b));
 }
+
 
 int main(int argc, char* argv[])
 {
