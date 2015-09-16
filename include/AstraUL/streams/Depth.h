@@ -113,7 +113,7 @@ namespace astra {
     {
     public:
         DepthFrame(astra_imageframe_t frame)
-            : ImageFrame(frame)
+            : ImageFrame(frame, ASTRA_PIXEL_FORMAT_DEPTH_MM)
         {}
 
     };

@@ -19,13 +19,22 @@ namespace astra {
         static const astra_stream_type_t id = ASTRA_STREAM_INFRARED;
     };
 
-    class InfraredFrame : public ImageFrame<RGBPixel, ASTRA_STREAM_INFRARED>
+    class InfraredFrame16 : public ImageFrame<uint16_t, ASTRA_STREAM_INFRARED>
     {
     public:
-        InfraredFrame(astra_imageframe_t frame)
-            : ImageFrame(frame)
+        InfraredFrame16(astra_imageframe_t frame)
+            : ImageFrame(frame, ASTRA_PIXEL_FORMAT_GRAY16)
         {}
     };
+
+    class InfraredFrameRGB : public ImageFrame<RGBPixel, ASTRA_STREAM_INFRARED>
+    {
+    public:
+        InfraredFrameRGB(astra_imageframe_t frame)
+            : ImageFrame(frame, ASTRA_PIXEL_FORMAT_RGB888)
+        {}
+    };
+
 }
 
 #endif /* INFRARED_H */

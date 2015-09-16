@@ -66,7 +66,7 @@ namespace astra { namespace plugins { namespace xs {
 
             metadata.width = depthFrame.resolutionX();
             metadata.height = depthFrame.resolutionY();
-            //metadata.bytesPerPixel = sizeof(astra_vector3f_t);
+            metadata.pixelFormat = ASTRA_PIXEL_FORMAT_POINT;
 
             pointFrameWrapper->frame.metadata = metadata;
 

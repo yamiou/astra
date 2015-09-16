@@ -59,7 +59,7 @@ namespace astra {
     {
     public:
         DebugHandFrame(astra_imageframe_t frame)
-            : ImageFrame(frame)
+            : ImageFrame(frame, ASTRA_PIXEL_FORMAT_RGB888)
         {}
     };
 }

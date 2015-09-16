@@ -29,7 +29,7 @@ namespace astra {
     {
     public:
         ColorFrame(astra_imageframe_t frame)
-            : ImageFrame(frame)
+            : ImageFrame(frame, ASTRA_PIXEL_FORMAT_RGB888)
         {}
     };
 
@@ -37,7 +37,7 @@ namespace astra {
     {
     public:
         ColorFrameRaw(astra_imageframe_t frame)
-            : ImageFrame(frame)
+            : ImageFrame(frame, ASTRA_PIXEL_FORMAT_RGB888)
         {}
     };
 }

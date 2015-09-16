@@ -175,12 +175,19 @@ namespace astra {
     class ImageFrame
     {
     public:
-        ImageFrame(astra_imageframe_t frame)
+        ImageFrame(astra_imageframe_t frame, astra_pixel_format_t expected_format)
         {
             m_imageFrame = frame;
             if (m_imageFrame)
             {
                 astra_imageframe_get_metadata(m_imageFrame, &m_metadata);
+                if (m_metadata.pixelFormat != expected_format)
+                {
+                    //wrong format -- this must be an invalid frame
+                    m_imageFrame = nullptr;
+                    return;
+                }
+
                 astra_imageframe_get_frameindex(m_imageFrame, &m_frameIndex);
 
                 void* voidData = nullptr;

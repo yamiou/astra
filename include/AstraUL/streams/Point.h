@@ -30,7 +30,7 @@ namespace astra {
     {
     public:
         PointFrame(astra_imageframe_t frame)
-            : ImageFrame(frame)
+            : ImageFrame(frame, ASTRA_PIXEL_FORMAT_POINT)
         {}
     };
 }
