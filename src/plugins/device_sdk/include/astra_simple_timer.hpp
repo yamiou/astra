@@ -7,7 +7,7 @@
 
 namespace astra { namespace utility {
 
-    template<typename TClock>
+    template<typename TClock = std::chrono::steady_clock>
     class simple_timer
     {
     public:
