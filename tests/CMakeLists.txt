@@ -1,5 +1,15 @@
 set(_projname "test-harness")
 
+function(add_astra_sdk_dependency _targetname)
+  if(NOT TARGET ${_targetname})
+    message("add_sdk_dependency: There is no target named '${_targetname}'")
+    return()
+  endif()
+  if(TARGET ${SDK_DEPENDENT_TARGET})
+    add_dependencies(${_targetname} ${SDK_DEPENDENT_TARGET})
+  endif()
+endfunction()
+
 include_directories(${CATCH_INCLUDE_DIR} ${ASTRA_INCLUDE_DIR})
 
 set(${_projname}_SOURCES
@@ -11,8 +21,6 @@ set(${_projname}_SOURCES
 
 add_executable(${_projname} ${${_projname}_SOURCES})
 target_link_libraries(${_projname} ${ASTRA_LIBRARIES})
-
-set_debug_working_dir(${_projname} "$(TargetDir)")
 
 add_astra_sdk_dependency(${_projname})
 

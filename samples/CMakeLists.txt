@@ -12,6 +12,16 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 include(ConfigUserFile)
 
+function(add_astra_sdk_dependency _targetname)
+  if(NOT TARGET ${_targetname})
+    message("add_sdk_dependency: There is no target named '${_targetname}'")
+    return()
+  endif()
+  if(TARGET ${SDK_DEPENDENT_TARGET})
+    add_dependencies(${_targetname} ${SDK_DEPENDENT_TARGET})
+  endif()
+endfunction()
+
 include_directories(${ASTRA_INCLUDE_DIR})
 
 get_filename_component(SAMPLE_COMMON_DIR "./common" ABSOLUTE)
