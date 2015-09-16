@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <deque>
 #include <unordered_map>
+#include <key_handler.h>
 
 class sfLine : public sf::Drawable
 {
@@ -334,6 +335,8 @@ int main(int argc, char** argv)
 {
     astra::Astra::initialize();
 
+    set_key_handler();
+
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Hand Viewer");
 
     astra::StreamSet streamset;
@@ -353,10 +356,20 @@ int main(int argc, char** argv)
         sf::Event event;
         while (window.pollEvent(event))
         {
-            if (event.type == sf::Event::Closed)
+            switch (event.type)
+            {
+            case sf::Event::Closed:
                 window.close();
-            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
-                window.close();
+                break;
+            case sf::Event::KeyPressed:
+                {
+                    if (event.key.code == sf::Keyboard::Escape || 
+                        (event.key.code == sf::Keyboard::C && event.key.control))
+                    {
+                        window.close();
+                    }
+                }
+            }
         }
 
         // clear the window with black color
@@ -364,6 +377,11 @@ int main(int argc, char** argv)
 
         listener.drawTo(window);
         window.display();
+
+        if (!shouldContinue)
+        {
+            window.close();
+        }
     }
 
     astra::Astra::terminate();

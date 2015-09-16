@@ -3,6 +3,7 @@ set (_projname "SimpleHandViewer-SFML")
 set (${_projname}_SOURCES
   ../../common/LitDepthVisualizer.h
   main.cpp
+  ${SAMPLE_COMMON_DIR}/key_handler.h
   )
 
 find_package(SFML COMPONENTS graphics window system)

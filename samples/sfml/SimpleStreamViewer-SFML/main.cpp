@@ -5,6 +5,7 @@
 #include <chrono>
 #include <iostream>
 #include <iomanip>
+#include <key_handler.h>
 
 enum ColorMode
 {
@@ -330,6 +331,8 @@ int main(int argc, char** argv)
 {
     astra::Astra::initialize();
 
+    set_key_handler();
+
     sf::VideoMode fullscreen_mode = sf::VideoMode::getFullscreenModes()[0];
     sf::VideoMode windowed_mode(1800, 650);
     bool is_fullscreen = false;
@@ -366,57 +369,64 @@ int main(int argc, char** argv)
                 window.close();
                 break;
             case sf::Event::KeyPressed:
-            {
-                switch (event.key.code)
                 {
-                case sf::Keyboard::Escape:
-                    window.close();
-                    break;
-                case sf::Keyboard::F:
-                    if (is_fullscreen)
+                    switch (event.key.code)
                     {
-                        is_fullscreen = false;
-                        window.create(windowed_mode, "Stream Viewer");
+                    case sf::Keyboard::Escape:
+                        window.close();
+                        break;
+                    case sf::Keyboard::F:
+                        if (is_fullscreen)
+                        {
+                            is_fullscreen = false;
+                            window.create(windowed_mode, "Stream Viewer");
+                        }
+                        else
+                        {
+                            is_fullscreen = true;
+                            window.create(fullscreen_mode, "Stream Viewer", sf::Style::Fullscreen);
+                        }
+                        break;
+                    case sf::Keyboard::R:
+                        depthStream.enable_registration(!depthStream.registration_enabled());
+                        break;
+                    case sf::Keyboard::M:
+                        {
+                            bool newMirroring = !depthStream.mirroring_enabled();
+                            depthStream.enable_mirroring(newMirroring);
+                            colorStream.enable_mirroring(newMirroring);
+                            irStream.enable_mirroring(newMirroring);
+                        }
+                        break;
+                    case sf::Keyboard::G:
+                        colorStream.stop();
+                        configure_ir(reader, false);
+                        listener.set_mode(MODE_IR_16);
+                        irStream.start();
+                        break;
+                    case sf::Keyboard::I:
+                        colorStream.stop();
+                        configure_ir(reader, true);
+                        listener.set_mode(MODE_IR_RGB);
+                        irStream.start();
+                        break;
+                    case sf::Keyboard::C:
+                        if (event.key.control)
+                        {
+                            window.close();
+                        }
+                        else
+                        {
+                            irStream.stop();
+                            listener.set_mode(MODE_COLOR);
+                            colorStream.start();
+                        }
+                        break;
+                    default:
+                        break;
                     }
-                    else
-                    {
-                        is_fullscreen = true;
-                        window.create(fullscreen_mode, "Stream Viewer", sf::Style::Fullscreen);
-                    }
-                    break;
-                case sf::Keyboard::R:
-                    depthStream.enable_registration(!depthStream.registration_enabled());
-                    break;
-                case sf::Keyboard::M:
-                    {
-                        bool newMirroring = !depthStream.mirroring_enabled();
-                        depthStream.enable_mirroring(newMirroring);
-                        colorStream.enable_mirroring(newMirroring);
-                        irStream.enable_mirroring(newMirroring);
-                    }
-                    break;
-                case sf::Keyboard::G:
-                    colorStream.stop();
-                    configure_ir(reader, false);
-                    listener.set_mode(MODE_IR_16);
-                    irStream.start();
-                    break;
-                case sf::Keyboard::I:
-                    colorStream.stop();
-                    configure_ir(reader, true);
-                    listener.set_mode(MODE_IR_RGB);
-                    irStream.start();
-                    break;
-                case sf::Keyboard::C:
-                    irStream.stop();
-                    listener.set_mode(MODE_COLOR);
-                    colorStream.start();
-                    break;
-                default:
                     break;
                 }
-                break;
-            }
             default:
                 break;
             }
@@ -427,6 +437,11 @@ int main(int argc, char** argv)
 
         listener.drawTo(window);
         window.display();
+
+        if (!shouldContinue)
+        {
+            window.close();
+        }
     }
 
     astra::Astra::terminate();

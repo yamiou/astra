@@ -5,6 +5,7 @@
 #include <chrono>
 #include <iostream>
 #include <iomanip>
+#include <key_handler.h>
 
 class DepthFrameListener : public astra::FrameReadyListener
 {
@@ -113,6 +114,8 @@ int main(int argc, char** argv)
 {
     astra::Astra::initialize();
 
+    set_key_handler();
+
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Depth Viewer");
 
     astra::StreamSet streamset;
@@ -139,28 +142,28 @@ int main(int argc, char** argv)
                 window.close();
                 break;
             case sf::Event::KeyPressed:
-            {
-                if (event.key.code == sf::Keyboard::C && event.key.control)
                 {
-                    window.close();
-                }
+                    if (event.key.code == sf::Keyboard::C && event.key.control)
+                    {
+                        window.close();
+                    }
 
-                switch(event.key.code)
-                {
-                case sf::Keyboard::Escape:
-                    window.close();
-                    break;
-                case sf::Keyboard::R:
-                    depthStream.enable_registration(!depthStream.registration_enabled());
-                    break;
-                case sf::Keyboard::M:
-                    depthStream.enable_mirroring(!depthStream.mirroring_enabled());
-                    break;
-                default:
+                    switch(event.key.code)
+                    {
+                    case sf::Keyboard::Escape:
+                        window.close();
+                        break;
+                    case sf::Keyboard::R:
+                        depthStream.enable_registration(!depthStream.registration_enabled());
+                        break;
+                    case sf::Keyboard::M:
+                        depthStream.enable_mirroring(!depthStream.mirroring_enabled());
+                        break;
+                    default:
+                        break;
+                    }
                     break;
                 }
-                break;
-            }
             default:
                 break;
             }
@@ -171,6 +174,11 @@ int main(int argc, char** argv)
 
         listener.drawTo(window);
         window.display();
+
+        if (!shouldContinue)
+        {
+            window.close();
+        }
     }
 
     astra::Astra::terminate();
