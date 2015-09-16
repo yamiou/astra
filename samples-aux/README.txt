@@ -2,12 +2,12 @@ Astra SDK v0.3.0 Preview
 Copyright (c) 2015 Orbbec
 www.orbbec3d.com
 
-josh@orbbec3d.com
+feedback@orbbec3d.com
 
 What's New
 ==========
 
-v0.3.0 2015/09/14 Rename to Astra SDK. Rename Sensor to StreamSet in C++ API. Various bug fixes and internal enhancements.
+v0.3.0 2015/09/14 Rename to Astra SDK. Rename Sensor to StreamSet in C++ API. Various bug fixes and internal enhancements. New samples. Improved performance. Add IR stream, mirrored depth, and registered depth support.
 
 v0.2.1 2015/07/06 Updated Android and Windows drivers for new sensor USB IDs. Add Android test app .apk.
 
