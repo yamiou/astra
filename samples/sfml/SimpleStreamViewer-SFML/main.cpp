@@ -134,12 +134,43 @@ public:
         m_colorView.texture.update(m_colorView.buffer.get());
     }
 
+    void update_ir(astra::Frame& frame)
+    {
+        astra::InfraredFrame irFrame = frame.get<astra::InfraredFrame>();
+
+        if (!irFrame.is_valid())
+        {
+            clear_view(m_colorView);
+            return;
+        }
+
+        int irWidth = irFrame.resolutionX();
+        int irHeight = irFrame.resolutionY();
+
+        init_texture(irWidth, irHeight, m_colorView);
+
+        const astra::RGBPixel* irRGB = irFrame.data();
+        uint8_t* buffer = m_colorView.buffer.get();
+        for (int i = 0; i < irWidth * irHeight; i++)
+        {
+            int rgbaOffset = i * 4;
+            buffer[rgbaOffset] = irRGB[i].r;
+            buffer[rgbaOffset + 1] = irRGB[i].g;
+            buffer[rgbaOffset + 2] = irRGB[i].b;
+            buffer[rgbaOffset + 3] = 255;
+        }
+
+        m_colorView.texture.update(m_colorView.buffer.get());
+    }
+
     virtual void on_frame_ready(astra::StreamReader& reader,
                                 astra::Frame& frame) override
     {
         update_depth(frame);
 
         update_color(frame);
+
+        update_ir(frame);
 
         check_fps();
     }
@@ -182,6 +213,55 @@ private:
     stream_view m_colorView;
 };
 
+astra::DepthStream configure_depth(astra::StreamReader& reader)
+{
+    auto depthStream = reader.stream<astra::DepthStream>();
+
+    //We don't have to set the mode to start the stream, but if you want to here is how:
+    astra::ImageStreamMode depthMode;
+
+    depthMode.set_width(640);
+    depthMode.set_height(480);
+    depthMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_DEPTH_MM);
+    depthMode.set_fps(30);
+
+    depthStream.set_mode(depthMode);
+
+    return depthStream;
+}
+
+astra::InfraredStream configure_ir(astra::StreamReader& reader)
+{
+    auto irStream = reader.stream<astra::InfraredStream>();
+
+    astra::ImageStreamMode irMode;
+
+    irMode.set_width(640);
+    irMode.set_height(480);
+    irMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_RGB888);
+    irMode.set_fps(30);
+
+    irStream.set_mode(irMode);
+
+    return irStream;
+}
+
+astra::ColorStream configure_color(astra::StreamReader& reader)
+{
+    auto colorStream = reader.stream<astra::ColorStream>();
+
+    astra::ImageStreamMode colorMode;
+
+    colorMode.set_width(640);
+    colorMode.set_height(480);
+    colorMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_RGB888);
+    colorMode.set_fps(30);
+
+    colorStream.set_mode(colorMode);
+
+    return colorStream;
+}
+
 int main(int argc, char** argv)
 {
     astra::Astra::initialize();
@@ -193,29 +273,15 @@ int main(int argc, char** argv)
     astra::StreamReader reader = streamset.create_reader();
 
     reader.stream<astra::PointStream>().start();
-    auto depthStream = reader.stream<astra::DepthStream>();
+    
+    auto depthStream = configure_depth(reader);
     depthStream.start();
 
-    astra::ImageStreamMode depthMode;
-
-    depthMode.set_width(640);
-    depthMode.set_height(480);
-    depthMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_DEPTH_MM);
-    depthMode.set_fps(30);
-
-    depthStream.set_mode(depthMode);
-
-    auto colorStream = reader.stream<astra::ColorStream>();
+    auto colorStream = configure_color(reader);
     colorStream.start();
 
-    astra::ImageStreamMode colorMode;
-
-    colorMode.set_width(640);
-    colorMode.set_height(480);
-    colorMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_RGB888);
-    colorMode.set_fps(30);
-
-    reader.stream<astra::ColorStream>().set_mode(colorMode);
+    auto irStream = configure_ir(reader);
+    //irStream.start();
 
     MultiFrameListener listener;
 
@@ -244,8 +310,20 @@ int main(int argc, char** argv)
                     depthStream.enable_registration(!depthStream.registration_enabled());
                     break;
                 case sf::Keyboard::M:
-                    depthStream.enable_mirroring(!depthStream.mirroring_enabled());
-                    colorStream.enable_mirroring(!colorStream.mirroring_enabled());
+                    {
+                        bool newMirroring = !depthStream.mirroring_enabled();
+                        depthStream.enable_mirroring(newMirroring);
+                        colorStream.enable_mirroring(newMirroring);
+                        irStream.enable_mirroring(newMirroring);
+                    }
+                    break;
+                case sf::Keyboard::I:
+                    colorStream.stop();
+                    irStream.start();
+                    break;
+                case sf::Keyboard::C:
+                    irStream.stop();
+                    colorStream.start();
                     break;
                 default:
                     break;
