@@ -358,7 +358,10 @@ namespace astra {
         for(auto& pair : m_streamMap)
         {
             ReaderConnectionData* data = pair.second;
-            data->connection->unlock();
+            if (data->connection->is_started())
+            {
+                data->connection->unlock();
+            }
         }
 
         return ASTRA_STATUS_SUCCESS;
