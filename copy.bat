@@ -1,2 +1,2 @@
-xcopy .\samples-aux\vs2013\thirdparty\copy_to_bin_dir\*.* .\build-vs\bin\Debug\/e
-xcopy .\samples-aux\vs2013\thirdparty\copy_to_bin_dir\*.* .\build-vs\bin\Release\/e
+xcopy .\samples-aux\vs2013\copy_to_bin_dir\*.* .\build\bin\Debug\/e
+xcopy .\samples-aux\vs2013\copy_to_bin_dir\*.* .\build\bin\Release\/e
