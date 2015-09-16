@@ -157,7 +157,8 @@ int main(int argc, char** argv)
     astra::StreamReader reader = streamset.create_reader();
 
     reader.stream<astra::PointStream>().start();
-    reader.stream<astra::DepthStream>().start();
+    auto depthStream = reader.stream<astra::DepthStream>();
+    depthStream.start();
 
     astra::ImageStreamMode depthMode;
 
@@ -166,8 +167,10 @@ int main(int argc, char** argv)
     depthMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_DEPTH_MM);
     depthMode.set_fps(30);
 
-    reader.stream<astra::DepthStream>().set_mode(depthMode);
-    reader.stream<astra::ColorStream>().start();
+    depthStream.set_mode(depthMode);
+
+    auto colorStream = reader.stream<astra::ColorStream>();
+    colorStream.start();
 
     astra::ImageStreamMode colorMode;
 
@@ -189,10 +192,33 @@ int main(int argc, char** argv)
         sf::Event event;
         while (window.pollEvent(event))
         {
-            if (event.type == sf::Event::Closed)
+            switch (event.type)
+            {
+            case sf::Event::Closed:
                 window.close();
-            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
-                window.close();
+                break;
+            case sf::Event::KeyPressed:
+            {
+                switch (event.key.code)
+                {
+                case sf::Keyboard::Escape:
+                    window.close();
+                    break;
+                case sf::Keyboard::R:
+                    depthStream.enable_registration(!depthStream.registration_enabled());
+                    break;
+                case sf::Keyboard::M:
+                    depthStream.enable_mirroring(!depthStream.mirroring_enabled());
+                    colorStream.enable_mirroring(!colorStream.mirroring_enabled());
+                    break;
+                default:
+                    break;
+                }
+                break;
+            }
+            default:
+                break;
+            }
         }
 
         // clear the window with black color

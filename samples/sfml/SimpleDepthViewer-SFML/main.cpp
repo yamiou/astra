@@ -119,8 +119,8 @@ int main(int argc, char** argv)
     astra::StreamReader reader = streamset.create_reader();
 
     reader.stream<astra::PointStream>().start();
-    auto ds = reader.stream<astra::DepthStream>();
-    ds.start();
+    auto depthStream = reader.stream<astra::DepthStream>();
+    depthStream.start();
 
     DepthFrameListener listener;
 
@@ -146,10 +146,10 @@ int main(int argc, char** argv)
                     window.close();
                     break;
                 case sf::Keyboard::R:
-                    ds.enable_registration(!ds.registration_enabled());
+                    depthStream.enable_registration(!depthStream.registration_enabled());
                     break;
                 case sf::Keyboard::M:
-                    ds.enable_mirroring(!ds.mirroring_enabled());
+                    depthStream.enable_mirroring(!depthStream.mirroring_enabled());
                     break;
                 default:
                     break;
