@@ -142,7 +142,6 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples
   PATTERN "samples/plugins/orbbec_skeleton" EXCLUDE
   PATTERN "samples/sfml/SimpleSkeletonViewer-SFML" EXCLUDE
   PATTERN "samples/tools/StreamRecorder" EXCLUDE
-  PATTERN "samples/gl" EXCLUDE
   )
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
