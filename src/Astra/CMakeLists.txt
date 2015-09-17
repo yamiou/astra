@@ -134,7 +134,7 @@ add_custom_target(copytoml_astra ALL
   #astra.toml
   COMMAND ${CMAKE_COMMAND} -E copy
   "${PROJECT_SOURCE_DIR}/src/astra/astra.toml"
-  "$<TARGET_FILE_DIR:${_projname}>/")
+  "$<TARGET_FILE_DIR:${_projname}>")
 
 set_target_properties(copytoml_astra PROPERTIES FOLDER CMakeCopyTargets)
 
