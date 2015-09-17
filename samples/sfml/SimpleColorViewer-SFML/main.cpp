@@ -146,6 +146,8 @@ int main(int argc, char** argv)
                         window.close();
                     }
                 }
+            default:
+                break;
             }
         }
 
