@@ -96,19 +96,23 @@ namespace orbbec { namespace ni {
             astra_status_t rc = pluginService().get_parameter_bin(resultByteLength,
                                                                   &parameterBin,
                                                                   &parameterData);
-            bool* enable = static_cast<bool*>(parameterData);
 
-            openni::ImageRegistrationMode mode = oniDevice_.getImageRegistrationMode();
-
-            switch (mode)
+            if (rc == ASTRA_STATUS_SUCCESS)
             {
-            case openni::ImageRegistrationMode::IMAGE_REGISTRATION_DEPTH_TO_COLOR:
-                *enable = true;
-                break;
-            case openni::ImageRegistrationMode::IMAGE_REGISTRATION_OFF:
-            default:
-                *enable = false;
-                break;
+                bool* enable = static_cast<bool*>(parameterData);
+
+                openni::ImageRegistrationMode mode = oniDevice_.getImageRegistrationMode();
+
+                switch (mode)
+                {
+                case openni::ImageRegistrationMode::IMAGE_REGISTRATION_DEPTH_TO_COLOR:
+                    *enable = true;
+                    break;
+                case openni::ImageRegistrationMode::IMAGE_REGISTRATION_OFF:
+                default:
+                    *enable = false;
+                    break;
+                }
             }
         }
         default:
