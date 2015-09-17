@@ -363,12 +363,14 @@ int main(int argc, char** argv)
                 break;
             case sf::Event::KeyPressed:
                 {
-                    if (event.key.code == sf::Keyboard::Escape || 
+                    if (event.key.code == sf::Keyboard::Escape ||
                         (event.key.code == sf::Keyboard::C && event.key.control))
                     {
                         window.close();
                     }
                 }
+            default:
+                break;
             }
         }
 
