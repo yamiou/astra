@@ -25,7 +25,7 @@ ASTRA_API_EX astra_status_t astra_colorframe_get_data_ptr(astra_colorframe_t col
                                                           size_t* byteLength);
 
 ASTRA_API_EX astra_status_t astra_colorframe_get_data_rgb_ptr(astra_colorframe_t colorFrame,
-															  astra_image_metadata_t** data,
+                                                              astra_rgb_pixel_t** data,
 															  size_t* byteLength);
 
 ASTRA_API_EX astra_status_t astra_colorframe_copy_data(astra_colorframe_t colorFrame,
