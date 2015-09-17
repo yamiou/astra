@@ -1,23 +1,33 @@
 set (_projname "openni_sensor")
 
-set(${_projname}_SOURCES
-  OpenNIPlugin.cpp
-  OpenNIPlugin.h
-  OniDeviceStream.h
-  OniDepthStream.h
-  OniDepthStream.cpp
-  OniColorStream.h
-  OniColorStream.cpp
-  OniDeviceStreamSet.h
-  OniDeviceStreamSet.cpp
+set(${_projname}_HEADERS
+  oni_adapter_plugin.hpp
+  oni_colorstream.hpp
+  oni_depthstream.hpp
+  oni_device_streamset.hpp
+  oni_devicestream.hpp
+  oni_infrared_stream.hpp
+  oni_mappers.hpp
+  oni_stream.hpp
   )
 
-add_definitions(-DSENSEKIT_BUILD)
+set(${_projname}_SOURCES
+  oni_adapter_plugin.cpp
+  oni_colorstream.cpp
+  oni_depthstream.cpp
+  oni_device_streamset.cpp
+  oni_infrared_stream.cpp
+  oni_mappers.cpp
+  )
+
+add_definitions(-DASTRA_BUILD)
 
 if (WIN32)
   find_library(OpenNI2_LIBRARY NAMES "OpenNI2.lib" HINTS "$ENV{OPENNI2_LIB}" PATH_SUFFIXES lib)
 elseif (APPLE)
   find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.dylib" HINTS "$ENV{OPENNI2_REDIST}" PATH_SUFFIXES lib)
+elseif (UNIX AND NOT ANDROID)
+  find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.so" HINTS "$ENV{OPENNI2_REDIST}" PATH_SUFFIXES lib)
 elseif (ANDROID)
   find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.so" PATHS "${CMAKE_SOURCE_DIR}/vendor/openni-android" NO_CMAKE_FIND_ROOT_PATH)
 endif()
@@ -26,15 +36,10 @@ include_directories ("$ENV{OPENNI2_INCLUDE}")
 
 include_directories(${_projname} ${SHINY_INCLUDE})
 
-add_library(${_projname} SHARED ${${_projname}_SOURCES})
+add_library(${_projname} SHARED ${${_projname}_SOURCES} ${${_projname}_HEADERS})
 
 set_target_properties(${_projname} PROPERTIES FOLDER "plugins")
 
-target_link_libraries(${_projname} SenseKitAPI Shiny ${OpenNI2_LIBRARY})
+target_link_libraries(${_projname} AstraAPI Shiny ${OpenNI2_LIBRARY})
 
-install(TARGETS ${_projname}
-  RUNTIME DESTINATION bin/Plugins/
-  LIBRARY DESTINATION lib/Plugins/
-  )
-
-install_pdb(${_projname} bin/Plugins/)
+install_lib(${_projname} "Plugins/")

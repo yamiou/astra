@@ -1,12 +1,13 @@
 #include <SFML/Graphics.hpp>
-#include <Sensekit/SenseKit.h>
-#include <SensekitUL/SenseKitUL.h>
+#include <Astra/Astra.h>
+#include <AstraUL/AstraUL.h>
 #include "../../common/LitDepthVisualizer.h"
 #include <chrono>
 #include <iostream>
 #include <iomanip>
+#include <key_handler.h>
 
-class DepthFrameListener : public sensekit::FrameReadyListener
+class DepthFrameListener : public astra::FrameReadyListener
 {
 public:
     DepthFrameListener()
@@ -55,10 +56,10 @@ public:
                   << std::endl;
     }
 
-    virtual void on_frame_ready(sensekit::StreamReader& reader,
-                                sensekit::Frame& frame) override
+    virtual void on_frame_ready(astra::StreamReader& reader,
+                                astra::Frame& frame) override
     {
-        sensekit::PointFrame pointFrame = frame.get<sensekit::PointFrame>();
+        astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
 
         int width = pointFrame.resolutionX();
         int height = pointFrame.resolutionY();
@@ -67,10 +68,10 @@ public:
 
         m_visualizer.update(pointFrame);
 
-        sensekit_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
-        for(int i = 0; i < width * height; i++)
+        astra_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
+        for (int i = 0; i < width * height; i++)
         {
-            int rgbaOffset = i *4;
+            int rgbaOffset = i * 4;
             m_displayBuffer[rgbaOffset] = vizBuffer[i].r;
             m_displayBuffer[rgbaOffset + 1] = vizBuffer[i].b;
             m_displayBuffer[rgbaOffset + 2] = vizBuffer[i].g;
@@ -111,14 +112,21 @@ private:
 
 int main(int argc, char** argv)
 {
-    sensekit::SenseKit::initialize();
+    astra::Astra::initialize();
 
+    set_key_handler();
+
+    sf::VideoMode fullscreen_mode = sf::VideoMode::getFullscreenModes()[0];
+    sf::VideoMode windowed_mode(1280, 960);
+    bool is_fullscreen = false;
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Depth Viewer");
 
-    sensekit::Sensor sensor;
-    sensekit::StreamReader reader = sensor.create_reader();
+    astra::StreamSet streamset;
+    astra::StreamReader reader = streamset.create_reader();
 
-    reader.stream<sensekit::PointStream>().start();
+    reader.stream<astra::PointStream>().start();
+    auto depthStream = reader.stream<astra::DepthStream>();
+    depthStream.start();
 
     DepthFrameListener listener;
 
@@ -126,15 +134,54 @@ int main(int argc, char** argv)
 
     while (window.isOpen())
     {
-        sensekit_temp_update();
+        astra_temp_update();
 
         sf::Event event;
         while (window.pollEvent(event))
         {
-            if (event.type == sf::Event::Closed)
+            switch (event.type)
+            {
+            case sf::Event::Closed:
                 window.close();
-            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
-                window.close();
+                break;
+            case sf::Event::KeyPressed:
+                {
+                    if (event.key.code == sf::Keyboard::C && event.key.control)
+                    {
+                        window.close();
+                    }
+
+                    switch(event.key.code)
+                    {
+                    case sf::Keyboard::Escape:
+                        window.close();
+                        break;
+                    case sf::Keyboard::F:
+                        if (is_fullscreen)
+                        {
+                            is_fullscreen = false;
+                            window.create(windowed_mode, "Depth Viewer");
+                        }
+                        else
+                        {
+                            is_fullscreen = true;
+                            window.create(fullscreen_mode, "Depth Viewer", sf::Style::Fullscreen);
+                        }
+                        break;
+                    case sf::Keyboard::R:
+                        depthStream.enable_registration(!depthStream.registration_enabled());
+                        break;
+                    case sf::Keyboard::M:
+                        depthStream.enable_mirroring(!depthStream.mirroring_enabled());
+                        break;
+                    default:
+                        break;
+                    }
+                    break;
+                }
+            default:
+                break;
+            }
         }
 
         // clear the window with black color
@@ -142,8 +189,13 @@ int main(int argc, char** argv)
 
         listener.drawTo(window);
         window.display();
+
+        if (!shouldContinue)
+        {
+            window.close();
+        }
     }
 
-    sensekit::SenseKit::terminate();
+    astra::Astra::terminate();
     return 0;
 }

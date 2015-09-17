@@ -2,9 +2,9 @@
 #define PROTOFRAMEOUTPUTSTREAM_H
 
 #include <common/serialization/FrameOutputStream.h>
-#include "gensrc/FrameDescription.pb.h"
-#include "gensrc/StreamHeader.pb.h"
-#include "gensrc/Frame.pb.h"
+#include "FrameDescription.pb.h"
+#include "StreamHeader.pb.h"
+#include "Frame.pb.h"
 
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 
@@ -16,13 +16,13 @@ namespace google{namespace protobuf{namespace io{
     class ZeroCopyOutputStream;
 }}}
 
-namespace sensekit { namespace serialization { 
+namespace astra { namespace serialization {
 
     class ProtoFrameOutputStream : public FrameOutputStream
     {
     public:
         ProtoFrameOutputStream(ZeroCopyOutputStream* outputStream);
-        ~ProtoFrameOutputStream();
+        virtual ~ProtoFrameOutputStream() override;
 
         void stage_frame(Frame& frame) override;
         void stage_frame_description(FrameDescription& frameDesc) override;

@@ -14,9 +14,9 @@ http://stackoverflow.com/questions/22881876/protocol-buffers-how-to-serialize-an
 */
 
 
-namespace sensekit { namespace serialization { namespace proto {
-    
-    bool write_delimited_to( const MessageLite& message, ZeroCopyOutputStream* rawOutput) 
+namespace astra { namespace serialization { namespace proto {
+
+    bool write_delimited_to( const MessageLite& message, ZeroCopyOutputStream* rawOutput)
     {
         // We create a new coded stream for each message.  Don't worry, this is fast.
         CodedOutputStream output(rawOutput);
@@ -40,7 +40,7 @@ namespace sensekit { namespace serialization { namespace proto {
         return true;
     }
 
-    bool read_delimited_to(ZeroCopyInputStream* rawInput, MessageLite* message) 
+    bool read_delimited_to(ZeroCopyInputStream* rawInput, MessageLite* message)
     {
         // We create a new coded stream for each message.  Don't worry, this is fast,
         // and it makes sure the 64MB total size limit is imposed per-message rather
@@ -67,6 +67,3 @@ namespace sensekit { namespace serialization { namespace proto {
     }
 
 }}}
-
-
-

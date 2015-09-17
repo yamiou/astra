@@ -1,8 +1,8 @@
 #include "TrajectoryAnalyzer.h"
 #include "constants.h"
-#include <SenseKit/Plugins/PluginLogger.h>
+#include <Astra/Plugins/PluginLogger.h>
 
-namespace sensekit { namespace plugins { namespace hand {
+namespace astra { namespace plugins { namespace hand {
 
     using namespace std;
 
@@ -46,7 +46,7 @@ namespace sensekit { namespace plugins { namespace hand {
 
     void TrajectoryAnalyzer::reset_wave()
     {
-        SINFO("TrajectoryAnalyzer", "Reset wave gesture for point #%d", m_trackingId);
+        LOG_INFO("TrajectoryAnalyzer", "Reset wave gesture for point #%d", m_trackingId);
 
         m_isWaveGesture = false;
         m_isInflecting = false;
@@ -76,14 +76,14 @@ namespace sensekit { namespace plugins { namespace hand {
         ++m_framesSinceInflection;
         if (m_framesSinceInflection == m_maxFramesBetweenInflections)
         {
-            SINFO("TrajectoryAnalyzer", "Wave gesture timed out for point #%d", m_trackingId);
+            LOG_INFO("TrajectoryAnalyzer", "Wave gesture timed out for point #%d", m_trackingId);
 
             reset_wave();
         }
 
         cv::Point3f deltaPosition = point.fullSizeWorldDeltaPosition;
 
-        float delta = cv::norm(deltaPosition);
+        float delta = static_cast<float>(cv::norm(deltaPosition));
 
         if (delta > m_maxSteadyDelta)
         {
@@ -104,9 +104,9 @@ namespace sensekit { namespace plugins { namespace hand {
 
                 m_avgDeltaHeadingValid = is_valid_heading_dist(point.fullSizeWorldPosition);
 
-                float headingDist = cv::norm(point.fullSizeWorldPosition - m_headingTrackStart);
+                float headingDist = static_cast<float>(cv::norm(point.fullSizeWorldPosition - m_headingTrackStart));
 
-                STRACE("TrajectoryAnalyzer", "#%d dist %f v1: %d v2: %d", m_trackingId, headingDist, m_avgDeltaHeadingValid, m_lastAvgDeltaHeadingValid);
+                LOG_TRACE("TrajectoryAnalyzer", "#%d dist %f v1: %d v2: %d", m_trackingId, headingDist, m_avgDeltaHeadingValid, m_lastAvgDeltaHeadingValid);
 
                 if (m_avgDeltaHeadingValid && m_lastAvgDeltaHeadingValid)
                 {
@@ -121,10 +121,10 @@ namespace sensekit { namespace plugins { namespace hand {
                             ++m_numWaveInflections;
                             if (!m_isWaveGesture)
                             {
-                                SINFO("TrajectoryAnalyzer", "Wave count %d for point #%d", m_numWaveInflections, m_trackingId);
+                                LOG_INFO("TrajectoryAnalyzer", "Wave count %d for point #%d", m_numWaveInflections, m_trackingId);
                                 if (m_numWaveInflections == m_minWaveInflectionsForGesture)
                                 {
-                                    SINFO("TrajectoryAnalyzer", "Wave gesture detected for point #%d", m_trackingId);
+                                    LOG_INFO("TrajectoryAnalyzer", "Wave gesture detected for point #%d", m_trackingId);
                                     m_isWaveGesture = true;
                                 }
                             }
@@ -158,7 +158,7 @@ namespace sensekit { namespace plugins { namespace hand {
             {
                 m_pointSteady = true;
 
-                SINFO("TrajectoryAnalyzer", "Steady gesture detected for point #%d", m_trackingId);
+                LOG_INFO("TrajectoryAnalyzer", "Steady gesture detected for point #%d", m_trackingId);
 
                 if (m_isWaveGesture)
                 {
@@ -182,18 +182,19 @@ namespace sensekit { namespace plugins { namespace hand {
 
     bool TrajectoryAnalyzer::is_valid_heading_dist(const cv::Point3f& currentWorldPosition)
     {
-        float headingDist = cv::norm(currentWorldPosition - m_headingTrackStart);
+        float headingDist = static_cast<float>(cv::norm(currentWorldPosition - m_headingTrackStart));
         bool validDist = headingDist > m_minHeadingDist;
         return validDist;
     }
 
     float TrajectoryAnalyzer::get_degree_difference(cv::Point3f& v1, cv::Point3f& v2)
     {
-        float len1 = cv::norm(v1);
-        float len2 = cv::norm(v2);
+        float len1 = static_cast<float>(cv::norm(v1));
+        float len2 = static_cast<float>(cv::norm(v2));
+
         if (len1 < EPSILON || len2 < EPSILON)
         {
-            return 0;
+            return 0.0f;
         }
 
         float invLen1 = 1.0 / len1;

@@ -1,13 +1,13 @@
 #ifndef HAND_PLUGIN_H
 #define HAND_PLUGIN_H
 
-#include <SenseKit/Plugins/PluginKit.h>
-#include <SenseKitUL/SenseKitUL.h>
+#include <Astra/Plugins/PluginKit.h>
+#include <AstraUL/AstraUL.h>
 #include <unordered_map>
-#include "handtracker.h"
+#include "HandTracker.h"
 #include "HandSettings.h"
 
-namespace sensekit { namespace plugins { namespace hand {
+namespace astra { namespace plugins { namespace hand {
 
     class HandPlugin : public PluginBase
     {
@@ -22,27 +22,27 @@ namespace sensekit { namespace plugins { namespace hand {
 
     private:
         static void stream_registered_handler_thunk(void* clientTag,
-                                               sensekit_streamset_t setHandle,
-                                               sensekit_stream_t streamHandle,
-                                               sensekit_stream_desc_t desc);
+                                               astra_streamset_t setHandle,
+                                               astra_stream_t streamHandle,
+                                               astra_stream_desc_t desc);
 
         static void stream_unregistering_handler_thunk(void* clientTag,
-                                                  sensekit_streamset_t setHandle,
-                                                  sensekit_stream_t streamHandle,
-                                                  sensekit_stream_desc_t desc);
+                                                  astra_streamset_t setHandle,
+                                                  astra_stream_t streamHandle,
+                                                  astra_stream_desc_t desc);
 
-        void stream_registered_handler(sensekit_streamset_t setHandle,
-                                  sensekit_stream_t streamHandle,
-                                  sensekit_stream_desc_t desc);
-        void stream_unregistering_handler(sensekit_streamset_t setHandle,
-                                     sensekit_stream_t streamHandle,
-                                     sensekit_stream_desc_t desc);
+        void stream_registered_handler(astra_streamset_t setHandle,
+                                  astra_stream_t streamHandle,
+                                  astra_stream_desc_t desc);
+        void stream_unregistering_handler(astra_streamset_t setHandle,
+                                     astra_stream_t streamHandle,
+                                     astra_stream_desc_t desc);
 
 
-        sensekit_callback_id_t m_streamAddedCallbackId{0};
-        sensekit_callback_id_t m_streamRemovingCallbackId{0};
+        astra_callback_id_t m_streamAddedCallbackId{0};
+        astra_callback_id_t m_streamRemovingCallbackId{0};
 
-        using StreamTrackerMap =  std::unordered_map<sensekit_stream_t,
+        using StreamTrackerMap =  std::unordered_map<astra_stream_t,
                                                      HandTracker*,
                                                      StreamHandleHash,
                                                      StreamHandleEqualTo>;

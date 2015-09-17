@@ -4,7 +4,7 @@
 #include <opencv2/core/affine.hpp>
 #include "TrackingData.h"
 
-namespace sensekit { namespace plugins { namespace hand {
+namespace astra { namespace plugins { namespace hand {
 
     struct TrackedPoint
     {

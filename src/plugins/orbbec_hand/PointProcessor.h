@@ -4,12 +4,12 @@
 #include <opencv2/core/affine.hpp>
 #include "TrackingData.h"
 #include "ScalingCoordinateMapper.h"
-#include <SenseKit/Plugins/PluginLogger.h>
+#include <Astra/Plugins/PluginLogger.h>
 #include "HandSettings.h"
 #include <unordered_map>
 #include "TrajectoryAnalyzer.h"
 
-namespace sensekit { namespace plugins { namespace hand {
+namespace astra { namespace plugins { namespace hand {
 
     struct TrackedPoint;
 

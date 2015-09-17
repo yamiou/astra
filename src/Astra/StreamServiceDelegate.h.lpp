@@ -1,0 +1,23 @@
+/* ^^^AUTOGENHEADER^^^ */
+#ifndef STREAMSERVICEDELEGATE_H
+#define STREAMSERVICEDELEGATE_H
+
+#include <Astra/astra_types.h>
+#include "AstraContext.h"
+
+namespace astra {
+
+    class StreamServiceDelegate
+    {
+    public:
+^^^BEGINREPLACE:stream^^^
+
+        static ^RETURN^ ^FUNC^(^PARAMS:void^)
+        {
+            return static_cast<AstraContext*>(^PARAMS:names,voidonly^)->^FUNC^(^PARAMS:names,deref^);
+        }
+^^^ENDREPLACE^^^
+    };
+}
+
+#endif /* STREAMSERVICEDELEGATE_H */

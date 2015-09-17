@@ -1,15 +1,20 @@
 #include "ProtoFrameInputStream.h"
 
-#include "gensrc/FrameDescription.pb.h"
-#include "gensrc/Frame.pb.h"
+#include "FrameDescription.pb.h"
+#include "Frame.pb.h"
 
 #include "pb_util.h"
 
-namespace sensekit { namespace serialization {
+namespace astra { namespace serialization {
     ProtoFrameInputStream::ProtoFrameInputStream(const char* path) :
         FrameInputStream()
     {
         m_file = fopen(path, "rb");
+
+        if (m_file == nullptr)
+        {
+            throw ResourceNotFoundException(path);
+        }
 
         m_fileDescriptor = get_file_descriptor(m_file);
 
@@ -28,7 +33,6 @@ namespace sensekit { namespace serialization {
 
         return fileDescriptor;
     }
-
 
     long ProtoFrameInputStream::get_file_size(int fd)
     {

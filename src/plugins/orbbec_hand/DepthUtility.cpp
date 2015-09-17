@@ -1,10 +1,10 @@
 #include "DepthUtility.h"
-#include <SenseKitUL/SenseKitUL.h>
+#include <AstraUL/AstraUL.h>
 #include "TrackingData.h"
 #include <cmath>
 #include <Shiny.h>
 
-namespace sensekit { namespace plugins { namespace hand {
+namespace astra { namespace plugins { namespace hand {
 
     DepthUtility::DepthUtility(float width, float height, DepthUtilitySettings& settings) :
         m_processingWidth(width),

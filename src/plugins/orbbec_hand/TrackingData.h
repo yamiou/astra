@@ -5,7 +5,7 @@
 #include "ScalingCoordinateMapper.h"
 #include "HandSettings.h"
 
-namespace sensekit { namespace plugins { namespace hand {
+namespace astra { namespace plugins { namespace hand {
 
     enum PixelType
     {
@@ -84,13 +84,13 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat& debugScoreValue;
         cv::Mat& debugTestPassMap;
         bool enableTestPassMap;
-        const sensekit::Vector3f* fullSizeWorldPoints;
-        sensekit::Vector3f* worldPoints;
+        const astra::Vector3f* fullSizeWorldPoints;
+        astra::Vector3f* worldPoints;
         bool debugLayersEnabled;
         int layerCount;
-        const sensekit::CoordinateMapper& fullSizeMapper;
+        const astra::CoordinateMapper& fullSizeMapper;
         const conversion_cache_t depthToWorldData;
-        std::vector<sensekit::Vector2i> layerCirclePoints;
+        std::vector<astra::Vector2i> layerCirclePoints;
 
         TrackingMatrices(cv::Mat& depthFullSize,
                          cv::Mat& depth,
@@ -108,10 +108,10 @@ namespace sensekit { namespace plugins { namespace hand {
                          cv::Mat& debugScoreValue,
                          cv::Mat& debugTestPassMap,
                          bool enableTestPassMap,
-                         const sensekit::Vector3f* fullSizeWorldPoints,
-                         sensekit::Vector3f* worldPoints,
+                         const astra::Vector3f* fullSizeWorldPoints,
+                         astra::Vector3f* worldPoints,
                          bool debugLayersEnabled,
-                         const sensekit::CoordinateMapper& fullSizeMapper,
+                         const astra::CoordinateMapper& fullSizeMapper,
                          const conversion_cache_t depthToWorldData)
             :
             depthFullSize(depthFullSize),

@@ -3,8 +3,41 @@
 
 #include "StreamFileModels.h"
 #include <cstdint>
+#include <exception>
 
-namespace sensekit { namespace serialization {
+#ifndef __has_feature
+#define __has_feature(x) 0
+#endif
+
+// Is noexcept supported?
+#if (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46) || \
+    (defined(__clang__) && defined(__has_feature) && __has_feature(cxx_noexcept)) || \
+    (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 190023026)
+#  define NOEXCEPT noexcept
+#else
+#  define NOEXCEPT
+#endif
+
+namespace astra { namespace serialization {
+
+
+    class ResourceNotFoundException : std::exception
+    {
+    public:
+        ResourceNotFoundException(const char* uri)
+            : m_uri(uri)
+        {
+
+        }
+
+        const char* what() const NOEXCEPT override
+        {
+            return m_uri;
+        }
+
+    private:
+        const char* m_uri;
+    };
 
     class FrameInputStream
     {

@@ -1,22 +1,22 @@
 ﻿// Orbbec (c) 2015
 
-#include <SenseKit/sensekit_capi.h>
-#include <SenseKitUL/skul_capi.h>
+#include <Astra/astra_capi.h>
+#include <AstraUL/skul_capi.h>
 #include <stdio.h>
 #include <key_handler.h>
 
-void print_depth(sensekit_depthframe_t depthFrame)
+void print_depth(astra_depthframe_t depthFrame)
 {
-    sensekit_image_metadata_t metadata;
+    astra_image_metadata_t metadata;
 
     int16_t* depthData;
     size_t depthLength;
 
-    sensekit_depthframe_get_data_byte_length(depthFrame, &depthLength);
-    sensekit_depthframe_get_metadata(depthFrame, &metadata);
+    astra_depthframe_get_data_byte_length(depthFrame, &depthLength);
+    astra_depthframe_get_metadata(depthFrame, &metadata);
 
     depthData = (int16_t*)malloc(depthLength);
-    sensekit_depthframe_copy_data(depthFrame, depthData);
+    astra_depthframe_copy_data(depthFrame, depthData);
 
     int width = metadata.width;
     int height = metadata.height;
@@ -26,8 +26,8 @@ void print_depth(sensekit_depthframe_t depthFrame)
 
     free(depthData);
 
-    sensekit_frame_index_t frameIndex;
-    sensekit_depthframe_get_frameindex(depthFrame, &frameIndex);
+    astra_frame_index_t frameIndex;
+    astra_depthframe_get_frameindex(depthFrame, &frameIndex);
     printf("index %d value %d\n", frameIndex, middle);
 }
 
@@ -35,42 +35,42 @@ int main(int argc, char* argv[])
 {
     set_key_handler();
 
-    sensekit_initialize();
+    astra_initialize();
 
-    sensekit_streamsetconnection_t sensor;
+    astra_streamsetconnection_t sensor;
 
-    sensekit_streamset_open("device/default", &sensor);
+    astra_streamset_open("device/default", &sensor);
 
-    sensekit_reader_t reader;
-    sensekit_reader_create(sensor, &reader);
+    astra_reader_t reader;
+    astra_reader_create(sensor, &reader);
 
-    sensekit_depthstream_t depthStream;
-    sensekit_reader_get_depthstream(reader, &depthStream);
+    astra_depthstream_t depthStream;
+    astra_reader_get_depthstream(reader, &depthStream);
 
     float hFov, vFov;
-    sensekit_depthstream_get_hfov(depthStream, &hFov);
-    sensekit_depthstream_get_vfov(depthStream, &vFov);
+    astra_depthstream_get_hfov(depthStream, &hFov);
+    astra_depthstream_get_vfov(depthStream, &vFov);
 
     printf("depth sensor -- hFov: %f radians vFov: %f radians\n", hFov, vFov);
 
-    sensekit_stream_start(depthStream);
+    astra_stream_start(depthStream);
 
-    sensekit_frame_index_t lastFrameIndex = -1;
+    astra_frame_index_t lastFrameIndex = -1;
 
     do
     {
-        sensekit_temp_update();
+        astra_temp_update();
 
-        sensekit_reader_frame_t frame;
-        sensekit_status_t rc = sensekit_reader_open_frame(reader, 0, &frame);
+        astra_reader_frame_t frame;
+        astra_status_t rc = astra_reader_open_frame(reader, 0, &frame);
 
-        if (rc == SENSEKIT_STATUS_SUCCESS)
+        if (rc == ASTRA_STATUS_SUCCESS)
         {
-            sensekit_depthframe_t depthFrame;
-            sensekit_frame_get_depthframe(frame, &depthFrame);
+            astra_depthframe_t depthFrame;
+            astra_frame_get_depthframe(frame, &depthFrame);
 
-            sensekit_frame_index_t newFrameIndex;
-            sensekit_depthframe_get_frameindex(depthFrame, &newFrameIndex);
+            astra_frame_index_t newFrameIndex;
+            astra_depthframe_get_frameindex(depthFrame, &newFrameIndex);
 
             if (lastFrameIndex == newFrameIndex)
             {
@@ -80,13 +80,13 @@ int main(int argc, char* argv[])
 
             print_depth(depthFrame);
 
-            sensekit_reader_close_frame(&frame);
+            astra_reader_close_frame(&frame);
         }
 
     } while (shouldContinue);
 
-    sensekit_reader_destroy(&reader);
-    sensekit_streamset_close(&sensor);
+    astra_reader_destroy(&reader);
+    astra_streamset_close(&sensor);
 
-    sensekit_terminate();
+    astra_terminate();
 }

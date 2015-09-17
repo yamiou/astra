@@ -4,7 +4,7 @@
 
 #include "ProtoFrameInputStream.h"
 
-namespace sensekit { namespace serialization {
+namespace astra { namespace serialization {
 
     FrameStreamReader::FrameStreamReader(FrameInputStream* frameStream) :
         m_inputStream(frameStream)

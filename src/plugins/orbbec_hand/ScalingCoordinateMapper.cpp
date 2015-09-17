@@ -1,9 +1,9 @@
 #include "ScalingCoordinateMapper.h"
 #include <opencv2/core/core.hpp>
-#include <SenseKitUL/streams/Depth.h>
+#include <AstraUL/streams/Depth.h>
 #include <Shiny.h>
 
-namespace sensekit { namespace plugins { namespace hand {
+namespace astra { namespace plugins { namespace hand {
 
     void convert_depth_to_world_f(const conversion_cache_t& depthToWorldData,
                                   float depthX, float depthY, float depthZ,

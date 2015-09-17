@@ -1,8 +1,8 @@
-#include <SensekitUL/streams/Depth.h>
-#include <SenseKit/Plugins/plugin_capi.h>
-#include <SenseKit/sensekit_capi.h>
-#include <Sensekit/SenseKit.h>
-#include <SenseKit/sensekit_types.h>
+#include <AstraUL/streams/Depth.h>
+#include <Astra/Plugins/plugin_capi.h>
+#include <Astra/astra_capi.h>
+#include <Astra/Astra.h>
+#include <Astra/astra_types.h>
 
 #include <memory>
 #include <chrono>
@@ -15,21 +15,81 @@
 #include <common/serialization/FrameStreamWriter.h>
 #include <common/serialization/FrameOutputStream.h>
 
-using namespace sensekit::serialization;
+using namespace astra;
 
-class PointFrameListener : public sensekit::FrameReadyListener
+class Recorder
 {
 public:
-    PointFrameListener(sensekit::PointStream& pointStream)
+    explicit Recorder(const char* filename) {
+        m_outputFile = fopen(filename, "wb");
+        m_frameOutputStream = serialization::open_frame_output_stream(m_outputFile);
+        m_frameStreamWriter = FrameStreamWriterPtr(new serialization::FrameStreamWriter(*m_frameOutputStream));
+        m_frameStreamWriter->begin_write();
+    }
+
+    ~Recorder() {
+        m_frameStreamWriter->end_write();
+        serialization::close_frame_output_stream(m_frameOutputStream);
+        m_frameStreamWriter = nullptr;
+        fclose(m_outputFile);
+        printf("closed file\n");
+    }
+
+    void add_frame(DepthFrame& depthFrame) {
+        if (!depthFrame.is_valid()) {
+            return;
+        }
+        bool result = m_frameStreamWriter->write(depthFrame);
+        printf("Saving frame: %d %s\n", m_frameCount, result ? "" : "failure");
+        ++m_frameCount;
+    }
+
+private:
+    FILE* m_outputFile;
+    serialization::FrameOutputStream* m_frameOutputStream;
+    int m_frameCount { 0 };
+
+    using FrameStreamWriterPtr = std::unique_ptr<serialization::FrameStreamWriter>;
+    FrameStreamWriterPtr m_frameStreamWriter;
+};
+
+class Viewer : public FrameReadyListener
+{
+public:
+    Viewer(StreamSet& streamset) :
+        m_reader(streamset.create_reader())
     {
         m_lastTimepoint = clock_type::now();
+
+        m_reader.stream<DepthStream>().start();
+        m_reader.stream<PointStream>().start();
+
+        m_reader.addListener(*this);
     }
 
-    ~PointFrameListener()
+    void draw_to(sf::RenderWindow& window)
     {
+        if (m_displayBuffer != nullptr)
+        {
+            float depthScale = window.getView().getSize().x / m_displayWidth;
 
+            m_sprite.setScale(depthScale, depthScale);
+
+            window.draw(m_sprite);
+        }
     }
 
+    void start_recording()
+    {
+        m_recorder = RecorderPtr(new Recorder("test.df"));
+    }
+
+    void stop_recording()
+    {
+        m_recorder = nullptr;
+    }
+
+private:
     void init_texture(int width, int height)
     {
         if (m_displayBuffer == nullptr || width != m_displayWidth || height != m_displayHeight)
@@ -63,19 +123,19 @@ public:
 
         auto precision = std::cout.precision();
         std::cout << std::fixed
-            << std::setprecision(1)
-            << fps << " fps ("
-            << std::setprecision(2)
-            << frameDuration.count() * 1000 << " ms)"
-            << std::setprecision(precision)
-            << std::endl;
+                  << std::setprecision(1)
+                  << fps << " fps ("
+                  << std::setprecision(2)
+                  << frameDuration.count() * 1000 << " ms)"
+                  << std::setprecision(precision)
+                  << std::endl;
     }
 
-    virtual void on_frame_ready(sensekit::StreamReader& reader,
-                                sensekit::Frame& frame) override
+    void visualize_frame(PointFrame& pointFrame)
     {
-        sensekit::PointFrame pointFrame = frame.get<sensekit::PointFrame>();
-
+        if (!pointFrame.is_valid()) {
+            return;
+        }
         int width = pointFrame.resolutionX();
         int height = pointFrame.resolutionY();
 
@@ -83,7 +143,7 @@ public:
 
         m_visualizer.update(pointFrame);
 
-        sensekit_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
+        astra_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
         for (int i = 0; i < width * height; i++)
         {
             int rgbaOffset = i * 4;
@@ -93,31 +153,23 @@ public:
             m_displayBuffer[rgbaOffset + 3] = 255;
         }
         m_texture.update(m_displayBuffer.get());
-
-        if (m_shouldCheckFps)
-        {
-            check_fps();
-        }
     }
 
-    void set_shouldcheckfps(bool shouldCheckFps)
+    virtual void on_frame_ready(StreamReader& reader,
+                                Frame& frame) override
     {
-        m_shouldCheckFps = shouldCheckFps;
-    }
+        PointFrame pointFrame = frame.get<PointFrame>();
+        DepthFrame depthFrame = frame.get<DepthFrame>();
 
-    void drawTo(sf::RenderWindow& window)
-    {
-        if (m_displayBuffer != nullptr)
-        {
-            float depthScale = window.getView().getSize().x / m_displayWidth;
-
-            m_sprite.setScale(depthScale, depthScale);
-
-            window.draw(m_sprite);
+        if (m_recorder != nullptr) {
+            m_recorder->add_frame(depthFrame);
         }
+
+        visualize_frame(pointFrame);
+
+        //check_fps();
     }
 
-private:
     samples::common::LitDepthVisualizer m_visualizer;
 
     using duration_type = std::chrono::duration<double>;
@@ -133,158 +185,75 @@ private:
     int m_displayWidth{0};
     int m_displayHeight{0};
 
-    bool m_shouldCheckFps{false};
+    StreamReader m_reader;
+    using RecorderPtr = std::unique_ptr<Recorder>;
+    RecorderPtr m_recorder;
 };
 
-
-class DepthFrameListener : public sensekit::FrameReadyListener
+void handle_key(sf::Keyboard::Key key, sf::RenderWindow& window, Viewer& viewer)
 {
-public:
-    DepthFrameListener(sensekit::DepthStream& depthStream, FrameStreamWriter& serializer)
-        : m_frameStreamWriter(serializer)
+    if (key == sf::Keyboard::Escape)
     {
-
+        window.close();
     }
-
-    ~DepthFrameListener()
+    else if (key == sf::Keyboard::S)
     {
-
+        viewer.stop_recording();
     }
-
-    virtual void on_frame_ready(sensekit::StreamReader& reader,
-                                sensekit::Frame& frame) override
+    if (key == sf::Keyboard::R)
     {
-        sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
-
-        m_frameStreamWriter.write(depthFrame);
+        viewer.start_recording();
     }
-
-private:
-
-    FrameStreamWriter& m_frameStreamWriter;
-};
+}
 
 int main(int argc, char** argv)
 {
-    bool isRecording = false;
-    bool isPlaying = false;
-    bool shouldBlockCommands = false;
-
-    FILE* outputFile = fopen("test.df", "wb");;
-
-    std::unique_ptr<FrameOutputStream> outputStream =
-        std::unique_ptr<FrameOutputStream>(open_frame_output_stream(outputFile));
-    FrameStreamWriter streamWriter(*outputStream.get());
-
-    sensekit::SenseKit::initialize();
+    Astra::initialize();
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Stream Recorder");
 
-    sensekit::Sensor sensor;
-    sensekit::StreamReader sensorReader = sensor.create_reader();
+    StreamSet streamset;
 
-    sensekit::Sensor streamPlayer("stream_player");
-    sensekit::StreamReader streamPlayerReader = streamPlayer.create_reader();
+/*
+    StreamSet streamPlayer("stream_player");
+    StreamReader streamPlayerReader = streamPlayer.create_reader();
 
-    auto sensorDs = sensorReader.stream<sensekit::DepthStream>();
-    auto sensorPs = sensorReader.stream<sensekit::PointStream>();
-    auto streamPlayerPs = streamPlayerReader.stream<sensekit::PointStream>();
-
-    sensorDs.start();
-    sensorPs.start();
-
-    DepthFrameListener sensorDsListener(sensorDs, streamWriter);
-    PointFrameListener sensorPsListener(sensorPs);
-    PointFrameListener streamPlayerPsListener(streamPlayerPs);
-
-    sensorReader.addListener(sensorDsListener);
-    sensorReader.addListener(sensorPsListener);
-    streamPlayerReader.addListener(streamPlayerPsListener);
+    auto streamPlayerPs = streamPlayerReader.stream<PointStream>();
+*/
+    Viewer viewer(streamset);
 
     while (window.isOpen())
     {
-        sensekit_temp_update();
+        astra_temp_update();
 
         sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-            {
-                window.close();
-            }
-            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
-            {
-                window.close();
-            }
-
-            if (!shouldBlockCommands &&
-                !isPlaying &&
-                !isRecording &&
-                (event.type == sf::Event::KeyPressed) &&
-                (event.key.code == sf::Keyboard::R))
-            {
-                sensorPsListener.set_shouldcheckfps(true);
-                streamWriter.begin_write();
-                isRecording = true;
-                shouldBlockCommands = true;
-            }
-
-            if (!shouldBlockCommands &&
-                !isPlaying &&
-                isRecording &&
-                (event.type == sf::Event::KeyPressed) &&
-                (event.key.code == sf::Keyboard::R))
-            {
-                sensorPsListener.set_shouldcheckfps(false);
-                streamWriter.end_write();
-                isRecording = false;
-                shouldBlockCommands = true;
-            }
-
-            if (!shouldBlockCommands &&
-                !isRecording && !isPlaying &&
-                (event.type == sf::Event::KeyPressed) &&
-                (event.key.code == sf::Keyboard::P))
-            {
-                streamPlayerPsListener.set_shouldcheckfps(true);
-                isPlaying = true;
-                shouldBlockCommands = true;
-            }
-            if (!shouldBlockCommands &&
-                !isRecording &&
-                isPlaying &&
-                (event.type == sf::Event::KeyPressed) &&
-                (event.key.code == sf::Keyboard::S))
-            {
-                streamPlayerPsListener.set_shouldcheckfps(false);
-                isPlaying = false;
-                shouldBlockCommands = true;
-            }
-
-            if (shouldBlockCommands)
-            {
-                shouldBlockCommands = false;
-            }
-        }
 
         window.clear(sf::Color::Black);
 
-        if (isPlaying)
+        while (window.pollEvent(event))
         {
-            streamPlayerPsListener.drawTo(window);
+            switch (event.type)
+            {
+            case sf::Event::Closed:
+                window.close();
+                break;
+            case sf::Event::KeyPressed:
+            {
+                sf::Keyboard::Key key = event.key.code;
+                handle_key(key, window, viewer);
+                break;
+            }
+            default:
+                break;
+            }
         }
-        else if (isRecording)
-        {
-            sensorPsListener.drawTo(window);
-        }
+
+        viewer.draw_to(window);
 
         window.display();
     }
 
-    sensekit::SenseKit::terminate();
-
-    outputStream.reset();
-    fclose(outputFile);
+    Astra::terminate();
 
     return 0;
 }

@@ -1,54 +1,67 @@
 cmake_minimum_required (VERSION 3.2)
 
-project (SenseKit)
+project (Astra)
 
 if (ANDROID)
-  set(SENSEKIT_ANDROID TRUE)
+  set(ASTRA_ANDROID TRUE)
+elseif (WIN32)
+  set(ASTRA_WINDOWS TRUE)
+elseif (UNIX)
+  set(ASTRA_UNIX TRUE)
 endif()
 
 # Version
 string (TIMESTAMP BUILD_DATE "%Y%m%dT%H%M%SZ" UTC)
-set (SenseKit_VERSION_MAJOR 0)
-set (SenseKit_VERSION_MINOR 2)
-set (SenseKit_VERSION_PATCH 1)
-set (SenseKit_VERSION_BUILD 0)
+set (Astra_VERSION_MAJOR 0)
+set (Astra_VERSION_MINOR 3)
+set (Astra_VERSION_PATCH 0)
+set (Astra_VERSION_BUILD 0)
 
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-  set(SENSEKIT_CLANG ON)
+  set(ASTRA_CLANG ON)
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set(SENSEKIT_GCC ON)
+  set(ASTRA_GCC ON)
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-  set(SENSEKIT_INTELC ON)
+  set(ASTRA_INTELC ON)
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  set(SENSEKIT_MSVC ON)
+  set(ASTRA_MSVC ON)
 endif()
 
-if(SENSEKIT_GCC OR SENSEKIT_CLANG)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-  if(SENSEKIT_ANDROID)
-    set(ANDROID_CXX_FLAGS "${ANDROID_CXX_FLAGS} -std=c++14 -Wall")
+if(ASTRA_GCC OR ASTRA_CLANG)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -fPIC")
+
+  if(ASTRA_ANDROID)
+    set(ANDROID_CXX_FLAGS "${ANDROID_CXX_FLAGS} -std=c++14 -Wall -fPIC")
   endif()
-
 endif()
+
+message(${CMAKE_CXX_FLAGS})
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-if(SENSEKIT_ANDROID)
+set(ASTRA_DOCS FALSE CACHE BOOL "Build Astra Documentation")
+
+if (ASTRA_DOCS)
+  add_subdirectory(docs)
+endif()
+
+if(ASTRA_ANDROID)
   find_host_package(CLISP REQUIRED)
 else()
   find_package(CLISP REQUIRED)
 endif()
 
-#Override FindSenseKit equivalents
-set(SENSEKIT_SDK_BUILD TRUE)
-set(SENSEKIT_LIBRARIES
-  SenseKit
-  SenseKitAPI
-  SenseKitUL
+#Override FindAstra equivalents
+set(ASTRA_SDK_BUILD TRUE)
+set(ASTRA_LIBRARIES
+  Astra
+  AstraAPI
+  AstraUL
   )
-set(SENSEKIT_INCLUDE_DIR
+set(ASTRA_INCLUDE_DIR
   ${PROJECT_SOURCE_DIR}/include
   )
 
@@ -62,9 +75,56 @@ set (SDK_DEPENDENT_TARGET "SDK_dependent")
 add_custom_target(${SDK_DEPENDENT_TARGET})
 
 set(SHINY_INCLUDE "${PROJECT_SOURCE_DIR}/vendor/shinyprofiler/include")
+set(CATCH_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/vendor/catch/include" CACHE INTERNAL "Path to include folder for Catch")
+
+function(install_lib _targetname)
+  set(extrapath ${ARGV1})
+  install(TARGETS ${_targetname}
+    RUNTIME DESTINATION bin/${extrapath}
+    LIBRARY DESTINATION lib/${extrapath}
+    ARCHIVE DESTINATION lib/${extrapath}
+    )
+  if (MSVC)
+    install_pdb(${_targetname} bin/)
+    set(INSTALL_PATHS 
+      samples/vs2013/copy_to_bin_dir/${extrapath}
+      samples/vs2013/bin/Debug/${extrapath}
+      samples/vs2013/bin/Release/${extrapath}
+    )
+    foreach(INSTALL_PATH ${INSTALL_PATHS})
+      install(TARGETS ${_targetname}
+        RUNTIME DESTINATION ${INSTALL_PATH}
+        )
+      install_pdb(${_targetname} ${INSTALL_PATH})
+    endforeach()
+  endif()
+endfunction()
+
+function(install_file _targetfile)
+  set(extrapath ${ARGV1})
+  if (MSVC)
+    set(INSTALL_PATHS 
+      bin/${extrapath}
+      samples/vs2013/copy_to_bin_dir/${extrapath}
+      samples/vs2013/bin/Debug/${extrapath}
+      samples/vs2013/bin/Release/${extrapath}
+    )
+    foreach(INSTALL_PATH ${INSTALL_PATHS})
+      install(FILES ${_targetfile}
+        DESTINATION ${INSTALL_PATH}
+        )
+    endforeach()
+  else()
+    install(FILES ${_targetfile}
+      DESTINATION lib/${extrapath}
+    )
+  endif()
+endfunction()
+
 add_subdirectory(vendor)
 add_subdirectory(src)
 add_subdirectory(samples)
+add_subdirectory(tests)
 
 set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/sdk")
 MESSAGE("CMAKE_INSTALL_PREFIX : ${CMAKE_INSTALL_PREFIX}")
@@ -72,7 +132,7 @@ MESSAGE("CMAKE_INSTALL_PREFIX : ${CMAKE_INSTALL_PREFIX}")
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include
   DESTINATION .
   FILES_MATCHING PATTERN "*.h"
-  PATTERN "include/SenseKitUL/Plugins" EXCLUDE
+  PATTERN "include/AstraUL/Plugins" EXCLUDE
   )
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples
@@ -82,7 +142,6 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples
   PATTERN "samples/plugins/orbbec_skeleton" EXCLUDE
   PATTERN "samples/sfml/SimpleSkeletonViewer-SFML" EXCLUDE
   PATTERN "samples/tools/StreamRecorder" EXCLUDE
-  PATTERN "samples/gl" EXCLUDE
   )
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
@@ -91,29 +150,26 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
   PATTERN ".gitignore" EXCLUDE
   )
 
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/android/
-  DESTINATION android
-  USE_SOURCE_PERMISSIONS
-  PATTERN ".gitignore" EXCLUDE
-  PATTERN ".git" EXCLUDE
-  PATTERN ".gitmodules" EXCLUDE
-  )
-
 if (MSVC)
-  install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013
-    DESTINATION samples
+  #Lack of a trailing / is important here, ends up in samples/vs2013/
+  install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013/thirdparty
+    DESTINATION samples/vs2013/
     PATTERN "build" EXCLUDE
     PATTERN ".gitignore" EXCLUDE
-    PATTERN "thirdparty/.git" EXCLUDE
-    PATTERN "thirdparty/glut_windows" EXCLUDE
-    PATTERN "thirdparty/copy_to_bin_dir/glut*.dll" EXCLUDE
+    PATTERN ".git" EXCLUDE
     )
 
-  file(GLOB_RECURSE THIRD_PARTY_FILES "${PROJECT_SOURCE_DIR}/samples-aux/vs2013/thirdparty/copy_to_bin_dir/*.*")
-  install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013/thirdparty/copy_to_bin_dir/
-    DESTINATION bin
-    PATTERN "glut*.dll" EXCLUDE
-    )
+  set(INSTALL_PATHS
+    bin/
+    samples/vs2013/copy_to_bin_dir/
+    samples/vs2013/bin/Debug/
+    samples/vs2013/bin/Release/
+  )
+  foreach(INSTALL_PATH ${INSTALL_PATHS})
+   install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013/copy_to_bin_dir/
+     DESTINATION ${INSTALL_PATH}
+     )
+  endforeach()
 
   set(SAMPLES_SOURCE_DIR "${PROJECT_BINARY_DIR}/sdk/samples")
   set(SAMPLES_BUILD_TEMP_DIR "${PROJECT_BINARY_DIR}/temp/vs2013/")
@@ -145,14 +201,14 @@ else()
     )
 endif()
 
-set(CPACK_PACKAGE_NAME "SenseKitSDK")
+set(CPACK_PACKAGE_NAME "AstraSDK")
 set(CPACK_PACKAGE_VENDOR "Orbbec")
 set(CPACK_PACKAGE_DIRECTORY "${PROJECT_BINARY_DIR}/sdk_package")
-set(CPACK_PACKAGE_VERSION_MAJOR ${SenseKit_VERSION_MAJOR})
-set(CPACK_PACKAGE_VERSION_MINOR ${SenseKit_VERSION_MINOR})
-set(CPACK_PACKAGE_VERSION_PATCH "${SenseKit_VERSION_PATCH}-${BUILD_DATE}")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Orbbec Sensekit SDK")
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "Orbbec/SenseKit")
+set(CPACK_PACKAGE_VERSION_MAJOR ${Astra_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${Astra_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH "${Astra_VERSION_PATCH}-${BUILD_DATE}")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Orbbec Astra SDK")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "Orbbec/Astra")
 
 if (WIN32)
   set(CPACK_GENERATOR "ZIP")

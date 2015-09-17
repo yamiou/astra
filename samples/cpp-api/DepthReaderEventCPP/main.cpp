@@ -1,14 +1,16 @@
 ﻿// Orbbec (c) 2015
 
-#include <Sensekit/SenseKit.h>
-#include <SensekitUL/SenseKitUL.h>
+#include <Astra/Astra.h>
+#include <AstraUL/AstraUL.h>
 #include <cstdio>
+#include <chrono>
 #include <iostream>
+#include <iomanip>
 
 #include <key_handler.h>
 
-void print_depth(sensekit::DepthFrame& depthFrame,
-                 const sensekit::CoordinateMapper& mapper)
+void print_depth(astra::DepthFrame& depthFrame,
+                 const astra::CoordinateMapper& mapper)
 {
     if (depthFrame.is_valid())
     {
@@ -41,48 +43,80 @@ void print_depth(sensekit::DepthFrame& depthFrame,
     }
 }
 
-class SampleFrameListener : public sensekit::FrameReadyListener
+class SampleFrameListener : public astra::FrameReadyListener
 {
-    virtual void on_frame_ready(sensekit::StreamReader& reader,
-                                 sensekit::Frame& frame) override
+    virtual void on_frame_ready(astra::StreamReader& reader,
+                                 astra::Frame& frame) override
     {
-        sensekit::DepthFrame depthFrame = frame.get<sensekit::DepthFrame>();
+        astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
 
         if (depthFrame.is_valid())
         {
             print_depth(depthFrame,
-                reader.stream<sensekit::DepthStream>().coordinateMapper());
+                reader.stream<astra::DepthStream>().coordinateMapper());
+            check_fps();
         }
     }
+
+
+    void check_fps()
+    {
+        const double frameWeight = 0.2;
+
+        auto newTimepoint = clock_type::now();
+        auto frameDuration = std::chrono::duration_cast<duration_type>(newTimepoint - m_lastTimepoint);
+
+        m_frameDuration = frameDuration * frameWeight + m_frameDuration * (1 - frameWeight);
+        m_lastTimepoint = newTimepoint;
+
+        double fps = 1.0 / m_frameDuration.count();
+
+        auto precision = std::cout.precision();
+        std::cout << std::fixed
+                  << std::setprecision(1)
+                  << fps << " fps ("
+                  << std::setprecision(2)
+                  << frameDuration.count() * 1000 << " ms)"
+                  << std::setprecision(precision)
+                  << std::endl;
+    }
+
+
+private:
+    using duration_type = std::chrono::duration<double>;
+    duration_type m_frameDuration{0.0};
+
+    using clock_type = std::chrono::system_clock;
+    std::chrono::time_point<clock_type> m_lastTimepoint;
 };
 
 int main(int argc, char** argv)
 {
-    sensekit::SenseKit::initialize();
+    astra::Astra::initialize();
 
     set_key_handler();
 
-    sensekit::Sensor sensor;
-    sensekit::StreamReader reader = sensor.create_reader();
+    astra::StreamSet streamset("device/default");
+    astra::StreamReader reader = streamset.create_reader();
 
     SampleFrameListener listener;
 
-    reader.stream<sensekit::DepthStream>().start();
+    reader.stream<astra::DepthStream>().start();
 
     std::cout << "depthStream -- hFov: "
-              << reader.stream<sensekit::DepthStream>().horizontalFieldOfView()
+              << reader.stream<astra::DepthStream>().horizontalFieldOfView()
               << " vFov: "
-              << reader.stream<sensekit::DepthStream>().verticalFieldOfView()
+              << reader.stream<astra::DepthStream>().verticalFieldOfView()
               << std::endl;
 
     reader.addListener(listener);
 
     do
     {
-        sensekit_temp_update();
+        astra_temp_update();
     } while (shouldContinue);
 
     reader.removeListener(listener);
 
-    sensekit::SenseKit::terminate();
+    astra::Astra::terminate();
 }

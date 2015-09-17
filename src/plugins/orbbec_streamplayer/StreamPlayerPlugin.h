@@ -1,10 +1,10 @@
 #ifndef STREAMPLAYERPLUGIN_H
 #define STREAMPLAYERPLUGIN_H
 
-#include <SenseKit/Plugins/PluginKit.h>
+#include <Astra/Plugins/PluginKit.h>
 #include "PlaybackStreamSet.h"
 
-namespace sensekit { namespace plugins { namespace streamplayer {
+namespace astra { namespace plugins { namespace streamplayer {
 
     class StreamPlayerPlugin : public PluginBase
     {
@@ -16,14 +16,14 @@ namespace sensekit { namespace plugins { namespace streamplayer {
     private:
         void create_streamset();
 
-        sensekit_status_t read_streams();
+        astra_status_t read_streams();
 
         using SetPtr = std::unique_ptr<PlaybackStreamSetBase>;
         using SetList = std::vector<SetPtr>;
 
         SetList m_sets;
     };
-    
+
 }}}
 
 

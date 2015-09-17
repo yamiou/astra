@@ -1,11 +1,22 @@
-SenseKit SDK v0.2.1 Preview for Windows and Android
+Astra SDK v0.3.0 Preview
 Copyright (c) 2015 Orbbec
 www.orbbec3d.com
 
-josh@orbbec3d.com
+feedback@orbbec3d.com
 
 What's New
 ==========
+
+v0.3.0 2015/09/14
+* Rename to Astra SDK.
+* Rename Sensor to StreamSet in C++ API.
+* Various bug fixes and internal enhancements.
+* New samples:  SimpleStreamViewer-SFML, SimpleColorViewer-SFML, ColorReaderEvent, ColorReaderPoll
+* Samples have improved performance.
+* Add IR stream, mirrored depth, and registered depth support.
+* VS2013 samples solution no longer requires copying files - compiles and runs out of the box.
+* StreamReader start() and stop() are functional now. See SimpleStreamViewer-SFML.
+* Add initial getting started documentation
 
 v0.2.1 2015/07/06 Updated Android and Windows drivers for new sensor USB IDs. Add Android test app .apk.
 
@@ -28,7 +39,7 @@ you must install the Visual C++ Redistributable Packages for Visual Studio 2013 
 http://www.microsoft.com/en-us/download/details.aspx?id=40784
 (Not required if VS2013 is installed.)
 
-Tested on Windows 8.1, Windows 7, and Android 4.4.2.
+Tested on Windows 10, Windows 8.1, Windows 7.
 
 Pre-built samples
 ==========
@@ -36,45 +47,44 @@ Pre-built samples
 Pre-built samples are included in the bin/ directory.
 Simply plug in your sensor and then run any of the executable files in the bin/ directory.
 
-We recommend starting with SimpleDepthViewer-SFML and SimpleHandViewer-SFML.
+We recommend starting with SimpleStreamViewer-SFML and SimpleHandViewer-SFML.
 In the hand viewer, wave left and right at the sensor a few times to start hand tracking.
+
+Sample keyboard shortcuts
+==========
+SimpleStreamViewer-SFML:
+* F - toggle fullscreen
+* R - toggle registered depth
+* M - toggle mirrored streams
+* I - enable IR (RGB mode)
+* G - enable IR (Gray16 mode)
+* C - enable color
+
+SimpleDepthViewer-SFML:
+* F - toggle fullscreen
+* R - toggle registered depth
+* M - toggle mirrored streams
 
 Building the samples
 ==========
 
-In the sdk/samples/vs2013 folder, open sensekit-samples.sln. Build solution.
+In the sdk/samples/vs2013 folder, open astra-samples.sln. Build solution.
 
-The samples compile to sdk/samples/vs2013/bin/Debug/ or Release/, depending upon your configuration.
+The samples compile to sdk/samples/vs2013/bin/Debug/ or Release/, depending upon your build configuration.
 
-Running the samples
+You can exit samples by pressing Control-C. They will catch this signal and exit cleanly. To exit samples with a GUI window, press Control-C, escape, or simply close the window.
+
+When you start development, we highly recommend using the C++ API (or a higher level language wrapper.) The C API is meant for compatibility, so the C++ API is much more pleasant development experience.
+
+Documentation
 ==========
-To run the samples:
-1) Copy all the files from sdk/samples/vs2013/thirdparty/copy_to_bin_dir/ to
-your build folder (bin/Debug/ or bin/Release/).
 
-2) From the sdk/bin/ folder, copy SenseKit.dll, SenseKitAPI.dll, SenseKitUL.dll,
-and the entire Plugin folder to your build folder.
-The plugins should still be in a Plugins subfolder under your sample .exe files.
-
-3) Run the samples!
-
-The .pdb files are not necessary for running the applications, but if you find a crash
-then you can load the symbols in Visual Studio using these .pdb files and give a useful
-stack trace for reporting bugs.
-
-You can exit most of the command line samples by pressing Control-C.
-They will catch this signal and exit cleanly.
-To exit samples with a GUI window, simply close the window.
+Preliminary documentation in HTML format can be found in the sdk/docs directory. 
 
 Known issues
 ==========
-1) There is no error message if no sensor is found or plugged in. (But, it doesn't crash!) You can
-plug in a sensor after the program starts and it should detect it and continue.
-Repeated hotplugging (in and out) does not work though.
+1) There is no error message if no sensor is found or plugged in. (But, it doesn't crash!) You can plug in a sensor after the program starts and it should detect it and continue. Repeated hotplugging (in and out) does not work though.
 
-2) If a sample crashes or you stop debugging before it cleans itself up nicely, the sensor driver
-may be put into a weird state. Before the next run you may need to replug the sensor or turn the sensor
-off and then on first. (This is primarily an OpenNI driver issue.)
+2) If a sample crashes or you stop debugging before it cleans itself up nicely, the sensor driver may be put into a weird state. Before the next run you may need to replug the sensor or turn the sensor off and then on first. (This is primarily an OpenNI driver issue.)
 
-3) If you close a sample's console window without cleanly exiting the program, it may crash. For console
-samples, press control-c to exit cleanly. For GUI apps, press escape to exit cleanly.
+3) If you close a sample's console window without cleanly exiting the program, it may crash. Press control-c to exit cleanly.

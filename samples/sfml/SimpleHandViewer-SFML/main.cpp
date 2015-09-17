@@ -1,11 +1,12 @@
 #include <SFML/Graphics.hpp>
-#include <Sensekit/SenseKit.h>
-#include <SensekitUL/SenseKitUL.h>
+#include <Astra/Astra.h>
+#include <AstraUL/AstraUL.h>
 #include "../../common/LitDepthVisualizer.h"
 #include <sstream>
 #include <iomanip>
 #include <deque>
 #include <unordered_map>
+#include <key_handler.h>
 
 class sfLine : public sf::Drawable
 {
@@ -38,10 +39,10 @@ private:
     sf::Color color;
 };
 
-class HandFrameListener : public sensekit::FrameReadyListener
+class HandFrameListener : public astra::FrameReadyListener
 {
 public:
-    using PointList = std::deque < sensekit::Vector2i >;
+    using PointList = std::deque < astra::Vector2i >;
     using PointMap = std::unordered_map < int, PointList >;
 
     HandFrameListener()
@@ -83,9 +84,9 @@ public:
         printf("FPS: %3.1f (%3.4Lf ms)\n", fps, m_frameDuration * 1000);
     }
 
-    void processDepth(sensekit::Frame& frame)
+    void processDepth(astra::Frame& frame)
     {
-        sensekit::PointFrame pointFrame = frame.get<sensekit::PointFrame>();
+        astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
 
         int width = pointFrame.resolutionX();
         int height = pointFrame.resolutionY();
@@ -93,7 +94,7 @@ public:
         init_texture(width, height);
 
         m_visualizer.update(pointFrame);
-        sensekit_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
+        astra_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
 
         for (int i = 0; i < width * height; i++)
         {
@@ -107,7 +108,7 @@ public:
         m_texture.update(m_displayBuffer.get());
     }
 
-    void updateHandTrace(int trackingId, const sensekit::Vector2i& position)
+    void updateHandTrace(int trackingId, const astra::Vector2i& position)
     {
         auto it = m_pointMap.find(trackingId);
         if (it == m_pointMap.end())
@@ -148,9 +149,9 @@ public:
         }
     }
 
-    void processHandFrame(sensekit::Frame& frame)
+    void processHandFrame(astra::Frame& frame)
     {
-        sensekit::HandFrame handFrame = frame.get<sensekit::HandFrame>();
+        astra::HandFrame handFrame = frame.get<astra::HandFrame>();
 
         m_handPoints = handFrame.handpoints();
 
@@ -164,8 +165,8 @@ public:
         }
     }
 
-    virtual void on_frame_ready(sensekit::StreamReader& reader,
-                                sensekit::Frame& frame) override
+    virtual void on_frame_ready(astra::StreamReader& reader,
+                                astra::Frame& frame) override
     {
         processDepth(frame);
         processHandFrame(frame);
@@ -195,7 +196,7 @@ public:
         window.draw(text);
     }
 
-    void drawHandLabel(sf::RenderWindow& window, float radius, float x, float y, sensekit::HandPoint& handPoint)
+    void drawHandLabel(sf::RenderWindow& window, float radius, float x, float y, astra::HandPoint& handPoint)
     {
         int32_t trackingId = handPoint.trackingId();
         std::stringstream str;
@@ -213,7 +214,7 @@ public:
         drawShadowText(window, label, sf::Color::White, x, y - radius - 10);
     }
 
-    void drawHandPosition(sf::RenderWindow& window, float radius, float x, float y, sensekit::HandPoint& handPoint)
+    void drawHandPosition(sf::RenderWindow& window, float radius, float x, float y, astra::HandPoint& handPoint)
     {
         auto worldPosition = handPoint.worldPosition();
         std::stringstream str;
@@ -238,10 +239,10 @@ public:
         float thickness = 4;
         auto it = pointList.begin();
 
-        sensekit::Vector2i lastPoint = *it;
+        astra::Vector2i lastPoint = *it;
         while (it != pointList.end())
         {
-            sensekit::Vector2i currentPoint = *it;
+            astra::Vector2i currentPoint = *it;
             ++it;
 
             sf::Vector2f p1((lastPoint.x + 0.5) * depthScale,
@@ -273,7 +274,7 @@ public:
                 color = candidateColor;
             }
 
-            const sensekit::Vector2i& p = handPoint.depthPosition();
+            const astra::Vector2i& p = handPoint.depthPosition();
 
             float circleX = (p.x + 0.5) * depthScale;
             float circleY = (p.y + 0.5) * depthScale;
@@ -321,7 +322,7 @@ private:
     using BufferPtr = std::unique_ptr < uint8_t[] >;
     BufferPtr m_displayBuffer{ nullptr };
 
-    std::vector<sensekit::HandPoint> m_handPoints;
+    std::vector<astra::HandPoint> m_handPoints;
 
     PointMap m_pointMap;
 
@@ -332,15 +333,17 @@ private:
 
 int main(int argc, char** argv)
 {
-    sensekit::SenseKit::initialize();
+    astra::Astra::initialize();
+
+    set_key_handler();
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Hand Viewer");
 
-    sensekit::Sensor sensor;
-    sensekit::StreamReader reader = sensor.create_reader();
+    astra::StreamSet streamset;
+    astra::StreamReader reader = streamset.create_reader();
 
-    reader.stream<sensekit::PointStream>().start();
-    reader.stream<sensekit::HandStream>().start();
+    reader.stream<astra::PointStream>().start();
+    reader.stream<astra::HandStream>().start();
 
     HandFrameListener listener;
 
@@ -348,15 +351,25 @@ int main(int argc, char** argv)
 
     while (window.isOpen())
     {
-        sensekit_temp_update();
+        astra_temp_update();
 
         sf::Event event;
         while (window.pollEvent(event))
         {
-            if (event.type == sf::Event::Closed)
+            switch (event.type)
+            {
+            case sf::Event::Closed:
                 window.close();
-            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
-                window.close();
+                break;
+            case sf::Event::KeyPressed:
+                {
+                    if (event.key.code == sf::Keyboard::Escape || 
+                        (event.key.code == sf::Keyboard::C && event.key.control))
+                    {
+                        window.close();
+                    }
+                }
+            }
         }
 
         // clear the window with black color
@@ -364,9 +377,14 @@ int main(int argc, char** argv)
 
         listener.drawTo(window);
         window.display();
+
+        if (!shouldContinue)
+        {
+            window.close();
+        }
     }
 
-    sensekit::SenseKit::terminate();
+    astra::Astra::terminate();
 
     return 0;
 }

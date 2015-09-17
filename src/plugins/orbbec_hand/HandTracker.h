@@ -2,9 +2,9 @@
 #define HANDTRACKER_H
 
 #include <opencv2/imgproc/imgproc.hpp>
-#include <SenseKitUL/SenseKitUL.h>
-#include <SenseKitUL/Plugins/stream_types.h>
-#include <SenseKit/Plugins/PluginKit.h>
+#include <AstraUL/AstraUL.h>
+#include <AstraUL/Plugins/stream_types.h>
+#include <Astra/Plugins/PluginKit.h>
 
 #include "DepthUtility.h"
 #include "TrackedPoint.h"
@@ -16,31 +16,31 @@
 #include "HandSettings.h"
 #include <memory>
 
-namespace sensekit { namespace plugins { namespace hand {
+namespace astra { namespace plugins { namespace hand {
 
     class HandTracker : public FrameReadyListener
     {
     public:
         HandTracker(PluginServiceProxy& pluginService,
-                    sensekit_streamset_t streamSet,
+                    astra_streamset_t streamSet,
                     StreamDescription& depthDesc,
                     HandSettings& settings);
 
         virtual ~HandTracker();
         virtual void on_frame_ready(StreamReader& reader, Frame& frame) override;
     private:
-        void create_streams(PluginServiceProxy& pluginService, sensekit_streamset_t streamSet);
+        void create_streams(PluginServiceProxy& pluginService, astra_streamset_t streamSet);
         void reset();
-        void generate_hand_frame(sensekit_frame_index_t frameIndex);
-        static void copy_position(cv::Point3f& source, sensekit_vector3f_t& target);
-        static sensekit_handstatus_t convert_hand_status(TrackingStatus status, TrackedPointType type);
-        static void reset_hand_point(sensekit_handpoint_t& point);
+        void generate_hand_frame(astra_frame_index_t frameIndex);
+        static void copy_position(cv::Point3f& source, astra_vector3f_t& target);
+        static astra_handstatus_t convert_hand_status(TrackingStatus status, TrackedPointType type);
+        static void reset_hand_point(astra_handpoint_t& point);
 
-        void overlay_circle(_sensekit_imageframe& imageFrame);
-        void update_debug_image_frame(_sensekit_imageframe& sensekitColorframe);
-        void generate_hand_debug_image_frame(sensekit_frame_index_t frameIndex);
+        void overlay_circle(_astra_imageframe& imageFrame);
+        void update_debug_image_frame(_astra_imageframe& astraColorframe);
+        void generate_hand_debug_image_frame(astra_frame_index_t frameIndex);
         void update_tracking(DepthFrame& depthFrame, PointFrame& pointFrame);
-        void update_hand_frame(std::vector<TrackedPoint>& internalTrackedPoints, _sensekit_handframe& frame);
+        void update_hand_frame(std::vector<TrackedPoint>& internalTrackedPoints, _astra_handframe& frame);
 
         void debug_probe_point(TrackingMatrices& matrices);
         void debug_spawn_point(TrackingMatrices& matrices);
@@ -54,16 +54,17 @@ namespace sensekit { namespace plugins { namespace hand {
 
         //fields
 
+        StreamSet m_streamset;
+        StreamReader m_reader;
+        DepthStream m_depthStream;
+
         HandSettings& m_settings;
         PluginServiceProxy& m_pluginService;
         DepthUtility m_depthUtility;
         PointProcessor m_pointProcessor;
-        Sensor m_sensor;
-        StreamReader m_reader;
+
         float m_processingSizeWidth;
         float m_processingSizeHeight;
-
-        DepthStream m_depthStream;
 
         using ColorStreamPtr = std::unique_ptr<DebugHandStream>;
         ColorStreamPtr m_debugImageStream;
@@ -103,7 +104,7 @@ namespace sensekit { namespace plugins { namespace hand {
         cv::Mat m_refineScore;
         cv::Mat m_refineEdgeDistance;
 
-        sensekit::Vector3f* m_worldPoints { nullptr };
+        astra::Vector3f* m_worldPoints { nullptr };
         int m_numWorldPoints { 0 };
 
         DebugVisualizer m_debugVisualizer;

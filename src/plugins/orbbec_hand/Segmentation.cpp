@@ -5,11 +5,11 @@
 #include "Segmentation.h"
 #include "constants.h"
 #include <Shiny.h>
-#include <SenseKit/Plugins/PluginLogger.h>
+#include <Astra/Plugins/PluginLogger.h>
 
 #define MAX_DEPTH 10000
 
-namespace sensekit { namespace plugins { namespace hand { namespace segmentation {
+namespace astra { namespace plugins { namespace hand { namespace segmentation {
 
     struct PointTTL
     {
@@ -235,13 +235,13 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         cv::Mat& layerScoreMatrix = data.matrices.layerScore;
         const float pointInertiaFactor = data.settings.pointInertiaFactor;
         const float pointInertiaRadius = data.settings.pointInertiaRadius;
-        const sensekit::Vector3f* worldPoints = data.matrices.worldPoints;
+        const astra::Vector3f* worldPoints = data.matrices.worldPoints;
 
         layerScoreMatrix = cv::Mat::zeros(data.matrices.depth.size(), CV_32FC1);
 
         ScalingCoordinateMapper mapper = get_scaling_mapper(data.matrices);
 
-        auto seedWorldPosition = sensekit::Vector3f(data.referenceWorldPosition.x,
+        auto seedWorldPosition = astra::Vector3f(data.referenceWorldPosition.x,
                                                     data.referenceWorldPosition.y,
                                                     data.referenceWorldPosition.z);
 
@@ -264,7 +264,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                        ++edgeDistanceRow,
                                        ++layerScoreRow)
             {
-                sensekit::Vector3f worldPosition = *worldPoints;
+                astra::Vector3f worldPosition = *worldPoints;
                 if (worldPosition.z != 0 && x > minX && x < maxX && y > minY && y < maxY)
                 {
                     //start with arbitrary large value to prevent scores from going negative
@@ -312,7 +312,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         {
             if (outputLog == TEST_BEHAVIOR_LOG)
             {
-                SINFO("PointProcessor", "test_point_in_range failed: position: (%d, %d)",
+                LOG_INFO("PointProcessor", "test_point_in_range failed: position: (%d, %d)",
                               targetPoint.x,
                               targetPoint.y);
             }
@@ -321,7 +321,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
 
         if (outputLog == TEST_BEHAVIOR_LOG)
         {
-            SINFO("PointProcessor", "test_point_in_range success: position: (%d, %d)",
+            LOG_INFO("PointProcessor", "test_point_in_range success: position: (%d, %d)",
                           targetPoint.x,
                           targetPoint.y);
         }
@@ -385,14 +385,14 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         {
             if (validPointArea)
             {
-                SINFO("Segmentation", "test_point_area passed: area %f within [%f, %f]",
+                LOG_INFO("Segmentation", "test_point_area passed: area %f within [%f, %f]",
                               area,
                               minArea,
                               maxArea);
             }
             else
             {
-                SINFO("Segmentation", "test_point_area failed: area %f not within [%f, %f]",
+                LOG_INFO("Segmentation", "test_point_area failed: area %f not within [%f, %f]",
                               area,
                               minArea,
                               maxArea);
@@ -511,13 +511,13 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         {
             if (passed)
             {
-                SINFO("Segmentation", "test_natural_edges passed: %f (minimum %f)",
+                LOG_INFO("Segmentation", "test_natural_edges passed: %f (minimum %f)",
                               percentNaturalEdges,
                               minPercentNaturalEdges);
             }
             else
             {
-                SINFO("Segmentation", "test_natural_edges failed: %f (minimum %f)",
+                LOG_INFO("Segmentation", "test_natural_edges failed: %f (minimum %f)",
                               percentNaturalEdges,
                               minPercentNaturalEdges);
             }
@@ -534,7 +534,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         PROFILE_FUNC();
         auto scalingMapper = get_scaling_mapper(matrices);
 
-        std::vector<sensekit::Vector2i>& points = matrices.layerCirclePoints;
+        std::vector<astra::Vector2i>& points = matrices.layerCirclePoints;
 
         float percentForeground1 = get_max_sequential_circumference_percentage(matrices.depth,
                                                                                matrices.layerSegmentation,
@@ -574,7 +574,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         {
             if (passed)
             {
-                SINFO("Segmentation", "test_foreground_radius_percentage passed: perc1 %f [%f,%f] perc2 %f [%f,%f]",
+                LOG_INFO("Segmentation", "test_foreground_radius_percentage passed: perc1 %f [%f,%f] perc2 %f [%f,%f]",
                               percentForeground1,
                               minPercent1,
                               maxPercent1,
@@ -584,7 +584,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
             }
             else
             {
-                SINFO("Segmentation", "test_foreground_radius_percentage failed: perc1 %f [%f,%f] perc2 %f [%f,%f]",
+                LOG_INFO("Segmentation", "test_foreground_radius_percentage failed: perc1 %f [%f,%f] perc2 %f [%f,%f]",
                               percentForeground1,
                               minPercent1,
                               maxPercent1,
@@ -978,7 +978,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                   const cv::Point& center,
                                   const float& radius,
                                   const ScalingCoordinateMapper& mapper,
-                                  std::vector<sensekit::Vector2i>& points)
+                                  std::vector<astra::Vector2i>& points)
     {
         PROFILE_FUNC();
 
@@ -1004,7 +1004,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         int cx = center.x;
         int cy = center.y;
 
-        std::vector<sensekit::Vector2i> offsets;
+        std::vector<astra::Vector2i> offsets;
         //reserve a slight overestimation of number of points for 1/8 of circumference
         offsets.reserve(pixelRadius);
 
@@ -1044,14 +1044,14 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         for (int i = 1; i < length; ++i)
         {
             //dx, dy
-            const sensekit::Vector2i delta = offsets[i];
+            const astra::Vector2i delta = offsets[i];
             const int x = cx + delta.x;
             const int y = cy + delta.y;
 
             if (x >= 0 && x < width &&
                 y >= 0 && y < height)
             {
-                points.push_back(sensekit::Vector2i(x, y));
+                points.push_back(astra::Vector2i(x, y));
             }
         }
 
@@ -1059,7 +1059,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         for (int i = length-1; i >= 0; --i)
         {
             //dy, dx
-            const sensekit::Vector2i delta = offsets[i];
+            const astra::Vector2i delta = offsets[i];
 
             const int dx = delta.x;
             const int dy = delta.y;
@@ -1070,7 +1070,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 if (x >= 0 && x < width &&
                     y >= 0 && y < height)
                 {
-                    points.push_back(sensekit::Vector2i(x, y));
+                    points.push_back(astra::Vector2i(x, y));
                 }
             }
         }
@@ -1078,21 +1078,21 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         for (int i = 1; i < length; ++i)
         {
             //-dy, dx
-            const sensekit::Vector2i delta = offsets[i];
+            const astra::Vector2i delta = offsets[i];
             const int x = cx - delta.y;
             const int y = cy + delta.x;
 
             if (x >= 0 && x < width &&
                 y >= 0 && y < height)
             {
-                points.push_back(sensekit::Vector2i(x, y));
+                points.push_back(astra::Vector2i(x, y));
             }
         }
 
         for (int i = length-1; i >= 0; --i)
         {
             //-dx, dy
-            const sensekit::Vector2i delta = offsets[i];
+            const astra::Vector2i delta = offsets[i];
 
             const int dx = delta.x;
             const int dy = delta.y;
@@ -1103,7 +1103,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 if (x >= 0 && x < width &&
                     y >= 0 && y < height)
                 {
-                    points.push_back(sensekit::Vector2i(x, y));
+                    points.push_back(astra::Vector2i(x, y));
                 }
             }
         }
@@ -1111,21 +1111,21 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         for (int i = 1; i < length; ++i)
         {
             //-dx, -dy
-            const sensekit::Vector2i delta = offsets[i];
+            const astra::Vector2i delta = offsets[i];
             const int x = cx - delta.x;
             const int y = cy - delta.y;
 
             if (x >= 0 && x < width &&
                 y >= 0 && y < height)
             {
-                points.push_back(sensekit::Vector2i(x, y));
+                points.push_back(astra::Vector2i(x, y));
             }
         }
 
         for (int i = length-1; i >= 0; --i)
         {
             //-dy, -dx
-            const sensekit::Vector2i delta = offsets[i];
+            const astra::Vector2i delta = offsets[i];
 
             const int dx = delta.x;
             const int dy = delta.y;
@@ -1136,7 +1136,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 if (x >= 0 && x < width &&
                     y >= 0 && y < height)
                 {
-                    points.push_back(sensekit::Vector2i(x, y));
+                    points.push_back(astra::Vector2i(x, y));
                 }
             }
         }
@@ -1144,21 +1144,21 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
         for (int i = 1; i < length; ++i)
         {
             //dy, -dx
-            const sensekit::Vector2i delta = offsets[i];
+            const astra::Vector2i delta = offsets[i];
             const int x = cx + delta.y;
             const int y = cy - delta.x;
 
             if (x >= 0 && x < width &&
                 y >= 0 && y < height)
             {
-                points.push_back(sensekit::Vector2i(x, y));
+                points.push_back(astra::Vector2i(x, y));
             }
         }
 
         for (int i = length-1; i >= 0; --i)
         {
             //dx, -dy
-            const sensekit::Vector2i delta = offsets[i];
+            const astra::Vector2i delta = offsets[i];
 
             const int dx = delta.x;
             const int dy = delta.y;
@@ -1169,7 +1169,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                 if (x >= 0 && x < width &&
                     y >= 0 && y < height)
                 {
-                    points.push_back(sensekit::Vector2i(x, y));
+                    points.push_back(astra::Vector2i(x, y));
                 }
             }
         }
@@ -1181,7 +1181,7 @@ namespace sensekit { namespace plugins { namespace hand { namespace segmentation
                                                       const cv::Point& center,
                                                       const float& radius,
                                                       const ScalingCoordinateMapper& mapper,
-                                                      std::vector<sensekit::Vector2i>& points)
+                                                      std::vector<astra::Vector2i>& points)
     {
         PROFILE_FUNC();
         int foregroundCount = 0;

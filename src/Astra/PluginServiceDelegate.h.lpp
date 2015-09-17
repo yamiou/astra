@@ -1,0 +1,24 @@
+/* ^^^AUTOGENHEADER^^^ */
+#ifndef PLUGINSERVICEDELEGATE_H
+#define PLUGINSERVICEDELEGATE_H
+
+#include <Astra/astra_types.h>
+#include <stdarg.h>
+#include "AstraContext.h"
+
+namespace astra {
+
+    class PluginServiceDelegate
+    {
+    public:
+^^^BEGINREPLACE:plugin^^^
+
+        static ^RETURN^ ^FUNC^(^PARAMS:void^)
+        {
+            return static_cast<PluginService*>(^PARAMS:names,voidonly^)->^FUNC^(^PARAMS:names,deref^);
+        }
+^^^ENDREPLACE^^^
+    };
+}
+
+#endif /* PLUGINSERVICEDELEGATE_H */

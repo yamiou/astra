@@ -3,9 +3,9 @@
 
 #include <common/serialization/FrameInputStream.h>
 
-#include "gensrc/Frame.pb.h"
-#include "gensrc/FrameDescription.pb.h"
-#include "gensrc/StreamHeader.pb.h"
+#include "Frame.pb.h"
+#include "FrameDescription.pb.h"
+#include "StreamHeader.pb.h"
 
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 
@@ -15,7 +15,7 @@
 
 using namespace google::protobuf::io;
 
-namespace sensekit { namespace serialization {
+namespace astra { namespace serialization {
 
     class ProtoFrameInputStream : public FrameInputStream
     {
@@ -40,19 +40,19 @@ namespace sensekit { namespace serialization {
         int get_file_descriptor(FILE* file);
 
         FILE* m_file;
-        int m_fileDescriptor{ -1 };
+        int m_fileDescriptor{-1};
 
-        int m_positionOffset{ 0 };
+        int m_positionOffset{0};
 
         std::unique_ptr<ZeroCopyInputStream> m_inputStream;
         proto::Frame m_frameMessage;
         proto::FrameDescription m_frameDescriptionMessage;
         proto::StreamHeader m_streamHeaderMessage;
-        
+
         Frame m_frame;
         FrameDescription m_frameDescription;
         StreamHeader m_streamHeader;
-        long m_fileSize;
+        long m_fileSize{-1};
     };
 
 }}

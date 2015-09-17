@@ -4,7 +4,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include "ScalingCoordinateMapper.h"
 
-namespace sensekit { namespace plugins { namespace hand {
+namespace astra { namespace plugins { namespace hand {
 
     struct TrackingData;
 
@@ -86,14 +86,14 @@ namespace sensekit { namespace plugins { namespace hand {
                                       const cv::Point& center,
                                       const float& radius,
                                       const ScalingCoordinateMapper& mapper,
-                                      std::vector<sensekit::Vector2i>& points);
+                                      std::vector<astra::Vector2i>& points);
 
         float get_max_sequential_circumference_percentage(cv::Mat& matDepth,
                                                           cv::Mat& matSegmentation,
                                                           const cv::Point& center,
                                                           const float& radius,
                                                           const ScalingCoordinateMapper& mapper,
-                                                          std::vector<sensekit::Vector2i>& points);
+                                                          std::vector<astra::Vector2i>& points);
 
         float get_percent_natural_edges(cv::Mat& matDepth,
                                         cv::Mat& matSegmentation,

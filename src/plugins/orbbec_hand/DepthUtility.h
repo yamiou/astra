@@ -2,10 +2,10 @@
 #define DEPTHUTILITY_H
 
 #include <opencv2/imgproc/imgproc.hpp>
-#include <SenseKitUL/SenseKitUL.h>
+#include <AstraUL/AstraUL.h>
 #include "HandSettings.h"
 
-namespace sensekit { namespace plugins { namespace hand {
+namespace astra { namespace plugins { namespace hand {
 
     class DepthUtility
     {
@@ -80,9 +80,9 @@ namespace sensekit { namespace plugins { namespace hand {
         float m_maxDepth;
 
         static const int NUM_DEPTH_VEL_CHUNKS = 8;
-        const float MIN_CHUNK_DEPTH = 0;
-        const float MAX_CHUNK_DEPTH = 8000;
-        float m_velErodeFactor{ 0.98 };
+        const float MIN_CHUNK_DEPTH = 0.0f;
+        const float MAX_CHUNK_DEPTH = 8000.0f;
+        float m_velErodeFactor{ 0.98f };
         float m_maxVel[NUM_DEPTH_VEL_CHUNKS];
         float m_depthCount[NUM_DEPTH_VEL_CHUNKS];
     };
