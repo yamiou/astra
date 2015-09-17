@@ -2,10 +2,9 @@ set (_projname "ClockUtil")
 
 set (${_projname}_SOURCES
   ../../../include/common/clock/Pulser.h
-  Pulser.cpp
   ../../../include/common/clock/Stdafx.h
-  Stdafx.cpp
   ../../../include/common/clock/Stopwatch.h
+  Pulser.cpp
   Stopwatch.cpp
 )
 
