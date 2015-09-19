@@ -65,9 +65,7 @@ set(${_projname}_SOURCES
   StreamBin.cpp
   StreamReader.h
   StreamReader.cpp
-  shared_library.h
-  shared_library_linux.cpp
-  shared_library_windows.cpp
+  astra_shared_library.hpp
   Registry.h
   Registry.cpp
   astra_filesystem.cpp
@@ -77,16 +75,19 @@ set(${_projname}_SOURCES
 set(${_projname}_ANDROID_SOURCES
   android/astra_environment_android.cpp
   unix/astra_filesystem_unix.cpp
+  unix/astra_shared_library_unix.cpp
   )
 
 set(${_projname}_WIN32_SOURCES
   win32/astra_environment_win32.cpp
   win32/astra_filesystem_win32.cpp
+  win32/astra_shared_library_win32.cpp
   )
 
 set(${_projname}_UNIX_SOURCES
   unix/astra_environment_unix.cpp
   unix/astra_filesystem_unix.cpp
+  unix/astra_shared_library_unix.cpp
   )
 
 if (ASTRA_ANDROID)

@@ -75,18 +75,18 @@ namespace astra {
 
     void PluginManager::try_load_plugin(const std::string& path)
     {
-        LibHandle libHandle = nullptr;
+        process::lib_handle libHandle = nullptr;
         LOG_TRACE("PluginManager", "try_load_plugin %s", path.c_str());
 
-        os_load_library(path.c_str(), libHandle);
+        process::load_library(path.c_str(), libHandle);
 
 	if (!libHandle)
 	  return;
-	
+
         PluginFuncs pluginFuncs;
-        os_get_proc_address(libHandle, ASTRA_STRINGIFY(astra_plugin_initialize), (FarProc&)pluginFuncs.initialize);
-        os_get_proc_address(libHandle, ASTRA_STRINGIFY(astra_plugin_terminate), (FarProc&)pluginFuncs.terminate);
-        os_get_proc_address(libHandle, ASTRA_STRINGIFY(astra_plugin_update), (FarProc&)pluginFuncs.update);
+        process::get_proc_address(libHandle, ASTRA_STRINGIFY(astra_plugin_initialize), (process::far_proc&)pluginFuncs.initialize);
+        process::get_proc_address(libHandle, ASTRA_STRINGIFY(astra_plugin_terminate), (process::far_proc&)pluginFuncs.terminate);
+        process::get_proc_address(libHandle, ASTRA_STRINGIFY(astra_plugin_update), (process::far_proc&)pluginFuncs.update);
         pluginFuncs.libHandle = libHandle;
 
         if (pluginFuncs.is_valid())
@@ -103,7 +103,7 @@ namespace astra {
                    pluginFuncs.terminate,
                    pluginFuncs.update);
 
-            os_free_library(libHandle);
+            process::free_library(libHandle);
         }
     }
 
@@ -123,7 +123,7 @@ namespace astra {
         for(auto pluginFuncs : m_pluginList)
         {
             pluginFuncs.terminate();
-            os_free_library(pluginFuncs.libHandle);
+            process::free_library(pluginFuncs.libHandle);
         }
 
         m_pluginList.clear();

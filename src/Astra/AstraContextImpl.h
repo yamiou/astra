@@ -11,7 +11,7 @@
 #include "PluginManager.h"
 #include "StreamSet.h"
 #include "StreamReader.h"
-#include "shared_library.h"
+#include "astra_shared_library.hpp"
 #include "Logger.h"
 #include "StreamSetCatalog.h"
 

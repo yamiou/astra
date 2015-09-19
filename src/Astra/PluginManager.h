@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 #include "PluginService.h"
-#include "shared_library.h"
+#include "astra_shared_library.hpp"
 #include <Astra/Plugins/PluginServiceProxyBase.h>
 #include "Logger.h"
 
@@ -20,7 +20,7 @@ namespace astra {
         initialize_fn initialize{nullptr};
         terminate_fn terminate{nullptr};
         update_fn update{nullptr};
-        LibHandle libHandle{nullptr};
+        process::lib_handle libHandle{nullptr};
 
         bool is_valid()
         {
