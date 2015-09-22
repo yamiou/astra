@@ -473,7 +473,8 @@ int main(int argc, char** argv)
             }
             if (event.type == sf::Event::KeyPressed)
             {
-                if (event.key.code == sf::Keyboard::Escape)
+                if (event.key.code == sf::Keyboard::Escape ||
+                    (event.key.code == sf::Keyboard::C && event.key.control))
                 {
                     window.close();
                 }
