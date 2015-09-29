@@ -153,6 +153,7 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
   )
 
 if (MSVC)
+  #copy third party build files to install vs2013 directory
   #Lack of a trailing / is important here, ends up in samples/vs2013/
   install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013/thirdparty
     DESTINATION samples/vs2013/
@@ -161,6 +162,7 @@ if (MSVC)
     PATTERN ".git" EXCLUDE
     )
 
+  #copy samples runtime files to all the places vs2013 would want them
   set(INSTALL_PATHS
     bin/
     samples/vs2013/copy_to_bin_dir/
@@ -173,32 +175,40 @@ if (MSVC)
      )
   endforeach()
 
+  #prepare to generate vs2013 solution for installation
   set(SAMPLES_SOURCE_DIR "${PROJECT_BINARY_DIR}/sdk/samples")
   set(SAMPLES_BUILD_TEMP_DIR "${PROJECT_BINARY_DIR}/temp/vs2013/")
 
-  configure_file("${PROJECT_SOURCE_DIR}/samples-aux/README.txt"
-    "${PROJECT_BINARY_DIR}/temp/README.txt"
+  #This doesn't replace anything except line endings for Windows CRLF style
+  configure_file("${PROJECT_SOURCE_DIR}/samples-aux/readme.txt"
+    "${PROJECT_BINARY_DIR}/temp/readme.txt"
     @ONLY
     NEWLINE_STYLE CRLF)
 
-  install(FILES ${PROJECT_BINARY_DIR}/temp/README.txt
+  #install the CRLF line ending readme
+  install(FILES ${PROJECT_BINARY_DIR}/temp/readme.txt
     DESTINATION .
     )
 
+  #Configure VS2013 project generation & cleanup script
   configure_file("${PROJECT_SOURCE_DIR}/InstallVS.txt.in"
     "${PROJECT_SOURCE_DIR}/InstallVS.txt"
     @ONLY)
+  #Run the script at install time to generate VS2013 projects for the samples
+  #also de-cmake-ifies the projects and makes everything a relative directory
   install(SCRIPT "InstallVS.txt")
 
+  #install the sample VS2013 projects
   install(DIRECTORY ${SAMPLES_BUILD_TEMP_DIR}
     DESTINATION samples/vs2013
     PATTERN "build" EXCLUDE
     PATTERN ".gitignore" EXCLUDE
     )
-
+  #remove temporary build dir
   install(CODE "file(REMOVE_RECURSE ${SAMPLES_BUILD_TEMP_DIR})")
 else()
-  install(FILES ${PROJECT_SOURCE_DIR}/samples-aux/README.txt
+  #for non-MSVC platforms, just install the readme directly
+  install(FILES ${PROJECT_SOURCE_DIR}/samples-aux/readme.txt
     DESTINATION .
     )
 endif()
