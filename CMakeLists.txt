@@ -29,10 +29,14 @@ endif()
 
 SET(CMAKE_SKIP_BUILD_RPATH FALSE)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-#For OSX need to reference the install directory
-#if Linux: $ORIGIN/../lib
-SET(CMAKE_INSTALL_RPATH "@executable_path/../lib")
+
+if(APPLE)
+    SET(CMAKE_INSTALL_RPATH "@executable_path/../lib")
+elseif(UNIX)
+    SET(CMAKE_INSTALL_RPATH "@ORIGIN/../lib")
+endif()
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+message("Setting rpath to ${CMAKE_INSTALL_RPATH}")
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
