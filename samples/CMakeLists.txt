@@ -28,6 +28,24 @@ get_filename_component(SAMPLE_COMMON_DIR "./common" ABSOLUTE)
 
 include_directories(${SAMPLE_COMMON_DIR})
 
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+  set(ASTRA_CLANG ON)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  set(ASTRA_GCC ON)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+  set(ASTRA_INTELC ON)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  set(ASTRA_MSVC ON)
+endif()
+
+if(ASTRA_GCC OR ASTRA_CLANG)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -fPIC")
+
+  if(ASTRA_ANDROID)
+    set(ANDROID_CXX_FLAGS "${ANDROID_CXX_FLAGS} -std=c++14 -Wall -fPIC")
+  endif()
+endif()
+
 add_subdirectory(c-api)
 add_subdirectory(cpp-api)
 if(NOT ASTRA_ANDROID)
