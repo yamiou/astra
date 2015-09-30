@@ -18,6 +18,4 @@ set_debug_working_dir(${_projname} "$(TargetDir)")
 
 add_astra_sdk_dependency(${_projname})
 
-#if (MSVC)
-#    install(TARGETS ${_projname} DESTINATION bin/)
-#endif()
+#install(TARGETS ${_projname} DESTINATION bin/)
