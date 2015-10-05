@@ -63,6 +63,7 @@ namespace astra {
         }
 
         bool has_connections() { return m_connections.size() > 0; }
+
     private:
         void disconnect_connections(stream_bin* bin);
 
