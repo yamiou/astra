@@ -20,7 +20,7 @@ namespace astra
         streamset& set = m_setCatalog.get_or_add(streamUri, true);
         streamSet = set.get_handle();
 
-        LOG_INFO("PluginService", "creating streamset: %s %x", streamUri, streamSet);
+        LOG_INFO("astra.plugin_service", "creating streamset: %s %x", streamUri, streamSet);
 
         return ASTRA_STATUS_SUCCESS;
     }
@@ -29,7 +29,7 @@ namespace astra
     {
         streamset* actualSet = streamset::get_ptr(streamSet);
 
-        LOG_INFO("PluginService", "destroying streamset: %s %x", actualSet->get_uri().c_str(), streamSet);
+        LOG_INFO("astra.plugin_service", "destroying streamset: %s %x", actualSet->get_uri().c_str(), streamSet);
         m_setCatalog.destroy_set(actualSet);
 
         streamSet = nullptr;
@@ -95,7 +95,7 @@ namespace astra
         stream* stream = set->register_stream(desc, pluginCallbacks);
         handle = stream->get_handle();
 
-        LOG_INFO("PluginService", "registered stream -- handle %x type: %d", handle, desc.type);
+        LOG_INFO("astra.plugin_service", "registered stream -- handle %x type: %d", handle, desc.type);
 
         return ASTRA_STATUS_SUCCESS;
     }
@@ -116,7 +116,7 @@ namespace astra
 
         const astra_stream_desc_t& desc = stream->get_description();
 
-        LOG_INFO("PluginService", "destroying stream -- handle: %x type: %d", stream->get_handle(), desc.type);
+        LOG_INFO("astra.plugin_service", "destroying stream -- handle: %x type: %d", stream->get_handle(), desc.type);
 
         set->destroy_stream(stream);
 
@@ -147,7 +147,7 @@ namespace astra
         binHandle = bin->get_handle();
         binBuffer = bin->get_backBuffer();
 
-        LOG_INFO("PluginService", "creating bin -- handle: %x stream: %x type: %d size: %u",
+        LOG_INFO("astra.plugin_service", "creating bin -- handle: %x stream: %x type: %d size: %u",
                       binHandle,
                       streamHandle,
                       actualStream->get_description().type,
@@ -163,7 +163,7 @@ namespace astra
         stream* actualStream = stream::get_ptr(streamHandle);
         stream_bin* bin = stream_bin::get_ptr(binHandle);
 
-        LOG_INFO("PluginService", "destroying bin -- %x stream: %x type: %d size: %u",
+        LOG_INFO("astra.plugin_service", "destroying bin -- %x stream: %x type: %d size: %u",
                       binHandle,
                       streamHandle,
                       actualStream->get_description().type,
@@ -205,7 +205,7 @@ namespace astra
         stream* stream = underlyingConnection->get_stream();
         if (binHandle != nullptr)
         {
-            LOG_INFO("PluginService", "linking connection to bin -- stream: %x type: %d conn: %x bin: %x",
+            LOG_INFO("astra.plugin_service", "linking connection to bin -- stream: %x type: %d conn: %x bin: %x",
                           stream->get_handle(),
                           stream->get_description().type,
                           connection,
@@ -213,7 +213,7 @@ namespace astra
         }
         else
         {
-            LOG_INFO("PluginService", "unlinking connection to bin -- stream: %x type: %d conn: %x",
+            LOG_INFO("astra.plugin_service", "unlinking connection to bin -- stream: %x type: %d conn: %x",
                           stream->get_handle(),
                           stream->get_description().type,
                           connection);
