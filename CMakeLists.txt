@@ -37,12 +37,13 @@ set(CMAKE_SKIP_BUILD_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
 if(APPLE)
-    set(CMAKE_INSTALL_RPATH "@executable_path/../lib")
+  set(CMAKE_INSTALL_RPATH "@executable_path/../lib")
+  message("Setting rpath to ${CMAKE_INSTALL_RPATH}")
 elseif(UNIX)
-    set(CMAKE_INSTALL_RPATH "@ORIGIN/../lib")
+  set(CMAKE_INSTALL_RPATH "@ORIGIN/../lib")
+  message("Setting rpath to ${CMAKE_INSTALL_RPATH}")
 endif()
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-message("Setting rpath to ${CMAKE_INSTALL_RPATH}")
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
