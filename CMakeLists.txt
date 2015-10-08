@@ -96,6 +96,12 @@ add_custom_target(${SDK_DEPENDENT_TARGET})
 set(SHINY_INCLUDE "${PROJECT_SOURCE_DIR}/vendor/shinyprofiler/include")
 set(CATCH_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/vendor/catch/include" CACHE INTERNAL "Path to include folder for Catch")
 
+if (ASTRA_64)
+  set(SAMPLE_DEPENDENCY_DIR "copy_to_bin64_dir")
+else()
+  set(SAMPLE_DEPENDENCY_DIR "copy_to_bin32_dir")
+endif()
+
 function(install_lib _targetname)
   set(extrapath ${ARGV1})
   install(TARGETS ${_targetname}
@@ -106,7 +112,7 @@ function(install_lib _targetname)
   if (MSVC)
     install_pdb(${_targetname} bin/)
     set(INSTALL_PATHS
-      samples/vs2013/copy_to_bin_dir/${extrapath}
+      samples/vs2013/${SAMPLE_DEPENDENCY_DIR}/${extrapath}
       samples/vs2013/bin/Debug/${extrapath}
       samples/vs2013/bin/Release/${extrapath}
     )
@@ -124,7 +130,7 @@ function(install_file _targetfile)
   if (MSVC)
     set(INSTALL_PATHS
       bin/${extrapath}
-      samples/vs2013/copy_to_bin_dir/${extrapath}
+      samples/vs2013/${SAMPLE_DEPENDENCY_DIR}/${extrapath}
       samples/vs2013/bin/Debug/${extrapath}
       samples/vs2013/bin/Release/${extrapath}
     )
@@ -182,13 +188,15 @@ if (MSVC)
   #copy samples runtime files to all the places vs2013 would want them
   set(INSTALL_PATHS
     bin/
-    samples/vs2013/copy_to_bin_dir/
+    samples/vs2013/${SAMPLE_DEPENDENCY_DIR}/
     samples/vs2013/bin/Debug/
     samples/vs2013/bin/Release/
   )
   foreach(INSTALL_PATH ${INSTALL_PATHS})
-   install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013/copy_to_bin_dir/
+   install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013/${SAMPLE_DEPENDENCY_DIR}/
      DESTINATION ${INSTALL_PATH}
+     PATTERN "opencv_core2410d.dll" EXCLUDE
+     PATTERN "opencv_imgproc2410d.dll" EXCLUDE
      )
   endforeach()
 
