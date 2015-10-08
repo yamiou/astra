@@ -37,12 +37,14 @@ if(ASTRA_GCC OR ASTRA_CLANG)
   endif()
 endif()
 
-message(${CMAKE_CXX_FLAGS})
-
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-set(ASTRA_DOCS FALSE CACHE BOOL "Build Astra Documentation")
+set(ASTRA_DOCS FALSE CACHE BOOL "Build documentation")
+set(ASTRA_XS TRUE CACHE BOOL "Build extra stream support plugin")
+set(ASTRA_HAND TRUE CACHE BOOL "Build hand tracking plugin")
+set(ASTRA_STREAMPLAYER FALSE CACHE BOOL "Build experimental stream playback plugin")
+set(ASTRA_MOCK_DEVICE FALSE CACHE BOOL "Build mock test device plugin")
 
 if (ASTRA_DOCS)
   add_subdirectory(docs)
@@ -86,7 +88,7 @@ function(install_lib _targetname)
     )
   if (MSVC)
     install_pdb(${_targetname} bin/)
-    set(INSTALL_PATHS 
+    set(INSTALL_PATHS
       samples/vs2013/copy_to_bin_dir/${extrapath}
       samples/vs2013/bin/Debug/${extrapath}
       samples/vs2013/bin/Release/${extrapath}
@@ -103,7 +105,7 @@ endfunction()
 function(install_file _targetfile)
   set(extrapath ${ARGV1})
   if (MSVC)
-    set(INSTALL_PATHS 
+    set(INSTALL_PATHS
       bin/${extrapath}
       samples/vs2013/copy_to_bin_dir/${extrapath}
       samples/vs2013/bin/Debug/${extrapath}

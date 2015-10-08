@@ -17,10 +17,23 @@ endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
 
 add_subdirectory(device_sdk)
 add_subdirectory(openni_sensor)
-add_subdirectory(orbbec_hand)
-add_subdirectory(orbbec_xs)
+
+if (ASTRA_HAND)
+  add_subdirectory(orbbec_hand)
+endif()
+
+if (ASTRA_XS)
+  add_subdirectory(orbbec_xs)
+endif()
 
 if (NOT ASTRA_ANDROID)
-  add_subdirectory(mock_sensor)
-  add_subdirectory(orbbec_streamplayer)
+
+  if (ASTRA_MOCK_DEVICE)
+    add_subdirectory(mock_sensor)
+  endif()
+
+  if (ASTRA_STREAMPLAYER)
+    add_subdirectory(orbbec_streamplayer)
+  endif()
+
 endif()

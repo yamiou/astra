@@ -111,7 +111,7 @@ namespace astra {
         virtual void connection_stopped(astra_stream_t stream,
                                         astra_streamconnection_t connection) {}
 
-        
+
         friend stream_callbacks_t create_plugin_callbacks(StreamCallbackListener* context);
     };
 

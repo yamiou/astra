@@ -21,6 +21,8 @@ PluginServiceProxyBase* create_plugin_proxy(plugin_service* service)
         proxy->destroy_stream_set = &plugin_service_delegate::destroy_stream_set;
         proxy->get_streamset_uri = &plugin_service_delegate::get_streamset_uri;
         proxy->create_stream = &plugin_service_delegate::create_stream;
+        proxy->register_stream = &plugin_service_delegate::register_stream;
+        proxy->unregister_stream = &plugin_service_delegate::unregister_stream;
         proxy->destroy_stream = &plugin_service_delegate::destroy_stream;
         proxy->create_stream_bin = &plugin_service_delegate::create_stream_bin;
         proxy->destroy_stream_bin = &plugin_service_delegate::destroy_stream_bin;

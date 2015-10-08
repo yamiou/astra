@@ -6,7 +6,7 @@
 #include "HandTracker.h"
 #include "Segmentation.h"
 #include <AstraUL/streams/hand_types.h>
-#include <AstraUL/skul_ctypes.h>
+#include <AstraUL/astraul_ctypes.h>
 #include <Astra/Plugins/PluginKit.h>
 #include <Shiny.h>
 
@@ -52,15 +52,16 @@ namespace astra { namespace plugins { namespace hand {
         {
             PROFILE_FUNC();
             LOG_INFO("HandTracker", "creating hand streams");
-            m_handStream = make_unique<HandStream>(pluginService, streamSet, ASTRA_HANDS_MAX_HAND_COUNT);
+            auto hs = make_stream<HandStream>(pluginService, streamSet, ASTRA_HANDS_MAX_HAND_COUNT);
+            m_handStream = std::unique_ptr<HandStream>(std::move(hs));
 
             const int bytesPerPixel = 3;
-
-            m_debugImageStream = make_unique<DebugHandStream>(pluginService,
-                                                              streamSet,
-                                                              m_processingSizeWidth,
-                                                              m_processingSizeHeight,
-                                                              bytesPerPixel);
+            auto dhs = make_stream<DebugHandStream>(pluginService,
+                                                    streamSet,
+                                                    m_processingSizeWidth,
+                                                    m_processingSizeHeight,
+                                                    bytesPerPixel);
+            m_debugImageStream = std::unique_ptr<DebugHandStream>(std::move(dhs));
         }
 
         void HandTracker::on_frame_ready(StreamReader& reader, Frame& frame)

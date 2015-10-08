@@ -2,7 +2,7 @@
 #define HAND_TYPES_H
 
 #include <Astra/astra_types.h>
-#include <AstraUL/skul_ctypes.h>
+#include <AstraUL/astraul_ctypes.h>
 
 #define ASTRA_HANDS_MAX_HAND_COUNT 10
 

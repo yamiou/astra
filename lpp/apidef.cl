@@ -151,16 +151,28 @@
                          (make-param :type "const char**" :name "uri" :deref T)))
 
 ;; astra_status_t create_stream(astra_streamset_t setHandle,
-;;                                 astra_stream_desc_t desc,
-;;                                 stream_callbacks_t pluginCallbacks,
-;;                                 astra_stream_t* handle)
+;;                              astra_stream_desc_t desc,
+;;                              stream_callbacks_t pluginCallbacks,
+;;                              astra_stream_t* handle)
 (add-func       :funcset "plugin"
                 :returntype "astra_status_t"
                 :funcname "create_stream"
                 :params (list (make-param :type "astra_streamset_t" :name "setHandle")
                               (make-param :type "astra_stream_desc_t" :name "desc")
-                              (make-param :type "stream_callbacks_t" :name "pluginCallbacks")
                               (make-param :type "astra_stream_t*" :name "handle" :deref T)))
+
+;; astra_status_t register_stream(astra_stream_t& handle)
+(add-func       :funcset "plugin"
+                :returntype "astra_status_t"
+                :funcname "register_stream"
+                :params (list (make-param :type "astra_stream_t" :name "handle")
+                              (make-param :type "stream_callbacks_t" :name "pluginCallbacks")))
+
+;; astra_status_t unregister_stream(astra_stream_t handle)
+(add-func       :funcset "plugin"
+                :returntype "astra_status_t"
+                :funcname "unregister_stream"
+                :params (list (make-param :type "astra_stream_t" :name "handle")))
 
 ;; astra_status_t destroy_stream(astra_stream_t& handle)
 (add-func       :funcset "plugin"

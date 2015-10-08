@@ -173,7 +173,7 @@ namespace astra {
             node->inc_reference();
             do
             {
-                if (node->m_callback != NULL)
+                if (node->m_callback != nullptr)
                 {
                     node->m_callback(sig...);
                 }

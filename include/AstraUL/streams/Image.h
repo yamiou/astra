@@ -3,7 +3,7 @@
 
 #include <Astra/Astra.h>
 #include <stdexcept>
-#include <AstraUL/skul_ctypes.h>
+#include <AstraUL/astraul_ctypes.h>
 #include <AstraUL/streams/image_capi.h>
 #include <iostream>
 #include <cstdint>

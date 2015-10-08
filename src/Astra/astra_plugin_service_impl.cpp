@@ -87,15 +87,13 @@ namespace astra
 
     astra_status_t plugin_service_impl::create_stream(astra_streamset_t setHandle,
                                                    astra_stream_desc_t desc,
-                                                   stream_callbacks_t pluginCallbacks,
                                                    astra_stream_t& handle)
     {
-        // TODO add to specific stream set
         streamset* set = streamset::get_ptr(setHandle);
-        stream* stream = set->register_stream(desc, pluginCallbacks);
+        stream* stream = set->register_stream(desc);
         handle = stream->get_handle();
 
-        LOG_INFO("astra.plugin_service", "registered stream -- handle %x type: %d", handle, desc.type);
+        LOG_INFO("astra.plugin_service", "created stream -- handle %p type: %d", handle, desc.type);
 
         return ASTRA_STATUS_SUCCESS;
     }
@@ -121,6 +119,29 @@ namespace astra
         set->destroy_stream(stream);
 
         streamHandle = nullptr;
+
+        return ASTRA_STATUS_SUCCESS;
+    }
+
+    astra_status_t plugin_service_impl::register_stream(astra_stream_t handle, stream_callbacks_t pluginCallbacks)
+    {
+        if (handle == nullptr)
+            return ASTRA_STATUS_INVALID_PARAMETER;
+
+        stream* stream = stream::get_ptr(handle);
+        stream->set_callbacks(pluginCallbacks);
+
+        return ASTRA_STATUS_SUCCESS;
+    }
+
+    astra_status_t plugin_service_impl::unregister_stream(astra_stream_t handle)
+    {
+        if (handle == nullptr)
+            return ASTRA_STATUS_INVALID_PARAMETER;
+
+        stream* stream = stream::get_ptr(handle);
+
+        stream->clear_callbacks();
 
         return ASTRA_STATUS_SUCCESS;
     }

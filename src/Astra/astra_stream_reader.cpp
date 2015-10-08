@@ -56,8 +56,10 @@ namespace astra {
     {
         stream_connection* connection = find_stream_of_type(desc);
 
-        if (connection != nullptr)
+        if (connection)
+        {
             return connection;
+        }
 
         connection = m_connection.get_streamSet()->create_stream_connection(desc);
 
@@ -369,7 +371,7 @@ namespace astra {
 
     void stream_reader::on_connection_frame_ready(stream_connection* connection, astra_frame_index_t frameIndex)
     {
-        LOG_TRACE("astra.stream_reader", "%p connection_frame_ready fi: %d lfi: %d", this, frameIndex, m_lastFrameIndex);
+        LOG_TRACE("astra.stream_reader", "%p connection_frame_ready", this, m_streamMap.size(), connection->get_description().type);
         if (frameIndex > m_lastFrameIndex)
         {
             auto& desc = connection->get_description();

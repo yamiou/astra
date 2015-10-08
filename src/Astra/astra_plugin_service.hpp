@@ -47,8 +47,10 @@ namespace astra
                                          const char*& uri);
         astra_status_t create_stream(astra_streamset_t setHandle,
                                      astra_stream_desc_t desc,
-                                     stream_callbacks_t pluginCallbacks,
                                      astra_stream_t& handle);
+        astra_status_t register_stream(astra_stream_t handle,
+                                       stream_callbacks_t pluginCallbacks);
+        astra_status_t unregister_stream(astra_stream_t handle);
         astra_status_t destroy_stream(astra_stream_t& handle);
         astra_status_t create_stream_bin(astra_stream_t streamHandle,
                                          size_t lengthInBytes,

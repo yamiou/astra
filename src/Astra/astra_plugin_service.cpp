@@ -77,10 +77,20 @@ namespace astra
 
    astra_status_t plugin_service::create_stream(astra_streamset_t setHandle,
                                                 astra_stream_desc_t desc,
-                                                stream_callbacks_t pluginCallbacks,
                                                 astra_stream_t& handle)
    {
-       return m_impl->create_stream(setHandle, desc, pluginCallbacks, handle);
+       return m_impl->create_stream(setHandle, desc, handle);
+   }
+
+   astra_status_t plugin_service::register_stream(astra_stream_t handle,
+                                                  stream_callbacks_t pluginCallbacks)
+   {
+       return m_impl->register_stream(handle, pluginCallbacks);
+   }
+
+   astra_status_t plugin_service::unregister_stream(astra_stream_t handle)
+   {
+       return m_impl->unregister_stream(handle);
    }
 
    astra_status_t plugin_service::destroy_stream(astra_stream_t& handle)

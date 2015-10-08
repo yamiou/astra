@@ -116,7 +116,7 @@ namespace orbbec { namespace ni {
         bool enableColor = true;
         if (enableColor && oniDevice_.hasSensor(openni::SENSOR_COLOR))
         {
-            colorstream* stream = new colorstream(pluginService_,
+            colorstream* stream = astra::plugins::make_stream<colorstream>(pluginService_,
                                                   streamSetHandle_,
                                                   oniDevice_, *this);
 
@@ -130,7 +130,7 @@ namespace orbbec { namespace ni {
 
         if (oniDevice_.hasSensor(openni::SENSOR_DEPTH))
         {
-            depthstream* stream = new depthstream(pluginService_,
+depthstream* stream = astra::plugins::make_stream<depthstream>(pluginService_,
                                                   streamSetHandle_,
                                                   oniDevice_, *this);
 
@@ -144,7 +144,7 @@ namespace orbbec { namespace ni {
 
         if (oniDevice_.hasSensor(openni::SENSOR_IR))
         {
-            infrared_stream* stream = new infrared_stream(pluginService_,
+infrared_stream* stream = astra::plugins::make_stream<infrared_stream>(pluginService_,
                                                           streamSetHandle_,
                                                           oniDevice_,
                                                           *this);

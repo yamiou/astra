@@ -4,22 +4,20 @@
 #include <atomic>
 #include <memory>
 #include <vector>
+
 #include "astra_signal.hpp"
 #include "astra_stream_connection.hpp"
 #include "astra_stream_backend.hpp"
 
 namespace astra {
 
+    class stream_listener;
+
     class stream : public stream_backend
     {
     public:
-        stream(astra_stream_desc_t description)
-            : stream_backend(description) {}
-
-        virtual ~stream()
-        {
-            m_connections.clear();
-        }
+        stream(astra_stream_desc_t description);
+        virtual ~stream();
 
         stream& operator=(const stream& stream) = delete;
         stream(const stream& stream) = delete;
@@ -52,7 +50,7 @@ namespace astra {
 
         static stream* get_ptr(astra_stream_t stream)
         {
-            return reinterpret_cast<class stream*>(stream);
+            return reinterpret_cast<astra::stream*>(stream);
         }
 
         virtual void on_availability_changed() override;
@@ -62,15 +60,21 @@ namespace astra {
             disconnect_connections(bin);
         }
 
-        bool has_connections() { return m_connections.size() > 0; }
+        bool has_connections() { return connections_.size() > 0; }
+
+        void set_listener(stream_listener* listener)
+        {
+            listener_ = listener;
+        }
 
     private:
         void disconnect_connections(stream_bin* bin);
 
-        using ConnPtr = std::unique_ptr<stream_connection>;
-        using ConnectionList = std::vector<ConnPtr>;
+        using connection_ptr = std::unique_ptr<stream_connection>;
+        using connection_vector = std::vector<connection_ptr>;
 
-        ConnectionList m_connections;
+        connection_vector connections_;
+        stream_listener* listener_{nullptr};
     };
 }
 

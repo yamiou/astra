@@ -35,6 +35,6 @@ namespace astra { namespace plugins { namespace xs {
         conversion_cache_t m_depthConversionCache;
     };
 
-} } }
+}}}
 
 #endif // POINTPROCESSOR_H

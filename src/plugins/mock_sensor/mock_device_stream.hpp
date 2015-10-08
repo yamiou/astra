@@ -286,8 +286,6 @@ namespace orbbec { namespace mocks {
 
         set_mode(deviceStream_->active_mode());
 
-        enable_callbacks();
-
         return astra_status_t::ASTRA_STATUS_SUCCESS;
     }
 

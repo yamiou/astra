@@ -1,5 +1,5 @@
-#ifndef SKUL_CTYPES_H
-#define SKUL_CTYPES_H
+#ifndef ASTRAUL_CTYPES_H
+#define ASTRAUL_CTYPES_H
 
 #include <stdint.h>
 
@@ -36,4 +36,4 @@ enum astra_core_stream_types {
     ASTRA_STREAM_DEBUG_HAND = 3001,
 };
 
-#endif /* SKUL_CTYPES_H */
+#endif /* ASTRAUL_CTYPES_H */

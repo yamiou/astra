@@ -2,7 +2,7 @@
 #define DEPTH_H
 
 #include <Astra/Astra.h>
-#include <AstraUL/skul_ctypes.h>
+#include <AstraUL/astraul_ctypes.h>
 #include <AstraUL/streams/depth_capi.h>
 #include <AstraUL/streams/Image.h>
 #include <AstraUL/Vector.h>

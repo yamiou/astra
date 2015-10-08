@@ -121,7 +121,7 @@ namespace astra { namespace plugins { namespace streamplayer {
             {
                 case ASTRA_STREAM_DEPTH:
                 {
-                    DepthStream* stream = new DepthStream(*m_frameStreamReader, m_pluginService, m_streamSetHandle);
+                    DepthStream* stream = make_stream<DepthStream>(*m_frameStreamReader, m_pluginService, m_streamSetHandle);
                     stream->open();
                     m_streams.push_back(StreamPtr(stream));
                     break;

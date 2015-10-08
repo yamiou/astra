@@ -77,10 +77,22 @@ namespace astra {
         static astra_status_t create_stream(void* pluginService,
                                             astra_streamset_t setHandle,
                                             astra_stream_desc_t desc,
-                                            stream_callbacks_t pluginCallbacks,
                                             astra_stream_t* handle)
         {
-            return static_cast<plugin_service*>(pluginService)->create_stream(setHandle, desc, pluginCallbacks, *handle);
+            return static_cast<plugin_service*>(pluginService)->create_stream(setHandle, desc, *handle);
+        }
+
+        static astra_status_t register_stream(void* pluginService,
+                                              astra_stream_t handle,
+                                              stream_callbacks_t pluginCallbacks)
+        {
+            return static_cast<plugin_service*>(pluginService)->register_stream(handle, pluginCallbacks);
+        }
+
+        static astra_status_t unregister_stream(void* pluginService,
+                                                astra_stream_t handle)
+        {
+            return static_cast<plugin_service*>(pluginService)->unregister_stream(handle);
         }
 
         static astra_status_t destroy_stream(void* pluginService,

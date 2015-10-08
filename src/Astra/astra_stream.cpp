@@ -5,12 +5,21 @@
 #include <cstdint>
 #include <cassert>
 #include <algorithm>
+#include "astra_stream_listener.hpp"
 
 namespace astra {
 
+    stream::stream(astra_stream_desc_t description)
+        : stream_backend(description) {}
+
+    stream::~stream()
+    {
+        connections_.clear();
+    }
+
     void stream::disconnect_connections(stream_bin* bin)
     {
-        for (auto& connection : m_connections)
+        for (auto& connection : connections_)
         {
             if (connection->get_bin() == bin)
             {
@@ -21,11 +30,11 @@ namespace astra {
 
     stream_connection* stream::create_connection()
     {
-        ConnPtr conn(new stream_connection(this));
+        connection_ptr conn(new stream_connection(this));
 
         stream_connection* rawPtr = conn.get();
 
-        m_connections.push_back(std::move(conn));
+        connections_.push_back(std::move(conn));
 
         if (is_available())
         {
@@ -37,21 +46,21 @@ namespace astra {
 
     void stream::destroy_connection(stream_connection* connection)
     {
-        auto it = std::find_if(m_connections.cbegin(),
-                               m_connections.cend(),
+        auto it = std::find_if(connections_.cbegin(),
+                               connections_.cend(),
                                [connection] (const std::unique_ptr<stream_connection>& element)
                                -> bool
                                {
                                    return element.get() == connection;
                                });
 
-        if (it != m_connections.cend())
+        if (it != connections_.cend())
         {
             if (is_available())
             {
                 on_connection_destroyed(it->get(), get_handle());
             }
-            m_connections.erase(it);
+            connections_.erase(it);
         }
     }
 
@@ -75,16 +84,25 @@ namespace astra {
 
     void stream::on_availability_changed()
     {
+        if (listener_)
+            listener_->on_stream_registered(this);
+
         if (is_available())
         {
-            for(auto& connection : m_connections)
+            for(auto& connection : connections_)
             {
                 on_connection_created(connection.get(), get_handle());
+
+                if (connection->is_started())
+                    start_connection(connection.get());
             }
         }
         else
         {
-            for(auto& connection : m_connections)
+            if (listener_)
+                listener_->on_stream_unregistering(this);
+
+            for(auto& connection : connections_)
             {
                 connection->set_bin(nullptr);
             }

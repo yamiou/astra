@@ -8,7 +8,7 @@ set(${_projname}_SOURCES
   ../../include/AstraUL/Vector2i.h
   ../../include/AstraUL/Vector3f.h
   ../../include/AstraUL/Vector3i.h
-  ../../include/AstraUL/skul_ctypes.h
+  ../../include/AstraUL/astraul_ctypes.h
   ../../include/AstraUL/streams/Image.h
   ../../include/AstraUL/streams/image_capi.h
   ../../include/AstraUL/streams/image_types.h

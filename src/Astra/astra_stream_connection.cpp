@@ -99,7 +99,11 @@ namespace astra {
                   get_description().type,
                   get_description().subtype);
 
-        m_stream->start_connection(this);
+        if (m_stream->is_available())
+        {
+            m_stream->start_connection(this);
+        }
+
         m_started = true;
     }
 
@@ -114,7 +118,11 @@ namespace astra {
                   get_description().type,
                   get_description().subtype);
 
-        m_stream->stop_connection(this);
+        if (m_stream->is_available())
+        {
+            m_stream->stop_connection(this);
+        }
+
         m_started = false;
     }
 
@@ -157,15 +165,15 @@ namespace astra {
     }
 
     void stream_connection::set_parameter(astra_parameter_id id,
-                                         size_t inByteLength,
-                                         astra_parameter_data_t inData)
+                                          size_t inByteLength,
+                                          astra_parameter_data_t inData)
     {
         m_stream->set_parameter(this, id, inByteLength, inData);
     }
 
     void stream_connection::get_parameter(astra_parameter_id id,
-                                         size_t& resultByteLength,
-                                         astra_result_token_t& token)
+                                          size_t& resultByteLength,
+                                          astra_result_token_t& token)
     {
         astra_parameter_bin_t parameterBinHandle = nullptr;
         m_stream->get_parameter(this, id, parameterBinHandle);
@@ -175,8 +183,8 @@ namespace astra {
     }
 
     astra_status_t stream_connection::get_result(astra_result_token_t token,
-                                                   size_t dataByteLength,
-                                                   astra_parameter_data_t dataDestination)
+                                                 size_t dataByteLength,
+                                                 astra_parameter_data_t dataDestination)
     {
         parameter_bin* parameterBin = parameter_bin::get_ptr(token);
         if (m_pendingParameterResult != nullptr && parameterBin == m_pendingParameterResult)
@@ -196,10 +204,10 @@ namespace astra {
     }
 
     void stream_connection::invoke(astra_command_id commandId,
-                                  size_t inByteLength,
-                                  astra_parameter_data_t inData,
-                                  size_t& resultByteLength,
-                                  astra_result_token_t& token)
+                                   size_t inByteLength,
+                                   astra_parameter_data_t inData,
+                                   size_t& resultByteLength,
+                                   astra_result_token_t& token)
     {
         astra_parameter_bin_t parameterBinHandle = nullptr;
         m_stream->invoke(this, commandId, inByteLength, inData, parameterBinHandle);
@@ -208,8 +216,8 @@ namespace astra {
     }
 
     void stream_connection::cache_parameter_bin_token(astra_parameter_bin_t parameterBinHandle,
-                                                     size_t& resultByteLength,
-                                                     astra_result_token_t& token)
+                                                      size_t& resultByteLength,
+                                                      astra_result_token_t& token)
     {
         //delete old parameter result -- only one outstanding allowed at a time
         clear_pending_parameter_result();

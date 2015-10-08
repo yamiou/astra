@@ -93,13 +93,13 @@ namespace orbbec { namespace mocks {
 
                 if (it2 != (*it)->streams_end())
                 {
-                    image_stream* stream = new image_stream(pluginService_,
-                                                            streamSetHandle_,
-                                                            astra::StreamDescription(
-                                                                ASTRA_STREAM_COLOR,
-                                                                DEFAULT_SUBTYPE),
-                                                            *this,
-                                                            *it2);
+                    image_stream* stream = astra::plugins::make_stream<image_stream>(pluginService_,
+                                                                                     streamSetHandle_,
+                                                                                     astra::StreamDescription(
+                                                                                         ASTRA_STREAM_COLOR,
+                                                                                         DEFAULT_SUBTYPE),
+                                                                                     *this,
+                                                                                     *it2);
 
                     astra_status_t rc = astra_status_t::ASTRA_STATUS_SUCCESS;
                     rc = stream->open();
@@ -123,13 +123,13 @@ namespace orbbec { namespace mocks {
 
                 if (it2 != (*it)->streams_end())
                 {
-                    image_stream* stream = new image_stream(pluginService_,
-                                                            streamSetHandle_,
-                                                            astra::StreamDescription(
-                                                                ASTRA_STREAM_DEPTH,
-                                                                DEFAULT_SUBTYPE),
-                                                            *this,
-                                                            *it2);
+                    image_stream* stream = astra::plugins::make_stream<image_stream>(pluginService_,
+                                                                                     streamSetHandle_,
+                                                                                     astra::StreamDescription(
+                                                                                         ASTRA_STREAM_DEPTH,
+                                                                                         DEFAULT_SUBTYPE),
+                                                                                     *this,
+                                                                                     *it2);
 
                     astra_status_t rc = astra_status_t::ASTRA_STATUS_SUCCESS;
                     rc = stream->open();
@@ -153,13 +153,13 @@ namespace orbbec { namespace mocks {
 
                 if (it2 != (*it)->streams_end())
                 {
-                    image_stream* stream = new image_stream(pluginService_,
-                                                            streamSetHandle_,
-                                                            astra::StreamDescription(
-                                                                ASTRA_STREAM_INFRARED,
-                                                                DEFAULT_SUBTYPE),
-                                                            *this,
-                                                            *it2);
+                    image_stream* stream = astra::plugins::make_stream<image_stream>(pluginService_,
+                                                                                     streamSetHandle_,
+                                                                                     astra::StreamDescription(
+                                                                                         ASTRA_STREAM_INFRARED,
+                                                                                         DEFAULT_SUBTYPE),
+                                                                                     *this,
+                                                                                     *it2);
 
                     astra_status_t rc = astra_status_t::ASTRA_STATUS_SUCCESS;
                     rc = stream->open();

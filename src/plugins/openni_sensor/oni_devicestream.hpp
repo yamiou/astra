@@ -291,8 +291,6 @@ namespace orbbec { namespace ni {
             auto oniVideoMode = oniStream_.getVideoMode();
             change_mode(convert_mode(oniVideoMode));
 
-            enable_callbacks();
-
             return ASTRA_STATUS_SUCCESS;
         }
 

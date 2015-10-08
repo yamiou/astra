@@ -29,17 +29,8 @@ namespace astra {
 
         bool is_available() { return m_callbacks != nullptr; }
 
-        void set_callbacks(const stream_callbacks_t& callbacks)
-        {
-            m_callbacks = std::make_unique<stream_callbacks_t>(callbacks);
-            on_availability_changed();
-        }
-
-        void clear_callbacks()
-        {
-            m_callbacks.reset();
-            on_availability_changed();
-        }
+        void set_callbacks(const stream_callbacks_t& callbacks);
+        void clear_callbacks();
 
     protected:
         void on_connection_created(stream_connection* connection, astra_stream_t stream);

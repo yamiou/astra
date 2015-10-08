@@ -4,6 +4,18 @@
 
 namespace astra {
 
+    void stream_backend::set_callbacks(const stream_callbacks_t& callbacks)
+    {
+        m_callbacks = std::make_unique<stream_callbacks_t>(callbacks);
+        on_availability_changed();
+    }
+
+    void stream_backend::clear_callbacks()
+    {
+        m_callbacks.reset();
+        on_availability_changed();
+    }
+
     stream_bin* stream_backend::create_bin(size_t bufferLengthInBytes)
     {
         bin_ptr bin(std::make_unique<stream_bin>(bufferLengthInBytes));

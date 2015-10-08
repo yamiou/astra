@@ -3,7 +3,6 @@
 
 #include <Astra/Plugins/PluginKit.h>
 #include <AstraUL/AstraUL.h>
-#include "StylizedDepthStream.h"
 #include "PointProcessor.h"
 #include <memory>
 #include <unordered_map>
@@ -16,12 +15,15 @@ namespace astra { namespace plugins { namespace xs {
         XSPlugin(PluginServiceProxy* pluginProxy)
             : PluginBase(pluginProxy, "orbbec_xs")
         {
+            LOG_INFO("astra.plugins.xs.XSPlugin", "Initializing XS plugin");
             register_for_stream_events();
+
         }
 
         virtual ~XSPlugin()
         {
             unregister_for_stream_events();
+            LOG_INFO("astra.plugins.xs.XSPlugin", "Terminated XS plugin");
         }
 
     private:
@@ -42,6 +44,5 @@ namespace astra { namespace plugins { namespace xs {
         PointProcessorMap m_pointProcessorMap;
     };
 }}}
-
 
 #endif /* XSPLUGIN_H */

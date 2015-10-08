@@ -10,7 +10,7 @@ namespace astra {
 
     stream_connection* streamset::create_stream_connection(const astra_stream_desc_t& desc)
     {
-        LOG_TRACE("astra.streamset", "connecting to (%u,%u) on %s", desc.type,desc.subtype, m_uri.c_str());
+        LOG_INFO("astra.streamset", "connecting to (%u,%u) on %s", desc.type,desc.subtype, m_uri.c_str());
 
         stream* stream = find_stream_by_type_subtype_impl(desc.type, desc.subtype);
 
@@ -22,7 +22,7 @@ namespace astra {
                       desc.subtype,
                       m_uri.c_str());
 
-            stream = register_orphan_stream(desc);
+            stream = register_stream(desc);
         }
 
         return stream->create_connection();
@@ -56,48 +56,42 @@ namespace astra {
         return true;
     }
 
-    stream* streamset::register_stream(astra_stream_desc_t desc,
-                                       stream_callbacks_t callbacks)
+    void streamset::claim_stream(stream* stream,
+                                 stream_callbacks_t callbacks)
     {
-        stream* stream = find_stream_by_type_subtype_impl(desc.type, desc.subtype);
 
         if (stream)
         {
             assert(!stream->is_available());
+
             if (stream->is_available())
             {
                 LOG_WARN("astra.streamset","register_stream: (%u,%u) already exists, already inflated on %s",
-                         desc.type,
-                         desc.subtype,
+                         stream->get_description().type,
+                         stream->get_description().subtype,
                          m_uri.c_str());
 
-                return nullptr;
+                return;
             }
 
-            LOG_DEBUG("astra.streamset","(%u,%u) already exists, adopting orphan stream on %s",
-                      desc.type,
-                      desc.subtype,
-                      m_uri.c_str());
-        }
-        else
-        {
-            LOG_DEBUG("astra.streamset","registering (%u,%u) on %s", desc.type, desc.subtype, m_uri.c_str());
-            stream = new astra::stream(desc);
-            m_streamCollection.insert(stream);
+            stream->set_callbacks(callbacks);
         }
 
-        stream->set_callbacks(callbacks);
-
-        m_streamRegisteredSignal.raise(stream_registered_event_args(this, stream, desc));
-
-        return stream;
+        return;
     }
 
-    stream* streamset::register_orphan_stream(astra_stream_desc_t desc)
+    stream* streamset::register_stream(astra_stream_desc_t desc)
     {
-        LOG_DEBUG("astra.streamset","registering orphan (%u,%u) on %s", desc.type, desc.subtype, m_uri.c_str());
-        stream* stream = new astra::stream(desc);
-        m_streamCollection.insert(stream);
+        stream* stream = find_stream_by_type_subtype_impl(desc.type, desc.subtype);
+
+        LOG_DEBUG("astra.streamset","registering stream (%u, %u) on %s", desc.type, desc.subtype, m_uri.c_str());
+
+        if (!stream)
+        {
+            stream = new astra::stream(desc);
+            stream->set_listener(this);
+            m_streamCollection.insert(stream);
+        }
 
         return stream;
     }
@@ -149,23 +143,21 @@ namespace astra {
         assert(stream != nullptr);
         if (!stream)
         {
-            LOG_WARN("astra.streamset","destroy_stream: null parameter on %s", m_uri.c_str());
+            LOG_WARN("astra.streamset",
+                     "destroy_stream: null parameter on %s", m_uri.c_str());
         }
 
         auto it = m_streamCollection.find(stream);
         if (it != m_streamCollection.end())
         {
-            LOG_TRACE("astra.streamset","destroying stream %p on %s", stream, m_uri.c_str());
-            if (stream->is_available())
-            {
-                m_streamUnregisteringSignal.raise(
-                    stream_unregistering_event_args(this, stream, stream->get_description()));
-            }
+            LOG_TRACE("astra.streamset",
+                      "destroying stream %p on %s", stream, m_uri.c_str());
+
             stream->clear_callbacks();
         }
         else
         {
-            LOG_WARN("astra.streamset","destroy_stream: stream %p not found on %s", stream, m_uri.c_str());
+            LOG_WARN("astra.streamset", "destroy_stream: stream %p not found on %s", stream, m_uri.c_str());
         }
     }
 
@@ -174,7 +166,7 @@ namespace astra {
         assert(m_isClaimed != true);
         if (m_isClaimed)
         {
-            LOG_WARN("astra.streamset","claim: %s already claimed", m_uri.c_str());
+            LOG_WARN("astra.streamset", "claim: %s already claimed", m_uri.c_str());
             return;
         }
 
@@ -246,4 +238,16 @@ namespace astra {
 
         return nullptr;
     }
+
+    void streamset::on_stream_registered(stream* stream)
+    {
+        m_streamRegisteredSignal.raise(stream_registered_event_args(this, stream, stream->get_description()));
+    }
+
+    void streamset::on_stream_unregistering(stream* stream)
+    {
+        m_streamUnregisteringSignal.raise(
+            stream_unregistering_event_args(this, stream, stream->get_description()));
+    }
+
 }

@@ -13,10 +13,11 @@
 #include <string>
 #include <cassert>
 #include "astra_streamset_connection.hpp"
+#include "astra_stream_listener.hpp"
 
 namespace astra {
 
-    class streamset
+    class streamset : public stream_listener
     {
     public:
         using VisitorFunc = std::function<void(stream*)>;
@@ -37,10 +38,10 @@ namespace astra {
 
         //plugins only below
 
-        stream* register_stream(astra_stream_desc_t desc, stream_callbacks_t callbacks);
-        stream* register_orphan_stream(astra_stream_desc_t desc);
-
+        astra::stream* register_stream(astra_stream_desc_t desc);
         void destroy_stream(stream* stream);
+
+        void claim_stream(stream* stream, stream_callbacks_t callbacks);
 
         bool is_member(astra_stream_t stream) const;
 
@@ -59,6 +60,9 @@ namespace astra {
         astra_callback_id_t register_for_stream_unregistering_event(StreamUnregisteringCallback callback);
         void unregister_for_stream_registered_event(astra_callback_id_t callbackId);
         void unregister_for_stream_unregistering_event(astra_callback_id_t callbackId);
+
+        virtual void on_stream_registered(stream* stream) override;
+        virtual void on_stream_unregistering(stream* stream) override;
 
     private:
         stream* find_stream_by_type_subtype_impl(astra_stream_type_t type,

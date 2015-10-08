@@ -39,12 +39,16 @@ namespace astra { namespace plugins { namespace xs {
         {
             return;
         }
+
         //TODO check for changes in depthFrame width and height and update bin size
-        LOG_INFO("PointerProcessor", "creating point stream");
+        LOG_INFO("PointProcessor", "creating point stream");
 
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
-        m_pointStream = std::make_unique<PointStream>(m_pluginService, m_streamSet, width, height);
+
+        auto ps = make_stream<PointStream>(m_pluginService, m_streamSet, width, height);
+        m_pointStream = std::unique_ptr<PointStream>(std::move(ps));
+
         LOG_INFO("PointProcessor", "created point stream");
 
         m_depthConversionCache = m_depthStream.depth_to_world_data();
