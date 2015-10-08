@@ -13,7 +13,7 @@ endif()
 # Version
 string (TIMESTAMP BUILD_DATE "%Y%m%dT%H%M%SZ" UTC)
 set (Astra_VERSION_MAJOR 0)
-set (Astra_VERSION_MINOR 3)
+set (Astra_VERSION_MINOR 4)
 set (Astra_VERSION_PATCH 0)
 set (Astra_VERSION_BUILD 0)
 

@@ -1,4 +1,4 @@
-Astra SDK v0.3.0 Preview
+Astra SDK v0.4.0 Preview
 Copyright (c) 2015 Orbbec
 www.orbbec3d.com
 
@@ -6,6 +6,10 @@ feedback@orbbec3d.com
 
 What's New
 ==========
+
+v0.4.0 2015/10/xx
+* Add official support for Win64, OS X 10.8+, and Ubuntu 14.04+
+* Minor bug fixes
 
 v0.3.0 2015/09/14
 * Rename to Astra SDK.
