@@ -23,7 +23,15 @@ set(${_projname}_SOURCES
 add_definitions(-DASTRA_BUILD)
 
 if (WIN32)
-  find_library(OpenNI2_LIBRARY NAMES "OpenNI2.lib" HINTS "$ENV{OPENNI2_LIB}" PATH_SUFFIXES lib)
+  if(ASTRA_64)
+    set(ONI_LIB_DIR $ENV{OPENNI2_LIB64})
+  else()
+    set(ONI_LIB_DIR $ENV{OPENNI2_LIB})
+  endif()
+  
+  message("ONI_LIB_DIR ${ONI_LIB_DIR}")
+
+  find_library(OpenNI2_LIBRARY NAMES "OpenNI2.lib" HINTS ${ONI_LIB_DIR} PATH_SUFFIXES lib)
 elseif (APPLE)
   find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.dylib" HINTS "$ENV{OPENNI2_REDIST}" PATH_SUFFIXES lib)
 elseif (UNIX AND NOT ANDROID)

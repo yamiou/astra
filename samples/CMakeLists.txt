@@ -10,6 +10,12 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+  set(ASTRA_64 ON)
+else()
+  set(ASTRA_32 ON)
+endif()
+
 include(ConfigUserFile)
 
 function(add_astra_sdk_dependency _targetname)
