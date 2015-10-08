@@ -74,31 +74,15 @@ namespace astra { namespace plugins {
             m_locked = false;
         }
 
-        std::vector<astra_streamconnection_t> connections()
-        {
-            return connections_;
-        }
-
         void link_connection(astra_streamconnection_t connection)
         {
-            auto it = std::find(connections_.begin(), connections_.end(), connection);
+            m_pluginService.link_connection_to_bin(connection, m_binHandle);
 
-            if (it == connections_.end())
-            {
-                m_pluginService.link_connection_to_bin(connection, m_binHandle);
-                connections_.push_back(connection);
-            }
         }
 
         void unlink_connection(astra_streamconnection_t connection)
         {
-            auto it = std::find(connections_.begin(), connections_.end(), connection);
-
-            if (it != connections_.end())
-            {
-                m_pluginService.link_connection_to_bin(connection, nullptr);
-                connections_.erase(it);
-            }
+            m_pluginService.link_connection_to_bin(connection, nullptr);
         }
 
     private:
@@ -108,7 +92,6 @@ namespace astra { namespace plugins {
         astra_frame_t* m_currentBuffer{nullptr};
         PluginServiceProxy& m_pluginService;
         bool m_locked{false};
-        std::vector<astra_streamconnection_t> connections_;
     };
 
 }}

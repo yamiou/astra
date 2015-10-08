@@ -81,6 +81,7 @@ namespace orbbec { namespace mocks {
     private:
         bool frameAvailable_{false};
         astra_stream_t streamHandle_{nullptr};
+        std::vector<astra_streamconnection_t> connections_;
     };
 }}
 
@@ -110,15 +111,27 @@ namespace orbbec { namespace mocks {
     template<typename TFrameWrapper>
     void device_stream<TFrameWrapper>::on_connection_added(astra_streamconnection_t connection)
     {
-        assert(bin_ != nullptr);
-        bin_->link_connection(connection);
+        auto it = std::find(connections_.begin(), connections_.end(), connection);
+
+        if (it == connections_.end())
+        {
+            if (bin_ != nullptr)
+                bin_->link_connection(connection);
+            connections_.push_back(connection);
+        }
     }
 
     template<typename TFrameWrapper>
     void device_stream<TFrameWrapper>::on_connection_removed(astra_bin_t bin,
                                                              astra_streamconnection_t connection)
     {
-        bin_->unlink_connection(connection);
+        auto it = std::find(connections_.begin(), connections_.end(), connection);
+
+        if (it != connections_.end())
+        {
+            bin_->unlink_connection(connection);
+            connections_.erase(it);
+        }
 
         if (!bin_->has_connections())
         {
@@ -208,13 +221,6 @@ namespace orbbec { namespace mocks {
     template<typename TFrameWrapper>
     void device_stream<TFrameWrapper>::set_mode(const astra::ImageStreamMode& mode)
     {
-        std::vector<astra_streamconnection_t> conns;
-
-        if (bin_ != nullptr)
-        {
-            conns = bin_->connections();
-        }
-
         assert(mode.pixelFormat() != 0);
 
         bufferLength_ =
@@ -232,7 +238,7 @@ namespace orbbec { namespace mocks {
                                           get_handle(),
                                           bufferLength_);
 
-        for(auto& conn : conns)
+        for(auto& conn : connections_)
         {
             bin_->link_connection(conn);
         };
