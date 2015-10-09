@@ -2,17 +2,31 @@ set(PROJECT_SOURCE_DIR "@PROJECT_SOURCE_DIR@")
 set(SAMPLES_SOURCE_DIR "@SAMPLES_SOURCE_DIR@")
 set(PROJECT_BINARY_DIR "@PROJECT_BINARY_DIR@")
 set(SAMPLES_BUILD_TEMP_DIR "@SAMPLES_BUILD_TEMP_DIR@")
+set(CMAKE_GENERATOR "Visual Studio 12 2013")
+set(CMAKE_GENERATOR_PLATFORM @CMAKE_GENERATOR_PLATFORM@)
+set(ASTRA_64 @ASTRA_64@)
+set(ASTRA_32 @ASTRA_32@)
 
 MESSAGE("Configuring sdk sample VS2013 projects...")
 MESSAGE("SAMPLES_SOURCE_DIR: ${SAMPLES_SOURCE_DIR}")
 
 file(REMOVE_RECURSE ${SAMPLES_BUILD_TEMP_DIR})
 
-configure_file("${PROJECT_SOURCE_DIR}/samples-aux/CMakeCache.txt.in"
+if (ASTRA_64)
+  set(SFML_LIB_DIR "SFML-min-64")
+  set(CMAKECACHE_IN "CMakeCache.txt.x64.in")
+  set(ARCH "-A ${CMAKE_GENERATOR_PLATFORM}")
+else()
+  set(SFML_LIB_DIR "SFML-min-32")
+  set(CMAKECACHE_IN "CMakeCache.txt.x86.in")
+  set(ARCH "")
+endif()
+
+configure_file("${PROJECT_SOURCE_DIR}/samples-aux/${CMAKECACHE_IN}"
   "${SAMPLES_BUILD_TEMP_DIR}/CMakeCache.txt"
   @ONLY)
 
-execute_process(COMMAND cmake.exe "${SAMPLES_BUILD_TEMP_DIR}"
+execute_process(COMMAND cmake.exe -G${CMAKE_GENERATOR} ${ARCH} "${SAMPLES_BUILD_TEMP_DIR}"
   WORKING_DIRECTORY ${SAMPLES_SOURCE_DIR})
 
 MESSAGE("Deleting CMake generated directories and files...")
@@ -54,4 +68,4 @@ MESSAGE("Removing CMake from VS2013 projects...")
 execute_process(COMMAND clisp.exe "parse-replace.cl" "${SAMPLES_BUILD_TEMP_DIR}" "${SAMPLES_SOURCE_DIR}"
   WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/lpp/")
 
-MESSAGE("Done configuring sdk sample VS2013 projects.")
+MESSAGE("Done configuring sdk sample VS2013 projects.") 

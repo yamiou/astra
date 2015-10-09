@@ -58,7 +58,7 @@ CMAKE_C_FLAGS_RELWITHDEBINFO:STRING=/MD /Zi /O2 /Ob1 /D NDEBUG
 CMAKE_C_STANDARD_LIBRARIES:STRING=kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
 
 //Flags used by the linker.
-CMAKE_EXE_LINKER_FLAGS:STRING= /machine:X86
+CMAKE_EXE_LINKER_FLAGS:STRING= /machine:x64
 
 //Flags used by the linker during debug builds.
 CMAKE_EXE_LINKER_FLAGS_DEBUG:STRING=/debug /INCREMENTAL
@@ -76,10 +76,10 @@ CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO:STRING=/debug /INCREMENTAL
 CMAKE_INSTALL_PREFIX:PATH=C:/Program Files (x86)/astra-samples
 
 //Path to a program.
-CMAKE_LINKER:FILEPATH=C:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/bin/link.exe
+CMAKE_LINKER:FILEPATH=C:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/bin/x86_amd64/link.exe
 
 //Flags used by the linker during the creation of modules.
-CMAKE_MODULE_LINKER_FLAGS:STRING= /machine:X86
+CMAKE_MODULE_LINKER_FLAGS:STRING= /machine:x64
 
 //Flags used by the linker during debug builds.
 CMAKE_MODULE_LINKER_FLAGS_DEBUG:STRING=/debug /INCREMENTAL
@@ -103,7 +103,7 @@ CMAKE_RC_COMPILER:FILEPATH=rc
 CMAKE_RC_FLAGS:STRING=' '
 
 //Flags used by the linker during the creation of dll's.
-CMAKE_SHARED_LINKER_FLAGS:STRING= /machine:X86
+CMAKE_SHARED_LINKER_FLAGS:STRING= /machine:x64
 
 //Flags used by the linker during debug builds.
 CMAKE_SHARED_LINKER_FLAGS_DEBUG:STRING=/debug /INCREMENTAL
@@ -148,12 +148,6 @@ CMAKE_USE_RELATIVE_PATHS:BOOL=ON
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=OFF
 
-//Path to a file.
-GLUT_INCLUDE_DIR:PATH=@SAMPLES_BUILD_TEMP_DIR@thirdparty/glut_windows/include
-
-//Path to a library.
-GLUT_glut_LIBRARY:FILEPATH=$(SolutionDir)thirdparty/glut_windows/Release/glut32.lib
-
 //OpenGL library for win32
 OPENGL_gl_LIBRARY:STRING=opengl32
 
@@ -194,10 +188,10 @@ SFML_AUDIO_LIBRARY_STATIC_DEBUG:FILEPATH=SFML_AUDIO_LIBRARY_STATIC_DEBUG-NOTFOUN
 SFML_AUDIO_LIBRARY_STATIC_RELEASE:FILEPATH=SFML_AUDIO_LIBRARY_STATIC_RELEASE-NOTFOUND
 
 //Path to a library.
-SFML_GRAPHICS_LIBRARY_DYNAMIC_DEBUG:FILEPATH=$(SolutionDir)thirdparty/SFML-2.2-min/lib/sfml-graphics-d.lib
+SFML_GRAPHICS_LIBRARY_DYNAMIC_DEBUG:FILEPATH=$(SolutionDir)thirdparty/@SFML_LIB_DIR@/lib/sfml-graphics-d.lib
 
 //Path to a library.
-SFML_GRAPHICS_LIBRARY_DYNAMIC_RELEASE:FILEPATH=$(SolutionDir)thirdparty/SFML-2.2-min/lib/sfml-graphics.lib
+SFML_GRAPHICS_LIBRARY_DYNAMIC_RELEASE:FILEPATH=$(SolutionDir)thirdparty/@SFML_LIB_DIR@/lib/sfml-graphics.lib
 
 //Path to a library.
 SFML_GRAPHICS_LIBRARY_STATIC_DEBUG:FILEPATH=SFML_GRAPHICS_LIBRARY_STATIC_DEBUG-NOTFOUND
@@ -206,13 +200,13 @@ SFML_GRAPHICS_LIBRARY_STATIC_DEBUG:FILEPATH=SFML_GRAPHICS_LIBRARY_STATIC_DEBUG-N
 SFML_GRAPHICS_LIBRARY_STATIC_RELEASE:FILEPATH=SFML_GRAPHICS_LIBRARY_STATIC_RELEASE-NOTFOUND
 
 //Path to a file.
-SFML_INCLUDE_DIR:PATH=@SAMPLES_BUILD_TEMP_DIR@thirdparty/SFML-2.2-min/include/
+SFML_INCLUDE_DIR:PATH=@SAMPLES_BUILD_TEMP_DIR@thirdparty/@SFML_LIB_DIR@/include/
 
 //Path to a library.
-SFML_SYSTEM_LIBRARY_DYNAMIC_DEBUG:FILEPATH=$(SolutionDir)thirdparty/SFML-2.2-min/lib/sfml-system-d.lib
+SFML_SYSTEM_LIBRARY_DYNAMIC_DEBUG:FILEPATH=$(SolutionDir)thirdparty/@SFML_LIB_DIR@/lib/sfml-system-d.lib
 
 //Path to a library.
-SFML_SYSTEM_LIBRARY_DYNAMIC_RELEASE:FILEPATH=$(SolutionDir)thirdparty/SFML-2.2-min/lib/sfml-system.lib
+SFML_SYSTEM_LIBRARY_DYNAMIC_RELEASE:FILEPATH=$(SolutionDir)thirdparty/@SFML_LIB_DIR@/lib/sfml-system.lib
 
 //Path to a library.
 SFML_SYSTEM_LIBRARY_STATIC_DEBUG:FILEPATH=SFML_SYSTEM_LIBRARY_STATIC_DEBUG-NOTFOUND
@@ -221,10 +215,10 @@ SFML_SYSTEM_LIBRARY_STATIC_DEBUG:FILEPATH=SFML_SYSTEM_LIBRARY_STATIC_DEBUG-NOTFO
 SFML_SYSTEM_LIBRARY_STATIC_RELEASE:FILEPATH=SFML_SYSTEM_LIBRARY_STATIC_RELEASE-NOTFOUND
 
 //Path to a library.
-SFML_WINDOW_LIBRARY_DYNAMIC_DEBUG:FILEPATH=$(SolutionDir)thirdparty/SFML-2.2-min/lib/sfml-window-d.lib
+SFML_WINDOW_LIBRARY_DYNAMIC_DEBUG:FILEPATH=$(SolutionDir)thirdparty/@SFML_LIB_DIR@/lib/sfml-window-d.lib
 
 //Path to a library.
-SFML_WINDOW_LIBRARY_DYNAMIC_RELEASE:FILEPATH=$(SolutionDir)thirdparty/SFML-2.2-min/lib/sfml-window.lib
+SFML_WINDOW_LIBRARY_DYNAMIC_RELEASE:FILEPATH=$(SolutionDir)thirdparty/@SFML_LIB_DIR@/lib/sfml-window.lib
 
 //Path to a library.
 SFML_WINDOW_LIBRARY_STATIC_DEBUG:FILEPATH=SFML_WINDOW_LIBRARY_STATIC_DEBUG-NOTFOUND
@@ -300,7 +294,7 @@ CMAKE_EXTRA_GENERATOR:INTERNAL=
 //Name of generator.
 CMAKE_GENERATOR:INTERNAL=Visual Studio 12 2013
 //Name of generator platform.
-CMAKE_GENERATOR_PLATFORM:INTERNAL=
+CMAKE_GENERATOR_PLATFORM:INTERNAL=x64
 //Name of generator toolset.
 CMAKE_GENERATOR_TOOLSET:INTERNAL=
 //Start directory with the top level CMakeLists.txt file for this
@@ -366,14 +360,8 @@ DepthReaderEvent_GUID_CMAKE:INTERNAL=93CAF843-DAF9-4F83-B54A-5540ACF9DD42
 DepthReader_GUID_CMAKE:INTERNAL=EC88231E-E623-4C7F-B7A7-6BF0AF3C2E86
 //Stored GUID
 DepthViewer_GUID_CMAKE:INTERNAL=AA522F45-9D83-4F71-AB1F-319EBC0F4C49
-//Details about finding GLUT
-FIND_PACKAGE_MESSAGE_DETAILS_GLUT:INTERNAL=[$(SolutionDir)thirdparty/glut_windows/glut32.lib][$(SolutionDir)thirdparty/glut_windows/][v()]
 //Details about finding OpenGL
 FIND_PACKAGE_MESSAGE_DETAILS_OpenGL:INTERNAL=[opengl32][v()]
-//ADVANCED property for variable: GLUT_INCLUDE_DIR
-GLUT_INCLUDE_DIR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: GLUT_glut_LIBRARY
-GLUT_glut_LIBRARY-ADVANCED:INTERNAL=1
 //Stored GUID
 HandReader_GUID_CMAKE:INTERNAL=CFAF6527-97AD-4056-AD91-C768889112CB
 //ADVANCED property for variable: OPENGL_gl_LIBRARY

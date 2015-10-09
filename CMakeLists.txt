@@ -217,12 +217,12 @@ if (MSVC)
     )
 
   #Configure VS2013 project generation & cleanup script
-  configure_file("${PROJECT_SOURCE_DIR}/InstallVS.txt.in"
-    "${PROJECT_SOURCE_DIR}/InstallVS.txt"
+  configure_file("${PROJECT_SOURCE_DIR}/samples-aux/InstallVS.cmake.in"
+    "${PROJECT_BINARY_DIR}/InstallVS.cmake"
     @ONLY)
   #Run the script at install time to generate VS2013 projects for the samples
   #also de-cmake-ifies the projects and makes everything a relative directory
-  install(SCRIPT "InstallVS.txt")
+  install(SCRIPT "${PROJECT_BINARY_DIR}/InstallVS.cmake")
 
   #install the sample VS2013 projects
   install(DIRECTORY ${SAMPLES_BUILD_TEMP_DIR}
