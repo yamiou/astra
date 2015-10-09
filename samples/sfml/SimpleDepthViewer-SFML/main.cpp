@@ -160,12 +160,12 @@ int main(int argc, char** argv)
                         if (is_fullscreen)
                         {
                             is_fullscreen = false;
-                            window.create(windowed_mode, "Depth Viewer");
+                            window.create(windowed_mode, "Depth Viewer", sf::Style::Default);
                         }
                         else
                         {
                             is_fullscreen = true;
-                            window.create(fullscreen_mode, "Depth Viewer", sf::Style::Fullscreen);
+                            window.create(fullscreen_mode, "Depth Viewer", sf::Style::None);
                         }
                         break;
                     case sf::Keyboard::R:
