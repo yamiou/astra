@@ -6,6 +6,7 @@
 #include "astra_streamset_connection.hpp"
 #include "astra_streamset.hpp"
 #include "astra_logger.hpp"
+#include "astra_cxx_compatibility.hpp"
 
 namespace astra {
     using namespace std::placeholders;

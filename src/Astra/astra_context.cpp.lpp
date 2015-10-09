@@ -1,6 +1,7 @@
 #include "astra_context.hpp"
 #include "astra_context_impl.hpp"
 #include "astra_create_stream_proxy.hpp"
+#include "astra_cxx_compatibility.hpp"
 #include <Astra/Plugins/StreamServiceProxyBase.h>
 #include <AstraAPI.h>
 

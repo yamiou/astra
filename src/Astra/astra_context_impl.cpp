@@ -10,6 +10,7 @@
 #include "astra_private.h"
 #include "astra_configuration.hpp"
 #include "astra_filesystem.hpp"
+#include "astra_cxx_compatibility.hpp"
 
 INITIALIZE_LOGGING
 

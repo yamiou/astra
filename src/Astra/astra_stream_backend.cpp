@@ -1,6 +1,7 @@
 #include "astra_stream_backend.hpp"
 #include "astra_stream_bin.hpp"
 #include <algorithm>
+#include "astra_cxx_compatibility.hpp"
 
 namespace astra {
 
@@ -28,8 +29,8 @@ namespace astra {
 
     void stream_backend::destroy_bin(stream_bin* bin)
     {
-        auto it = std::find_if(m_bins.cbegin(),
-                               m_bins.cend(),
+        auto it = std::find_if(m_bins.begin(),
+                               m_bins.end(),
                                [&bin] (const bin_ptr& element)
                                {
                                    return bin == element.get();
@@ -37,7 +38,7 @@ namespace astra {
 
 
 
-        if (it != m_bins.cend())
+        if (it != m_bins.end())
         {
             on_destroying_bin(it->get());
             m_bins.erase(it);

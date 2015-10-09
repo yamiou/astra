@@ -46,15 +46,15 @@ namespace astra {
 
     void stream::destroy_connection(stream_connection* connection)
     {
-        auto it = std::find_if(connections_.cbegin(),
-                               connections_.cend(),
+        auto it = std::find_if(connections_.begin(),
+                               connections_.end(),
                                [connection] (const std::unique_ptr<stream_connection>& element)
                                -> bool
                                {
                                    return element.get() == connection;
                                });
 
-        if (it != connections_.cend())
+        if (it != connections_.end())
         {
             if (is_available())
             {

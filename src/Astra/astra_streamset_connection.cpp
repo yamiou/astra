@@ -1,5 +1,6 @@
 #include "astra_streamset_connection.hpp"
 #include <memory>
+#include "astra_cxx_compatibility.hpp"
 
 namespace astra {
 

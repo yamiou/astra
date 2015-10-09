@@ -1,11 +1,13 @@
 #include "ProtoFrameInputStream.h"
 
+#include <Astra/astra_cxx_make_unique.hpp>
 #include "FrameDescription.pb.h"
 #include "Frame.pb.h"
 
 #include "pb_util.h"
 
 namespace astra { namespace serialization {
+
     ProtoFrameInputStream::ProtoFrameInputStream(const char* path) :
         FrameInputStream()
     {

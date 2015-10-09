@@ -1,6 +1,7 @@
 ﻿#include "astra_plugin_service.hpp"
 #include "astra_plugin_service_impl.hpp"
 #include "astra_create_plugin_proxy.hpp"
+#include "astra_cxx_compatibility.hpp"
 
 namespace astra
 {

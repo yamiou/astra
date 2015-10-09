@@ -19,25 +19,25 @@ namespace astra { namespace devices {
 
     void sensor_stream::add_listener(const listener_ptr listener)
     {
-        auto it = std::find_if(listeners_.cbegin(), listeners_.cend(),
+        auto it = std::find_if(listeners_.begin(), listeners_.end(),
                                [&listener](const listener_ptr& colItem) -> bool
                                {
                                    return colItem == listener;
                                });
 
-        if (it == listeners_.cend())
+        if (it == listeners_.end())
             listeners_.push_back(listener);
     }
 
     void sensor_stream::remove_listener(const listener_ptr listener)
     {
-        auto it = std::find_if(listeners_.cbegin(), listeners_.cend(),
+        auto it = std::find_if(listeners_.begin(), listeners_.end(),
                                [&listener](const listener_ptr& colItem) -> bool
                                {
                                    return colItem == listener;
                                });
 
-        if (it != listeners_.cend())
+        if (it != listeners_.end())
             listeners_.erase(it);
     }
 
@@ -113,12 +113,12 @@ namespace astra { namespace devices {
 
     sensor_stream::mode_const_iterator sensor_stream::modes_begin()
     {
-        return availableModes_.cbegin();
+        return availableModes_.begin();
     }
 
     sensor_stream::mode_const_iterator sensor_stream::modes_end()
     {
-        return availableModes_.cend();
+        return availableModes_.end();
     }
 
     std::size_t sensor_stream::modes_size() const
@@ -171,25 +171,25 @@ namespace astra { namespace devices {
 
     void sensor_stream::add_available_mode(const stream_mode& mode)
     {
-        auto it = std::find(availableModes_.cbegin(), availableModes_.cend(), mode);
+        auto it = std::find(availableModes_.begin(), availableModes_.end(), mode);
 
-        if (it == availableModes_.cend())
+        if (it == availableModes_.end())
             availableModes_.push_back(mode);
     }
 
     void sensor_stream::remove_available_mode(const stream_mode& mode)
     {
-        auto it = std::find(availableModes_.cbegin(), availableModes_.cend(), mode);
+        auto it = std::find(availableModes_.begin(), availableModes_.end(), mode);
 
-        if (it != availableModes_.cend())
+        if (it != availableModes_.end())
             availableModes_.erase(it);
     }
 
     device_status sensor_stream::set_active_mode(const stream_mode& mode)
     {
-        auto it = std::find(availableModes_.cbegin(), availableModes_.cend(), mode);
+        auto it = std::find(availableModes_.begin(), availableModes_.end(), mode);
 
-        if (it != availableModes_.cend())
+        if (it != availableModes_.end())
         {
             activeMode_ = std::make_unique<stream_mode>(*it);
             on_active_mode_changed();

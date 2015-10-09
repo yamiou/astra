@@ -18,6 +18,10 @@ endif()
 
 include(ConfigUserFile)
 
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
+
 function(add_astra_sdk_dependency _targetname)
   if(NOT TARGET ${_targetname})
     message("add_sdk_dependency: There is no target named '${_targetname}'")
@@ -52,11 +56,20 @@ if (ASTRA_MSVC)
 endif()
 
 if(ASTRA_GCC OR ASTRA_CLANG)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -fPIC")
+
+  set(ASTRA_CXX_FLAGS "-Wall -fPIC")
+  if (COMPILER_SUPPORTS_CXX14)
+    set(ASTRA_CXX_FLAGS "${ASTRA_CXX_FLAGS} -std=c++14")
+  elseif( COMPILER_SUPPORTS_CXX11)
+    set(ASTRA_CXX_FLAGS "${ASTRA_CXX_FLAGS} -std=c++11")
+  endif()
+
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ASTRA_CXX_FLAGS}")
 
   if(ASTRA_ANDROID)
-    set(ANDROID_CXX_FLAGS "${ANDROID_CXX_FLAGS} -std=c++14 -Wall -fPIC")
+    set(ANDROID_CXX_FLAGS "${ANDROID_CXX_FLAGS} ${ASTRA_CXX_FLAGS}")
   endif()
+
 endif()
 
 #set the rpath to go up from the bin/ to to the lib/ dir to find the Astra libs

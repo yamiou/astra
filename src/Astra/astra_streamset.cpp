@@ -1,6 +1,7 @@
 ﻿#include "astra_streamset.hpp"
 #include "astra_streamset_connection.hpp"
 #include <cassert>
+#include "astra_cxx_compatibility.hpp"
 
 namespace astra {
 

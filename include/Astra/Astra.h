@@ -7,6 +7,7 @@
 #include <Astra/FrameReadyListener.h>
 #include <Astra/StreamReader.h>
 #include <Astra/DataStream.h>
+#include <Astra/astra_cxx_make_unique.hpp>
 
 namespace astra {
 
@@ -23,6 +24,7 @@ namespace astra {
             return astra_terminate();
         }
     };
+
 }
 
 #endif // ASTRA_H

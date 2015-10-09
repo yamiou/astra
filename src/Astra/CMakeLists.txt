@@ -144,4 +144,4 @@ add_custom_target(copytoml_astra ALL
 set_target_properties(copytoml_astra PROPERTIES FOLDER CMakeCopyTargets)
 
 install_lib(${_projname})
-install_file("${PROJECT_SOURCE_DIR}/src/astra/astra.toml")
+install_file("${PROJECT_SOURCE_DIR}/src/Astra/astra.toml")

@@ -1,6 +1,7 @@
 /* THIS FILE AUTO-GENERATED FROM astra.cpp.lpp. DO NOT EDIT. */
 
 #include "astra_context.hpp"
+#include "astra_cxx_compatibility.hpp"
 #include <Astra/Plugins/StreamServiceProxyBase.h>
 #include <AstraAPI.h>
 #include <Astra/host_events.h>

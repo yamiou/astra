@@ -4,6 +4,7 @@
 #include "astra_streamset_connection.hpp"
 #include "astra_signal.hpp"
 #include "astra_logger.hpp"
+#include "astra_cxx_compatibility.hpp"
 
 namespace astra {
 
