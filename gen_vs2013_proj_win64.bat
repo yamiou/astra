@@ -4,7 +4,7 @@ cd build-x64
 
 REM Update your dependency directories below as necessary
 
-cmake -G"Visual Studio 12" -A x64 -DOpenCV_DIR="C:\libs\opencv-2.4.10\build-x64" -DSFML_ROOT="C:\libs\SFML-2.3.2-64" -DPROTOBUF_SRC_ROOT_FOLDER="C:\libs\protobuf-2.6.1" .. && goto :copy_files
+cmake -G"Visual Studio 12" -Ax64 -DOpenCV_DIR="C:\libs\opencv-2.4.10\build-x64" -DSFML_ROOT="C:\libs\SFML-2.3.2-64" -DPROTOBUF_SRC_ROOT_FOLDER="C:\libs\protobuf-2.6.1" .. && goto :copy_files
 
 REM only if cmake failed...
 GOTO end
