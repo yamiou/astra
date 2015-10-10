@@ -66,6 +66,12 @@ public:
 
         init_texture(width, height);
 
+        check_fps();
+
+        if (m_isPaused)
+        {
+            return;
+        }    
         m_visualizer.update(pointFrame);
 
         astra_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
@@ -78,7 +84,6 @@ public:
             m_displayBuffer[rgbaOffset + 3] = 255;
         }
         m_texture.update(m_displayBuffer.get());
-        check_fps();
     }
 
     void drawTo(sf::RenderWindow& window)
@@ -91,6 +96,16 @@ public:
 
             window.draw(m_sprite);
         }
+    }
+    
+    void toggle_Paused()
+    {
+        m_isPaused = ! m_isPaused;
+    }
+    
+    bool get_isPaused() const
+    {
+        return m_isPaused;
     }
 
 private:
@@ -108,6 +123,7 @@ private:
     BufferPtr m_displayBuffer { nullptr };
     int m_displayWidth{0};
     int m_displayHeight{0};
+    bool m_isPaused{ false };
 };
 
 int main(int argc, char** argv)
@@ -179,6 +195,9 @@ int main(int argc, char** argv)
                         break;
                     case sf::Keyboard::M:
                         depthStream.enable_mirroring(!depthStream.mirroring_enabled());
+                        break;
+                    case sf::Keyboard::P:
+                        listener.toggle_Paused();
                         break;
                     default:
                         break;

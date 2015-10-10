@@ -98,6 +98,11 @@ public:
 
         init_texture(depthWidth, depthHeight, m_depthView);
 
+        if (m_isPaused)
+        {
+            return;
+        }
+
         m_visualizer.update(pointFrame);
 
         astra_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
@@ -273,6 +278,16 @@ public:
         return m_isOverlayDepth;
     }
 
+    void toggle_Paused()
+    {
+        m_isPaused = !m_isPaused;
+    }
+
+    bool get_isPaused() const
+    {
+        return m_isPaused;
+    }
+
     ColorMode get_mode() const { return m_colorMode; }
     void set_mode(ColorMode mode) { m_colorMode = mode; }
 
@@ -289,6 +304,7 @@ private:
     stream_view m_colorView;
     ColorMode m_colorMode;
     bool m_isOverlayDepth{ false };
+    bool m_isPaused{ false };
 };
 
 astra::DepthStream configure_depth(astra::StreamReader& reader)
@@ -439,6 +455,9 @@ int main(int argc, char** argv)
                         break;
                     case sf::Keyboard::O:
                         listener.toggle_depth_overlay();
+                        break;
+                    case sf::Keyboard::P:
+                        listener.toggle_Paused();
                         break;
                     case sf::Keyboard::C:
                         if (event.key.control)
