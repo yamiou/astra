@@ -248,9 +248,29 @@ public:
             float height = m_colorView.height * colorScale;
             int horzCenter = window.getView().getCenter().y - height / 2.0f;
             m_colorView.sprite.setScale(colorScale, colorScale);
-            m_colorView.sprite.setPosition(viewSize, horzCenter);
+    
+            if (m_isOverlayDepth)
+            {
+                m_colorView.sprite.setPosition(0, horzCenter);
+                m_colorView.sprite.setColor(sf::Color(255, 255, 255, 128));
+            }
+            else
+            {
+                m_colorView.sprite.setPosition(viewSize, horzCenter);
+                m_colorView.sprite.setColor(sf::Color(255, 255, 255, 255));
+            }
             window.draw(m_colorView.sprite);
         }
+    }
+
+    void toggle_depth_overlay()
+    {
+        m_isOverlayDepth = !m_isOverlayDepth;
+    }
+    
+    bool get_isOverlayDepth()
+    {
+        return m_isOverlayDepth;
     }
 
     ColorMode get_mode() const { return m_colorMode; }
@@ -268,6 +288,7 @@ private:
     stream_view m_depthView;
     stream_view m_colorView;
     ColorMode m_colorMode;
+    bool m_isOverlayDepth{ false };
 };
 
 astra::DepthStream configure_depth(astra::StreamReader& reader)
@@ -415,6 +436,9 @@ int main(int argc, char** argv)
                         configure_ir(reader, true);
                         listener.set_mode(MODE_IR_RGB);
                         irStream.start();
+                        break;
+                    case sf::Keyboard::O:
+                        listener.toggle_depth_overlay();
                         break;
                     case sf::Keyboard::C:
                         if (event.key.control)
