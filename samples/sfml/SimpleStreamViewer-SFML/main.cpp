@@ -361,7 +361,7 @@ int main(int argc, char** argv)
 #endif
 
     sf::VideoMode fullscreen_mode = sf::VideoMode::getFullscreenModes()[0];
-    sf::VideoMode windowed_mode(1800, 650);
+    sf::VideoMode windowed_mode(1800, 675);
     bool is_fullscreen = false;
     sf::RenderWindow window(windowed_mode, "Stream Viewer");
 
