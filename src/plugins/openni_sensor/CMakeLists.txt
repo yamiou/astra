@@ -28,7 +28,7 @@ if (WIN32)
   else()
     set(ONI_LIB_DIR $ENV{OPENNI2_LIB})
   endif()
-  
+
   message("ONI_LIB_DIR ${ONI_LIB_DIR}")
 
   find_library(OpenNI2_LIBRARY NAMES "OpenNI2.lib" HINTS ${ONI_LIB_DIR} PATH_SUFFIXES lib)
@@ -37,7 +37,7 @@ elseif (APPLE)
 elseif (UNIX AND NOT ANDROID)
   find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.so" HINTS "$ENV{OPENNI2_REDIST}" PATH_SUFFIXES lib)
 elseif (ANDROID)
-  find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.so" PATHS "${CMAKE_SOURCE_DIR}/vendor/openni-android" NO_CMAKE_FIND_ROOT_PATH)
+  find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.so" PATHS "${CMAKE_SOURCE_DIR}/vendor/openni2/android-armeabi-v7a" NO_CMAKE_FIND_ROOT_PATH)
 endif()
 
 include_directories ("$ENV{OPENNI2_INCLUDE}")
