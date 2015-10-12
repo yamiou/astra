@@ -6,6 +6,7 @@
 #include <iostream>
 #include <iomanip>
 #include <key_handler.h>
+#include <sstream>
 
 class DepthFrameListener : public astra::FrameReadyListener
 {
@@ -13,6 +14,7 @@ public:
     DepthFrameListener()
     {
         m_lastTimepoint = clock_type::now();
+        m_font.loadFromFile("Inconsolata.otf");
     }
 
     void init_texture(int width, int height)
@@ -66,12 +68,13 @@ public:
 
         init_texture(width, height);
 
+        update_mouse_overlay_from_depth(frame);
         check_fps();
 
         if (m_isPaused)
         {
             return;
-        }    
+        }
         m_visualizer.update(pointFrame);
 
         astra_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
@@ -86,26 +89,98 @@ public:
         m_texture.update(m_displayBuffer.get());
     }
 
+    void update_mouse_overlay_from_depth(astra::Frame& frame)
+    {
+        astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
+
+        if (depthFrame.is_valid())
+        {
+            int with = depthFrame.resolutionX();
+            int height = depthFrame.resolutionY();
+
+            const int16_t* buffer = depthFrame.data();
+
+            m_mouse_X = with * m_width_Scale;
+            m_mouse_Y = height * m_height_Scale;
+
+            size_t index = (with * m_mouse_Y + m_mouse_X);
+       
+            m_mouse_D = buffer[index];
+        }
+    }
+
+    void set_Scale(sf::RenderWindow& window)
+    {
+        sf::Vector2i position = sf::Mouse::getPosition(window);
+        astra::Vector2f normPosition;
+        auto windowSize = window.getSize();
+
+        normPosition.x = position.x / static_cast<float>(windowSize.x);
+        normPosition.y = position.y / static_cast<float>(windowSize.y);
+
+        m_width_Scale = normPosition.x;
+        m_height_Scale = normPosition.y;
+    }
+
+    void drawMouseText(sf::RenderWindow& window, sf::Text& text, sf::Color color, int x, int y)
+    {
+        text.setColor(sf::Color::Black);
+        text.setPosition(x + 5, y + 5);
+        window.draw(text);
+
+        text.setColor(color);
+        text.setPosition(x, y);
+        window.draw(text);
+    }
+
+    void drawMousePoints(sf::RenderWindow& window, float depthWScale, float depthHScale)
+    {
+        std::stringstream str;
+        str << std::fixed << std::setprecision(0);
+        str << "X:" << m_mouse_X << " " << "Y:" << m_mouse_Y << " " << "D:" << m_mouse_D;
+        sf::Text text(str.str(), m_font);
+
+        int characterSize = 40;
+        text.setCharacterSize(characterSize);
+        text.setStyle(sf::Text::Bold);
+
+        float display_x = 100;
+        float display_y = window.getView().getSize().y - 100;
+        drawMouseText(window, text, sf::Color::White, display_x, display_y);
+    }
+
     void drawTo(sf::RenderWindow& window)
     {
         if (m_displayBuffer != nullptr)
         {
-            float depthScale = window.getView().getSize().x / m_displayWidth;
+            float depthWScale = window.getView().getSize().x / m_displayWidth;
+            float depthHScale = window.getView().getSize().y / m_displayHeight;
 
-            m_sprite.setScale(depthScale, depthScale);
+            m_sprite.setScale(depthWScale, depthHScale);
 
             window.draw(m_sprite);
+            drawMousePoints(window, depthWScale, depthHScale);
         }
     }
-    
+
     void toggle_Paused()
     {
-        m_isPaused = ! m_isPaused;
+        m_isPaused = !m_isPaused;
     }
-    
+
     bool get_isPaused() const
     {
         return m_isPaused;
+    }
+    
+    void toggle_Display()
+    {
+        m_isDisplay = !m_isDisplay;
+    }
+
+    bool get_isDisplay() const
+    {
+        return m_isDisplay;
     }
 
 private:
@@ -118,19 +193,30 @@ private:
     std::chrono::time_point<clock_type> m_lastTimepoint;
     sf::Texture m_texture;
     sf::Sprite m_sprite;
+    sf::Font m_font;
 
-    using BufferPtr = std::unique_ptr < uint8_t[] > ;
-    BufferPtr m_displayBuffer { nullptr };
-    int m_displayWidth{0};
-    int m_displayHeight{0};
+    using BufferPtr = std::unique_ptr< uint8_t[] >;
+    BufferPtr m_displayBuffer{ nullptr };
+    int m_displayWidth{ 0 };
+    int m_displayHeight{ 0 };
+
+    int m_mouse_X{ 0 };
+    int m_mouse_Y{ 0 };
+    int m_mouse_D{ 0 };
+    float m_width_Scale{ 0 };
+    float m_height_Scale{ 0 };
     bool m_isPaused{ false };
+    bool m_isDisplay{ false };
 };
+
 
 int main(int argc, char** argv)
 {
     astra::Astra::initialize();
 
     set_key_handler();
+
+    sf::RenderWindow window(sf::VideoMode(1280, 960), "Depth Viewer");
 
     #ifdef _WIN32
         auto fullscreenStyle = sf::Style::None;
@@ -141,7 +227,6 @@ int main(int argc, char** argv)
     sf::VideoMode fullscreen_mode = sf::VideoMode::getFullscreenModes()[0];
     sf::VideoMode windowed_mode(1280, 960);
     bool is_fullscreen = false;
-    sf::RenderWindow window(sf::VideoMode(1280, 960), "Depth Viewer");
 
     astra::StreamSet streamset;
     astra::StreamReader reader = streamset.create_reader();
@@ -167,14 +252,13 @@ int main(int argc, char** argv)
                 window.close();
                 break;
             case sf::Event::KeyPressed:
+            {
+                if (event.key.code == sf::Keyboard::C && event.key.control)
                 {
-                    if (event.key.code == sf::Keyboard::C && event.key.control)
-                    {
-                        window.close();
-                    }
-
-                    switch(event.key.code)
-                    {
+                    window.close();
+                }
+                switch (event.key.code)
+                {
                     case sf::Keyboard::Escape:
                         window.close();
                         break;
@@ -199,11 +283,20 @@ int main(int argc, char** argv)
                     case sf::Keyboard::P:
                         listener.toggle_Paused();
                         break;
+                    case sf::Keyboard::Space:
+                        listener.toggle_Display();
+                        break;
                     default:
                         break;
-                    }
-                    break;
                 }
+                break;
+            }
+            case sf::Event::MouseMoved:
+            {
+                if (listener.get_isDisplay())
+                    listener.set_Scale(window);
+                break;
+            }
             default:
                 break;
             }
@@ -224,3 +317,4 @@ int main(int argc, char** argv)
     astra::Astra::terminate();
     return 0;
 }
+
