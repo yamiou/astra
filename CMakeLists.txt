@@ -184,6 +184,9 @@ function(install_dir _targetdir)
   endif()
 endfunction()
 
+set(ASTRA_SDK_BINARY_DIR ${PROJECT_BINARY_DIR})
+set(ASTRA_SDK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
+
 add_subdirectory(vendor)
 add_subdirectory(src)
 add_subdirectory(samples)
@@ -194,7 +197,7 @@ MESSAGE("CMAKE_INSTALL_PREFIX : ${CMAKE_INSTALL_PREFIX}")
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include
   DESTINATION .
-  FILES_MATCHING PATTERN "*.h"
+  PATTERN "*.lpp" EXCLUDE
   PATTERN "include/AstraUL/Plugins" EXCLUDE
   )
 
