@@ -142,8 +142,8 @@ function(install_lib _targetname)
   endif()
 endfunction()
 
-function(install_file _targetfile)
-  set(extrapath ${ARGV1})
+function(install_file _targetfile basepath)
+  set(extrapath ${ARGV2})
   if (MSVC)
     set(INSTALL_PATHS
       bin/${extrapath}
@@ -158,13 +158,13 @@ function(install_file _targetfile)
     endforeach()
   else()
     install(FILES ${_targetfile}
-      DESTINATION lib/${extrapath}
+      DESTINATION ${basepath}/${extrapath}
     )
   endif()
 endfunction()
 
-function(install_dir _targetdir)
-  set(extrapath ${ARGV1})
+function(install_dir _targetdir basepath)
+  set(extrapath ${ARGV2})
   if (MSVC)
     set(INSTALL_PATHS
       bin/${extrapath}
@@ -179,7 +179,7 @@ function(install_dir _targetdir)
     endforeach()
   else()
     install(DIRECTORY ${_targetdir}
-      DESTINATION lib/${extrapath}
+      DESTINATION ${basepath}/${extrapath}
     )
   endif()
 endfunction()

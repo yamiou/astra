@@ -61,4 +61,4 @@ add_custom_target(copytoml_hand ALL
 set_target_properties(copytoml_hand PROPERTIES FOLDER CMakeCopyTargets)
 
 install_lib(${_projname} "Plugins/")
-install_file("${PROJECT_SOURCE_DIR}/src/plugins/orbbec_hand/orbbec_hand.toml" "Plugins/")
+install_file("${PROJECT_SOURCE_DIR}/src/plugins/orbbec_hand/orbbec_hand.toml" lib "Plugins/")

@@ -80,5 +80,5 @@ if (NOT ASTRA_ANDROID)
                      COMMAND ${CMAKE_COMMAND} -E copy_directory
                       ${openni2_vendor_dir} ${PROJECT_BINARY_DIR}/lib/${openni2_target_dir})
 
-  install_dir(${openni2_vendor_dir} ${openni2_target_dir})
+  install_dir(${openni2_vendor_dir} lib ${openni2_target_dir})
 endif()

@@ -105,8 +105,7 @@ else()
 endif()
 
 if (ASTRA_SDK_BUILD)
-  install(FILES ${PROJECT_SOURCE_DIR}/vendor/Inconsolata.otf
-          DESTINATION bin/)
+  install_file(${PROJECT_SOURCE_DIR}/vendor/Inconsolata.otf bin)
 endif()
 
 add_custom_target(copyfont ALL
