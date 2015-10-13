@@ -40,23 +40,14 @@ OS-specific prerequisites instructions:
 
 OS X:
 =======
-Requires: 
+Requires:
 * OS X 10.8+
-* Xcode 6.2+ 
+* Xcode 6.2+
 * homebrew from http://brew.sh/
 
 At the terminal command line:
-$ brew install cmake
 $ brew install homebrew/science/opencv
 $ brew install sfml
-$ brew install --HEAD https://www.dropbox.com/s/e2y9ru5jo3wfqu2/orbbec_openni.rb?dl=1
-(If you have already installed orbbec_openni once, to update it simply replace 'install' with 'reinstall'.)
-
-Add these lines to your .bash_profile
-export OPENNI2_INCLUDE=/usr/local/include/ni2.3-dev
-export OPENNI2_REDIST=/usr/local/lib/ni2.3-dev
-In your terminal, reload the profile by running:
-$ source ~/.bash_profile 
 
 Now you can run the pre-built binaries from the Astra SDK bin/ directory.
 
@@ -89,8 +80,10 @@ OS X:
 =======
 
 Make sure you have already run the commands above to install sample prerequisites.
+You will also need to install CMake 3.2+ with this command:
+$ brew install cmake
 
-In the terminal, change directories to the Astra SDK samples/ directory, then:
+Then, in the terminal, change directories to the Astra SDK samples/ directory, then:
 $ mkdir build && cd build
 $ cmake -DCMAKE_BUILD_TYPE=Release ..
 $ make
@@ -120,7 +113,7 @@ When you start development, we highly recommend using the C++ API (or a higher l
 Documentation
 ==========
 
-Preliminary documentation in HTML format can be found in the sdk/docs directory. 
+Preliminary documentation in HTML format can be found in the sdk/docs directory.
 
 Known issues
 ==========
