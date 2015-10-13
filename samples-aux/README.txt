@@ -86,7 +86,7 @@ $ brew install cmake
 Then, in the terminal, change directories to the Astra SDK samples/ directory, then:
 $ mkdir build && cd build
 $ cmake -DCMAKE_BUILD_TYPE=Release ..
-$ make
+$ make -j8
 
 Now you can run the samples in the samples/bin/ directory.
 
