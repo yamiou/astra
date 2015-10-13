@@ -135,6 +135,11 @@ public:
 
         init_texture(colorWidth, colorHeight, m_colorView);
 
+        if (m_isPaused)
+        {
+            return;
+        }
+
         const astra::RGBPixel* color = colorFrame.data();
         uint8_t* buffer = m_colorView.buffer.get();
         for(int i = 0; i < colorWidth * colorHeight; i++)
@@ -164,6 +169,11 @@ public:
         int irHeight = irFrame.resolutionY();
 
         init_texture(irWidth, irHeight, m_colorView);
+
+        if (m_isPaused)
+        {
+            return;
+        }
 
         const uint16_t* ir_values = irFrame.data();
         uint8_t* buffer = m_colorView.buffer.get();
@@ -197,6 +207,11 @@ public:
         int irHeight = irFrame.resolutionY();
 
         init_texture(irWidth, irHeight, m_colorView);
+
+        if (m_isPaused)
+        {
+            return;
+        }
 
         const astra::RGBPixel* irRGB = irFrame.data();
         uint8_t* buffer = m_colorView.buffer.get();
@@ -253,7 +268,7 @@ public:
             float height = m_colorView.height * colorScale;
             int horzCenter = window.getView().getCenter().y - height / 2.0f;
             m_colorView.sprite.setScale(colorScale, colorScale);
-    
+
             if (m_isOverlayDepth)
             {
                 m_colorView.sprite.setPosition(0, horzCenter);
@@ -272,8 +287,8 @@ public:
     {
         m_isOverlayDepth = !m_isOverlayDepth;
     }
-    
-    bool get_isOverlayDepth()
+
+    bool get_isOverlayDepth() const
     {
         return m_isOverlayDepth;
     }
