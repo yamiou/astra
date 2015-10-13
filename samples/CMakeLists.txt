@@ -32,6 +32,12 @@ function(add_astra_sdk_dependency _targetname)
   endif()
 endfunction()
 
+function(install_sample _targetname)
+  if (ASTRA_SDK_BUILD)
+    install(TARGETS ${_targetname} DESTINATION bin/)
+  endif()
+endfunction()
+
 include_directories(${ASTRA_INCLUDE_DIR})
 
 get_filename_component(SAMPLE_COMMON_DIR "./common" ABSOLUTE)

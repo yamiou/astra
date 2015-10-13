@@ -17,4 +17,4 @@ set_debug_working_dir(${_projname} "$(TargetDir)")
 
 add_astra_sdk_dependency(${_projname})
 
-install(TARGETS ${_projname} DESTINATION bin/)
+install_sample(${_projname})
