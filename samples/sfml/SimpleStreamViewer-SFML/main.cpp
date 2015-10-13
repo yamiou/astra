@@ -333,6 +333,12 @@ int main(int argc, char** argv)
 
     set_key_handler();
 
+#ifdef _WIN32
+    auto fullscreenStyle = sf::Style::None;
+#else
+    auto fullscreenStyle = sf::Style::Fullscreen;
+#endif
+
     sf::VideoMode fullscreen_mode = sf::VideoMode::getFullscreenModes()[0];
     sf::VideoMode windowed_mode(1800, 650);
     bool is_fullscreen = false;
@@ -342,7 +348,7 @@ int main(int argc, char** argv)
     astra::StreamReader reader = streamset.create_reader();
 
     reader.stream<astra::PointStream>().start();
-    
+
     auto depthStream = configure_depth(reader);
     depthStream.start();
 
@@ -384,7 +390,7 @@ int main(int argc, char** argv)
                         else
                         {
                             is_fullscreen = true;
-                            window.create(fullscreen_mode, "Stream Viewer", sf::Style::None);
+                            window.create(fullscreen_mode, "Stream Viewer", fullscreenStyle);
                         }
                         break;
                     case sf::Keyboard::R:
