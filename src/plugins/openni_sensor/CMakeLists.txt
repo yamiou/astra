@@ -73,10 +73,12 @@ elseif (ASTRA_UNIX)
   set(openni2_vendor_dir ${CMAKE_SOURCE_DIR}/vendor/openni2/ubuntu-x64/)
   set(openni2_target_dir "Plugins/openni2")
 endif()
-#ASTRA_ANDROID omitted -- The Android AAR includes openni for us.
 
-add_custom_command(TARGET ${_projname} POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy_directory
-                    ${openni2_vendor_dir} ${PROJECT_BINARY_DIR}/lib/${openni2_target_dir})
+#ASTRA_ANDROID omitted -- The Android AAR includes openni2 for us.
+if (NOT ASTRA_ANDROID)
+  add_custom_command(TARGET ${_projname} POST_BUILD
+                     COMMAND ${CMAKE_COMMAND} -E copy_directory
+                      ${openni2_vendor_dir} ${PROJECT_BINARY_DIR}/lib/${openni2_target_dir})
 
-install_dir(${openni2_vendor_dir} ${openni2_target_dir})
+  install_dir(${openni2_vendor_dir} ${openni2_target_dir})
+endif()

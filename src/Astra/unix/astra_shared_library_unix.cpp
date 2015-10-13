@@ -15,7 +15,7 @@ namespace astra { namespace process {
         if (libHandle == nullptr)
         {
             // error
-            char* err = ::dlerror();
+            const char* err = ::dlerror();
             LOG_TRACE("shared_library_unix", "load_library failed: %s", err);
             return;
         }
@@ -26,7 +26,7 @@ namespace astra { namespace process {
         if (::dlclose(libHandle) != 0)
         {
             //error
-            char* err = ::dlerror();
+            const char* err = ::dlerror();
             LOG_TRACE("shared_library_unix", "load_library failed: %s", err);
             return;
         }
