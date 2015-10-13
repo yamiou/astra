@@ -269,7 +269,7 @@ public:
             int horzCenter = window.getView().getCenter().y - height / 2.0f;
             m_colorView.sprite.setScale(colorScale, colorScale);
 
-            if (m_isOverlayDepth)
+            if (m_overlayDepth)
             {
                 m_colorView.sprite.setPosition(0, horzCenter);
                 m_colorView.sprite.setColor(sf::Color(255, 255, 255, 128));
@@ -285,12 +285,12 @@ public:
 
     void toggle_depth_overlay()
     {
-        m_isOverlayDepth = !m_isOverlayDepth;
+        m_overlayDepth = !m_overlayDepth;
     }
 
-    bool get_isOverlayDepth() const
+    bool get_overlayDepth() const
     {
-        return m_isOverlayDepth;
+        return m_overlayDepth;
     }
 
     void toggle_Paused()
@@ -318,7 +318,7 @@ private:
     stream_view m_depthView;
     stream_view m_colorView;
     ColorMode m_colorMode;
-    bool m_isOverlayDepth{ false };
+    bool m_overlayDepth{ false };
     bool m_isPaused{ false };
 };
 
@@ -470,6 +470,9 @@ int main(int argc, char** argv)
                         break;
                     case sf::Keyboard::O:
                         listener.toggle_depth_overlay();
+                        if (listener.get_overlayDepth()) {
+                            depthStream.enable_registration(true);
+                        }
                         break;
                     case sf::Keyboard::P:
                         listener.toggle_Paused();
