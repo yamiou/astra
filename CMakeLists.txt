@@ -207,6 +207,12 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples
   PATTERN "samples/tools/StreamRecorder" EXCLUDE
   )
 
+if (ASTRA_UNIX)
+  install(DIRECTORY ${PROJECT_SOURCE_DIR}/install
+    DESTINATION .
+    )
+endif()
+
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
   DESTINATION samples
   PATTERN "build" EXCLUDE
@@ -288,8 +294,12 @@ set(CPACK_PACKAGE_INSTALL_DIRECTORY "Orbbec/Astra")
 message("CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME}")
 string(TOLOWER "${CMAKE_SYSTEM_NAME}" system_name_lower)
 if (system_name_lower STREQUAL "darwin")
-    set(CMAKE_SYSTEM_NAME "OSX-x64")
-    message("Setting CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME}")
+  if (ASTRA_64)
+    set(CMAKE_SYSTEM_NAME "osx-x64")
+  else()
+    error("32-bit OS X not supported")
+  endif()
+  message("Setting CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME}")
 endif()
 
 if (WIN32)
