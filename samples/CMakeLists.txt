@@ -59,6 +59,15 @@ if(ASTRA_GCC OR ASTRA_CLANG)
   endif()
 endif()
 
+#set the rpath to go up from the bin/ to to the lib/ dir to find the Astra libs
+if(ASTRA_OSX)
+  set(CMAKE_INSTALL_RPATH "@executable_path/../lib")
+  message("Setting rpath to ${CMAKE_INSTALL_RPATH}")
+elseif(ASTRA_UNIX)
+  set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
+  message("Setting rpath to ${CMAKE_INSTALL_RPATH}")
+endif()
+
 add_subdirectory(c-api)
 add_subdirectory(cpp-api)
 if(NOT ASTRA_ANDROID)

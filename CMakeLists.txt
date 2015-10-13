@@ -6,7 +6,9 @@ if (ANDROID)
   set(ASTRA_ANDROID TRUE)
 elseif (WIN32)
   set(ASTRA_WINDOWS TRUE)
-elseif (UNIX)
+elseif (APPLE)
+  set(ASTRA_OSX TRUE)
+elseif (UNIX) #not android
   set(ASTRA_UNIX TRUE)
 endif()
 
@@ -41,15 +43,7 @@ if (ASTRA_MSVC)
 endif()
 
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-
-if(APPLE)
-  set(CMAKE_INSTALL_RPATH "@executable_path/../lib")
-  message("Setting rpath to ${CMAKE_INSTALL_RPATH}")
-elseif(UNIX)
-  set(CMAKE_INSTALL_RPATH "@ORIGIN/../lib")
-  message("Setting rpath to ${CMAKE_INSTALL_RPATH}")
-endif()
+set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)

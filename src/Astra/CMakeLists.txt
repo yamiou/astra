@@ -95,7 +95,7 @@ if (ASTRA_ANDROID)
   set(${_projname}_SOURCES ${${_projname}_SOURCES} ${${_projname}_ANDROID_SOURCES})
 elseif(ASTRA_WINDOWS)
   set(${_projname}_SOURCES ${${_projname}_SOURCES} ${${_projname}_WIN32_SOURCES})
-elseif(ASTRA_UNIX)
+elseif(ASTRA_UNIX OR ASTRA_OSX)
   set(${_projname}_SOURCES ${${_projname}_SOURCES} ${${_projname}_UNIX_SOURCES})
 endif()
 
