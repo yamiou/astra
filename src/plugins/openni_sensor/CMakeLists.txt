@@ -61,17 +61,22 @@ install_lib(${_projname} "Plugins/")
 
 if (ASTRA_WINDOWS)
   if(ASTRA_64)
-    set(openni2_vendor_dir ${CMAKE_SOURCE_DIR}/vendor/openni2/vc12-x64/)
+    set(openni2_vendor_dir ${CMAKE_SOURCE_DIR}/vendor/openni2/win-vc12-x64/)
   else()
-    set(openni2_vendor_dir ${CMAKE_SOURCE_DIR}/vendor/openni2/vc12-x86/)
+    set(openni2_vendor_dir ${CMAKE_SOURCE_DIR}/vendor/openni2/win-vc12-x86/)
   endif()
+  set(openni2_target_dir ".")
 elseif (ASTRA_OSX)
   set(openni2_vendor_dir ${CMAKE_SOURCE_DIR}/vendor/openni2/osx-x64/)
+  set(openni2_target_dir "Plugins/openni2")
 elseif (ASTRA_UNIX)
   set(openni2_vendor_dir ${CMAKE_SOURCE_DIR}/vendor/openni2/ubuntu-x64/)
+  set(openni2_target_dir "Plugins/openni2")
 endif()
 #ASTRA_ANDROID omitted -- The Android AAR includes openni for us.
 
 add_custom_command(TARGET ${_projname} POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
-                    ${openni2_vendor_dir} $<TARGET_FILE_DIR:${_projname}>/openni2)
+                    ${openni2_vendor_dir} ${PROJECT_BINARY_DIR}/lib/${openni2_target_dir})
+
+install_dir(${openni2_vendor_dir} ${openni2_target_dir})

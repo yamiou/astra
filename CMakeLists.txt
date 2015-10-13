@@ -148,6 +148,27 @@ function(install_file _targetfile)
   endif()
 endfunction()
 
+function(install_dir _targetdir)
+  set(extrapath ${ARGV1})
+  if (MSVC)
+    set(INSTALL_PATHS
+      bin/${extrapath}
+      samples/vs2013/${SAMPLE_DEPENDENCY_DIR}/${extrapath}
+      samples/vs2013/bin/Debug/${extrapath}
+      samples/vs2013/bin/Release/${extrapath}
+    )
+    foreach(INSTALL_PATH ${INSTALL_PATHS})
+      install(DIRECTORY ${_targetdir}
+        DESTINATION ${INSTALL_PATH}
+        )
+    endforeach()
+  else()
+    install(DIRECTORY ${_targetdir}
+      DESTINATION lib/${extrapath}
+    )
+  endif()
+endfunction()
+
 add_subdirectory(vendor)
 add_subdirectory(src)
 add_subdirectory(samples)
@@ -179,7 +200,7 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
 
 if (MSVC)
   #copy third party build files to install vs2013 directory
-  #Lack of a trailing / is important here, ends up in samples/vs2013/
+  #Lack of a trailing / is important here, thirdparty ends up in samples/vs2013/
   install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013/thirdparty
     DESTINATION samples/vs2013/
     PATTERN "build" EXCLUDE
