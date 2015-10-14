@@ -7,10 +7,11 @@ For help and support, check https://3dclub.orbbec3d.com.
 What's New
 ==========
 
-v0.4.0 2015/10/12
-* Add official support for Win64, OS X 10.8+, and Ubuntu 14.04+
-* Minor bug fixes
+v0.4.0 2015/10/14
+* Add official support for Win64 and OS X 10.8+
 * Updated SFML to 2.3.2
+* Added features to SimpleDepthViewer-SFML and SimpleStreamViewer-SFML: pausing, overlay color on depth, display depth data under the mouse in text overlay. (See keyboard shortcut section below.)
+* Minor internal bug fixes
 
 v0.3.0 2015/09/14
 * Rename to Astra SDK.
@@ -67,11 +68,15 @@ SimpleStreamViewer-SFML:
 * I - enable IR (RGB mode)
 * G - enable IR (Gray16 mode)
 * C - enable color
+* P - toggle pausing the streams
+* O - toggle overlay color stream on depth stream
 
 SimpleDepthViewer-SFML:
 * F - toggle fullscreen
 * R - toggle registered depth
 * M - toggle mirrored streams
+* P - toggle pausing the streams
+* Space bar - toggle text overlay with the depth data under the mouse cursor
 
 Building the samples from source
 ==========
