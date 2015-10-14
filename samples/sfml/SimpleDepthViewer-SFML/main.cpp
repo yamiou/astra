@@ -95,34 +95,30 @@ public:
 
         if (depthFrame.is_valid())
         {
-            int with = depthFrame.resolutionX();
+            int width = depthFrame.resolutionX();
             int height = depthFrame.resolutionY();
 
             const int16_t* buffer = depthFrame.data();
 
-            m_mouse_X = with * m_width_Scale;
-            m_mouse_Y = height * m_height_Scale;
+            m_mouse_X = width * m_mouseNormX;
+            m_mouse_Y = height * m_mouseNormY;
 
-            size_t index = (with * m_mouse_Y + m_mouse_X);
+            size_t index = (width * m_mouse_Y + m_mouse_X);
        
-            m_mouse_D = buffer[index];
+            m_mouse_Z = buffer[index];
         }
     }
 
-    void set_Scale(sf::RenderWindow& window)
+    void update_mouse_position(sf::RenderWindow& window)
     {
         sf::Vector2i position = sf::Mouse::getPosition(window);
-        astra::Vector2f normPosition;
         auto windowSize = window.getSize();
 
-        normPosition.x = position.x / static_cast<float>(windowSize.x);
-        normPosition.y = position.y / static_cast<float>(windowSize.y);
-
-        m_width_Scale = normPosition.x;
-        m_height_Scale = normPosition.y;
+        m_mouseNormX = position.x / static_cast<float>(windowSize.x);
+        m_mouseNormY = position.y / static_cast<float>(windowSize.y);
     }
 
-    void drawMouseText(sf::RenderWindow& window, sf::Text& text, sf::Color color, int x, int y)
+    void drawText(sf::RenderWindow& window, sf::Text& text, sf::Color color, int x, int y)
     {
         text.setColor(sf::Color::Black);
         text.setPosition(x + 5, y + 5);
@@ -133,20 +129,24 @@ public:
         window.draw(text);
     }
 
-    void drawMousePoints(sf::RenderWindow& window, float depthWScale, float depthHScale)
+    void drawMouseOverlay(sf::RenderWindow& window, float depthWScale, float depthHScale)
     {
+        if (!m_isMouseOverlayEnabled)
+        {
+            return;
+        }
         std::stringstream str;
         str << std::fixed << std::setprecision(0);
-        str << "X:" << m_mouse_X << " " << "Y:" << m_mouse_Y << " " << "D:" << m_mouse_D;
+        str << "X:" << m_mouse_X << " " << "Y:" << m_mouse_Y << " " << "Z:" << m_mouse_Z;
         sf::Text text(str.str(), m_font);
 
         int characterSize = 40;
         text.setCharacterSize(characterSize);
         text.setStyle(sf::Text::Bold);
 
-        float display_x = 100;
-        float display_y = window.getView().getSize().y - 100;
-        drawMouseText(window, text, sf::Color::White, display_x, display_y);
+        float display_x = 10;
+        float display_y = window.getView().getSize().y - 10 - characterSize;
+        drawText(window, text, sf::Color::White, display_x, display_y);
     }
 
     void drawTo(sf::RenderWindow& window)
@@ -159,11 +159,12 @@ public:
             m_sprite.setScale(depthWScale, depthHScale);
 
             window.draw(m_sprite);
-            drawMousePoints(window, depthWScale, depthHScale);
+
+            drawMouseOverlay(window, depthWScale, depthHScale);
         }
     }
 
-    void toggle_Paused()
+    void toggle_isPaused()
     {
         m_isPaused = !m_isPaused;
     }
@@ -173,14 +174,14 @@ public:
         return m_isPaused;
     }
     
-    void toggle_Display()
+    void toggle_isMouseOverlayEnabled()
     {
-        m_isDisplay = !m_isDisplay;
+        m_isMouseOverlayEnabled = !m_isMouseOverlayEnabled;
     }
 
-    bool get_isDisplay() const
+    bool get_isMouseOverlayEnabled() const
     {
-        return m_isDisplay;
+        return m_isMouseOverlayEnabled;
     }
 
 private:
@@ -202,11 +203,11 @@ private:
 
     int m_mouse_X{ 0 };
     int m_mouse_Y{ 0 };
-    int m_mouse_D{ 0 };
-    float m_width_Scale{ 0 };
-    float m_height_Scale{ 0 };
+    int m_mouse_Z{ 0 };
+    float m_mouseNormX{ 0 };
+    float m_mouseNormY{ 0 };
     bool m_isPaused{ false };
-    bool m_isDisplay{ false };
+    bool m_isMouseOverlayEnabled{ false };
 };
 
 
@@ -281,10 +282,10 @@ int main(int argc, char** argv)
                         depthStream.enable_mirroring(!depthStream.mirroring_enabled());
                         break;
                     case sf::Keyboard::P:
-                        listener.toggle_Paused();
+                        listener.toggle_isPaused();
                         break;
                     case sf::Keyboard::Space:
-                        listener.toggle_Display();
+                        listener.toggle_isMouseOverlayEnabled();
                         break;
                     default:
                         break;
@@ -293,8 +294,7 @@ int main(int argc, char** argv)
             }
             case sf::Event::MouseMoved:
             {
-                if (listener.get_isDisplay())
-                    listener.set_Scale(window);
+                listener.update_mouse_position(window);
                 break;
             }
             default:
