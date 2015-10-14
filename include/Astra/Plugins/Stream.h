@@ -30,6 +30,24 @@ namespace astra { namespace plugins {
         }
     };
 
+    template<class T, class U>
+    T* make_stream(U&& u)
+    {
+        T* t = new T(std::forward<U>(u));
+        t->register_self();
+
+        return t;
+    }
+
+    template<class T, class... U>
+    T* make_stream(U&&... u)
+    {
+        T* t = new T(std::forward<U>(u)...);
+        t->register_self();
+
+        return t;
+    }
+
     class Stream : public StreamCallbackListener
     {
     public:
@@ -38,8 +56,7 @@ namespace astra { namespace plugins {
                StreamDescription description)
             : m_pluginService(pluginService),
               m_streamSet(streamSet),
-              m_description(description),
-              m_inhibitCallbacks(true)
+              m_description(description)
         {
             create_stream(description);
         }
@@ -49,13 +66,21 @@ namespace astra { namespace plugins {
             m_pluginService.destroy_stream(m_streamHandle);
         }
 
+        void register_self()
+        {
+            if (m_registered)
+                return;
+
+            stream_callbacks_t pluginCallbacks = create_plugin_callbacks(this);
+            m_pluginService.register_stream(m_streamHandle, pluginCallbacks);
+            m_registered = true;
+        }
+
         inline const StreamDescription& description() { return m_description; }
         inline astra_stream_t get_handle() { return m_streamHandle; }
 
     protected:
         inline PluginServiceProxy& pluginService() const { return m_pluginService; }
-        inline void enable_callbacks();
-
     private:
         virtual void connection_added(astra_stream_t stream,
                                       astra_streamconnection_t connection) override final;
@@ -113,22 +138,21 @@ namespace astra { namespace plugins {
         {
             assert(m_streamHandle == nullptr);
 
-            stream_callbacks_t pluginCallbacks = create_plugin_callbacks(this);
-
             astra_stream_desc_t* desc = static_cast<astra_stream_desc_t*>(m_description);
+
+            LOG_INFO("astra.plugins.Stream", "creating a %u, %u", desc->type, desc->subtype);
             m_pluginService.create_stream(m_streamSet,
                                           *desc,
-                                          pluginCallbacks,
                                           &m_streamHandle);
+
+
         }
 
+        bool m_registered{false};
         PluginServiceProxy& m_pluginService;
         astra_streamset_t m_streamSet{nullptr};
         StreamDescription m_description;
         astra_stream_t m_streamHandle{nullptr};
-
-        bool m_inhibitCallbacks;
-        std::unordered_set<astra_streamconnection_t> m_savedConnections;
     };
 
     inline void Stream::set_parameter(astra_streamconnection_t connection,
@@ -158,31 +182,18 @@ namespace astra { namespace plugins {
     inline void Stream::connection_added(astra_stream_t stream,
                                          astra_streamconnection_t connection)
     {
-        if (m_inhibitCallbacks)
-        {
-            LOG_INFO("astra.plugins.Stream", "Saving a connection_added for later");
-            m_savedConnections.insert(connection);
-        }
-        else
-        {
-            assert(stream == m_streamHandle);
-            on_connection_added(connection);
-        }
+        assert(stream == m_streamHandle);
+        LOG_INFO("astra.plugins.Stream", "adding connection");
+        on_connection_added(connection);
     }
 
     inline void Stream::connection_removed(astra_stream_t stream,
                                            astra_bin_t bin,
                                            astra_streamconnection_t connection)
     {
-        if (m_inhibitCallbacks)
-        {
-            m_savedConnections.erase(connection);
-        }
-        else
-        {
-            assert(stream == m_streamHandle);
-            on_connection_removed(bin, connection);
-        }
+        assert(stream == m_streamHandle);
+        LOG_INFO("astra.plugins.Stream", "removing connection");
+        on_connection_removed(bin, connection);
     }
 
     inline void Stream::connection_started(astra_stream_t stream,
@@ -197,26 +208,6 @@ namespace astra { namespace plugins {
     {
         assert(stream == m_streamHandle);
         on_connection_stopped(connection);
-    }
-
-    inline void Stream::enable_callbacks()
-    {
-        if (!m_inhibitCallbacks)
-        {
-            return;
-        }
-
-        m_inhibitCallbacks = false;
-
-        if (m_savedConnections.size() > 0)
-        {
-            LOG_INFO("astra.plugins.Stream", "Flushing saved connection_added connections");
-            for (auto connection : m_savedConnections)
-            {
-                on_connection_added(connection);
-            }
-            m_savedConnections.clear();
-        }
     }
 }}
 

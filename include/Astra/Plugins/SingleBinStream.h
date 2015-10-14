@@ -8,7 +8,7 @@
 namespace astra { namespace plugins {
 
     template<typename TFrameType>
-    class SingleBinStream : public Stream
+    class SingleBinStream : public astra::plugins::Stream
     {
     public:
         SingleBinStream(PluginServiceProxy& pluginService,
@@ -22,7 +22,6 @@ namespace astra { namespace plugins {
             m_bin = std::make_unique<bin_type>(pluginService,
                                                get_handle(),
                                                sizeof(TFrameType) + bufferSize);
-            enable_callbacks();
         }
 
         using frame_type = TFrameType;
@@ -42,6 +41,7 @@ namespace astra { namespace plugins {
             return m_bin->end_write();
         }
 
+    protected:
         virtual void on_connection_added(astra_streamconnection_t connection) override
         {
             m_bin->link_connection(connection);

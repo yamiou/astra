@@ -6,6 +6,13 @@ set(CMAKE_DEBUG_POSTFIX "-d")
 
 include(InstallPDB)
 
+#set the rpath to look in the same directory for other Astra libs
+if(ASTRA_OSX)
+  set(CMAKE_INSTALL_RPATH "@loader_path")
+elseif(ASTRA_UNIX)
+  set(CMAKE_INSTALL_RPATH "$ORIGIN")
+endif()
+
 add_subdirectory(Astra)
 add_subdirectory(AstraUL)
 add_subdirectory(AstraAPI)
@@ -33,19 +40,32 @@ add_dependencies(Astra ${_projname})
 add_dependencies(AstraUL ${_projname})
 add_dependencies(AstraAPI ${_projname})
 add_dependencies(openni_sensor ${_projname})
-add_dependencies(orbbec_hand ${_projname})
-add_dependencies(orbbec_xs ${_projname})
 
 add_dependencies(${SDK_DEPENDENT_TARGET} Astra)
 add_dependencies(${SDK_DEPENDENT_TARGET} AstraUL)
 add_dependencies(${SDK_DEPENDENT_TARGET} AstraAPI)
 add_dependencies(${SDK_DEPENDENT_TARGET} openni_sensor)
-add_dependencies(${SDK_DEPENDENT_TARGET} orbbec_hand)
-add_dependencies(${SDK_DEPENDENT_TARGET} orbbec_xs)
+
+if (ASTRA_XS AND ASTRA_HAND)
+  add_dependencies(${SDK_DEPENDENT_TARGET} orbbec_hand)
+  add_dependencies(orbbec_hand ${_projname})
+endif()
+
+if (ASTRA_XS)
+  add_dependencies(${SDK_DEPENDENT_TARGET} orbbec_xs)
+  add_dependencies(orbbec_xs ${_projname})
+endif()
 
 if (NOT ASTRA_ANDROID)
-  add_dependencies(${SDK_DEPENDENT_TARGET} mock_sensor)
+  if (ASTRA_MOCK_DEVICE)
+    add_dependencies(${SDK_DEPENDENT_TARGET} mock_sensor)
+  endif()
+
   add_dependencies(${SDK_DEPENDENT_TARGET} copytoml_astra)
-  add_dependencies(${SDK_DEPENDENT_TARGET} copytoml_hand)
+
+  if (ASTRA_HAND)
+    add_dependencies(${SDK_DEPENDENT_TARGET} copytoml_hand)
+  endif()
+
   add_dependencies(${SDK_DEPENDENT_TARGET} FrameSerialization)
 endif()

@@ -114,8 +114,6 @@ namespace astra { namespace plugins { namespace streamplayer {
 
         m_isOpen = true;
 
-        enable_callbacks();
-
         return ASTRA_STATUS_SUCCESS;
     }
 

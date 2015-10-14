@@ -134,6 +134,7 @@ namespace astra { namespace utility {
 
             if (duration >= interval_)
             {
+                std::lock_guard<std::mutex> lock(mutex_);
                 isTriggered_ = true;
                 previousTimepoint_ = currentTimepoint;
             }

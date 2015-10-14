@@ -15,42 +15,42 @@ namespace astra { namespace devices {
 
     void device::add_listener(const listener_ptr listener)
     {
-        auto it = std::find_if(listeners_.cbegin(), listeners_.cend(),
+        auto it = std::find_if(listeners_.begin(), listeners_.end(),
                                [&listener](const listener_ptr& colItem) -> bool
                                {
                                    return colItem == listener;
                                });
 
-        if (it == listeners_.cend())
+        if (it == listeners_.end())
             listeners_.push_back(listener);
     }
 
     void device::remove_listener(const listener_ptr listener)
     {
-        auto it = std::find_if(listeners_.cbegin(), listeners_.cend(),
+        auto it = std::find_if(listeners_.begin(), listeners_.end(),
                                [&listener](const listener_ptr& colItem) -> bool
                                {
                                    return colItem == listener;
                                });
 
-        if (it != listeners_.cend())
+        if (it != listeners_.end())
             listeners_.erase(it);
     }
 
     device::sensor_const_iterator device::sensors_begin()
     {
-        return sensors_.cbegin();
+        return sensors_.begin();
     }
 
     device::sensor_const_iterator device::sensors_end()
     {
-        return sensors_.cend();
+        return sensors_.end();
     }
 
     device::sensor_const_iterator device::find_sensor(const sensor_type& type)
     {
-        return std::find_if(sensors_.cbegin(),
-                            sensors_.cend(),
+        return std::find_if(sensors_.begin(),
+                            sensors_.end(),
                             [&type](sensor::shared_ptr s) -> bool
                             {
                                 return s->info().type() == type;
@@ -192,7 +192,7 @@ namespace astra { namespace devices {
 
     void device::add_sensor(sensor_shared_ptr sensor)
     {
-        auto it = std::find(sensors_.cbegin(), sensors_.cend(), sensor);
+        auto it = std::find(sensors_.begin(), sensors_.end(), sensor);
 
         if (it == sensors_.end())
         {
@@ -203,7 +203,7 @@ namespace astra { namespace devices {
 
     void device::remove_sensor(sensor_shared_ptr sensor)
     {
-        auto it = std::find(sensors_.cbegin(), sensors_.cend(), sensor);
+        auto it = std::find(sensors_.begin(), sensors_.end(), sensor);
 
         if (it != sensors_.end())
             sensors_.erase(it);

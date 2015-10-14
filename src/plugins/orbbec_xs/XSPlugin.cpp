@@ -13,7 +13,7 @@ namespace astra { namespace plugins { namespace xs {
         if (streamDesc.type == ASTRA_STREAM_DEPTH &&
             m_pointProcessorMap.find(streamHandle) == m_pointProcessorMap.end())
         {
-            LOG_INFO("XSPlugin", "XS creating point processor");
+            LOG_INFO("astra.plugins.xs.XSPlugin", "creating point processor");
 
             StreamDescription depthDescription = streamDesc;
 

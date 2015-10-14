@@ -15,12 +15,32 @@ foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
   set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib/${OUTPUTCONFIG}/Plugins )
 endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
 
+#set the rpath to look up from the Plugin directory to the main lib folder
+if(ASTRA_OSX)
+  set(CMAKE_INSTALL_RPATH "@loader_path/..")
+elseif(ASTRA_UNIX)
+  set(CMAKE_INSTALL_RPATH "$ORIGIN/..")
+endif()
+
 add_subdirectory(device_sdk)
 add_subdirectory(openni_sensor)
-add_subdirectory(orbbec_hand)
-add_subdirectory(orbbec_xs)
+
+if (ASTRA_HAND)
+  add_subdirectory(orbbec_hand)
+endif()
+
+if (ASTRA_XS)
+  add_subdirectory(orbbec_xs)
+endif()
 
 if (NOT ASTRA_ANDROID)
-  add_subdirectory(mock_sensor)
-  add_subdirectory(orbbec_streamplayer)
+
+  if (ASTRA_MOCK_DEVICE)
+    add_subdirectory(mock_sensor)
+  endif()
+
+  if (ASTRA_STREAMPLAYER)
+    add_subdirectory(orbbec_streamplayer)
+  endif()
+
 endif()

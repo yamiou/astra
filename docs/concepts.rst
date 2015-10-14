@@ -29,7 +29,7 @@ While a streamset could be entirely composed of streams arriving from a physical
 Streamsets are addressed by a string-based unique identifier (URI) which allows developers to access multiple distinct streamsets at once in code. This becomes useful when working with multiple StreamSets, or perhaps addressing a server that produces higher-level streams created by a network of StreamSets.
 
 3.3 StreamReaders
-===========
+=================
 A stream reader is our window to the frames in the stream. Before we can actually look at each individual frame of any given type coming from our streamsets, we use the streamset to create a reader in order to access the frames of that stream. To help with understanding what a reader does, let's continue with the film analogy one more time. While the audio/video film contains all of the information that we need to playback a movie,  the film alone isn't sufficient to presenting the movie. Another device is needed - a reel-to-reel projector. The projector not only advances the film and projects the images onto a screen, but also synchronizes the film's audio to the video for a smooth, seamless performance.
 
 .. figure:: images/Projector_running.jpg

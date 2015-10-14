@@ -1,5 +1,5 @@
 #include <Astra/astra_types.h>
-#include <AstraUL/skul_ctypes.h>
+#include <AstraUL/astraul_ctypes.h>
 #include "generic_stream_api.h"
 #include <AstraUL/streams/color_types.h>
 #include <AstraUL/Plugins/stream_types.h>

@@ -22,14 +22,29 @@ set(${_projname}_SOURCES
 
 add_definitions(-DASTRA_BUILD)
 
-if (WIN32)
-  find_library(OpenNI2_LIBRARY NAMES "OpenNI2.lib" HINTS "$ENV{OPENNI2_LIB}" PATH_SUFFIXES lib)
-elseif (APPLE)
-  find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.dylib" HINTS "$ENV{OPENNI2_REDIST}" PATH_SUFFIXES lib)
-elseif (UNIX AND NOT ANDROID)
+if (ASTRA_WINDOWS)
+  if(ASTRA_64)
+    set(ONI_LIB_DIR $ENV{OPENNI2_LIB64})
+  else()
+    set(ONI_LIB_DIR $ENV{OPENNI2_LIB})
+  endif()
+
+  message("ONI_LIB_DIR ${ONI_LIB_DIR}")
+
+  find_library(OpenNI2_LIBRARY NAMES "OpenNI2.lib" HINTS ${ONI_LIB_DIR} PATH_SUFFIXES lib)
+elseif (ASTRA_OSX)
+  find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.dylib" HINTS "${CMAKE_SOURCE_DIR}/vendor/openni2/osx-x64")
+elseif (ASTRA_UNIX)
   find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.so" HINTS "$ENV{OPENNI2_REDIST}" PATH_SUFFIXES lib)
-elseif (ANDROID)
-  find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.so" PATHS "${CMAKE_SOURCE_DIR}/vendor/openni-android" NO_CMAKE_FIND_ROOT_PATH)
+elseif (ASTRA_ANDROID)
+  find_library(OpenNI2_LIBRARY NAMES "libOpenNI2.so" PATHS "${CMAKE_SOURCE_DIR}/vendor/openni2/android-armeabi-v7a" NO_CMAKE_FIND_ROOT_PATH)
+endif()
+
+#extend the rpath to include the openni2 subdirectory
+if(ASTRA_OSX)
+  set(CMAKE_INSTALL_RPATH "@loader_path/..;@loader_path/openni2")
+elseif(ASTRA_UNIX)
+  set(CMAKE_INSTALL_RPATH "$ORIGIN/..;$ORIGIN/openni2")
 endif()
 
 include_directories ("$ENV{OPENNI2_INCLUDE}")
@@ -43,3 +58,30 @@ set_target_properties(${_projname} PROPERTIES FOLDER "plugins")
 target_link_libraries(${_projname} AstraAPI Shiny ${OpenNI2_LIBRARY})
 
 install_lib(${_projname} "Plugins/")
+
+if (ASTRA_WINDOWS)
+  if(ASTRA_64)
+    set(openni2_vendor_dir ${CMAKE_SOURCE_DIR}/vendor/openni2/win-vc12-x64/)
+  else()
+    set(openni2_vendor_dir ${CMAKE_SOURCE_DIR}/vendor/openni2/win-vc12-x86/)
+  endif()
+  set(openni2_target_dir "${PROJECT_BINARY_DIR}/bin/$<CONFIG>")
+  set(openni2_target_install_dir ".")
+elseif (ASTRA_OSX)
+  set(openni2_vendor_dir ${CMAKE_SOURCE_DIR}/vendor/openni2/osx-x64/)
+  set(openni2_target_dir "${PROJECT_BINARY_DIR}/lib/Plugins/openni2")
+  set(openni2_target_install_dir "Plugins/openni2")
+elseif (ASTRA_UNIX)
+  set(openni2_vendor_dir ${CMAKE_SOURCE_DIR}/vendor/openni2/ubuntu-x64/)
+  set(openni2_target_dir "${PROJECT_BINARY_DIR}/lib/Plugins/openni2")
+  set(openni2_target_install_dir "Plugins/openni2")
+endif()
+
+#ASTRA_ANDROID omitted -- The Android AAR includes openni2 for us.
+if (NOT ASTRA_ANDROID)
+  add_custom_command(TARGET ${_projname} POST_BUILD
+                     COMMAND ${CMAKE_COMMAND} -E copy_directory
+                      ${openni2_vendor_dir} ${openni2_target_dir})
+
+  install_dir(${openni2_vendor_dir} lib ${openni2_target_install_dir})
+endif()

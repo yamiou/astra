@@ -3,7 +3,7 @@
 
 #include <Astra/Plugins/PluginKit.h>
 #include <Astra/Astra.h>
-#include <AstraUL/skul_ctypes.h>
+#include <AstraUL/astraul_ctypes.h>
 #include <AstraUL/streams/skeleton_types.h>
 
 namespace astra { namespace plugins { namespace skeleton {

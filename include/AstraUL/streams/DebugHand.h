@@ -2,7 +2,7 @@
 #define HANDDEBUG_H
 
 #include <Astra/Astra.h>
-#include <AstraUL/skul_ctypes.h>
+#include <AstraUL/astraul_ctypes.h>
 #include <AstraUL/streams/hand_capi.h>
 
 namespace astra {

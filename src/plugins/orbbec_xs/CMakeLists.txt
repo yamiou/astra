@@ -6,8 +6,7 @@ set(${_projname}_SOURCES
   PointProcessor.h
   PointProcessor.cpp
   PointStream.h
-  StylizedDepthStream.h
-  )
+ )
 
 add_library(${_projname} SHARED ${${_projname}_SOURCES})
 

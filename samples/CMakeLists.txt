@@ -10,7 +10,17 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+  set(ASTRA_64 ON)
+else()
+  set(ASTRA_32 ON)
+endif()
+
 include(ConfigUserFile)
+
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
 
 function(add_astra_sdk_dependency _targetname)
   if(NOT TARGET ${_targetname})
@@ -22,11 +32,60 @@ function(add_astra_sdk_dependency _targetname)
   endif()
 endfunction()
 
+function(install_sample _targetname)
+  if (ASTRA_SDK_BUILD)
+    install(TARGETS ${_targetname} DESTINATION bin/)
+  endif()
+endfunction()
+
 include_directories(${ASTRA_INCLUDE_DIR})
 
 get_filename_component(SAMPLE_COMMON_DIR "./common" ABSOLUTE)
 
 include_directories(${SAMPLE_COMMON_DIR})
+
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+  set(ASTRA_CLANG ON)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  set(ASTRA_GCC ON)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+  set(ASTRA_INTELC ON)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  set(ASTRA_MSVC ON)
+endif()
+
+if (ASTRA_MSVC)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
+  MESSAGE("CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}")
+  MESSAGE("CMAKE_C_FLAGS ${CMAKE_C_FLAGS}")
+endif()
+
+if(ASTRA_GCC OR ASTRA_CLANG)
+
+  set(ASTRA_CXX_FLAGS "-Wall -fPIC")
+  if (COMPILER_SUPPORTS_CXX14)
+    set(ASTRA_CXX_FLAGS "${ASTRA_CXX_FLAGS} -std=c++14")
+  elseif( COMPILER_SUPPORTS_CXX11)
+    set(ASTRA_CXX_FLAGS "${ASTRA_CXX_FLAGS} -std=c++11")
+  endif()
+
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ASTRA_CXX_FLAGS}")
+
+  if(ASTRA_ANDROID)
+    set(ANDROID_CXX_FLAGS "${ANDROID_CXX_FLAGS} ${ASTRA_CXX_FLAGS}")
+  endif()
+
+endif()
+
+#set the rpath to go up from the bin/ to to the lib/ dir to find the Astra libs
+if(ASTRA_OSX)
+  set(CMAKE_INSTALL_RPATH "@executable_path/../lib")
+  message("Setting rpath to ${CMAKE_INSTALL_RPATH}")
+elseif(ASTRA_UNIX)
+  set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
+  message("Setting rpath to ${CMAKE_INSTALL_RPATH}")
+endif()
 
 add_subdirectory(c-api)
 add_subdirectory(cpp-api)
@@ -38,3 +97,4 @@ if(NOT ASTRA_ANDROID)
       add_dependencies(SimpleSkeletonViewer-SFML orbbec_skeleton)
   endif()
 endif()
+add_subdirectory(vendor)

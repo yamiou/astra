@@ -1,6 +1,7 @@
 # root ignore patterns
 
 .tags
+.tags1
 
 # emacs
 \#*\#

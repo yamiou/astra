@@ -190,14 +190,6 @@ namespace orbbec { namespace ni {
         {
             mode_ = mode;
             oniMode_ = convert_mode(mode);
-
-            std::vector<astra_streamconnection_t> conns;
-
-            if (bin_ != nullptr)
-            {
-              conns = bin_->connections();
-            }
-
             assert(mode_.pixelFormat() != 0);
 
             bufferLength_ =
@@ -215,7 +207,7 @@ namespace orbbec { namespace ni {
                                               get_handle(),
                                               bufferLength_);
 
-            for(auto& conn : conns)
+            for(auto& conn : connections_)
             {
                 bin_->link_connection(conn);
             };
@@ -291,8 +283,6 @@ namespace orbbec { namespace ni {
             auto oniVideoMode = oniStream_.getVideoMode();
             change_mode(convert_mode(oniVideoMode));
 
-            enable_callbacks();
-
             return ASTRA_STATUS_SUCCESS;
         }
 
@@ -349,6 +339,8 @@ namespace orbbec { namespace ni {
         using bin_type = astra::plugins::StreamBin<wrapper_type>;
         std::unique_ptr<bin_type> bin_;
 
+        std::vector<astra_streamconnection_t> connections_;
+
         size_t bufferLength_{0};
         astra_stream_t streamHandle_{nullptr};
 
@@ -359,8 +351,15 @@ namespace orbbec { namespace ni {
     void devicestream<TFrameWrapper>::on_connection_added(astra_streamconnection_t connection)
     {
         PROFILE_FUNC();
-        assert(bin_ != nullptr);
-        bin_->link_connection(connection);
+
+        auto it = std::find(connections_.begin(), connections_.end(), connection);
+
+        if (it == connections_.end())
+        {
+            if (bin_ != nullptr)
+                bin_->link_connection(connection);
+            connections_.push_back(connection);
+        }
     }
 
     template<typename TFrameWrapper>
@@ -368,7 +367,14 @@ namespace orbbec { namespace ni {
                                                             astra_streamconnection_t connection)
     {
         PROFILE_FUNC();
-        bin_->unlink_connection(connection);
+
+        auto it = std::find(connections_.begin(), connections_.end(), connection);
+
+        if (it != connections_.end())
+        {
+            bin_->unlink_connection(connection);
+            connections_.erase(it);
+        }
 
         if (!bin_->has_connections())
         {

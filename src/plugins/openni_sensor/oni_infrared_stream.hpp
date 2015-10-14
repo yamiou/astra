@@ -3,7 +3,7 @@
 
 #include "oni_devicestream.hpp"
 #include <Astra/Plugins/plugin_capi.h>
-#include <AstraUL/skul_ctypes.h>
+#include <AstraUL/astraul_ctypes.h>
 #include <AstraUL/Plugins/stream_types.h>
 
 namespace orbbec { namespace ni {

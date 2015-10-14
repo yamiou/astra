@@ -5,7 +5,7 @@ make_directory(${JNI_LIB_DESTINATION})
 
 add_custom_target(AstraAndroid ALL
   COMMAND ${CMAKE_COMMAND}
-  -D"INPATH=${CMAKE_SOURCE_DIR}/vendor/openni-android/"
+  -D"INPATH=${CMAKE_SOURCE_DIR}/vendor/openni2/android-armeabi-v7a"
   -D"OUTPATH=${JNI_LIB_DESTINATION}"
   -D"PATTERN=*.so"
   -P "CopyFiles.cmake"

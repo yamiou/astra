@@ -24,7 +24,7 @@ namespace astra {
         virtual ^RETURN^ ^FUNC^(^PARAMS:ref^) {}
 
 ^^^ENDREPLACE^^^
-        
+
         friend stream_callbacks_t create_plugin_callbacks(StreamCallbackListener* context);
     };
 

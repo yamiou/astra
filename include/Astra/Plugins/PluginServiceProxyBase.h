@@ -48,8 +48,14 @@ struct PluginServiceProxyBase
     astra_status_t (*create_stream)(void*,
                                     astra_streamset_t,
                                     astra_stream_desc_t,
-                                    stream_callbacks_t,
                                     astra_stream_t*);
+
+    astra_status_t (*register_stream)(void*,
+                                      astra_stream_t,
+                                      stream_callbacks_t);
+
+    astra_status_t (*unregister_stream)(void*,
+                                        astra_stream_t);
 
     astra_status_t (*destroy_stream)(void*,
                                      astra_stream_t&);

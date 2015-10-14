@@ -2,7 +2,7 @@
 #define DEPTHSTREAM_H
 
 #include <AstraUL/streams/depth_parameters.h>
-#include <AstraUL/skul_ctypes.h>
+#include <AstraUL/astraul_ctypes.h>
 #include <AstraUL/Plugins/stream_types.h>
 #include <common/serialization/FrameStreamReader.h>
 #include "PlaybackStream.h"

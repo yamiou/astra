@@ -1,7 +1,7 @@
 #include <Astra/astra_types.h>
 #include "generic_stream_api.h"
 #include <memory.h>
-#include <AstraUL/skul_ctypes.h>
+#include <AstraUL/astraul_ctypes.h>
 #include <AstraUL/Plugins/stream_types.h>
 #include <AstraUL/streams/hand_capi.h>
 #include <string.h>

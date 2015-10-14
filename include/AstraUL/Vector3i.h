@@ -3,7 +3,7 @@
 
 #include <cmath>
 #include <cstdint>
-#include <AstraUL/skul_ctypes.h>
+#include <AstraUL/astraul_ctypes.h>
 
 namespace astra {
 

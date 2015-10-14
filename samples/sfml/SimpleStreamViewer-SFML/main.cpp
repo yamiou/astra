@@ -98,6 +98,11 @@ public:
 
         init_texture(depthWidth, depthHeight, m_depthView);
 
+        if (m_isPaused)
+        {
+            return;
+        }
+
         m_visualizer.update(pointFrame);
 
         astra_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
@@ -130,6 +135,11 @@ public:
 
         init_texture(colorWidth, colorHeight, m_colorView);
 
+        if (m_isPaused)
+        {
+            return;
+        }
+
         const astra::RGBPixel* color = colorFrame.data();
         uint8_t* buffer = m_colorView.buffer.get();
         for(int i = 0; i < colorWidth * colorHeight; i++)
@@ -159,6 +169,11 @@ public:
         int irHeight = irFrame.resolutionY();
 
         init_texture(irWidth, irHeight, m_colorView);
+
+        if (m_isPaused)
+        {
+            return;
+        }
 
         const uint16_t* ir_values = irFrame.data();
         uint8_t* buffer = m_colorView.buffer.get();
@@ -192,6 +207,11 @@ public:
         int irHeight = irFrame.resolutionY();
 
         init_texture(irWidth, irHeight, m_colorView);
+
+        if (m_isPaused)
+        {
+            return;
+        }
 
         const astra::RGBPixel* irRGB = irFrame.data();
         uint8_t* buffer = m_colorView.buffer.get();
@@ -248,9 +268,39 @@ public:
             float height = m_colorView.height * colorScale;
             int horzCenter = window.getView().getCenter().y - height / 2.0f;
             m_colorView.sprite.setScale(colorScale, colorScale);
-            m_colorView.sprite.setPosition(viewSize, horzCenter);
+
+            if (m_overlayDepth)
+            {
+                m_colorView.sprite.setPosition(0, horzCenter);
+                m_colorView.sprite.setColor(sf::Color(255, 255, 255, 128));
+            }
+            else
+            {
+                m_colorView.sprite.setPosition(viewSize, horzCenter);
+                m_colorView.sprite.setColor(sf::Color(255, 255, 255, 255));
+            }
             window.draw(m_colorView.sprite);
         }
+    }
+
+    void toggle_depth_overlay()
+    {
+        m_overlayDepth = !m_overlayDepth;
+    }
+
+    bool get_overlayDepth() const
+    {
+        return m_overlayDepth;
+    }
+
+    void toggle_Paused()
+    {
+        m_isPaused = !m_isPaused;
+    }
+
+    bool get_isPaused() const
+    {
+        return m_isPaused;
     }
 
     ColorMode get_mode() const { return m_colorMode; }
@@ -268,6 +318,8 @@ private:
     stream_view m_depthView;
     stream_view m_colorView;
     ColorMode m_colorMode;
+    bool m_overlayDepth{ false };
+    bool m_isPaused{ false };
 };
 
 astra::DepthStream configure_depth(astra::StreamReader& reader)
@@ -333,8 +385,14 @@ int main(int argc, char** argv)
 
     set_key_handler();
 
+#ifdef _WIN32
+    auto fullscreenStyle = sf::Style::None;
+#else
+    auto fullscreenStyle = sf::Style::Fullscreen;
+#endif
+
     sf::VideoMode fullscreen_mode = sf::VideoMode::getFullscreenModes()[0];
-    sf::VideoMode windowed_mode(1800, 650);
+    sf::VideoMode windowed_mode(1800, 675);
     bool is_fullscreen = false;
     sf::RenderWindow window(windowed_mode, "Stream Viewer");
 
@@ -342,7 +400,7 @@ int main(int argc, char** argv)
     astra::StreamReader reader = streamset.create_reader();
 
     reader.stream<astra::PointStream>().start();
-    
+
     auto depthStream = configure_depth(reader);
     depthStream.start();
 
@@ -379,12 +437,12 @@ int main(int argc, char** argv)
                         if (is_fullscreen)
                         {
                             is_fullscreen = false;
-                            window.create(windowed_mode, "Stream Viewer");
+                            window.create(windowed_mode, "Stream Viewer", sf::Style::Default);
                         }
                         else
                         {
                             is_fullscreen = true;
-                            window.create(fullscreen_mode, "Stream Viewer", sf::Style::Fullscreen);
+                            window.create(fullscreen_mode, "Stream Viewer", fullscreenStyle);
                         }
                         break;
                     case sf::Keyboard::R:
@@ -409,6 +467,15 @@ int main(int argc, char** argv)
                         configure_ir(reader, true);
                         listener.set_mode(MODE_IR_RGB);
                         irStream.start();
+                        break;
+                    case sf::Keyboard::O:
+                        listener.toggle_depth_overlay();
+                        if (listener.get_overlayDepth()) {
+                            depthStream.enable_registration(true);
+                        }
+                        break;
+                    case sf::Keyboard::P:
+                        listener.toggle_Paused();
                         break;
                     case sf::Keyboard::C:
                         if (event.key.control)

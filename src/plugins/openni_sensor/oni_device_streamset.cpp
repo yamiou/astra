@@ -76,15 +76,6 @@ namespace orbbec { namespace ni {
         int i = 0;
         openni::Status rc;
 
-        std::stringstream str;
-
-        for(auto s : astraActiveStreams_)
-        {
-            (str << s->description().type()) << " ";
-        }
-
-        //LOG_INFO("orbbec.ni.device_streamset", "streams active: %s", str.str().c_str());
-
         for(i = 0; i < niActiveStreams_.size(); i++)
         {
             rc = openni::OpenNI::waitForAnyStream(&niActiveStreams_.data()[i],
@@ -94,14 +85,7 @@ namespace orbbec { namespace ni {
             if (streamIndex != -1)
             {
                 auto stream = astraActiveStreams_[i];
-
                 stream->read(frameIndex_);
-                //LOG_WARN("orbbec.ni.device_streamset", "stream read: %u", stream->description().type());
-            }
-            else
-            {
-                auto stream = astraActiveStreams_[i];
-                //LOG_INFO("orbbec.ni.device_streamset", "stream not read: %u, ec: %u", stream->description().type(), rc);
             }
 
             if (streamIndex == 0)
@@ -111,31 +95,6 @@ namespace orbbec { namespace ni {
                 frameIndex_++;
             }
         }
-
-        // do
-        // {
-        //     rc = openni::OpenNI::waitForAnyStream(niActiveStreams_.data(),
-        //                                           niActiveStreams_.size(),
-        //                                           &streamIndex,
-        //                                           timeout);
-        //     if (streamIndex != -1)
-        //     {
-        //         auto stream = astraActiveStreams_[streamIndex];
-
-        //         stream->read(frameIndex_);
-        //         LOG_INFO("orbbec.ni.device_streamset", "stream read: %u", stream->description().type());
-        //         i++;
-        //     }
-
-        //     if (streamIndex == 0)
-        //     {
-        //         //only increment frameIndex with primary stream
-        //         //TODO this won't work when streams have different target FPS
-        //         frameIndex_++;
-        //     }
-        // } while (i < niActiveStreams_.size() && rc == openni::STATUS_OK);
-
-        //LOG_INFO("orbbec.ni.device_streamset", "read from %u streams, rc: %d ", i, rc);
 
         if (rc == openni::STATUS_TIME_OUT)
         {
@@ -157,7 +116,7 @@ namespace orbbec { namespace ni {
         bool enableColor = true;
         if (enableColor && oniDevice_.hasSensor(openni::SENSOR_COLOR))
         {
-            colorstream* stream = new colorstream(pluginService_,
+            colorstream* stream = astra::plugins::make_stream<colorstream>(pluginService_,
                                                   streamSetHandle_,
                                                   oniDevice_, *this);
 
@@ -171,7 +130,7 @@ namespace orbbec { namespace ni {
 
         if (oniDevice_.hasSensor(openni::SENSOR_DEPTH))
         {
-            depthstream* stream = new depthstream(pluginService_,
+depthstream* stream = astra::plugins::make_stream<depthstream>(pluginService_,
                                                   streamSetHandle_,
                                                   oniDevice_, *this);
 
@@ -185,7 +144,7 @@ namespace orbbec { namespace ni {
 
         if (oniDevice_.hasSensor(openni::SENSOR_IR))
         {
-            infrared_stream* stream = new infrared_stream(pluginService_,
+infrared_stream* stream = astra::plugins::make_stream<infrared_stream>(pluginService_,
                                                           streamSetHandle_,
                                                           oniDevice_,
                                                           *this);

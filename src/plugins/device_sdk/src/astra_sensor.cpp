@@ -51,42 +51,42 @@ namespace astra { namespace devices {
 
     void sensor::add_listener(const listener_ptr listener)
     {
-        auto it = std::find_if(listeners_.cbegin(), listeners_.cend(),
+        auto it = std::find_if(listeners_.begin(), listeners_.end(),
                                [&listener](const listener_ptr& colItem) -> bool
                                {
                                    return colItem == listener;
                                });
 
-        if (it == listeners_.cend())
+        if (it == listeners_.end())
             listeners_.push_back(listener);
     }
 
     void sensor::remove_listener(const listener_ptr listener)
     {
-        auto it = std::find_if(listeners_.cbegin(), listeners_.cend(),
+        auto it = std::find_if(listeners_.begin(), listeners_.end(),
                                [&listener](const listener_ptr& colItem) -> bool
                                {
                                    return colItem == listener;
                                });
 
-        if (it != listeners_.cend())
+        if (it != listeners_.end())
             listeners_.erase(it);
     }
 
     sensor::stream_const_iterator sensor::streams_begin()
     {
-        return streams_.cbegin();
+        return streams_.begin();
     }
 
     sensor::stream_const_iterator sensor::streams_end()
     {
-        return streams_.cend();
+        return streams_.end();
     }
 
     sensor::stream_const_iterator sensor::find_stream(sensor_stream::stream_type type)
     {
-        return std::find_if(streams_.cbegin(),
-                            streams_.cend(),
+        return std::find_if(streams_.begin(),
+                            streams_.end(),
                             [&type](sensor_stream::shared_ptr s) -> bool
                             {
                                 return s->type() == type;
@@ -141,9 +141,9 @@ namespace astra { namespace devices {
 
     void sensor::add_stream(stream_shared_ptr stream)
     {
-        auto it = std::find(streams_.cbegin(), streams_.cend(), stream);
+        auto it = std::find(streams_.begin(), streams_.end(), stream);
 
-        if (it == streams_.cend())
+        if (it == streams_.end())
         {
             stream->initialize();
             streams_.push_back(stream);
@@ -152,9 +152,9 @@ namespace astra { namespace devices {
 
     void sensor::remove_stream(stream_shared_ptr stream)
     {
-        auto it = std::find(streams_.cbegin(), streams_.cend(), stream);
+        auto it = std::find(streams_.begin(), streams_.end(), stream);
 
-        if (it != streams_.cend())
+        if (it != streams_.end())
             streams_.erase(it);
     }
 
