@@ -97,19 +97,4 @@ if(NOT ASTRA_ANDROID)
       add_dependencies(SimpleSkeletonViewer-SFML orbbec_skeleton)
   endif()
 endif()
-
-if (ASTRA_SDK_BUILD)
-  set(FONT_TARGET_DIR "${ASTRA_SDK_BINARY_DIR}/bin/")
-else()
-  set(FONT_TARGET_DIR "${PROJECT_BINARY_DIR}/bin/")
-endif()
-
-if (ASTRA_SDK_BUILD)
-  install_file(${PROJECT_SOURCE_DIR}/vendor/Inconsolata.otf bin)
-endif()
-
-add_custom_target(copyfont ALL
-  COMMAND ${CMAKE_COMMAND} -E copy
-  "${PROJECT_SOURCE_DIR}/vendor/Inconsolata.otf"
-  ${FONT_TARGET_DIR})
-set_target_properties(copyfont PROPERTIES FOLDER CMakeCopyTargets)
+add_subdirectory(vendor)
