@@ -75,6 +75,9 @@ public:
         {
             return;
         }
+
+        copy_depth_data(frame);
+
         m_visualizer.update(pointFrame);
 
         astra_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
@@ -89,7 +92,7 @@ public:
         m_texture.update(m_displayBuffer.get());
     }
 
-    void update_mouse_overlay_from_depth(astra::Frame& frame)
+    void copy_depth_data(astra::Frame& frame)
     {
         astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
 
@@ -97,15 +100,30 @@ public:
         {
             int width = depthFrame.resolutionX();
             int height = depthFrame.resolutionY();
+            if (m_depthData == nullptr || width != m_depthWidth || height != m_depthHeight)
+            {
+                m_depthWidth = width;
+                m_depthHeight = height;
 
-            const int16_t* buffer = depthFrame.data();
+                // texture is RGBA
+                int byteLength = m_depthWidth * m_depthHeight * sizeof(uint16_t);
 
-            m_mouse_X = width * m_mouseNormX;
-            m_mouse_Y = height * m_mouseNormY;
+                m_depthData = DepthPtr(new int16_t[byteLength]);
+            }
+            depthFrame.copy_to(m_depthData.get());
+        }
+    }
 
-            size_t index = (width * m_mouse_Y + m_mouse_X);
+    void update_mouse_overlay_from_depth(astra::Frame& frame)
+    {
+        if (m_depthData != nullptr)
+        {
+            m_mouse_X = m_depthWidth * m_mouseNormX;
+            m_mouse_Y = m_depthHeight * m_mouseNormY;
+
+            size_t index = (m_depthWidth * m_mouse_Y + m_mouse_X);
        
-            m_mouse_Z = buffer[index];
+            m_mouse_Z = m_depthData[index];
         }
     }
 
@@ -200,6 +218,11 @@ private:
     BufferPtr m_displayBuffer{ nullptr };
     int m_displayWidth{ 0 };
     int m_displayHeight{ 0 };
+
+    int m_depthWidth{ 0 };
+    int m_depthHeight{ 0 };
+    using DepthPtr = std::unique_ptr < int16_t[] > ;
+    DepthPtr m_depthData{ nullptr };
 
     int m_mouse_X{ 0 };
     int m_mouse_Y{ 0 };
