@@ -1,111 +1,111 @@
-#include "DepthUtility.h"
+#include "hnd_depth_utility.hpp"
 #include <AstraUL/AstraUL.h>
-#include "TrackingData.h"
+#include "hnd_tracking_data.hpp"
 #include <cmath>
 #include <Shiny.h>
 
-namespace astra { namespace plugins { namespace hand {
+namespace astra { namespace hand {
 
-    DepthUtility::DepthUtility(float width, float height, DepthUtilitySettings& settings) :
-        m_processingWidth(width),
-        m_processingHeight(height),
-        m_depthSmoothingFactor(settings.depthSmoothingFactor),
-        m_velocityThresholdFactor(settings.velocityThresholdFactor),
-        m_maxDepthJumpPercent(settings.maxDepthJumpPercent),
-        m_erodeSize(settings.erodeSize),
-        m_depthAdjustmentFactor(settings.depthAdjustmentFactor),
-        m_minDepth(settings.minDepth),
-        m_maxDepth(settings.maxDepth)
+    depth_utility::depth_utility(float width, float height, depth_utility_settings& settings) :
+        processingWidth_(width),
+        processingHeight_(height),
+        depthSmoothingFactor_(settings.depthSmoothingFactor),
+        velocityThresholdFactor_(settings.velocityThresholdFactor),
+        maxDepthJumpPercent_(settings.maxDepthJumpPercent),
+        erodeSize_(settings.erodeSize),
+        depthAdjustmentFactor_(settings.depthAdjustmentFactor),
+        minDepth_(settings.minDepth),
+        maxDepth_(settings.maxDepth)
     {
         PROFILE_FUNC();
-        m_rectElement = cv::getStructuringElement(cv::MORPH_RECT,
-                                                  cv::Size(m_erodeSize * 2 + 1, m_erodeSize * 2 + 1),
-                                                  cv::Point(m_erodeSize, m_erodeSize));
+        rectElement_ = cv::getStructuringElement(cv::MORPH_RECT,
+                                                  cv::Size(erodeSize_ * 2 + 1, erodeSize_ * 2 + 1),
+                                                  cv::Point(erodeSize_, erodeSize_));
 
         reset();
     }
 
-    DepthUtility::~DepthUtility()
+    depth_utility::~depth_utility()
     {
         PROFILE_FUNC();
     }
 
-    void DepthUtility::reset()
+    void depth_utility::reset()
     {
         PROFILE_FUNC();
-        m_matDepthFilled = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_32FC1);
-        m_matDepthFilledMask = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_8UC1);
-        m_matDepthPrevious = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_32FC1);
-        m_matDepthAvg = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_32FC1);
-        m_matDepthVel.create(m_processingHeight, m_processingWidth, CV_32FC1);
-        m_matDepthVelErode.create(m_processingHeight, m_processingWidth, CV_32FC1);
+        matDepthFilled_ = cv::Mat::zeros(processingHeight_, processingWidth_, CV_32FC1);
+        matDepthFilledMask_ = cv::Mat::zeros(processingHeight_, processingWidth_, CV_8UC1);
+        matDepthPrevious_ = cv::Mat::zeros(processingHeight_, processingWidth_, CV_32FC1);
+        matDepthAvg_ = cv::Mat::zeros(processingHeight_, processingWidth_, CV_32FC1);
+        matDepthVel_.create(processingHeight_, processingWidth_, CV_32FC1);
+        matDepthVelErode_.create(processingHeight_, processingWidth_, CV_32FC1);
 
         for (int i = 0; i < NUM_DEPTH_VEL_CHUNKS; i++)
         {
-            m_maxVel[i] = 0;
+            maxVel_[i] = 0;
         }
     }
 
-    void DepthUtility::processDepthToVelocitySignal(DepthFrame& depthFrame,
-                                                    cv::Mat& matDepth,
-                                                    cv::Mat& matDepthFullSize,
-                                                    cv::Mat& matVelocitySignal)
+    void depth_utility::depth_to_velocity_signal(DepthFrame& depthFrame,
+                                                     cv::Mat& matDepth,
+                                                     cv::Mat& matDepthFullSize,
+                                                     cv::Mat& matVelocitySignal)
     {
         PROFILE_FUNC();
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
 
-        depthFrameToMat(depthFrame, width, height, matDepthFullSize);
+        depthframe_to_matrix(depthFrame, width, height, matDepthFullSize);
 
-        if (width == m_processingWidth && height == m_processingHeight)
+        if (width == processingWidth_ && height == processingHeight_)
         {
             //target size is original size, just use the same data
             matDepth = matDepthFullSize;
         }
         else
         {
-            matDepth.create(m_processingHeight, m_processingWidth, CV_32FC1);
+            matDepth.create(processingHeight_, processingWidth_, CV_32FC1);
             //convert to the target processing size with nearest neighbor
             cv::resize(matDepthFullSize, matDepth, matDepth.size(), 0, 0, CV_INTER_NN);
         }
 
-        matVelocitySignal = cv::Mat::zeros(m_processingHeight, m_processingWidth, CV_8UC1);
+        matVelocitySignal = cv::Mat::zeros(processingHeight_, processingWidth_, CV_8UC1);
 
         //fill 0 depth pixels with the value from the previous frame
-        fillZeroValues(matDepth, m_matDepthFilled, m_matDepthFilledMask, m_matDepthPrevious);
+        fill_zero_values(matDepth, matDepthFilled_, matDepthFilledMask_, matDepthPrevious_);
 
         //accumulate current frame to average using smoothing factor
 
-        cv::accumulateWeighted(m_matDepthFilled, m_matDepthAvg, m_depthSmoothingFactor);
+        cv::accumulateWeighted(matDepthFilled_, matDepthAvg_, depthSmoothingFactor_);
 
-        filterZeroValuesAndJumps(m_matDepthFilled,
-                                 m_matDepthPrevious,
-                                 m_matDepthAvg,
-                                 m_matDepthFilledMask,
-                                 m_maxDepthJumpPercent);
+        filter_zero_values_and_jumps(matDepthFilled_,
+                                 matDepthPrevious_,
+                                 matDepthAvg_,
+                                 matDepthFilledMask_,
+                                 maxDepthJumpPercent_);
 
         //current minus average, scaled by average = velocity as a percent change
 
-        m_matDepthVel = (m_matDepthFilled - m_matDepthAvg) / m_matDepthAvg;
+        matDepthVel_ = (matDepthFilled_ - matDepthAvg_) / matDepthAvg_;
 
-        adjust_velocities_for_depth(matDepth, m_matDepthVel);
+        adjust_velocities_for_depth(matDepth, matDepthVel_);
 
         //erode to eliminate single pixel velocity artifacts
-        m_matDepthVelErode = cv::abs(m_matDepthVel);
-        cv::erode(m_matDepthVelErode, m_matDepthVelErode, m_rectElement);
-        //cv::dilate(m_matDepthVelErode, m_matDepthVelErode, m_rectElement);
+        matDepthVelErode_ = cv::abs(matDepthVel_);
+        cv::erode(matDepthVelErode_, matDepthVelErode_, rectElement_);
+        //cv::dilate(matDepthVelErode_, matDepthVelErode_, rectElement_);
 
-        thresholdVelocitySignal(m_matDepthVelErode,
+        threshold_velocity_signal(matDepthVelErode_,
                                 matVelocitySignal,
-                                m_velocityThresholdFactor);
+                                velocityThresholdFactor_);
 
-        //analyze_velocities(matDepth, m_matDepthVelErode);
+        //analyze_velocities(matDepth, matDepthVelErode_);
     }
 
-    void DepthUtility::depthFrameToMat(DepthFrame& depthFrameSrc,
-                                       const int width,
-                                       const int height,
-                                       cv::Mat& matTarget)
+    void depth_utility::depthframe_to_matrix(DepthFrame& depthFrameSrc,
+                                        const int width,
+                                        const int height,
+                                        cv::Mat& matTarget)
     {
         PROFILE_FUNC();
         //ensure initialized
@@ -126,10 +126,10 @@ namespace astra { namespace plugins { namespace hand {
         }
     }
 
-    void DepthUtility::fillZeroValues(cv::Mat& matDepth,
-                                      cv::Mat& matDepthFilled,
-                                      cv::Mat& matDepthFilledMask,
-                                      cv::Mat& matDepthPrevious)
+    void depth_utility::fill_zero_values(cv::Mat& matDepth,
+                                       cv::Mat& matDepthFilled,
+                                       cv::Mat& matDepthFilledMask,
+                                       cv::Mat& matDepthPrevious)
     {
         PROFILE_FUNC();
         int width = matDepth.cols;
@@ -149,11 +149,11 @@ namespace astra { namespace plugins { namespace hand {
                 if (depth == 0)
                 {
                     depth = *prevDepthRow;
-                    *filledDepthMaskRow = FillMaskType::Filled;
+                    *filledDepthMaskRow = static_cast<uint8_t>(fill_mask_type::filled);
                 }
                 else
                 {
-                    *filledDepthMaskRow = FillMaskType::Normal;
+                    *filledDepthMaskRow = static_cast<uint8_t>(fill_mask_type::normal);
                 }
 
                 *filledDepthRow = depth;
@@ -166,11 +166,11 @@ namespace astra { namespace plugins { namespace hand {
         }
     }
 
-    void DepthUtility::filterZeroValuesAndJumps(cv::Mat& matDepth,
-                                                cv::Mat& matDepthPrevious,
-                                                cv::Mat& matDepthAvg,
-                                                cv::Mat& matDepthFilledMask,
-                                                const float maxDepthJumpPercent)
+    void depth_utility::filter_zero_values_and_jumps(cv::Mat& matDepth,
+                                                 cv::Mat& matDepthPrevious,
+                                                 cv::Mat& matDepthAvg,
+                                                 cv::Mat& matDepthFilledMask,
+                                                 const float maxDepthJumpPercent)
     {
         PROFILE_FUNC();
         int width = matDepth.cols;
@@ -187,7 +187,7 @@ namespace astra { namespace plugins { namespace hand {
             {
                 float depth = *depthRow;
                 float previousDepth = *prevDepthRow;
-                uint8_t fillType = *filledDepthMaskRow;
+                fill_mask_type fillType = static_cast<fill_mask_type>(*filledDepthMaskRow);
 
                 //calculate percent change since last frame
                 float deltaPercent = (depth - previousDepth) / previousDepth;
@@ -198,7 +198,7 @@ namespace astra { namespace plugins { namespace hand {
                 bool isZeroDepth = (0 == depth || 0 == previousDepth);
 
                 //suppress signal when a pixel was artificially filled
-                bool isFilled = (fillType == FillMaskType::Filled);
+                bool isFilled = (fillType == fill_mask_type::filled);
 
                 //suppress signal when a pixel jumps a long distance from near to far
                 bool isJumpingAway = (absDeltaPercent > maxDepthJumpPercent && movingAway);
@@ -215,9 +215,9 @@ namespace astra { namespace plugins { namespace hand {
         }
     }
 
-    void DepthUtility::thresholdVelocitySignal(cv::Mat& matVelocityFiltered,
-                                               cv::Mat& matVelocitySignal,
-                                               const float velocityThresholdFactor)
+    void depth_utility::threshold_velocity_signal(cv::Mat& matVelocityFiltered,
+                                                cv::Mat& matVelocitySignal,
+                                                const float velocityThresholdFactor)
     {
         PROFILE_FUNC();
         int width = matVelocitySignal.cols;
@@ -235,20 +235,20 @@ namespace astra { namespace plugins { namespace hand {
 
                 if (velFiltered > velocityThresholdFactor)
                 {
-                    *velocitySignalRow = PixelType::Foreground;
+                    *velocitySignalRow = pixel_type::foreground;
                 }
                 else
                 {
-                    *velocitySignalRow = PixelType::Background;
+                    *velocitySignalRow = pixel_type::background;
                 }
             }
         }
     }
 
-    void DepthUtility::adjust_velocities_for_depth(cv::Mat& matDepth, cv::Mat& matVelocityFiltered)
+    void depth_utility::adjust_velocities_for_depth(cv::Mat& matDepth, cv::Mat& matVelocityFiltered)
     {
         PROFILE_FUNC();
-        if (m_depthAdjustmentFactor == 0)
+        if (depthAdjustmentFactor_ == 0)
         {
             return;
         }
@@ -267,10 +267,10 @@ namespace astra { namespace plugins { namespace hand {
                 if (depth != 0.0f)
                 {
                     float& velFiltered = *velFilteredRow;
-                    if (depth > m_minDepth && depth < m_maxDepth)
+                    if (depth > minDepth_ && depth < maxDepth_)
                     {
                         float depthM = depth / 1000.0f;
-                        velFiltered /= depthM * m_depthAdjustmentFactor;
+                        velFiltered /= depthM * depthAdjustmentFactor_;
                     }
                     else
                     {
@@ -281,7 +281,7 @@ namespace astra { namespace plugins { namespace hand {
         }
     }
 
-    int DepthUtility::depth_to_chunk_index(float depth)
+    int depth_utility::depth_to_chunk_index(float depth)
     {
         PROFILE_FUNC();
         if (depth == 0 || depth < MIN_CHUNK_DEPTH || depth > MAX_CHUNK_DEPTH)
@@ -294,7 +294,7 @@ namespace astra { namespace plugins { namespace hand {
         return std::min(NUM_DEPTH_VEL_CHUNKS - 1, static_cast<int>(NUM_DEPTH_VEL_CHUNKS * normDepth));
     }
 
-    void DepthUtility::analyze_velocities(cv::Mat& matDepth, cv::Mat& matVelocityFiltered)
+    void depth_utility::analyze_velocities(cv::Mat& matDepth, cv::Mat& matVelocityFiltered)
     {
         PROFILE_FUNC();
         int width = matDepth.cols;
@@ -302,8 +302,8 @@ namespace astra { namespace plugins { namespace hand {
 
         for (int i = 0; i < NUM_DEPTH_VEL_CHUNKS; i++)
         {
-            m_maxVel[i] *= m_velErodeFactor;
-            m_depthCount[i] = 0;
+            maxVel_[i] *= velErodeFactor_;
+            depthCount_[i] = 0;
         }
 
         for (int y = 0; y < height; ++y)
@@ -319,9 +319,9 @@ namespace astra { namespace plugins { namespace hand {
                 int chunkIndex = depth_to_chunk_index(depth);
                 if (chunkIndex >= 0 && depth != 0)
                 {
-                    ++m_depthCount[chunkIndex];
+                    ++depthCount_[chunkIndex];
 
-                    float& maxVel = m_maxVel[chunkIndex];
+                    float& maxVel = maxVel_[chunkIndex];
                     float velFiltered = *velFilteredRow;
 
                     if (velFiltered > maxVel)
@@ -337,8 +337,8 @@ namespace astra { namespace plugins { namespace hand {
 
         for (int i = 0; i < NUM_DEPTH_VEL_CHUNKS; i++)
         {
-            float maxVel = m_maxVel[i];
-            int count = m_depthCount[i];
+            float maxVel = maxVel_[i];
+            int count = depthCount_[i];
             float startDepth = (MIN_CHUNK_DEPTH + i * chunk_size) / 1000.0f;
             float endDepth = (MIN_CHUNK_DEPTH + (1 + i) * chunk_size) / 1000.0f;
             float ratio = 0;
@@ -355,4 +355,4 @@ namespace astra { namespace plugins { namespace hand {
         }
         printf("[%.1fm]\n\n", static_cast<int>(MAX_CHUNK_DEPTH)/1000.0f);
     }
-}}}
+}}

@@ -1,9 +1,9 @@
-#include "ScalingCoordinateMapper.h"
+#include "hnd_scaling_coordinate_mapper.hpp"
 #include <opencv2/core/core.hpp>
 #include <AstraUL/streams/Depth.h>
 #include <Shiny.h>
 
-namespace astra { namespace plugins { namespace hand {
+namespace astra { namespace hand {
 
     void convert_depth_to_world_f(const conversion_cache_t& depthToWorldData,
                                   float depthX, float depthY, float depthZ,
@@ -61,19 +61,19 @@ namespace astra { namespace plugins { namespace hand {
     }
 
 
-    cv::Point ScalingCoordinateMapper::offset_pixel_location_by_mm(const cv::Point& position,
-                                                                   float offsetX,
-                                                                   float offsetY,
-                                                                   float depthZ) const
+    cv::Point scaling_coordinate_mapper::offset_pixel_location_by_mm(const cv::Point& position,
+                                                                     float offsetX,
+                                                                     float offsetY,
+                                                                     float depthZ) const
     {
         if (depthZ == 0)
         {
             return position;
         }
 
-        const conversion_cache_t& depthToWorldData = m_depthToWorldData;
+        const conversion_cache_t& depthToWorldData = depthToWorldData_;
 
-        const float scaledDepth = depthZ * m_scale;
+        const float scaledDepth = depthZ * scale_;
 
         //This bakes the world to depth conversion and full size to scaled conversion into
         //a single factor that we apply to the requested offset.
@@ -88,4 +88,4 @@ namespace astra { namespace plugins { namespace hand {
 
         return cv::Point(static_cast<int>(finalDepthX), static_cast<int>(finalDepthY));
     }
-}}}
+}}

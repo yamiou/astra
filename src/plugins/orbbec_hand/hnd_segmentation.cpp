@@ -1,23 +1,23 @@
-#include "TrackingData.h"
+#include "hnd_tracking_data.hpp"
 #include <queue>
-#include "ScalingCoordinateMapper.h"
+#include "hnd_scaling_coordinate_mapper.hpp"
 #include <cmath>
-#include "Segmentation.h"
-#include "constants.h"
+#include "hnd_segmentation.hpp"
+#include "hnd_constants.hpp"
 #include <Shiny.h>
 #include <Astra/Plugins/PluginLogger.h>
 
 #define MAX_DEPTH 10000
 
-namespace astra { namespace plugins { namespace hand { namespace segmentation {
+namespace astra { namespace hand { namespace segmentation {
 
-    struct PointTTL
+    struct point_ttl
     {
         int x;
         int y;
         float ttl;
 
-        PointTTL(int x, int y, float ttl) :
+        point_ttl(int x, int y, float ttl) :
             x(x),
             y(y),
             ttl(ttl)
@@ -25,8 +25,8 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
     };
 
     static void enqueue_neighbors(cv::Mat& matVisited,
-                                 std::queue<PointTTL>& pointQueue,
-                                 const PointTTL& pt)
+                                  std::queue<point_ttl>& pointQueue,
+                                  const point_ttl& pt)
     {
         PROFILE_FUNC();
         const int& x = pt.x;
@@ -46,33 +46,33 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
         if (0 == rightVisited)
         {
             rightVisited = 1;
-            pointQueue.push(PointTTL(x+1, y, ttlRef));
+            pointQueue.push(point_ttl(x+1, y, ttlRef));
         }
 
         char& leftVisited = matVisited.at<char>(y, x-1);
         if (0 == leftVisited)
         {
             leftVisited = 1;
-            pointQueue.push(PointTTL(x-1, y, ttlRef));
+            pointQueue.push(point_ttl(x-1, y, ttlRef));
         }
 
         char& downVisited = matVisited.at<char>(y+1, x);
         if (0 == downVisited)
         {
             downVisited = 1;
-            pointQueue.push(PointTTL(x, y+1, ttlRef));
+            pointQueue.push(point_ttl(x, y+1, ttlRef));
         }
 
         char& upVisited = matVisited.at<char>(y-1, x);
         if (0 == upVisited)
         {
             upVisited = 1;
-            pointQueue.push(PointTTL(x, y-1, ttlRef));
+            pointQueue.push(point_ttl(x, y-1, ttlRef));
         }
     }
 
-    static cv::Point find_nearest_in_range_pixel(TrackingData& data,
-                                                cv::Mat& matVisited)
+    static cv::Point find_nearest_in_range_pixel(tracking_data& data,
+                                                 cv::Mat& matVisited)
     {
         PROFILE_FUNC();
         assert(matVisited.size() == data.matrices.depth.size());
@@ -88,17 +88,17 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
         cv::Mat& depthMatrix = data.matrices.depth;
         cv::Mat& searchedMatrix = data.matrices.foregroundSearched;
 
-        std::queue<PointTTL> pointQueue;
+        std::queue<point_ttl> pointQueue;
 
-        pointQueue.push(PointTTL(data.seedPosition.x,
-                                 data.seedPosition.y,
-                                 maxSegmentationDist));
+        pointQueue.push(point_ttl(data.seedPosition.x,
+                                  data.seedPosition.y,
+                                  maxSegmentationDist));
 
         matVisited.at<char>(data.seedPosition) = 1;
 
         while (!pointQueue.empty())
         {
-            PointTTL pt = pointQueue.front();
+            point_ttl pt = pointQueue.front();
             pointQueue.pop();
             const int& x = pt.x;
             const int& y = pt.y;
@@ -109,7 +109,8 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
                 continue;
             }
 
-            searchedMatrix.at<char>(y, x) = PixelType::SearchedFromOutOfRange;
+            searchedMatrix.at<char>(y, x) =
+                pixel_type::searched_from_out_of_range;
 
             float depth = depthMatrix.at<float>(y, x);
             bool pointInRange = depth != 0 && depth > minDepth && depth < maxDepth;
@@ -127,11 +128,11 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
         return INVALID_POINT;
     }
 
-    static float segment_foreground_and_get_average_depth(TrackingData& data)
+    static float segment_foreground_and_get_average_depth(tracking_data& data)
     {
         PROFILE_FUNC();
         const float& maxSegmentationDist = data.settings.maxSegmentationDist;
-        const SegmentationVelocityPolicy& velocitySignalPolicy = data.velocityPolicy;
+        const segmentation_velocity_policy& velocitySignalPolicy = data.velocityPolicy;
         const float seedDepth = data.matrices.depth.at<float>(data.seedPosition);
         const float referenceAreaSqrt = data.referenceAreaSqrt;
         cv::Mat& depthMatrix = data.matrices.depth;
@@ -139,7 +140,7 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
         cv::Mat& segmentationMatrix = data.matrices.layerSegmentation;
         cv::Mat& searchedMatrix = data.matrices.foregroundSearched;
 
-        std::queue<PointTTL> pointQueue;
+        std::queue<point_ttl> pointQueue;
 
         double totalDepth = 0;
         int depthCount = 0;
@@ -166,47 +167,47 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
             }
         }
 
-        pointQueue.push(PointTTL(seedPosition.x,
-                                 seedPosition.y,
-                                 maxSegmentationDist));
+        pointQueue.push(point_ttl(seedPosition.x,
+                                  seedPosition.y,
+                                  maxSegmentationDist));
 
         matVisited.at<char>(seedPosition) = 1;
 
         while (!pointQueue.empty())
         {
-            PointTTL pt = pointQueue.front();
+            point_ttl pt = pointQueue.front();
             pointQueue.pop();
             const int& x = pt.x;
             const int& y = pt.y;
             float& ttlRef = pt.ttl;
 
             if (velocitySignalPolicy == VELOCITY_POLICY_RESET_TTL &&
-                velocitySignalMatrix.at<char>(y, x) == PixelType::Foreground)
+                velocitySignalMatrix.at<char>(y, x) == pixel_type::foreground)
             {
                 ttlRef = maxSegmentationDist;
             }
 
             float depth = depthMatrix.at<float>(y, x);
             bool pointOutOfRange = depth == 0 ||
-                                   depth < minDepth ||
-                                   depth > maxDepth;
+                depth < minDepth ||
+                        depth > maxDepth;
 
             if (ttlRef <= 0)
             {
-                segmentationMatrix.at<char>(y, x) = PixelType::ForegroundOutOfRangeEdge;
+                segmentationMatrix.at<char>(y, x) = pixel_type::foreground_out_of_range_edge;
                 continue;
             }
             else if (pointOutOfRange)
             {
-                segmentationMatrix.at<char>(y, x) = PixelType::ForegroundNaturalEdge;
+                segmentationMatrix.at<char>(y, x) = pixel_type::foreground_natural_edge;
                 continue;
             }
 
             totalDepth += depth;
             ++depthCount;
 
-            searchedMatrix.at<char>(y, x) = PixelType::Searched;
-            segmentationMatrix.at<char>(y, x) = PixelType::Foreground;
+            searchedMatrix.at<char>(y, x) = pixel_type::searched;
+            segmentationMatrix.at<char>(y, x) = pixel_type::foreground;
 
             ttlRef -= referenceAreaSqrt;
 
@@ -224,7 +225,7 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
         }
     }
 
-    void calculate_layer_score(TrackingData& data, const float layerAverageDepth)
+    void calculate_layer_score(tracking_data& data, const float layerAverageDepth)
     {
         PROFILE_FUNC();
         cv::Mat& edgeDistanceMatrix = data.matrices.layerEdgeDistance;
@@ -239,11 +240,11 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
 
         layerScoreMatrix = cv::Mat::zeros(data.matrices.depth.size(), CV_32FC1);
 
-        ScalingCoordinateMapper mapper = get_scaling_mapper(data.matrices);
+        scaling_coordinate_mapper mapper = get_scaling_mapper(data.matrices);
 
         auto seedWorldPosition = astra::Vector3f(data.referenceWorldPosition.x,
-                                                    data.referenceWorldPosition.y,
-                                                    data.referenceWorldPosition.z);
+                                                 data.referenceWorldPosition.y,
+                                                 data.referenceWorldPosition.z);
 
         int width = data.matrices.depth.cols;
         int height = data.matrices.depth.rows;
@@ -260,9 +261,9 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
             float* layerScoreRow = layerScoreMatrix.ptr<float>(y);
 
             for (int x = 0; x < width; ++x,
-                                       ++worldPoints,
-                                       ++edgeDistanceRow,
-                                       ++layerScoreRow)
+                     ++worldPoints,
+                     ++edgeDistanceRow,
+                     ++layerScoreRow)
             {
                 astra::Vector3f worldPosition = *worldPoints;
                 if (worldPosition.z != 0 && x > minX && x < maxX && y > minY && y < maxY)
@@ -281,7 +282,7 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
                         auto vector = worldPosition - seedWorldPosition;
                         float length = vector.length();
                         float distFromSeedNorm = std::max(0.0f, std::min(1.0f,
-                                                    length / pointInertiaRadius));
+                                                                         length / pointInertiaRadius));
                         score += (1.0f - distFromSeedNorm) * pointInertiaFactor;
                     }
 
@@ -301,9 +302,9 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
     }
 
 
-    bool test_point_in_range(TrackingMatrices& matrices,
+    bool test_point_in_range(tracking_matrices& matrices,
                              const cv::Point& targetPoint,
-                             TestBehavior outputLog)
+                             test_behavior outputLog)
     {
         PROFILE_FUNC();
         if (targetPoint == segmentation::INVALID_POINT ||
@@ -312,25 +313,25 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
         {
             if (outputLog == TEST_BEHAVIOR_LOG)
             {
-                LOG_INFO("PointProcessor", "test_point_in_range failed: position: (%d, %d)",
-                              targetPoint.x,
-                              targetPoint.y);
+                LOG_INFO("point_processor", "test_point_in_range failed: position: (%d, %d)",
+                         targetPoint.x,
+                         targetPoint.y);
             }
             return false;
         }
 
         if (outputLog == TEST_BEHAVIOR_LOG)
         {
-            LOG_INFO("PointProcessor", "test_point_in_range success: position: (%d, %d)",
-                          targetPoint.x,
-                          targetPoint.y);
+            LOG_INFO("point_processor", "test_point_in_range success: position: (%d, %d)",
+                     targetPoint.x,
+                     targetPoint.y);
         }
 
         return true;
     }
 
-    float get_point_area(TrackingMatrices& matrices,
-                         AreaTestSettings& settings,
+    float get_point_area(tracking_matrices& matrices,
+                         area_test_settings& settings,
                          const cv::Point& point)
     {
         PROFILE_FUNC();
@@ -348,9 +349,9 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
     }
 
 
-    float get_point_area_integral(TrackingMatrices& matrices,
+    float get_point_area_integral(tracking_matrices& matrices,
                                   cv::Mat& integralArea,
-                                  AreaTestSettings& settings,
+                                  area_test_settings& settings,
                                   const cv::Point& point)
     {
         //PROFILE_FUNC();
@@ -366,9 +367,9 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
     }
 
     bool test_point_area_core(float area,
-                              AreaTestSettings& settings,
-                              TestPhase phase,
-                              TestBehavior outputLog)
+                              area_test_settings& settings,
+                              test_phase phase,
+                              test_behavior outputLog)
     {
         //PROFILE_FUNC();
         float minArea = settings.minArea;
@@ -386,27 +387,27 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
             if (validPointArea)
             {
                 LOG_INFO("Segmentation", "test_point_area passed: area %f within [%f, %f]",
-                              area,
-                              minArea,
-                              maxArea);
+                         area,
+                         minArea,
+                         maxArea);
             }
             else
             {
                 LOG_INFO("Segmentation", "test_point_area failed: area %f not within [%f, %f]",
-                              area,
-                              minArea,
-                              maxArea);
+                         area,
+                         minArea,
+                         maxArea);
             }
         }
 
         return validPointArea;
     }
 
-    bool test_point_area(TrackingMatrices& matrices,
-                         AreaTestSettings& settings,
+    bool test_point_area(tracking_matrices& matrices,
+                         area_test_settings& settings,
                          const cv::Point& targetPoint,
-                         TestPhase phase,
-                         TestBehavior outputLog)
+                         test_phase phase,
+                         test_behavior outputLog)
     {
         PROFILE_FUNC();
         float area = get_point_area(matrices, settings, targetPoint);
@@ -415,12 +416,12 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
     }
 
 
-    bool test_point_area_integral(TrackingMatrices& matrices,
+    bool test_point_area_integral(tracking_matrices& matrices,
                                   cv::Mat& integralArea,
-                                  AreaTestSettings& settings,
+                                  area_test_settings& settings,
                                   const cv::Point& targetPoint,
-                                  TestPhase phase,
-                                  TestBehavior outputLog)
+                                  test_phase phase,
+                                  test_behavior outputLog)
     {
         PROFILE_FUNC();
         float area = get_point_area_integral(matrices, integralArea, settings, targetPoint);
@@ -432,7 +433,7 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
                                     cv::Mat& matSegmentation,
                                     const cv::Point& center,
                                     const float bandwidth,
-                                    const ScalingCoordinateMapper& mapper)
+                                    const scaling_coordinate_mapper& mapper)
     {
         PROFILE_FUNC();
         int width = matDepth.cols;
@@ -466,13 +467,13 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
             segmentationRow += x0;
             for (int x = x0; x <= x1; ++x, ++segmentationRow)
             {
-                char segmentation = *segmentationRow;
-                if (segmentation == PixelType::ForegroundNaturalEdge)
+                pixel_type segmentation = static_cast<pixel_type>(*segmentationRow);
+                if (segmentation == pixel_type::foreground_natural_edge)
                 {
                     ++naturalEdgeCount;
                     ++totalEdgeCount;
                 }
-                else if (segmentation == PixelType::ForegroundOutOfRangeEdge)
+                else if (segmentation == pixel_type::foreground_out_of_range_edge)
                 {
                     ++totalEdgeCount;
                 }
@@ -488,11 +489,11 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
         return percentNaturalEdges;
     }
 
-    bool test_natural_edges(TrackingMatrices& matrices,
-                            NaturalEdgeTestSettings& settings,
+    bool test_natural_edges(tracking_matrices& matrices,
+                            natural_edge_test_settings& settings,
                             const cv::Point& targetPoint,
-                            TestPhase phase,
-                            TestBehavior outputLog)
+                            test_phase phase,
+                            test_behavior outputLog)
     {
         PROFILE_FUNC();
 
@@ -512,24 +513,24 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
             if (passed)
             {
                 LOG_INFO("Segmentation", "test_natural_edges passed: %f (minimum %f)",
-                              percentNaturalEdges,
-                              minPercentNaturalEdges);
+                         percentNaturalEdges,
+                         minPercentNaturalEdges);
             }
             else
             {
                 LOG_INFO("Segmentation", "test_natural_edges failed: %f (minimum %f)",
-                              percentNaturalEdges,
-                              minPercentNaturalEdges);
+                         percentNaturalEdges,
+                         minPercentNaturalEdges);
             }
         }
         return passed;
     }
 
-    bool test_foreground_radius_percentage(TrackingMatrices& matrices,
-                                           CircumferenceTestSettings& settings,
+    bool test_foreground_radius_percentage(tracking_matrices& matrices,
+                                           circumference_test_settings& settings,
                                            const cv::Point& targetPoint,
-                                           TestPhase phase,
-                                           TestBehavior outputLog)
+                                           test_phase phase,
+                                           test_behavior outputLog)
     {
         PROFILE_FUNC();
         auto scalingMapper = get_scaling_mapper(matrices);
@@ -563,10 +564,10 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
         }
 
         bool passTest1 = percentForeground1 >= minPercent1 &&
-                         percentForeground1 <= maxPercent1;
+            percentForeground1 <= maxPercent1;
 
         bool passTest2 = percentForeground2 >= minPercent2 &&
-                         percentForeground2 <= maxPercent2;
+            percentForeground2 <= maxPercent2;
 
         bool passed = passTest1 && passTest2;
 
@@ -575,28 +576,28 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
             if (passed)
             {
                 LOG_INFO("Segmentation", "test_foreground_radius_percentage passed: perc1 %f [%f,%f] perc2 %f [%f,%f]",
-                              percentForeground1,
-                              minPercent1,
-                              maxPercent1,
-                              percentForeground2,
-                              minPercent2,
-                              maxPercent2);
+                         percentForeground1,
+                         minPercent1,
+                         maxPercent1,
+                         percentForeground2,
+                         minPercent2,
+                         maxPercent2);
             }
             else
             {
                 LOG_INFO("Segmentation", "test_foreground_radius_percentage failed: perc1 %f [%f,%f] perc2 %f [%f,%f]",
-                              percentForeground1,
-                              minPercent1,
-                              maxPercent1,
-                              percentForeground2,
-                              minPercent2,
-                              maxPercent2);
+                         percentForeground1,
+                         minPercent1,
+                         maxPercent1,
+                         percentForeground2,
+                         minPercent2,
+                         maxPercent2);
             }
         }
         return passed;
     }
 
-    cv::Mat& calculate_integral_area(TrackingMatrices& matrices)
+    cv::Mat& calculate_integral_area(tracking_matrices& matrices)
     {
         PROFILE_FUNC();
         cv::Mat& segmentationMatrix = matrices.layerSegmentation;
@@ -619,9 +620,9 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
             float upLeftArea = 0;
 
             for (int x = 0; x < width; ++x,
-                                       ++areaRow,
-                                       ++integralAreaRow,
-                                       ++segmentationRow)
+                     ++areaRow,
+                     ++integralAreaRow,
+                     ++segmentationRow)
             {
                 float upArea = 0;
                 if (lastIntegralAreaRow != nullptr)
@@ -632,7 +633,8 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
 
                 float currentArea = 0;
 
-                if (*segmentationRow == PixelType::Foreground)
+                pixel_type segmentation = static_cast<pixel_type>(*segmentationRow);
+                if (segmentation == pixel_type::foreground)
                 {
                     currentArea = *areaRow;
                 }
@@ -651,7 +653,7 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
         return integralAreaMatrix;
     }
 
-    bool test_single_point(TrackingData& data, cv::Point seedPosition)
+    bool test_single_point(tracking_data& data, cv::Point seedPosition)
     {
         auto matrices = data.matrices;
 
@@ -660,8 +662,8 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
         auto naturalEdgeTestSettings = data.settings.naturalEdgeTestSettings;
         auto integralArea = matrices.layerIntegralArea;
 
-        TestPhase phase = data.phase;
-        TestBehavior outputTestLog = TEST_BEHAVIOR_NONE;
+        test_phase phase = data.phase;
+        test_behavior outputTestLog = TEST_BEHAVIOR_NONE;
 
         bool validPointArea = test_point_area_integral(matrices,
                                                        integralArea,
@@ -695,7 +697,7 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
         return passesAllTests;
     }
 
-    ForegroundStatus create_test_pass_from_foreground(TrackingData& data)
+    foreground_status create_test_pass_from_foreground(tracking_data& data)
     {
         PROFILE_FUNC();
         auto matrices = data.matrices;
@@ -713,10 +715,10 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
 
         auto integralArea = matrices.layerIntegralArea;
 
-        TestPhase phase = data.phase;
-        TestBehavior outputTestLog = TEST_BEHAVIOR_NONE;
+        test_phase phase = data.phase;
+        test_behavior outputTestLog = TEST_BEHAVIOR_NONE;
 
-        ForegroundStatus status = FOREGROUND_EMPTY;
+        foreground_status status = foreground_status::empty;
 
         int xskip = 1;
         int yskip = 1;
@@ -739,11 +741,12 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
             char* testPassRowNext = testPassMatrix.ptr<char>(y+1);
 
             for (int x = 0; x < width; x += xskip,
-                                       segmentationRow += xskip,
-                                       testPassRow += xskip,
-                                       testPassRowNext += xskip)
+                     segmentationRow += xskip,
+                     testPassRow += xskip,
+                     testPassRowNext += xskip)
             {
-                if (*segmentationRow != PixelType::Foreground)
+                pixel_type segmentation = static_cast<pixel_type>(*segmentationRow);
+                if (segmentation != pixel_type::foreground)
                 {
                     continue;
                 }
@@ -778,21 +781,22 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
 
                 if (validPointArea && validRadiusTest && validNaturalEdgeTest)
                 {
-                    status = FOREGROUND_HAS_POINTS;
-                    *testPassRow = PixelType::Foreground;
+                    status = foreground_status::has_points;
+                    *testPassRow = pixel_type::foreground;
                     if (downscale)
                     {
-                        *(testPassRow+1) = PixelType::Foreground;
-                        *testPassRowNext = PixelType::Foreground;
-                        *(testPassRowNext+1) = PixelType::Foreground;
+                        *(testPassRow+1) = pixel_type::foreground;
+                        *testPassRowNext = pixel_type::foreground;
+                        *(testPassRowNext+1) = pixel_type::foreground;
                     }
                 }
             }
         }
+
         return status;
     }
 
-    cv::Point track_point_from_seed(TrackingData& data)
+    cv::Point track_point_from_seed(tracking_data& data)
     {
         PROFILE_FUNC();
         cv::Size size = data.matrices.depth.size();
@@ -835,8 +839,8 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
                 //our initial point failed the tests, so now we will test all the points
                 //and find the max score with the testPassMap
 
-                ForegroundStatus status = create_test_pass_from_foreground(data);
-                if (status == FOREGROUND_EMPTY)
+                foreground_status status = create_test_pass_from_foreground(data);
+                if (status == foreground_status::empty)
                 {
                     foundPoint = false;
                 }
@@ -854,14 +858,14 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
             cv::Mat layerCountMat = cv::Mat(size, CV_8UC1, cv::Scalar(data.matrices.layerCount));
 
             cv::bitwise_or(layerCountMat,
-                data.matrices.debugSegmentation,
-                data.matrices.debugSegmentation,
-                data.matrices.layerSegmentation);
+                           data.matrices.debugSegmentation,
+                           data.matrices.debugSegmentation,
+                           data.matrices.layerSegmentation);
 
             cv::bitwise_or(layerCountMat,
-                data.matrices.debugTestPassMap,
-                data.matrices.debugTestPassMap,
-                data.matrices.layerTestPassMap);
+                           data.matrices.debugTestPassMap,
+                           data.matrices.debugTestPassMap,
+                           data.matrices.layerTestPassMap);
 
             cv::Mat scoreMask;
             cv::inRange(matScore, 1, INT_MAX, scoreMask);
@@ -878,9 +882,9 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
     }
 
     bool find_next_velocity_seed_pixel(cv::Mat& velocitySignalMatrix,
-                                        cv::Mat& searchedMatrix,
-                                        cv::Point& foregroundPosition,
-                                        cv::Point& nextSearchStart)
+                                       cv::Mat& searchedMatrix,
+                                       cv::Point& foregroundPosition,
+                                       cv::Point& nextSearchStart)
     {
         PROFILE_FUNC();
         assert(velocitySignalMatrix.cols == searchedMatrix.cols);
@@ -895,9 +899,9 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
         {
             for (int x = startX; x < width; x++)
             {
-                uint8_t velocitySignal = *velocitySignalMatrix.ptr<uint8_t>(y, x);
-                uint8_t searched = *searchedMatrix.ptr<uint8_t>(y, x);
-                if (velocitySignal == PixelType::Foreground && searched != PixelType::Searched)
+                pixel_type velocitySignal = static_cast<pixel_type>(*velocitySignalMatrix.ptr<uint8_t>(y, x));
+                pixel_type searched = static_cast<pixel_type>(*searchedMatrix.ptr<uint8_t>(y, x));
+                if (velocitySignal == pixel_type::foreground && searched != pixel_type::searched)
                 {
                     foregroundPosition.x = x;
                     foregroundPosition.y = y;
@@ -977,7 +981,7 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
     void get_circumference_points(cv::Mat& matDepth,
                                   const cv::Point& center,
                                   const float& radius,
-                                  const ScalingCoordinateMapper& mapper,
+                                  const scaling_coordinate_mapper& mapper,
                                   std::vector<astra::Vector2i>& points)
     {
         PROFILE_FUNC();
@@ -1180,7 +1184,7 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
                                                       cv::Mat& matSegmentation,
                                                       const cv::Point& center,
                                                       const float& radius,
-                                                      const ScalingCoordinateMapper& mapper,
+                                                      const scaling_coordinate_mapper& mapper,
                                                       std::vector<astra::Vector2i>& points)
     {
         PROFILE_FUNC();
@@ -1196,7 +1200,8 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
 
         for (auto p : points)
         {
-            bool isForeground = matSegmentation.at<uint8_t>(p.y, p.x) == PixelType::Foreground;
+            bool isForeground =
+                matSegmentation.at<uint8_t>(p.y, p.x) == pixel_type::foreground;
             if (isForeground)
             {
                 ++foregroundCount;
@@ -1248,7 +1253,7 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
                                   const cv::Point& center,
                                   const float bandwidth,
                                   const float bandwidthDepth,
-                                  const ScalingCoordinateMapper& mapper)
+                                  const scaling_coordinate_mapper& mapper)
     {
         PROFILE_FUNC();
         if (center.x < 0 || center.y < 0 ||
@@ -1281,7 +1286,8 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
             areaRow += x0;
             for (int x = x0; x <= x1; ++x, ++areaRow, ++segmentationRow)
             {
-                if (*segmentationRow == PixelType::Foreground)
+                pixel_type segmentation = static_cast<pixel_type>(*segmentationRow);
+                if (segmentation == pixel_type::foreground)
                 {
                     area += *areaRow;
                 }
@@ -1296,7 +1302,7 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
                                            cv::Mat& matAreaIntegral,
                                            const cv::Point& center,
                                            const float bandwidth,
-                                           const ScalingCoordinateMapper& mapper)
+                                           const scaling_coordinate_mapper& mapper)
     {
         //PROFILE_FUNC();
         int width = matDepth.cols;
@@ -1331,4 +1337,4 @@ namespace astra { namespace plugins { namespace hand { namespace segmentation {
         return area;
     }
 
-}}}}
+}}}

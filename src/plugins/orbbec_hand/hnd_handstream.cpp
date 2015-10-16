@@ -1,9 +1,9 @@
-#include "HandStream.h"
+#include "hnd_handstream.hpp"
 #include <AstraUL/streams/hand_parameters.h>
 
-namespace astra { namespace plugins { namespace hand {
+namespace astra { namespace hand {
 
-    void HandStream::on_set_parameter(astra_streamconnection_t connection,
+    void handstream::on_set_parameter(astra_streamconnection_t connection,
                                       astra_parameter_id id,
                                       size_t inByteLength,
                                       astra_parameter_data_t inData)
@@ -16,7 +16,7 @@ namespace astra { namespace plugins { namespace hand {
         }
     }
 
-    void HandStream::on_get_parameter(astra_streamconnection_t connection,
+    void handstream::on_get_parameter(astra_streamconnection_t connection,
                                       astra_parameter_id id,
                                       astra_parameter_bin_t& parameterBin)
     {
@@ -28,7 +28,7 @@ namespace astra { namespace plugins { namespace hand {
         }
     }
 
-    void HandStream::get_include_candidates(astra_parameter_bin_t& parameterBin)
+    void handstream::get_include_candidates(astra_parameter_bin_t& parameterBin)
     {
         size_t resultByteLength = sizeof(bool);
 
@@ -38,11 +38,11 @@ namespace astra { namespace plugins { namespace hand {
                                                               &parameterData);
         if (rc == ASTRA_STATUS_SUCCESS)
         {
-            memcpy(parameterData, &m_includeCandidatePoints, resultByteLength);
+            memcpy(parameterData, &includeCandidatePoints_, resultByteLength);
         }
     }
 
-    void HandStream::set_include_candidates(size_t inByteLength, astra_parameter_data_t& inData)
+    void handstream::set_include_candidates(size_t inByteLength, astra_parameter_data_t& inData)
     {
         if (inByteLength >= sizeof(bool))
         {
@@ -52,4 +52,4 @@ namespace astra { namespace plugins { namespace hand {
             set_include_candidate_points(newIncludeCandidatePoints);
         }
     }
-}}}
+}}

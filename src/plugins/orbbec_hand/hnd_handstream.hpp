@@ -1,5 +1,5 @@
-#ifndef HANDSTREAM_H
-#define HANDSTREAM_H
+#ifndef HND_HAND_STREAM_H
+#define HND_HAND_STREAM_H
 
 #include <Astra/Plugins/SingleBinStream.h>
 #include <AstraUL/streams/hand_types.h>
@@ -7,12 +7,12 @@
 #include <AstraUL/Plugins/stream_types.h>
 #include <Shiny.h>
 
-namespace astra { namespace plugins { namespace hand {
+namespace astra { namespace hand {
 
-    class HandStream : public SingleBinStream<astra_handframe_wrapper_t>
+    class handstream : public plugins::SingleBinStream<astra_handframe_wrapper_t>
     {
     public:
-        HandStream(PluginServiceProxy& pluginService,
+        handstream(PluginServiceProxy& pluginService,
                    astra_streamset_t streamSet,
                    size_t maxHandCount)
             : SingleBinStream(pluginService,
@@ -22,10 +22,10 @@ namespace astra { namespace plugins { namespace hand {
                               sizeof(astra_handpoint_t) * maxHandCount)
         { }
 
-        bool include_candidate_points() const { return m_includeCandidatePoints; }
+        bool include_candidate_points() const { return includeCandidatePoints_; }
         void set_include_candidate_points(bool includeCandidatePoints)
         {
-            m_includeCandidatePoints = includeCandidatePoints;
+            includeCandidatePoints_ = includeCandidatePoints;
         }
     protected:
         virtual void on_set_parameter(astra_streamconnection_t connection,
@@ -45,15 +45,15 @@ namespace astra { namespace plugins { namespace hand {
         {
             SingleBinStream::on_connection_removed(bin, connection);
 
-            #ifdef __ANDROID__
-                PROFILE_UPDATE();
-                PROFILE_OUTPUT("/sdcard/profile_orbbec_hand.txt");
-            #endif
+#ifdef __ANDROID__
+            PROFILE_UPDATE();
+            PROFILE_OUTPUT("/sdcard/profile_orbbec_hand.txt");
+#endif
         }
 
-        bool m_includeCandidatePoints{ false };
+        bool includeCandidatePoints_{false};
     };
 
-}}}
+}}
 
-#endif /* HANDSTREAM_H */
+#endif /* HND_HAND_STREAM_H */

@@ -1,31 +1,34 @@
 set (_projname "orbbec_hand")
 
-set(${_projname}_SOURCES
-  HandTracker.cpp
-  HandTracker.h
-  HandStream.h
-  HandStream.cpp
-  TrajectoryAnalyzer.h
-  TrajectoryAnalyzer.cpp
-  DebugHandStream.h
-  DebugHandStream.cpp
-  DebugVisualizer.h
-  DepthUtility.h
-  DepthUtility.cpp
-  Segmentation.h
-  Segmentation.cpp
-  TrackedPoint.h
-  PointProcessor.h
-  PointProcessor.cpp
-  TrackingData.h
-  ScalingCoordinateMapper.h
-  ScalingCoordinateMapper.cpp
-  HandPlugin.cpp
-  HandPlugin.h
-  HandSettings.h
-  SettingsParser.cpp
-  constants.h
+set(ORBBEC_HAND_INCLUDE
   ../../Astra/vendor/cpptoml.h
+  hnd_constants.hpp
+  hnd_debug_handstream.hpp
+  hnd_debug_visualizer.hpp
+  hnd_depth_utility.hpp
+  hnd_settings.hpp
+  hnd_hand_tracker.hpp
+  hnd_handstream.hpp
+  hnd_plugin.hpp
+  hnd_point_processor.hpp
+  hnd_scaling_coordinate_mapper.hpp
+  hnd_segmentation.hpp
+  hnd_tracked_point.hpp
+  hnd_tracking_data.hpp
+  hnd_trajectory_analyzer.hpp
+  )
+
+set(ORBBEC_HAND_SRC
+  hnd_debug_handstream.cpp
+  hnd_depth_utility.cpp
+  hnd_hand_tracker.cpp
+  hnd_handstream.cpp
+  hnd_plugin.cpp
+  hnd_point_processor.cpp
+  hnd_scaling_coordinate_mapper.cpp
+  hnd_segmentation.cpp
+  hnd_settings_parser.cpp
+  hnd_trajectory_analyzer.cpp
   orbbec_hand.toml
   )
 
@@ -43,7 +46,7 @@ endif()
 set_target_properties(${OpenCV_LIBS} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO RELEASE)
 set_target_properties(${OpenCV_LIBS} PROPERTIES MAP_IMPORTED_CONFIG_MINSIZEREL RELEASE)
 
-add_library(${_projname} SHARED ${${_projname}_SOURCES})
+add_library(${_projname} SHARED ${ORBBEC_HAND_SRC} ${ORBBEC_HAND_INCLUDE})
 
 set_target_properties(${_projname} PROPERTIES FOLDER "plugins")
 

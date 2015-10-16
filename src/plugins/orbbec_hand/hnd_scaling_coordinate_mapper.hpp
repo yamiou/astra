@@ -1,13 +1,13 @@
-#ifndef SCALINGCOORDINATEMAPPER_H
-#define SCALINGCOORDINATEMAPPER_H
+#ifndef HND_SCALING_COORDINATE_MAPPER_H
+#define HND_SCALING_COORDINATE_MAPPER_H
 
 #include <opencv2/core/core.hpp>
 #include <AstraUL/streams/Depth.h>
 #include <Shiny.h>
 
-namespace astra { namespace plugins { namespace hand {
+namespace astra { namespace hand {
 
-    class ScalingCoordinateMapper;
+    class scaling_coordinate_mapper;
 
     void convert_depth_to_world_f(const conversion_cache_t& depthToWorldData,
                                   float depthX, float depthY, float depthZ,
@@ -28,36 +28,36 @@ namespace astra { namespace plugins { namespace hand {
     cv::Point3f cv_convert_world_to_depth(const conversion_cache_t& depthToWorldData,
                                           const cv::Point3f& world);
 
-    class ScalingCoordinateMapper
+    class scaling_coordinate_mapper
     {
     public:
-        ScalingCoordinateMapper(const conversion_cache_t depthToWorldData,
-                                const float scale,
-                                const float offsetX = 0,
-                                const float offsetY = 0)
-            : m_depthToWorldData(depthToWorldData),
-              m_scale(scale),
-              m_offsetX(offsetX),
-              m_offsetY(offsetY)
+        scaling_coordinate_mapper(const conversion_cache_t depthToWorldData,
+                                  const float scale,
+                                  const float offsetX = 0,
+                                  const float offsetY = 0)
+            : depthToWorldData_(depthToWorldData),
+              scale_(scale),
+              offsetX_(offsetX),
+              offsetY_(offsetY)
         { }
 
         inline cv::Point3f convert_depth_to_world(int depthX, int depthY, float depthZ) const
         {
             PROFILE_FUNC();
-            depthX = static_cast<int>((depthX + m_offsetX) * m_scale);
-            depthY = static_cast<int>((depthY + m_offsetY) * m_scale);
+            depthX = static_cast<int>((depthX + offsetX_) * scale_);
+            depthY = static_cast<int>((depthY + offsetY_) * scale_);
 
-            return cv_convert_depth_to_world(m_depthToWorldData, depthX, depthY, depthZ);
+            return cv_convert_depth_to_world(depthToWorldData_, depthX, depthY, depthZ);
         }
 
         inline void convert_depth_to_world(int depthX, int depthY, float depthZ,
                                            float& worldX, float& worldY, float& worldZ) const
         {
             PROFILE_FUNC();
-            depthX = static_cast<int>((depthX + m_offsetX) * m_scale);
-            depthY = static_cast<int>((depthY + m_offsetY) * m_scale);
+            depthX = static_cast<int>((depthX + offsetX_) * scale_);
+            depthY = static_cast<int>((depthY + offsetY_) * scale_);
 
-            convert_depth_to_world_f(m_depthToWorldData,
+            convert_depth_to_world_f(depthToWorldData_,
                                      depthX, depthY, static_cast<int>(depthZ),
                                      worldX, worldY, worldZ);
         }
@@ -65,10 +65,10 @@ namespace astra { namespace plugins { namespace hand {
         inline cv::Point3f convert_depth_to_world(float depthX, float depthY, float depthZ) const
         {
             PROFILE_FUNC();
-            depthX = (depthX + m_offsetX) * m_scale;
-            depthY = (depthY + m_offsetY) * m_scale;
+            depthX = (depthX + offsetX_) * scale_;
+            depthY = (depthY + offsetY_) * scale_;
 
-            return cv_convert_depth_to_world(m_depthToWorldData, depthX, depthY, depthZ);
+            return cv_convert_depth_to_world(depthToWorldData_, depthX, depthY, depthZ);
         }
 
         inline cv::Point3f convert_depth_to_world(cv::Point3f depthPosition) const
@@ -80,10 +80,10 @@ namespace astra { namespace plugins { namespace hand {
         inline cv::Point3f convert_world_to_depth(cv::Point3f worldPosition) const
         {
             PROFILE_FUNC();
-            cv::Point3f depth = cv_convert_world_to_depth(m_depthToWorldData, worldPosition);
+            cv::Point3f depth = cv_convert_world_to_depth(depthToWorldData_, worldPosition);
 
-            depth.x = (depth.x / m_scale) - m_offsetX;
-            depth.y = (depth.y / m_scale) - m_offsetY;
+            depth.x = (depth.x / scale_) - offsetX_;
+            depth.y = (depth.y / scale_) - offsetY_;
 
             return depth;
         }
@@ -93,17 +93,16 @@ namespace astra { namespace plugins { namespace hand {
                                               float offsetY,
                                               float depthZ) const;
 
-        inline float scale() const { return m_scale; }
-        inline float offsetX() const { return m_offsetX; }
-        inline float offsetY() const { return m_offsetY; }
+        inline float scale() const { return scale_; }
+        inline float offsetX() const { return offsetX_; }
+        inline float offsetY() const { return offsetY_; }
 
     private:
-        const conversion_cache_t m_depthToWorldData;
-        const float m_scale;
-        const float m_offsetX;
-        const float m_offsetY;
+        const conversion_cache_t depthToWorldData_;
+        const float scale_;
+        const float offsetX_;
+        const float offsetY_;
     };
+}}
 
-}}}
-
-#endif // SCALINGCOORDINATEMAPPER_H
+#endif // HND_SCALING_COORDINATE_MAPPER_H

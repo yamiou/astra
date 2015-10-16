@@ -1,11 +1,11 @@
-#ifndef HANDSETTINGS_H
-#define HANDSETTINGS_H
+#ifndef HND_SETTINGS_H
+#define HND_SETTINGS_H
 
 #include <string>
 
-namespace astra { namespace plugins { namespace hand {
+namespace astra { namespace hand {
 
-    struct DepthUtilitySettings
+    struct depth_utility_settings
     {
         float depthSmoothingFactor{ 0.05f };
         float velocityThresholdFactor{ 0.005f };
@@ -16,7 +16,7 @@ namespace astra { namespace plugins { namespace hand {
         float maxDepth { 4000.0f };
     };
 
-    struct TrajectoryAnalyzerSettings
+    struct trajectory_analyzer_settings
     {
         float maxSteadyDelta{ 5.0f };
         int minSteadyFrames{ 15 };
@@ -28,7 +28,7 @@ namespace astra { namespace plugins { namespace hand {
         int maxFramesBetweenInflections{ 90 };
     };
 
-    struct AreaTestSettings
+    struct area_test_settings
     {
         float areaBandwidth{ 150.0f }; //mm
         float areaBandwidthDepth{ 100.0f }; //mm
@@ -36,13 +36,13 @@ namespace astra { namespace plugins { namespace hand {
         float maxArea{ 35000.0f }; //mm^2
     };
 
-    struct NaturalEdgeTestSettings
+    struct natural_edge_test_settings
     {
         float naturalEdgeBandwidth{ 150.0f }; //mm
         float minPercentNaturalEdges { 0.8f }; //mm^2
     };
 
-    struct CircumferenceTestSettings
+    struct circumference_test_settings
     {
         float foregroundRadius1{ 100.0f };
         float foregroundRadius2{ 150.0f };
@@ -52,11 +52,11 @@ namespace astra { namespace plugins { namespace hand {
         float foregroundRadiusMaxPercent2{ 0.15f };
     };
 
-    struct SegmentationSettings
+    struct segmentation_settings
     {
-        AreaTestSettings areaTestSettings;
-        CircumferenceTestSettings circumferenceTestSettings;
-        NaturalEdgeTestSettings naturalEdgeTestSettings;
+        area_test_settings areaTestSettings;
+        circumference_test_settings circumferenceTestSettings;
+        natural_edge_test_settings naturalEdgeTestSettings;
 
         float segmentationBandwidthDepthNear{ 500.0f };
         float segmentationBandwidthDepthFar{ 100.0f };
@@ -70,10 +70,10 @@ namespace astra { namespace plugins { namespace hand {
         float maxDepthToDownscaleTestPass { 1300.0f }; //mm
     };
 
-    struct PointProcessorSettings
+    struct point_processor_settings
     {
-        TrajectoryAnalyzerSettings trajectoryAnalyzerSettings;
-        SegmentationSettings segmentationSettings;
+        trajectory_analyzer_settings trajectoryAnalyzerSettings;
+        segmentation_settings segmentationSettings;
 
         float maxMatchDistLostActive{ 500.0f }; //mm
         float maxMatchDistDefault{ 500.0f }; //mm
@@ -92,16 +92,16 @@ namespace astra { namespace plugins { namespace hand {
         int maxHandPointUpdatesPerFrame { 10 };
     };
 
-    struct HandSettings
+    struct hand_settings
     {
         int processingSizeWidth{ 160 };
         int processingSizeHeight{ 120 };
 
-        DepthUtilitySettings depthUtilitySettings;
-        PointProcessorSettings pointProcessorSettings;
+        depth_utility_settings depthUtilitySettings;
+        point_processor_settings pointProcessorSettings;
     };
 
-    HandSettings parse_settings(std::string path);
-}}}
+    hand_settings parse_settings(std::string path);
+}}
 
-#endif // HANDSETTINGS_H
+#endif // HND_SETTINGS_H

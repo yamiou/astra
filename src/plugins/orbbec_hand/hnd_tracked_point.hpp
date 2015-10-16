@@ -1,12 +1,12 @@
-#ifndef TRACKEDPOINT_H
-#define TRACKEDPOINT_H
+#ifndef HND_TRACKED_POINT_H
+#define HND_TRACKED_POINT_H
 
 #include <opencv2/core/affine.hpp>
-#include "TrackingData.h"
+#include "hnd_tracking_data.hpp"
 
-namespace astra { namespace plugins { namespace hand {
+namespace astra { namespace hand {
 
-    struct TrackedPoint
+    struct tracked_point
     {
     public:
         cv::Point position;
@@ -21,11 +21,11 @@ namespace astra { namespace plugins { namespace hand {
         int failedTestCount;
         bool isInProbation;
         int probationFrameCount;
-        TrackedPointType pointType;
-        TrackingStatus trackingStatus;
+        tracked_point_type pointType;
+        tracking_status trackingStatus;
         float referenceAreaSqrt;
 
-        TrackedPoint(cv::Point position, cv::Point3f worldPosition, int trackingId) :
+        tracked_point(cv::Point position, cv::Point3f worldPosition, int trackingId) :
             position(position),
             worldPosition(worldPosition),
             worldDeltaPosition(),
@@ -38,11 +38,11 @@ namespace astra { namespace plugins { namespace hand {
             failedTestCount(0),
             isInProbation(true),
             probationFrameCount(0),
-            pointType(TrackedPointType::CandidatePoint),
-            trackingStatus(TrackingStatus::NotTracking),
+            pointType(tracked_point_type::candidate_point),
+            trackingStatus(tracking_status::not_tracking),
             referenceAreaSqrt(0)
         { }
     };
-}}}
+}}
 
-#endif // TRACKEDPOINT_H
+#endif // HND_TRACKED_POINT_H

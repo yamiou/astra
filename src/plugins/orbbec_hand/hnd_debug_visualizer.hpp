@@ -1,22 +1,19 @@
-#ifndef DEBUGVISUALIZER_H
-#define DEBUGVISUALIZER_H
+#ifndef HND_DEBUG_VISUALIZER_H
+#define HND_DEBUG_VISUALIZER_H
 
 #include <vector>
-#include "TrackedPoint.h"
+#include "hnd_tracked_point.hpp"
 #include <AstraUL/Plugins/stream_types.h>
 
-namespace astra { namespace plugins { namespace hand {
+namespace astra { namespace hand {
 
     using namespace std;
 
-    class DebugVisualizer
+    class debug_visualizer
     {
     public:
-        DebugVisualizer() {}
-        ~DebugVisualizer() {}
-
-        void overlayCrosshairs(const vector<TrackedPoint>& points,
-                               _astra_imageframe& imageFrame)
+        void overlay_crosshairs(const vector<tracked_point>& points,
+                                _astra_imageframe& imageFrame)
         {
             int width = imageFrame.metadata.width;
             int height = imageFrame.metadata.height;
@@ -28,11 +25,11 @@ namespace astra { namespace plugins { namespace hand {
 
             for (auto iter = points.begin(); iter != points.end(); ++iter)
             {
-                TrackedPoint tracked = *iter;
+                tracked_point tracked = *iter;
                 cv::Point position = tracked.position;
 
-                bool isActivePoint = tracked.pointType == TrackedPointType::ActivePoint;
-                bool isLostTrackingPoint = isActivePoint && tracked.trackingStatus == TrackingStatus::Lost;
+                bool isActivePoint = tracked.pointType == tracked_point_type::active_point;
+                bool isLostTrackingPoint = isActivePoint && tracked.trackingStatus == tracking_status::lost;
 
                 int y0 = MAX(0, position.y - 1);
                 int y1 = MIN(height - 1, position.y + 1);
@@ -85,10 +82,11 @@ namespace astra { namespace plugins { namespace hand {
                 }
             }
         }
-        void overlayMask(const cv::Mat& matMask,
-                         _astra_imageframe& imageFrame,
-                         const RGBPixel& maskColor,
-                         const PixelType targetValue)
+
+        void overlay_mask(const cv::Mat& matMask,
+                          _astra_imageframe& imageFrame,
+                          const RGBPixel& maskColor,
+                          const pixel_type targetValue)
         {
             assert(matMask.cols == imageFrame.metadata.width);
             assert(matMask.rows == imageFrame.metadata.height);
@@ -104,7 +102,7 @@ namespace astra { namespace plugins { namespace hand {
 
                 for (int x = 0; x < width; ++x, ++maskRow, ++colorData)
                 {
-                    uint8_t maskValue = *maskRow;
+                    pixel_type maskValue = static_cast<pixel_type>(*maskRow);
 
                     if (maskValue == targetValue)
                     {
@@ -114,8 +112,8 @@ namespace astra { namespace plugins { namespace hand {
             }
         }
 
-        void showDepthMat(const cv::Mat& matDepth,
-                          _astra_imageframe& imageFrame)
+        void show_depth_matrix(const cv::Mat& matDepth,
+                               _astra_imageframe& imageFrame)
         {
             assert(matDepth.cols == imageFrame.metadata.width);
             assert(matDepth.rows == imageFrame.metadata.height);
@@ -145,9 +143,9 @@ namespace astra { namespace plugins { namespace hand {
             }
         }
 
-        void showVelocityMat(const cv::Mat& matVelocity,
-                             float maxScale,
-                             _astra_imageframe& imageFrame)
+        void show_velocity_matrix(const cv::Mat& matVelocity,
+                                  float maxScale,
+                                  _astra_imageframe& imageFrame)
         {
             assert(matVelocity.cols == imageFrame.metadata.width);
             assert(matVelocity.rows == imageFrame.metadata.height);
@@ -184,7 +182,7 @@ namespace astra { namespace plugins { namespace hand {
         }
 
         template<typename T>
-        void showNormArray(const cv::Mat& mat,
+        void show_norm_array(const cv::Mat& mat,
                            const cv::Mat& mask,
                            _astra_imageframe& imageFrame)
         {
@@ -255,9 +253,7 @@ namespace astra { namespace plugins { namespace hand {
                 }
             }
         }
-    private:
-
     };
-}}}
+}}
 
-#endif // DEBUGVISUALIZER_H
+#endif // HND_DEBUGVISUALIZER_H

@@ -1,7 +1,7 @@
 #include "../../Astra/vendor/cpptoml.h"
-#include "HandSettings.h"
+#include "hnd_settings.hpp"
 
-namespace astra { namespace plugins { namespace hand {
+namespace astra { namespace hand {
 
     template<typename T>
     T get_from_table(cpptoml::table& t, std::string key, T defaultValue)
@@ -27,9 +27,9 @@ namespace astra { namespace plugins { namespace hand {
         return static_cast<int>(value);
     }
 
-    DepthUtilitySettings parse_depth_utility_settings(cpptoml::table t)
+    depth_utility_settings parse_depth_utility_settings(cpptoml::table t)
     {
-        DepthUtilitySettings settings;
+        depth_utility_settings settings;
 
         settings.depthSmoothingFactor = get_float_from_table(t, "depthutility.depthSmoothingFactor", settings.depthSmoothingFactor);
         settings.velocityThresholdFactor = get_float_from_table(t, "depthutility.velocityThresholdFactor", settings.velocityThresholdFactor);
@@ -42,9 +42,9 @@ namespace astra { namespace plugins { namespace hand {
         return settings;
     }
 
-    PointProcessorSettings parse_point_processor_settings(cpptoml::table t)
+    point_processor_settings parse_point_processor_settings(cpptoml::table t)
     {
-        PointProcessorSettings settings;
+        point_processor_settings settings;
 
         settings.maxMatchDistLostActive = get_float_from_table(t, "pointprocessor.maxMatchDistLostActive", settings.maxMatchDistLostActive);
         settings.maxMatchDistDefault = get_float_from_table(t, "pointprocessor.maxMatchDistDefault", settings.maxMatchDistDefault);
@@ -65,9 +65,9 @@ namespace astra { namespace plugins { namespace hand {
         return settings;
     }
 
-    TrajectoryAnalyzerSettings parse_trajectory_analyzer_settings(cpptoml::table t)
+    trajectory_analyzer_settings parse_trajectory_analyzer_settings(cpptoml::table t)
     {
-        TrajectoryAnalyzerSettings settings;
+        trajectory_analyzer_settings settings;
 
         settings.maxSteadyDelta = get_float_from_table(t, "trajectoryanalyzer.maxSteadyDelta", settings.maxSteadyDelta);
         settings.minSteadyFrames = get_int_from_table(t, "trajectoryanalyzer.minSteadyFrames", settings.minSteadyFrames);
@@ -81,9 +81,9 @@ namespace astra { namespace plugins { namespace hand {
         return settings;
     }
 
-    AreaTestSettings parse_area_test_settings(cpptoml::table t)
+    area_test_settings parse_area_test_settings(cpptoml::table t)
     {
-        AreaTestSettings settings;
+        area_test_settings settings;
 
         settings.areaBandwidth = get_float_from_table(t, "areatest.areaBandwidth", settings.areaBandwidth);
         settings.areaBandwidthDepth = get_float_from_table(t, "areatest.areaBandwidthDepth", settings.areaBandwidthDepth);
@@ -93,9 +93,9 @@ namespace astra { namespace plugins { namespace hand {
         return settings;
     }
 
-    CircumferenceTestSettings parse_circumference_test_settings(cpptoml::table t)
+    circumference_test_settings parse_circumference_test_settings(cpptoml::table t)
     {
-        CircumferenceTestSettings settings;
+        circumference_test_settings settings;
 
         settings.foregroundRadius1 = get_float_from_table(t, "circumferencetest.foregroundRadius1", settings.foregroundRadius1);
         settings.foregroundRadius2 = get_float_from_table(t, "circumferencetest.foregroundRadius2", settings.foregroundRadius2);
@@ -107,9 +107,9 @@ namespace astra { namespace plugins { namespace hand {
         return settings;
     }
 
-    NaturalEdgeTestSettings parse_natural_edge_test_settings(cpptoml::table t)
+    natural_edge_test_settings parse_natural_edge_test_settings(cpptoml::table t)
     {
-        NaturalEdgeTestSettings settings;
+        natural_edge_test_settings settings;
 
         settings.naturalEdgeBandwidth = get_float_from_table(t, "naturaledgetest.naturalEdgeBandwidth", settings.naturalEdgeBandwidth);
         settings.minPercentNaturalEdges = get_float_from_table(t, "naturaledgetest.minPercentNaturalEdges", settings.minPercentNaturalEdges);
@@ -117,9 +117,9 @@ namespace astra { namespace plugins { namespace hand {
         return settings;
     }
 
-    SegmentationSettings parse_segmentation_settings(cpptoml::table t)
+    segmentation_settings parse_segmentation_settings(cpptoml::table t)
     {
-        SegmentationSettings settings;
+        segmentation_settings settings;
 
         settings.segmentationBandwidthDepthNear = get_float_from_table(t, "segmentation.segmentationBandwidthDepthNear", settings.segmentationBandwidthDepthNear);
         settings.segmentationBandwidthDepthFar = get_float_from_table(t, "segmentation.segmentationBandwidthDepthFar", settings.segmentationBandwidthDepthFar);
@@ -139,9 +139,9 @@ namespace astra { namespace plugins { namespace hand {
         return settings;
     }
 
-    HandSettings parse_settings(std::string path)
+    hand_settings parse_settings(std::string path)
     {
-        HandSettings settings;
+        hand_settings settings;
 
         cpptoml::table t;
 
@@ -164,4 +164,4 @@ namespace astra { namespace plugins { namespace hand {
 
         return settings;
     }
-}}}
+}}

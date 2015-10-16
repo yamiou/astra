@@ -1,72 +1,73 @@
-#ifndef TRACKINGDATA_H
-#define TRACKINGDATA_H
+#ifndef HND_TRACKING_DATA_H
+#define HND_TRACKING_DATA_H
 
 #include <opencv2/core/core.hpp>
-#include "ScalingCoordinateMapper.h"
-#include "HandSettings.h"
+#include "hnd_scaling_coordinate_mapper.hpp"
+#include "hnd_settings.hpp"
+#include <cstdint>
 
-namespace astra { namespace plugins { namespace hand {
+namespace astra { namespace hand {
 
-    enum PixelType
+    enum pixel_type
     {
-        Background = 0,
-        Foreground = 1,
-        Searched = 2,
-        SearchedFromOutOfRange = 3,
-        ForegroundNaturalEdge = 4,
-        ForegroundOutOfRangeEdge = 5
+        background = 0,
+        foreground = 1,
+        searched = 2,
+        searched_from_out_of_range = 3,
+        foreground_natural_edge = 4,
+        foreground_out_of_range_edge = 5
     };
 
-    enum TrackedPointType
+    enum class tracked_point_type
     {
-        CandidatePoint,
-        ActivePoint
+        candidate_point,
+        active_point
     };
 
-    enum TrackingStatus
+    enum class tracking_status
     {
-        NotTracking,
-        Tracking,
-        Lost,
-        Dead
+        not_tracking,
+        tracking,
+        lost,
+        dead
     };
 
-    enum TestBehavior
+    enum test_behavior
     {
         TEST_BEHAVIOR_NONE = 0,
         TEST_BEHAVIOR_LOG = 1
     };
 
-    enum TestPhase
+    enum test_phase
     {
         TEST_PHASE_CREATE = 0,
         TEST_PHASE_UPDATE = 1
     };
 
-    inline std::string tracking_status_to_string(TrackingStatus status)
+    inline std::string tracking_status_to_string(tracking_status status)
     {
         switch (status)
         {
-        case TrackingStatus::NotTracking:
-            return "NotTracking";
-        case TrackingStatus::Tracking:
+        case tracking_status::not_tracking:
+            return "Not Tracking";
+        case tracking_status::tracking:
             return "Tracking";
-        case TrackingStatus::Lost:
+        case tracking_status::lost:
             return "Lost";
-        case TrackingStatus::Dead:
+        case tracking_status::dead:
             return "Dead";
         default:
             return "Unknown";
         }
     }
 
-    enum SegmentationVelocityPolicy
+    enum segmentation_velocity_policy
     {
         VELOCITY_POLICY_IGNORE = 0,
         VELOCITY_POLICY_RESET_TTL = 1
     };
 
-    struct TrackingMatrices
+    struct tracking_matrices
     {
         cv::Mat& depthFullSize;
         cv::Mat& depth;
@@ -92,28 +93,28 @@ namespace astra { namespace plugins { namespace hand {
         const conversion_cache_t depthToWorldData;
         std::vector<astra::Vector2i> layerCirclePoints;
 
-        TrackingMatrices(cv::Mat& depthFullSize,
-                         cv::Mat& depth,
-                         cv::Mat& area,
-                         cv::Mat& areaSqrt,
-                         cv::Mat& velocitySignal,
-                         cv::Mat& foregroundSearched,
-                         cv::Mat& layerSegmentation,
-                         cv::Mat& layerScore,
-                         cv::Mat& layerEdgeDistance,
-                         cv::Mat& layerIntegralArea,
-                         cv::Mat& layerTestPassMap,
-                         cv::Mat& debugSegmentation,
-                         cv::Mat& debugScore,
-                         cv::Mat& debugScoreValue,
-                         cv::Mat& debugTestPassMap,
-                         bool enableTestPassMap,
-                         const astra::Vector3f* fullSizeWorldPoints,
-                         astra::Vector3f* worldPoints,
-                         bool debugLayersEnabled,
-                         const astra::CoordinateMapper& fullSizeMapper,
-                         const conversion_cache_t depthToWorldData)
-            :
+        tracking_matrices(cv::Mat& depthFullSize,
+                          cv::Mat& depth,
+                          cv::Mat& area,
+                          cv::Mat& areaSqrt,
+                          cv::Mat& velocitySignal,
+                          cv::Mat& foregroundSearched,
+                          cv::Mat& layerSegmentation,
+                          cv::Mat& layerScore,
+                          cv::Mat& layerEdgeDistance,
+                          cv::Mat& layerIntegralArea,
+                          cv::Mat& layerTestPassMap,
+                          cv::Mat& debugSegmentation,
+                          cv::Mat& debugScore,
+                          cv::Mat& debugScoreValue,
+                          cv::Mat& debugTestPassMap,
+                          bool enableTestPassMap,
+                          const astra::Vector3f* fullSizeWorldPoints,
+                          astra::Vector3f* worldPoints,
+                          bool debugLayersEnabled,
+                          const astra::CoordinateMapper& fullSizeMapper,
+                          const conversion_cache_t depthToWorldData)
+        :
             depthFullSize(depthFullSize),
             depth(depth),
             area(area),
@@ -136,40 +137,40 @@ namespace astra { namespace plugins { namespace hand {
             layerCount(0),
             fullSizeMapper(fullSizeMapper),
             depthToWorldData(depthToWorldData)
-            { }
+        { }
     };
 
-    inline float get_resize_factor(TrackingMatrices& matrices)
+    inline float get_resize_factor(tracking_matrices& matrices)
     {
         float resizeFactor = matrices.depthFullSize.cols / static_cast<float>(matrices.depth.cols);
 
         return resizeFactor;
     }
 
-    inline ScalingCoordinateMapper get_scaling_mapper(TrackingMatrices& matrices)
+    inline scaling_coordinate_mapper get_scaling_mapper(tracking_matrices& matrices)
     {
         const float resizeFactor = get_resize_factor(matrices);
 
-        return ScalingCoordinateMapper(matrices.depthToWorldData, resizeFactor);
+        return scaling_coordinate_mapper(matrices.depthToWorldData, resizeFactor);
     }
 
-    struct TrackingData
+    struct tracking_data
     {
-        TrackingMatrices& matrices;
+        tracking_matrices& matrices;
         const cv::Point& seedPosition;
         const cv::Point3f referenceWorldPosition;
         const float referenceAreaSqrt;
-        const SegmentationVelocityPolicy velocityPolicy;
-        const SegmentationSettings settings;
-        const TestPhase phase;
+        const segmentation_velocity_policy velocityPolicy;
+        const segmentation_settings settings;
+        const test_phase phase;
 
-        TrackingData(TrackingMatrices& matrices,
-                     const cv::Point& seedPosition,
-                     const cv::Point3f referenceWorldPosition,
-                     const float referenceAreaSqrt,
-                     const SegmentationVelocityPolicy velocityPolicy,
-                     const SegmentationSettings settings,
-                     const TestPhase phase)
+        tracking_data(tracking_matrices& matrices,
+                      const cv::Point& seedPosition,
+                      const cv::Point3f referenceWorldPosition,
+                      const float referenceAreaSqrt,
+                      const segmentation_velocity_policy velocityPolicy,
+                      const segmentation_settings settings,
+                      const test_phase phase)
             : matrices(matrices),
               seedPosition(seedPosition),
               referenceWorldPosition(referenceWorldPosition),
@@ -179,6 +180,6 @@ namespace astra { namespace plugins { namespace hand {
               phase(phase)
         {}
     };
-}}}
+}}
 
-#endif // SEGMENTATIONTRACKER_H
+#endif // HND_TRACKING_DATA_H

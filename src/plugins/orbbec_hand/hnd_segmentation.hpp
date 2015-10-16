@@ -1,61 +1,61 @@
-#ifndef SEGMENTATION_H
-#define SEGMENTATION_H
+#ifndef HND_SEGMENTATION_H
+#define HND_SEGMENTATION_H
 
 #include <opencv2/imgproc/imgproc.hpp>
-#include "ScalingCoordinateMapper.h"
+#include "hnd_scaling_coordinate_mapper.hpp"
 
-namespace astra { namespace plugins { namespace hand {
+namespace astra { namespace hand {
 
-    struct TrackingData;
+    struct tracking_data;
 
-    enum ForegroundStatus
+    enum class foreground_status
     {
-        FOREGROUND_EMPTY = 0,
-        FOREGROUND_HAS_POINTS = 1
+        empty = 0,
+        has_points = 1
     };
 
     namespace segmentation {
 
         static cv::Point INVALID_POINT(-1, -1);
 
-        float get_point_area(TrackingMatrices& matrices,
-                             AreaTestSettings& settings,
+        float get_point_area(tracking_matrices& matrices,
+                             area_test_settings& settings,
                              const cv::Point& point);
 
-        float get_point_area_integral(TrackingMatrices& matrices,
+        float get_point_area_integral(tracking_matrices& matrices,
                                       cv::Mat& integralArea,
-                                      AreaTestSettings& settings,
+                                      area_test_settings& settings,
                                       const cv::Point& point);
 
-        bool test_point_in_range(TrackingMatrices& matrices,
+        bool test_point_in_range(tracking_matrices& matrices,
                                  const cv::Point& targetPoint,
-                                 TestBehavior outputLog);
+                                 test_behavior outputLog);
 
-        bool test_point_area(TrackingMatrices& matrices,
-                             AreaTestSettings& settings,
+        bool test_point_area(tracking_matrices& matrices,
+                             area_test_settings& settings,
                              const cv::Point& targetPoint,
-                             TestPhase phase,
-                             TestBehavior outputLog);
+                             test_phase phase,
+                             test_behavior outputLog);
 
-        bool test_point_area_integral(TrackingMatrices& matrices,
+        bool test_point_area_integral(tracking_matrices& matrices,
                                       cv::Mat& integralArea,
-                                      AreaTestSettings& settings,
+                                      area_test_settings& settings,
                                       const cv::Point& targetPoint,
-                                      TestPhase phase,
-                                      TestBehavior outputLog);
+                                      test_phase phase,
+                                      test_behavior outputLog);
 
-        bool test_foreground_radius_percentage(TrackingMatrices& matrices,
-                                               CircumferenceTestSettings& settings,
+        bool test_foreground_radius_percentage(tracking_matrices& matrices,
+                                               circumference_test_settings& settings,
                                                const cv::Point& targetPoint,
-                                               TestPhase phase,
-                                               TestBehavior outputLog);
+                                               test_phase phase,
+                                               test_behavior outputLog);
 
-        ForegroundStatus create_test_pass_from_foreground(TrackingData& data);
+        foreground_status create_test_pass_from_foreground(tracking_data& data);
 
         bool find_next_velocity_seed_pixel(cv::Mat& foregroundMatrix,
-                                        cv::Mat& searchedMatrix,
-                                        cv::Point& foregroundPosition,
-                                        cv::Point& nextSearchStart);
+                                           cv::Mat& searchedMatrix,
+                                           cv::Point& foregroundPosition,
+                                           cv::Point& nextSearchStart);
 
         void calculate_edge_distance(cv::Mat& segmentationMatrix,
                                      cv::Mat& areaSqrtMatrix,
@@ -68,45 +68,45 @@ namespace astra { namespace plugins { namespace hand {
                                       const cv::Point& center,
                                       const float bandwidth,
                                       const float bandwidthDepth,
-                                      const ScalingCoordinateMapper& mapper);
+                                      const scaling_coordinate_mapper& mapper);
 
-        cv::Mat& calculate_integral_area(TrackingMatrices& matrices);
+        cv::Mat& calculate_integral_area(tracking_matrices& matrices);
 
         float count_neighborhood_area_integral(cv::Mat& matDepth,
                                                cv::Mat& matAreaIntegral,
                                                const cv::Point& center,
                                                const float bandwidth,
-                                               const ScalingCoordinateMapper& mapper);
+                                               const scaling_coordinate_mapper& mapper);
 
-        cv::Point track_point_impl(TrackingData& data);
+        cv::Point track_point_impl(tracking_data& data);
 
-        cv::Point track_point_from_seed(TrackingData& data);
+        cv::Point track_point_from_seed(tracking_data& data);
 
         void get_circumference_points(cv::Mat& matDepth,
                                       const cv::Point& center,
                                       const float& radius,
-                                      const ScalingCoordinateMapper& mapper,
+                                      const scaling_coordinate_mapper& mapper,
                                       std::vector<astra::Vector2i>& points);
 
         float get_max_sequential_circumference_percentage(cv::Mat& matDepth,
                                                           cv::Mat& matSegmentation,
                                                           const cv::Point& center,
                                                           const float& radius,
-                                                          const ScalingCoordinateMapper& mapper,
+                                                          const scaling_coordinate_mapper& mapper,
                                                           std::vector<astra::Vector2i>& points);
 
         float get_percent_natural_edges(cv::Mat& matDepth,
                                         cv::Mat& matSegmentation,
                                         const cv::Point& center,
                                         const float bandwidth,
-                                        const ScalingCoordinateMapper& mapper);
+                                        const scaling_coordinate_mapper& mapper);
 
-        bool test_natural_edges(TrackingMatrices& matrices,
-                                NaturalEdgeTestSettings& settings,
+        bool test_natural_edges(tracking_matrices& matrices,
+                                natural_edge_test_settings& settings,
                                 const cv::Point& targetPoint,
-                                TestPhase phase,
-                                TestBehavior outputLog);
+                                test_phase phase,
+                                test_behavior outputLog);
     }
-}}}
+}}
 
-#endif // SEGMENTATION_H
+#endif // HND_SEGMENTATION_H
