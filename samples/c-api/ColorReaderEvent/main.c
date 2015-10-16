@@ -1,7 +1,7 @@
 ﻿// Orbbec (c) 2015
 
 #include <Astra/astra_capi.h>
-#include <AstraUL/skul_capi.h>
+#include <AstraUL/astraul_capi.h>
 #include <stdio.h>
 #include <key_handler.h>
 
@@ -23,7 +23,7 @@ void print_color(astra_colorframe_t colorFrame)
     astra_frame_index_t frameIndex;
     astra_colorframe_get_frameindex(colorFrame, &frameIndex);
 
-    astra_rgb_pixel_t middle = colorData_rgb[index];	
+    astra_rgb_pixel_t middle = colorData_rgb[index];
     printf("color frameIndex: %d  r: %d    g: %d    b: %d \n", frameIndex, (int)(middle.r), (int)(middle.g), (int)(middle.b));
 }
 

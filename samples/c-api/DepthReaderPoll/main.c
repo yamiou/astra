@@ -1,7 +1,7 @@
 ﻿// Orbbec (c) 2015
 
 #include <Astra/astra_capi.h>
-#include <AstraUL/skul_capi.h>
+#include <AstraUL/astraul_capi.h>
 #include <stdio.h>
 #include <key_handler.h>
 
