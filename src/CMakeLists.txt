@@ -52,8 +52,8 @@ if (ASTRA_XS AND ASTRA_HAND)
 endif()
 
 if (ASTRA_XS)
-  add_dependencies(${SDK_DEPENDENT_TARGET} orbbec_xs)
-  add_dependencies(orbbec_xs ${_projname})
+  add_dependencies(${SDK_DEPENDENT_TARGET} orbbec-xs-plugin)
+  add_dependencies(orbbec-xs-plugin ${_projname})
 endif()
 
 if (NOT ASTRA_ANDROID)

@@ -1,19 +1,18 @@
-set (_projname "orbbec_xs")
+set(XS_SRC
+  xs_plugin.cpp
+  xs_point_processor.cpp
+  )
 
-set(${_projname}_SOURCES
-  XSPlugin.h
-  XSPlugin.cpp
-  PointProcessor.h
-  PointProcessor.cpp
-  PointStream.h
- )
+set(XS_INCLUDE
+  xs_plugin.hpp
+  xs_point_processor.hpp
+  xs_pointstream.hpp
+  )
 
-add_library(${_projname} SHARED ${${_projname}_SOURCES})
+include_directories(orbbec-xs-plugin ${SHINY_INCLUDE})
+add_library(orbbec-xs-plugin SHARED ${XS_SRC} ${XS_INCLUDE})
+target_link_libraries(orbbec-xs-plugin AstraAPI AstraUL Shiny)
 
-set_target_properties(${_projname} PROPERTIES FOLDER "plugins")
-
-target_link_libraries(${_projname} AstraAPI AstraUL Shiny)
-
-include_directories(${_projname} ${SHINY_INCLUDE})
-
-install_lib(${_projname} "Plugins")
+set_target_properties(orbbec-xs-plugin PROPERTIES FOLDER "plugins")
+set_target_properties(orbbec-xs-plugin PROPERTIES OUTPUT_NAME "orbbec_xs")
+install_lib(orbbec-xs-plugin "Plugins")

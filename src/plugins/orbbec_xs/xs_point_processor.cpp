@@ -1,65 +1,63 @@
-#include "PointProcessor.h"
+#include "xs_point_processor.hpp"
 #include <Shiny.h>
 
-namespace astra { namespace plugins { namespace xs {
+namespace astra { namespace xs {
 
-    PointProcessor::PointProcessor(PluginServiceProxy& pluginService,
-                                   astra_streamset_t streamset,
-                                   StreamDescription& depthDesc)
-        : m_streamset(get_uri_for_streamset(pluginService, streamset)),
-          m_streamSet(streamset),
-          m_reader(m_streamset.create_reader()),
-          m_depthStream(m_reader.stream<DepthStream>(depthDesc.subtype())),
-          m_pluginService(pluginService)
+    point_processor::point_processor(PluginServiceProxy& pluginService,
+                                     astra_streamset_t streamset,
+                                     StreamDescription& depthDesc)
+        : streamset_(get_uri_for_streamset(pluginService, streamset)),
+          setHandle_(streamset),
+          reader_(streamset_.create_reader()),
+          depthStream_(reader_.stream<DepthStream>(depthDesc.subtype())),
+          pluginService_(pluginService)
     {
-        m_depthStream.start();
-        m_reader.addListener(*this);
+        depthStream_.start();
+        reader_.addListener(*this);
     }
 
-    PointProcessor::~PointProcessor()
-    {
-    }
+    point_processor::~point_processor() = default;
 
-    void PointProcessor::on_frame_ready(StreamReader& reader, Frame& frame)
+    void point_processor::on_frame_ready(StreamReader& reader, Frame& frame)
     {
         DepthFrame depthFrame = frame.get<DepthFrame>();
 
         create_point_stream_if_necessary(depthFrame);
 
-        if (m_pointStream->has_connections())
+        if (pointStream_->has_connections())
         {
-            LOG_TRACE("PointProcessor", "updating point frame");
+            LOG_TRACE("astra.xs.point_processor", "updating point frame");
             update_pointframe_from_depth(depthFrame);
         }
     }
 
-    void PointProcessor::create_point_stream_if_necessary(DepthFrame& depthFrame)
+    void point_processor::create_point_stream_if_necessary(DepthFrame& depthFrame)
     {
-        if (m_pointStream != nullptr)
+        if (pointStream_ != nullptr)
         {
             return;
         }
 
         //TODO check for changes in depthFrame width and height and update bin size
-        LOG_INFO("PointProcessor", "creating point stream");
+        LOG_INFO("astra.xs.point_processor", "creating point stream");
 
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
 
-        auto ps = make_stream<PointStream>(m_pluginService, m_streamSet, width, height);
-        m_pointStream = std::unique_ptr<PointStream>(std::move(ps));
+        auto ps = plugins::make_stream<pointstream>(pluginService_, setHandle_, width, height);
+        pointStream_ = std::unique_ptr<pointstream>(std::move(ps));
 
-        LOG_INFO("PointProcessor", "created point stream");
+        LOG_INFO("astra.xs.point_processor", "created point stream");
 
-        m_depthConversionCache = m_depthStream.depth_to_world_data();
+        depthConversionCache_ = depthStream_.depth_to_world_data();
     }
 
-    void PointProcessor::update_pointframe_from_depth(DepthFrame& depthFrame)
+    void point_processor::update_pointframe_from_depth(DepthFrame& depthFrame)
     {
         //use same frameIndex as source depth frame
         astra_frame_index_t frameIndex = depthFrame.frameIndex();
 
-        astra_imageframe_wrapper_t* pointFrameWrapper = m_pointStream->begin_write(frameIndex);
+        astra_imageframe_wrapper_t* pointFrameWrapper = pointStream_->begin_write(frameIndex);
 
         if (pointFrameWrapper != nullptr)
         {
@@ -77,18 +75,18 @@ namespace astra { namespace plugins { namespace xs {
             Vector3f* p_points = reinterpret_cast<Vector3f*>(pointFrameWrapper->frame.data);
             calculate_point_frame(depthFrame, p_points);
 
-            m_pointStream->end_write();
+            pointStream_->end_write();
         }
     }
 
-    void PointProcessor::calculate_point_frame(DepthFrame& depthFrame,
-                                               Vector3f* p_points)
+    void point_processor::calculate_point_frame(DepthFrame& depthFrame,
+                                                Vector3f* p_points)
     {
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
         const int16_t* p_depth = depthFrame.data();
 
-        const conversion_cache_t conversionData = m_depthConversionCache;
+        const conversion_cache_t conversionData = depthConversionCache_;
 
         for (int y = 0; y < height; ++y)
         {
@@ -106,5 +104,4 @@ namespace astra { namespace plugins { namespace xs {
             }
         }
     }
-
-}}}
+}}
