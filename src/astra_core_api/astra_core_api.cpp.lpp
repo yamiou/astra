@@ -1,0 +1,31 @@
+/* ^^^AUTOGENHEADER^^^ */
+#include "astra_core_api.h"
+#include <astra_core/Plugins/StreamServiceProxy.h>
+
+ASTRA_BEGIN_DECLS
+
+ASTRA_LOCAL astra_streamservice_proxy_t* __astra_api_proxy_ptr = nullptr;
+
+static astra::StreamServiceProxy* get_api_proxy()
+{
+    return reinterpret_cast<astra::StreamServiceProxy*>(__astra_api_proxy_ptr);
+}
+
+ASTRA_API_PROXY astra_streamservice_proxy_t* astra_api_get_proxy()
+{
+    return __astra_api_proxy_ptr;
+}
+
+ASTRA_API_PROXY void astra_api_set_proxy(astra_streamservice_proxy_t* proxy)
+{
+    __astra_api_proxy_ptr = proxy;
+}
+
+^^^BEGINREPLACE:stream^^^
+ASTRA_API ^RETURN^ astra_^FUNC^(^PARAMS^)
+{
+    return get_api_proxy()->^FUNC^(^PARAMS:names^);
+}
+
+^^^ENDREPLACE^^^
+ASTRA_END_DECLS

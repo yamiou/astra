@@ -1,0 +1,45 @@
+#include "astra_context.hpp"
+#include "astra_context_impl.hpp"
+#include "astra_create_stream_proxy.hpp"
+#include "astra_cxx_compatibility.hpp"
+#include <astra_core/capi/astra_streamservice_proxy.h>
+#include <AstraAPI.h>
+
+namespace astra {
+
+    context::context()
+          : impl_(std::make_unique<context_impl>()),
+            proxy_(create_stream_proxy(this))
+            {}
+
+    context::~context() {}
+
+    astra_status_t context::initialize()
+    {
+        astra_api_set_proxy(proxy());
+        return impl_->initialize();
+    }
+
+    astra_status_t context::terminate()
+    {
+        return impl_->terminate();
+    }
+
+    astra_streamservice_proxy_t* context::proxy()
+    {
+        return proxy_.get();
+    }
+
+^^^BEGINREPLACE:stream^^^
+    ^RETURN^ context::^FUNC^(^PARAMS:ref^)
+    {
+        return impl_->^FUNC^(^PARAMS:names^);
+    }
+
+^^^ENDREPLACE^^^
+
+    astra_status_t context::notify_host_event(astra_event_id id, const void* data, size_t dataSize)
+    {
+        return impl_->notify_host_event(id, data, dataSize);
+    }
+}

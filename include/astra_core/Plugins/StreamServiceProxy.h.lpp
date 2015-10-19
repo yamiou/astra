@@ -1,0 +1,22 @@
+/* ^^^AUTOGENHEADER^^^ */
+#ifndef STREAMSERVICEPROXY_H
+#define STREAMSERVICEPROXY_H
+
+#include <astra_core/capi/astra_streamservice_proxy.h>
+
+namespace astra {
+
+    class StreamServiceProxy : public astra_streamservice_proxy_t
+    {
+    public:
+^^^BEGINREPLACE:stream^^^
+
+        ^RETURN^ ^FUNC^(^PARAMS^)
+        {
+            return astra_streamservice_proxy_t::^FUNC^(^PARAMS:void,names^);
+        }
+^^^ENDREPLACE^^^
+    };
+}
+
+#endif /* STREAMSERVICEPROXY_H */

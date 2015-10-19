@@ -1,7 +1,7 @@
 #ifndef STREAMPLAYERPLUGIN_H
 #define STREAMPLAYERPLUGIN_H
 
-#include <Astra/Plugins/PluginKit.h>
+#include <astra_core/Plugins/PluginKit.h>
 #include "PlaybackStreamSet.h"
 
 namespace astra { namespace plugins { namespace streamplayer {

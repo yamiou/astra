@@ -1,10 +1,10 @@
 #ifndef HND_DEBUG_HANDSTREAM_H
 #define HND_DEBUG_HANDSTREAM_H
 
-#include <Astra/Plugins/SingleBinStream.h>
-#include <AstraUL/astraul_ctypes.h>
-#include <AstraUL/Plugins/stream_types.h>
-#include <AstraUL/Vector.h>
+#include <astra_core/Plugins/SingleBinStream.h>
+#include <astra/capi/astra_ctypes.h>
+#include <astra/capi/streams/stream_types.h>
+#include <astra/vector.hpp>
 
 namespace astra { namespace hand {
 
@@ -21,8 +21,8 @@ namespace astra { namespace hand {
                          uint32_t bytesPerPixel)
             : SingleBinStream(pluginService,
                               streamSet,
-                              StreamDescription(ASTRA_STREAM_DEBUG_HAND,
-                                                DEFAULT_SUBTYPE),
+                              stream_description(ASTRA_STREAM_DEBUG_HAND,
+                                                 DEFAULT_SUBTYPE),
                               width * height * bytesPerPixel)
         { }
 
@@ -30,10 +30,10 @@ namespace astra { namespace hand {
         void set_view_type(debug_handview_type view) { viewType_ = view; }
 
         bool use_mouse_probe() const { return useMouseProbe_; }
-        const Vector2f& mouse_norm_position() const { return mouseNormPosition_; }
+        const vector2f& mouse_norm_position() const { return mouseNormPosition_; }
         bool pause_input() const { return pauseInput_; }
         bool spawn_point_locked() const { return lockSpawnPoint_; }
-        const Vector2f& spawn_norm_position() const { return spawnNormPosition_; }
+        const vector2f& spawn_norm_position() const { return spawnNormPosition_; }
 
     protected:
         virtual void on_set_parameter(astra_streamconnection_t connection,
@@ -61,8 +61,8 @@ namespace astra { namespace hand {
 
         debug_handview_type viewType_{ DEBUG_HAND_VIEW_DEPTH };
         bool useMouseProbe_{false};
-        Vector2f mouseNormPosition_;
-        Vector2f spawnNormPosition_;
+        vector2f mouseNormPosition_;
+        vector2f spawnNormPosition_;
         bool pauseInput_{false};
         bool lockSpawnPoint_{false};
     };

@@ -1,4 +1,4 @@
-#include "../../Astra/vendor/cpptoml.h"
+#include "../../astra_core/vendor/cpptoml.h"
 #include "hnd_settings.hpp"
 
 namespace astra { namespace hand {
@@ -60,7 +60,7 @@ namespace astra { namespace hand {
         settings.maxFailedTestsInProbationActivePoints = get_int_from_table(t, "pointprocessor.maxFailedTestsInProbationActivePoints", settings.maxFailedTestsInProbationActivePoints);
         settings.secondChanceMinDistance = get_float_from_table(t, "pointprocessor.secondChanceMinDistance", settings.secondChanceMinDistance);
         settings.mergePointDistance = get_float_from_table(t, "pointprocessor.mergePointDistance", settings.mergePointDistance);
-        settings.maxHandPointUpdatesPerFrame = get_int_from_table(t, "pointprocessor.maxHandPointUpdatesPerFrame", settings.maxHandPointUpdatesPerFrame);
+        settings.maxhandpointUpdatesPerFrame = get_int_from_table(t, "pointprocessor.maxhandpointUpdatesPerFrame", settings.maxhandpointUpdatesPerFrame);
 
         return settings;
     }

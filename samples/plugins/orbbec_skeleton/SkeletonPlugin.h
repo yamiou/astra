@@ -1,8 +1,8 @@
 #ifndef SKELETONPLUGIN_H
 #define SKELETONPLUGIN_H
 
-#include <Astra/Plugins/PluginKit.h>
-#include <AstraUL/AstraUL.h>
+#include <astra_core/Plugins/PluginKit.h>
+#include <astra/astra.hpp>
 #include "SkeletonTracker.h"
 #include <memory>
 #include <vector>

@@ -1,12 +1,12 @@
 #ifndef DEPTHSTREAM_H
 #define DEPTHSTREAM_H
 
-#include <AstraUL/streams/depth_parameters.h>
-#include <AstraUL/astraul_ctypes.h>
-#include <AstraUL/Plugins/stream_types.h>
+#include <astra/capi/streams/depth_parameters.h>
+#include <astra/capi/astra_ctypes.h>
+#include <astra/capi/streams/stream_types.h>
 #include <common/serialization/FrameStreamReader.h>
 #include "PlaybackStream.h"
-#include <Astra/StreamDescription.h>
+#include <astra_core/astra_stream_description.hpp>
 #include <cstring>
 
 using namespace astra::serialization;
@@ -20,7 +20,7 @@ namespace astra { namespace plugins { namespace streamplayer
             DepthStream(FrameStreamReader& streamParser,
                              PluginServiceProxy& pluginService,
                              astra_streamset_t streamSet)
-                             : PlaybackStream(streamParser, pluginService, streamSet, StreamDescription(
+                             : PlaybackStream(streamParser, pluginService, streamSet, stream_description(
                                   ASTRA_STREAM_DEPTH,
                                   DEFAULT_SUBTYPE)) { }
             virtual ~DepthStream() {}

@@ -1,11 +1,11 @@
 #ifndef MOCK_DEVICE_STREAM_H
 #define MOCK_DEVICE_STREAM_H
 
-#include <AstraUL/streams/Image.h>
-#include <AstraUL/streams/image_parameters.h>
-#include <AstraUL/streams/image_types.h>
-#include <AstraUL/streams/image_capi.h>
-#include <AstraUL/Plugins/stream_types.h>
+#include <astra/streams/astra_image.hpp>
+#include <astra/capi/streams/image_parameters.h>
+#include <astra/capi/streams/image_types.h>
+#include <astra/capi/streams/image_capi.h>
+#include <astra/capi/streams/stream_types.h>
 
 #include <chrono>
 #include <memory>
@@ -29,7 +29,7 @@ namespace orbbec { namespace mocks {
 
         device_stream(astra::PluginServiceProxy& pluginService,
                       astra_streamset_t streamSet,
-                      astra::StreamDescription desc,
+                      astra::stream_description desc,
                       orbbec::mocks::stream_listener& listener,
                       astra::devices::sensor_stream::shared_ptr stream);
 
@@ -68,8 +68,8 @@ namespace orbbec { namespace mocks {
 
         virtual void on_new_buffer(wrapper_type* wrapper);
 
-        void change_mode(const astra::ImageStreamMode& mode);
-        void set_mode(const astra::ImageStreamMode& mode);
+        void change_mode(const astra::imagestream_mode& mode);
+        void set_mode(const astra::imagestream_mode& mode);
 
         astra::devices::sensor_stream::shared_ptr deviceStream_;
 
@@ -90,7 +90,7 @@ namespace orbbec { namespace mocks {
     template<typename TFrameWrapper>
     device_stream<TFrameWrapper>::device_stream(astra::PluginServiceProxy& pluginService,
                                                 astra_streamset_t streamSet,
-                                                astra::StreamDescription desc,
+                                                astra::stream_description desc,
                                                 orbbec::mocks::stream_listener& listener,
                                                 astra::devices::sensor_stream::shared_ptr stream)
         : orbbec::mocks::stream(pluginService,
@@ -219,7 +219,7 @@ namespace orbbec { namespace mocks {
     }
 
     template<typename TFrameWrapper>
-    void device_stream<TFrameWrapper>::set_mode(const astra::ImageStreamMode& mode)
+    void device_stream<TFrameWrapper>::set_mode(const astra::imagestream_mode& mode)
     {
         assert(mode.pixelFormat() != 0);
 
@@ -357,7 +357,7 @@ namespace orbbec { namespace mocks {
     public:
         image_stream(astra::PluginServiceProxy& pluginService,
                      astra_streamset_t streamSet,
-                     astra::StreamDescription desc,
+                     astra::stream_description desc,
                      orbbec::mocks::stream_listener& listener,
                      astra::devices::sensor_stream::shared_ptr deviceStream)
             : device_stream(pluginService, streamSet, desc, listener, deviceStream)

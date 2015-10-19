@@ -1,10 +1,10 @@
 #ifndef XS_POINTSTREAM_H
 #define XS_POINTSTREAM_H
 
-#include <Astra/Plugins/SingleBinStream.h>
-#include <AstraUL/streams/point_types.h>
-#include <AstraUL/astraul_ctypes.h>
-#include <AstraUL/Plugins/stream_types.h>
+#include <astra_core/Plugins/SingleBinStream.h>
+#include <astra/capi/streams/point_types.h>
+#include <astra/capi/astra_ctypes.h>
+#include <astra/capi/streams/stream_types.h>
 #include <Shiny.h>
 
 namespace astra { namespace xs {
@@ -18,7 +18,7 @@ namespace astra { namespace xs {
                     uint32_t height)
             : SingleBinStream(pluginService,
                               streamSet,
-                              StreamDescription(ASTRA_STREAM_POINT,
+                              stream_description(ASTRA_STREAM_POINT,
                                                 DEFAULT_SUBTYPE),
                               width * height * sizeof(astra_vector3f_t))
         {}

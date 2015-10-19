@@ -5,7 +5,7 @@
 #include "hnd_segmentation.hpp"
 #include "hnd_constants.hpp"
 #include <Shiny.h>
-#include <Astra/Plugins/PluginLogger.h>
+#include <astra_core/Plugins/PluginLogger.h>
 
 #define MAX_DEPTH 10000
 
@@ -236,13 +236,13 @@ namespace astra { namespace hand { namespace segmentation {
         cv::Mat& layerScoreMatrix = data.matrices.layerScore;
         const float pointInertiaFactor = data.settings.pointInertiaFactor;
         const float pointInertiaRadius = data.settings.pointInertiaRadius;
-        const astra::Vector3f* worldPoints = data.matrices.worldPoints;
+        const astra::vector3f* worldPoints = data.matrices.worldPoints;
 
         layerScoreMatrix = cv::Mat::zeros(data.matrices.depth.size(), CV_32FC1);
 
         scaling_coordinate_mapper mapper = get_scaling_mapper(data.matrices);
 
-        auto seedWorldPosition = astra::Vector3f(data.referenceWorldPosition.x,
+        auto seedWorldPosition = astra::vector3f(data.referenceWorldPosition.x,
                                                  data.referenceWorldPosition.y,
                                                  data.referenceWorldPosition.z);
 
@@ -265,7 +265,7 @@ namespace astra { namespace hand { namespace segmentation {
                      ++edgeDistanceRow,
                      ++layerScoreRow)
             {
-                astra::Vector3f worldPosition = *worldPoints;
+                astra::vector3f worldPosition = *worldPoints;
                 if (worldPosition.z != 0 && x > minX && x < maxX && y > minY && y < maxY)
                 {
                     //start with arbitrary large value to prevent scores from going negative
@@ -535,7 +535,7 @@ namespace astra { namespace hand { namespace segmentation {
         PROFILE_FUNC();
         auto scalingMapper = get_scaling_mapper(matrices);
 
-        std::vector<astra::Vector2i>& points = matrices.layerCirclePoints;
+        std::vector<astra::vector2i>& points = matrices.layerCirclePoints;
 
         float percentForeground1 = get_max_sequential_circumference_percentage(matrices.depth,
                                                                                matrices.layerSegmentation,
@@ -982,7 +982,7 @@ namespace astra { namespace hand { namespace segmentation {
                                   const cv::Point& center,
                                   const float& radius,
                                   const scaling_coordinate_mapper& mapper,
-                                  std::vector<astra::Vector2i>& points)
+                                  std::vector<astra::vector2i>& points)
     {
         PROFILE_FUNC();
 
@@ -1008,7 +1008,7 @@ namespace astra { namespace hand { namespace segmentation {
         int cx = center.x;
         int cy = center.y;
 
-        std::vector<astra::Vector2i> offsets;
+        std::vector<astra::vector2i> offsets;
         //reserve a slight overestimation of number of points for 1/8 of circumference
         offsets.reserve(pixelRadius);
 
@@ -1019,7 +1019,7 @@ namespace astra { namespace hand { namespace segmentation {
 
             while (dx >= dy)
             {
-                offsets.push_back(Vector2i(dx, dy));
+                offsets.push_back(vector2i(dx, dy));
 
                 dy++;
                 if (radiusError < 0)
@@ -1048,14 +1048,14 @@ namespace astra { namespace hand { namespace segmentation {
         for (int i = 1; i < length; ++i)
         {
             //dx, dy
-            const astra::Vector2i delta = offsets[i];
+            const astra::vector2i delta = offsets[i];
             const int x = cx + delta.x;
             const int y = cy + delta.y;
 
             if (x >= 0 && x < width &&
                 y >= 0 && y < height)
             {
-                points.push_back(astra::Vector2i(x, y));
+                points.push_back(astra::vector2i(x, y));
             }
         }
 
@@ -1063,7 +1063,7 @@ namespace astra { namespace hand { namespace segmentation {
         for (int i = length-1; i >= 0; --i)
         {
             //dy, dx
-            const astra::Vector2i delta = offsets[i];
+            const astra::vector2i delta = offsets[i];
 
             const int dx = delta.x;
             const int dy = delta.y;
@@ -1074,7 +1074,7 @@ namespace astra { namespace hand { namespace segmentation {
                 if (x >= 0 && x < width &&
                     y >= 0 && y < height)
                 {
-                    points.push_back(astra::Vector2i(x, y));
+                    points.push_back(astra::vector2i(x, y));
                 }
             }
         }
@@ -1082,21 +1082,21 @@ namespace astra { namespace hand { namespace segmentation {
         for (int i = 1; i < length; ++i)
         {
             //-dy, dx
-            const astra::Vector2i delta = offsets[i];
+            const astra::vector2i delta = offsets[i];
             const int x = cx - delta.y;
             const int y = cy + delta.x;
 
             if (x >= 0 && x < width &&
                 y >= 0 && y < height)
             {
-                points.push_back(astra::Vector2i(x, y));
+                points.push_back(astra::vector2i(x, y));
             }
         }
 
         for (int i = length-1; i >= 0; --i)
         {
             //-dx, dy
-            const astra::Vector2i delta = offsets[i];
+            const astra::vector2i delta = offsets[i];
 
             const int dx = delta.x;
             const int dy = delta.y;
@@ -1107,7 +1107,7 @@ namespace astra { namespace hand { namespace segmentation {
                 if (x >= 0 && x < width &&
                     y >= 0 && y < height)
                 {
-                    points.push_back(astra::Vector2i(x, y));
+                    points.push_back(astra::vector2i(x, y));
                 }
             }
         }
@@ -1115,21 +1115,21 @@ namespace astra { namespace hand { namespace segmentation {
         for (int i = 1; i < length; ++i)
         {
             //-dx, -dy
-            const astra::Vector2i delta = offsets[i];
+            const astra::vector2i delta = offsets[i];
             const int x = cx - delta.x;
             const int y = cy - delta.y;
 
             if (x >= 0 && x < width &&
                 y >= 0 && y < height)
             {
-                points.push_back(astra::Vector2i(x, y));
+                points.push_back(astra::vector2i(x, y));
             }
         }
 
         for (int i = length-1; i >= 0; --i)
         {
             //-dy, -dx
-            const astra::Vector2i delta = offsets[i];
+            const astra::vector2i delta = offsets[i];
 
             const int dx = delta.x;
             const int dy = delta.y;
@@ -1140,7 +1140,7 @@ namespace astra { namespace hand { namespace segmentation {
                 if (x >= 0 && x < width &&
                     y >= 0 && y < height)
                 {
-                    points.push_back(astra::Vector2i(x, y));
+                    points.push_back(astra::vector2i(x, y));
                 }
             }
         }
@@ -1148,21 +1148,21 @@ namespace astra { namespace hand { namespace segmentation {
         for (int i = 1; i < length; ++i)
         {
             //dy, -dx
-            const astra::Vector2i delta = offsets[i];
+            const astra::vector2i delta = offsets[i];
             const int x = cx + delta.y;
             const int y = cy - delta.x;
 
             if (x >= 0 && x < width &&
                 y >= 0 && y < height)
             {
-                points.push_back(astra::Vector2i(x, y));
+                points.push_back(astra::vector2i(x, y));
             }
         }
 
         for (int i = length-1; i >= 0; --i)
         {
             //dx, -dy
-            const astra::Vector2i delta = offsets[i];
+            const astra::vector2i delta = offsets[i];
 
             const int dx = delta.x;
             const int dy = delta.y;
@@ -1173,7 +1173,7 @@ namespace astra { namespace hand { namespace segmentation {
                 if (x >= 0 && x < width &&
                     y >= 0 && y < height)
                 {
-                    points.push_back(astra::Vector2i(x, y));
+                    points.push_back(astra::vector2i(x, y));
                 }
             }
         }
@@ -1185,7 +1185,7 @@ namespace astra { namespace hand { namespace segmentation {
                                                       const cv::Point& center,
                                                       const float& radius,
                                                       const scaling_coordinate_mapper& mapper,
-                                                      std::vector<astra::Vector2i>& points)
+                                                      std::vector<astra::vector2i>& points)
     {
         PROFILE_FUNC();
         int foregroundCount = 0;

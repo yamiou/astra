@@ -1,6 +1,6 @@
 #include "mock_device_depth_stream.hpp"
 
-#include <AstraUL/streams/depth_parameters.h>
+#include <astra/capi/streams/depth_parameters.h>
 #include <sstream>
 #include <cstring>
 

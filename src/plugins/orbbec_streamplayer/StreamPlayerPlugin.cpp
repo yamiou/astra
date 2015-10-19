@@ -1,5 +1,5 @@
 #include "StreamPlayerPlugin.h"
-#include <Astra/Astra.h>
+#include <astra_core/astra_core.hpp>
 #include "PlaybackStreamSet.h"
 
 EXPORT_PLUGIN(astra::plugins::streamplayer::StreamPlayerPlugin)

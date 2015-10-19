@@ -27,8 +27,8 @@ Our first step will be to set up a skeleton application as a starting point for 
 .. code-block:: c++
    :linenos:
 
-   #include <Astra/Astra.h>
-   #include <AstraUL/AstraUL.h>
+   #include <astra_core/Astra.h>
+   #include <astra/astra.hpp>
 
    #include <cstdio>
    #include <iostream>
@@ -41,7 +41,7 @@ Our first step will be to set up a skeleton application as a starting point for 
    }
 
 - Line 1 - Astra.h must be included in all applications. It is the core of |sdkname| and is required for all C++ based |sdkname| applications.
-- Line 2 - Most applications will also require AstraUL.h, which defines convenient ways to read and manipulate the most common types of sensor data like color, depth, and hand positions.
+- Line 2 - Most applications will also require astra.hpp, which defines convenient ways to read and manipulate the most common types of sensor data like color, depth, and hand positions.
 - Lines 9-10 - We'll use `std::cin.get() <http://en.cppreference.com/w/cpp/io/basic_istream/get>`_ to make sure we have an opportunity to see our handiwork before our application closes its window.
 
 Initializing and Terminating |sdkname|
@@ -153,7 +153,7 @@ In order to access streams from the Astra and get to the frames, we'll need a ``
       astra::StreamSet streamSet;
       astra::StreamReader reader = streamSet.create_reader();
 
-      reader.stream<astra::DepthStream>().start();
+      reader.stream<astra::depthstream>().start();
 
       astra::Astra::terminate();
 
@@ -178,10 +178,10 @@ In order to access streams from the Astra and get to the frames, we'll need a ``
       astra::StreamSet streamSet;
       astra::StreamReader reader = streamSet.create_reader();
 
-      reader.stream<astra::DepthStream>().start();
+      reader.stream<astra::depthstream>().start();
 
-      astra::Frame frame = reader.get_latest_frame();
-      auto depthFrame = frame.get<astra::DepthFrame>();
+      astra::frame frame = reader.get_latest_frame();
+      auto depthFrame = frame.get<astra::depthframe>();
 
       astra::Astra::terminate();
 
@@ -207,10 +207,10 @@ In order to access streams from the Astra and get to the frames, we'll need a ``
       astra::StreamSet streamSet;
       astra::StreamReader reader = streamSet.create_reader();
 
-      reader.stream<astra::DepthStream>().start();
+      reader.stream<astra::depthstream>().start();
 
-      astra::Frame frame = reader.get_latest_frame();
-      auto depthFrame = frame.get<astra::DepthFrame>();
+      astra::frame frame = reader.get_latest_frame();
+      auto depthFrame = frame.get<astra::depthframe>();
 
       int frameIndex = depthFrame.frameIndex();
       int16_t pixelValue = depthFrame.data()[0];
@@ -255,15 +255,15 @@ The following code is highly similar to the code from our last example, except w
       astra::StreamSet streamSet;
       astra::StreamReader reader = streamSet.create_reader();
 
-      reader.stream<astra::DepthStream>().start();
+      reader.stream<astra::depthstream>().start();
 
       int maxFramesToProcess = 100;
       int count = 0;
 
       do
       {
-         astra::Frame frame = reader.get_latest_frame();
-         auto depthFrame = frame.get<astra::DepthFrame>();
+         astra::frame frame = reader.get_latest_frame();
+         auto depthFrame = frame.get<astra::depthframe>();
 
          int frameIndex = depthFrame.frameIndex();
          int16_t pixelValue = depthFrame.data()[0];

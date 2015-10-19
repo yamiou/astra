@@ -1,5 +1,5 @@
 #include "xs_plugin.hpp"
-#include <Astra/Astra.h>
+#include <astra_core/astra_core.hpp>
 #include <Shiny.h>
 
 EXPORT_PLUGIN(astra::xs::plugin);
@@ -15,7 +15,7 @@ namespace astra { namespace xs {
         {
             LOG_INFO("astra.xs.plugin", "creating point processor");
 
-            StreamDescription depthDescription = streamDesc;
+            stream_description depthDescription = streamDesc;
 
             auto ppPtr = std::make_unique<point_processor>(pluginService(),
                                                            setHandle,

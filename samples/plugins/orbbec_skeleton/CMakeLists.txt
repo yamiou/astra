@@ -3,7 +3,7 @@ set (_projname "orbbec_skeleton")
 set(${_projname}_SOURCES
   SkeletonPlugin.h
   SkeletonPlugin.cpp
-  SkeletonStream.h
+  skeletonstream.h
   SkeletonTracker.h
   SkeletonTracker.cpp
   )

@@ -1,10 +1,10 @@
 #ifndef ONI_STREAM_H
 #define ONI_STREAM_H
 
-#include <Astra/Astra.h>
-#include <Astra/Plugins/plugin_capi.h>
-#include <Astra/Plugins/Stream.h>
-#include <Astra/Plugins/StreamBin.h>
+#include <astra_core/astra_core.hpp>
+#include <astra_core/capi/plugins/astra_plugin.h>
+#include <astra_core/Plugins/Stream.h>
+#include <astra_core/Plugins/StreamBin.h>
 #include <OpenNI.h>
 #include <Shiny.h>
 
@@ -17,7 +17,7 @@ namespace orbbec { namespace ni {
     public:
         stream(astra::PluginServiceProxy& pluginService,
                astra_streamset_t streamSet,
-               astra::StreamDescription desc,
+               astra::stream_description desc,
                stream_listener& listener)
             : Stream(pluginService,
                      streamSet,

@@ -2,15 +2,15 @@
 
 #include "catch.hpp"
 #include "reporters/catch_reporter_teamcity.hpp"
-#include <Astra/Astra.h>
+#include <astra_core/astra_core.hpp>
 
 int main( int argc, char* const argv[] )
 {
-    astra::Astra::initialize();
+    astra::initialize();
 
     int result = Catch::Session().run( argc, argv );
 
-    astra::Astra::terminate();
+    astra::terminate();
 
     return result;
 }

@@ -95,7 +95,7 @@ namespace orbbec { namespace mocks {
                 {
                     image_stream* stream = astra::plugins::make_stream<image_stream>(pluginService_,
                                                                                      streamSetHandle_,
-                                                                                     astra::StreamDescription(
+                                                                                     astra::stream_description(
                                                                                          ASTRA_STREAM_COLOR,
                                                                                          DEFAULT_SUBTYPE),
                                                                                      *this,
@@ -125,7 +125,7 @@ namespace orbbec { namespace mocks {
                 {
                     image_stream* stream = astra::plugins::make_stream<image_stream>(pluginService_,
                                                                                      streamSetHandle_,
-                                                                                     astra::StreamDescription(
+                                                                                     astra::stream_description(
                                                                                          ASTRA_STREAM_DEPTH,
                                                                                          DEFAULT_SUBTYPE),
                                                                                      *this,
@@ -155,7 +155,7 @@ namespace orbbec { namespace mocks {
                 {
                     image_stream* stream = astra::plugins::make_stream<image_stream>(pluginService_,
                                                                                      streamSetHandle_,
-                                                                                     astra::StreamDescription(
+                                                                                     astra::stream_description(
                                                                                          ASTRA_STREAM_INFRARED,
                                                                                          DEFAULT_SUBTYPE),
                                                                                      *this,

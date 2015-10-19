@@ -3,10 +3,10 @@
 
 #include <Shiny.h>
 #include <OpenNI.h>
-#include <AstraUL/streams/Image.h>
-#include <AstraUL/streams/image_parameters.h>
-#include <AstraUL/streams/image_types.h>
-#include <AstraUL/streams/image_capi.h>
+#include <astra/streams/astra_image.hpp>
+#include <astra/capi/streams/image_parameters.h>
+#include <astra/capi/streams/image_types.h>
+#include <astra/capi/streams/image_capi.h>
 #include <memory>
 #include <cstring>
 #include <vector>
@@ -31,7 +31,7 @@ namespace orbbec { namespace ni {
 
         devicestream(astra::PluginServiceProxy& pluginService,
                      astra_streamset_t streamSet,
-                     astra::StreamDescription desc,
+                     astra::stream_description desc,
                      openni::Device& oniDevice,
                      openni::SensorType oniSensorType,
                      stream_listener& listener)
@@ -133,7 +133,7 @@ namespace orbbec { namespace ni {
                                                                       &parameterBin,
                                                                       &parameterData);
 
-                astra::ImageStreamMode* result = static_cast<astra::ImageStreamMode*>(parameterData);
+                astra::imagestream_mode* result = static_cast<astra::imagestream_mode*>(parameterData);
 
                 if (rc == ASTRA_STATUS_SUCCESS)
                 {
@@ -162,7 +162,7 @@ namespace orbbec { namespace ni {
                 break;
             }
             case ASTRA_PARAMETER_IMAGE_MODE:
-                astra::ImageStreamMode mode = *static_cast<astra::ImageStreamMode*>(inData);
+                astra::imagestream_mode mode = *static_cast<astra::imagestream_mode*>(inData);
                 auto oniMode = convert_mode(mode);
 
                 LOG_INFO("orbbec.ni.devicestream", "mode change requested: %ux%ux%u@%u pf:%u",
@@ -186,7 +186,7 @@ namespace orbbec { namespace ni {
             }
         }
 
-        void change_mode(const astra::ImageStreamMode& mode)
+        void change_mode(const astra::imagestream_mode& mode)
         {
             mode_ = mode;
             oniMode_ = convert_mode(mode);
@@ -240,7 +240,7 @@ namespace orbbec { namespace ni {
         openni::SensorType oniSensorType_;
         openni::VideoStream oniStream_;
         openni::VideoMode oniMode_;
-        astra::ImageStreamMode mode_;
+        astra::imagestream_mode mode_;
 
         virtual astra_status_t on_open() override
         {
@@ -269,7 +269,7 @@ namespace orbbec { namespace ni {
 
                 if (std::get<0>(convert_format(oniMode.getPixelFormat())) != 0)
                 {
-                    astra::ImageStreamMode mode = convert_mode(oniMode);
+                    astra::imagestream_mode mode = convert_mode(oniMode);
                     modes_.push_back(mode);
                 }
 
@@ -344,7 +344,7 @@ namespace orbbec { namespace ni {
         size_t bufferLength_{0};
         astra_stream_t streamHandle_{nullptr};
 
-        std::vector<astra::ImageStreamMode> modes_;
+        std::vector<astra::imagestream_mode> modes_;
     };
 
     template<typename TFrameWrapper>

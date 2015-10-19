@@ -1,9 +1,9 @@
 #ifndef MOCK_DEVICE_STREAMSET_H
 #define MOCK_DEVICE_STREAMSET_H
 
-#include <Astra/StreamSet.h>
-#include <Astra/Plugins/plugin_capi.h>
-#include <Astra/Plugins/PluginLogger.h>
+#include <astra_core/astra_streamset.hpp>
+#include <astra_core/capi/plugins/astra_plugin.h>
+#include <astra_core/Plugins/PluginLogger.h>
 
 #include <functional>
 #include <memory>

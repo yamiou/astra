@@ -1,0 +1,34 @@
+﻿#include "astra_plugin_service.hpp"
+#include "astra_plugin_service_impl.hpp"
+#include "astra_create_plugin_proxy.hpp"
+#include "astra_cxx_compatibility.hpp"
+
+namespace astra
+{
+    plugin_service::plugin_service(streamset_catalog& catalog)
+        : impl_(std::make_unique<plugin_service_impl>(catalog)),
+          proxy_(create_plugin_proxy(this))
+    {}
+
+    plugin_service::~plugin_service()
+    {}
+
+    void plugin_service::notify_host_event(astra_event_id id, const void* data, size_t dataSize)
+    {
+        impl_->notify_host_event(id, data, dataSize);
+    }
+
+    astra_pluginservice_proxy_t* plugin_service::proxy()
+    {
+        return proxy_.get();
+    }
+
+^^^BEGINREPLACE:plugin^^^
+   ^RETURN^ plugin_service::^FUNC^(^PARAMS:ref^)
+   {
+       return impl_->^FUNC^(^PARAMS:names^);
+   }
+
+^^^ENDREPLACE^^^
+
+}

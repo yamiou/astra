@@ -1,6 +1,6 @@
 #include "ProtoFrameInputStream.h"
 
-#include <Astra/astra_cxx_make_unique.hpp>
+#include <astra_core/astra_cxx_make_unique.hpp>
 #include "FrameDescription.pb.h"
 #include "Frame.pb.h"
 

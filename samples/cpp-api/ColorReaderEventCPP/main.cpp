@@ -1,13 +1,13 @@
 ﻿// Orbbec (c) 2015
 
-#include <Astra/Astra.h>
-#include <AstraUL/AstraUL.h>
+#include <astra_core/astra_core.hpp>
+#include <astra/astra.hpp>
 #include <cstdio>
 #include <iostream>
 
 #include <key_handler.h>
 
-void print_color(astra::ColorFrame& colorFrame)
+void print_color(astra::colorframe& colorFrame)
 {
     if (colorFrame.is_valid())
     {
@@ -15,11 +15,11 @@ void print_color(astra::ColorFrame& colorFrame)
         int height = colorFrame.resolutionY();
         int frameIndex = colorFrame.frameIndex();
 
-        astra::RGBPixel* buffer = new astra::RGBPixel[colorFrame.numberOfPixels()];
+        astra::rgb_pixel* buffer = new astra::rgb_pixel[colorFrame.numberOfPixels()];
         colorFrame.copy_to(buffer);
 
         size_t index = ((width * (height / 2.0f)) + (width / 2.0f));
-        astra::RGBPixel middle = buffer[index];
+        astra::rgb_pixel middle = buffer[index];
 
         std::cout << "color frameIndex: " << frameIndex
                   << " r: " << static_cast<int>(middle.r)
@@ -31,12 +31,12 @@ void print_color(astra::ColorFrame& colorFrame)
     }
 }
 
-class SampleFrameListener : public astra::FrameReadyListener
+class SampleFrameListener : public astra::frame_listener
 {
-    virtual void on_frame_ready(astra::StreamReader& reader,
-                                astra::Frame& frame) override
+    virtual void on_frame_ready(astra::stream_reader& reader,
+                                astra::frame& frame) override
     {
-        astra::ColorFrame colorFrame = frame.get<astra::ColorFrame>();
+        astra::colorframe colorFrame = frame.get<astra::colorframe>();
 
         if (colorFrame.is_valid())
         {
@@ -47,23 +47,22 @@ class SampleFrameListener : public astra::FrameReadyListener
 
 int main(int argc, char** argv)
 {
-    astra::Astra::initialize();
+    astra::initialize();
 
     set_key_handler();
 
-    astra::StreamSet streamset;
-    astra::StreamReader reader = streamset.create_reader();
+    astra::streamset streamset;
+    astra::stream_reader reader = streamset.create_reader();
 
     SampleFrameListener listener;
 
-    reader.stream<astra::ColorStream>().start();
+    reader.stream<astra::colorstream>().start();
 
     std::cout << "colorStream -- hFov: "
-              << reader.stream<astra::ColorStream>().horizontalFieldOfView()
+              << reader.stream<astra::colorstream>().horizontalFieldOfView()
               << " vFov: "
-              << reader.stream<astra::ColorStream>().verticalFieldOfView()
+              << reader.stream<astra::colorstream>().verticalFieldOfView()
               << std::endl;
-
 
     reader.addListener(listener);
 
@@ -74,5 +73,5 @@ int main(int argc, char** argv)
 
     reader.removeListener(listener);
 
-    astra::Astra::terminate();
+    astra::terminate();
 }

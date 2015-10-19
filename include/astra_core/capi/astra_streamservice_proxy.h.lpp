@@ -1,0 +1,17 @@
+/* ^^^AUTOGENHEADER^^^ */
+#ifndef ASTRA_STREAMSERVICE_PROXY_H
+#define ASTRA_STREAMSERVICE_PROXY_H
+
+#include "astra_types.h"
+
+struct astra_streamservice_proxy_t
+{
+    void* streamService;
+
+^^^BEGINREPLACE:stream^^^
+    ^RETURN^ (*^FUNC^)(^PARAMS:types,void^);
+
+^^^ENDREPLACE^^^
+};
+
+#endif /* ASTRA_STREAMSERVICE_PROXY_H */

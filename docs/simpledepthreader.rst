@@ -9,9 +9,9 @@ Thirsting for more knowledge after finishing the Hello World Tutorial? Now that 
 
 By the end of this tutorial you should be familiar with:
 
-- The purpose of the ``FrameReadyListener`` class
-- How to define a ``FrameReadyListener``
-- Using a ``FrameReadyListener`` to process a depth stream
+- The purpose of the ``frame_listener`` class
+- How to define a ``frame_listener``
+- Using a ``frame_listener`` to process a depth stream
 
 Before We Begin
 ===============
@@ -23,7 +23,7 @@ Before We Begin
    :linenos:
 
    #include <Astra\Astra.h>
-   #include <AstraUL\AstraUL.h>
+   #include <AstraUL\astra.hpp>
 
    #include <cstdio>
    #include <iostream>
@@ -35,7 +35,7 @@ Before We Begin
       astra::StreamSet streamSet;
       astra::StreamReader reader = streamSet.create_reader();
 
-      reader.stream<astra::DepthStream>().start();
+      reader.stream<astra::depthstream>().start();
 
       // Your code will go here
 
@@ -54,20 +54,20 @@ Listening to Streams
 ====================
 In the Hello World tutorial, we processed a stream of frames by looping over a call to our ``StreamReader``'s ``get_latest_frame`` function. This solution works perfectly fine in a simple case such as our Hello World application. But, what if we wanted to register for a number of streams and work with them? Or, what if we were working with more than one ``StreamSet``, or possibly more than one ``StreamReader`` per ``StreamSet``? In all of those cases, the code within the loop could quickly become complex, cluttered and cumbersome.
 
-To alleviate these issues, |sdkname| provides us with a framework to define and create ``FrameReadyListener`` s. A ``FrameReadyListener`` has one function called ``on_frame_ready`` that (you guessed it!) is called when a new frame of a specific type is ready for processing. So, instead of looping over our ``StreamReader``'s ``get_latest_frame`` function, our listener will have the latest frame automatically delivered to it as soon as the frame is ready. Neato!
+To alleviate these issues, |sdkname| provides us with a framework to define and create ``frame_listener`` s. A ``frame_listener`` has one function called ``on_frame_ready`` that (you guessed it!) is called when a new frame of a specific type is ready for processing. So, instead of looping over our ``StreamReader``'s ``get_latest_frame`` function, our listener will have the latest frame automatically delivered to it as soon as the frame is ready. Neato!
 
-In order to use a ``FrameReadyListener`` with our example...
+In order to use a ``frame_listener`` with our example...
 
-1. We need to define a listener class that implements ``FrameReadyListener``. This class will give us access to the actual frames that are coming from the Astra sensor. We'll get those frames in the ``on_frame_ready`` function. Copy the following code below your ``#include`` directives and above your ``main`` function:
+1. We need to define a listener class that implements ``frame_listener``. This class will give us access to the actual frames that are coming from the Astra sensor. We'll get those frames in the ``on_frame_ready`` function. Copy the following code below your ``#include`` directives and above your ``main`` function:
 
 .. code-block:: c++
    :linenos:
    :lineno-start: 7
 
-   class DepthFrameListener : public astra::FrameReadyListener
+   class depthframeListener : public astra::frame_listener
    {
    public:
-      DepthFrameListener(int maxFramesToProcess) :
+      depthframeListener(int maxFramesToProcess) :
           m_maxFramesToProcess(maxFramesToProcess)
       {
 
@@ -80,9 +80,9 @@ In order to use a ``FrameReadyListener`` with our example...
 
    private:
       virtual void on_frame_ready(astra::StreamReader& reader,
-                                  astra::Frame& frame) override
+                                  astra::frame& frame) override
       {
-          astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
+          astra::depthframe depthFrame = frame.get<astra::depthframe>();
 
           if (depthFrame.is_valid())
           {
@@ -96,7 +96,7 @@ In order to use a ``FrameReadyListener`` with our example...
           }
       }
 
-      void print_depth_frame(astra::DepthFrame& depthFrame)
+      void print_depth_frame(astra::depthframe& depthFrame)
       {
           int frameIndex = depthFrame.frameIndex();
           short middleValue = get_middle_value(depthFrame);
@@ -104,7 +104,7 @@ In order to use a ``FrameReadyListener`` with our example...
          std::printf("Depth frameIndex: %d value: %d \n", frameIndex, middleValue);
       }
 
-      int16_t get_middle_value(astra::DepthFrame& depthFrame)
+      int16_t get_middle_value(astra::depthframe& depthFrame)
       {
           int width = depthFrame.resolutionX();
           int height = depthFrame.resolutionY();
@@ -137,7 +137,7 @@ In order to use a ``FrameReadyListener`` with our example...
 
    The only required function is the ``on_frame_ready`` function. The other functions in this class support what we do within that function.
 
-2. With the ``DepthFrameListener`` defined, let's construct our listener in the ``main`` function and add it to the ``StreamReader`` that we created in a previous step.
+2. With the ``depthframeListener`` defined, let's construct our listener in the ``main`` function and add it to the ``StreamReader`` that we created in a previous step.
 
 .. code-block:: c++
    :linenos:
@@ -151,10 +151,10 @@ In order to use a ``FrameReadyListener`` with our example...
       astra::StreamSet streamSet;
       astra::StreamReader reader = streamSet.create_reader();
 
-      reader.stream<astra::DepthStream>().start();
+      reader.stream<astra::depthstream>().start();
 
       int maxFramesToProcess = 100;
-      DepthFrameListener listener(maxFramesToProcess);
+      depthframeListener listener(maxFramesToProcess);
 
       reader.addListener(listener);
 
@@ -167,7 +167,7 @@ In order to use a ``FrameReadyListener`` with our example...
       return 0;
    }
 
-- Line 75 - Constructs a ``DepthFrameListener`` that will loop 100 times
+- Line 75 - Constructs a ``depthframeListener`` that will loop 100 times
 - Line 77 - Adds the listener to our reader
 - Line 81 - Removes the listener from our reader
 
@@ -188,10 +188,10 @@ We've got |sdkname| and the ``StreamSet`` running, and we're listening to depth 
       astra::StreamSet streamSet;
       astra::StreamReader reader = streamSet.create_reader();
 
-      reader.stream<astra::DepthStream>().start();
+      reader.stream<astra::depthstream>().start();
 
       int maxFramesToProcess = 100;
-      DepthFrameListener listener(maxFramesToProcess);
+      depthframeListener listener(maxFramesToProcess);
 
       reader.addListener(listener);
 

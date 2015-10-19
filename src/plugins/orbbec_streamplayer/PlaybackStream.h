@@ -1,10 +1,10 @@
 #ifndef PLAYBACKSTREAM_H
 #define PLAYBACKSTREAM_H
 
-#include <Astra/Plugins/Stream.h>
-#include <Astra/Plugins/StreamBin.h>
-#include <Astra/Plugins/plugin_capi.h>
-#include <AstraUL/streams/image_parameters.h>
+#include <astra_core/Plugins/Stream.h>
+#include <astra_core/Plugins/StreamBin.h>
+#include <astra_core/capi/plugins/astra_plugin.h>
+#include <astra/capi/streams/image_parameters.h>
 #include <common/serialization/FrameStreamReader.h>
 #include <cstring>
 
@@ -17,7 +17,7 @@ namespace astra { namespace plugins { namespace streamplayer {
     public:
         PlaybackStreamBase(PluginServiceProxy& pluginService,
                             astra_streamset_t streamSet,
-                            StreamDescription desc)
+                            stream_description desc)
                             : Stream(pluginService,
                             streamSet,
                             desc) { }
@@ -40,7 +40,7 @@ namespace astra { namespace plugins { namespace streamplayer {
         PlaybackStream(FrameStreamReader& depthStreamParser,
                         PluginServiceProxy& pluginService,
                         astra_streamset_t streamSet,
-                        StreamDescription desc);
+                        stream_description desc);
 
         virtual ~PlaybackStream();
 
@@ -82,7 +82,7 @@ namespace astra { namespace plugins { namespace streamplayer {
     PlaybackStream<TFrameWrapper>::PlaybackStream(FrameStreamReader& frameStreamReader,
                                                     PluginServiceProxy& pluginService,
                                                     astra_streamset_t streamSet,
-                                                    StreamDescription desc) :
+                                                    stream_description desc) :
                                                     PlaybackStreamBase(pluginService,
                                                     streamSet,
                                                     desc),

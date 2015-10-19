@@ -1,39 +1,38 @@
 #include <SFML/Graphics.hpp>
-#include <Astra/Astra.h>
-#include <AstraUL/AstraUL.h>
-#include "../../common/LitDepthVisualizer.h"
+#include <astra/astra.hpp>
+#include "../../common/lit_depth_visualizer.hpp"
 #include <chrono>
 #include <iostream>
 #include <iomanip>
 #include <key_handler.h>
 #include <sstream>
 
-class DepthFrameListener : public astra::FrameReadyListener
+class depthframe_listener : public astra::frame_listener
 {
 public:
-    DepthFrameListener(const astra::CoordinateMapper& coordinate_mapper) :
-        m_coordinate_mapper(coordinate_mapper)
+    depthframe_listener(const astra::coordinate_mapper& coordinate_mapper)
+        : coordinate_mapper_(coordinate_mapper)
     {
-        m_lastTimepoint = clock_type::now();
-        m_font.loadFromFile("Inconsolata.otf");
+        lastTimepoint_ = clock_type::now();
+        font_.loadFromFile("Inconsolata.otf");
     }
 
     void init_texture(int width, int height)
     {
-        if (m_displayBuffer == nullptr || width != m_displayWidth || height != m_displayHeight)
+        if (displayBuffer_ == nullptr || width != displayWidth_ || height != displayHeight_)
         {
-            m_displayWidth = width;
-            m_displayHeight = height;
+            displayWidth_ = width;
+            displayHeight_ = height;
 
             // texture is RGBA
-            int byteLength = m_displayWidth * m_displayHeight * 4;
+            int byteLength = displayWidth_ * displayHeight_ * 4;
 
-            m_displayBuffer = BufferPtr(new uint8_t[byteLength]);
-            memset(m_displayBuffer.get(), 0, byteLength);
+            displayBuffer_ = buffer_ptr(new uint8_t[byteLength]);
+            memset(displayBuffer_.get(), 0, byteLength);
 
-            m_texture.create(m_displayWidth, m_displayHeight);
-            m_sprite.setTexture(m_texture);
-            m_sprite.setPosition(0, 0);
+            texture_.create(displayWidth_, displayHeight_);
+            sprite_.setTexture(texture_);
+            sprite_.setPosition(0, 0);
         }
     }
 
@@ -42,12 +41,12 @@ public:
         const double frameWeight = 0.2;
 
         auto newTimepoint = clock_type::now();
-        auto frameDuration = std::chrono::duration_cast<duration_type>(newTimepoint - m_lastTimepoint);
+        auto frameDuration = std::chrono::duration_cast<duration_type>(newTimepoint - lastTimepoint_);
 
-        m_frameDuration = frameDuration * frameWeight + m_frameDuration * (1 - frameWeight);
-        m_lastTimepoint = newTimepoint;
+        frameDuration_ = frameDuration * frameWeight + frameDuration_ * (1 - frameWeight);
+        lastTimepoint_ = newTimepoint;
 
-        double fps = 1.0 / m_frameDuration.count();
+        double fps = 1.0 / frameDuration_.count();
 
         auto precision = std::cout.precision();
         std::cout << std::fixed
@@ -59,10 +58,10 @@ public:
                   << std::endl;
     }
 
-    virtual void on_frame_ready(astra::StreamReader& reader,
-                                astra::Frame& frame) override
+    virtual void on_frame_ready(astra::stream_reader& reader,
+                                astra::frame& frame) override
     {
-        astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
+        astra::pointframe pointFrame = frame.get<astra::pointframe>();
 
         int width = pointFrame.resolutionX();
         int height = pointFrame.resolutionY();
@@ -71,46 +70,46 @@ public:
 
         check_fps();
 
-        if (m_isPaused)
+        if (isPaused_)
         {
             return;
         }
 
         copy_depth_data(frame);
 
-        m_visualizer.update(pointFrame);
+        visualizer_.update(pointFrame);
 
-        astra_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
+        astra_rgb_pixel_t* vizBuffer = visualizer_.get_output();
         for (int i = 0; i < width * height; i++)
         {
             int rgbaOffset = i * 4;
-            m_displayBuffer[rgbaOffset] = vizBuffer[i].r;
-            m_displayBuffer[rgbaOffset + 1] = vizBuffer[i].b;
-            m_displayBuffer[rgbaOffset + 2] = vizBuffer[i].g;
-            m_displayBuffer[rgbaOffset + 3] = 255;
+            displayBuffer_[rgbaOffset] = vizBuffer[i].r;
+            displayBuffer_[rgbaOffset + 1] = vizBuffer[i].b;
+            displayBuffer_[rgbaOffset + 2] = vizBuffer[i].g;
+            displayBuffer_[rgbaOffset + 3] = 255;
         }
-        m_texture.update(m_displayBuffer.get());
+        texture_.update(displayBuffer_.get());
     }
 
-    void copy_depth_data(astra::Frame& frame)
+    void copy_depth_data(astra::frame& frame)
     {
-        astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
+        astra::depthframe depthFrame = frame.get<astra::depthframe>();
 
         if (depthFrame.is_valid())
         {
             int width = depthFrame.resolutionX();
             int height = depthFrame.resolutionY();
-            if (m_depthData == nullptr || width != m_depthWidth || height != m_depthHeight)
+            if (depthData_ == nullptr || width != depthWidth_ || height != depthHeight_)
             {
-                m_depthWidth = width;
-                m_depthHeight = height;
+                depthWidth_ = width;
+                depthHeight_ = height;
 
                 // texture is RGBA
-                int byteLength = m_depthWidth * m_depthHeight * sizeof(uint16_t);
+                int byteLength = depthWidth_ * depthHeight_ * sizeof(uint16_t);
 
-                m_depthData = DepthPtr(new int16_t[byteLength]);
+                depthData_ = depth_ptr(new int16_t[byteLength]);
             }
-            depthFrame.copy_to(m_depthData.get());
+            depthFrame.copy_to(depthData_.get());
         }
     }
 
@@ -119,8 +118,8 @@ public:
         sf::Vector2i position = sf::Mouse::getPosition(window);
         auto windowSize = window.getSize();
 
-        m_mouseNormX = position.x / static_cast<float>(windowSize.x);
-        m_mouseNormY = position.y / static_cast<float>(windowSize.y);
+        mouseNormX_ = position.x / static_cast<float>(windowSize.x);
+        mouseNormY_ = position.y / static_cast<float>(windowSize.y);
     }
 
     void drawText(sf::RenderWindow& window, sf::Text& text, sf::Color color, int x, int y)
@@ -136,35 +135,37 @@ public:
 
     void drawMouseOverlay(sf::RenderWindow& window, float depthWScale, float depthHScale)
     {
-        if (!m_isMouseOverlayEnabled || m_depthData == nullptr)
+        if (!isMouseOverlayEnabled_ || depthData_ == nullptr)
         {
             return;
         }
-        int mouseX = m_depthWidth * m_mouseNormX;
-        int mouseY = m_depthHeight * m_mouseNormY;
+        int mouseX = depthWidth_ * mouseNormX_;
+        int mouseY = depthHeight_ * mouseNormY_;
 
-        if (mouseX >= m_depthWidth || mouseY >= m_depthHeight ||
+        if (mouseX >= depthWidth_ || mouseY >= depthHeight_ ||
             mouseX < 0 || mouseY < 0)
         {
             return;
         }
 
-        size_t index = (m_depthWidth * mouseY + mouseX);
+        size_t index = (depthWidth_ * mouseY + mouseX);
 
-        int z = m_depthData[index];
+        int z = depthData_[index];
 
         float worldX, worldY, worldZ;
-        m_coordinate_mapper.convert_depth_to_world(static_cast<float>(mouseX),
-                                                   static_cast<float>(mouseY),
-                                                   static_cast<float>(z),
-                                                   &worldX,
-                                                   &worldY,
-                                                   &worldZ);
+        coordinate_mapper_.convert_depth_to_world(static_cast<float>(mouseX),
+                                                  static_cast<float>(mouseY),
+                                                  static_cast<float>(z),
+                                                  &worldX,
+                                                  &worldY,
+                                                  &worldZ);
 
         std::stringstream str;
-        str << std::fixed << std::setprecision(0);
-        str << "(" << mouseX << ", " << mouseY << ") X:" << worldX << " Y:" << worldY << " Z:" << worldZ;
-        sf::Text text(str.str(), m_font);
+        str << std::fixed << std::setprecision(0)
+            << "(" << mouseX << ", " << mouseY << ") "
+            << "X:" << worldX << " Y:" << worldY << " Z:" << worldZ;
+
+        sf::Text text(str.str(), font_);
 
         int characterSize = 40;
         text.setCharacterSize(characterSize);
@@ -177,14 +178,14 @@ public:
 
     void drawTo(sf::RenderWindow& window)
     {
-        if (m_displayBuffer != nullptr)
+        if (displayBuffer_ != nullptr)
         {
-            float depthWScale = window.getView().getSize().x / m_displayWidth;
-            float depthHScale = window.getView().getSize().y / m_displayHeight;
+            float depthWScale = window.getView().getSize().x / displayWidth_;
+            float depthHScale = window.getView().getSize().y / displayHeight_;
 
-            m_sprite.setScale(depthWScale, depthHScale);
+            sprite_.setScale(depthWScale, depthHScale);
 
-            window.draw(m_sprite);
+            window.draw(sprite_);
 
             drawMouseOverlay(window, depthWScale, depthHScale);
         }
@@ -192,83 +193,84 @@ public:
 
     void toggle_isPaused()
     {
-        m_isPaused = !m_isPaused;
+        isPaused_ = !isPaused_;
     }
 
     bool get_isPaused() const
     {
-        return m_isPaused;
+        return isPaused_;
     }
-    
+
     void toggle_isMouseOverlayEnabled()
     {
-        m_isMouseOverlayEnabled = !m_isMouseOverlayEnabled;
+        isMouseOverlayEnabled_ = !isMouseOverlayEnabled_;
     }
 
     bool get_isMouseOverlayEnabled() const
     {
-        return m_isMouseOverlayEnabled;
+        return isMouseOverlayEnabled_;
     }
 
 private:
-    samples::common::LitDepthVisualizer m_visualizer;
+    samples::common::lit_depth_visualizer visualizer_;
 
     using duration_type = std::chrono::duration<double>;
-    duration_type m_frameDuration{0.0};
+    duration_type frameDuration_{0.0};
 
     using clock_type = std::chrono::system_clock;
-    std::chrono::time_point<clock_type> m_lastTimepoint;
-    sf::Texture m_texture;
-    sf::Sprite m_sprite;
-    sf::Font m_font;
+    std::chrono::time_point<clock_type> lastTimepoint_;
+    sf::Texture texture_;
+    sf::Sprite sprite_;
+    sf::Font font_;
 
-    const astra::CoordinateMapper& m_coordinate_mapper;
+    const astra::coordinate_mapper& coordinate_mapper_;
 
-    using BufferPtr = std::unique_ptr< uint8_t[] >;
-    BufferPtr m_displayBuffer{ nullptr };
-    int m_displayWidth{ 0 };
-    int m_displayHeight{ 0 };
+    int displayWidth_{0};
+    int displayHeight_{0};
 
-    int m_depthWidth{ 0 };
-    int m_depthHeight{ 0 };
-    using DepthPtr = std::unique_ptr < int16_t[] > ;
-    DepthPtr m_depthData{ nullptr };
+    using buffer_ptr = std::unique_ptr<uint8_t[]>;
+    buffer_ptr displayBuffer_{ nullptr };
 
-    float m_mouseNormX{ 0 };
-    float m_mouseNormY{ 0 };
-    bool m_isPaused{ false };
-    bool m_isMouseOverlayEnabled{ true };
+    int depthWidth_{0};
+    int depthHeight_{0};
+
+    using depth_ptr = std::unique_ptr<int16_t[]>;
+    depth_ptr depthData_{nullptr};
+
+    float mouseNormX_{0};
+    float mouseNormY_{0};
+    bool isPaused_{false};
+    bool isMouseOverlayEnabled_{true};
 };
 
 
 int main(int argc, char** argv)
 {
-    astra::Astra::initialize();
+    astra::initialize();
 
     set_key_handler();
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Depth Viewer");
 
-    #ifdef _WIN32
-        auto fullscreenStyle = sf::Style::None;
-    #else
-        auto fullscreenStyle = sf::Style::Fullscreen;
-    #endif
+#ifdef _WIN32
+    auto fullscreenStyle = sf::Style::None;
+#else
+    auto fullscreenStyle = sf::Style::Fullscreen;
+#endif
 
     sf::VideoMode fullscreen_mode = sf::VideoMode::getFullscreenModes()[0];
     sf::VideoMode windowed_mode(1280, 960);
     bool is_fullscreen = false;
 
-    astra::StreamSet streamset;
-    astra::StreamReader reader = streamset.create_reader();
+    astra::streamset streamset;
+    astra::stream_reader reader = streamset.create_reader();
 
-    reader.stream<astra::PointStream>().start();
-    auto depthStream = reader.stream<astra::DepthStream>();
+    reader.stream<astra::pointstream>().start();
+    auto depthStream = reader.stream<astra::depthstream>();
     depthStream.start();
 
     auto coordinate_mapper = depthStream.coordinateMapper();
-
-    DepthFrameListener listener(coordinate_mapper);
+    depthframe_listener listener(coordinate_mapper);
 
     reader.addListener(listener);
 
@@ -292,35 +294,35 @@ int main(int argc, char** argv)
                 }
                 switch (event.key.code)
                 {
-                    case sf::Keyboard::Escape:
-                        window.close();
-                        break;
-                    case sf::Keyboard::F:
-                        if (is_fullscreen)
-                        {
-                            is_fullscreen = false;
-                            window.create(windowed_mode, "Depth Viewer", sf::Style::Default);
-                        }
-                        else
-                        {
-                            is_fullscreen = true;
-                            window.create(fullscreen_mode, "Depth Viewer", fullscreenStyle);
-                        }
-                        break;
-                    case sf::Keyboard::R:
-                        depthStream.enable_registration(!depthStream.registration_enabled());
-                        break;
-                    case sf::Keyboard::M:
-                        depthStream.enable_mirroring(!depthStream.mirroring_enabled());
-                        break;
-                    case sf::Keyboard::P:
-                        listener.toggle_isPaused();
-                        break;
-                    case sf::Keyboard::Space:
-                        listener.toggle_isMouseOverlayEnabled();
-                        break;
-                    default:
-                        break;
+                case sf::Keyboard::Escape:
+                    window.close();
+                    break;
+                case sf::Keyboard::F:
+                    if (is_fullscreen)
+                    {
+                        is_fullscreen = false;
+                        window.create(windowed_mode, "Depth Viewer", sf::Style::Default);
+                    }
+                    else
+                    {
+                        is_fullscreen = true;
+                        window.create(fullscreen_mode, "Depth Viewer", fullscreenStyle);
+                    }
+                    break;
+                case sf::Keyboard::R:
+                    depthStream.enable_registration(!depthStream.registration_enabled());
+                    break;
+                case sf::Keyboard::M:
+                    depthStream.enable_mirroring(!depthStream.mirroring_enabled());
+                    break;
+                case sf::Keyboard::P:
+                    listener.toggle_isPaused();
+                    break;
+                case sf::Keyboard::Space:
+                    listener.toggle_isMouseOverlayEnabled();
+                    break;
+                default:
+                    break;
                 }
                 break;
             }
@@ -346,7 +348,6 @@ int main(int argc, char** argv)
         }
     }
 
-    astra::Astra::terminate();
+    astra::terminate();
     return 0;
 }
-

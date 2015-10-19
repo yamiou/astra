@@ -55,7 +55,7 @@ add_library(${_projname} SHARED ${${_projname}_SOURCES} ${${_projname}_HEADERS})
 
 set_target_properties(${_projname} PROPERTIES FOLDER "plugins")
 
-target_link_libraries(${_projname} AstraAPI Shiny ${OpenNI2_LIBRARY})
+target_link_libraries(${_projname} astra_core_api Shiny ${OpenNI2_LIBRARY})
 
 install_lib(${_projname} "Plugins/")
 

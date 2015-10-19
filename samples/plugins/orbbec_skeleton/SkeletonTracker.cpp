@@ -4,18 +4,18 @@ namespace astra { namespace plugins { namespace skeleton {
 
     const size_t SkeletonTracker::MAX_SKELETONS = 6;
 
-    void SkeletonTracker::on_frame_ready(StreamReader& reader, Frame& frame)
+    void SkeletonTracker::on_frame_ready(stream_reader_& reader, frame& frame)
     {
-        if (!m_skeletonStream->has_connections())
+        if (!skeletonStream_->has_connections())
             return; // don't waste cycles if no one is listening
 
-        astra::DepthFrame depthFrame = frame.get<DepthFrame>();
+        astra::depthframe depthFrame = frame.get<depthframe>();
 
         if (!depthFrame.is_valid())
             return;
 
         // do something cool
-        astra_skeletonframe_wrapper_t* skeletonFrame = m_skeletonStream->begin_write(depthFrame.frameIndex());
+        astra_skeletonframe_wrapper_t* skeletonFrame = skeletonStream_->begin_write(depthFrame.frameIndex());
 
         if (skeletonFrame != nullptr)
         {
@@ -39,7 +39,7 @@ namespace astra { namespace plugins { namespace skeleton {
                 skeleton.status = ASTRA_SKELETON_STATUS_NOT_TRACKED;
             }
 
-            m_skeletonStream->end_write();
+            skeletonStream_->end_write();
         }
     }
 

@@ -1,5 +1,5 @@
 #include "hnd_depth_utility.hpp"
-#include <AstraUL/AstraUL.h>
+#include <astra/astra.hpp>
 #include "hnd_tracking_data.hpp"
 #include <cmath>
 #include <Shiny.h>
@@ -46,7 +46,7 @@ namespace astra { namespace hand {
         }
     }
 
-    void depth_utility::depth_to_velocity_signal(DepthFrame& depthFrame,
+    void depth_utility::depth_to_velocity_signal(depthframe& depthFrame,
                                                      cv::Mat& matDepth,
                                                      cv::Mat& matDepthFullSize,
                                                      cv::Mat& matVelocitySignal)
@@ -102,7 +102,7 @@ namespace astra { namespace hand {
         //analyze_velocities(matDepth, matDepthVelErode_);
     }
 
-    void depth_utility::depthframe_to_matrix(DepthFrame& depthFrameSrc,
+    void depth_utility::depthframe_to_matrix(depthframe& depthFrameSrc,
                                         const int width,
                                         const int height,
                                         cv::Mat& matTarget)

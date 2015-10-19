@@ -63,7 +63,7 @@ namespace astra { namespace hand {
         if (streamDesc.type == ASTRA_STREAM_DEPTH &&
             streamTrackerMap_.find(streamHandle) == streamTrackerMap_.end())
         {
-            StreamDescription depthDescription = streamDesc;
+            stream_description depthDescription = streamDesc;
 
             hand_tracker* tracker = new hand_tracker(pluginService(),
                                                      setHandle,

@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
-#include <Astra/Astra.h>
-#include <AstraUL/AstraUL.h>
+#include <astra_core/astra_core.hpp>
+#include <astra/astra.hpp>
 
 #include <chrono>
 #include <iostream>
@@ -8,30 +8,30 @@
 #include <cstring>
 #include <key_handler.h>
 
-class ColorFrameListener : public astra::FrameReadyListener
+class my_frame_listener : public astra::frame_listener
 {
 public:
-    ColorFrameListener()
+    my_frame_listener()
     {
-        m_lastTimepoint = clock_type::now();
+        lastTimepoint_ = clock_type::now();
     }
 
     void init_texture(int width, int height)
     {
-        if (m_displayBuffer == nullptr || width != m_displayWidth || height != m_displayHeight)
+        if (displayBuffer_ == nullptr || width != displayWidth_ || height != displayHeight_)
         {
-            m_displayWidth = width;
-            m_displayHeight = height;
+            displayWidth_ = width;
+            displayHeight_ = height;
 
             // texture is RGBA
-            int byteLength = m_displayWidth * m_displayHeight * 4;
+            int byteLength = displayWidth_ * displayHeight_ * 4;
 
-            m_displayBuffer = BufferPtr(new uint8_t[byteLength]);
-            std::memset(m_displayBuffer.get(), 0, byteLength);
+            displayBuffer_ = BufferPtr(new uint8_t[byteLength]);
+            std::memset(displayBuffer_.get(), 0, byteLength);
 
-            m_texture.create(m_displayWidth, m_displayHeight);
-            m_sprite.setTexture(m_texture);
-            m_sprite.setPosition(0, 0);
+            texture_.create(displayWidth_, displayHeight_);
+            sprite_.setTexture(texture_);
+            sprite_.setPosition(0, 0);
         }
     }
 
@@ -40,12 +40,12 @@ public:
         const double frameWeight = 0.2;
 
         auto newTimepoint = clock_type::now();
-        auto frameDuration = std::chrono::duration_cast<duration_type>(newTimepoint - m_lastTimepoint);
+        auto frameDuration = std::chrono::duration_cast<duration_type>(newTimepoint - lastTimepoint_);
 
-        m_frameDuration = frameDuration * frameWeight + m_frameDuration * (1 - frameWeight);
-        m_lastTimepoint = newTimepoint;
+        frameDuration_ = frameDuration * frameWeight + frameDuration_ * (1 - frameWeight);
+        lastTimepoint_ = newTimepoint;
 
-        double fps = 1.0 / m_frameDuration.count();
+        double fps = 1.0 / frameDuration_.count();
 
         auto precision = std::cout.precision();
         std::cout << std::fixed
@@ -57,10 +57,10 @@ public:
             << std::endl;
     }
 
-    virtual void on_frame_ready(astra::StreamReader& reader,
-        astra::Frame& frame) override
+    virtual void on_frame_ready(astra::stream_reader& reader,
+        astra::frame& frame) override
     {
-        astra::ColorFrame colorFrame = frame.get<astra::ColorFrame>();
+        astra::colorframe colorFrame = frame.get<astra::colorframe>();
 
         int width = colorFrame.resolutionX();
         int height = colorFrame.resolutionY();
@@ -72,58 +72,58 @@ public:
         for (int i = 0; i < width * height; i++)
         {
             int rgbaOffset = i * 4;
-            m_displayBuffer[rgbaOffset] = colorData[i].r;
-            m_displayBuffer[rgbaOffset + 1] = colorData[i].g;
-            m_displayBuffer[rgbaOffset + 2] = colorData[i].b;
-            m_displayBuffer[rgbaOffset + 3] = 255;
+            displayBuffer_[rgbaOffset] = colorData[i].r;
+            displayBuffer_[rgbaOffset + 1] = colorData[i].g;
+            displayBuffer_[rgbaOffset + 2] = colorData[i].b;
+            displayBuffer_[rgbaOffset + 3] = 255;
         }
-        m_texture.update(m_displayBuffer.get());
+        texture_.update(displayBuffer_.get());
         check_fps();
     }
 
     void drawTo(sf::RenderWindow& window)
     {
-        if (m_displayBuffer != nullptr)
+        if (displayBuffer_ != nullptr)
         {
-            float imageScale = window.getView().getSize().x / m_displayWidth;
+            float imageScale = window.getView().getSize().x / displayWidth_;
 
-            m_sprite.setScale(imageScale, imageScale);
+            sprite_.setScale(imageScale, imageScale);
 
-            window.draw(m_sprite);
+            window.draw(sprite_);
         }
     }
 
 private:
     using duration_type = std::chrono::duration<double>;
-    duration_type m_frameDuration{ 0.0 };
+    duration_type frameDuration_{ 0.0 };
 
     using clock_type = std::chrono::system_clock;
-    std::chrono::time_point<clock_type> m_lastTimepoint;
-    sf::Texture m_texture;
-    sf::Sprite m_sprite;
+    std::chrono::time_point<clock_type> lastTimepoint_;
+    sf::Texture texture_;
+    sf::Sprite sprite_;
 
     using BufferPtr = std::unique_ptr < uint8_t[] >;
-    BufferPtr m_displayBuffer{ nullptr };
-    int m_displayWidth{ 0 };
-    int m_displayHeight{ 0 };
+    BufferPtr displayBuffer_{ nullptr };
+    int displayWidth_{ 0 };
+    int displayHeight_{ 0 };
 };
 
 
 
 int main(int argc, char** argv)
 {
-    astra::Astra::initialize();
+    astra::initialize();
 
     set_key_handler();
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Color Viewer");
 
-    astra::StreamSet streamset;
-    astra::StreamReader reader = streamset.create_reader();
+    astra::streamset streamset;
+    astra::stream_reader reader = streamset.create_reader();
 
-    reader.stream<astra::ColorStream>().start();
+    reader.stream<astra::colorstream>().start();
 
-    ColorFrameListener listener;
+    my_frame_listener listener;
     reader.addListener(listener);
 
     while (window.isOpen())
@@ -163,6 +163,6 @@ int main(int argc, char** argv)
         }
     }
 
-    astra::Astra::terminate();
+    astra::terminate();
     return 0;
 }

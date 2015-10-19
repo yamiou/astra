@@ -1,5 +1,5 @@
 #include "hnd_debug_handstream.hpp"
-#include <AstraUL/streams/hand_parameters.h>
+#include <astra/capi/streams/hand_parameters.h>
 #include <cstring>
 
 namespace astra { namespace hand {

@@ -13,9 +13,9 @@ elseif(ASTRA_UNIX)
   set(CMAKE_INSTALL_RPATH "$ORIGIN")
 endif()
 
-add_subdirectory(Astra)
-add_subdirectory(AstraUL)
-add_subdirectory(AstraAPI)
+add_subdirectory(astra_core)
+add_subdirectory(astra)
+add_subdirectory(astra_core_api)
 add_subdirectory(plugins)
 
 if (NOT ASTRA_ANDROID)
@@ -36,14 +36,14 @@ add_custom_target(${_projname} ALL
   COMMAND ${CLISP_EXECUTABLE} "lpp.cl" "../src"
   WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/lpp/")
 
-add_dependencies(Astra ${_projname})
-add_dependencies(AstraUL ${_projname})
-add_dependencies(AstraAPI ${_projname})
+add_dependencies(astra_core ${_projname})
+add_dependencies(astra ${_projname})
+add_dependencies(astra_core_api ${_projname})
 add_dependencies(openni_sensor ${_projname})
 
-add_dependencies(${SDK_DEPENDENT_TARGET} Astra)
-add_dependencies(${SDK_DEPENDENT_TARGET} AstraUL)
-add_dependencies(${SDK_DEPENDENT_TARGET} AstraAPI)
+add_dependencies(${SDK_DEPENDENT_TARGET} astra_core)
+add_dependencies(${SDK_DEPENDENT_TARGET} astra)
+add_dependencies(${SDK_DEPENDENT_TARGET} astra_core_api)
 add_dependencies(${SDK_DEPENDENT_TARGET} openni_sensor)
 
 if (ASTRA_XS AND ASTRA_HAND)

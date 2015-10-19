@@ -1,7 +1,7 @@
 set (_projname "orbbec_hand")
 
 set(ORBBEC_HAND_INCLUDE
-  ../../Astra/vendor/cpptoml.h
+  ../../astra_core/vendor/cpptoml.h
   hnd_constants.hpp
   hnd_debug_handstream.hpp
   hnd_debug_visualizer.hpp
@@ -50,7 +50,7 @@ add_library(${_projname} SHARED ${ORBBEC_HAND_SRC} ${ORBBEC_HAND_INCLUDE})
 
 set_target_properties(${_projname} PROPERTIES FOLDER "plugins")
 
-target_link_libraries(${_projname} AstraAPI AstraUL Shiny ${OpenCV_LIBS})
+target_link_libraries(${_projname} astra_core_api astra Shiny ${OpenCV_LIBS})
 
 include_directories(${_projname} ${OpenCV_INCLUDE_DIRS})
 

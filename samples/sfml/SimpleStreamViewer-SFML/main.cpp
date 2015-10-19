@@ -1,7 +1,7 @@
 #include <SFML/Graphics.hpp>
-#include <Astra/Astra.h>
-#include <AstraUL/AstraUL.h>
-#include "../../common/LitDepthVisualizer.h"
+#include <astra_core/astra_core.hpp>
+#include <astra/astra.hpp>
+#include "../../common/lit_depth_visualizer.hpp"
 #include <chrono>
 #include <iostream>
 #include <iomanip>
@@ -14,7 +14,7 @@ enum ColorMode
     MODE_IR_RGB,
 };
 
-class MultiFrameListener : public astra::FrameReadyListener
+class MultiFrameListener : public astra::frame_listener
 {
 public:
     using BufferPtr = std::unique_ptr<uint8_t[]>;
@@ -30,7 +30,7 @@ public:
 
     MultiFrameListener()
     {
-        m_lastTimepoint = clock_type::now();
+        lastTimepoint_ = clock_type::now();
     }
 
     void init_texture(int width, int height, stream_view& view)
@@ -65,12 +65,12 @@ public:
         const double frameWeight = 0.2;
 
         auto newTimepoint = clock_type::now();
-        auto frameDuration = std::chrono::duration_cast<duration_type>(newTimepoint - m_lastTimepoint);
+        auto frameDuration = std::chrono::duration_cast<duration_type>(newTimepoint - lastTimepoint_);
 
-        m_frameDuration = frameDuration * frameWeight + m_frameDuration * (1 - frameWeight);
-        m_lastTimepoint = newTimepoint;
+        frameDuration_ = frameDuration * frameWeight + frameDuration_ * (1 - frameWeight);
+        lastTimepoint_ = newTimepoint;
 
-        double fps = 1.0 / m_frameDuration.count();
+        double fps = 1.0 / frameDuration_.count();
 
         auto precision = std::cout.precision();
         std::cout << std::fixed
@@ -82,31 +82,31 @@ public:
                   << std::endl;
     }
 
-    void update_depth(astra::Frame& frame)
+    void update_depth(astra::frame& frame)
     {
-        astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
+        astra::pointframe pointFrame = frame.get<astra::pointframe>();
 
         if (!pointFrame.is_valid())
         {
-            clear_view(m_depthView);
-            m_depthView.texture.update(m_depthView.buffer.get());
+            clear_view(depthView_);
+            depthView_.texture.update(depthView_.buffer.get());
             return;
         }
 
         int depthWidth = pointFrame.resolutionX();
         int depthHeight = pointFrame.resolutionY();
 
-        init_texture(depthWidth, depthHeight, m_depthView);
+        init_texture(depthWidth, depthHeight, depthView_);
 
-        if (m_isPaused)
+        if (isPaused_)
         {
             return;
         }
 
-        m_visualizer.update(pointFrame);
+        visualizer_.update(pointFrame);
 
-        astra_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
-        uint8_t* buffer = m_depthView.buffer.get();
+        astra_rgb_pixel_t* vizBuffer = visualizer_.get_output();
+        uint8_t* buffer = depthView_.buffer.get();
         for (int i = 0; i < depthWidth * depthHeight; i++)
         {
             int rgbaOffset = i * 4;
@@ -116,32 +116,32 @@ public:
             buffer[rgbaOffset + 3] = 255;
         }
 
-        m_depthView.texture.update(m_depthView.buffer.get());
+        depthView_.texture.update(depthView_.buffer.get());
     }
 
-    void update_color(astra::Frame& frame)
+    void update_color(astra::frame& frame)
     {
-        astra::ColorFrame colorFrame = frame.get<astra::ColorFrame>();
+        astra::colorframe colorFrame = frame.get<astra::colorframe>();
 
         if (!colorFrame.is_valid())
         {
-            clear_view(m_colorView);
-            m_colorView.texture.update(m_colorView.buffer.get());
+            clear_view(colorView_);
+            colorView_.texture.update(colorView_.buffer.get());
             return;
         }
 
         int colorWidth = colorFrame.resolutionX();
         int colorHeight = colorFrame.resolutionY();
 
-        init_texture(colorWidth, colorHeight, m_colorView);
+        init_texture(colorWidth, colorHeight, colorView_);
 
-        if (m_isPaused)
+        if (isPaused_)
         {
             return;
         }
 
-        const astra::RGBPixel* color = colorFrame.data();
-        uint8_t* buffer = m_colorView.buffer.get();
+        const astra::rgb_pixel* color = colorFrame.data();
+        uint8_t* buffer = colorView_.buffer.get();
         for(int i = 0; i < colorWidth * colorHeight; i++)
         {
             int rgbaOffset = i * 4;
@@ -151,32 +151,32 @@ public:
             buffer[rgbaOffset + 3] = 255;
         }
 
-        m_colorView.texture.update(m_colorView.buffer.get());
+        colorView_.texture.update(colorView_.buffer.get());
     }
 
-    void update_ir_16(astra::Frame& frame)
+    void update_ir_16(astra::frame& frame)
     {
-        astra::InfraredFrame16 irFrame = frame.get<astra::InfraredFrame16>();
+        astra::infraredframe_16 irFrame = frame.get<astra::infraredframe_16>();
 
         if (!irFrame.is_valid())
         {
-            clear_view(m_colorView);
-            m_colorView.texture.update(m_colorView.buffer.get());
+            clear_view(colorView_);
+            colorView_.texture.update(colorView_.buffer.get());
             return;
         }
 
         int irWidth = irFrame.resolutionX();
         int irHeight = irFrame.resolutionY();
 
-        init_texture(irWidth, irHeight, m_colorView);
+        init_texture(irWidth, irHeight, colorView_);
 
-        if (m_isPaused)
+        if (isPaused_)
         {
             return;
         }
 
         const uint16_t* ir_values = irFrame.data();
-        uint8_t* buffer = m_colorView.buffer.get();
+        uint8_t* buffer = colorView_.buffer.get();
         for (int i = 0; i < irWidth * irHeight; i++)
         {
             int rgbaOffset = i * 4;
@@ -189,32 +189,32 @@ public:
             buffer[rgbaOffset + 3] = 255;
         }
 
-        m_colorView.texture.update(m_colorView.buffer.get());
+        colorView_.texture.update(colorView_.buffer.get());
     }
 
-    void update_ir_rgb(astra::Frame& frame)
+    void update_ir_rgb(astra::frame& frame)
     {
-        astra::InfraredFrameRGB irFrame = frame.get<astra::InfraredFrameRGB>();
+        astra::infraredframe_rgb irFrame = frame.get<astra::infraredframe_rgb>();
 
         if (!irFrame.is_valid())
         {
-            clear_view(m_colorView);
-            m_colorView.texture.update(m_colorView.buffer.get());
+            clear_view(colorView_);
+            colorView_.texture.update(colorView_.buffer.get());
             return;
         }
 
         int irWidth = irFrame.resolutionX();
         int irHeight = irFrame.resolutionY();
 
-        init_texture(irWidth, irHeight, m_colorView);
+        init_texture(irWidth, irHeight, colorView_);
 
-        if (m_isPaused)
+        if (isPaused_)
         {
             return;
         }
 
-        const astra::RGBPixel* irRGB = irFrame.data();
-        uint8_t* buffer = m_colorView.buffer.get();
+        const astra::rgb_pixel* irRGB = irFrame.data();
+        uint8_t* buffer = colorView_.buffer.get();
         for (int i = 0; i < irWidth * irHeight; i++)
         {
             int rgbaOffset = i * 4;
@@ -224,15 +224,15 @@ public:
             buffer[rgbaOffset + 3] = 255;
         }
 
-        m_colorView.texture.update(m_colorView.buffer.get());
+        colorView_.texture.update(colorView_.buffer.get());
     }
 
-    virtual void on_frame_ready(astra::StreamReader& reader,
-                                astra::Frame& frame) override
+    virtual void on_frame_ready(astra::stream_reader& reader,
+                                astra::frame& frame) override
     {
         update_depth(frame);
 
-        switch (m_colorMode)
+        switch (colorMode_)
         {
         case MODE_COLOR:
             update_color(frame);
@@ -252,82 +252,82 @@ public:
     {
         int viewSize = (int)(window.getView().getSize().x / 2.0f);
 
-        if (m_depthView.buffer != nullptr)
+        if (depthView_.buffer != nullptr)
         {
-            float depthScale = viewSize / (float)m_depthView.width;
-            float height = m_depthView.height * depthScale;
+            float depthScale = viewSize / (float)depthView_.width;
+            float height = depthView_.height * depthScale;
             int horzCenter = window.getView().getCenter().y - height / 2.0f;
-            m_depthView.sprite.setScale(depthScale, depthScale);
-            m_depthView.sprite.setPosition(0, horzCenter);
-            window.draw(m_depthView.sprite);
+            depthView_.sprite.setScale(depthScale, depthScale);
+            depthView_.sprite.setPosition(0, horzCenter);
+            window.draw(depthView_.sprite);
         }
 
-        if (m_colorView.buffer != nullptr)
+        if (colorView_.buffer != nullptr)
         {
-            float colorScale = viewSize / (float)m_colorView.width;
-            float height = m_colorView.height * colorScale;
+            float colorScale = viewSize / (float)colorView_.width;
+            float height = colorView_.height * colorScale;
             int horzCenter = window.getView().getCenter().y - height / 2.0f;
-            m_colorView.sprite.setScale(colorScale, colorScale);
+            colorView_.sprite.setScale(colorScale, colorScale);
 
-            if (m_overlayDepth)
+            if (overlayDepth_)
             {
-                m_colorView.sprite.setPosition(0, horzCenter);
-                m_colorView.sprite.setColor(sf::Color(255, 255, 255, 128));
+                colorView_.sprite.setPosition(0, horzCenter);
+                colorView_.sprite.setColor(sf::Color(255, 255, 255, 128));
             }
             else
             {
-                m_colorView.sprite.setPosition(viewSize, horzCenter);
-                m_colorView.sprite.setColor(sf::Color(255, 255, 255, 255));
+                colorView_.sprite.setPosition(viewSize, horzCenter);
+                colorView_.sprite.setColor(sf::Color(255, 255, 255, 255));
             }
-            window.draw(m_colorView.sprite);
+            window.draw(colorView_.sprite);
         }
     }
 
     void toggle_depth_overlay()
     {
-        m_overlayDepth = !m_overlayDepth;
+        overlayDepth_ = !overlayDepth_;
     }
 
     bool get_overlayDepth() const
     {
-        return m_overlayDepth;
+        return overlayDepth_;
     }
 
     void toggle_Paused()
     {
-        m_isPaused = !m_isPaused;
+        isPaused_ = !isPaused_;
     }
 
     bool get_isPaused() const
     {
-        return m_isPaused;
+        return isPaused_;
     }
 
-    ColorMode get_mode() const { return m_colorMode; }
-    void set_mode(ColorMode mode) { m_colorMode = mode; }
+    ColorMode get_mode() const { return colorMode_; }
+    void set_mode(ColorMode mode) { colorMode_ = mode; }
 
 private:
-    samples::common::LitDepthVisualizer m_visualizer;
+    samples::common::lit_depth_visualizer visualizer_;
 
     using duration_type = std::chrono::duration<double>;
-    duration_type m_frameDuration{0.0};
+    duration_type frameDuration_{0.0};
 
     using clock_type = std::chrono::system_clock;
-    std::chrono::time_point<clock_type> m_lastTimepoint;
+    std::chrono::time_point<clock_type> lastTimepoint_;
 
-    stream_view m_depthView;
-    stream_view m_colorView;
-    ColorMode m_colorMode;
-    bool m_overlayDepth{ false };
-    bool m_isPaused{ false };
+    stream_view depthView_;
+    stream_view colorView_;
+    ColorMode colorMode_;
+    bool overlayDepth_{ false };
+    bool isPaused_{ false };
 };
 
-astra::DepthStream configure_depth(astra::StreamReader& reader)
+astra::depthstream configure_depth(astra::stream_reader& reader)
 {
-    auto depthStream = reader.stream<astra::DepthStream>();
+    auto depthStream = reader.stream<astra::depthstream>();
 
     //We don't have to set the mode to start the stream, but if you want to here is how:
-    astra::ImageStreamMode depthMode;
+    astra::imagestream_mode depthMode;
 
     depthMode.set_width(640);
     depthMode.set_height(480);
@@ -339,11 +339,11 @@ astra::DepthStream configure_depth(astra::StreamReader& reader)
     return depthStream;
 }
 
-astra::InfraredStream configure_ir(astra::StreamReader& reader, bool useRGB)
+astra::infraredstream configure_ir(astra::stream_reader& reader, bool useRGB)
 {
-    auto irStream = reader.stream<astra::InfraredStream>();
+    auto irStream = reader.stream<astra::infraredstream>();
 
-    astra::ImageStreamMode irMode;
+    astra::imagestream_mode irMode;
 
     irMode.set_width(640);
     irMode.set_height(480);
@@ -363,11 +363,11 @@ astra::InfraredStream configure_ir(astra::StreamReader& reader, bool useRGB)
     return irStream;
 }
 
-astra::ColorStream configure_color(astra::StreamReader& reader)
+astra::colorstream configure_color(astra::stream_reader& reader)
 {
-    auto colorStream = reader.stream<astra::ColorStream>();
+    auto colorStream = reader.stream<astra::colorstream>();
 
-    astra::ImageStreamMode colorMode;
+    astra::imagestream_mode colorMode;
 
     colorMode.set_width(640);
     colorMode.set_height(480);
@@ -381,7 +381,7 @@ astra::ColorStream configure_color(astra::StreamReader& reader)
 
 int main(int argc, char** argv)
 {
-    astra::Astra::initialize();
+    astra::initialize();
 
     set_key_handler();
 
@@ -396,10 +396,10 @@ int main(int argc, char** argv)
     bool is_fullscreen = false;
     sf::RenderWindow window(windowed_mode, "Stream Viewer");
 
-    astra::StreamSet streamset;
-    astra::StreamReader reader = streamset.create_reader();
+    astra::streamset streamset;
+    astra::stream_reader reader = streamset.create_reader();
 
-    reader.stream<astra::PointStream>().start();
+    reader.stream<astra::pointstream>().start();
 
     auto depthStream = configure_depth(reader);
     depthStream.start();
@@ -511,6 +511,6 @@ int main(int argc, char** argv)
         }
     }
 
-    astra::Astra::terminate();
+    astra::terminate();
     return 0;
 }

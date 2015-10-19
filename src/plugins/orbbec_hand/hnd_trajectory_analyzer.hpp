@@ -3,7 +3,7 @@
 
 #include "hnd_tracked_point.hpp"
 #include "hnd_settings.hpp"
-#include <Astra/Plugins/PluginLogger.h>
+#include <astra_core/Plugins/PluginLogger.h>
 
 namespace astra { namespace hand {
 

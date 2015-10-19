@@ -1,16 +1,16 @@
 #ifndef SKELETONTRACKER_H
 #define SKELETONTRACKER_H
 
-#include <Astra/Plugins/PluginKit.h>
-#include <Astra/Astra.h>
-#include <AstraUL/astraul_ctypes.h>
-#include <AstraUL/streams/Depth.h>
-#include <AstraUL/streams/skeleton_types.h>
-#include "SkeletonStream.h"
+#include <astra_core/Plugins/PluginKit.h>
+#include <astra_core/Astra.h>
+#include <astra/capi/astra_ctypes.h>
+#include <astra/streams/Depth.h>
+#include <astra/streams/skeleton_types.h>
+#include "skeletonstream.h"
 
 namespace astra { namespace plugins { namespace skeleton {
 
-    class SkeletonTracker : public astra::FrameReadyListener
+    class SkeletonTracker : public astra::frame_listener
     {
     public:
         static const size_t MAX_SKELETONS;
@@ -18,34 +18,34 @@ namespace astra { namespace plugins { namespace skeleton {
         SkeletonTracker(PluginServiceProxy& pluginService,
                         astra_streamset_t streamSet,
                         astra_stream_t sourceStream)
-            : m_sourceStreamHandle(sourceStream),
-              m_sensor(get_uri_for_streamset(pluginService, streamSet)),
-              m_pluginService(pluginService)
+            : sourceStreamHandle_(sourceStream),
+              sensor_(get_uri_for_streamset(pluginService, streamSet)),
+              pluginService_(pluginService)
         {
-            m_reader = m_sensor.create_reader();
-            m_depthStream = m_reader.stream<astra::DepthStream>();
-            m_depthStream.start();
+            reader_ = sensor_.create_reader();
+            depthStream_ = reader_.stream<astra::depthstream>();
+            depthStream_.start();
 
-            m_reader.addListener(*this);
-            m_skeletonStream = std::make_unique<SkeletonStream>(m_pluginService,
-                                                                streamSet,
-                                                                m_sourceStreamHandle,
-                                                                SkeletonTracker::MAX_SKELETONS);
+            reader_.addListener(*this);
+            skeletonStream_ = std::make_unique<skeletonstream>(pluginService_,
+                                                               streamSet,
+                                                               sourceStreamHandle_,
+                                                               SkeletonTracker::MAX_SKELETONS);
         }
 
-        astra_stream_t sourceStream() { return m_sourceStreamHandle; }
+        astra_stream_t sourceStream() { return sourceStreamHandle_; }
 
-        virtual void on_frame_ready(astra::StreamReader& reader, astra::Frame& frame) override;
+        virtual void on_frame_ready(astra::StreaReader_& reader, astra::frame& frame) override;
 
     private:
-        astra_stream_t m_sourceStreamHandle;
-        DepthStream m_depthStream{nullptr};
-        Sensor m_sensor;
-        StreamReader m_reader;
-        PluginServiceProxy& m_pluginService;
+        astra_stream_t sourceStreamHandle_;
+        depthstream depthStream_{nullptr};
+        streamset sensor_;
+        stream_reader reader_;
+        PluginServiceProxy& pluginService_;
 
-        using SkeletonStreamPtr = std::unique_ptr<SkeletonStream>;
-        SkeletonStreamPtr m_skeletonStream;
+        using skeletonstream_ptr = std::unique_ptr<skeletonstream>;
+        skeletonstream_ptr skeletonStream_;
     };
 
 

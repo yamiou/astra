@@ -46,4 +46,4 @@ add_library(${_projname} SHARED ${${_projname}_SOURCES} ${${_projname}_HEADERS})
 
 set_target_properties(${_projname} PROPERTIES FOLDER "plugins")
 
-target_link_libraries(${_projname} AstraAPI astra-device-sdk ${SFML_LIBRARIES})
+target_link_libraries(${_projname} astra_core_api astra-device-sdk ${SFML_LIBRARIES})

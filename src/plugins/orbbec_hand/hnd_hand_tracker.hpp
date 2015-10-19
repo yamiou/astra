@@ -2,9 +2,9 @@
 #define HND_HAND_TRACKER_H
 
 #include <opencv2/imgproc/imgproc.hpp>
-#include <AstraUL/AstraUL.h>
-#include <AstraUL/Plugins/stream_types.h>
-#include <Astra/Plugins/PluginKit.h>
+#include <astra/astra.hpp>
+#include <astra/capi/streams/stream_types.h>
+#include <astra_core/Plugins/PluginKit.h>
 
 #include "hnd_depth_utility.hpp"
 #include "hnd_tracked_point.hpp"
@@ -18,16 +18,16 @@
 
 namespace astra { namespace hand {
 
-    class hand_tracker : public FrameReadyListener
+    class hand_tracker : public frame_listener
     {
     public:
         hand_tracker(PluginServiceProxy& pluginService,
                      astra_streamset_t streamSet,
-                     StreamDescription& depthDesc,
+                     stream_description& depthDesc,
                      hand_settings& settings);
 
         virtual ~hand_tracker();
-        virtual void on_frame_ready(StreamReader& reader, Frame& frame) override;
+        virtual void on_frame_ready(stream_reader& reader, frame& frame) override;
     private:
         void create_streams(PluginServiceProxy& pluginService, astra_streamset_t streamSet);
         void reset();
@@ -39,7 +39,7 @@ namespace astra { namespace hand {
         void overlay_circle(_astra_imageframe& imageFrame);
         void update_debug_image_frame(_astra_imageframe& astraColorframe);
         void generate_hand_debug_image_frame(astra_frame_index_t frameIndex);
-        void update_tracking(DepthFrame& depthFrame, PointFrame& pointFrame);
+        void update_tracking(depthframe& depthFrame, pointframe& pointFrame);
         void update_hand_frame(std::vector<tracked_point>& internaltracked_points, _astra_handframe& frame);
 
         void debug_probe_point(tracking_matrices& matrices);
@@ -48,15 +48,15 @@ namespace astra { namespace hand {
         void track_points(cv::Mat& matDepth,
                           cv::Mat& matDepthFullSize,
                           cv::Mat& matForeground,
-                          const Vector3f* worldPoints);
+                          const vector3f* worldPoints);
         cv::Point get_mouse_probe_position();
         cv::Point get_spawn_position();
 
         //fields
 
-        StreamSet streamset_;
-        StreamReader reader_;
-        DepthStream depthStream_;
+        streamset streamset_;
+        stream_reader reader_;
+        depthstream depthStream_;
 
         hand_settings& settings_;
         PluginServiceProxy& pluginService_;
@@ -67,7 +67,7 @@ namespace astra { namespace hand {
         float processingSizeHeight_;
 
         using colorstream_ptr = std::unique_ptr<debug_handstream>;
-        colorstream_ptr debugImageStream_;
+        colorstream_ptr debugimagestream_;
 
         using handstream_ptr = std::unique_ptr<handstream>;
         handstream_ptr handStream_;
@@ -104,7 +104,7 @@ namespace astra { namespace hand {
         cv::Mat refineScore_;
         cv::Mat refineEdgeDistance_;
 
-        astra::Vector3f* worldPoints_{nullptr};
+        astra::vector3f* worldPoints_{nullptr};
         int numWorldPoints_{0};
 
         debug_visualizer debugVisualizer_;

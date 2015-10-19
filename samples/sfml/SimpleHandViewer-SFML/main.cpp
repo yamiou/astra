@@ -1,7 +1,7 @@
 #include <SFML/Graphics.hpp>
-#include <Astra/Astra.h>
-#include <AstraUL/AstraUL.h>
-#include "../../common/LitDepthVisualizer.h"
+#include <astra_core/astra_core.hpp>
+#include <astra/astra.hpp>
+#include "../../common/lit_depth_visualizer.hpp"
 #include <sstream>
 #include <iomanip>
 #include <deque>
@@ -39,15 +39,15 @@ private:
     sf::Color color;
 };
 
-class HandFrameListener : public astra::FrameReadyListener
+class HandFrameListener : public astra::frame_listener
 {
 public:
-    using PointList = std::deque < astra::Vector2i >;
+    using PointList = std::deque < astra::vector2i >;
     using PointMap = std::unordered_map < int, PointList >;
 
     HandFrameListener()
     {
-        m_font.loadFromFile("Inconsolata.otf");
+        font_.loadFromFile("Inconsolata.otf");
     }
 
     HandFrameListener(const HandFrameListener&) = delete;
@@ -55,18 +55,18 @@ public:
 
     void init_texture(int width, int height)
     {
-        if (m_displayBuffer == nullptr || width != m_depthWidth || height != m_depthHeight)
+        if (displayBuffer_ == nullptr || width != depthWidth_ || height != depthHeight_)
         {
-            m_depthWidth = width;
-            m_depthHeight = height;
-            int byteLength = m_depthWidth * m_depthHeight * 4;
+            depthWidth_ = width;
+            depthHeight_ = height;
+            int byteLength = depthWidth_ * depthHeight_ * 4;
 
-            m_displayBuffer = BufferPtr(new uint8_t[byteLength]);
-            memset(m_displayBuffer.get(), 0, byteLength);
+            displayBuffer_ = BufferPtr(new uint8_t[byteLength]);
+            memset(displayBuffer_.get(), 0, byteLength);
 
-            m_texture.create(m_depthWidth, m_depthHeight);
-            m_sprite.setTexture(m_texture);
-            m_sprite.setPosition(0, 0);
+            texture_.create(depthWidth_, depthHeight_);
+            sprite_.setTexture(texture_);
+            sprite_.setPosition(0, 0);
         }
     }
 
@@ -75,55 +75,55 @@ public:
         double fpsFactor = 0.02;
 
         std::clock_t newTimepoint= std::clock();
-        long double frameDuration = (newTimepoint - m_lastTimepoint) / static_cast<long double>(CLOCKS_PER_SEC);
+        long double frameDuration = (newTimepoint - lastTimepoint_) / static_cast<long double>(CLOCKS_PER_SEC);
 
-        m_frameDuration = frameDuration * fpsFactor + m_frameDuration * (1 - fpsFactor);
-        m_lastTimepoint = newTimepoint;
-        double fps = 1.0 / m_frameDuration;
+        frameDuration_ = frameDuration * fpsFactor + frameDuration_ * (1 - fpsFactor);
+        lastTimepoint_ = newTimepoint;
+        double fps = 1.0 / frameDuration_;
 
-        printf("FPS: %3.1f (%3.4Lf ms)\n", fps, m_frameDuration * 1000);
+        printf("FPS: %3.1f (%3.4Lf ms)\n", fps, frameDuration_ * 1000);
     }
 
-    void processDepth(astra::Frame& frame)
+    void processDepth(astra::frame& frame)
     {
-        astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
+        astra::pointframe pointFrame = frame.get<astra::pointframe>();
 
         int width = pointFrame.resolutionX();
         int height = pointFrame.resolutionY();
 
         init_texture(width, height);
 
-        m_visualizer.update(pointFrame);
-        astra_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
+        visualizer_.update(pointFrame);
+        astra_rgb_pixel_t* vizBuffer = visualizer_.get_output();
 
         for (int i = 0; i < width * height; i++)
         {
             int rgbaOffset = i * 4;
-            m_displayBuffer[rgbaOffset] = vizBuffer[i].r;
-            m_displayBuffer[rgbaOffset + 1] = vizBuffer[i].b;
-            m_displayBuffer[rgbaOffset + 2] = vizBuffer[i].g;
-            m_displayBuffer[rgbaOffset + 3] = 255;
+            displayBuffer_[rgbaOffset] = vizBuffer[i].r;
+            displayBuffer_[rgbaOffset + 1] = vizBuffer[i].b;
+            displayBuffer_[rgbaOffset + 2] = vizBuffer[i].g;
+            displayBuffer_[rgbaOffset + 3] = 255;
         }
 
-        m_texture.update(m_displayBuffer.get());
+        texture_.update(displayBuffer_.get());
     }
 
-    void updateHandTrace(int trackingId, const astra::Vector2i& position)
+    void updateHandTrace(int trackingId, const astra::vector2i& position)
     {
-        auto it = m_pointMap.find(trackingId);
-        if (it == m_pointMap.end())
+        auto it = pointMap_.find(trackingId);
+        if (it == pointMap_.end())
         {
             PointList list;
-            for (int i = 0; i < m_maxTraceLength; i++)
+            for (int i = 0; i < maxTraceLength_; i++)
             {
                 list.push_back(position);
             }
-            m_pointMap.insert(std::make_pair(trackingId, list));
+            pointMap_.insert(std::make_pair(trackingId, list));
         }
         else
         {
             PointList& list = it->second;
-            while (list.size() < m_maxTraceLength)
+            while (list.size() < maxTraceLength_)
             {
                 list.push_back(position);
             }
@@ -132,9 +132,9 @@ public:
 
     void shortenHandTraces()
     {
-        auto it = m_pointMap.begin();
+        auto it = pointMap_.begin();
 
-        while (it != m_pointMap.end())
+        while (it != pointMap_.end())
         {
             PointList& list = it->second;
             if (list.size() > 1)
@@ -144,19 +144,19 @@ public:
             }
             else
             {
-                it = m_pointMap.erase(it);
+                it = pointMap_.erase(it);
             }
         }
     }
 
-    void processHandFrame(astra::Frame& frame)
+    void processHandFrame(astra::frame& frame)
     {
-        astra::HandFrame handFrame = frame.get<astra::HandFrame>();
+        astra::handframe handFrame = frame.get<astra::handframe>();
 
-        m_handPoints = handFrame.handpoints();
+        handPoints_ = handFrame.handpoints();
 
         shortenHandTraces();
-        for (auto handPoint : m_handPoints)
+        for (auto handPoint : handPoints_)
         {
             if (handPoint.status() == HAND_STATUS_TRACKING)
             {
@@ -165,8 +165,8 @@ public:
         }
     }
 
-    virtual void on_frame_ready(astra::StreamReader& reader,
-                                astra::Frame& frame) override
+    virtual void on_frame_ready(astra::stream_reader& reader,
+                                astra::frame& frame) override
     {
         processDepth(frame);
         processHandFrame(frame);
@@ -196,7 +196,7 @@ public:
         window.draw(text);
     }
 
-    void drawHandLabel(sf::RenderWindow& window, float radius, float x, float y, astra::HandPoint& handPoint)
+    void drawHandLabel(sf::RenderWindow& window, float radius, float x, float y, astra::handpoint& handPoint)
     {
         int32_t trackingId = handPoint.trackingId();
         std::stringstream str;
@@ -205,7 +205,7 @@ public:
         {
             str << " Lost";
         }
-        sf::Text label(str.str(), m_font);
+        sf::Text label(str.str(), font_);
         int characterSize = 60;
         label.setCharacterSize(characterSize);
 
@@ -214,13 +214,13 @@ public:
         drawShadowText(window, label, sf::Color::White, x, y - radius - 10);
     }
 
-    void drawHandPosition(sf::RenderWindow& window, float radius, float x, float y, astra::HandPoint& handPoint)
+    void drawHandPosition(sf::RenderWindow& window, float radius, float x, float y, astra::handpoint& handPoint)
     {
         auto worldPosition = handPoint.worldPosition();
         std::stringstream str;
         str << std::fixed << std::setprecision(0);
         str << worldPosition.x << "," << worldPosition.y << "," << worldPosition.z;
-        sf::Text label(str.str(), m_font);
+        sf::Text label(str.str(), font_);
         int characterSize = 60;
         label.setCharacterSize(characterSize);
 
@@ -239,10 +239,10 @@ public:
         float thickness = 4;
         auto it = pointList.begin();
 
-        astra::Vector2i lastPoint = *it;
+        astra::vector2i lastPoint = *it;
         while (it != pointList.end())
         {
-            astra::Vector2i currentPoint = *it;
+            astra::vector2i currentPoint = *it;
             ++it;
 
             sf::Vector2f p1((lastPoint.x + 0.5) * depthScale,
@@ -255,14 +255,14 @@ public:
         }
     }
 
-    void drawHandPoints(sf::RenderWindow& window, float depthScale)
+    void drawhandpoints(sf::RenderWindow& window, float depthScale)
     {
         float radius = 16;
         sf::Color candidateColor(255, 255, 0);
         sf::Color lostColor(255, 0, 0);
         sf::Color trackingColor(0, 139, 69);
 
-        for (auto handPoint : m_handPoints)
+        for (auto handPoint : handPoints_)
         {
             sf::Color color = trackingColor;
             if (handPoint.status() == HAND_STATUS_LOST)
@@ -274,7 +274,7 @@ public:
                 color = candidateColor;
             }
 
-            const astra::Vector2i& p = handPoint.depthPosition();
+            const astra::vector2i& p = handPoint.depthPosition();
 
             float circleX = (p.x + 0.5) * depthScale;
             float circleY = (p.y + 0.5) * depthScale;
@@ -289,7 +289,7 @@ public:
         }
 
         sf::Color lineColor(0, 0, 255);
-        for (auto it : m_pointMap)
+        for (auto it : pointMap_)
         {
             PointList& list = it.second;
             drawHandTrace(window, list, lineColor, depthScale);
@@ -298,52 +298,52 @@ public:
 
     void drawTo(sf::RenderWindow& window)
     {
-        if (m_displayBuffer != nullptr)
+        if (displayBuffer_ != nullptr)
         {
-            float depthScale = window.getView().getSize().x / m_depthWidth;
+            float depthScale = window.getView().getSize().x / depthWidth_;
 
-            m_sprite.setScale(depthScale, depthScale);
+            sprite_.setScale(depthScale, depthScale);
 
-            window.draw(m_sprite);
+            window.draw(sprite_);
 
-            drawHandPoints(window, depthScale);
+            drawhandpoints(window, depthScale);
         }
     }
 
 private:
-    samples::common::LitDepthVisualizer m_visualizer;
+    samples::common::lit_depth_visualizer visualizer_;
 
-    long double m_frameDuration{ 0 };
-    std::clock_t m_lastTimepoint { 0 };
-    sf::Texture m_texture;
-    sf::Sprite m_sprite;
-    sf::Font m_font;
+    long double frameDuration_{ 0 };
+    std::clock_t lastTimepoint_ { 0 };
+    sf::Texture texture_;
+    sf::Sprite sprite_;
+    sf::Font font_;
 
     using BufferPtr = std::unique_ptr < uint8_t[] >;
-    BufferPtr m_displayBuffer{ nullptr };
+    BufferPtr displayBuffer_{ nullptr };
 
-    std::vector<astra::HandPoint> m_handPoints;
+    std::vector<astra::handpoint> handPoints_;
 
-    PointMap m_pointMap;
+    PointMap pointMap_;
 
-    int m_depthWidth { 0 };
-    int m_depthHeight { 0 };
-    int m_maxTraceLength{ 15 };
+    int depthWidth_ { 0 };
+    int depthHeight_ { 0 };
+    int maxTraceLength_{ 15 };
 };
 
 int main(int argc, char** argv)
 {
-    astra::Astra::initialize();
+    astra::initialize();
 
     set_key_handler();
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Hand Viewer");
 
-    astra::StreamSet streamset;
-    astra::StreamReader reader = streamset.create_reader();
+    astra::streamset streamset;
+    astra::stream_reader reader = streamset.create_reader();
 
-    reader.stream<astra::PointStream>().start();
-    reader.stream<astra::HandStream>().start();
+    reader.stream<astra::pointstream>().start();
+    reader.stream<astra::handstream>().start();
 
     HandFrameListener listener;
 
@@ -386,7 +386,7 @@ int main(int argc, char** argv)
         }
     }
 
-    astra::Astra::terminate();
+    astra::terminate();
 
     return 0;
 }

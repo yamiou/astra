@@ -3,10 +3,10 @@
 
 #include <memory>
 
-#include <Astra/Astra.h>
-#include <Astra/Plugins/plugin_capi.h>
-#include <Astra/Plugins/Stream.h>
-#include <Astra/Plugins/StreamBin.h>
+#include <astra_core/astra_core.hpp>
+#include <astra_core/capi/plugins/astra_plugin.h>
+#include <astra_core/Plugins/Stream.h>
+#include <astra_core/Plugins/StreamBin.h>
 
 #include "mock_stream_listener.hpp"
 
@@ -17,7 +17,7 @@ namespace orbbec { namespace mocks {
     public:
         inline stream(astra::PluginServiceProxy& pluginService,
                       astra_streamset_t streamSet,
-                      astra::StreamDescription desc,
+                      astra::stream_description desc,
                       stream_listener& listener);
 
         inline astra_status_t read(astra_frame_index_t frameIndex);
@@ -51,7 +51,7 @@ namespace orbbec { namespace mocks {
 
     stream::stream(astra::PluginServiceProxy& pluginService,
                    astra_streamset_t streamSet,
-                   astra::StreamDescription desc,
+                   astra::stream_description desc,
                    orbbec::mocks::stream_listener& listener)
         : Stream(pluginService,
                  streamSet,

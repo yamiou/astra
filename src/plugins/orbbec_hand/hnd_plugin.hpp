@@ -1,8 +1,8 @@
 #ifndef HND_PLUGIN_H
 #define HND_PLUGIN_H
 
-#include <Astra/Plugins/PluginKit.h>
-#include <AstraUL/AstraUL.h>
+#include <astra_core/Plugins/PluginKit.h>
+#include <astra/astra.hpp>
 #include <map>
 #include "hnd_hand_tracker.hpp"
 #include "hnd_settings.hpp"

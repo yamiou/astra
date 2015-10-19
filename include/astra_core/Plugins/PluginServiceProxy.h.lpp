@@ -1,0 +1,24 @@
+/* ^^^AUTOGENHEADER^^^ */
+#ifndef PLUGINSERVICEPROXY_H
+#define PLUGINSERVICEPROXY_H
+
+#include <astra_core/capi/plugins/astra_pluginservice_proxy.h>
+#include <cstdarg>
+#include <cstdio>
+
+namespace astra {
+
+    class PluginServiceProxy : public astra_pluginservice_proxy_t
+    {
+    public:
+^^^BEGINREPLACE:plugin^^^
+
+    ^RETURN^ ^FUNC^(^PARAMS^)
+    {
+        return astra_pluginservice_proxy_t::^FUNC^(^PARAMS:void,names^);
+    }
+^^^ENDREPLACE^^^
+    };
+}
+
+#endif /* PLUGINSERVICEPROXY_H */

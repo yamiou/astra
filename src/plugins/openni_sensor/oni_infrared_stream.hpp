@@ -2,9 +2,9 @@
 #define ONI_INFRARED_STREAM_H
 
 #include "oni_devicestream.hpp"
-#include <Astra/Plugins/plugin_capi.h>
-#include <AstraUL/astraul_ctypes.h>
-#include <AstraUL/Plugins/stream_types.h>
+#include <astra_core/capi/plugins/astra_plugin.h>
+#include <astra/capi/astra_ctypes.h>
+#include <astra/capi/streams/stream_types.h>
 
 namespace orbbec { namespace ni {
 

@@ -1,7 +1,7 @@
 #ifndef PLAYBACKSTREAMSET_H
 #define PLAYBACKSTREAMSET_H
 
-#include <Astra/Plugins/plugin_capi.h>
+#include <astra_core/capi/plugins/astra_plugin.h>
 #include <memory>
 #include <vector>
 #include <string>

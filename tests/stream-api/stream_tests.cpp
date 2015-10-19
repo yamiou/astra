@@ -1,9 +1,9 @@
 #include "catch.hpp"
-#include <Astra/Astra.h>
-#include <AstraUL/AstraUL.h>
+#include <astra_core/astra_core.hpp>
+#include <astra/astra.hpp>
 
-TEST_CASE("Can start a DepthStream", "[c++-stream-api-ul]") {
-    astra::StreamSet streamset;
-    astra::StreamReader reader = streamset.create_reader();
-    reader.stream<astra::DepthStream>().start();
+TEST_CASE("Can start a depthstream", "[c++-stream-api-ul]") {
+    astra::streamset streamset;
+    astra::stream_reader reader = streamset.create_reader();
+    reader.stream<astra::depthstream>().start();
 }

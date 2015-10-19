@@ -1,0 +1,24 @@
+/* ^^^AUTOGENHEADER^^^ */
+#ifndef ASTRA_CREATE_STREAM_PROXY_H
+#define ASTRA_CREATE_STREAM_PROXY_H
+
+#include "astra_context.hpp"
+#include "astra_stream_service_delegate.hpp"
+#include <astra_core/capi/astra_streamservice_proxy.h>
+
+namespace astra {
+
+    static inline astra_streamservice_proxy_t* create_stream_proxy(context* context)
+    {
+        astra_streamservice_proxy_t* proxy = new astra_streamservice_proxy_t;
+
+^^^BEGINREPLACE:stream^^^
+        proxy->^FUNC^ = &stream_service_delegate::^FUNC^;
+^^^ENDREPLACE^^^
+        proxy->streamService = context;
+
+        return proxy;
+    }
+}
+
+#endif /* ASTRA_CREATE_STREAM_PROXY_H */

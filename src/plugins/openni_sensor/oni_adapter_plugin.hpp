@@ -1,17 +1,17 @@
 ﻿#ifndef OPENNIPLUGIN_H
 #define OPENNIPLUGIN_H
 
-#include <Astra/Astra.h>
-#include <Astra/Plugins/PluginBase.h>
-#include <Astra/Plugins/PluginLogger.h>
+#include <astra_core/astra_core.hpp>
+#include <astra_core/Plugins/PluginBase.h>
+#include <astra_core/Plugins/PluginLogger.h>
 #include "oni_devicestream.hpp"
 #include "oni_device_streamset.hpp"
 #include <memory>
 #include <vector>
 #include <OpenNI.h>
-#include <AstraUL/streams/depth_types.h>
-#include <AstraUL/streams/color_types.h>
-#include <AstraUL/Plugins/stream_types.h>
+#include <astra/capi/streams/depth_types.h>
+#include <astra/capi/streams/color_types.h>
+#include <astra/capi/streams/stream_types.h>
 
 namespace orbbec { namespace ni {
 

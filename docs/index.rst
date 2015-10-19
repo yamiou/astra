@@ -46,22 +46,22 @@ The designers of the SDK are also experienced 3D sensor developers themselves, a
    astra::StreamReader reader = streamSet.create_reader();
 
    // Low-Level Streams
-   reader.stream<astra::DepthStream>().start();
-   reader.stream<astra::ColorStream>().start();
+   reader.stream<astra::depthstream>().start();
+   reader.stream<astra::colorstream>().start();
 
    //High-Level Streams
-   reader.stream<astra::HandStream>().start();
-   reader.stream<astra::PointStream>().start();
+   reader.stream<astra::handstream>().start();
+   reader.stream<astra::pointstream>().start();
 
-   astra::Frame frame = reader.get_latest_frame();
+   astra::frame frame = reader.get_latest_frame();
 
    //Low-Level Streams
-   auto depthFrame = frame.get<astra::DepthFrame>();
-   auto colorFrame = frame.get<astra::ColorFrame>();
+   auto depthFrame = frame.get<astra::depthframe>();
+   auto colorFrame = frame.get<astra::colorframe>();
 
    //High-Level Streams
-   auto handFrame = frame.get<astra::HandFrame>();
-   auto pointFrame = frame.get<astra::PointFrame>();
+   auto handFrame = frame.get<astra::handframe>();
+   auto pointFrame = frame.get<astra::pointframe>();
 
    astra::Astra::terminate();
 

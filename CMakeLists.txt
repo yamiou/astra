@@ -93,9 +93,9 @@ endif()
 #Override FindAstra equivalents
 set(ASTRA_SDK_BUILD TRUE)
 set(ASTRA_LIBRARIES
-  Astra
-  AstraAPI
-  AstraUL
+  astra_core
+  astra_core_api
+  astra
   )
 set(ASTRA_INCLUDE_DIR
   ${PROJECT_SOURCE_DIR}/include
@@ -198,7 +198,7 @@ MESSAGE("CMAKE_INSTALL_PREFIX : ${CMAKE_INSTALL_PREFIX}")
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include
   DESTINATION .
   PATTERN "*.lpp" EXCLUDE
-  PATTERN "include/AstraUL/Plugins" EXCLUDE
+  PATTERN "include/astra/Plugins" EXCLUDE
   )
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples

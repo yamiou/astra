@@ -1,10 +1,10 @@
 #ifndef HND_HAND_STREAM_H
 #define HND_HAND_STREAM_H
 
-#include <Astra/Plugins/SingleBinStream.h>
-#include <AstraUL/streams/hand_types.h>
-#include <AstraUL/astraul_ctypes.h>
-#include <AstraUL/Plugins/stream_types.h>
+#include <astra_core/Plugins/SingleBinStream.h>
+#include <astra/capi/streams/hand_types.h>
+#include <astra/capi/astra_ctypes.h>
+#include <astra/capi/streams/stream_types.h>
 #include <Shiny.h>
 
 namespace astra { namespace hand {
@@ -17,7 +17,7 @@ namespace astra { namespace hand {
                    size_t maxHandCount)
             : SingleBinStream(pluginService,
                               streamSet,
-                              StreamDescription(ASTRA_STREAM_HAND,
+                              stream_description(ASTRA_STREAM_HAND,
                                                 DEFAULT_SUBTYPE),
                               sizeof(astra_handpoint_t) * maxHandCount)
         { }

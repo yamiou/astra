@@ -1,8 +1,8 @@
 #ifndef MOCK_DEVICE_DEPTH_STREAM_H
 #define MOCK_DEVICE_DEPTH_STREAM_H
 
-#include <AstraUL/astraul_ctypes.h>
-#include <AstraUL/streams/depth_capi.h>
+#include <astra/capi/astra_ctypes.h>
+#include <astra/capi/streams/depth_capi.h>
 
 #include <cmath>
 #include <chrono>

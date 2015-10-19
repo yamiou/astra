@@ -1,5 +1,5 @@
 #include "mock_base_stream.hpp"
-#include <AstraUL/streams/image_parameters.h>
+#include <astra/capi/streams/image_parameters.h>
 #include <cstring>
 
 namespace orbbec { namespace mocks {
@@ -75,10 +75,10 @@ namespace orbbec { namespace mocks {
             *size =  sizeof(float);
             break;
         case ASTRA_PARAMETER_IMAGE_MODE:
-            *size = sizeof(astra::ImageStreamMode);
+            *size = sizeof(astra::imagestream_mode);
             break;
         case ASTRA_PARAMETER_IMAGE_MODES:
-            *size = sizeof(astra::ImageStreamMode) * modes_size();
+            *size = sizeof(astra::imagestream_mode) * modes_size();
             break;
         default:
             return device_status_value::invalid_parameter;
@@ -121,7 +121,7 @@ namespace orbbec { namespace mocks {
         }
         case ASTRA_PARAMETER_IMAGE_MODES:
         {
-            assert(size >= sizeof(astra::ImageStreamMode) * modes_size());
+            assert(size >= sizeof(astra::imagestream_mode) * modes_size());
             std::memcpy(value, &(*modes_begin()), size);
 
             break;
@@ -146,7 +146,7 @@ namespace orbbec { namespace mocks {
         }
         case ASTRA_PARAMETER_IMAGE_MODE:
         {
-            const astra::ImageStreamMode mode = *static_cast<const astra::ImageStreamMode*>(value);
+            const astra::imagestream_mode mode = *static_cast<const astra::imagestream_mode*>(value);
             timer_.set_interval(1.0 / mode.fps());
             set_active_mode(mode);
 

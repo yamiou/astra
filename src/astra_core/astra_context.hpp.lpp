@@ -1,0 +1,42 @@
+/* ^^^AUTOGENHEADER^^^ */
+#ifndef ASTRA_CONTEXT_H
+#define ASTRA_CONTEXT_H
+
+#include <astra_core/capi/astra_types.h>
+#include <memory>
+
+struct astra_streamservice_proxy_t;
+
+namespace astra {
+
+    class streamset;
+    class streamset_catalog;
+    class context_impl;
+
+    class context
+    {
+    public:
+        context();
+        ~context();
+
+        context& operator=(const context& rhs) = delete;
+        context(const context& context) = delete;
+
+        astra_status_t initialize();
+        astra_status_t terminate();
+
+^^^BEGINREPLACE:stream^^^
+        ^RETURN^ ^FUNC^(^PARAMS:ref^);
+
+^^^ENDREPLACE^^^
+        astra_streamservice_proxy_t* proxy();
+
+        astra_status_t notify_host_event(astra_event_id id, const void* data, size_t dataSize);
+
+    private:
+        std::unique_ptr<context_impl> impl_;
+        std::unique_ptr<astra_streamservice_proxy_t> proxy_;
+    };
+}
+
+#endif /* ASTRA_CONTEXT_H */

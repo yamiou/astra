@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 
-#include <AstraUL/streams/Image.h>
+#include <astra/streams/astra_image.hpp>
 #include "astra_device_status.hpp"
 #include "astra_stream_state.hpp"
 
@@ -38,7 +38,7 @@ namespace astra { namespace devices {
     {
     public:
         using shared_ptr = std::shared_ptr<sensor_stream>;
-        using stream_mode = astra::ImageStreamMode;
+        using stream_mode = astra::imagestream_mode;
         using mode_collection =  std::vector<stream_mode>;
         using mode_const_iterator = mode_collection::const_iterator;
         using listener_ptr = stream_listener*;

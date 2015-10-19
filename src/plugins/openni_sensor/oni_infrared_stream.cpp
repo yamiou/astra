@@ -8,7 +8,7 @@ namespace orbbec { namespace ni {
                                      stream_listener& listener)
         : devicestream(pluginService,
                        streamSet,
-                       astra::StreamDescription(
+                       astra::stream_description(
                            ASTRA_STREAM_INFRARED,
                            DEFAULT_SUBTYPE),
                        oniDevice,

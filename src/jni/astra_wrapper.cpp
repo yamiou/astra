@@ -1,6 +1,6 @@
 #include <jni.h>
-#include <Astra/Astra.h>
-#include <Astra/host_events.h>
+#include <astra_core/Astra.h>
+#include <astra_core/astra_host_events.h>
 #include "astra_wrapper.h"
 
 #ifdef __cplusplus

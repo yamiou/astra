@@ -89,7 +89,7 @@ namespace astra { namespace hand {
         int maxFailedTestsInProbationActivePoints{ 3 };
         float secondChanceMinDistance{ 100.0f };
         float mergePointDistance { 100.0f }; //mm
-        int maxHandPointUpdatesPerFrame { 10 };
+        int maxhandpointUpdatesPerFrame { 10 };
     };
 
     struct hand_settings

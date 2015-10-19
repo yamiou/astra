@@ -1,25 +1,24 @@
 #include <SFML/Graphics.hpp>
-#include <Astra/Astra.h>
-#include <AstraUL/AstraUL.h>
+#include <astra/astra.hpp>
 #include <iostream>
 
-class SkeletonFrameListener : public astra::FrameReadyListener
+class skeletonframeListener : public astra::frame_listener
 {
 public:
     void init_texture(int width, int height)
     {
-        if (m_displayBuffer == nullptr || width != m_depthWidth || height != m_depthHeight)
+        if (displayBuffer_ == nullptr || width != depthWidth_ || height != depthHeight_)
         {
-            m_depthWidth = width;
-            m_depthHeight = height;
-            int byteLength = m_depthWidth * m_depthHeight * 4;
+            depthWidth_ = width;
+            depthHeight_ = height;
+            int byteLength = depthWidth_ * depthHeight_ * 4;
 
-            m_displayBuffer = BufferPtr(new uint8_t[byteLength]);
-            memset(m_displayBuffer.get(), 0, byteLength);
+            displayBuffer_ = BufferPtr(new uint8_t[byteLength]);
+            memset(displayBuffer_.get(), 0, byteLength);
 
-            m_texture.create(m_depthWidth, m_depthHeight);
-            m_sprite.setTexture(m_texture);
-            m_sprite.setPosition(0, 0);
+            texture_.create(depthWidth_, depthHeight_);
+            sprite_.setTexture(texture_);
+            sprite_.setPosition(0, 0);
         }
     }
 
@@ -28,18 +27,18 @@ public:
         double fpsFactor = 0.02;
 
         std::clock_t newTimepoint= std::clock();
-        long double frameDuration = (newTimepoint - m_lastTimepoint) / static_cast<long double>(CLOCKS_PER_SEC);
+        long double frameDuration = (newTimepoint - lastTimepoint_) / static_cast<long double>(CLOCKS_PER_SEC);
 
-        m_frameDuration = frameDuration * fpsFactor + m_frameDuration * (1 - fpsFactor);
-        m_lastTimepoint = newTimepoint;
-        double fps = 1.0 / m_frameDuration;
+        frameDuration_ = frameDuration * fpsFactor + frameDuration_ * (1 - fpsFactor);
+        lastTimepoint_ = newTimepoint;
+        double fps = 1.0 / frameDuration_;
 
-        printf("FPS: %3.1f (%3.4Lf ms)\n", fps, m_frameDuration * 1000);
+        printf("FPS: %3.1f (%3.4Lf ms)\n", fps, frameDuration_ * 1000);
     }
 
-    void processDepth(astra::Frame& frame)
+    void processDepth(astra::frame& frame)
     {
-        astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
+        astra::depthframe depthFrame = frame.get<astra::depthframe>();
 
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
@@ -57,42 +56,42 @@ public:
                 int16_t depth = depthPtr[index];
                 uint8_t value = depth % 255;
 
-                m_displayBuffer[index4] = value;
-                m_displayBuffer[index4 + 1] = value;
-                m_displayBuffer[index4 + 2] = value;
-                m_displayBuffer[index4 + 3] = 255;
+                displayBuffer_[index4] = value;
+                displayBuffer_[index4 + 1] = value;
+                displayBuffer_[index4 + 2] = value;
+                displayBuffer_[index4 + 3] = 255;
             }
         }
 
-        m_texture.update(m_displayBuffer.get());
+        texture_.update(displayBuffer_.get());
     }
 
-    void processSkeletons(astra::Frame& frame)
+    void processSkeletons(astra::frame& frame)
     {
-        astra::SkeletonFrame skeletonFrame = frame.get<astra::SkeletonFrame>();
+        astra::skeletonframe skeletonFrame = frame.get<astra::skeletonframe>();
 
-        m_skeletons = skeletonFrame.skeletons();
-        m_jointPositions.clear();
+        skeletons_ = skeletonFrame.skeletons();
+        jointPositions_.clear();
 
-        for (auto skeleton : m_skeletons)
+        for (auto skeleton : skeletons_)
         {
             for(auto joint : skeleton.joints())
             {
                 auto depthPosition =
-                    m_mapper->convert_world_to_depth(joint.position());
+                    mapper_->convert_world_to_depth(joint.position());
 
-                m_jointPositions.push_back(depthPosition);
+                jointPositions_.push_back(depthPosition);
             }
         }
     }
 
-    virtual void on_frame_ready(astra::StreamReader& reader,
-                                astra::Frame& frame) override
+    virtual void on_frame_ready(astra::Stream_Reader& reader,
+                                astra::frame& frame) override
     {
-        if (m_mapper == nullptr)
+        if (mapper_ == nullptr)
         {
-            auto& mapper = reader.stream<astra::DepthStream>().coordinateMapper();
-            m_mapper = std::make_unique<astra::CoordinateMapper>(mapper);
+            auto& mapper = reader.stream<astra::depthstream>().coordinateMapper();
+            mapper_ = std::make_unique<astra::coordinate_mapper>(mapper);
         }
 
         processDepth(frame);
@@ -117,7 +116,7 @@ public:
         float radius = 16;
         sf::Color trackingColor(10, 10, 200);
 
-        for (auto position : m_jointPositions)
+        for (auto position : jointPositions_)
         {
             drawCircle(window,
                        radius,
@@ -129,33 +128,33 @@ public:
 
     void drawTo(sf::RenderWindow& window)
     {
-        if (m_displayBuffer != nullptr)
+        if (displayBuffer_ != nullptr)
         {
-            float depthScale = window.getView().getSize().x / m_depthWidth;
+            float depthScale = window.getView().getSize().x / depthWidth_;
 
-            m_sprite.setScale(depthScale, depthScale);
+            sprite_.setScale(depthScale, depthScale);
 
-            window.draw(m_sprite);
+            window.draw(sprite_);
 
             drawSkeletons(window, depthScale);
         }
     }
 
 private:
-    long double m_frameDuration{ 0 };
-    std::clock_t m_lastTimepoint { 0 };
-    sf::Texture m_texture;
-    sf::Sprite m_sprite;
+    long double frameDuration_{ 0 };
+    std::clock_t lastTimepoint_ { 0 };
+    sf::Texture texture_;
+    sf::Sprite sprite_;
 
     using BufferPtr = std::unique_ptr < uint8_t[] >;
-    BufferPtr m_displayBuffer{ nullptr };
+    BufferPtr displayBuffer_{ nullptr };
 
-    std::unique_ptr<astra::CoordinateMapper> m_mapper;
-    std::vector<astra::Skeleton> m_skeletons;
-    std::vector<astra::Vector3f> m_jointPositions;
+    std::unique_ptr<astra::coordinate_mapper> mapper_;
+    std::vector<astra::skeleton> skeletons_;
+    std::vector<astra::vector3f> jointPositions_;
 
-    int m_depthWidth{0};
-    int m_depthHeight{0};
+    int depthWidth_{0};
+    int depthHeight_{0};
 };
 
 int main(int argc, char** argv)
@@ -164,13 +163,13 @@ int main(int argc, char** argv)
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Skeleton Viewer");
 
-    astra::Sensor sensor;
-    astra::StreamReader reader = sensor.create_reader();
+    astra::streamset sensor;
+    astra::stream_reader reader = sensor.create_reader();
 
-    SkeletonFrameListener listener;
+    skeletonframeListener listener;
 
-    reader.stream<astra::DepthStream>().start();
-    reader.stream<astra::SkeletonStream>().start();
+    reader.stream<astra::depthstream>().start();
+    reader.stream<astra::skeletonstream>().start();
     reader.addListener(listener);
 
     while (window.isOpen())

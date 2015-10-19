@@ -2,9 +2,9 @@
 #define ONI_DEPTHSTREAM_H
 
 #include "oni_devicestream.hpp"
-#include <Astra/Plugins/plugin_capi.h>
-#include <AstraUL/Plugins/stream_types.h>
-#include <AstraUL/astraul_ctypes.h>
+#include <astra_core/capi/plugins/astra_plugin.h>
+#include <astra/capi/streams/stream_types.h>
+#include <astra/capi/astra_ctypes.h>
 #include <cmath>
 #include <Shiny.h>
 

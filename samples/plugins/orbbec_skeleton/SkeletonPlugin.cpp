@@ -1,5 +1,5 @@
 #include "SkeletonPlugin.h"
-#include <Astra/Astra.h>
+#include <astra_core/Astra.h>
 
 EXPORT_PLUGIN(astra::plugins::skeleton::SkeletonPlugin);
 

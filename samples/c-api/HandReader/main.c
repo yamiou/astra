@@ -1,7 +1,6 @@
 ﻿// Orbbec (c) 2015
 
-#include <Astra/astra_capi.h>
-#include <AstraUL/astraul_capi.h>
+#include <astra/capi/astra.h>
 #include <stdio.h>
 #include <key_handler.h>
 
@@ -53,11 +52,11 @@ void runHandStream(astra_reader_t reader)
 
             print_hand_frame(handFrame);
 
-            astra_colorframe_t handDebugImageFrame;
-            astra_frame_get_debug_handframe(frame, &handDebugImageFrame);
+            astra_colorframe_t handDebugimageframe;
+            astra_frame_get_debug_handframe(frame, &handDebugimageframe);
 
             astra_image_metadata_t metadata;
-            astra_colorframe_get_metadata(handDebugImageFrame, &metadata);
+            astra_colorframe_get_metadata(handDebugimageframe, &metadata);
 
             astra_reader_close_frame(&frame);
         }
@@ -82,9 +81,9 @@ int main(int argc, char* argv[])
     astra_reader_get_handstream(reader, &handStream);
     astra_stream_start(handStream);
 
-    astra_colorstream_t handDebugImageStream;
-    astra_reader_get_debug_handstream(reader, &handDebugImageStream);
-    astra_stream_start(handDebugImageStream);
+    astra_colorstream_t handDebugimagestream;
+    astra_reader_get_debug_handstream(reader, &handDebugimagestream);
+    astra_stream_start(handDebugimagestream);
 
     runHandStream(reader);
 

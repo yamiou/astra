@@ -1,6 +1,6 @@
 #include "hnd_trajectory_analyzer.hpp"
 #include "hnd_constants.hpp"
-#include <Astra/Plugins/PluginLogger.h>
+#include <astra_core/Plugins/PluginLogger.h>
 
 namespace astra { namespace hand {
 

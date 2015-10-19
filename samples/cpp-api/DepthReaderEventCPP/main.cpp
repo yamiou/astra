@@ -1,7 +1,7 @@
 ﻿// Orbbec (c) 2015
 
-#include <Astra/Astra.h>
-#include <AstraUL/AstraUL.h>
+#include <astra_core/astra_core.hpp>
+#include <astra/astra.hpp>
 #include <cstdio>
 #include <chrono>
 #include <iostream>
@@ -9,8 +9,8 @@
 
 #include <key_handler.h>
 
-void print_depth(astra::DepthFrame& depthFrame,
-                 const astra::CoordinateMapper& mapper)
+void print_depth(astra::depthframe& depthFrame,
+                 const astra::coordinate_mapper& mapper)
 {
     if (depthFrame.is_valid())
     {
@@ -43,33 +43,32 @@ void print_depth(astra::DepthFrame& depthFrame,
     }
 }
 
-class SampleFrameListener : public astra::FrameReadyListener
+class SampleFrameListener : public astra::frame_listener
 {
-    virtual void on_frame_ready(astra::StreamReader& reader,
-                                 astra::Frame& frame) override
+    virtual void on_frame_ready(astra::stream_reader& reader,
+                                 astra::frame& frame) override
     {
-        astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
+        astra::depthframe depthFrame = frame.get<astra::depthframe>();
 
         if (depthFrame.is_valid())
         {
             print_depth(depthFrame,
-                reader.stream<astra::DepthStream>().coordinateMapper());
+                reader.stream<astra::depthstream>().coordinateMapper());
             check_fps();
         }
     }
-
 
     void check_fps()
     {
         const double frameWeight = 0.2;
 
         auto newTimepoint = clock_type::now();
-        auto frameDuration = std::chrono::duration_cast<duration_type>(newTimepoint - m_lastTimepoint);
+        auto frameDuration = std::chrono::duration_cast<duration_type>(newTimepoint - lastTimepoint_);
 
-        m_frameDuration = frameDuration * frameWeight + m_frameDuration * (1 - frameWeight);
-        m_lastTimepoint = newTimepoint;
+        frameDuration_ = frameDuration * frameWeight + frameDuration_ * (1 - frameWeight);
+        lastTimepoint_ = newTimepoint;
 
-        double fps = 1.0 / m_frameDuration.count();
+        double fps = 1.0 / frameDuration_.count();
 
         auto precision = std::cout.precision();
         std::cout << std::fixed
@@ -81,32 +80,31 @@ class SampleFrameListener : public astra::FrameReadyListener
                   << std::endl;
     }
 
-
 private:
     using duration_type = std::chrono::duration<double>;
-    duration_type m_frameDuration{0.0};
+    duration_type frameDuration_{0.0};
 
     using clock_type = std::chrono::system_clock;
-    std::chrono::time_point<clock_type> m_lastTimepoint;
+    std::chrono::time_point<clock_type> lastTimepoint_;
 };
 
 int main(int argc, char** argv)
 {
-    astra::Astra::initialize();
+    astra::initialize();
 
     set_key_handler();
 
-    astra::StreamSet streamset("device/default");
-    astra::StreamReader reader = streamset.create_reader();
+    astra::streamset streamset("device/default");
+    astra::stream_reader reader = streamset.create_reader();
 
     SampleFrameListener listener;
 
-    reader.stream<astra::DepthStream>().start();
+    reader.stream<astra::depthstream>().start();
 
     std::cout << "depthStream -- hFov: "
-              << reader.stream<astra::DepthStream>().horizontalFieldOfView()
+              << reader.stream<astra::depthstream>().horizontalFieldOfView()
               << " vFov: "
-              << reader.stream<astra::DepthStream>().verticalFieldOfView()
+              << reader.stream<astra::depthstream>().verticalFieldOfView()
               << std::endl;
 
     reader.addListener(listener);
@@ -118,5 +116,5 @@ int main(int argc, char** argv)
 
     reader.removeListener(listener);
 
-    astra::Astra::terminate();
+    astra::terminate();
 }

@@ -1,5 +1,5 @@
 #include "oni_depthstream.hpp"
-#include <AstraUL/streams/depth_parameters.h>
+#include <astra/capi/streams/depth_parameters.h>
 
 namespace orbbec { namespace ni {
 
@@ -9,7 +9,7 @@ namespace orbbec { namespace ni {
                              stream_listener& listener)
         : devicestream(pluginService,
                        streamSet,
-                       astra::StreamDescription(
+                       astra::stream_description(
                            ASTRA_STREAM_DEPTH,
                            DEFAULT_SUBTYPE),
                        oniDevice,
