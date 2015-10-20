@@ -18,7 +18,7 @@ add_subdirectory(astra)
 add_subdirectory(astra_core_api)
 add_subdirectory(plugins)
 
-if (NOT ASTRA_ANDROID)
+if (NOT ASTRA_ANDROID AND ASTRA_STREAMPLAYER)
   add_subdirectory(common)
 endif()
 
@@ -67,5 +67,7 @@ if (NOT ASTRA_ANDROID)
     add_dependencies(${SDK_DEPENDENT_TARGET} copytoml_hand)
   endif()
 
-  add_dependencies(${SDK_DEPENDENT_TARGET} FrameSerialization)
+  if (ASTRA_STREAMPLAYER)
+    add_dependencies(${SDK_DEPENDENT_TARGET} FrameSerialization)
+  endif()
 endif()
