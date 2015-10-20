@@ -9,10 +9,9 @@ set(XS_INCLUDE
   xs_pointstream.hpp
   )
 
-include_directories(orbbec-xs-plugin ${SHINY_INCLUDE})
-add_library(orbbec-xs-plugin SHARED ${XS_SRC} ${XS_INCLUDE})
-target_link_libraries(orbbec-xs-plugin astra_core_api astra Shiny)
+include_directories(orbbec_xs ${SHINY_INCLUDE})
+add_library(orbbec_xs SHARED ${XS_SRC} ${XS_INCLUDE})
+target_link_libraries(orbbec_xs astra_core_api astra Shiny)
 
-set_target_properties(orbbec-xs-plugin PROPERTIES FOLDER "plugins")
-set_target_properties(orbbec-xs-plugin PROPERTIES OUTPUT_NAME "orbbec_xs")
-install_lib(orbbec-xs-plugin "Plugins")
+set_target_properties(orbbec_xs PROPERTIES FOLDER "plugins")
+install_lib(orbbec_xs "Plugins")
