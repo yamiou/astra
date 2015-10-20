@@ -26,7 +26,7 @@
 #define ELPP_STACKTRACE_ON_CRASH
 #endif
 
-#include "vendor/easylogging++.h"
+#include "easylogging++.h"
 #include <astra_core/capi/astra_types.h>
 
 #define INITIALIZE_LOGGING INITIALIZE_EASYLOGGINGPP

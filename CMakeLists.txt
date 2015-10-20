@@ -19,10 +19,6 @@ set (Astra_VERSION_MINOR 4)
 set (Astra_VERSION_PATCH 1)
 set (Astra_VERSION_BUILD 0)
 
-include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
-
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   set(ASTRA_CLANG ON)
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -31,6 +27,12 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   set(ASTRA_INTELC ON)
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   set(ASTRA_MSVC ON)
+endif()
+
+if (NOT ASTRA_MSVC)
+  include(CheckCXXCompilerFlag)
+  CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+  CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
 endif()
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -110,8 +112,30 @@ set(SAMPLE_DIR_FOLDER "samples/")
 set (SDK_DEPENDENT_TARGET "SDK_dependent")
 add_custom_target(${SDK_DEPENDENT_TARGET})
 
-set(SHINY_INCLUDE "${PROJECT_SOURCE_DIR}/vendor/shinyprofiler/include")
-set(CATCH_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/vendor/catch/include" CACHE INTERNAL "Path to include folder for Catch")
+set(SHINY_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/vendor/shinyprofiler/include"
+  CACHE
+  INTERNAL
+  "Path to include folder for Shiny")
+
+set(CATCH_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/vendor/catch/include"
+  CACHE
+  INTERNAL
+  "Path to include folder for Catch")
+
+set(TINYDIR_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/vendor/tinydir"
+  CACHE
+  INTERNAL
+  "Path to include folder for tinydir")
+
+set(CPPTOML_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/vendor/cpptoml"
+  CACHE
+  INTERNAL
+  "Path to include folder for cpptoml")
+
+set(EASYLOGGINGPP_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/vendor/easyloggingpp"
+  CACHE
+  INTERNAL
+  "Path to include folder for easylogging++")
 
 if (ASTRA_64)
   set(SAMPLE_DEPENDENCY_DIR "copy_to_bin64_dir")
@@ -132,7 +156,7 @@ function(install_lib _targetname)
       samples/vs2013/${SAMPLE_DEPENDENCY_DIR}/${extrapath}
       samples/vs2013/bin/Debug/${extrapath}
       samples/vs2013/bin/Release/${extrapath}
-    )
+      )
     foreach(INSTALL_PATH ${INSTALL_PATHS})
       install(TARGETS ${_targetname}
         RUNTIME DESTINATION ${INSTALL_PATH}
@@ -150,7 +174,7 @@ function(install_file _targetfile basepath)
       samples/vs2013/${SAMPLE_DEPENDENCY_DIR}/${extrapath}
       samples/vs2013/bin/Debug/${extrapath}
       samples/vs2013/bin/Release/${extrapath}
-    )
+      )
     foreach(INSTALL_PATH ${INSTALL_PATHS})
       install(FILES ${_targetfile}
         DESTINATION ${INSTALL_PATH}
@@ -159,7 +183,7 @@ function(install_file _targetfile basepath)
   else()
     install(FILES ${_targetfile}
       DESTINATION ${basepath}/${extrapath}
-    )
+      )
   endif()
 endfunction()
 
@@ -171,7 +195,7 @@ function(install_dir _targetdir basepath)
       samples/vs2013/${SAMPLE_DEPENDENCY_DIR}/${extrapath}
       samples/vs2013/bin/Debug/${extrapath}
       samples/vs2013/bin/Release/${extrapath}
-    )
+      )
     foreach(INSTALL_PATH ${INSTALL_PATHS})
       install(DIRECTORY ${_targetdir}
         DESTINATION ${INSTALL_PATH}
@@ -180,7 +204,7 @@ function(install_dir _targetdir basepath)
   else()
     install(DIRECTORY ${_targetdir}
       DESTINATION ${basepath}/${extrapath}
-    )
+      )
   endif()
 endfunction()
 
@@ -238,13 +262,13 @@ if (MSVC)
     samples/vs2013/${SAMPLE_DEPENDENCY_DIR}/
     samples/vs2013/bin/Debug/
     samples/vs2013/bin/Release/
-  )
+    )
   foreach(INSTALL_PATH ${INSTALL_PATHS})
-   install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013/${SAMPLE_DEPENDENCY_DIR}/
-     DESTINATION ${INSTALL_PATH}
-     PATTERN "opencv_core2410d.dll" EXCLUDE
-     PATTERN "opencv_imgproc2410d.dll" EXCLUDE
-     )
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013/${SAMPLE_DEPENDENCY_DIR}/
+      DESTINATION ${INSTALL_PATH}
+      PATTERN "opencv_core2410d.dll" EXCLUDE
+      PATTERN "opencv_imgproc2410d.dll" EXCLUDE
+      )
   endforeach()
 
   #prepare to generate vs2013 solution for installation

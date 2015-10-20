@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#include "../../astra_core/vendor/cpptoml.h"
+#include "cpptoml.h"
 #include "hnd_settings.hpp"
 
 namespace astra { namespace hand {

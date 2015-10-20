@@ -15,7 +15,7 @@
 //
 // Be excellent to each other.
 #include "astra_plugin_manager.hpp"
-#include "vendor/tinydir.h"
+#include "tinydir.h"
 #include "astra_cxx_compatibility.hpp"
 
 namespace astra {

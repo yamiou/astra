@@ -1,7 +1,9 @@
 set (_projname "orbbec_hand")
 
+include_directories(${CPPTOML_INCLUDE_DIR})
+
 set(ORBBEC_HAND_INCLUDE
-  ../../astra_core/vendor/cpptoml.h
+  ${CPPTOML_INCLUDE_DIR}/cpptoml.h
   hnd_constants.hpp
   hnd_debug_handstream.hpp
   hnd_debug_visualizer.hpp
@@ -54,7 +56,7 @@ target_link_libraries(${_projname} astra_core_api astra Shiny ${OpenCV_LIBS})
 
 include_directories(${_projname} ${OpenCV_INCLUDE_DIRS})
 
-include_directories(${_projname} ${SHINY_INCLUDE})
+include_directories(${_projname} ${SHINY_INCLUDE_DIR})
 
 add_custom_target(copytoml_hand ALL
   #orbbec_hand.toml

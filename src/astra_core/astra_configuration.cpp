@@ -15,7 +15,7 @@
 //
 // Be excellent to each other.
 #include "astra_configuration.hpp"
-#include "vendor/cpptoml.h"
+#include "cpptoml.h"
 #include <iostream>
 
 namespace astra {

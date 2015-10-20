@@ -52,6 +52,6 @@ add_definitions(-DASTRA_BUILD_EX)
 
 target_link_libraries(${_projname} astra_core_api Shiny)
 
-include_directories(${_projname} ${SHINY_INCLUDE})
+include_directories(${_projname} ${SHINY_INCLUDE_DIR})
 
 install_lib(${_projname})

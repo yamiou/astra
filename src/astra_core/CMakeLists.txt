@@ -1,5 +1,11 @@
 set (_projname "astra_core")
 
+include_directories(
+  ${CPPTOML_INCLUDE_DIR}
+  ${TINYDIR_INCLUDE_DIR}
+  ${EASYLOGGINGPP_INCLUDE_DIR}
+  )
+
 set(${_projname}_SOURCES
   ../../include/astra_core/astra_core.hpp
   ../../include/astra_core/astra_datastream.hpp
