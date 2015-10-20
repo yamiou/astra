@@ -27,14 +27,14 @@ set(${_projname}_SOURCES
   ../../include/astra/capi/streams/skeleton_capi.h
   ../../include/astra/capi/streams/skeleton_types.h
   ../../include/astra/capi/streams/stream_types.h
-  ../../include/astra/streams/color.hpp
-  ../../include/astra/streams/debug_hand.hpp
-  ../../include/astra/streams/depth.hpp
-  ../../include/astra/streams/hand.hpp
-  ../../include/astra/streams/image.hpp
-  ../../include/astra/streams/infrared.hpp
-  ../../include/astra/streams/point.hpp
-  ../../include/astra/streams/skeleton.hpp
+  ../../include/astra/streams/astra_color.hpp
+  ../../include/astra/streams/astra_debug_hand.hpp
+  ../../include/astra/streams/astra_depth.hpp
+  ../../include/astra/streams/astra_hand.hpp
+  ../../include/astra/streams/astra_image.hpp
+  ../../include/astra/streams/astra_infrared.hpp
+  ../../include/astra/streams/astra_point.hpp
+  ../../include/astra/streams/astra_skeleton.hpp
   astra_depth.cpp
   astra_color.cpp
   astra_infrared.cpp

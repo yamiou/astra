@@ -1,3 +1,20 @@
+;; This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
+;; Copyright (c) 2015 Orbbec 3D
+;;
+;; Licensed under the Apache License, Version 2.0 (the "License");
+;; you may not use this file except in compliance with the License.
+;; You may obtain a copy of the License at
+;;
+;; http://www.apache.org/licenses/LICENSE-2.0
+;;
+;; Unless required by applicable law or agreed to in writing, software
+;; distributed under the License is distributed on an "AS IS" BASIS,
+;; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+;; See the License for the specific language governing permissions and
+;; limitations under the License.
+;;
+;; Be excellent to each other.
+
 (use-package :regexp)
 
 (load "cl-fad/load.lisp" :verbose nil)
@@ -12,7 +29,7 @@
   (reduce #'(lambda (x y) (string-concat x repl y))
           (regexp:regexp-split pat string))
 )
-          
+
 (defun file-string (path)
   (with-open-file (infile path :if-does-not-exist nil)
     (cond ((not (null infile))
@@ -28,14 +45,14 @@
     )
   )
 )
-      
+
 (defun write-file (file-name content)
   (with-open-file (outfile file-name
       :direction :output
       :if-exists :supersede
       :if-does-not-exist :create)
   (format outfile "~A" content)))
-    
+
 (defmacro get-next-substr-index (str &key start-marker end-marker start-index end-index include-markers (next-index 0))
   `(progn
     (let ((start-m (match ,start-marker ,str :start ,next-index))
@@ -103,7 +120,7 @@
 
 (defun apply-replacement-templates (str templates)
   (cond ((null templates) str)
-        (t (apply-replacement-templates 
+        (t (apply-replacement-templates
             (parse-replace str (car templates))
             (cdr templates)
            )
@@ -112,7 +129,7 @@
 )
 
 (defun apply-parse-file (file-name-in file-name-out templates)
-  (write-file file-name-out 
+  (write-file file-name-out
     (apply-replacement-templates (file-string file-name-in) templates)
   )
 )
@@ -147,7 +164,7 @@ is replaced with replacement."
 (create-rdata-list sln-data-list add-slndata)
 (create-rdata-list filter-data-list add-filterdata)
 
-(setq tp1 (make-rdata :start-marker "<data[^>]*>" 
+(setq tp1 (make-rdata :start-marker "<data[^>]*>"
                      :end-marker "</data>"
                      :replacement-callback (lambda (str) "_123_")
                      :include-markers T))
@@ -156,13 +173,13 @@ is replaced with replacement."
   (replace-all str "\\" "/")
 )
 
-(setq lambda-build-path-to-sln-dir (lambda (str) (regexp-replace (back-to-forward-slashes str) 
+(setq lambda-build-path-to-sln-dir (lambda (str) (regexp-replace (back-to-forward-slashes str)
                                                                  (back-to-forward-slashes build-dir)
                                                                  "$(SolutionDir)")))
-(setq lambda-source-path-to-source-dir (lambda (str) (regexp-replace (back-to-forward-slashes str) 
+(setq lambda-source-path-to-source-dir (lambda (str) (regexp-replace (back-to-forward-slashes str)
                                                                      (back-to-forward-slashes source-dir)
                                                                      "$(SolutionDir)..")))
-(setq lambda-convert-include-path (lambda (str) (funcall lambda-build-path-to-sln-dir 
+(setq lambda-convert-include-path (lambda (str) (funcall lambda-build-path-to-sln-dir
                                                          (funcall lambda-source-path-to-source-dir str)
                                                          )))
 (setq lambda-int-dir-to-obj-dir (lambda (str) (regexp-replace (back-to-forward-slashes str)
@@ -170,16 +187,16 @@ is replaced with replacement."
                                                               "obj")))
 (setq lambda-remove (lambda (str) ""))
 
-(add-projdata :start-marker "<AdditionalIncludeDirectories>" 
+(add-projdata :start-marker "<AdditionalIncludeDirectories>"
               :end-marker "</AdditionalIncludeDirectories>"
               :replacement-callback lambda-convert-include-path)
-(add-projdata :start-marker "<OutDir[^>]*>" 
+(add-projdata :start-marker "<OutDir[^>]*>"
               :end-marker "</OutDir>"
               :replacement-callback lambda-build-path-to-sln-dir)
-(add-projdata :start-marker "<ImportLibrary[^>]*>" 
+(add-projdata :start-marker "<ImportLibrary[^>]*>"
               :end-marker "</ImportLibrary>"
               :replacement-callback lambda-build-path-to-sln-dir)
-(add-projdata :start-marker "<ProgramDataBaseFile[^>]*>" 
+(add-projdata :start-marker "<ProgramDataBaseFile[^>]*>"
               :end-marker "</ProgramDataBaseFile>"
               :replacement-callback lambda-build-path-to-sln-dir)
 (add-projdata :start-marker "[^<>]*<ItemGroup[^>]*>[^<]*<CustomBuild[^>]*CMakeLists[.]txt[^>]*>"
@@ -194,26 +211,26 @@ is replaced with replacement."
               :end-marker ";"
               :replacement-callback lambda-remove
               :include-markers T)
-(add-projdata :start-marker "<Cl\\(Include\\|Compile\\)[^iI>]*Include=\"" 
+(add-projdata :start-marker "<Cl\\(Include\\|Compile\\)[^iI>]*Include=\""
               :end-marker "\""
               :replacement-callback lambda-source-path-to-source-dir)
-(add-projdata :start-marker "<IntDir[^>]*>" 
+(add-projdata :start-marker "<IntDir[^>]*>"
               :end-marker "<"
               :replacement-callback lambda-int-dir-to-obj-dir)
 
-(add-filterdata :start-marker "<Cl\\(Include\\|Compile\\)[^iI>]*Include=\"" 
+(add-filterdata :start-marker "<Cl\\(Include\\|Compile\\)[^iI>]*Include=\""
               :end-marker "\""
               :replacement-callback lambda-source-path-to-source-dir)
 (add-filterdata :start-marker "[^<>]*<ItemGroup[^>]*>[^<]*<CustomBuild[^>]*CMakeLists[.]txt[^>]*>"
               :end-marker "</ItemGroup>"
               :replacement-callback lambda-remove
               :include-markers T)
-              
+
 (add-slndata  :start-marker "Project([^,]*\\(ALL_BUILD\\|CMakePredefinedTargets\\|ZERO_CHECK\\|INSTALL\\)"
               :end-marker "EndProject"
               :replacement-callback lambda-remove
               :include-markers T)
-              
+
 (defun mapc-directory-tree (fn directory)
   (dolist (entry (cl-fad:list-directory directory))
     (when (cl-fad:directory-pathname-p entry)
@@ -222,7 +239,7 @@ is replaced with replacement."
 
 (defun get-temp-filename (fn)
   (format nil "~A.tmp" fn))
-  
+
 (defun process-file (filename-in file-extension)
   (let ((filename-out (get-temp-filename filename-in))
         (data-list (cond ((equal file-extension solution-file-extension) sln-data-list)
