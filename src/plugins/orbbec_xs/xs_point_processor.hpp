@@ -17,7 +17,7 @@
 #ifndef XS_POINT_PROCESSOR_H
 #define XS_POINT_PROCESSOR_H
 
-#include <astra_core/Plugins/PluginKit.h>
+#include <astra_core/plugins/astra_plugin.hpp>
 #include <astra/astra.hpp>
 #include "xs_pointstream.hpp"
 
@@ -26,7 +26,7 @@ namespace astra { namespace xs {
     class point_processor : public frame_listener
     {
     public:
-        point_processor(PluginServiceProxy& pluginService,
+        point_processor(pluginservice_proxy& pluginService,
                        astra_streamset_t streamset,
                        stream_description& depthDesc);
         virtual ~point_processor();
@@ -43,7 +43,7 @@ namespace astra { namespace xs {
         astra_streamset_t setHandle_;
         stream_reader reader_;
         depthstream depthStream_;
-        PluginServiceProxy& pluginService_;
+        pluginservice_proxy& pluginService_;
 
         using pointstream_ptr = std::unique_ptr<pointstream>;
         pointstream_ptr pointStream_;

@@ -14,28 +14,28 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef SINGLEBINSTREAM_H
-#define SINGLEBINSTREAM_H
+#ifndef ASTRA_SINGLE_BIN_STREAM_HPP
+#define ASTRA_SINGLE_BIN_STREAM_HPP
 
-#include "Stream.h"
-#include "StreamBin.h"
+#include "astra_plugin_stream.hpp"
+#include "astra_stream_bin.hpp"
 #include <memory>
 
 namespace astra { namespace plugins {
 
     template<typename TFrameType>
-    class SingleBinStream : public astra::plugins::Stream
+    class single_bin_stream : public astra::plugins::stream
     {
     public:
-        SingleBinStream(PluginServiceProxy& pluginService,
-                        astra_streamset_t streamSet,
-                        stream_description description,
-                        size_t bufferSize)
-            : Stream(pluginService,
+        single_bin_stream(pluginservice_proxy& pluginService,
+                          astra_streamset_t streamSet,
+                          stream_description description,
+                          size_t bufferSize)
+            : stream(pluginService,
                      streamSet,
                      description)
         {
-            m_bin = std::make_unique<bin_type>(pluginService,
+            bin_ = std::make_unique<bin_type>(pluginService,
                                                get_handle(),
                                                sizeof(TFrameType) + bufferSize);
         }
@@ -44,35 +44,35 @@ namespace astra { namespace plugins {
 
         bool has_connections()
         {
-            return m_bin->has_connections();
+            return bin_->has_connections();
         }
 
         TFrameType* begin_write(size_t frameIndex)
         {
-            return m_bin->begin_write(frameIndex);
+            return bin_->begin_write(frameIndex);
         }
 
         void end_write()
         {
-            return m_bin->end_write();
+            return bin_->end_write();
         }
 
     protected:
         virtual void on_connection_added(astra_streamconnection_t connection) override
         {
-            m_bin->link_connection(connection);
+            bin_->link_connection(connection);
         }
 
         virtual void on_connection_removed(astra_bin_t bin,
                                            astra_streamconnection_t connection) override
         {
-            m_bin->unlink_connection(connection);
+            bin_->unlink_connection(connection);
         }
 
     private:
-        using bin_type = StreamBin<TFrameType>;
-        std::unique_ptr<bin_type> m_bin;
+        using bin_type = stream_bin<TFrameType>;
+        std::unique_ptr<bin_type> bin_;
     };
 }}
 
-#endif /* SINGLEBINSTREAM_H */
+#endif /* ASTRA_SINGLE_BIN_STREAM_HPP */

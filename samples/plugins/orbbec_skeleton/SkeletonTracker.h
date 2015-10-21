@@ -17,7 +17,7 @@
 #ifndef SKELETONTRACKER_H
 #define SKELETONTRACKER_H
 
-#include <astra_core/Plugins/PluginKit.h>
+#include <astra_core/plugins/astra_plugin.hpp>
 #include <astra_core/Astra.h>
 #include <astra/capi/astra_ctypes.h>
 #include <astra/streams/Depth.h>
@@ -31,7 +31,7 @@ namespace astra { namespace plugins { namespace skeleton {
     public:
         static const size_t MAX_SKELETONS;
 
-        SkeletonTracker(PluginServiceProxy& pluginService,
+        SkeletonTracker(pluginservice_proxy& pluginService,
                         astra_streamset_t streamSet,
                         astra_stream_t sourceStream)
             : sourceStreamHandle_(sourceStream),
@@ -58,7 +58,7 @@ namespace astra { namespace plugins { namespace skeleton {
         depthstream depthStream_{nullptr};
         streamset sensor_;
         stream_reader reader_;
-        PluginServiceProxy& pluginService_;
+        pluginservice_proxy& pluginService_;
 
         using skeletonstream_ptr = std::unique_ptr<skeletonstream>;
         skeletonstream_ptr skeletonStream_;

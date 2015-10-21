@@ -20,7 +20,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <astra/astra.hpp>
 #include <astra/capi/streams/stream_types.h>
-#include <astra_core/Plugins/PluginKit.h>
+#include <astra_core/plugins/astra_plugin.hpp>
 
 #include "hnd_depth_utility.hpp"
 #include "hnd_tracked_point.hpp"
@@ -37,7 +37,7 @@ namespace astra { namespace hand {
     class hand_tracker : public frame_listener
     {
     public:
-        hand_tracker(PluginServiceProxy& pluginService,
+        hand_tracker(pluginservice_proxy& pluginService,
                      astra_streamset_t streamSet,
                      stream_description& depthDesc,
                      hand_settings& settings);
@@ -45,7 +45,7 @@ namespace astra { namespace hand {
         virtual ~hand_tracker();
         virtual void on_frame_ready(stream_reader& reader, frame& frame) override;
     private:
-        void create_streams(PluginServiceProxy& pluginService, astra_streamset_t streamSet);
+        void create_streams(pluginservice_proxy& pluginService, astra_streamset_t streamSet);
         void reset();
         void generate_hand_frame(astra_frame_index_t frameIndex);
         static void copy_position(cv::Point3f& source, astra_vector3f_t& target);
@@ -75,7 +75,7 @@ namespace astra { namespace hand {
         depthstream depthStream_;
 
         hand_settings& settings_;
-        PluginServiceProxy& pluginService_;
+        pluginservice_proxy& pluginService_;
         depth_utility depthUtility_;
         point_processor pointProcessor_;
 

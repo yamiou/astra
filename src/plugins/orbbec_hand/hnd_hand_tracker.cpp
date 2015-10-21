@@ -23,18 +23,18 @@
 #include "hnd_segmentation.hpp"
 #include <astra/capi/streams/hand_types.h>
 #include <astra/capi/astra_ctypes.h>
-#include <astra_core/Plugins/PluginKit.h>
+#include <astra_core/plugins/astra_plugin.hpp>
 #include <Shiny.h>
 
 namespace astra { namespace hand {
 
     using namespace std;
 
-    hand_tracker::hand_tracker(PluginServiceProxy& pluginService,
+    hand_tracker::hand_tracker(pluginservice_proxy& pluginService,
                                astra_streamset_t streamSet,
                                stream_description& depthDesc,
                                hand_settings& settings) :
-        streamset_(get_uri_for_streamset(pluginService, streamSet)),
+        streamset_(plugins::get_uri_for_streamset(pluginService, streamSet)),
         reader_(streamset_.create_reader()),
         depthStream_(reader_.stream<depthstream>(depthDesc.subtype())),
         settings_(settings),
@@ -64,7 +64,7 @@ namespace astra { namespace hand {
         }
     }
 
-    void hand_tracker::create_streams(PluginServiceProxy& pluginService, astra_streamset_t streamSet)
+    void hand_tracker::create_streams(pluginservice_proxy& pluginService, astra_streamset_t streamSet)
     {
         PROFILE_FUNC();
         LOG_INFO("hand_tracker", "creating hand streams");

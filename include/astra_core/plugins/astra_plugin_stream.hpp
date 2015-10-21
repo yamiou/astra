@@ -14,13 +14,13 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef PLUGINSTREAM_H
-#define PLUGINSTREAM_H
+#ifndef ASTRA_PLUGIN_STREAM_HPP
+#define ASTRA_PLUGIN_STREAM_HPP
 
 #include <astra_core/astra_core.hpp>
-#include <astra_core/Plugins/PluginLogger.h>
-#include <astra_core/Plugins/PluginServiceProxy.h>
-#include <astra_core/Plugins/StreamCallbackListener.h>
+#include <astra_core/plugins/astra_plugin_logging.hpp>
+#include <astra_core/plugins/astra_pluginservice_proxy.hpp>
+#include <astra_core/plugins/astra_stream_callback_listener.hpp>
 #include <system_error>
 #include <cassert>
 #include <unordered_set>
@@ -64,39 +64,39 @@ namespace astra { namespace plugins {
         return t;
     }
 
-    class Stream : public StreamCallbackListener
+    class stream : public stream_callback_listener
     {
     public:
-        Stream(PluginServiceProxy& pluginService,
+        stream(pluginservice_proxy& pluginService,
                astra_streamset_t streamSet,
                stream_description description)
-            : m_pluginService(pluginService),
-              m_streamSet(streamSet),
-              m_description(description)
+            : pluginService_(pluginService),
+              streamSet_(streamSet),
+              description_(description)
         {
             create_stream(description);
         }
 
-        virtual ~Stream()
+        virtual ~stream()
         {
-            m_pluginService.destroy_stream(m_streamHandle);
+            pluginService_.destroy_stream(streamHandle_);
         }
 
         void register_self()
         {
-            if (m_registered)
+            if (registered_)
                 return;
 
             stream_callbacks_t pluginCallbacks = create_plugin_callbacks(this);
-            m_pluginService.register_stream(m_streamHandle, pluginCallbacks);
-            m_registered = true;
+            pluginService_.register_stream(streamHandle_, pluginCallbacks);
+            registered_ = true;
         }
 
-        inline const stream_description& description() { return m_description; }
-        inline astra_stream_t get_handle() { return m_streamHandle; }
+        inline const stream_description& description() { return description_; }
+        inline astra_stream_t get_handle() { return streamHandle_; }
 
     protected:
-        inline PluginServiceProxy& pluginService() const { return m_pluginService; }
+        inline pluginservice_proxy& pluginService() const { return pluginService_; }
     private:
         virtual void connection_added(astra_stream_t stream,
                                       astra_streamconnection_t connection) override final;
@@ -152,26 +152,26 @@ namespace astra { namespace plugins {
 
         void create_stream(stream_description& description)
         {
-            assert(m_streamHandle == nullptr);
+            assert(streamHandle_ == nullptr);
 
-            astra_stream_desc_t* desc = static_cast<astra_stream_desc_t*>(m_description);
+            astra_stream_desc_t* desc = static_cast<astra_stream_desc_t*>(description_);
 
-            LOG_INFO("astra.plugins.Stream", "creating a %u, %u", desc->type, desc->subtype);
-            m_pluginService.create_stream(m_streamSet,
+            LOG_INFO("astra.plugins.stream", "creating a %u, %u", desc->type, desc->subtype);
+            pluginService_.create_stream(streamSet_,
                                           *desc,
-                                          &m_streamHandle);
+                                          &streamHandle_);
 
 
         }
 
-        bool m_registered{false};
-        PluginServiceProxy& m_pluginService;
-        astra_streamset_t m_streamSet{nullptr};
-        stream_description m_description;
-        astra_stream_t m_streamHandle{nullptr};
+        bool registered_{false};
+        pluginservice_proxy& pluginService_;
+        astra_streamset_t streamSet_{nullptr};
+        stream_description description_;
+        astra_stream_t streamHandle_{nullptr};
     };
 
-    inline void Stream::set_parameter(astra_streamconnection_t connection,
+    inline void stream::set_parameter(astra_streamconnection_t connection,
                                       astra_parameter_id id,
                                       size_t inByteLength,
                                       astra_parameter_data_t inData)
@@ -179,14 +179,14 @@ namespace astra { namespace plugins {
         on_set_parameter(connection, id, inByteLength, inData);
     }
 
-    inline void Stream::get_parameter(astra_streamconnection_t connection,
+    inline void stream::get_parameter(astra_streamconnection_t connection,
                                       astra_parameter_id id,
                                       astra_parameter_bin_t& parameterBin)
     {
         on_get_parameter(connection, id, parameterBin);
     }
 
-    inline void Stream::invoke(astra_streamconnection_t connection,
+    inline void stream::invoke(astra_streamconnection_t connection,
                                astra_command_id commandId,
                                size_t inByteLength,
                                astra_parameter_data_t inData,
@@ -195,36 +195,36 @@ namespace astra { namespace plugins {
         on_invoke(connection, commandId, inByteLength, inData, parameterBin);
     }
 
-    inline void Stream::connection_added(astra_stream_t stream,
+    inline void stream::connection_added(astra_stream_t stream,
                                          astra_streamconnection_t connection)
     {
-        assert(stream == m_streamHandle);
-        LOG_INFO("astra.plugins.Stream", "adding connection");
+        assert(stream == streamHandle_);
+        LOG_INFO("astra.plugins.stream", "adding connection");
         on_connection_added(connection);
     }
 
-    inline void Stream::connection_removed(astra_stream_t stream,
+    inline void stream::connection_removed(astra_stream_t stream,
                                            astra_bin_t bin,
                                            astra_streamconnection_t connection)
     {
-        assert(stream == m_streamHandle);
-        LOG_INFO("astra.plugins.Stream", "removing connection");
+        assert(stream == streamHandle_);
+        LOG_INFO("astra.plugins.stream", "removing connection");
         on_connection_removed(bin, connection);
     }
 
-    inline void Stream::connection_started(astra_stream_t stream,
+    inline void stream::connection_started(astra_stream_t stream,
                                            astra_streamconnection_t connection)
     {
-        assert(stream == m_streamHandle);
+        assert(stream == streamHandle_);
         on_connection_started(connection);
     }
 
-    inline void Stream::connection_stopped(astra_stream_t stream,
+    inline void stream::connection_stopped(astra_stream_t stream,
                                            astra_streamconnection_t connection)
     {
-        assert(stream == m_streamHandle);
+        assert(stream == streamHandle_);
         on_connection_stopped(connection);
     }
 }}
 
-#endif /* PLUGINSTREAM_H */
+#endif /* ASTRA_PLUGIN_STREAM_HPP */

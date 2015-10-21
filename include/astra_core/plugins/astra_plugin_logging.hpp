@@ -14,10 +14,10 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef PLUGINLOGGER_H
-#define PLUGINLOGGER_H
+#ifndef ASTRA_PLUGIN_LOGGING_HPP
+#define ASTRA_PLUGIN_LOGGING_HPP
 
-#include <astra_core/Plugins/PluginServiceProxy.h>
+#include <astra_core/plugins/astra_pluginservice_proxy.hpp>
 #include <cstdarg>
 
 #if defined(_MSC_VER)  // Visual C++
@@ -54,7 +54,7 @@
 #define LOG_WARN(channel, format, ...) \
     ::astra::plugins::log(channel, ASTRA_SEVERITY_WARN, __FILE__, __LINE__, LOG_FUNC, format, ##__VA_ARGS__)
 
-extern astra::PluginServiceProxy* __g_serviceProxy;
+extern astra::pluginservice_proxy* __g_serviceProxy;
 
 namespace astra { namespace plugins {
 
@@ -72,4 +72,4 @@ namespace astra { namespace plugins {
         va_end(args);
     }
 }}
-#endif /* PLUGINLOGGER_H */
+#endif /* ASTRA_PLUGIN_LOGGING_HPP */

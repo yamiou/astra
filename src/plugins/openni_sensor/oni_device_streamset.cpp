@@ -24,7 +24,7 @@
 namespace orbbec { namespace ni {
 
     device_streamset::device_streamset(std::string name,
-                                       astra::PluginServiceProxy& pluginService,
+                                       astra::pluginservice_proxy& pluginService,
                                        const char* uri)
         : pluginService_(pluginService),
           uri_(uri)

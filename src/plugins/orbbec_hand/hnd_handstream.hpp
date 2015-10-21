@@ -17,7 +17,7 @@
 #ifndef HND_HAND_STREAM_H
 #define HND_HAND_STREAM_H
 
-#include <astra_core/Plugins/SingleBinStream.h>
+#include <astra_core/plugins/astra_single_bin_stream.hpp>
 #include <astra/capi/streams/hand_types.h>
 #include <astra/capi/astra_ctypes.h>
 #include <astra/capi/streams/stream_types.h>
@@ -25,13 +25,13 @@
 
 namespace astra { namespace hand {
 
-    class handstream : public plugins::SingleBinStream<astra_handframe_wrapper_t>
+    class handstream : public plugins::single_bin_stream<astra_handframe_wrapper_t>
     {
     public:
-        handstream(PluginServiceProxy& pluginService,
+        handstream(pluginservice_proxy& pluginService,
                    astra_streamset_t streamSet,
                    size_t maxHandCount)
-            : SingleBinStream(pluginService,
+            : single_bin_stream(pluginService,
                               streamSet,
                               stream_description(ASTRA_STREAM_HAND,
                                                 DEFAULT_SUBTYPE),
@@ -59,7 +59,7 @@ namespace astra { namespace hand {
         virtual void on_connection_removed(astra_bin_t bin,
                                            astra_streamconnection_t connection) override
         {
-            SingleBinStream::on_connection_removed(bin, connection);
+            single_bin_stream::on_connection_removed(bin, connection);
 
 #ifdef __ANDROID__
             PROFILE_UPDATE();

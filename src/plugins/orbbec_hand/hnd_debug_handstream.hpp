@@ -17,7 +17,7 @@
 #ifndef HND_DEBUG_HANDSTREAM_H
 #define HND_DEBUG_HANDSTREAM_H
 
-#include <astra_core/Plugins/SingleBinStream.h>
+#include <astra_core/plugins/astra_single_bin_stream.hpp>
 #include <astra/capi/astra_ctypes.h>
 #include <astra/capi/streams/stream_types.h>
 #include <astra/vector.hpp>
@@ -26,16 +26,16 @@ namespace astra { namespace hand {
 
     using debug_handview_type = astra_debug_hand_view_type_t;
 
-    class debug_handstream : public plugins::SingleBinStream<astra_imageframe_wrapper_t>
+    class debug_handstream : public plugins::single_bin_stream<astra_imageframe_wrapper_t>
 
     {
     public:
-        debug_handstream(PluginServiceProxy& pluginService,
+        debug_handstream(pluginservice_proxy& pluginService,
                          astra_streamset_t streamSet,
                          uint32_t width,
                          uint32_t height,
                          uint32_t bytesPerPixel)
-            : SingleBinStream(pluginService,
+            : single_bin_stream(pluginService,
                               streamSet,
                               stream_description(ASTRA_STREAM_DEBUG_HAND,
                                                  DEFAULT_SUBTYPE),

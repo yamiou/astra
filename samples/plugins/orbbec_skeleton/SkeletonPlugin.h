@@ -17,7 +17,7 @@
 #ifndef SKELETONPLUGIN_H
 #define SKELETONPLUGIN_H
 
-#include <astra_core/Plugins/PluginKit.h>
+#include <astra_core/plugins/astra_plugin.hpp>
 #include <astra/astra.hpp>
 #include "SkeletonTracker.h"
 #include <memory>
@@ -25,13 +25,13 @@
 
 namespace astra { namespace plugins { namespace skeleton {
 
-    class SkeletonPlugin : public astra::PluginBase
+    class SkeletonPlugin : public astra::plugin_base
     {
     public:
         static const size_t MAX_SKELETONS = 5;
 
-        SkeletonPlugin(PluginServiceProxy* pluginProxy)
-            : PluginBase(pluginProxy, "orbbec_skeleton")
+        SkeletonPlugin(pluginservice_proxy* pluginProxy)
+            : plugin_base(pluginProxy, "orbbec_skeleton")
         {
             register_for_stream_events();
         }

@@ -11,14 +11,14 @@ set(${_projname}_SOURCES
   ../../include/astra_core/astra_datastream.hpp
   ../../include/astra_core/astra_frame.hpp
   ../../include/astra_core/astra_frame_listener.hpp
-  ../../include/astra_core/Plugins/PluginBase.h
-  ../../include/astra_core/Plugins/PluginKit.h
-  ../../include/astra_core/Plugins/PluginServiceProxy.h
-  ../../include/astra_core/Plugins/SingleBinStream.h
-  ../../include/astra_core/Plugins/Stream.h
-  ../../include/astra_core/Plugins/StreamBin.h
-  ../../include/astra_core/Plugins/StreamCallbackListener.h
-  ../../include/astra_core/Plugins/StreamServiceProxy.h
+  ../../include/astra_core/plugins/astra_plugin_base.hpp
+  ../../include/astra_core/plugins/astra_plugin.hpp
+  ../../include/astra_core/plugins/astra_pluginservice_proxy.hpp
+  ../../include/astra_core/plugins/astra_single_bin_stream.hpp
+  ../../include/astra_core/plugins/astra_plugin_stream.hpp
+  ../../include/astra_core/plugins/astra_stream_bin.hpp
+  ../../include/astra_core/plugins/astra_stream_callback_listener.hpp
+  ../../include/astra_core/astra_streamservice_proxy.hpp
   ../../include/astra_core/astra_stream_description.hpp
   ../../include/astra_core/astra_stream_reader.hpp
   ../../include/astra_core/astra_streamset.hpp
@@ -105,23 +105,23 @@ elseif(ASTRA_UNIX OR ASTRA_OSX)
 endif()
 
 set(${_projname}_SOURCES_GEN
-  astra_context.hpp.lpp
-  astra_context.cpp.lpp
-  astra_context_impl.hpp.lpp
-  astra_stream_service_delegate.hpp.lpp
-  astra.cpp.lpp
-  astra_plugin_service.hpp.lpp
-  astra_plugin_service_impl.hpp.lpp
-  astra_plugin_service_delegate.hpp.lpp
-  astra_create_stream_proxy.hpp.lpp
-  astra_create_plugin_proxy.hpp.lpp
+  ../../include/astra_core/astra_streamservice_proxy.hpp.lpp
   ../../include/astra_core/capi/astra_core.h.lpp
   ../../include/astra_core/capi/astra_streamservice_proxy.h.lpp
-  ../../include/astra_core/Plugins/StreamServiceProxy.h.lpp
-  ../../include/astra_core/capi/plugins/astra_pluginservice_proxy.h.lpp
-  ../../include/astra_core/Plugins/PluginServiceProxy.h.lpp
-  ../../include/astra_core/Plugins/StreamCallbackListener.h.lpp
   ../../include/astra_core/capi/plugins/astra_plugin_callbacks.h.lpp
+  ../../include/astra_core/capi/plugins/astra_pluginservice_proxy.h.lpp
+  ../../include/astra_core/plugins/astra_pluginservice_proxy.hpp.lpp
+  ../../include/astra_core/plugins/astra_stream_callback_listener.hpp.lpp
+  astra.cpp.lpp
+  astra_context.cpp.lpp
+  astra_context.hpp.lpp
+  astra_context_impl.hpp.lpp
+  astra_create_plugin_proxy.hpp.lpp
+  astra_create_stream_proxy.hpp.lpp
+  astra_plugin_service.hpp.lpp
+  astra_plugin_service_delegate.hpp.lpp
+  astra_plugin_service_impl.hpp.lpp
+  astra_stream_service_delegate.hpp.lpp
   )
 
 source_group(templates FILES ${${_projname}_SOURCES_GEN})

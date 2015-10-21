@@ -19,7 +19,7 @@
 
 #include <astra_core/astra_streamset.hpp>
 #include <astra_core/capi/plugins/astra_plugin.h>
-#include <astra_core/Plugins/PluginLogger.h>
+#include <astra_core/plugins/astra_plugin_logging.hpp>
 
 #include <functional>
 #include <memory>
@@ -37,7 +37,7 @@ namespace orbbec { namespace mocks {
     {
     public:
         device_streamset(const std::string& name,
-                         astra::PluginServiceProxy& pluginService,
+                         astra::pluginservice_proxy& pluginService,
                          const char* uri);
 
         virtual ~device_streamset();
@@ -61,7 +61,7 @@ namespace orbbec { namespace mocks {
         astra_status_t close_sensor_streams();
         void add_stream(stream* stream);
 
-        astra::PluginServiceProxy& pluginService_;
+        astra::pluginservice_proxy& pluginService_;
 
         astra_streamset_t streamSetHandle_;
 

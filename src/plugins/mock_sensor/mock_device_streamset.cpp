@@ -23,7 +23,7 @@
 namespace orbbec { namespace mocks {
 
     device_streamset::device_streamset(const std::string& name,
-                                       astra::PluginServiceProxy& pluginService,
+                                       astra::pluginservice_proxy& pluginService,
                                        const char* uri)
         : pluginService_(pluginService),
           uri_(uri)

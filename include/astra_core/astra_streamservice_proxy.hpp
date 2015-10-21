@@ -1,4 +1,4 @@
-/* THIS FILE AUTO-GENERATED FROM StreamServiceProxy.h.lpp. DO NOT EDIT. */
+/* THIS FILE AUTO-GENERATED FROM astra_streamservice_proxy.hpp.lpp. DO NOT EDIT. */
 // This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
 // Copyright (c) 2015 Orbbec 3D
 //
@@ -15,14 +15,14 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef STREAMSERVICEPROXY_H
-#define STREAMSERVICEPROXY_H
+#ifndef ASTRA_STREAMSERVICE_PROXY_HPP
+#define ASTRA_STREAMSERVICE_PROXY_HPP
 
 #include <astra_core/capi/astra_streamservice_proxy.h>
 
 namespace astra {
 
-    class StreamServiceProxy : public astra_streamservice_proxy_t
+    class streamservice_proxy : public astra_streamservice_proxy_t
     {
     public:
 
@@ -146,4 +146,4 @@ namespace astra {
     };
 }
 
-#endif /* STREAMSERVICEPROXY_H */
+#endif // ASTRA_STREAMSERVICE_PROXY_HPP

@@ -21,17 +21,17 @@
 
 #include <astra_core/astra_core.hpp>
 #include <astra_core/capi/plugins/astra_plugin.h>
-#include <astra_core/Plugins/Stream.h>
-#include <astra_core/Plugins/StreamBin.h>
+#include <astra_core/plugins/astra_plugin_stream.hpp>
+#include <astra_core/plugins/astra_stream_bin.hpp>
 
 #include "mock_stream_listener.hpp"
 
 namespace orbbec { namespace mocks {
 
-    class stream : public astra::plugins::Stream
+    class stream : public astra::plugins::stream
     {
     public:
-        inline stream(astra::PluginServiceProxy& pluginService,
+        inline stream(astra::pluginservice_proxy& pluginService,
                       astra_streamset_t streamSet,
                       astra::stream_description desc,
                       stream_listener& listener);
@@ -65,11 +65,11 @@ namespace orbbec { namespace mocks {
 
 namespace orbbec { namespace mocks {
 
-    stream::stream(astra::PluginServiceProxy& pluginService,
+    stream::stream(astra::pluginservice_proxy& pluginService,
                    astra_streamset_t streamSet,
                    astra::stream_description desc,
                    orbbec::mocks::stream_listener& listener)
-        : Stream(pluginService,
+        : astra::plugins::stream(pluginService,
                  streamSet,
                  desc),
           listener_(listener)

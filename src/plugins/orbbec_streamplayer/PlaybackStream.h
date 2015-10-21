@@ -17,8 +17,8 @@
 #ifndef PLAYBACKSTREAM_H
 #define PLAYBACKSTREAM_H
 
-#include <astra_core/Plugins/Stream.h>
-#include <astra_core/Plugins/StreamBin.h>
+#include <astra_core/plugins/astra_plugin_stream.hpp>
+#include <astra_core/plugins/astra_stream_bin.hpp>
 #include <astra_core/capi/plugins/astra_plugin.h>
 #include <astra/capi/streams/image_parameters.h>
 #include <common/serialization/FrameStreamReader.h>
@@ -28,13 +28,13 @@ using namespace astra::serialization;
 
 namespace astra { namespace plugins { namespace streamplayer {
 
-    class PlaybackStreamBase : public Stream
+    class PlaybackStreamBase : public stream
     {
     public:
-        PlaybackStreamBase(PluginServiceProxy& pluginService,
+        PlaybackStreamBase(pluginservice_proxy& pluginService,
                             astra_streamset_t streamSet,
                             stream_description desc)
-                            : Stream(pluginService,
+                            : stream(pluginService,
                             streamSet,
                             desc) { }
 
@@ -54,7 +54,7 @@ namespace astra { namespace plugins { namespace streamplayer {
         using wrapper_type = TFrameWrapper;
 
         PlaybackStream(FrameStreamReader& depthStreamParser,
-                        PluginServiceProxy& pluginService,
+                        pluginservice_proxy& pluginService,
                         astra_streamset_t streamSet,
                         stream_description desc);
 
@@ -90,13 +90,13 @@ namespace astra { namespace plugins { namespace streamplayer {
 
         int m_frameIndex{ 0 };
 
-        using BinType = StreamBin<wrapper_type>;
+        using BinType = stream_bin<wrapper_type>;
         std::unique_ptr<BinType> m_bin;
     };
 
     template<typename TFrameWrapper>
     PlaybackStream<TFrameWrapper>::PlaybackStream(FrameStreamReader& frameStreamReader,
-                                                    PluginServiceProxy& pluginService,
+                                                    pluginservice_proxy& pluginService,
                                                     astra_streamset_t streamSet,
                                                     stream_description desc) :
                                                     PlaybackStreamBase(pluginService,
@@ -121,7 +121,7 @@ namespace astra { namespace plugins { namespace streamplayer {
             return ASTRA_STATUS_SUCCESS;
         }
 
-        m_bin = std::make_unique<StreamBin<wrapper_type> >(
+        m_bin = std::make_unique<stream_bin<wrapper_type> >(
             pluginService(),
             get_handle(),
             m_frameStreamReader.get_buffer_length() - sizeof(wrapper_type));

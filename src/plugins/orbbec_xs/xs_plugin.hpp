@@ -17,7 +17,7 @@
 #ifndef XS_PLUGIN_H
 #define XS_PLUGIN_H
 
-#include <astra_core/Plugins/PluginKit.h>
+#include <astra_core/plugins/astra_plugin.hpp>
 #include <astra/astra.hpp>
 #include "xs_point_processor.hpp"
 #include <memory>
@@ -25,11 +25,11 @@
 
 namespace astra { namespace xs {
 
-    class plugin : public astra::PluginBase
+    class plugin : public astra::plugins::plugin_base
     {
     public:
-        plugin(PluginServiceProxy* pluginProxy)
-            : PluginBase(pluginProxy, "orbbec_xs")
+        plugin(pluginservice_proxy* pluginProxy)
+            : plugin_base(pluginProxy, "orbbec_xs")
         {
             LOG_INFO("astra.xs.plugin", "Initializing xs plugin");
             register_for_stream_events();

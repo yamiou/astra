@@ -34,7 +34,7 @@ namespace astra { namespace plugins { namespace streamplayer
         {
         public:
             DepthStream(FrameStreamReader& streamParser,
-                             PluginServiceProxy& pluginService,
+                             pluginservice_proxy& pluginService,
                              astra_streamset_t streamSet)
                              : PlaybackStream(streamParser, pluginService, streamSet, stream_description(
                                   ASTRA_STREAM_DEPTH,

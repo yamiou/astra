@@ -25,8 +25,8 @@ namespace astra { namespace hand {
 
     const char HANDPLUGIN_CONFIG_FILE[] = "plugins/orbbec_hand.toml";
 
-    plugin::plugin(PluginServiceProxy* pluginProxy)
-        : PluginBase(pluginProxy, "orbbec_hand")
+    plugin::plugin(pluginservice_proxy* pluginProxy)
+        : plugin_base(pluginProxy, "orbbec_hand")
     {
         settings_ = parse_settings(HANDPLUGIN_CONFIG_FILE);
     }

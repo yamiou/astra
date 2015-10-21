@@ -43,7 +43,7 @@ namespace orbbec { namespace mocks {
     public:
         using wrapper_type = TFrameWrapper;
 
-        device_stream(astra::PluginServiceProxy& pluginService,
+        device_stream(astra::pluginservice_proxy& pluginService,
                       astra_streamset_t streamSet,
                       astra::stream_description desc,
                       orbbec::mocks::stream_listener& listener,
@@ -89,7 +89,7 @@ namespace orbbec { namespace mocks {
 
         astra::devices::sensor_stream::shared_ptr deviceStream_;
 
-        using bin_type = astra::plugins::StreamBin<wrapper_type>;
+        using bin_type = astra::plugins::stream_bin<wrapper_type>;
         std::unique_ptr<bin_type> bin_;
 
         size_t bufferLength_{0};
@@ -104,7 +104,7 @@ namespace orbbec { namespace mocks {
 namespace orbbec { namespace mocks {
 
     template<typename TFrameWrapper>
-    device_stream<TFrameWrapper>::device_stream(astra::PluginServiceProxy& pluginService,
+    device_stream<TFrameWrapper>::device_stream(astra::pluginservice_proxy& pluginService,
                                                 astra_streamset_t streamSet,
                                                 astra::stream_description desc,
                                                 orbbec::mocks::stream_listener& listener,
@@ -371,7 +371,7 @@ namespace orbbec { namespace mocks {
     class image_stream : public device_stream<::astra_imageframe_wrapper_t>
     {
     public:
-        image_stream(astra::PluginServiceProxy& pluginService,
+        image_stream(astra::pluginservice_proxy& pluginService,
                      astra_streamset_t streamSet,
                      astra::stream_description desc,
                      orbbec::mocks::stream_listener& listener,

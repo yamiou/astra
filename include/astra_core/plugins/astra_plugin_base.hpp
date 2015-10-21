@@ -14,19 +14,19 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef PLUGINBASE_H
-#define PLUGINBASE_H
+#ifndef ASTRA_PLUGIN_BASE_HPP
+#define ASTRA_PLUGIN_BASE_HPP
 
 #include <cassert>
 
 #include "../capi/astra_types.h"
 #include "../capi/astra_host_events.h"
-#include "PluginServiceProxy.h"
-#include "PluginLogger.h"
+#include "astra_pluginservice_proxy.hpp"
+#include "astra_plugin_logging.hpp"
 
-namespace astra {
+namespace astra { namespace plugins {
 
-    inline const char* get_uri_for_streamset(PluginServiceProxy& pluginService, astra_streamset_t streamSet)
+    inline const char* get_uri_for_streamset(pluginservice_proxy& pluginService, astra_streamset_t streamSet)
     {
         const char* uri;
         pluginService.get_streamset_uri(streamSet, &uri);
@@ -34,59 +34,59 @@ namespace astra {
         return uri;
     }
 
-    class PluginBase
+    class plugin_base
     {
     public:
-        PluginBase(PluginServiceProxy* pluginService, const char* pluginName)
-            :  m_pluginService(pluginService)
+        plugin_base(pluginservice_proxy* pluginService, const char* pluginName)
+            :  pluginService_(pluginService)
         {
             assert(pluginService != nullptr);
         }
 
-        virtual ~PluginBase() = default;
+        virtual ~plugin_base() = default;
 
         void initialize() { on_initialize(); };
 
         virtual void temp_update() { };
 
     protected:
-        inline PluginServiceProxy& pluginService() const { return *m_pluginService; }
+        inline pluginservice_proxy& pluginService() const { return *pluginService_; }
 
         void register_for_stream_events()
         {
             pluginService().
-                register_stream_registered_callback(&PluginBase::stream_added_handler_thunk,
+                register_stream_registered_callback(&plugin_base::stream_added_handler_thunk,
                                                     this,
-                                                    &m_streamAddedCallbackId);
+                                                    &streamAddedCallbackId_);
 
             pluginService().
-                register_stream_unregistering_callback(&PluginBase::stream_removing_handler_thunk,
+                register_stream_unregistering_callback(&plugin_base::stream_removing_handler_thunk,
                                                        this,
-                                                       &m_streamRemovingCallbackId);
+                                                       &streamRemovingCallbackId_);
         }
 
         void register_for_host_events()
         {
 
             pluginService().
-                register_host_event_callback(&PluginBase::host_event_handler_thunk,
+                register_host_event_callback(&plugin_base::host_event_handler_thunk,
                                              this,
-                                             &m_hostEventCallbackId);
+                                             &hostEventCallbackId_);
         }
 
         void unregister_for_stream_events()
         {
-            pluginService().unregister_stream_registered_callback(m_streamAddedCallbackId);
-            pluginService().unregister_stream_unregistering_callback(m_streamRemovingCallbackId);
+            pluginService().unregister_stream_registered_callback(streamAddedCallbackId_);
+            pluginService().unregister_stream_unregistering_callback(streamRemovingCallbackId_);
         }
 
         void unregister_for_host_events()
         {
-            pluginService().unregister_host_event_callback(m_hostEventCallbackId);
+            pluginService().unregister_host_event_callback(hostEventCallbackId_);
         }
 
     private:
-        PluginServiceProxy* m_pluginService{nullptr};
+        pluginservice_proxy* pluginService_{nullptr};
 
         virtual void on_initialize() { };
 
@@ -95,7 +95,7 @@ namespace astra {
                                                astra_stream_t streamHandle,
                                                astra_stream_desc_t desc)
         {
-            PluginBase* plugin = static_cast<PluginBase*>(clientTag);
+            plugin_base* plugin = static_cast<plugin_base*>(clientTag);
             plugin->stream_added_handler(setHandle, streamHandle, desc);
         }
 
@@ -105,7 +105,7 @@ namespace astra {
                                                   astra_stream_desc_t desc)
 
         {
-            PluginBase* plugin = static_cast<PluginBase*>(clientTag);
+            plugin_base* plugin = static_cast<plugin_base*>(clientTag);
             plugin->stream_removing_handler(setHandle, streamHandle, desc);
         }
 
@@ -114,7 +114,7 @@ namespace astra {
                                              const void* data,
                                              size_t dataSize)
         {
-            PluginBase* self = static_cast<PluginBase*>(clientTag);
+            plugin_base* self = static_cast<plugin_base*>(clientTag);
             self->host_event_handler(id, data, dataSize);
         }
 
@@ -152,24 +152,24 @@ namespace astra {
         virtual void on_host_event(astra_event_id id, const void* data, size_t dataSize)
         {}
 
-        astra_callback_id_t m_streamAddedCallbackId;
-        astra_callback_id_t m_streamRemovingCallbackId;
-        astra_callback_id_t m_hostEventCallbackId;
+        astra_callback_id_t streamAddedCallbackId_;
+        astra_callback_id_t streamRemovingCallbackId_;
+        astra_callback_id_t hostEventCallbackId_;
     };
-}
+}}
 
 #define EXPORT_PLUGIN(className)                                                         \
                                                                                          \
     static std::unique_ptr<className> g_plugin;                                          \
-    astra::PluginServiceProxy* __g_serviceProxy;                                         \
+    astra::pluginservice_proxy* __g_serviceProxy;                                        \
                                                                                          \
     ASTRA_BEGIN_DECLS                                                                    \
                                                                                          \
-    ASTRA_EXPORT void astra_plugin_initialize(astra_pluginservice_proxy_t* pluginProxy)       \
+    ASTRA_EXPORT void astra_plugin_initialize(astra_pluginservice_proxy_t* pluginProxy)  \
     {                                                                                    \
-        __g_serviceProxy = static_cast<astra::PluginServiceProxy*>(pluginProxy);         \
+        __g_serviceProxy = static_cast<astra::pluginservice_proxy*>(pluginProxy);        \
         g_plugin = std::make_unique<className>(                                          \
-            static_cast<astra::PluginServiceProxy*>(pluginProxy));                       \
+            static_cast<astra::pluginservice_proxy*>(pluginProxy));                      \
         g_plugin->initialize();                                                          \
     }                                                                                    \
                                                                                          \
@@ -186,4 +186,4 @@ namespace astra {
                                                                                          \
     ASTRA_END_DECLS
 
-#endif /* PLUGINBASE_H */
+#endif /* ASTRA_PLUGIN_BASE_HPP */

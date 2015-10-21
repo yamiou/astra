@@ -19,10 +19,10 @@
 
 namespace astra { namespace xs {
 
-    point_processor::point_processor(PluginServiceProxy& pluginService,
+    point_processor::point_processor(pluginservice_proxy& pluginService,
                                      astra_streamset_t streamset,
                                      stream_description& depthDesc)
-        : streamset_(get_uri_for_streamset(pluginService, streamset)),
+        : streamset_(plugins::get_uri_for_streamset(pluginService, streamset)),
           setHandle_(streamset),
           reader_(streamset_.create_reader()),
           depthStream_(reader_.stream<depthstream>(depthDesc.subtype())),

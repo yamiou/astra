@@ -17,7 +17,7 @@
 #ifndef HND_PLUGIN_H
 #define HND_PLUGIN_H
 
-#include <astra_core/Plugins/PluginKit.h>
+#include <astra_core/plugins/astra_plugin.hpp>
 #include <astra/astra.hpp>
 #include <map>
 #include "hnd_hand_tracker.hpp"
@@ -25,10 +25,10 @@
 
 namespace astra { namespace hand {
 
-    class plugin : public PluginBase
+    class plugin : public plugins::plugin_base
     {
     public:
-        plugin(PluginServiceProxy* pluginProxy);
+        plugin(pluginservice_proxy* pluginProxy);
         virtual ~plugin();
 
         virtual void temp_update() override { }

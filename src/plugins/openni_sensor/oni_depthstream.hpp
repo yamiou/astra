@@ -29,7 +29,7 @@ namespace orbbec { namespace ni {
     class depthstream : public devicestream<astra_imageframe_wrapper_t>
     {
     public:
-        depthstream(astra::PluginServiceProxy& pluginService,
+        depthstream(astra::pluginservice_proxy& pluginService,
                     astra_streamset_t streamSet,
                     openni::Device& oniDevice,
                     stream_listener& listener);

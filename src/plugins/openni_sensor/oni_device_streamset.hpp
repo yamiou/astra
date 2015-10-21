@@ -19,7 +19,7 @@
 
 #include <astra_core/astra_streamset.hpp>
 #include <astra_core/capi/plugins/astra_plugin.h>
-#include <astra_core/Plugins/PluginLogger.h>
+#include <astra_core/plugins/astra_plugin_logging.hpp>
 #include <OpenNI.h>
 #include <memory>
 #include <vector>
@@ -32,7 +32,7 @@ namespace orbbec { namespace ni {
     class device_streamset : public stream_listener
     {
     public:
-        device_streamset(std::string name, astra::PluginServiceProxy& pluginService, const char* uri);
+        device_streamset(std::string name, astra::pluginservice_proxy& pluginService, const char* uri);
         ~device_streamset();
 
         astra_status_t open();
@@ -54,7 +54,7 @@ namespace orbbec { namespace ni {
         astra_status_t close_sensor_streams();
         void add_stream(stream* stream);
 
-        astra::PluginServiceProxy& pluginService_;
+        astra::pluginservice_proxy& pluginService_;
         astra_streamset_t streamSetHandle_;
         openni::Device oniDevice_;
         std::string uri_;

@@ -45,7 +45,7 @@ namespace orbbec { namespace ni {
     public:
         using wrapper_type = TFrameWrapper;
 
-        devicestream(astra::PluginServiceProxy& pluginService,
+        devicestream(astra::pluginservice_proxy& pluginService,
                      astra_streamset_t streamSet,
                      astra::stream_description desc,
                      openni::Device& oniDevice,
@@ -352,7 +352,7 @@ namespace orbbec { namespace ni {
         }
 
     private:
-        using bin_type = astra::plugins::StreamBin<wrapper_type>;
+        using bin_type = astra::plugins::stream_bin<wrapper_type>;
         std::unique_ptr<bin_type> bin_;
 
         std::vector<astra_streamconnection_t> connections_;

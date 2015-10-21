@@ -18,8 +18,8 @@
 #define MOCKSENSORPLUGIN_H
 
 #include <astra_core/astra_core.hpp>
-#include <astra_core/Plugins/PluginBase.h>
-#include <astra_core/Plugins/PluginLogger.h>
+#include <astra_core/plugins/astra_plugin_base.hpp>
+#include <astra_core/plugins/astra_plugin_logging.hpp>
 #include "mock_device_stream.hpp"
 #include "mock_device_streamset.hpp"
 #include <memory>
@@ -30,11 +30,11 @@
 
 namespace orbbec { namespace mocks {
 
-    class mock_sensor_plugin : public astra::PluginBase
+    class mock_sensor_plugin : public astra::plugins::plugin_base
     {
     public:
-        mock_sensor_plugin(astra::PluginServiceProxy* pluginService)
-            : PluginBase(pluginService, "mock_sensor")
+        mock_sensor_plugin(astra::pluginservice_proxy* pluginService)
+            : plugin_base(pluginService, "mock_sensor")
         {
             register_for_host_events();
 

@@ -1,4 +1,4 @@
-/* THIS FILE AUTO-GENERATED FROM PluginServiceProxy.h.lpp. DO NOT EDIT. */
+/* THIS FILE AUTO-GENERATED FROM astra_pluginservice_proxy.hpp.lpp. DO NOT EDIT. */
 // This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
 // Copyright (c) 2015 Orbbec 3D
 //
@@ -15,8 +15,8 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef PLUGINSERVICEPROXY_H
-#define PLUGINSERVICEPROXY_H
+#ifndef ASTRA_PLUGINSERVICE_PROXY_HPP
+#define ASTRA_PLUGINSERVICE_PROXY_HPP
 
 #include <astra_core/capi/plugins/astra_pluginservice_proxy.h>
 #include <cstdarg>
@@ -24,7 +24,7 @@
 
 namespace astra {
 
-    class PluginServiceProxy : public astra_pluginservice_proxy_t
+    class pluginservice_proxy : public astra_pluginservice_proxy_t
     {
     public:
 
@@ -157,4 +157,4 @@ namespace astra {
     };
 }
 
-#endif /* PLUGINSERVICEPROXY_H */
+#endif // ASTRA_PLUGINSERVICE_PROXY_HPP

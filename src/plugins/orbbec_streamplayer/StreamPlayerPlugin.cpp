@@ -22,8 +22,8 @@ EXPORT_PLUGIN(astra::plugins::streamplayer::StreamPlayerPlugin)
 
 namespace astra { namespace plugins { namespace streamplayer {
 
-    StreamPlayerPlugin::StreamPlayerPlugin(PluginServiceProxy* pluginService)
-        : PluginBase(pluginService, "orbbec_streamplayer")
+    StreamPlayerPlugin::StreamPlayerPlugin(pluginservice_proxy* pluginService)
+        : plugin_base(pluginService, "orbbec_streamplayer")
     {
         create_streamset();
     }

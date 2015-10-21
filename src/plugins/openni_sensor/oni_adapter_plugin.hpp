@@ -18,8 +18,8 @@
 #define OPENNIPLUGIN_H
 
 #include <astra_core/astra_core.hpp>
-#include <astra_core/Plugins/PluginBase.h>
-#include <astra_core/Plugins/PluginLogger.h>
+#include <astra_core/plugins/astra_plugin_base.hpp>
+#include <astra_core/plugins/astra_plugin_logging.hpp>
 #include "oni_devicestream.hpp"
 #include "oni_device_streamset.hpp"
 #include <memory>
@@ -31,13 +31,13 @@
 
 namespace orbbec { namespace ni {
 
-    class oni_adapter_plugin : public astra::PluginBase,
+    class oni_adapter_plugin : public astra::plugins::plugin_base,
                                public openni::OpenNI::DeviceConnectedListener,
                                public openni::OpenNI::DeviceDisconnectedListener
     {
     public:
-        oni_adapter_plugin(astra::PluginServiceProxy* pluginService)
-            : PluginBase(pluginService, "openni_sensor")
+        oni_adapter_plugin(astra::pluginservice_proxy* pluginService)
+            : plugin_base(pluginService, "openni_sensor")
         {
             register_for_host_events();
             init_openni();

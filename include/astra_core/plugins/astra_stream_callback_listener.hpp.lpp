@@ -15,24 +15,24 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef STREAMCALLBACKLISTENER_H
-#define STREAMCALLBACKLISTENER_H
+#ifndef ASTRA_STREAMCALLBACK_LISTENER_HPP
+#define ASTRA_STREAMCALLBACK_LISTENER_HPP
 
 #include "../capi/astra_types.h"
 #include <astra_core/capi/plugins/astra_plugin_callbacks.h>
 
 namespace astra {
 
-    class StreamCallbackListener
+    class stream_callback_listener
     {
     public:
-        virtual ~StreamCallbackListener() = default;
+        virtual ~stream_callback_listener() = default;
     private:
 
 ^^^BEGINREPLACE:plugincallbacks^^^
         static ^RETURN^ ^FUNC^_thunk(^PARAMS:void^)
         {
-            static_cast<StreamCallbackListener*>(^PARAMS:voidonly,names^)->^FUNC^(^PARAMS:names,wrap,deref^);
+            static_cast<stream_callback_listener*>(^PARAMS:voidonly,names^)->^FUNC^(^PARAMS:names,wrap,deref^);
         }
 
 ^^^ENDREPLACE^^^
@@ -41,20 +41,20 @@ namespace astra {
 
 ^^^ENDREPLACE^^^
 
-        friend stream_callbacks_t create_plugin_callbacks(StreamCallbackListener* context);
+        friend stream_callbacks_t create_plugin_callbacks(stream_callback_listener* context);
     };
 
-    inline stream_callbacks_t create_plugin_callbacks(StreamCallbackListener* context)
+    inline stream_callbacks_t create_plugin_callbacks(stream_callback_listener* context)
     {
         stream_callbacks_t callbacks;
 
         callbacks.context = context;
 ^^^BEGINREPLACE:plugincallbacks^^^
-        callbacks.^FUNC^_callback = &StreamCallbackListener::^FUNC^_thunk;
+        callbacks.^FUNC^_callback = &stream_callback_listener::^FUNC^_thunk;
 ^^^ENDREPLACE^^^
 
         return callbacks;
     }
 }
 
-#endif /* STREAMCALLBACKLISTENER_H */
+#endif // ASTRA_STREAMCALLBACK_LISTENER_HPP

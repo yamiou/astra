@@ -15,26 +15,24 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef PLUGINSERVICEPROXY_H
-#define PLUGINSERVICEPROXY_H
+#ifndef ASTRA_STREAMSERVICE_PROXY_HPP
+#define ASTRA_STREAMSERVICE_PROXY_HPP
 
-#include <astra_core/capi/plugins/astra_pluginservice_proxy.h>
-#include <cstdarg>
-#include <cstdio>
+#include <astra_core/capi/astra_streamservice_proxy.h>
 
 namespace astra {
 
-    class PluginServiceProxy : public astra_pluginservice_proxy_t
+    class streamservice_proxy : public astra_streamservice_proxy_t
     {
     public:
-^^^BEGINREPLACE:plugin^^^
+^^^BEGINREPLACE:stream^^^
 
-    ^RETURN^ ^FUNC^(^PARAMS^)
-    {
-        return astra_pluginservice_proxy_t::^FUNC^(^PARAMS:void,names^);
-    }
+        ^RETURN^ ^FUNC^(^PARAMS^)
+        {
+            return astra_streamservice_proxy_t::^FUNC^(^PARAMS:void,names^);
+        }
 ^^^ENDREPLACE^^^
     };
 }
 
-#endif /* PLUGINSERVICEPROXY_H */
+#endif // ASTRA_STREAMSERVICE_PROXY_HPP

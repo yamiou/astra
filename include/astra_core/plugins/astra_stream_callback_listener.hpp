@@ -1,4 +1,4 @@
-﻿/* THIS FILE AUTO-GENERATED FROM StreamCallbackListener.h.lpp. DO NOT EDIT. */
+﻿/* THIS FILE AUTO-GENERATED FROM astra_stream_callback_listener.hpp.lpp. DO NOT EDIT. */
 // This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
 // Copyright (c) 2015 Orbbec 3D
 //
@@ -15,18 +15,18 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef STREAMCALLBACKLISTENER_H
-#define STREAMCALLBACKLISTENER_H
+#ifndef ASTRA_STREAMCALLBACK_LISTENER_HPP
+#define ASTRA_STREAMCALLBACK_LISTENER_HPP
 
 #include "../capi/astra_types.h"
 #include <astra_core/capi/plugins/astra_plugin_callbacks.h>
 
 namespace astra {
 
-    class StreamCallbackListener
+    class stream_callback_listener
     {
     public:
-        virtual ~StreamCallbackListener() = default;
+        virtual ~stream_callback_listener() = default;
     private:
 
         static void set_parameter_thunk(void* instance,
@@ -35,10 +35,10 @@ namespace astra {
                                         size_t inByteLength,
                                         astra_parameter_data_t inData)
         {
-            static_cast<StreamCallbackListener*>(instance)->set_parameter(connection,
-                                                                          id,
-                                                                          inByteLength,
-                                                                          inData);
+            static_cast<stream_callback_listener*>(instance)->set_parameter(connection,
+                                                                            id,
+                                                                            inByteLength,
+                                                                            inData);
         }
 
         static void get_parameter_thunk(void* instance,
@@ -46,9 +46,9 @@ namespace astra {
                                         astra_parameter_id id,
                                         astra_parameter_bin_t* parameterBin)
         {
-            static_cast<StreamCallbackListener*>(instance)->get_parameter(connection,
-                                                                          id,
-                                                                          *parameterBin);
+            static_cast<stream_callback_listener*>(instance)->get_parameter(connection,
+                                                                            id,
+                                                                            *parameterBin);
         }
 
         static void invoke_thunk(void* instance,
@@ -58,19 +58,19 @@ namespace astra {
                                  astra_parameter_data_t inData,
                                  astra_parameter_bin_t* parameterBin)
         {
-            static_cast<StreamCallbackListener*>(instance)->invoke(connection,
-                                                                   commandId,
-                                                                   inByteLength,
-                                                                   inData,
-                                                                   *parameterBin);
+            static_cast<stream_callback_listener*>(instance)->invoke(connection,
+                                                                     commandId,
+                                                                     inByteLength,
+                                                                     inData,
+                                                                     *parameterBin);
         }
 
         static void connection_added_thunk(void* instance,
                                            astra_stream_t stream,
                                            astra_streamconnection_t connection)
         {
-            static_cast<StreamCallbackListener*>(instance)->connection_added(stream,
-                                                                             connection);
+            static_cast<stream_callback_listener*>(instance)->connection_added(stream,
+                                                                               connection);
         }
 
         static void connection_removed_thunk(void* instance,
@@ -78,25 +78,25 @@ namespace astra {
                                              astra_bin_t bin,
                                              astra_streamconnection_t connection)
         {
-            static_cast<StreamCallbackListener*>(instance)->connection_removed(stream,
-                                                                               bin,
-                                                                               connection);
+            static_cast<stream_callback_listener*>(instance)->connection_removed(stream,
+                                                                                 bin,
+                                                                                 connection);
         }
 
         static void connection_started_thunk(void* instance,
                                              astra_stream_t stream,
                                              astra_streamconnection_t connection)
         {
-            static_cast<StreamCallbackListener*>(instance)->connection_started(stream,
-                                                                               connection);
+            static_cast<stream_callback_listener*>(instance)->connection_started(stream,
+                                                                                 connection);
         }
 
         static void connection_stopped_thunk(void* instance,
                                              astra_stream_t stream,
                                              astra_streamconnection_t connection)
         {
-            static_cast<StreamCallbackListener*>(instance)->connection_stopped(stream,
-                                                                               connection);
+            static_cast<stream_callback_listener*>(instance)->connection_stopped(stream,
+                                                                                 connection);
         }
 
         virtual void set_parameter(astra_streamconnection_t connection,
@@ -128,24 +128,24 @@ namespace astra {
                                         astra_streamconnection_t connection) {}
 
 
-        friend stream_callbacks_t create_plugin_callbacks(StreamCallbackListener* context);
+        friend stream_callbacks_t create_plugin_callbacks(stream_callback_listener* context);
     };
 
-    inline stream_callbacks_t create_plugin_callbacks(StreamCallbackListener* context)
+    inline stream_callbacks_t create_plugin_callbacks(stream_callback_listener* context)
     {
         stream_callbacks_t callbacks;
 
         callbacks.context = context;
-        callbacks.set_parameter_callback = &StreamCallbackListener::set_parameter_thunk;
-        callbacks.get_parameter_callback = &StreamCallbackListener::get_parameter_thunk;
-        callbacks.invoke_callback = &StreamCallbackListener::invoke_thunk;
-        callbacks.connection_added_callback = &StreamCallbackListener::connection_added_thunk;
-        callbacks.connection_removed_callback = &StreamCallbackListener::connection_removed_thunk;
-        callbacks.connection_started_callback = &StreamCallbackListener::connection_started_thunk;
-        callbacks.connection_stopped_callback = &StreamCallbackListener::connection_stopped_thunk;
+        callbacks.set_parameter_callback = &stream_callback_listener::set_parameter_thunk;
+        callbacks.get_parameter_callback = &stream_callback_listener::get_parameter_thunk;
+        callbacks.invoke_callback = &stream_callback_listener::invoke_thunk;
+        callbacks.connection_added_callback = &stream_callback_listener::connection_added_thunk;
+        callbacks.connection_removed_callback = &stream_callback_listener::connection_removed_thunk;
+        callbacks.connection_started_callback = &stream_callback_listener::connection_started_thunk;
+        callbacks.connection_stopped_callback = &stream_callback_listener::connection_stopped_thunk;
 
         return callbacks;
     }
 }
 
-#endif /* STREAMCALLBACKLISTENER_H */
+#endif // ASTRA_STREAMCALLBACK_LISTENER_HPP
