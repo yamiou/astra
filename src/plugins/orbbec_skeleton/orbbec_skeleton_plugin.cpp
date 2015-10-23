@@ -22,32 +22,31 @@ EXPORT_PLUGIN(orbbec::skeleton::skeleton_plugin);
 namespace orbbec { namespace skeleton {
 
     void skeleton_plugin::on_stream_added(astra_streamset_t setHandle,
-                                         astra_stream_t streamHandle,
-                                         astra_stream_desc_t desc)
+                                          astra_stream_t streamHandle,
+                                          astra_stream_desc_t desc)
     {
         if (desc.type != ASTRA_STREAM_DEPTH)
             return; // if new stream is not depth, we don't care.
 
-        m_skeletonTrackers.push_back(std::make_unique<skeleton_tracker>(pluginService(),
+        skeletonTrackers_.push_back(std::make_unique<skeleton_tracker>(pluginService(),
                                                                        setHandle,
                                                                        streamHandle));
     }
 
     void skeleton_plugin::on_stream_removed(astra_streamset_t setHandle,
-                                           astra_stream_t streamHandle,
-                                           astra_stream_desc_t desc)
+                                            astra_stream_t streamHandle,
+                                            astra_stream_desc_t desc)
     {
-        auto it = std::find_if(m_skeletonTrackers.cbegin(),
-                               m_skeletonTrackers.cend(),
+        auto it = std::find_if(skeletonTrackers_.cbegin(),
+                               skeletonTrackers_.cend(),
                                [&streamHandle] (const skeleton_trackerPtr& trackerPtr)
                                {
                                    return trackerPtr->sourceStream() == streamHandle;
                                });
 
-        if (it != m_skeletonTrackers.cend())
+        if (it != skeletonTrackers_.cend())
         {
-            m_skeletonTrackers.erase(it);
+            skeletonTrackers_.erase(it);
         }
     }
-
 }}

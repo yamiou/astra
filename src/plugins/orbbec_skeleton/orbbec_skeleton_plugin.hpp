@@ -53,7 +53,7 @@ namespace orbbec { namespace skeleton {
         using skeleton_trackerPtr = std::unique_ptr<skeleton_tracker>;
         using skeleton_trackerList = std::vector<skeleton_trackerPtr>;
 
-        skeleton_trackerList m_skeletonTrackers;
+        skeleton_trackerList skeletonTrackers_;
     };
 }}
 
