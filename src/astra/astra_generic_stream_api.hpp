@@ -5,7 +5,7 @@
 #include <astra_core/capi/plugins/astra_plugin.h>
 #include <cassert>
 #include <cstring>
-#include <stdio.h>
+#include <cstdio>
 
 template<typename TFrameWrapperType, typename TFrameType>
 astra_status_t astra_generic_frame_get(astra_reader_frame_t readerFrame,
@@ -66,9 +66,9 @@ template<typename TElementType>
 astra_status_t astra_generic_stream_request_array(astra_streamconnection_t connection,
                                                   astra_parameter_id parameterId,
                                                   astra_result_token_t* token,
-                                                  size_t* count)
+                                                  std::size_t* count)
 {
-    size_t paramSize;
+    std::size_t paramSize;
     astra_status_t rc = astra_stream_get_parameter(connection,
                                                    parameterId,
                                                    &paramSize,
@@ -83,9 +83,9 @@ template<typename TElementType>
 astra_status_t astra_generic_stream_get_result_array(astra_streamconnection_t connection,
                                                      astra_result_token_t token,
                                                      void* array,
-                                                     size_t count)
+                                                     std::size_t count)
 {
-    size_t resultSize = count * sizeof(TElementType);
+    std::size_t resultSize = count * sizeof(TElementType);
 
     return astra_stream_get_result(connection,
                                    token,
@@ -95,11 +95,11 @@ astra_status_t astra_generic_stream_get_result_array(astra_streamconnection_t co
 
 inline astra_status_t astra_stream_get_parameter_fixed(astra_streamconnection_t connection,
                                                        astra_parameter_id parameterId,
-                                                       size_t byteLength,
+                                                       std::size_t byteLength,
                                                        astra_parameter_data_t* data)
 {
     astra_result_token_t token;
-    size_t paramSize;
+    std::size_t paramSize;
     astra_status_t rc = astra_stream_get_parameter(connection,
                                                    parameterId,
                                                    &paramSize,
@@ -107,7 +107,7 @@ inline astra_status_t astra_stream_get_parameter_fixed(astra_streamconnection_t 
 
     if (rc != ASTRA_STATUS_SUCCESS)
     {
-        memset(data, 0, byteLength);
+        std::memset(data, 0, byteLength);
         return rc;
     }
 
