@@ -100,11 +100,11 @@ namespace astra {
 
     void stream::on_availability_changed()
     {
-        if (listener_)
-            listener_->on_stream_registered(this);
-
         if (is_available())
         {
+            if (listener_)
+                listener_->on_stream_registered(this);
+
             for(auto& connection : connections_)
             {
                 on_connection_created(connection.get(), get_handle());
