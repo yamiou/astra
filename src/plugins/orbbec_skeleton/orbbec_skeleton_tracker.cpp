@@ -15,10 +15,11 @@
 //
 // Be excellent to each other.
 #include "orbbec_skeleton_tracker.hpp"
+#include <cstddef>
 
 namespace orbbec { namespace skeleton {
 
-    const size_t skeleton_tracker::MAX_SKELETONS = 6;
+    const std::size_t skeleton_tracker::MAX_SKELETONS = 6;
 
     void skeleton_tracker::on_frame_ready(astra::stream_reader& reader, astra::frame& frame)
     {
@@ -48,7 +49,7 @@ namespace orbbec { namespace skeleton {
             skeleton.joints[0].position.y = 0;
             skeleton.joints[0].position.z = 2000;
 
-            for(int i = 1; i < MAX_SKELETONS; i++)
+            for(unsigned i = 1; i < MAX_SKELETONS; i++)
             {
                 astra_skeleton_t& skeleton = skeletonFrame->frame.skeletons[i];
                 skeleton.trackingId = i + 1;

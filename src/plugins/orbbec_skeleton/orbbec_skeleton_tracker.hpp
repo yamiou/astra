@@ -42,10 +42,11 @@ namespace orbbec { namespace skeleton {
             depthStream_.start();
 
             reader_.addListener(*this);
-            skeletonStream_ = std::make_unique<skeletonstream>(pluginService_,
-                                                               streamSet,
-                                                               sourceStreamHandle_,
-                                                               skeleton_tracker::MAX_SKELETONS);
+            auto s = astra::plugins::make_stream<skeletonstream>(pluginService_,
+                                                                 streamSet,
+                                                                 skeleton_tracker::MAX_SKELETONS);
+
+            skeletonStream_ = std::unique_ptr<skeletonstream>(std::move(s));
         }
 
         astra_stream_t sourceStream() { return sourceStreamHandle_; }
@@ -62,9 +63,6 @@ namespace orbbec { namespace skeleton {
         using skeletonstream_ptr = std::unique_ptr<skeletonstream>;
         skeletonstream_ptr skeletonStream_;
     };
-
-
 }}
-
 
 #endif /* ORBBEC_SKELETON_TRACKER_HPP */

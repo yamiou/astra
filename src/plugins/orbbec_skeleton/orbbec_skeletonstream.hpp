@@ -29,7 +29,6 @@ namespace orbbec { namespace skeleton {
     public:
         skeletonstream(astra::pluginservice_proxy& pluginService,
                        astra_streamset_t streamSet,
-                       astra_stream_t sourceStream,
                        size_t skeletonCount)
             : single_bin_stream(pluginService,
                                 streamSet,
