@@ -52,6 +52,8 @@ namespace astra {
         el::Configurations defaultConf;
 
         defaultConf.setToDefault();
+        defaultConf.set(el::Level::Debug,
+                        el::ConfigurationType::Format, "%datetime %level [%logger] %msg");
         defaultConf.setGlobally(el::ConfigurationType::Enabled, TRUE_STRING);
         defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, TRUE_STRING);
         defaultConf.setGlobally(el::ConfigurationType::ToFile, TRUE_STRING);
