@@ -83,6 +83,12 @@ set(ASTRA_STREAMPLAYER FALSE CACHE BOOL "Build experimental stream playback plug
 set(ASTRA_MOCK_DEVICE FALSE CACHE BOOL "Build mock test device plugin")
 set(ASTRA_SKELETON FALSE CACHE BOOL "Build experimental skeleton support (not working)")
 
+if (ASTRA_EXPERIMENTAL)
+  set(ASTRA_STREAMPLAYER TRUE)
+  set(ASTRA_MOCK_DEVICE TRUE)
+  set(ASTRA_SKELETON TRUE)
+endif()
+
 if (ASTRA_DOCS)
   add_subdirectory(docs)
 endif()
