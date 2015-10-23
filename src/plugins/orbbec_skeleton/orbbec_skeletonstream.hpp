@@ -14,18 +14,17 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef SKELETONSTREAM_H
-#define SKELETONSTREAM_H
+#ifndef ORBBEC_SKELETONSTREAM_HPP
+#define ORBBEC_SKELETONSTREAM_HPP
 
 #include <astra_core/plugins/astra_plugin.hpp>
-#include <astra_core/Astra.h>
+#include <astra/astra.hpp>
 #include <astra/capi/astra_ctypes.h>
-#include <astra/streams/skeleton_types.h>
+#include <astra/capi/streams/skeleton_types.h>
 
-namespace astra { namespace plugins { namespace skeleton {
+namespace orbbec { namespace skeleton {
 
-    class skeletonstream : public astra::plugins::single_bin_stream<astra_skeletonframe_wrapper_t,
-                                                                  astra_skeleton_joint_t>
+    class skeletonstream : public astra::plugins::single_bin_stream<astra_skeletonframe_wrapper_t>
     {
     public:
         skeletonstream(astra::pluginservice_proxy& pluginService,
@@ -33,15 +32,14 @@ namespace astra { namespace plugins { namespace skeleton {
                        astra_stream_t sourceStream,
                        size_t skeletonCount)
             : single_bin_stream(pluginService,
-                              streamSet,
-                              astra::stream_description(ASTRA_STREAM_SKELETON,
-                                                        DEFAULT_SUBTYPE),
-                              sizeof(astra_skeleton_t) * skeletonCount)
+                                streamSet,
+                                astra::stream_description(ASTRA_STREAM_SKELETON,
+                                                          DEFAULT_SUBTYPE),
+                                sizeof(astra_skeleton_t) * skeletonCount)
 
         {
-            enable_callbacks();
         }
     };
-}}}
+}}
 
-#endif /* SKELETONSTREAM_H */
+#endif /* ORBBEC_SKELETONSTREAM_HPP */

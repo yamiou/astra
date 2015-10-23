@@ -14,18 +14,18 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#include "SkeletonTracker.h"
+#include "orbbec_skeleton_tracker.hpp"
 
-namespace astra { namespace plugins { namespace skeleton {
+namespace orbbec { namespace skeleton {
 
-    const size_t SkeletonTracker::MAX_SKELETONS = 6;
+    const size_t skeleton_tracker::MAX_SKELETONS = 6;
 
-    void SkeletonTracker::on_frame_ready(stream_reader_& reader, frame& frame)
+    void skeleton_tracker::on_frame_ready(astra::stream_reader& reader, astra::frame& frame)
     {
         if (!skeletonStream_->has_connections())
             return; // don't waste cycles if no one is listening
 
-        astra::depthframe depthFrame = frame.get<depthframe>();
+        astra::depthframe depthFrame = frame.get<astra::depthframe>();
 
         if (!depthFrame.is_valid())
             return;
@@ -36,7 +36,7 @@ namespace astra { namespace plugins { namespace skeleton {
         if (skeletonFrame != nullptr)
         {
             skeletonFrame->frame.skeletons = reinterpret_cast<astra_skeleton_t*>(&(skeletonFrame->frame_data));
-            skeletonFrame->frame.skeletonCount = SkeletonTracker::MAX_SKELETONS;
+            skeletonFrame->frame.skeletonCount = skeleton_tracker::MAX_SKELETONS;
 
             astra_skeleton_t& skeleton = skeletonFrame->frame.skeletons[0];
             skeleton.trackingId = 1;
@@ -59,4 +59,4 @@ namespace astra { namespace plugins { namespace skeleton {
         }
     }
 
-}}}
+}}

@@ -25,6 +25,10 @@ endif()
 add_subdirectory(device_sdk)
 add_subdirectory(openni_sensor)
 
+if (ASTRA_SKELETON)
+  add_subdirectory(orbbec_skeleton)
+endif()
+
 if (ASTRA_HAND)
   add_subdirectory(orbbec_hand)
 endif()

@@ -89,10 +89,10 @@ endif()
 
 add_subdirectory(c-api)
 add_subdirectory(cpp-api)
+
 if(NOT ASTRA_ANDROID)
   add_subdirectory(sfml)
   add_subdirectory(tools)
-  add_subdirectory(plugins)
   if (ASTRA_SKELETON)
       add_dependencies(SimpleSkeletonViewer-SFML orbbec_skeleton)
   endif()

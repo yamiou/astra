@@ -14,29 +14,29 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef SKELETONPLUGIN_H
-#define SKELETONPLUGIN_H
+#ifndef ORBBEC_SKELETON_PLUGIN_HPP
+#define ORBBEC_SKELETON_PLUGIN_HPP
 
 #include <astra_core/plugins/astra_plugin.hpp>
 #include <astra/astra.hpp>
-#include "SkeletonTracker.h"
+#include "orbbec_skeleton_tracker.hpp"
 #include <memory>
 #include <vector>
 
-namespace astra { namespace plugins { namespace skeleton {
+namespace orbbec { namespace skeleton {
 
-    class SkeletonPlugin : public astra::plugin_base
+    class skeleton_plugin : public astra::plugins::plugin_base
     {
     public:
         static const size_t MAX_SKELETONS = 5;
 
-        SkeletonPlugin(pluginservice_proxy* pluginProxy)
+        skeleton_plugin(astra::pluginservice_proxy* pluginProxy)
             : plugin_base(pluginProxy, "orbbec_skeleton")
         {
             register_for_stream_events();
         }
 
-        virtual ~SkeletonPlugin()
+        virtual ~skeleton_plugin()
         {
             unregister_for_stream_events();
         }
@@ -50,12 +50,12 @@ namespace astra { namespace plugins { namespace skeleton {
                                        astra_stream_t streamHandle,
                                        astra_stream_desc_t desc) override;
 
-        using SkeletonTrackerPtr = std::unique_ptr<SkeletonTracker>;
-        using SkeletonTrackerList = std::vector<SkeletonTrackerPtr>;
+        using skeleton_trackerPtr = std::unique_ptr<skeleton_tracker>;
+        using skeleton_trackerList = std::vector<skeleton_trackerPtr>;
 
-        SkeletonTrackerList m_skeletonTrackers;
+        skeleton_trackerList m_skeletonTrackers;
     };
-}}}
+}}
 
 
-#endif /* SKELETONPLUGIN_H */
+#endif /* ORBBEC_SKELETON_PLUGIN_HPP */

@@ -14,32 +14,32 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#include "SkeletonPlugin.h"
-#include <astra_core/Astra.h>
+#include "orbbec_skeleton_plugin.hpp"
+#include <astra/astra.hpp>
 
-EXPORT_PLUGIN(astra::plugins::skeleton::SkeletonPlugin);
+EXPORT_PLUGIN(orbbec::skeleton::skeleton_plugin);
 
-namespace astra { namespace plugins { namespace skeleton {
+namespace orbbec { namespace skeleton {
 
-    void SkeletonPlugin::on_stream_added(astra_streamset_t setHandle,
+    void skeleton_plugin::on_stream_added(astra_streamset_t setHandle,
                                          astra_stream_t streamHandle,
                                          astra_stream_desc_t desc)
     {
         if (desc.type != ASTRA_STREAM_DEPTH)
             return; // if new stream is not depth, we don't care.
 
-        m_skeletonTrackers.push_back(std::make_unique<SkeletonTracker>(get_pluginService(),
-                                                                     setHandle,
-                                                                     streamHandle));
+        m_skeletonTrackers.push_back(std::make_unique<skeleton_tracker>(pluginService(),
+                                                                       setHandle,
+                                                                       streamHandle));
     }
 
-    void SkeletonPlugin::on_stream_removed(astra_streamset_t setHandle,
+    void skeleton_plugin::on_stream_removed(astra_streamset_t setHandle,
                                            astra_stream_t streamHandle,
                                            astra_stream_desc_t desc)
     {
         auto it = std::find_if(m_skeletonTrackers.cbegin(),
                                m_skeletonTrackers.cend(),
-                               [&streamHandle] (const SkeletonTrackerPtr& trackerPtr)
+                               [&streamHandle] (const skeleton_trackerPtr& trackerPtr)
                                {
                                    return trackerPtr->sourceStream() == streamHandle;
                                });
@@ -50,4 +50,4 @@ namespace astra { namespace plugins { namespace skeleton {
         }
     }
 
-}}}
+}}

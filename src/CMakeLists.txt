@@ -56,6 +56,11 @@ if (ASTRA_XS)
   add_dependencies(orbbec_xs ${_projname})
 endif()
 
+if (ASTRA_SKELETON)
+  add_dependencies(${SDK_DEPENDENT_TARGET} orbbec_skeleton)
+  add_dependencies(orbbec_skeleton ${_projname})
+endif()
+
 if (NOT ASTRA_ANDROID)
   if (ASTRA_MOCK_DEVICE)
     add_dependencies(${SDK_DEPENDENT_TARGET} mock_sensor)

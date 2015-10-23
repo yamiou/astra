@@ -14,31 +14,30 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef SKELETONTRACKER_H
-#define SKELETONTRACKER_H
+#ifndef ORBBEC_SKELETON_TRACKER_HPP
+#define ORBBEC_SKELETON_TRACKER_HPP
 
 #include <astra_core/plugins/astra_plugin.hpp>
-#include <astra_core/Astra.h>
+#include <astra/astra.hpp>
 #include <astra/capi/astra_ctypes.h>
-#include <astra/streams/Depth.h>
-#include <astra/streams/skeleton_types.h>
-#include "skeletonstream.h"
+#include <astra/capi/streams/skeleton_types.h>
+#include "orbbec_skeletonstream.hpp"
 
-namespace astra { namespace plugins { namespace skeleton {
+namespace orbbec { namespace skeleton {
 
-    class SkeletonTracker : public astra::frame_listener
+    class skeleton_tracker : public astra::frame_listener
     {
     public:
         static const size_t MAX_SKELETONS;
 
-        SkeletonTracker(pluginservice_proxy& pluginService,
-                        astra_streamset_t streamSet,
-                        astra_stream_t sourceStream)
+        skeleton_tracker(astra::pluginservice_proxy& pluginService,
+                         astra_streamset_t streamSet,
+                         astra_stream_t sourceStream)
             : sourceStreamHandle_(sourceStream),
-              sensor_(get_uri_for_streamset(pluginService, streamSet)),
+              sensor_(astra::plugins::get_uri_for_streamset(pluginService, streamSet)),
+              reader_(sensor_.create_reader()),
               pluginService_(pluginService)
         {
-            reader_ = sensor_.create_reader();
             depthStream_ = reader_.stream<astra::depthstream>();
             depthStream_.start();
 
@@ -46,26 +45,26 @@ namespace astra { namespace plugins { namespace skeleton {
             skeletonStream_ = std::make_unique<skeletonstream>(pluginService_,
                                                                streamSet,
                                                                sourceStreamHandle_,
-                                                               SkeletonTracker::MAX_SKELETONS);
+                                                               skeleton_tracker::MAX_SKELETONS);
         }
 
         astra_stream_t sourceStream() { return sourceStreamHandle_; }
 
-        virtual void on_frame_ready(astra::StreaReader_& reader, astra::frame& frame) override;
+        virtual void on_frame_ready(astra::stream_reader& reader, astra::frame& frame) override;
 
     private:
         astra_stream_t sourceStreamHandle_;
-        depthstream depthStream_{nullptr};
-        streamset sensor_;
-        stream_reader reader_;
-        pluginservice_proxy& pluginService_;
+        astra::depthstream depthStream_{nullptr};
+        astra::streamset sensor_;
+        astra::stream_reader reader_;
+        astra::pluginservice_proxy& pluginService_;
 
         using skeletonstream_ptr = std::unique_ptr<skeletonstream>;
         skeletonstream_ptr skeletonStream_;
     };
 
 
-}}}
+}}
 
 
-#endif /* SKELETONTRACKER_H */
+#endif /* ORBBEC_SKELETON_TRACKER_HPP */

@@ -18,7 +18,7 @@
 #include <astra/astra.hpp>
 #include <iostream>
 
-class skeletonframeListener : public astra::frame_listener
+class skeleton_visualizer : public astra::frame_listener
 {
 public:
     void init_texture(int width, int height)
@@ -101,7 +101,7 @@ public:
         }
     }
 
-    virtual void on_frame_ready(astra::Stream_Reader& reader,
+    virtual void on_frame_ready(astra::stream_reader& reader,
                                 astra::frame& frame) override
     {
         if (mapper_ == nullptr)
@@ -116,7 +116,7 @@ public:
         check_fps();
     }
 
-    void drawCircle(sf::RenderWindow& window, float radius, float x, float y, sf::Color color)
+    void draw_circle(sf::RenderWindow& window, float radius, float x, float y, sf::Color color)
     {
         sf::CircleShape shape(radius);
 
@@ -127,14 +127,14 @@ public:
         window.draw(shape);
     }
 
-    void drawSkeletons(sf::RenderWindow& window, float depthScale)
+    void draw_skeletons(sf::RenderWindow& window, float depthScale)
     {
         float radius = 16;
         sf::Color trackingColor(10, 10, 200);
 
         for (auto position : jointPositions_)
         {
-            drawCircle(window,
+            draw_circle(window,
                        radius,
                        position.x * depthScale,
                        position.y * depthScale,
@@ -142,7 +142,7 @@ public:
         }
     }
 
-    void drawTo(sf::RenderWindow& window)
+    void draw_to(sf::RenderWindow& window)
     {
         if (displayBuffer_ != nullptr)
         {
@@ -152,7 +152,7 @@ public:
 
             window.draw(sprite_);
 
-            drawSkeletons(window, depthScale);
+            draw_skeletons(window, depthScale);
         }
     }
 
@@ -175,14 +175,14 @@ private:
 
 int main(int argc, char** argv)
 {
-    astra::Astra::initialize();
+    astra::initialize();
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Skeleton Viewer");
 
     astra::streamset sensor;
     astra::stream_reader reader = sensor.create_reader();
 
-    skeletonframeListener listener;
+    skeleton_visualizer listener;
 
     reader.stream<astra::depthstream>().start();
     reader.stream<astra::skeletonstream>().start();
@@ -204,11 +204,11 @@ int main(int argc, char** argv)
         // clear the window with black color
         window.clear(sf::Color::Black);
 
-        listener.drawTo(window);
+        listener.draw_to(window);
         window.display();
     }
 
-    astra::Astra::terminate();
+    astra::terminate();
 
     return 0;
 }
