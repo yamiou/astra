@@ -17,6 +17,7 @@
 #include <SFML/Graphics.hpp>
 #include <astra/astra.hpp>
 #include <iostream>
+#include <cstring>
 
 class skeleton_visualizer : public astra::frame_listener
 {
@@ -30,7 +31,7 @@ public:
             int byteLength = depthWidth_ * depthHeight_ * 4;
 
             displayBuffer_ = BufferPtr(new uint8_t[byteLength]);
-            memset(displayBuffer_.get(), 0, byteLength);
+            std::memset(displayBuffer_.get(), 0, byteLength);
 
             texture_.create(depthWidth_, depthHeight_);
             sprite_.setTexture(texture_);
