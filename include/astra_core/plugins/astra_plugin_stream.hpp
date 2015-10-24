@@ -158,10 +158,8 @@ namespace astra { namespace plugins {
 
             LOG_INFO("astra.plugins.stream", "creating a %u, %u", desc->type, desc->subtype);
             pluginService_.create_stream(streamSet_,
-                                          *desc,
-                                          &streamHandle_);
-
-
+                                         *desc,
+                                         &streamHandle_);
         }
 
         bool registered_{false};
