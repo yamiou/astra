@@ -37,7 +37,7 @@
 namespace orbbec { namespace mocks {
 
     template<typename TFrameWrapper>
-    class device_stream : public stream,
+    class device_stream : public mock_stream,
                           public astra::devices::stream_listener
     {
     public:
@@ -109,10 +109,10 @@ namespace orbbec { namespace mocks {
                                                 astra::stream_description desc,
                                                 orbbec::mocks::stream_listener& listener,
                                                 astra::devices::sensor_stream::shared_ptr stream)
-        : orbbec::mocks::stream(pluginService,
-                                streamSet,
-                                desc,
-                                listener),
+        : orbbec::mocks::mock_stream(pluginService,
+                                     streamSet,
+                                     desc,
+                                     listener),
           deviceStream_(stream)
     {
         deviceStream_->add_listener(this);

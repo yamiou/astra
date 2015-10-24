@@ -28,13 +28,13 @@
 
 namespace orbbec { namespace mocks {
 
-    class stream : public astra::plugins::stream
+    class mock_stream : public astra::plugins::stream
     {
     public:
-        inline stream(astra::pluginservice_proxy& pluginService,
-                      astra_streamset_t streamSet,
-                      astra::stream_description desc,
-                      stream_listener& listener);
+        inline mock_stream(astra::pluginservice_proxy& pluginService,
+                           astra_streamset_t streamSet,
+                           astra::stream_description desc,
+                           stream_listener& listener);
 
         inline astra_status_t read(astra_frame_index_t frameIndex);
         inline astra_status_t open();
@@ -65,17 +65,17 @@ namespace orbbec { namespace mocks {
 
 namespace orbbec { namespace mocks {
 
-    stream::stream(astra::pluginservice_proxy& pluginService,
-                   astra_streamset_t streamSet,
-                   astra::stream_description desc,
-                   orbbec::mocks::stream_listener& listener)
+    mock_stream::mock_stream(astra::pluginservice_proxy& pluginService,
+                             astra_streamset_t streamSet,
+                             astra::stream_description desc,
+                             orbbec::mocks::stream_listener& listener)
         : astra::plugins::stream(pluginService,
-                 streamSet,
-                 desc),
+                                 streamSet,
+                                 desc),
           listener_(listener)
     {}
 
-    astra_status_t stream::read(astra_frame_index_t frameIndex)
+    astra_status_t mock_stream::read(astra_frame_index_t frameIndex)
     {
         if (!is_open() || !is_started())
             return astra_status_t::ASTRA_STATUS_INVALID_OPERATION;
@@ -83,7 +83,7 @@ namespace orbbec { namespace mocks {
         return on_read(frameIndex);
     }
 
-    astra_status_t stream::open()
+    astra_status_t mock_stream::open()
     {
         if (is_open())
             return astra_status_t::ASTRA_STATUS_SUCCESS;
@@ -99,7 +99,7 @@ namespace orbbec { namespace mocks {
         return rc;
     }
 
-    astra_status_t stream::close()
+    astra_status_t mock_stream::close()
     {
         if (!is_open())
             return astra_status_t::ASTRA_STATUS_SUCCESS;
@@ -122,7 +122,7 @@ namespace orbbec { namespace mocks {
         return rc;
     }
 
-    astra_status_t stream::start()
+    astra_status_t mock_stream::start()
     {
         if (isStarted_)
             return astra_status_t::ASTRA_STATUS_SUCCESS;
@@ -138,7 +138,7 @@ namespace orbbec { namespace mocks {
         return rc;
     }
 
-    astra_status_t stream::stop()
+    astra_status_t mock_stream::stop()
     {
         if (!isStarted_)
             return astra_status_t::ASTRA_STATUS_SUCCESS;

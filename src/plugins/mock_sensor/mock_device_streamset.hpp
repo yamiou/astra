@@ -48,8 +48,8 @@ namespace orbbec { namespace mocks {
 
         std::string get_uri() { return uri_; }
 
-        virtual void on_started(stream* stream) override;
-        virtual void on_stopped(stream* stream) override;
+        virtual void on_started(mock_stream* stream) override;
+        virtual void on_stopped(mock_stream* stream) override;
 
         device_streamset(const device_streamset&) = delete;
         device_streamset& operator=(const device_streamset&) = delete;
@@ -59,7 +59,7 @@ namespace orbbec { namespace mocks {
 
         astra_status_t open_sensor_streams();
         astra_status_t close_sensor_streams();
-        void add_stream(stream* stream);
+        void add_stream(mock_stream* stream);
 
         astra::pluginservice_proxy& pluginService_;
 
@@ -69,7 +69,7 @@ namespace orbbec { namespace mocks {
 
         astra::devices::device::shared_ptr device_;
 
-        using stream_ptr = std::unique_ptr<stream>;
+        using stream_ptr = std::unique_ptr<mocks::mock_stream>;
         std::vector<stream_ptr> streams_;
 
         astra_frame_index_t frameIndex_{0};

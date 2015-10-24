@@ -90,7 +90,7 @@ namespace orbbec { namespace mocks {
         return astra_status_t::ASTRA_STATUS_SUCCESS;
     }
 
-    void device_streamset::add_stream(stream* stream)
+    void device_streamset::add_stream(mock_stream* stream)
     {
         streams_.push_back(stream_ptr(stream));
     }
@@ -190,14 +190,14 @@ namespace orbbec { namespace mocks {
         return astra_status_t::ASTRA_STATUS_SUCCESS;
     }
 
-    void device_streamset::on_started(stream* stream)
+    void device_streamset::on_started(mock_stream* stream)
     {
         LOG_INFO("orbbec.mocks.device_streamset",
                  "adding stream type %u to active streams",
                  stream->description().type());
     }
 
-    void device_streamset::on_stopped(stream* stream)
+    void device_streamset::on_stopped(mock_stream* stream)
     {
         LOG_INFO("orbbec.mocks.device_streamset",
                  "removing stream type %u from active streams",
