@@ -38,6 +38,8 @@ namespace orbbec { namespace skeleton {
                                             astra_stream_t streamHandle,
                                             astra_stream_desc_t desc)
     {
+        if (desc.type != ASTRA_STREAM_DEPTH)
+            return;
 
         LOG_DEBUG("orbbec.skeleton.skeleton_plugin", "looking for skeleton tracker for %p", streamHandle);
         auto it = std::find_if(skeletonTrackers_.cbegin(),
