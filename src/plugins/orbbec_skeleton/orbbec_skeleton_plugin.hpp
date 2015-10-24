@@ -38,6 +38,7 @@ namespace orbbec { namespace skeleton {
 
         virtual ~skeleton_plugin()
         {
+            LOG_INFO("orbbec.skeleton.skeleton_plugin", "poof destroyed");
             unregister_for_stream_events();
         }
 

@@ -42,6 +42,8 @@ namespace orbbec { namespace skeleton {
             depthStream_.start();
 
             reader_.addListener(*this);
+
+            LOG_DEBUG("orbbec.skeleton.skeleton_tracker", "creating skeleton stream for %p", sourceStreamHandle_);
             auto s = astra::plugins::make_stream<skeletonstream>(pluginService_,
                                                                  streamSet,
                                                                  skeleton_tracker::MAX_SKELETONS);

@@ -40,6 +40,9 @@ namespace orbbec { namespace mocks {
     {
         close();
         streams_.clear();
+
+        LOG_DEBUG("orbbec.mocks.device_streamset", "destroying streamset for device %s", uri_.c_str());
+
         pluginService_.destroy_stream_set(streamSetHandle_);
     }
 
@@ -48,11 +51,11 @@ namespace orbbec { namespace mocks {
         if (isOpen_)
             return astra_status_t::ASTRA_STATUS_SUCCESS;
 
-        LOG_INFO("orbbec.mocks.device_streamset", "opening device: %s", uri_.c_str());
+        LOG_DEBUG("orbbec.mocks.device_streamset", "opening device: %s", uri_.c_str());
 
         open_sensor_streams();
 
-        LOG_INFO("orbbec.mocks.device_streamset", "opened device: %s", uri_.c_str());
+        LOG_DEBUG("orbbec.mocks.device_streamset", "opened device: %s", uri_.c_str());
 
         isOpen_ = true;
 

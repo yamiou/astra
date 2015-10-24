@@ -28,6 +28,7 @@ namespace orbbec { namespace skeleton {
         if (desc.type != ASTRA_STREAM_DEPTH)
             return; // if new stream is not depth, we don't care.
 
+        LOG_DEBUG("orbbec.skeleton.skeleton_plugin", "creating skeleton tracker for %p", streamHandle);
         skeletonTrackers_.push_back(std::make_unique<skeleton_tracker>(pluginService(),
                                                                        setHandle,
                                                                        streamHandle));
@@ -37,6 +38,8 @@ namespace orbbec { namespace skeleton {
                                             astra_stream_t streamHandle,
                                             astra_stream_desc_t desc)
     {
+
+        LOG_DEBUG("orbbec.skeleton.skeleton_plugin", "looking for skeleton tracker for %p", streamHandle);
         auto it = std::find_if(skeletonTrackers_.cbegin(),
                                skeletonTrackers_.cend(),
                                [&streamHandle] (const skeleton_trackerPtr& trackerPtr)
@@ -44,6 +47,7 @@ namespace orbbec { namespace skeleton {
                                    return trackerPtr->sourceStream() == streamHandle;
                                });
 
+        LOG_DEBUG("orbbec.skeleton.skeleton_plugin", "destroying skeleton tracker for %p", streamHandle);
         if (it != skeletonTrackers_.cend())
         {
             skeletonTrackers_.erase(it);
