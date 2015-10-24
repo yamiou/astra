@@ -21,6 +21,7 @@
 #include <astra_core/plugins/astra_plugin_logging.hpp>
 #include <astra_core/plugins/astra_pluginservice_proxy.hpp>
 #include <astra_core/plugins/astra_stream_callback_listener.hpp>
+#include <astra_core/plugins/astra_stream_event_handler.hpp>
 #include <system_error>
 #include <cassert>
 #include <unordered_set>
@@ -90,6 +91,11 @@ namespace astra { namespace plugins {
             stream_callbacks_t pluginCallbacks = create_plugin_callbacks(this);
             pluginService_.register_stream(streamHandle_, pluginCallbacks);
             registered_ = true;
+        }
+
+        void set_handler(stream_event_handler* handler)
+        {
+            eventHandler_ = handler;
         }
 
         inline const stream_description& description() { return description_; }
@@ -167,6 +173,7 @@ namespace astra { namespace plugins {
         astra_streamset_t streamSet_{nullptr};
         stream_description description_;
         astra_stream_t streamHandle_{nullptr};
+        stream_event_handler* eventHandler_{nullptr};
     };
 
     inline void stream::set_parameter(astra_streamconnection_t connection,
@@ -174,6 +181,9 @@ namespace astra { namespace plugins {
                                       size_t inByteLength,
                                       astra_parameter_data_t inData)
     {
+        if (eventHandler_)
+            eventHandler_->on_set_parameter(this, connection, id, inByteLength, inData);
+
         on_set_parameter(connection, id, inByteLength, inData);
     }
 
@@ -181,6 +191,9 @@ namespace astra { namespace plugins {
                                       astra_parameter_id id,
                                       astra_parameter_bin_t& parameterBin)
     {
+        if (eventHandler_)
+            eventHandler_->on_get_parameter(this, connection, id, parameterBin);
+
         on_get_parameter(connection, id, parameterBin);
     }
 
@@ -190,6 +203,9 @@ namespace astra { namespace plugins {
                                astra_parameter_data_t inData,
                                astra_parameter_bin_t& parameterBin)
     {
+        if (eventHandler_)
+            eventHandler_->on_invoke(this, connection, commandId, inByteLength, inData, parameterBin);
+
         on_invoke(connection, commandId, inByteLength, inData, parameterBin);
     }
 
@@ -197,7 +213,12 @@ namespace astra { namespace plugins {
                                          astra_streamconnection_t connection)
     {
         assert(stream == streamHandle_);
+
         LOG_INFO("astra.plugins.stream", "adding connection");
+
+        if (eventHandler_)
+            eventHandler_->on_connection_added(this, connection);
+
         on_connection_added(connection);
     }
 
@@ -206,7 +227,12 @@ namespace astra { namespace plugins {
                                            astra_streamconnection_t connection)
     {
         assert(stream == streamHandle_);
+
         LOG_INFO("astra.plugins.stream", "removing connection");
+
+        if (eventHandler_)
+            eventHandler_->on_connection_removed(this, bin, connection);
+
         on_connection_removed(bin, connection);
     }
 
@@ -214,6 +240,10 @@ namespace astra { namespace plugins {
                                            astra_streamconnection_t connection)
     {
         assert(stream == streamHandle_);
+
+        if (eventHandler_)
+            eventHandler_->on_connection_started(this, connection);
+
         on_connection_started(connection);
     }
 
@@ -221,6 +251,10 @@ namespace astra { namespace plugins {
                                            astra_streamconnection_t connection)
     {
         assert(stream == streamHandle_);
+
+        if (eventHandler_)
+            eventHandler_->on_connection_stopped(this, connection);
+
         on_connection_stopped(connection);
     }
 }}
