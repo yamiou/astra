@@ -26,7 +26,7 @@ namespace orbbec { namespace skeleton {
         if (!skeletonStream_->has_connections())
             return; // don't waste cycles if no one is listening
 
-        LOG_DEBUG("orbbec.skeleton.skeleton_tracker", "generating skeleton frame");
+        LOG_TRACE("orbbec.skeleton.skeleton_tracker", "generating skeleton frame");
         astra::depthframe depthFrame = frame.get<astra::depthframe>();
 
         if (!depthFrame.is_valid())
