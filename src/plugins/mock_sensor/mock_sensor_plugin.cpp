@@ -73,7 +73,7 @@ namespace orbbec { namespace mocks {
         device_streamset* mock_sensor_plugin::find_device(const char* mockUri)
         {
             auto it = std::find_if(streamsets_.begin(), streamsets_.end(),
-                                   [&mockUri] (streamset_ptr& setPtr) -> bool
+                                   [&mockUri](const streamset_ptr& setPtr) -> bool
                                    {
                                        return setPtr->get_uri() == mockUri;
                                    });
