@@ -21,6 +21,7 @@
 #include <memory.h>
 #include <astra/capi/astra_ctypes.h>
 #include <astra/capi/streams/stream_types.h>
+#include <astra/capi/streams/skeleton_parameters.h>
 #include <string.h>
 
 
@@ -78,4 +79,37 @@ ASTRA_API_EX astra_status_t astra_skeletonframe_get_skeletons_ptr(astra_skeleton
 
     return ASTRA_STATUS_SUCCESS;
 }
+
+ASTRA_API_EX astra_status_t astra_skeletonstream_get_z_min(astra_skeletonstream_t skeletonStream,
+                                                           uint16_t* zMin)
+{
+    return astra_stream_get_parameter_fixed(skeletonStream,
+                                            ASTRA_PARAMETER_SKELETON_Z_MIN,
+                                            sizeof(uint16_t),
+                                            reinterpret_cast<astra_parameter_data_t*>(zMin));
+}
+
+
+ASTRA_API_EX astra_status_t astra_skeletonstream_set_z_min(astra_skeletonstream_t skeletonStream,
+                                                           uint16_t zMin)
+{
+    return astra_stream_set_parameter(skeletonStream, ASTRA_PARAMETER_SKELETON_Z_MIN, sizeof(uint16_t), &zMin);
+}
+
+
+ASTRA_API_EX astra_status_t astra_skeletonstream_get_z_max(astra_skeletonstream_t skeletonStream,
+                                                           uint16_t* zMax)
+{
+    return astra_stream_get_parameter_fixed(skeletonStream,
+                                            ASTRA_PARAMETER_SKELETON_Z_MAX,
+                                            sizeof(uint16_t),
+                                            reinterpret_cast<astra_parameter_data_t*>(zMax));
+}
+
+ASTRA_API_EX astra_status_t astra_skeletonstream_set_z_max(astra_skeletonstream_t skeletonStream,
+                                                           uint16_t zMax)
+{
+    return astra_stream_set_parameter(skeletonStream, ASTRA_PARAMETER_SKELETON_Z_MAX, sizeof(uint16_t), &zMax);
+}
+
 ASTRA_END_DECLS

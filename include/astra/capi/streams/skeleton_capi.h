@@ -42,6 +42,19 @@ ASTRA_API_EX astra_status_t astra_skeletonframe_get_skeletons_ptr(astra_skeleton
                                                                   astra_skeleton_t** skeletons,
                                                                   size_t* skeletonCount);
 
+ASTRA_API_EX astra_status_t astra_skeletonstream_get_z_min(astra_skeletonstream_t skeletonStream,
+                                                           uint16_t* zMin);
+
+
+ASTRA_API_EX astra_status_t astra_skeletonstream_set_z_min(astra_skeletonstream_t skeletonStream,
+                                                           uint16_t zMin);
+
+ASTRA_API_EX astra_status_t astra_skeletonstream_get_z_max(astra_skeletonstream_t skeletonStream,
+                                                           uint16_t* zMax);
+
+ASTRA_API_EX astra_status_t astra_skeletonstream_set_z_max(astra_skeletonstream_t skeletonStream,
+                                                           uint16_t zMax);
+
 ASTRA_END_DECLS
 
 #endif // SKELETON_CAPI_H

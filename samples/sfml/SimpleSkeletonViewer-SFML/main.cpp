@@ -187,6 +187,8 @@ int main(int argc, char** argv)
 
     reader.stream<astra::depthstream>().start();
     reader.stream<astra::skeletonstream>().start();
+    reader.stream<astra::skeletonstream>().set_zMin(5);
+    reader.stream<astra::skeletonstream>().set_zMax(1000);
     reader.addListener(listener);
 
     while (window.isOpen())

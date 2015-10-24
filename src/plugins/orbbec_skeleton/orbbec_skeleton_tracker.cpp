@@ -15,11 +15,81 @@
 //
 // Be excellent to each other.
 #include "orbbec_skeleton_tracker.hpp"
+#include <astra/capi/streams/skeleton_parameters.h>
 #include <cstddef>
 
 namespace orbbec { namespace skeleton {
 
     const std::size_t skeleton_tracker::MAX_SKELETONS = 6;
+
+    void skeleton_tracker::on_set_parameter(astra::plugins::stream* stream,
+                                            astra_streamconnection_t connection,
+                                            astra_parameter_id id,
+                                            size_t inByteLength,
+                                            astra_parameter_data_t inData)
+    {
+        switch(id)
+        {
+        case ASTRA_PARAMETER_SKELETON_Z_MIN:
+        {
+            std::uint16_t* zMin = reinterpret_cast<std::uint16_t*>(inData);
+            zMin_ = *zMin;
+            break;
+        }
+        case ASTRA_PARAMETER_SKELETON_Z_MAX:
+        {
+            std::uint16_t* zMax = reinterpret_cast<std::uint16_t*>(inData);
+            zMax_ = *zMax;
+            break;
+        }
+        default:
+            break;
+        }
+    }
+
+    void skeleton_tracker::on_get_parameter(astra::plugins::stream* stream,
+                                            astra_streamconnection_t connection,
+                                            astra_parameter_id id,
+                                            astra_parameter_bin_t& parameterBin)
+    {
+        switch(id)
+        {
+        case ASTRA_PARAMETER_SKELETON_Z_MIN:
+        {
+            std::size_t resultByteLength = sizeof(std::uint16_t);
+
+            astra_parameter_data_t parameterData;
+            astra_status_t rc = pluginService_.get_parameter_bin(resultByteLength,
+                                                                 &parameterBin,
+                                                                 &parameterData);
+            if (rc == ASTRA_STATUS_SUCCESS)
+            {
+                std::uint16_t* zMin = reinterpret_cast<std::uint16_t*>(parameterData);
+                *zMin = zMin_;
+            }
+
+            break;
+        }
+        case ASTRA_PARAMETER_SKELETON_Z_MAX:
+        {
+            std::size_t resultByteLength = sizeof(std::uint16_t);
+
+            astra_parameter_data_t parameterData;
+            astra_status_t rc = pluginService_.get_parameter_bin(resultByteLength,
+                                                                 &parameterBin,
+                                                                 &parameterData);
+            if (rc == ASTRA_STATUS_SUCCESS)
+            {
+                std::uint16_t* zMax = reinterpret_cast<std::uint16_t*>(parameterData);
+                *zMax = zMax_;
+            }
+
+            break;
+        }
+        default:
+            break;
+        }
+    }
 
     void skeleton_tracker::on_frame_ready(astra::stream_reader& reader, astra::frame& frame)
     {

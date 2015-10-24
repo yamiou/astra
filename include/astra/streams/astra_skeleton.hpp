@@ -85,10 +85,42 @@ namespace astra {
     {
     public:
         explicit skeletonstream(astra_streamconnection_t connection)
-            : datastream(connection)
+            : datastream(connection),
+              skeletonStream_(reinterpret_cast<astra_skeletonstream_t>(connection))
         { }
 
         static const astra_stream_type_t id = ASTRA_STREAM_SKELETON;
+
+        // temporary band-pass variables (until segmentation)
+        void set_zMin(std::uint16_t zMin)
+        {
+            astra_skeletonstream_set_z_min(skeletonStream_, zMin);
+        }
+
+        const std::uint16_t zMin()
+        {
+            std::uint16_t zMin = 0;
+            astra_skeletonstream_get_z_min(skeletonStream_, &zMin);
+
+            return zMin;
+        }
+
+        void set_zMax(std::uint16_t zMax)
+        {
+            astra_skeletonstream_set_z_max(skeletonStream_, zMax);
+        }
+
+        // temporary band-pass variables (until segmentation)
+        const std::uint16_t zMax()
+        {
+            std::uint16_t zMax = 65535;
+            astra_skeletonstream_get_z_max(skeletonStream_, &zMax);
+
+            return zMax;
+        }
+
+    private:
+        astra_skeletonstream_t skeletonStream_{nullptr};
     };
 
     class skeletonframe

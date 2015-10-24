@@ -22,10 +22,12 @@
 #include <astra/capi/astra_ctypes.h>
 #include <astra/capi/streams/skeleton_types.h>
 #include "orbbec_skeletonstream.hpp"
+#include <cstdint>
 
 namespace orbbec { namespace skeleton {
 
-    class skeleton_tracker : public astra::frame_listener
+    class skeleton_tracker : public astra::frame_listener,
+                             public astra::plugins::stream_event_handler
     {
     public:
         static const size_t MAX_SKELETONS;
@@ -47,12 +49,13 @@ namespace orbbec { namespace skeleton {
             auto s = astra::plugins::make_stream<skeletonstream>(pluginService_,
                                                                  streamSet,
                                                                  skeleton_tracker::MAX_SKELETONS);
-
+            s->set_handler(this);
             skeletonStream_ = std::unique_ptr<skeletonstream>(std::move(s));
         }
 
         virtual ~skeleton_tracker() override
         {
+            skeletonStream_->set_handler(nullptr);
             reader_.removeListener(*this);
 
             LOG_DEBUG("orbbec.skeleton.skeleton_tracker", "destroying skeleton tracker for %p", sourceStreamHandle_);
@@ -62,12 +65,26 @@ namespace orbbec { namespace skeleton {
 
         virtual void on_frame_ready(astra::stream_reader& reader, astra::frame& frame) override;
 
+        virtual void on_set_parameter(astra::plugins::stream* stream,
+                                      astra_streamconnection_t connection,
+                                      astra_parameter_id id,
+                                      size_t inByteLength,
+                                      astra_parameter_data_t inData) override;
+
+        virtual void on_get_parameter(astra::plugins::stream* stream,
+                                      astra_streamconnection_t connection,
+                                      astra_parameter_id id,
+                                      astra_parameter_bin_t& parameterBin) override;
+
     private:
         astra_stream_t sourceStreamHandle_;
         astra::depthstream depthStream_{nullptr};
         astra::streamset sensor_;
         astra::stream_reader reader_;
         astra::pluginservice_proxy& pluginService_;
+
+        std::uint16_t zMin_{0};
+        std::uint16_t zMax_{65535};
 
         using skeletonstream_ptr = std::unique_ptr<skeletonstream>;
         skeletonstream_ptr skeletonStream_;
