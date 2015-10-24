@@ -49,6 +49,13 @@ namespace orbbec { namespace skeleton {
             skeletonStream_ = std::unique_ptr<skeletonstream>(std::move(s));
         }
 
+        virtual ~skeleton_tracker() override
+        {
+            reader_.removeListener(*this);
+
+            LOG_DEBUG("orbbec.skeleton.skeleton_tracker", "destroying skeleton tracker for %p", sourceStreamHandle_);
+        }
+
         astra_stream_t sourceStream() { return sourceStreamHandle_; }
 
         virtual void on_frame_ready(astra::stream_reader& reader, astra::frame& frame) override;
