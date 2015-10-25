@@ -24,11 +24,7 @@
 using namespace google::protobuf;
 using namespace google::protobuf::io;
 
-/*
-This code is credited to Kenton Varda, author of ProtoBuf and Cap'n Proto, from the following Stackoverflow article:
-http://stackoverflow.com/questions/22881876/protocol-buffers-how-to-serialize-and-deserialize-multiple-messages-into-a-file
-*/
-
+// http://stackoverflow.com/questions/22881876/protocol-buffers-how-to-serialize-and-deserialize-multiple-messages-into-a-file
 
 namespace astra { namespace serialization { namespace proto {
 
