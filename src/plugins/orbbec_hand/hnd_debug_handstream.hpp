@@ -36,10 +36,10 @@ namespace astra { namespace hand {
                          uint32_t height,
                          uint32_t bytesPerPixel)
             : single_bin_stream(pluginService,
-                              streamSet,
-                              stream_description(ASTRA_STREAM_DEBUG_HAND,
-                                                 DEFAULT_SUBTYPE),
-                              width * height * bytesPerPixel)
+                                streamSet,
+                                stream_description(ASTRA_STREAM_DEBUG_HAND,
+                                                   DEFAULT_SUBTYPE),
+                                width * height * bytesPerPixel)
         { }
 
         debug_handview_type view_type() const { return viewType_; }

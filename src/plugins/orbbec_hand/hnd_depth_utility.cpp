@@ -35,8 +35,8 @@ namespace astra { namespace hand {
     {
         PROFILE_FUNC();
         rectElement_ = cv::getStructuringElement(cv::MORPH_RECT,
-                                                  cv::Size(erodeSize_ * 2 + 1, erodeSize_ * 2 + 1),
-                                                  cv::Point(erodeSize_, erodeSize_));
+                                                 cv::Size(erodeSize_ * 2 + 1, erodeSize_ * 2 + 1),
+                                                 cv::Point(erodeSize_, erodeSize_));
 
         reset();
     }
@@ -63,9 +63,9 @@ namespace astra { namespace hand {
     }
 
     void depth_utility::depth_to_velocity_signal(depthframe& depthFrame,
-                                                     cv::Mat& matDepth,
-                                                     cv::Mat& matDepthFullSize,
-                                                     cv::Mat& matVelocitySignal)
+                                                 cv::Mat& matDepth,
+                                                 cv::Mat& matDepthFullSize,
+                                                 cv::Mat& matVelocitySignal)
     {
         PROFILE_FUNC();
         int width = depthFrame.resolutionX();
@@ -95,10 +95,10 @@ namespace astra { namespace hand {
         cv::accumulateWeighted(matDepthFilled_, matDepthAvg_, depthSmoothingFactor_);
 
         filter_zero_values_and_jumps(matDepthFilled_,
-                                 matDepthPrevious_,
-                                 matDepthAvg_,
-                                 matDepthFilledMask_,
-                                 maxDepthJumpPercent_);
+                                     matDepthPrevious_,
+                                     matDepthAvg_,
+                                     matDepthFilledMask_,
+                                     maxDepthJumpPercent_);
 
         //current minus average, scaled by average = velocity as a percent change
 
@@ -112,16 +112,16 @@ namespace astra { namespace hand {
         //cv::dilate(matDepthVelErode_, matDepthVelErode_, rectElement_);
 
         threshold_velocity_signal(matDepthVelErode_,
-                                matVelocitySignal,
-                                velocityThresholdFactor_);
+                                  matVelocitySignal,
+                                  velocityThresholdFactor_);
 
         //analyze_velocities(matDepth, matDepthVelErode_);
     }
 
     void depth_utility::depthframe_to_matrix(depthframe& depthFrameSrc,
-                                        const int width,
-                                        const int height,
-                                        cv::Mat& matTarget)
+                                             const int width,
+                                             const int height,
+                                             cv::Mat& matTarget)
     {
         PROFILE_FUNC();
         //ensure initialized
@@ -143,9 +143,9 @@ namespace astra { namespace hand {
     }
 
     void depth_utility::fill_zero_values(cv::Mat& matDepth,
-                                       cv::Mat& matDepthFilled,
-                                       cv::Mat& matDepthFilledMask,
-                                       cv::Mat& matDepthPrevious)
+                                         cv::Mat& matDepthFilled,
+                                         cv::Mat& matDepthFilledMask,
+                                         cv::Mat& matDepthPrevious)
     {
         PROFILE_FUNC();
         int width = matDepth.cols;
@@ -183,10 +183,10 @@ namespace astra { namespace hand {
     }
 
     void depth_utility::filter_zero_values_and_jumps(cv::Mat& matDepth,
-                                                 cv::Mat& matDepthPrevious,
-                                                 cv::Mat& matDepthAvg,
-                                                 cv::Mat& matDepthFilledMask,
-                                                 const float maxDepthJumpPercent)
+                                                     cv::Mat& matDepthPrevious,
+                                                     cv::Mat& matDepthAvg,
+                                                     cv::Mat& matDepthFilledMask,
+                                                     const float maxDepthJumpPercent)
     {
         PROFILE_FUNC();
         int width = matDepth.cols;
@@ -232,8 +232,8 @@ namespace astra { namespace hand {
     }
 
     void depth_utility::threshold_velocity_signal(cv::Mat& matVelocityFiltered,
-                                                cv::Mat& matVelocitySignal,
-                                                const float velocityThresholdFactor)
+                                                  cv::Mat& matVelocitySignal,
+                                                  const float velocityThresholdFactor)
     {
         PROFILE_FUNC();
         int width = matVelocitySignal.cols;

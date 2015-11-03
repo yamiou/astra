@@ -32,10 +32,10 @@ namespace astra { namespace hand {
                    astra_streamset_t streamSet,
                    size_t maxHandCount)
             : single_bin_stream(pluginService,
-                              streamSet,
-                              stream_description(ASTRA_STREAM_HAND,
-                                                DEFAULT_SUBTYPE),
-                              sizeof(astra_handpoint_t) * maxHandCount)
+                                streamSet,
+                                stream_description(ASTRA_STREAM_HAND,
+                                                   DEFAULT_SUBTYPE),
+                                sizeof(astra_handpoint_t) * maxHandCount)
         { }
 
         bool include_candidate_points() const { return includeCandidatePoints_; }

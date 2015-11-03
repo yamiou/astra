@@ -199,8 +199,8 @@ namespace astra { namespace hand {
 
         template<typename T>
         void show_norm_array(const cv::Mat& mat,
-                           const cv::Mat& mask,
-                           _astra_imageframe& imageFrame)
+                             const cv::Mat& mask,
+                             _astra_imageframe& imageFrame)
         {
             assert(mat.cols == imageFrame.metadata.width);
             assert(mat.rows == imageFrame.metadata.height);

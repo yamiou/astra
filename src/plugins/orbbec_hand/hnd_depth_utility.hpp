@@ -45,8 +45,8 @@ namespace astra { namespace hand {
         enum class fill_mask_type : std::uint8_t
         {
             normal = 0,
-            filled = 1
-        };
+                filled = 1
+                };
 
         static void depthframe_to_matrix(depthframe& depthFrameSrc,
                                          const int width,

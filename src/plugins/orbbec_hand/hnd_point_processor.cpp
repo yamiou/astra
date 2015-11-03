@@ -135,8 +135,8 @@ namespace astra { namespace hand {
     }
 
     void point_processor::update_tracked_point(tracking_matrices& matrices,
-                                              scaling_coordinate_mapper& scalingMapper,
-                                              tracked_point& trackedPoint)
+                                               scaling_coordinate_mapper& scalingMapper,
+                                               tracked_point& trackedPoint)
     {
         PROFILE_FUNC();
         const float width = matrices.depth.cols;
@@ -425,9 +425,9 @@ namespace astra { namespace hand {
     }
 
     void point_processor::validate_and_update_tracked_point(tracking_matrices& matrices,
-                                                         scaling_coordinate_mapper& scalingMapper,
-                                                         tracked_point& trackedPoint,
-                                                         const cv::Point& newTargetPoint)
+                                                            scaling_coordinate_mapper& scalingMapper,
+                                                            tracked_point& trackedPoint,
+                                                            const cv::Point& newTargetPoint)
     {
         PROFILE_FUNC();
         if(trackedPoint.trackingStatus == tracking_status::dead)
@@ -568,7 +568,7 @@ namespace astra { namespace hand {
     }
 
     void point_processor::update_tracked_or_create_new_point_from_seed(tracking_matrices& matrices,
-                                                                              const cv::Point& seedPosition)
+                                                                       const cv::Point& seedPosition)
     {
         PROFILE_FUNC();
         float referenceDepth = matrices.depth.at<float>(seedPosition);
