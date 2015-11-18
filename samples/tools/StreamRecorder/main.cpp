@@ -79,7 +79,7 @@ public:
         reader_.stream<depthstream>().start();
         reader_.stream<pointstream>().start();
 
-        reader_.addListener(*this);
+        reader_.add_listener(*this);
     }
 
     void draw_to(sf::RenderWindow& window)
