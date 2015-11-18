@@ -51,7 +51,7 @@ namespace astra { namespace hand {
         depthStream_.start();
 
         reader_.stream<pointstream>().start();
-        reader_.addListener(*this);
+        reader_.add_listener(*this);
     }
 
     hand_tracker::~hand_tracker()

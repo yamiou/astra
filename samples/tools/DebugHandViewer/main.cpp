@@ -473,7 +473,7 @@ int main(int argc, char** argv)
     handStream.set_include_candidate_points(true);
 
     reader.stream<astra::debug_handstream>().start();
-    reader.addListener(listener);
+    reader.add_listener(listener);
 
     while (window.isOpen())
     {

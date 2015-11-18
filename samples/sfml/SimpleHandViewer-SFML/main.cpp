@@ -363,7 +363,7 @@ int main(int argc, char** argv)
 
     HandFrameListener listener;
 
-    reader.addListener(listener);
+    reader.add_listener(listener);
 
     while (window.isOpen())
     {

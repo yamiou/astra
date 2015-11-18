@@ -444,8 +444,8 @@ int main(int argc, char** argv)
     MultiFrameListener listener2;
     listener2.set_mode(MODE_COLOR);
 
-    reader1.addListener(listener1);
-    reader2.addListener(listener2);
+    reader1.add_listener(listener1);
+    reader2.add_listener(listener2);
 
     while (window.isOpen())
     {

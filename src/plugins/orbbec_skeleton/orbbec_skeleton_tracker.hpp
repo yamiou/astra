@@ -43,7 +43,7 @@ namespace orbbec { namespace skeleton {
             depthStream_ = reader_.stream<astra::depthstream>();
             depthStream_.start();
 
-            reader_.addListener(*this);
+            reader_.add_listener(*this);
 
             LOG_DEBUG("orbbec.skeleton.skeleton_tracker", "creating skeleton stream for %p", sourceStreamHandle_);
             auto s = astra::plugins::make_stream<skeletonstream>(pluginService_,
@@ -56,7 +56,7 @@ namespace orbbec { namespace skeleton {
         virtual ~skeleton_tracker() override
         {
             skeletonStream_->set_handler(nullptr);
-            reader_.removeListener(*this);
+            reader_.remove_listener(*this);
 
             LOG_DEBUG("orbbec.skeleton.skeleton_tracker", "destroying skeleton tracker for %p", sourceStreamHandle_);
         }

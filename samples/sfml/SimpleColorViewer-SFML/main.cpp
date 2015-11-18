@@ -140,7 +140,7 @@ int main(int argc, char** argv)
     reader.stream<astra::colorstream>().start();
 
     my_frame_listener listener;
-    reader.addListener(listener);
+    reader.add_listener(listener);
 
     while (window.isOpen())
     {

@@ -288,7 +288,7 @@ int main(int argc, char** argv)
     auto coordinate_mapper = depthStream.coordinateMapper();
     depthframe_listener listener(coordinate_mapper);
 
-    reader.addListener(listener);
+    reader.add_listener(listener);
 
     while (window.isOpen())
     {

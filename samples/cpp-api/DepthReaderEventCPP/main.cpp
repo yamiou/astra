@@ -121,14 +121,14 @@ int main(int argc, char** argv)
               << reader.stream<astra::depthstream>().verticalFieldOfView()
               << std::endl;
 
-    reader.addListener(listener);
+    reader.add_listener(listener);
 
     do
     {
         astra_temp_update();
     } while (shouldContinue);
 
-    reader.removeListener(listener);
+    reader.remove_listener(listener);
 
     astra::terminate();
 }

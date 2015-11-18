@@ -189,7 +189,7 @@ int main(int argc, char** argv)
     reader.stream<astra::skeletonstream>().start();
     reader.stream<astra::skeletonstream>().set_zMin(5);
     reader.stream<astra::skeletonstream>().set_zMax(1000);
-    reader.addListener(listener);
+    reader.add_listener(listener);
 
     while (window.isOpen())
     {

@@ -29,7 +29,7 @@ namespace astra { namespace xs {
           pluginService_(pluginService)
     {
         depthStream_.start();
-        reader_.addListener(*this);
+        reader_.add_listener(*this);
     }
 
     point_processor::~point_processor() = default;
