@@ -98,6 +98,9 @@ inline void astra_pixelformat_get_bytes_per_pixel(astra_pixel_format_t format,
     case astra_pixel_formats::ASTRA_PIXEL_FORMAT_YUYV:
         *bpp = 2;
         break;
+    case astra_pixel_formats::ASTRA_PIXEL_FORMAT_POINT:
+        *bpp = 12;
+        break;
     default:
         *bpp = 1;
         break;
