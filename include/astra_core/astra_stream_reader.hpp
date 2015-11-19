@@ -117,7 +117,7 @@ namespace astra {
 
                 if (isNotifying_)
                 {
-                    added_listeners_.push_back(listener);
+                    addedListeners_.push_back(listener);
                 }
                 else
                 {
@@ -136,7 +136,7 @@ namespace astra {
 
                 if (isNotifying_)
                 {
-                    removed_listeners_.push_back(listener);
+                    removedListeners_.push_back(listener);
                 }
                 else
                 {
@@ -151,9 +151,9 @@ namespace astra {
 
             void notify_listeners(astra_reader_frame_t readerFrame)
             {
-                if (removed_listeners_.size() > 0)
+                if (removedListeners_.size() > 0)
                 {
-                    for(frame_listener& listener : removed_listeners_)
+                    for(frame_listener& listener : removedListeners_)
                     {
                         auto it = std::find(listeners_.begin(),
                                             listeners_.end(),
@@ -161,11 +161,11 @@ namespace astra {
 
                         listeners_.erase(it);
                     }
-                    removed_listeners_.clear();
+                    removedListeners_.clear();
                 }
 
-                std::move(added_listeners_.begin(),
-                          added_listeners_.end(),
+                std::move(addedListeners_.begin(),
+                          addedListeners_.end(),
                           std::back_inserter(listeners_));
 
                 if (listeners_.size() == 0)
@@ -221,8 +221,8 @@ namespace astra {
             using ListenerList = std::vector<std::reference_wrapper<frame_listener> >;
 
             ListenerList listeners_;
-            ListenerList added_listeners_;
-            ListenerList removed_listeners_;
+            ListenerList addedListeners_;
+            ListenerList removedListeners_;
 
             astra_reader_callback_id_t callbackId_;
         };
