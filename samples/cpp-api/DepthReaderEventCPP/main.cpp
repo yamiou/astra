@@ -14,61 +14,70 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#include <astra_core/astra_core.hpp>
 #include <astra/astra.hpp>
 #include <cstdio>
 #include <chrono>
 #include <iostream>
 #include <iomanip>
-
 #include <key_handler.h>
-
-void print_depth(astra::depthframe& depthFrame,
-                 const astra::coordinate_mapper& mapper)
-{
-    if (depthFrame.is_valid())
-    {
-        int width = depthFrame.resolutionX();
-        int height = depthFrame.resolutionY();
-        int frameIndex = depthFrame.frameIndex();
-
-        int16_t* buffer = new int16_t[depthFrame.numberOfPixels()];
-        depthFrame.copy_to(buffer);
-
-        size_t index = ((width * (height / 2.0f)) + (width / 2.0f));
-        short middle = buffer[index];
-
-        float worldX, worldY, worldZ;
-        float depthX, depthY, depthZ;
-        mapper.convert_depth_to_world(width / 2.0f, height / 2.0f, middle, &worldX, &worldY, &worldZ);
-        mapper.convert_world_to_depth(worldX, worldY, worldZ, &depthX, &depthY, &depthZ);
-
-        std::cout << "depth frameIndex: " << frameIndex
-                  << " value: " << middle
-                  << " wX: " << worldX
-                  << " wY: " << worldY
-                  << " wZ: " << worldZ
-                  << " dX: " << depthX
-                  << " dY: " << depthY
-                  << " dZ: " << depthZ
-                  << std::endl;
-
-        delete[] buffer;
-    }
-}
 
 class SampleFrameListener : public astra::frame_listener
 {
+private:
+    using buffer_ptr = std::unique_ptr<int16_t []>;
+    buffer_ptr buffer_;
+    unsigned int lastWidth_;
+    unsigned int lastHeight_;
+
+public:
     virtual void on_frame_ready(astra::stream_reader& reader,
-                                 astra::frame& frame) override
+                 astra::frame& frame) override
     {
         astra::depthframe depthFrame = frame.get<astra::depthframe>();
 
         if (depthFrame.is_valid())
         {
             print_depth(depthFrame,
-                reader.stream<astra::depthstream>().coordinateMapper());
+            reader.stream<astra::depthstream>().coordinateMapper());
             check_fps();
+        }
+    }
+
+    void print_depth(astra::depthframe& depthFrame,
+         const astra::coordinate_mapper& mapper)
+    {
+        if (depthFrame.is_valid())
+        {
+            int width = depthFrame.resolutionX();
+            int height = depthFrame.resolutionY();
+            int frameIndex = depthFrame.frameIndex();
+
+            //determine if buffer needs to be reallocated
+            if (width != lastWidth_ || height != lastHeight_)
+            {
+                buffer_ = buffer_ptr(new int16_t[depthFrame.numberOfPixels()]);
+                lastWidth_ = width;
+                lastHeight_ = height;
+            }
+            depthFrame.copy_to(buffer_.get());
+
+            size_t index = ((width * (height / 2.0f)) + (width / 2.0f));
+            short middle = buffer_[index];
+
+            float worldX, worldY, worldZ;
+            float depthX, depthY, depthZ;
+            mapper.convert_depth_to_world(width / 2.0f, height / 2.0f, middle, &worldX, &worldY, &worldZ);
+            mapper.convert_world_to_depth(worldX, worldY, worldZ, &depthX, &depthY, &depthZ);
+
+            std::cout << "depth frameIndex: " << frameIndex
+                      << " value: " << middle
+                      << " wX: " << worldX
+                      << " wY: " << worldY
+                      << " wZ: " << worldZ
+                      << " dX: " << depthX
+                      << " dY: " << depthY
+                      << " dZ: " << depthZ
+                      << std::endl;
         }
     }
 
@@ -95,8 +104,8 @@ class SampleFrameListener : public astra::frame_listener
     }
 
 private:
-    using duration_type = std::chrono::duration<double>;
-    duration_type frameDuration_{0.0};
+    using duration_type = std::chrono::duration < double > ;
+    duration_type frameDuration_{ 0.0 };
 
     using clock_type = std::chrono::system_clock;
     std::chrono::time_point<clock_type> lastTimepoint_;
@@ -108,7 +117,7 @@ int main(int argc, char** argv)
 
     set_key_handler();
 
-    astra::streamset streamset("device/default");
+    astra::streamset streamset;
     astra::stream_reader reader = streamset.create_reader();
 
     SampleFrameListener listener;

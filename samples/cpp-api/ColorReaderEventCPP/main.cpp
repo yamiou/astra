@@ -14,47 +14,54 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#include <astra_core/astra_core.hpp>
 #include <astra/astra.hpp>
 #include <cstdio>
 #include <iostream>
-
 #include <key_handler.h>
-
-void print_color(astra::colorframe& colorFrame)
-{
-    if (colorFrame.is_valid())
-    {
-        int width = colorFrame.resolutionX();
-        int height = colorFrame.resolutionY();
-        int frameIndex = colorFrame.frameIndex();
-
-        astra::rgb_pixel* buffer = new astra::rgb_pixel[colorFrame.numberOfPixels()];
-        colorFrame.copy_to(buffer);
-
-        size_t index = ((width * (height / 2.0f)) + (width / 2.0f));
-        astra::rgb_pixel middle = buffer[index];
-
-        std::cout << "color frameIndex: " << frameIndex
-                  << " r: " << static_cast<int>(middle.r)
-                  << " g: " << static_cast<int>(middle.g)
-                  << " b: " << static_cast<int>(middle.b)
-                  << std::endl;
-
-        delete[] buffer;
-    }
-}
 
 class SampleFrameListener : public astra::frame_listener
 {
+private:
+    using buffer_ptr = std::unique_ptr<astra::rgb_pixel []>;
+    buffer_ptr buffer_;
+    unsigned int lastWidth_;
+    unsigned int lastHeight_;
+
+public:
     virtual void on_frame_ready(astra::stream_reader& reader,
-                                astra::frame& frame) override
+                 astra::frame& frame) override
     {
         astra::colorframe colorFrame = frame.get<astra::colorframe>();
 
         if (colorFrame.is_valid())
         {
             print_color(colorFrame);
+        }
+    }
+
+    void print_color(astra::colorframe& colorFrame)
+    {
+        if (colorFrame.is_valid())
+        {
+            int width = colorFrame.resolutionX();
+            int height = colorFrame.resolutionY();
+            int frameIndex = colorFrame.frameIndex();
+
+            if (width != lastWidth_ || height != lastHeight_){
+                buffer_ = buffer_ptr(new astra::rgb_pixel[colorFrame.numberOfPixels()]);
+                lastWidth_ = width;
+                lastHeight_ = height;
+            }
+            colorFrame.copy_to(buffer_.get());
+
+            size_t index = ((width * (height / 2.0f)) + (width / 2.0f));
+            astra::rgb_pixel middle = buffer_[index];
+
+            std::cout << "color frameIndex: " << frameIndex
+                      << " r: " << static_cast<int>(middle.r)
+                      << " g: " << static_cast<int>(middle.g)
+                      << " b: " << static_cast<int>(middle.b)
+                      << std::endl;
         }
     }
 };
