@@ -32,7 +32,7 @@
 #define INITIALIZE_LOGGING INITIALIZE_EASYLOGGINGPP
 
 namespace astra {
-    void initialize_logging(const char* logFilePath, astra_log_severity_t severity);
+    void initialize_logging(const char* logFilePath, astra_log_severity_t severity, bool consoleOutput, bool fileOutput);
 }
 
 #endif /* ASTRA_LOGGING_H */

@@ -41,9 +41,10 @@ namespace astra {
         }
     }
 
-    void initialize_logging(const char* logFilePath, astra_log_severity_t severity)
+    void initialize_logging(const char* logFilePath, astra_log_severity_t severity, bool consoleOutput, bool fileOutput)
     {
         const char TRUE_STRING[] = "true";
+        const char FALSE_STRING[] = "false";
 
         el::Loggers::addFlag(el::LoggingFlag::CreateLoggerAutomatically);
         el::Loggers::addFlag(el::LoggingFlag::ColoredTerminalOutput);
@@ -55,8 +56,8 @@ namespace astra {
         defaultConf.set(el::Level::Debug,
                         el::ConfigurationType::Format, "%datetime %level [%logger] %msg");
         defaultConf.setGlobally(el::ConfigurationType::Enabled, TRUE_STRING);
-        defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, TRUE_STRING);
-        defaultConf.setGlobally(el::ConfigurationType::ToFile, TRUE_STRING);
+        defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, consoleOutput ? TRUE_STRING : FALSE_STRING);
+        defaultConf.setGlobally(el::ConfigurationType::ToFile, fileOutput ? TRUE_STRING : FALSE_STRING);
         defaultConf.setGlobally(el::ConfigurationType::Filename, logFilePath);
 
         el::Loggers::setDefaultConfigurations(defaultConf, true);

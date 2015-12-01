@@ -47,7 +47,7 @@ namespace astra {
 #endif
 
         std::unique_ptr<configuration> config(configuration::load_from_file(configPath.c_str()));
-        initialize_logging(logPath.c_str(), config->severityLevel());
+        initialize_logging(logPath.c_str(), config->severityLevel(), config->consoleOutput(), config->fileOutput());
 
         LOG_WARN("context", "Hold on to yer butts");
         LOG_INFO("context", "configuration path: %s", configPath.c_str());

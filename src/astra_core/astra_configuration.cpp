@@ -52,12 +52,15 @@ namespace astra {
 
     configuration::configuration()
         : pluginsPath_("Plugins")
-    {}
+    {
+        set_severityLevel(ASTRA_SEVERITY_INFO);
+        set_consoleOutput(false);
+        set_fileOutput(false);
+    }
 
     configuration* configuration::load_from_file(const char* tomlFilePath)
     {
         configuration* config = new configuration();
-
         cpptoml::table t;
 
         try
@@ -79,6 +82,20 @@ namespace astra {
             {
                 config->set_severityLevel(severity);
             }
+        }
+
+        const char* outputLogsToConsole = "logging.console_output";
+        if (t.contains_qualified(outputLogsToConsole))
+        {
+            bool consoleOutput = t.get_qualified(outputLogsToConsole)->as<bool>()->get();
+            config->set_consoleOutput(consoleOutput);
+        }
+
+        const char* outputLogsToFile = "logging.file_output";
+        if (t.contains_qualified(outputLogsToFile))
+        {
+            bool fileOutput = t.get_qualified(outputLogsToFile)->as<bool>()->get();
+            config->set_fileOutput(fileOutput);
         }
 
         const char* pluginsPathKey = "plugins.path";

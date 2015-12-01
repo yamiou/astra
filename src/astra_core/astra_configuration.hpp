@@ -35,9 +35,17 @@ namespace astra {
 
         static configuration* load_from_file(const char* tomlFilePath);
 
+        bool consoleOutput(){ return consoleOutput_; }
+        void set_consoleOutput(bool consoleOutput){ consoleOutput_ = consoleOutput; }
+
+        bool fileOutput(){ return fileOutput_; }
+        void set_fileOutput(bool fileOutput){ fileOutput_ = fileOutput; }
+
     private:
         astra_log_severity_t severityLevel_{ASTRA_SEVERITY_FATAL};
         std::string pluginsPath_;
+        bool consoleOutput_;
+        bool fileOutput_;
     };
 }
 
