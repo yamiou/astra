@@ -908,7 +908,7 @@ namespace astra { namespace hand { namespace segmentation {
         int width = velocitySignalMatrix.cols;
         int height = velocitySignalMatrix.rows;
 
-        const int startX = MAX(0, MIN(width - 1, nextSearchStart.x));
+        int startX = MAX(0, MIN(width - 1, nextSearchStart.x));
         const int startY = MAX(0, MIN(height - 1, nextSearchStart.y));
 
         for (int y = startY; y < height; y++)
@@ -939,7 +939,9 @@ namespace astra { namespace hand { namespace segmentation {
                     return true;
                 }
             }
+            startX = 0;
         }
+
         foregroundPosition = segmentation::INVALID_POINT;
         nextSearchStart.x = width;
         nextSearchStart.y = height;
