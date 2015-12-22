@@ -24,37 +24,36 @@
 
 namespace astra {
 
+    static const char* ASTRA_DEFAULT_DEVICE_URI = "device/default";
+
     class streamset
     {
     public:
-        streamset(std::string uri)
-        {
-            astra_streamsetconnection_t streamSetConnection;
-            astra_streamset_open(uri.c_str(), &streamSetConnection);
-            sensorRef_ = std::make_shared<streamset_ref>(streamSetConnection);
-        }
-
-        streamset(const astra_streamsetconnection_t& streamSetHandle)
-        {
-            if (streamSetHandle == nullptr)
-            {
-                throw std::invalid_argument("streamSetHandle must not be null");
-            }
-            sensorRef_ = std::make_shared<streamset_ref>(streamSetHandle);
-        }
-
         streamset()
-            : streamset("device/default")
+            : streamset(ASTRA_DEFAULT_DEVICE_URI)
         {}
 
-        bool is_valid() { return sensorRef_ != nullptr; }
+        streamset(const char* uri)
+        {
+            setRef_ = std::make_shared<streamset_ref>(uri);
+        }
+
+        streamset(const streamset& other)
+            : setRef_(other.setRef_)
+        {}
+
+        streamset& operator=(const streamset& rhs)
+        {
+            this->setRef_ = rhs.setRef_;
+            return *this;
+        }
+
+        bool is_valid() { return setRef_ != nullptr; }
 
         inline stream_reader create_reader();
-        astra_streamsetconnection_t get_handle() const { return sensorRef_->get_connection(); }
+        astra_streamsetconnection_t get_handle() const { return setRef_->connection_handle(); }
 
     private:
-        std::string uri_;
-
         class streamset_ref;
         using streamset_ref_ptr = std::shared_ptr<streamset_ref>;
 
@@ -62,22 +61,32 @@ namespace astra {
             public std::enable_shared_from_this<streamset_ref>
         {
         public:
-            streamset_ref(astra_streamsetconnection_t connection)
-                :  connection_(connection)
+            streamset_ref(std::string uri)
+                :  uri_(uri)
             { }
+
+            void connect()
+            {
+                if (!is_connected())
+                    astra_streamset_open(uri_.c_str(), &connection_);
+            }
+
+            bool is_connected() { return connection_ != nullptr; }
 
             ~streamset_ref()
             {
-                astra_streamset_close(&connection_);
+                if (is_connected())
+                    astra_streamset_close(&connection_);
             }
 
-            astra_streamsetconnection_t get_connection() const { return connection_; }
+            astra_streamsetconnection_t connection_handle() const { return connection_; }
 
         private:
-            astra_streamsetconnection_t connection_;
+            astra_streamsetconnection_t connection_{nullptr};
+            std::string uri_;
         };
 
-        streamset_ref_ptr sensorRef_;
+        streamset_ref_ptr setRef_;
 
         friend bool operator==(const streamset& lhs, const streamset& rhs);
         friend bool operator!=(const streamset& lhs, const streamset& rhs);
@@ -85,7 +94,7 @@ namespace astra {
 
     inline bool operator==(const streamset& lhs, const streamset& rhs)
     {
-        return lhs.sensorRef_ == rhs.sensorRef_;
+        return lhs.setRef_ == rhs.setRef_;
     }
 
     inline bool operator!=(const streamset& lhs, const streamset& rhs)
@@ -95,6 +104,9 @@ namespace astra {
 
     stream_reader streamset::create_reader()
     {
+        if (!setRef_->is_connected())
+            setRef_->connect();
+
         astra_reader_t reader;
         astra_reader_create(get_handle(), &reader);
 

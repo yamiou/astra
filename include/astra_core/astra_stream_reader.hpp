@@ -31,9 +31,23 @@ namespace astra {
     class stream_reader
     {
     public:
+        stream_reader()
+            : readerRef_(nullptr)
+        {}
+
         stream_reader(astra_reader_t reader)
             : readerRef_(std::make_shared<reader_ref>(reader))
         {}
+
+        stream_reader(const stream_reader& reader)
+             : readerRef_(reader.readerRef_)
+        {}
+
+        stream_reader& operator=(const stream_reader& reader)
+        {
+            this->readerRef_ = reader.readerRef_;
+            return *this;
+        }
 
         template<typename T>
         T stream()
@@ -44,8 +58,10 @@ namespace astra {
         template<typename T>
         T stream(astra_stream_subtype_t subtype)
         {
-            astra_streamconnection_t connection;
+            if (!is_valid())
+                throw std::logic_error("stream_reader is not associated with a streamset.");
 
+            astra_streamconnection_t connection;
             astra_reader_get_stream(readerRef_->get_reader(),
                                     T::id,
                                     subtype,
@@ -56,11 +72,17 @@ namespace astra {
 
         void add_listener(frame_listener& listener)
         {
+            if (!is_valid())
+                throw std::logic_error("stream_reader is not associated with a streamset.");
+
             readerRef_.get()->add_listener(listener);
         }
 
         void remove_listener(frame_listener& listener)
         {
+            if (!is_valid())
+                throw std::logic_error("stream_reader is not associated with a streamset.");
+
             readerRef_.get()->remove_listener(listener);
         }
 
@@ -68,6 +90,9 @@ namespace astra {
 
         frame get_latest_frame(int timeoutMillis = ASTRA_TIMEOUT_FOREVER)
         {
+            if (!is_valid())
+                throw std::logic_error("stream_reader is not associated with a streamset.");
+
             astra_reader_frame_t frame;
             astra_reader_open_frame(readerRef_->get_reader(), timeoutMillis, &frame);
 
