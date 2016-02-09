@@ -433,7 +433,7 @@ namespace orbbec { namespace ni {
             //          oniVideoMode.getResolutionX(),
             //          oniVideoMode.getResolutionY());
 
-            if (oniVideoMode != oniMode_)
+            if (bin_ == nullptr || oniVideoMode != oniMode_)
             {
                 change_mode(convert_mode(oniVideoMode));
             }
