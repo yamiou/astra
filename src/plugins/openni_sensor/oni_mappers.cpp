@@ -65,9 +65,9 @@ namespace orbbec { namespace ni {
         }
     }
 
-    astra::imagestream_mode convert_mode(const openni::VideoMode& oniMode)
+    astra::ImageStreamMode convert_mode(const openni::VideoMode& oniMode)
     {
-        astra::imagestream_mode mode;
+        astra::ImageStreamMode mode;
 
         mode.set_width(oniMode.getResolutionX());
         mode.set_height(oniMode.getResolutionY());
@@ -82,7 +82,7 @@ namespace orbbec { namespace ni {
         return mode;
     }
 
-    openni::VideoMode convert_mode(const astra::imagestream_mode& mode)
+    openni::VideoMode convert_mode(const astra::ImageStreamMode& mode)
     {
         openni::VideoMode oniMode;
         oniMode.setResolution(mode.width(), mode.height());

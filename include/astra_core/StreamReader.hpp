@@ -28,22 +28,22 @@
 
 namespace astra {
 
-    class stream_reader
+    class StreamReader
     {
     public:
-        stream_reader()
+        StreamReader()
             : readerRef_(nullptr)
         {}
 
-        stream_reader(astra_reader_t reader)
-            : readerRef_(std::make_shared<reader_ref>(reader))
+        StreamReader(astra_reader_t reader)
+            : readerRef_(std::make_shared<ReaderRef>(reader))
         {}
 
-        stream_reader(const stream_reader& reader)
+        StreamReader(const StreamReader& reader)
              : readerRef_(reader.readerRef_)
         {}
 
-        stream_reader& operator=(const stream_reader& reader)
+        StreamReader& operator=(const StreamReader& reader)
         {
             this->readerRef_ = reader.readerRef_;
             return *this;
@@ -59,7 +59,7 @@ namespace astra {
         T stream(astra_stream_subtype_t subtype)
         {
             if (!is_valid())
-                throw std::logic_error("stream_reader is not associated with a streamset.");
+                throw std::logic_error("StreamReader is not associated with a streamset.");
 
             astra_streamconnection_t connection;
             astra_reader_get_stream(readerRef_->get_reader(),
@@ -70,52 +70,52 @@ namespace astra {
             return T(connection);
         }
 
-        void add_listener(frame_listener& listener)
+        void add_listener(FrameListener& listener)
         {
             if (!is_valid())
-                throw std::logic_error("stream_reader is not associated with a streamset.");
+                throw std::logic_error("StreamReader is not associated with a streamset.");
 
             readerRef_.get()->add_listener(listener);
         }
 
-        void remove_listener(frame_listener& listener)
+        void remove_listener(FrameListener& listener)
         {
             if (!is_valid())
-                throw std::logic_error("stream_reader is not associated with a streamset.");
+                throw std::logic_error("StreamReader is not associated with a streamset.");
 
             readerRef_.get()->remove_listener(listener);
         }
 
         bool is_valid() { return readerRef_ != nullptr; }
 
-        frame get_latest_frame(int timeoutMillis = ASTRA_TIMEOUT_FOREVER)
+        Frame get_latest_frame(int timeoutMillis = ASTRA_TIMEOUT_FOREVER)
         {
             if (!is_valid())
-                throw std::logic_error("stream_reader is not associated with a streamset.");
+                throw std::logic_error("StreamReader is not associated with a streamset.");
 
             astra_reader_frame_t frame;
             astra_reader_open_frame(readerRef_->get_reader(), timeoutMillis, &frame);
 
-            return astra::frame(frame);
+            return astra::Frame(frame);
         }
 
     private:
-        class reader_ref;
-        using reader_ref_ptr = std::shared_ptr<reader_ref>;
+        class ReaderRef;
+        using ReaderRefPtr = std::shared_ptr<ReaderRef>;
 
-        stream_reader(reader_ref_ptr readerRef)
+        StreamReader(ReaderRefPtr readerRef)
             : readerRef_(readerRef)
         { }
 
-        class reader_ref :
-            public std::enable_shared_from_this<reader_ref>
+        class ReaderRef :
+            public std::enable_shared_from_this<ReaderRef>
         {
         public:
-            reader_ref(astra_reader_t reader)
+            ReaderRef(astra_reader_t reader)
                 :  reader_(reader)
             { }
 
-            ~reader_ref()
+            ~ReaderRef()
             {
                 listeners_.clear();
                 ensure_callback_removed();
@@ -126,11 +126,11 @@ namespace astra {
                                           astra_reader_t reader,
                                           astra_reader_frame_t frame)
             {
-                reader_ref* self = static_cast<reader_ref*>(clientTag);
+                ReaderRef* self = static_cast<ReaderRef*>(clientTag);
                 self->notify_listeners(frame);
             }
 
-            void add_listener(frame_listener& listener)
+            void add_listener(FrameListener& listener)
             {
                 ensure_callback_added();
 
@@ -151,7 +151,7 @@ namespace astra {
                 }
             }
 
-            void remove_listener(frame_listener& listener)
+            void remove_listener(FrameListener& listener)
             {
                 auto it = std::find(listeners_.begin(),
                                     listeners_.end(),
@@ -179,7 +179,7 @@ namespace astra {
             {
                 if (removedListeners_.size() > 0)
                 {
-                    for(frame_listener& listener : removedListeners_)
+                    for(FrameListener& listener : removedListeners_)
                     {
                         auto it = std::find(listeners_.begin(),
                                             listeners_.end(),
@@ -201,16 +201,17 @@ namespace astra {
                 }
 
                 //we didn't open the frame, so don't auto close it.
-                //the Stream_Reader internals will close it automatically
+                //the StreamReader internals will close it automatically
                 const bool autoCloseFrame = false;
-                astra::frame frameWrapper(readerFrame, autoCloseFrame);
+                astra::Frame frameWrapper(readerFrame, autoCloseFrame);
 
                 isNotifying_ = true;
-                stream_reader reader(shared_from_this());
-                for(frame_listener& listener : listeners_)
+                StreamReader reader(shared_from_this());
+                for(FrameListener& listener : listeners_)
                 {
                     listener.on_frame_ready(reader, frameWrapper);
                 }
+
                 isNotifying_ = false;
             }
 
@@ -222,7 +223,7 @@ namespace astra {
                 if (!callbackRegistered_)
                 {
                     astra_reader_register_frame_ready_callback(reader_,
-                                                               &reader_ref::frame_ready_thunk,
+                                                               &ReaderRef::frame_ready_thunk,
                                                                this,
                                                                &callbackId_);
 
@@ -244,7 +245,7 @@ namespace astra {
             bool isNotifying_{false};
             bool callbackRegistered_{false};
 
-            using ListenerList = std::vector<std::reference_wrapper<frame_listener> >;
+            using ListenerList = std::vector<std::reference_wrapper<FrameListener>>;
 
             ListenerList listeners_;
             ListenerList addedListeners_;
@@ -253,17 +254,17 @@ namespace astra {
             astra_reader_callback_id_t callbackId_;
         };
 
-        reader_ref_ptr readerRef_;
+        ReaderRefPtr readerRef_;
 
-        friend bool operator==(const stream_reader& lhs, const stream_reader& rhs);
+        friend bool operator==(const StreamReader& lhs, const StreamReader& rhs);
     };
 
-    inline bool operator==(const stream_reader& lhs, const stream_reader& rhs)
+    inline bool operator==(const StreamReader& lhs, const StreamReader& rhs)
     {
         return lhs.readerRef_ == rhs.readerRef_;
     }
 
-    inline bool operator!=(const stream_reader& lhs, const stream_reader& rhs)
+    inline bool operator!=(const StreamReader& lhs, const StreamReader& rhs)
     {
         return !(lhs == rhs);
     }

@@ -31,9 +31,9 @@ namespace orbbec { namespace ni {
     class stream : public astra::plugins::stream
     {
     public:
-        stream(astra::pluginservice_proxy& pluginService,
+        stream(astra::PluginServiceProxy& pluginService,
                astra_streamset_t streamSet,
-               astra::stream_description desc,
+               astra::StreamDescription desc,
                stream_listener& listener)
             : astra::plugins::stream(pluginService,
                                      streamSet,

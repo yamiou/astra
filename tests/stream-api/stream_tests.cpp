@@ -19,7 +19,7 @@
 #include <astra/astra.hpp>
 
 TEST_CASE("Can start a depthstream", "[c++-stream-api-ul]") {
-    astra::streamset streamset;
-    astra::stream_reader reader = streamset.create_reader();
-    reader.stream<astra::depthstream>().start();
+    astra::StreamSet streamSet;
+    astra::StreamReader reader = streamSet.create_reader();
+    reader.stream<astra::DepthStream>().start();
 }

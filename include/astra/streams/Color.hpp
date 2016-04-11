@@ -24,12 +24,12 @@
 
 namespace astra {
 
-    class colorstream : public imagestream
+    class ColorStream : public ImageStream
     {
     public:
 
-        explicit colorstream(astra_streamconnection_t connection)
-            : imagestream(connection)
+        explicit ColorStream(astra_streamconnection_t connection)
+            : ImageStream(connection)
         {
             colorStream_ = reinterpret_cast<astra_colorstream_t>(connection);
         }
@@ -41,19 +41,19 @@ namespace astra {
         astra_colorstream_t colorStream_;
     };
 
-    class colorframe : public imageframe<rgb_pixel, ASTRA_STREAM_COLOR>
+    class ColorFrame : public ImageFrame<rgb_pixel, ASTRA_STREAM_COLOR>
     {
     public:
-        colorframe(astra_imageframe_t frame)
-            : imageframe(frame, ASTRA_PIXEL_FORMAT_RGB888)
+        ColorFrame(astra_imageframe_t frame)
+            : ImageFrame(frame, ASTRA_PIXEL_FORMAT_RGB888)
         {}
     };
 
-    class rawcolorframe : public imageframe<uint8_t, ASTRA_STREAM_COLOR>
+    class RawColorFrame : public ImageFrame<uint8_t, ASTRA_STREAM_COLOR>
     {
     public:
-        rawcolorframe(astra_imageframe_t frame)
-            : imageframe(frame, ASTRA_PIXEL_FORMAT_RGB888)
+        RawColorFrame(astra_imageframe_t frame)
+            : ImageFrame(frame, ASTRA_PIXEL_FORMAT_RGB888)
         {}
     };
 }

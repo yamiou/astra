@@ -18,13 +18,13 @@
 
 namespace orbbec { namespace ni {
 
-    infrared_stream::infrared_stream(astra::pluginservice_proxy& pluginService,
+    infrared_stream::infrared_stream(astra::PluginServiceProxy& pluginService,
                                      astra_streamset_t streamSet,
                                      openni::Device& oniDevice,
                                      stream_listener& listener)
         : devicestream(pluginService,
                        streamSet,
-                       astra::stream_description(
+                       astra::StreamDescription(
                            ASTRA_STREAM_INFRARED,
                            DEFAULT_SUBTYPE),
                        oniDevice,

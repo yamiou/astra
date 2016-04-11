@@ -23,30 +23,30 @@
 
 namespace astra { namespace xs {
 
-    class point_processor : public frame_listener
+    class point_processor : public FrameListener
     {
     public:
-        point_processor(pluginservice_proxy& pluginService,
-                       astra_streamset_t streamset,
-                       stream_description& depthDesc);
+        point_processor(PluginServiceProxy& pluginService,
+                        astra_streamset_t streamset,
+                        StreamDescription& depthDesc);
         virtual ~point_processor();
-        virtual void on_frame_ready(stream_reader& reader, frame& frame) override;
+        virtual void on_frame_ready(StreamReader& reader, Frame& frame) override;
 
     private:
-        void create_point_stream_if_necessary(depthframe& depthFrame);
+        void create_point_stream_if_necessary(DepthFrame& depthFrame);
 
-        void update_pointframe_from_depth(depthframe& depthFrame);
-        void calculate_point_frame(depthframe& depthFrame,
-                                   vector3f* p_points);
+        void update_pointframe_from_depth(DepthFrame& depthFrame);
+        void calculate_point_frame(DepthFrame& depthFrame,
+                                   Vector3f* p_points);
 
-        streamset streamset_;
+        StreamSet streamset_;
         astra_streamset_t setHandle_;
-        stream_reader reader_;
-        depthstream depthStream_;
-        pluginservice_proxy& pluginService_;
+        StreamReader reader_;
+        DepthStream depthStream_;
+        PluginServiceProxy& pluginService_;
 
-        using pointstream_ptr = std::unique_ptr<pointstream>;
-        pointstream_ptr pointStream_;
+        using PointStreamPtr = std::unique_ptr<PointStream>;
+        PointStreamPtr pointStream_;
 
         conversion_cache_t depthConversionCache_;
     };

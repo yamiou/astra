@@ -30,13 +30,13 @@ namespace astra { namespace hand {
 
     using namespace std;
 
-    hand_tracker::hand_tracker(pluginservice_proxy& pluginService,
+    hand_tracker::hand_tracker(PluginServiceProxy& pluginService,
                                astra_streamset_t streamSet,
-                               stream_description& depthDesc,
+                               StreamDescription& depthDesc,
                                hand_settings& settings) :
         streamset_(plugins::get_uri_for_streamset(pluginService, streamSet)),
         reader_(streamset_.create_reader()),
-        depthStream_(reader_.stream<depthstream>(depthDesc.subtype())),
+        depthStream_(reader_.stream<DepthStream>(depthDesc.subtype())),
         settings_(settings),
         pluginService_(pluginService),
         depthUtility_(settings.processingSizeWidth, settings.processingSizeHeight, settings.depthUtilitySettings),
@@ -50,7 +50,7 @@ namespace astra { namespace hand {
         create_streams(pluginService_, streamSet);
         depthStream_.start();
 
-        reader_.stream<pointstream>().start();
+        reader_.stream<PointStream>().start();
         reader_.add_listener(*this);
     }
 
@@ -64,7 +64,7 @@ namespace astra { namespace hand {
         }
     }
 
-    void hand_tracker::create_streams(pluginservice_proxy& pluginService, astra_streamset_t streamSet)
+    void hand_tracker::create_streams(PluginServiceProxy& pluginService, astra_streamset_t streamSet)
     {
         PROFILE_FUNC();
         LOG_INFO("hand_tracker", "creating hand streams");
@@ -80,14 +80,14 @@ namespace astra { namespace hand {
         debugimagestream_ = std::unique_ptr<debug_handstream>(std::move(dhs));
     }
 
-    void hand_tracker::on_frame_ready(stream_reader& reader, frame& frame)
+    void hand_tracker::on_frame_ready(StreamReader& reader, Frame& frame)
     {
         PROFILE_FUNC();
         if (handStream_->has_connections() ||
             debugimagestream_->has_connections())
         {
-            depthframe depthFrame = frame.get<depthframe>();
-            pointframe pointFrame = frame.get<pointframe>();
+            DepthFrame depthFrame = frame.get<DepthFrame>();
+            PointFrame pointFrame = frame.get<PointFrame>();
             update_tracking(depthFrame, pointFrame);
         }
 
@@ -101,7 +101,7 @@ namespace astra { namespace hand {
         pointProcessor_.reset();
     }
 
-    void hand_tracker::update_tracking(depthframe& depthFrame, pointframe& pointFrame)
+    void hand_tracker::update_tracking(DepthFrame& depthFrame, PointFrame& pointFrame)
     {
         PROFILE_FUNC();
         if (!debugimagestream_->pause_input())
@@ -128,7 +128,7 @@ namespace astra { namespace hand {
     void hand_tracker::track_points(cv::Mat& matDepth,
                                     cv::Mat& matDepthFullSize,
                                     cv::Mat& matVelocitySignal,
-                                    const vector3f* fullSizeWorldPoints)
+                                    const Vector3f* fullSizeWorldPoints)
     {
         PROFILE_FUNC();
 
@@ -164,7 +164,7 @@ namespace astra { namespace hand {
             }
 
             numWorldPoints_ = numPoints;
-            worldPoints_ = new astra::vector3f[numPoints];
+            worldPoints_ = new astra::Vector3f[numPoints];
         }
 
         const conversion_cache_t depthToWorldData = depthStream_.depth_to_world_data();
@@ -494,7 +494,7 @@ namespace astra { namespace hand {
 
     void mark_image_pixel(_astra_imageframe& imageFrame,
                           rgb_pixel color,
-                          astra::vector2i p)
+                          astra::Vector2i p)
     {
         PROFILE_FUNC();
         rgb_pixel* colorData = static_cast<rgb_pixel*>(imageFrame.data);
@@ -517,7 +517,7 @@ namespace astra { namespace hand {
 
         cv::Point probePosition = get_mouse_probe_position();
 
-        std::vector<astra::vector2i> points;
+        std::vector<astra::Vector2i> points;
 
         segmentation::get_circumference_points(matDepth_, probePosition, foregroundRadius1, mapper, points);
 
@@ -536,7 +536,7 @@ namespace astra { namespace hand {
         cv::Point spawnPosition = get_spawn_position();
         rgb_pixel spawnColor(255, 0, 255);
 
-        mark_image_pixel(imageFrame, spawnColor, vector2i(spawnPosition.x, spawnPosition.y));
+        mark_image_pixel(imageFrame, spawnColor, Vector2i(spawnPosition.x, spawnPosition.y));
     }
 
     void hand_tracker::update_debug_image_frame(_astra_imageframe& colorFrame)

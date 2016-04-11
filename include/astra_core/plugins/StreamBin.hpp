@@ -27,7 +27,7 @@ namespace astra { namespace plugins {
     class stream_bin
     {
     public:
-        stream_bin(pluginservice_proxy& pluginService,
+        stream_bin(PluginServiceProxy& pluginService,
                    astra_stream_t streamHandle,
                    size_t dataSize)
             : streamHandle_(streamHandle),
@@ -106,7 +106,7 @@ namespace astra { namespace plugins {
         astra_bin_t binHandle_;
         size_t bufferSize_{0};
         astra_frame_t* currentBuffer_{nullptr};
-        pluginservice_proxy& pluginService_;
+        PluginServiceProxy& pluginService_;
         bool locked_{false};
     };
 

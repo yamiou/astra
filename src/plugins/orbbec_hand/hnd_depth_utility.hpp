@@ -30,7 +30,7 @@ namespace astra { namespace hand {
         depth_utility(float width, float height, depth_utility_settings& settings);
         virtual ~depth_utility();
 
-        void depth_to_velocity_signal(depthframe& depthFrame,
+        void depth_to_velocity_signal(DepthFrame& depthFrame,
                                       cv::Mat& matDepth,
                                       cv::Mat& matDepthFullSize,
                                       cv::Mat& matVelocitySignal);
@@ -48,7 +48,7 @@ namespace astra { namespace hand {
                 filled = 1
                 };
 
-        static void depthframe_to_matrix(depthframe& depthFrameSrc,
+        static void depthframe_to_matrix(DepthFrame& depthFrameSrc,
                                          const int width,
                                          const int height,
                                          cv::Mat& matTarget);

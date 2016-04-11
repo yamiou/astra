@@ -32,7 +32,7 @@ namespace orbbec { namespace ni {
     class device_streamset : public stream_listener
     {
     public:
-        device_streamset(std::string name, astra::pluginservice_proxy& pluginService, const char* uri);
+        device_streamset(std::string name, astra::PluginServiceProxy& pluginService, const char* uri);
         ~device_streamset();
 
         astra_status_t open();
@@ -54,7 +54,7 @@ namespace orbbec { namespace ni {
         astra_status_t close_sensor_streams();
         void add_stream(stream* stream);
 
-        astra::pluginservice_proxy& pluginService_;
+        astra::PluginServiceProxy& pluginService_;
         astra_streamset_t streamSetHandle_;
         openni::Device oniDevice_;
         std::string uri_;

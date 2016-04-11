@@ -21,7 +21,7 @@
 #include <iomanip>
 #include <key_handler.h>
 
-class SampleFrameListener : public astra::frame_listener
+class SampleFrameListener : public astra::FrameListener
 {
 private:
     using buffer_ptr = std::unique_ptr<int16_t []>;
@@ -30,21 +30,21 @@ private:
     unsigned int lastHeight_;
 
 public:
-    virtual void on_frame_ready(astra::stream_reader& reader,
-                 astra::frame& frame) override
+    virtual void on_frame_ready(astra::StreamReader& reader,
+                                astra::Frame& frame) override
     {
-        astra::depthframe depthFrame = frame.get<astra::depthframe>();
+        astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
 
         if (depthFrame.is_valid())
         {
             print_depth(depthFrame,
-            reader.stream<astra::depthstream>().coordinateMapper());
+            reader.stream<astra::DepthStream>().coordinateMapper());
             check_fps();
         }
     }
 
-    void print_depth(astra::depthframe& depthFrame,
-         const astra::coordinate_mapper& mapper)
+    void print_depth(astra::DepthFrame& depthFrame,
+                     const astra::CoordinateMapper& mapper)
     {
         if (depthFrame.is_valid())
         {
@@ -117,17 +117,17 @@ int main(int argc, char** argv)
 
     set_key_handler();
 
-    astra::streamset streamset;
-    astra::stream_reader reader = streamset.create_reader();
+    astra::StreamSet streamSet;
+    astra::StreamReader reader = streamSet.create_reader();
 
     SampleFrameListener listener;
 
-    reader.stream<astra::depthstream>().start();
+    reader.stream<astra::DepthStream>().start();
 
     std::cout << "depthStream -- hFov: "
-              << reader.stream<astra::depthstream>().horizontalFieldOfView()
+              << reader.stream<astra::DepthStream>().horizontalFieldOfView()
               << " vFov: "
-              << reader.stream<astra::depthstream>().verticalFieldOfView()
+              << reader.stream<astra::DepthStream>().verticalFieldOfView()
               << std::endl;
 
     reader.add_listener(listener);

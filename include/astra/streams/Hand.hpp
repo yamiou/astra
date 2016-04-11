@@ -30,9 +30,9 @@ namespace astra {
     public:
         handpoint(std::int32_t trackingId,
                   astra_handstatus_t status,
-                  vector2i depthPosition,
-                  vector3f worldPosition,
-                  vector3f worldDeltaPosition)
+                  Vector2i depthPosition,
+                  Vector3f worldPosition,
+                  Vector3f worldDeltaPosition)
         {
             astra_handpoint_t::trackingId = trackingId;
             astra_handpoint_t::status = status;
@@ -62,24 +62,24 @@ namespace astra {
 
         inline int32_t trackingId() const { return astra_handpoint_t::trackingId; }
         inline astra_handstatus_t status() const { return astra_handpoint_t::status; }
-        inline vector2i depthPosition() const { return astra_handpoint_t::depthPosition; }
-        inline vector3f worldPosition() const { return astra_handpoint_t::worldPosition; }
-        inline vector3f worldDeltaPosition() const { return astra_handpoint_t::worldDeltaPosition; }
+        inline Vector2i depthPosition() const { return astra_handpoint_t::depthPosition; }
+        inline Vector3f worldPosition() const { return astra_handpoint_t::worldPosition; }
+        inline Vector3f worldDeltaPosition() const { return astra_handpoint_t::worldDeltaPosition; }
 
     private:
         astra_handpoint_t handPoint_;
-        vector2i depthPosition_;
-        vector3f worldPosition_;
-        vector3f worldDeltaPosition_;
+        Vector2i depthPosition_;
+        Vector3f worldPosition_;
+        Vector3f worldDeltaPosition_;
     };
 
     using handpointList = std::vector<handpoint>;
 
-    class handstream : public datastream
+    class handstream : public DataStream
     {
     public:
         explicit handstream(astra_streamconnection_t connection)
-            : datastream(connection),
+            : DataStream(connection),
               handStream_(connection)
         { }
 

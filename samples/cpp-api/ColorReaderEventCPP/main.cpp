@@ -19,7 +19,7 @@
 #include <iostream>
 #include <key_handler.h>
 
-class SampleFrameListener : public astra::frame_listener
+class SampleFrameListener : public astra::FrameListener
 {
 private:
     using buffer_ptr = std::unique_ptr<astra::rgb_pixel []>;
@@ -28,10 +28,10 @@ private:
     unsigned int lastHeight_;
 
 public:
-    virtual void on_frame_ready(astra::stream_reader& reader,
-                 astra::frame& frame) override
+    virtual void on_frame_ready(astra::StreamReader& reader,
+                                astra::Frame& frame) override
     {
-        astra::colorframe colorFrame = frame.get<astra::colorframe>();
+        astra::ColorFrame colorFrame = frame.get<astra::ColorFrame>();
 
         if (colorFrame.is_valid())
         {
@@ -39,7 +39,7 @@ public:
         }
     }
 
-    void print_color(astra::colorframe& colorFrame)
+    void print_color(astra::ColorFrame& colorFrame)
     {
         if (colorFrame.is_valid())
         {
@@ -72,17 +72,17 @@ int main(int argc, char** argv)
 
     set_key_handler();
 
-    astra::streamset streamset;
-    astra::stream_reader reader = streamset.create_reader();
+    astra::StreamSet streamSet;
+    astra::StreamReader reader = streamSet.create_reader();
 
     SampleFrameListener listener;
 
-    reader.stream<astra::colorstream>().start();
+    reader.stream<astra::ColorStream>().start();
 
     std::cout << "colorStream -- hFov: "
-              << reader.stream<astra::colorstream>().horizontalFieldOfView()
+              << reader.stream<astra::ColorStream>().horizontalFieldOfView()
               << " vFov: "
-              << reader.stream<astra::colorstream>().verticalFieldOfView()
+              << reader.stream<astra::ColorStream>().verticalFieldOfView()
               << std::endl;
 
     reader.add_listener(listener);

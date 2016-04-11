@@ -27,9 +27,9 @@ namespace astra { namespace plugins {
     class single_bin_stream : public astra::plugins::stream
     {
     public:
-        single_bin_stream(pluginservice_proxy& pluginService,
+        single_bin_stream(PluginServiceProxy& pluginService,
                           astra_streamset_t streamSet,
-                          stream_description description,
+                          StreamDescription description,
                           size_t bufferSize)
             : stream(pluginService,
                      streamSet,

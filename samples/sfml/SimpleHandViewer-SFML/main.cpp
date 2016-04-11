@@ -55,11 +55,11 @@ private:
     sf::Color color;
 };
 
-class HandFrameListener : public astra::frame_listener
+class HandFrameListener : public astra::FrameListener
 {
 public:
-    using PointList = std::deque < astra::vector2i >;
-    using PointMap = std::unordered_map < int, PointList >;
+    using PointList = std::deque<astra::Vector2i>;
+    using PointMap = std::unordered_map<int, PointList>;
 
     HandFrameListener()
     {
@@ -100,9 +100,9 @@ public:
         printf("FPS: %3.1f (%3.4Lf ms)\n", fps, frameDuration_ * 1000);
     }
 
-    void processDepth(astra::frame& frame)
+    void processDepth(astra::Frame& frame)
     {
-        astra::pointframe pointFrame = frame.get<astra::pointframe>();
+        astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
 
         int width = pointFrame.resolutionX();
         int height = pointFrame.resolutionY();
@@ -124,7 +124,7 @@ public:
         texture_.update(displayBuffer_.get());
     }
 
-    void updateHandTrace(int trackingId, const astra::vector2i& position)
+    void updateHandTrace(int trackingId, const astra::Vector2i& position)
     {
         auto it = pointMap_.find(trackingId);
         if (it == pointMap_.end())
@@ -165,7 +165,7 @@ public:
         }
     }
 
-    void processHandFrame(astra::frame& frame)
+    void processHandFrame(astra::Frame& frame)
     {
         astra::handframe handFrame = frame.get<astra::handframe>();
 
@@ -181,8 +181,8 @@ public:
         }
     }
 
-    virtual void on_frame_ready(astra::stream_reader& reader,
-                                astra::frame& frame) override
+    virtual void on_frame_ready(astra::StreamReader& reader,
+                                astra::Frame& frame) override
     {
         processDepth(frame);
         processHandFrame(frame);
@@ -255,10 +255,10 @@ public:
         float thickness = 4;
         auto it = pointList.begin();
 
-        astra::vector2i lastPoint = *it;
+        astra::Vector2i lastPoint = *it;
         while (it != pointList.end())
         {
-            astra::vector2i currentPoint = *it;
+            astra::Vector2i currentPoint = *it;
             ++it;
 
             sf::Vector2f p1((lastPoint.x + 0.5) * depthScale,
@@ -290,7 +290,7 @@ public:
                 color = candidateColor;
             }
 
-            const astra::vector2i& p = handPoint.depthPosition();
+            const astra::Vector2i& p = handPoint.depthPosition();
 
             float circleX = (p.x + 0.5) * depthScale;
             float circleY = (p.y + 0.5) * depthScale;
@@ -355,10 +355,10 @@ int main(int argc, char** argv)
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Hand Viewer");
 
-    astra::streamset streamset;
-    astra::stream_reader reader = streamset.create_reader();
+    astra::StreamSet streamSet;
+    astra::StreamReader reader = streamSet.create_reader();
 
-    reader.stream<astra::pointstream>().start();
+    reader.stream<astra::PointStream>().start();
     reader.stream<astra::handstream>().start();
 
     HandFrameListener listener;

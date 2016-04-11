@@ -84,8 +84,8 @@ namespace orbbec { namespace mocks {
 
         virtual void on_new_buffer(wrapper_type* wrapper);
 
-        void change_mode(const astra::imagestream_mode& mode);
-        void set_mode(const astra::imagestream_mode& mode);
+        void change_mode(const astra::ImageStreamMode& mode);
+        void set_mode(const astra::ImageStreamMode& mode);
 
         astra::devices::sensor_stream::shared_ptr deviceStream_;
 
@@ -235,7 +235,7 @@ namespace orbbec { namespace mocks {
     }
 
     template<typename TFrameWrapper>
-    void device_stream<TFrameWrapper>::set_mode(const astra::imagestream_mode& mode)
+    void device_stream<TFrameWrapper>::set_mode(const astra::ImageStreamMode& mode)
     {
         assert(mode.pixelFormat() != 0);
 

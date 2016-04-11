@@ -68,7 +68,7 @@ private:
     FrameStreamWriterPtr frameStreamWriter_;
 };
 
-class Viewer : public frame_listener
+class Viewer : public FrameListener
 {
 public:
     Viewer(streamset& streamset) :
@@ -170,7 +170,7 @@ private:
         texture_.update(displayBuffer_.get());
     }
 
-    virtual void on_frame_ready(stream_reader& reader,
+    virtual void on_frame_ready(StreamReader& reader,
                                 frame& frame) override
     {
         pointframe pointFrame = frame.get<pointframe>();
@@ -200,7 +200,7 @@ private:
     int displayWidth_{0};
     int displayHeight_{0};
 
-    stream_reader reader_;
+    StreamReader reader_;
     using RecorderPtr = std::unique_ptr<Recorder>;
     RecorderPtr recorder_;
 };
@@ -231,7 +231,7 @@ int main(int argc, char** argv)
 
 /*
     streamset streamPlayer("stream_player");
-    stream_reader streamPlayerReader = streamPlayer.create_reader();
+    StreamReader streamPlayerReader = streamPlayer.create_reader();
 
     auto streamPlayerPs = streamPlayerReader.stream<pointstream>();
 */

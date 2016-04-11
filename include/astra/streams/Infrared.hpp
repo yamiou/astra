@@ -25,29 +25,29 @@
 
 namespace astra {
 
-    class infraredstream : public imagestream
+    class InfraredStream : public ImageStream
     {
     public:
-        explicit infraredstream(astra_streamconnection_t connection)
-            : imagestream(connection)
+        explicit InfraredStream(astra_streamconnection_t connection)
+            : ImageStream(connection)
         { }
 
         static const astra_stream_type_t id = ASTRA_STREAM_INFRARED;
     };
 
-    class infraredframe_16 : public imageframe<uint16_t, ASTRA_STREAM_INFRARED>
+    class InfraredFrame16 : public ImageFrame<uint16_t, ASTRA_STREAM_INFRARED>
     {
     public:
-        infraredframe_16(astra_imageframe_t frame)
-            : imageframe(frame, ASTRA_PIXEL_FORMAT_GRAY16)
+        InfraredFrame16(astra_imageframe_t frame)
+            : ImageFrame(frame, ASTRA_PIXEL_FORMAT_GRAY16)
         {}
     };
 
-    class infraredframe_rgb : public imageframe<rgb_pixel, ASTRA_STREAM_INFRARED>
+    class InfraredFrameRgb : public ImageFrame<rgb_pixel, ASTRA_STREAM_INFRARED>
     {
     public:
-        infraredframe_rgb(astra_imageframe_t frame)
-            : imageframe(frame, ASTRA_PIXEL_FORMAT_RGB888)
+        InfraredFrameRgb(astra_imageframe_t frame)
+            : ImageFrame(frame, ASTRA_PIXEL_FORMAT_RGB888)
         {}
     };
 

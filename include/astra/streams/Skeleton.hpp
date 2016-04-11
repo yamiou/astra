@@ -33,7 +33,7 @@ namespace astra {
 
         inline astra_joint_status status() { return joint_.status; }
         inline astra_joint_type type() { return joint_.jointType; }
-        inline const vector3f position() { return joint_.position; }
+        inline const Vector3f position() { return joint_.position; }
 
     private:
         astra_skeleton_joint_t joint_;
@@ -81,11 +81,11 @@ namespace astra {
 
     using SkeletonList = std::vector<skeleton>;
 
-    class skeletonstream : public datastream
+    class skeletonstream : public DataStream
     {
     public:
         explicit skeletonstream(astra_streamconnection_t connection)
-            : datastream(connection),
+            : DataStream(connection),
               skeletonStream_(reinterpret_cast<astra_skeletonstream_t>(connection))
         { }
 

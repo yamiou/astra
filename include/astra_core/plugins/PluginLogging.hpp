@@ -54,7 +54,7 @@
 #define LOG_WARN(channel, format, ...) \
     ::astra::plugins::log(channel, ASTRA_SEVERITY_WARN, __FILE__, __LINE__, LOG_FUNC, format, ##__VA_ARGS__)
 
-extern astra::pluginservice_proxy* __g_serviceProxy;
+extern astra::PluginServiceProxy* __g_serviceProxy;
 
 namespace astra { namespace plugins {
 

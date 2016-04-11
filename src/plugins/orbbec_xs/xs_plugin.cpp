@@ -31,7 +31,7 @@ namespace astra { namespace xs {
         {
             LOG_INFO("astra.xs.plugin", "creating point processor");
 
-            stream_description depthDescription = streamDesc;
+            StreamDescription depthDescription = streamDesc;
 
             auto ppPtr = std::make_unique<point_processor>(pluginService(),
                                                            setHandle,

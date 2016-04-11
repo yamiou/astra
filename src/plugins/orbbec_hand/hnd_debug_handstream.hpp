@@ -30,15 +30,15 @@ namespace astra { namespace hand {
 
     {
     public:
-        debug_handstream(pluginservice_proxy& pluginService,
+        debug_handstream(PluginServiceProxy& pluginService,
                          astra_streamset_t streamSet,
                          uint32_t width,
                          uint32_t height,
                          uint32_t bytesPerPixel)
             : single_bin_stream(pluginService,
                                 streamSet,
-                                stream_description(ASTRA_STREAM_DEBUG_HAND,
-                                                   DEFAULT_SUBTYPE),
+                                StreamDescription(ASTRA_STREAM_DEBUG_HAND,
+                                                  DEFAULT_SUBTYPE),
                                 width * height * bytesPerPixel)
         { }
 
@@ -46,10 +46,10 @@ namespace astra { namespace hand {
         void set_view_type(debug_handview_type view) { viewType_ = view; }
 
         bool use_mouse_probe() const { return useMouseProbe_; }
-        const vector2f& mouse_norm_position() const { return mouseNormPosition_; }
+        const Vector2f& mouse_norm_position() const { return mouseNormPosition_; }
         bool pause_input() const { return pauseInput_; }
         bool spawn_point_locked() const { return lockSpawnPoint_; }
-        const vector2f& spawn_norm_position() const { return spawnNormPosition_; }
+        const Vector2f& spawn_norm_position() const { return spawnNormPosition_; }
 
     protected:
         virtual void on_set_parameter(astra_streamconnection_t connection,
@@ -77,8 +77,8 @@ namespace astra { namespace hand {
 
         debug_handview_type viewType_{ DEBUG_HAND_VIEW_DEPTH };
         bool useMouseProbe_{false};
-        vector2f mouseNormPosition_;
-        vector2f spawnNormPosition_;
+        Vector2f mouseNormPosition_;
+        Vector2f spawnNormPosition_;
         bool pauseInput_{false};
         bool lockSpawnPoint_{false};
     };

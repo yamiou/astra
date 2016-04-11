@@ -25,18 +25,18 @@
 
 namespace astra { namespace xs {
 
-    class pointstream : public astra::plugins::single_bin_stream<astra_imageframe_wrapper_t>
+    class PointStream : public astra::plugins::single_bin_stream<astra_imageframe_wrapper_t>
     {
     public:
-        pointstream(pluginservice_proxy& pluginService,
+        PointStream(PluginServiceProxy& pluginService,
                     astra_streamset_t streamSet,
                     uint32_t width,
                     uint32_t height)
             : single_bin_stream(pluginService,
-                              streamSet,
-                              stream_description(ASTRA_STREAM_POINT,
-                                                DEFAULT_SUBTYPE),
-                              width * height * sizeof(astra_vector3f_t))
+                                streamSet,
+                                StreamDescription(ASTRA_STREAM_POINT,
+                                                  DEFAULT_SUBTYPE),
+                                width * height * sizeof(astra_vector3f_t))
         {}
     };
 }}

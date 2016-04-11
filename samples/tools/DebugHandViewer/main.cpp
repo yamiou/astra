@@ -20,7 +20,7 @@
 #include <iomanip>
 #include <cstring>
 
-class debug_frame_listener : public astra::frame_listener
+class debug_frame_listener : public astra::FrameListener
 {
 public:
     debug_frame_listener()
@@ -65,9 +65,9 @@ public:
         }
     }
 
-    void processDepth(astra::frame& frame)
+    void processDepth(astra::Frame& frame)
     {
-        astra::depthframe depthFrame = frame.get<astra::depthframe>();
+        astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
 
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
@@ -95,16 +95,16 @@ public:
         */
     }
 
-    void processHandFrame(astra::frame& frame)
+    void processHandFrame(astra::Frame& frame)
     {
         astra::handframe handFrame = frame.get<astra::handframe>();
 
         handPoints_ = handFrame.handpoints();
     }
 
-    void processdebug_handframe(astra::frame& frame)
+    void processdebug_handframe(astra::Frame& frame)
     {
-        astra::debug_handframe handFrame = frame.get<astra::debug_handframe>();
+        astra::DebugHandFrame handFrame = frame.get<astra::DebugHandFrame>();
 
         int width = handFrame.resolutionX();
         int height = handFrame.resolutionY();
@@ -130,14 +130,14 @@ public:
         texture_.update(displayBuffer_.get());
     }
 
-    virtual void on_frame_ready(astra::stream_reader& reader,
-        astra::frame& frame) override
+    virtual void on_frame_ready(astra::StreamReader& reader,
+                                astra::Frame& frame) override
     {
         processDepth(frame);
         processHandFrame(frame);
         processdebug_handframe(frame);
 
-        viewType_ = reader.stream<astra::debug_handstream>().get_view_type();
+        viewType_ = reader.stream<astra::DebugHandStream>().get_view_type();
 
         check_fps();
     }
@@ -216,7 +216,7 @@ public:
                 color = candidateColor;
             }
 
-            const astra::vector2i& p = handPoint.depthPosition();
+            const astra::Vector2i& p = handPoint.depthPosition();
 
             float circleX = (p.x + 0.5) * depthScale;
             float circleY = (p.y + 0.5) * depthScale;
@@ -345,45 +345,45 @@ private:
     bool showCircles_ { true };
 };
 
-void request_view_mode(astra::stream_reader& reader, astra::DebugHandViewType view)
+void request_view_mode(astra::StreamReader& reader, astra::DebugHandViewType view)
 {
-    reader.stream<astra::debug_handstream>().set_view_type(view);
+    reader.stream<astra::DebugHandStream>().set_view_type(view);
 }
 
-void process_mouse_move(sf::RenderWindow& window, astra::stream_reader& reader)
+void process_mouse_move(sf::RenderWindow& window, astra::StreamReader& reader)
 {
     sf::Vector2i position = sf::Mouse::getPosition(window);
-    astra::vector2f normPosition;
+    astra::Vector2f normPosition;
     auto windowSize = window.getSize();
     normPosition.x = position.x / (float)windowSize.x;
     normPosition.y = position.y / (float)windowSize.y;
 
-    reader.stream<astra::debug_handstream>().set_mouse_position(normPosition);
+    reader.stream<astra::DebugHandStream>().set_mouse_position(normPosition);
 }
 
 static bool g_mouseProbe = false;
 static bool g_pauseInput = false;
 static bool g_lockSpawnPoint = false;
 
-void toggle_mouse_probe(astra::stream_reader& reader)
+void toggle_mouse_probe(astra::StreamReader& reader)
 {
     g_mouseProbe = !g_mouseProbe;
-    reader.stream<astra::debug_handstream>().set_use_mouse_probe(g_mouseProbe);
+    reader.stream<astra::DebugHandStream>().set_use_mouse_probe(g_mouseProbe);
 }
 
-void toggle_pause_input(astra::stream_reader& reader)
+void toggle_pause_input(astra::StreamReader& reader)
 {
     g_pauseInput = !g_pauseInput;
-    reader.stream<astra::debug_handstream>().set_pause_input(g_pauseInput);
+    reader.stream<astra::DebugHandStream>().set_pause_input(g_pauseInput);
 }
 
-void toggle_spawn_lock(astra::stream_reader& reader)
+void toggle_spawn_lock(astra::StreamReader& reader)
 {
     g_lockSpawnPoint = !g_lockSpawnPoint;
-    reader.stream<astra::debug_handstream>().set_lock_spawn_point(g_lockSpawnPoint);
+    reader.stream<astra::DebugHandStream>().set_lock_spawn_point(g_lockSpawnPoint);
 }
 
-void process_key_input(astra::stream_reader& reader, debug_frame_listener& listener, sf::Event::KeyEvent key)
+void process_key_input(astra::StreamReader& reader, debug_frame_listener& listener, sf::Event::KeyEvent key)
 {
     if (key.code == sf::Keyboard::F)
     {
@@ -462,17 +462,17 @@ int main(int argc, char** argv)
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Hand Debug Viewer");
 
-    astra::streamset streamset;
-    astra::stream_reader reader = streamset.create_reader();
+    astra::StreamSet streamSet;
+    astra::StreamReader reader = streamSet.create_reader();
 
     debug_frame_listener listener;
 
-    reader.stream<astra::depthstream>().start();
+    reader.stream<astra::DepthStream>().start();
     auto handStream = reader.stream<astra::handstream>();
     handStream.start();
     handStream.set_include_candidate_points(true);
 
-    reader.stream<astra::debug_handstream>().start();
+    reader.stream<astra::DebugHandStream>().start();
     reader.add_listener(listener);
 
     while (window.isOpen())

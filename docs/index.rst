@@ -47,7 +47,7 @@ The designers of the SDK are also experienced 3D sensor developers themselves, a
 
    // Low-Level Streams
    reader.stream<astra::depthstream>().start();
-   reader.stream<astra::colorstream>().start();
+   reader.stream<astra::ColorStream>().start();
 
    //High-Level Streams
    reader.stream<astra::handstream>().start();

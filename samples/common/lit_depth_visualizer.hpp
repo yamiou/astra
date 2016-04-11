@@ -55,17 +55,17 @@ namespace samples { namespace common {
             blurRadius_ = radius;
         }
 
-        void update(pointframe& pointFrame);
+        void update(PointFrame& pointFrame);
 
         astra_rgb_pixel_t* get_output() { return outputBuffer_.get(); }
 
     private:
-        using VectorMapPtr = std::unique_ptr<vector3f[]>;
+        using VectorMapPtr = std::unique_ptr<Vector3f[]>;
         VectorMapPtr normalMap_{nullptr};
         VectorMapPtr blurNormalMap_{nullptr};
         size_t normalMapLength_{0};
 
-        vector3f lightVector_;
+        Vector3f lightVector_;
         unsigned int blurRadius_{1};
         astra_rgb_pixel_t lightColor_;
         astra_rgb_pixel_t ambientColor_;
@@ -77,11 +77,11 @@ namespace samples { namespace common {
         BufferPtr outputBuffer_{nullptr};
 
         void prepare_buffer(size_t width, size_t height);
-        void calculate_normals(pointframe& pointFrame);
+        void calculate_normals(PointFrame& pointFrame);
     };
 
-    void box_blur(const vector3f* in,
-                  vector3f* out,
+    void box_blur(const Vector3f* in,
+                  Vector3f* out,
                   const size_t width,
                   const size_t height,
                   const int blurRadius = 1)
@@ -96,48 +96,48 @@ namespace samples { namespace common {
             out += blurRadius;
             for (size_t x = blurRadius; x < maxX; ++x, ++out)
             {
-                vector3f normAvg;
+                Vector3f normAvg;
 
                 size_t index = x - blurRadius + (y - blurRadius) * width;
-                const vector3f* in_row = in + index;
+                const Vector3f* in_row = in + index;
 
                 for (int dy = -blurRadius; dy <= blurRadius; ++dy, in_row += width)
                 {
-                    const vector3f* in_kernel = in_row;
+                    const Vector3f* in_kernel = in_row;
                     for (int dx = -blurRadius; dx <= blurRadius; ++dx, ++in_kernel)
                     {
                         normAvg += *in_kernel;
                     }
                 }
 
-                *out = vector3f::normalize(normAvg);
+                *out = Vector3f::normalize(normAvg);
             }
             out += blurRadius;
         }
     }
 
-    void box_blur_fast(const vector3f* in,
-                       vector3f* out,
+    void box_blur_fast(const Vector3f* in,
+                       Vector3f* out,
                        const size_t width,
                        const size_t height)
     {
         const size_t maxY = height;
         const size_t maxX = width;
 
-        const vector3f* in_row = in + width;
-        vector3f* out_row = out;
+        const Vector3f* in_row = in + width;
+        Vector3f* out_row = out;
 
-        memset(out, 0, width * height * sizeof(vector3f));
+        memset(out, 0, width * height * sizeof(Vector3f));
 
         for (size_t y = 1; y < maxY; ++y, in_row += width, out_row += width)
         {
-            const vector3f* in_left = in_row - 1;
-            const vector3f* in_mid = in_row + 1;
+            const Vector3f* in_left = in_row - 1;
+            const Vector3f* in_mid = in_row + 1;
 
-            vector3f* out_up = out_row;
-            vector3f* out_mid = out_row + width;
+            Vector3f* out_up = out_row;
+            Vector3f* out_mid = out_row + width;
 
-            vector3f xKernelTotal = *in_left + *in_row;
+            Vector3f xKernelTotal = *in_left + *in_row;
 
             for (size_t x = 1; x < maxX; ++x)
             {
@@ -156,9 +156,9 @@ namespace samples { namespace common {
         }
     }
 
-    void lit_depth_visualizer::calculate_normals(pointframe& pointFrame)
+    void lit_depth_visualizer::calculate_normals(PointFrame& pointFrame)
     {
-        const vector3f* positionMap = pointFrame.data();
+        const Vector3f* positionMap = pointFrame.data();
 
         const int width = pointFrame.resolutionX();
         const int height = pointFrame.resolutionY();
@@ -167,20 +167,20 @@ namespace samples { namespace common {
 
         if (normalMap_ == nullptr || normalMapLength_ != numPixels)
         {
-            normalMap_ = std::make_unique<vector3f[]>(numPixels);
-            blurNormalMap_ = std::make_unique<vector3f[]>(numPixels);
+            normalMap_ = std::make_unique<Vector3f[]>(numPixels);
+            blurNormalMap_ = std::make_unique<Vector3f[]>(numPixels);
 
-            std::fill(blurNormalMap_.get(), blurNormalMap_.get() + numPixels, vector3f::zero());
+            std::fill(blurNormalMap_.get(), blurNormalMap_.get() + numPixels, Vector3f::zero());
 
             normalMapLength_ = numPixels;
         }
 
-        vector3f* normMap = normalMap_.get();
+        Vector3f* normMap = normalMap_.get();
 
         //top row
         for (int x = 0; x < width; ++x)
         {
-            *normMap = vector3f::zero();
+            *normMap = Vector3f::zero();
             ++normMap;
         }
 
@@ -190,15 +190,15 @@ namespace samples { namespace common {
         for (int y = 1; y < maxY; ++y)
         {
             //first pixel at start of row
-            *normMap = vector3f::zero();
+            *normMap = Vector3f::zero();
             ++normMap;
 
             //Initialize pointer arithmetic for the x=0 position
-            const vector3f* p_point = positionMap + y * width;
-            const vector3f* p_pointLeft = p_point - 1;
-            const vector3f* p_pointRight = p_point + 1;
-            const vector3f* p_pointUp = p_point - width;
-            const vector3f* p_pointDown = p_point + width;
+            const Vector3f* p_point = positionMap + y * width;
+            const Vector3f* p_pointLeft = p_point - 1;
+            const Vector3f* p_pointRight = p_point + 1;
+            const Vector3f* p_pointUp = p_point - width;
+            const Vector3f* p_pointDown = p_point + width;
 
             for (int x = 1; x < maxX; ++x)
             {
@@ -208,11 +208,11 @@ namespace samples { namespace common {
                 ++p_pointUp;
                 ++p_pointDown;
 
-                const vector3f& point = *p_point;
-                const vector3f& pointLeft = *p_pointLeft;
-                const vector3f& pointRight = *p_pointRight;
-                const vector3f& pointUp = *p_pointUp;
-                const vector3f& pointDown = *p_pointDown;
+                const Vector3f& point = *p_point;
+                const Vector3f& pointLeft = *p_pointLeft;
+                const Vector3f& pointRight = *p_pointRight;
+                const Vector3f& pointUp = *p_pointUp;
+                const Vector3f& pointDown = *p_pointDown;
 
                 if (point.z != 0 &&
                     pointRight.z != 0 &&
@@ -221,36 +221,36 @@ namespace samples { namespace common {
                     pointUp.z != 0
                     )
                 {
-                    vector3f vr = pointRight - point;
-                    vector3f vd = pointDown - point;
-                    vector3f vl = pointLeft - point;
-                    vector3f vu = pointUp - point;
+                    Vector3f vr = pointRight - point;
+                    Vector3f vd = pointDown - point;
+                    Vector3f vl = pointLeft - point;
+                    Vector3f vu = pointUp - point;
 
-                    vector3f normAvg = vd.cross(vr);
+                    Vector3f normAvg = vd.cross(vr);
                     normAvg += vl.cross(vd);
                     normAvg += vu.cross(vl);
                     normAvg += vr.cross(vu);
 
-                    *normMap = vector3f::normalize(normAvg);
+                    *normMap = Vector3f::normalize(normAvg);
 
                 }
                 else
                 {
-                    *normMap = vector3f::zero();
+                    *normMap = Vector3f::zero();
                 }
 
                 ++normMap;
             }
 
             //last pixel at end of row
-            *normMap = vector3f::zero();
+            *normMap = Vector3f::zero();
             ++normMap;
         }
 
         //bottom row
         for (int x = 0; x < width; ++x)
         {
-            *normMap = vector3f::zero();
+            *normMap = Vector3f::zero();
             ++normMap;
         }
 
@@ -270,7 +270,7 @@ namespace samples { namespace common {
         std::fill(outputBuffer_.get(), outputBuffer_.get()+outputWidth_*outputHeight_, astra_rgb_pixel_t{0,0,0});
     }
 
-    void lit_depth_visualizer::update(astra::pointframe& pointFrame)
+    void lit_depth_visualizer::update(astra::PointFrame& pointFrame)
     {
         calculate_normals(pointFrame);
 
@@ -279,11 +279,11 @@ namespace samples { namespace common {
 
         prepare_buffer(width, height);
 
-        const vector3f* pointData = pointFrame.data();
+        const Vector3f* pointData = pointFrame.data();
 
         astra_rgb_pixel_t* texturePtr = outputBuffer_.get();
 
-        const vector3f* normMap = blurNormalMap_.get();
+        const Vector3f* normMap = blurNormalMap_.get();
         const bool useNormalMap = normMap != nullptr;
 
         for (unsigned y = 0; y < height; ++y)
@@ -292,11 +292,11 @@ namespace samples { namespace common {
             {
                 float depth = (*pointData).z;
 
-                vector3f norm(1,0,0);
+                Vector3f norm(1,0,0);
 
                 if (useNormalMap)
                 {
-                    norm = vector3f::normalize(*normMap);
+                    norm = Vector3f::normalize(*normMap);
                 }
 
                 if (depth != 0)

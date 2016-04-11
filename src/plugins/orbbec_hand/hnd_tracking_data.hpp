@@ -101,13 +101,13 @@ namespace astra { namespace hand {
         cv::Mat& debugScoreValue;
         cv::Mat& debugTestPassMap;
         bool enableTestPassMap;
-        const astra::vector3f* fullSizeWorldPoints;
-        astra::vector3f* worldPoints;
+        const astra::Vector3f* fullSizeWorldPoints;
+        astra::Vector3f* worldPoints;
         bool debugLayersEnabled;
         int layerCount;
-        const astra::coordinate_mapper& fullSizeMapper;
+        const astra::CoordinateMapper& fullSizeMapper;
         const conversion_cache_t depthToWorldData;
-        std::vector<astra::vector2i> layerCirclePoints;
+        std::vector<astra::Vector2i> layerCirclePoints;
 
         tracking_matrices(cv::Mat& depthFullSize,
                           cv::Mat& depth,
@@ -125,10 +125,10 @@ namespace astra { namespace hand {
                           cv::Mat& debugScoreValue,
                           cv::Mat& debugTestPassMap,
                           bool enableTestPassMap,
-                          const astra::vector3f* fullSizeWorldPoints,
-                          astra::vector3f* worldPoints,
+                          const astra::Vector3f* fullSizeWorldPoints,
+                          astra::Vector3f* worldPoints,
                           bool debugLayersEnabled,
-                          const astra::coordinate_mapper& fullSizeMapper,
+                          const astra::CoordinateMapper& fullSizeMapper,
                           const conversion_cache_t depthToWorldData)
         :
             depthFullSize(depthFullSize),

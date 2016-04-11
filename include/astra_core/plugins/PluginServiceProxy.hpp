@@ -24,7 +24,7 @@
 
 namespace astra {
 
-    class pluginservice_proxy : public astra_pluginservice_proxy_t
+    class PluginServiceProxy : public astra_pluginservice_proxy_t
     {
     public:
 

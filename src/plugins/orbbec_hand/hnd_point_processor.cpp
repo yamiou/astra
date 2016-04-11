@@ -36,8 +36,8 @@ namespace astra { namespace hand {
     {
         PROFILE_FUNC();
 
-        const astra::vector3f* fullSizeWorldPoints = matrices.fullSizeWorldPoints;
-        astra::vector3f* worldPoints = matrices.worldPoints;
+        const astra::Vector3f* fullSizeWorldPoints = matrices.fullSizeWorldPoints;
+        astra::Vector3f* worldPoints = matrices.worldPoints;
         auto depthToWorldData = matrices.depthToWorldData;
         cv::Mat& areaMatrix = matrices.area;
         cv::Mat& areaSqrtMatrix = matrices.areaSqrt;
@@ -64,7 +64,7 @@ namespace astra { namespace hand {
             for (int x = 0; x < width; ++x, ++worldPoints, ++areaRow, ++areaSqrtRow)
             {
                 int fullSizeIndex = (x + y * fullSizeWidth) * intScale;
-                const vector3f& p = fullSizeWorldPoints[fullSizeIndex];
+                const Vector3f& p = fullSizeWorldPoints[fullSizeIndex];
                 *worldPoints = p;
                 const float depth = p.z;
 

@@ -26,7 +26,7 @@
 
 namespace astra { namespace plugins {
 
-    inline const char* get_uri_for_streamset(pluginservice_proxy& pluginService, astra_streamset_t streamSet)
+    inline const char* get_uri_for_streamset(PluginServiceProxy& pluginService, astra_streamset_t streamSet)
     {
         const char* uri;
         pluginService.get_streamset_uri(streamSet, &uri);
@@ -37,7 +37,7 @@ namespace astra { namespace plugins {
     class plugin_base
     {
     public:
-        plugin_base(pluginservice_proxy* pluginService, const char* pluginName)
+        plugin_base(PluginServiceProxy* pluginService, const char* pluginName)
             :  pluginService_(pluginService)
         {
             assert(pluginService != nullptr);
@@ -50,7 +50,7 @@ namespace astra { namespace plugins {
         virtual void temp_update() { };
 
     protected:
-        inline pluginservice_proxy& pluginService() const { return *pluginService_; }
+        inline PluginServiceProxy& pluginService() const { return *pluginService_; }
 
         void register_for_stream_events()
         {
@@ -86,7 +86,7 @@ namespace astra { namespace plugins {
         }
 
     private:
-        pluginservice_proxy* pluginService_{nullptr};
+        PluginServiceProxy* pluginService_{nullptr};
 
         virtual void on_initialize() { };
 
@@ -161,15 +161,15 @@ namespace astra { namespace plugins {
 #define EXPORT_PLUGIN(className)                                                         \
                                                                                          \
     static std::unique_ptr<className> g_plugin;                                          \
-    astra::pluginservice_proxy* __g_serviceProxy;                                        \
+    astra::PluginServiceProxy* __g_serviceProxy;                                         \
                                                                                          \
     ASTRA_BEGIN_DECLS                                                                    \
                                                                                          \
     ASTRA_EXPORT void astra_plugin_initialize(astra_pluginservice_proxy_t* pluginProxy)  \
     {                                                                                    \
-        __g_serviceProxy = static_cast<astra::pluginservice_proxy*>(pluginProxy);        \
+        __g_serviceProxy = static_cast<astra::PluginServiceProxy*>(pluginProxy);         \
         g_plugin = std::make_unique<className>(                                          \
-            static_cast<astra::pluginservice_proxy*>(pluginProxy));                      \
+            static_cast<astra::PluginServiceProxy*>(pluginProxy));                       \
         g_plugin->initialize();                                                          \
     }                                                                                    \
                                                                                          \

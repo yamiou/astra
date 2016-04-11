@@ -15,14 +15,14 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef ASTRA_STREAMSERVICE_PROXY_HPP
-#define ASTRA_STREAMSERVICE_PROXY_HPP
+#ifndef ASTRA_STREAMSERVICEPROXY_HPP
+#define ASTRA_STREAMSERVICEPROXY_HPP
 
 #include <astra_core/capi/astra_streamservice_proxy.h>
 
 namespace astra {
 
-    class streamservice_proxy : public astra_streamservice_proxy_t
+    class StreamServiceProxy : public astra_streamservice_proxy_t
     {
     public:
 
@@ -146,4 +146,4 @@ namespace astra {
     };
 }
 
-#endif // ASTRA_STREAMSERVICE_PROXY_HPP
+#endif // ASTRA_STREAMSERVICEPROXY_HPP

@@ -28,7 +28,7 @@ namespace astra { namespace hand {
     class plugin : public plugins::plugin_base
     {
     public:
-        plugin(pluginservice_proxy* pluginProxy);
+        plugin(PluginServiceProxy* pluginProxy);
         virtual ~plugin();
 
         virtual void temp_update() override { }

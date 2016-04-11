@@ -19,7 +19,7 @@
 #include <iostream>
 #include <cstring>
 
-class skeleton_visualizer : public astra::frame_listener
+class skeleton_visualizer : public astra::FrameListener
 {
 public:
     void init_texture(int width, int height)
@@ -53,9 +53,9 @@ public:
         printf("FPS: %3.1f (%3.4Lf ms)\n", fps, frameDuration_ * 1000);
     }
 
-    void processDepth(astra::frame& frame)
+    void processDepth(astra::Frame& frame)
     {
-        astra::depthframe depthFrame = frame.get<astra::depthframe>();
+        astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
 
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
@@ -83,7 +83,7 @@ public:
         texture_.update(displayBuffer_.get());
     }
 
-    void processSkeletons(astra::frame& frame)
+    void processSkeletons(astra::Frame& frame)
     {
         astra::skeletonframe skeletonFrame = frame.get<astra::skeletonframe>();
 
@@ -102,13 +102,13 @@ public:
         }
     }
 
-    virtual void on_frame_ready(astra::stream_reader& reader,
-                                astra::frame& frame) override
+    virtual void on_frame_ready(astra::StreamReader& reader,
+                                astra::Frame& frame) override
     {
         if (mapper_ == nullptr)
         {
-            auto& mapper = reader.stream<astra::depthstream>().coordinateMapper();
-            mapper_ = std::make_unique<astra::coordinate_mapper>(mapper);
+            auto& mapper = reader.stream<astra::DepthStream>().coordinateMapper();
+            mapper_ = std::make_unique<astra::CoordinateMapper>(mapper);
         }
 
         processDepth(frame);
@@ -166,9 +166,9 @@ private:
     using BufferPtr = std::unique_ptr < uint8_t[] >;
     BufferPtr displayBuffer_{ nullptr };
 
-    std::unique_ptr<astra::coordinate_mapper> mapper_;
+    std::unique_ptr<astra::CoordinateMapper> mapper_;
     std::vector<astra::skeleton> skeletons_;
-    std::vector<astra::vector3f> jointPositions_;
+    std::vector<astra::Vector3f> jointPositions_;
 
     int depthWidth_{0};
     int depthHeight_{0};
@@ -180,12 +180,12 @@ int main(int argc, char** argv)
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Skeleton Viewer");
 
-    astra::streamset sensor;
-    astra::stream_reader reader = sensor.create_reader();
+    astra::StreamSet sensor;
+    astra::StreamReader reader = sensor.create_reader();
 
     skeleton_visualizer listener;
 
-    reader.stream<astra::depthstream>().start();
+    reader.stream<astra::DepthStream>().start();
     reader.stream<astra::skeletonstream>().start();
     reader.stream<astra::skeletonstream>().set_zMin(5);
     reader.stream<astra::skeletonstream>().set_zMax(1000);

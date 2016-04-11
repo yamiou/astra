@@ -22,15 +22,15 @@
 
 namespace astra {
 
-    class frame
+    class Frame
     {
     public:
-        frame(astra_reader_frame_t readerFrame)
-            : frame(readerFrame, true)
+        Frame(astra_reader_frame_t readerFrame, const bool autoCloseFrame)
+            : frameRef_(std::make_shared<FrameRef>(readerFrame, autoCloseFrame))
         { }
 
-        frame(astra_reader_frame_t readerFrame, const bool autoCloseFrame)
-            : frameRef_(std::make_shared<frame_ref>(readerFrame, autoCloseFrame))
+        Frame(astra_reader_frame_t readerFrame)
+            : Frame(readerFrame, true)
         { }
 
         template<typename T>
@@ -56,15 +56,15 @@ namespace astra {
         }
 
     private:
-        class frame_ref
+        class FrameRef
         {
         public:
-            frame_ref(astra_reader_frame_t readerFrame, const bool autoCloseFrame)
+            FrameRef(astra_reader_frame_t readerFrame, const bool autoCloseFrame)
                 :  frame_(readerFrame),
                    autoCloseFrame_(autoCloseFrame)
             { }
 
-            ~frame_ref()
+            ~FrameRef()
             {
                 if (frame_ != nullptr && autoCloseFrame_)
                 {
@@ -79,7 +79,7 @@ namespace astra {
             const bool autoCloseFrame_;
         };
 
-        std::shared_ptr<frame_ref> frameRef_;
+        std::shared_ptr<FrameRef> frameRef_;
     };
 }
 

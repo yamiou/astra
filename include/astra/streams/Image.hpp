@@ -40,13 +40,13 @@ namespace astra {
         }
     };
 
-    class imagestream_mode : private ::astra_imagestream_mode_t
+    class ImageStreamMode : private ::astra_imagestream_mode_t
     {
     public:
-        imagestream_mode()
+        ImageStreamMode()
         {}
 
-        imagestream_mode(std::uint32_t width, std::uint32_t height, std::uint8_t fps, astra_pixel_format_t format)
+        ImageStreamMode(std::uint32_t width, std::uint32_t height, std::uint8_t fps, astra_pixel_format_t format)
         {
             set_width(width);
             set_height(height);
@@ -54,12 +54,12 @@ namespace astra {
             set_pixelFormat(format);
         }
 
-        imagestream_mode(const ::astra_imagestream_mode_t& mode)
+        ImageStreamMode(const ::astra_imagestream_mode_t& mode)
         {
             *this = mode;
         }
 
-        imagestream_mode& operator=(const ::astra_imagestream_mode_t& mode)
+        ImageStreamMode& operator=(const ::astra_imagestream_mode_t& mode)
         {
             set_width(mode.width);
             set_height(mode.height);
@@ -91,10 +91,10 @@ namespace astra {
         astra_pixel_format_t pixelFormat() const { return astra_imagestream_mode_t::pixelFormat; }
         void set_pixelFormat(astra_pixel_format_t format) { astra_imagestream_mode_t::pixelFormat = format; }
 
-        friend std::ostream& operator<<(std::ostream& os, const imagestream_mode& ism);
+        friend std::ostream& operator<<(std::ostream& os, const ImageStreamMode& ism);
     };
 
-    inline bool operator==(const imagestream_mode& lhs, const imagestream_mode& rhs)
+    inline bool operator==(const ImageStreamMode& lhs, const ImageStreamMode& rhs)
     {
         return
             lhs.width() == rhs.width() &&
@@ -104,12 +104,12 @@ namespace astra {
             lhs.bytesPerPixel() && rhs.bytesPerPixel();
     }
 
-    inline bool operator!=(const imagestream_mode& lhs, const imagestream_mode& rhs)
+    inline bool operator!=(const ImageStreamMode& lhs, const ImageStreamMode& rhs)
     {
         return !(lhs == rhs);
     }
 
-    inline std::ostream& operator<<(std::ostream& os, const imagestream_mode& ism)
+    inline std::ostream& operator<<(std::ostream& os, const ImageStreamMode& ism)
     {
         os << ism.width()
            << "x"
@@ -124,11 +124,11 @@ namespace astra {
         return os;
     }
 
-    class imagestream : public datastream
+    class ImageStream : public DataStream
     {
     public:
-        explicit imagestream(astra_streamconnection_t connection)
-            : datastream(connection),
+        explicit ImageStream(astra_streamconnection_t connection)
+            : DataStream(connection),
               imageStream_(reinterpret_cast<astra_imagestream_t>(connection))
         {}
 
@@ -161,13 +161,13 @@ namespace astra {
             astra_imagestream_set_mirroring(imageStream_, mirroring);
         }
 
-        std::vector<imagestream_mode> available_modes()
+        std::vector<ImageStreamMode> available_modes()
         {
             astra_result_token_t token;
             std::size_t count = 0;
             astra_imagestream_request_modes(imageStream_, &token, &count);
 
-            std::vector<imagestream_mode> result;
+            std::vector<ImageStreamMode> result;
             result.resize(count);
 
             astra_imagestream_get_modes_result(imageStream_,
@@ -178,7 +178,7 @@ namespace astra {
             return result;
         }
 
-        void set_mode(const imagestream_mode& mode)
+        void set_mode(const ImageStreamMode& mode)
         {
             astra_imagestream_set_mode(imageStream_, mode);
         }
@@ -188,10 +188,10 @@ namespace astra {
     };
 
     template<typename TDataType, astra_stream_type_t TStreamType>
-    class imageframe
+    class ImageFrame
     {
     public:
-        imageframe(astra_imageframe_t frame, astra_pixel_format_t expected_format)
+        ImageFrame(astra_imageframe_t frame, astra_pixel_format_t expected_format)
         {
             imageFrame_ = frame;
             if (imageFrame_)

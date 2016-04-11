@@ -24,14 +24,14 @@
 
 namespace astra {
 
-    class pointstream : public datastream
+    class PointStream : public DataStream
     {
     public:
-        pointstream()
+        PointStream()
         {}
 
-        explicit pointstream(astra_streamconnection_t connection)
-            : datastream(connection)
+        explicit PointStream(astra_streamconnection_t connection)
+            : DataStream(connection)
         {
             pointStream_ = reinterpret_cast<astra_pointstream_t>(connection);
         }
@@ -42,11 +42,11 @@ namespace astra {
         astra_pointstream_t pointStream_;
     };
 
-    class pointframe : public imageframe<vector3f, ASTRA_STREAM_POINT>
+    class PointFrame : public ImageFrame<Vector3f, ASTRA_STREAM_POINT>
     {
     public:
-        pointframe(astra_imageframe_t frame)
-            : imageframe(frame, ASTRA_PIXEL_FORMAT_POINT)
+        PointFrame(astra_imageframe_t frame)
+            : ImageFrame(frame, ASTRA_PIXEL_FORMAT_POINT)
         {}
     };
 }

@@ -22,22 +22,22 @@
 
 namespace astra {
 
-    class stream_description : private ::astra_stream_desc_t
+    class StreamDescription : private ::astra_stream_desc_t
     {
     public:
-        stream_description(::astra_stream_type_t type,
-                           ::astra_stream_subtype_t subtype = DEFAULT_SUBTYPE)
+        StreamDescription(::astra_stream_type_t type,
+                          ::astra_stream_subtype_t subtype = DEFAULT_SUBTYPE)
         {
             ::astra_stream_desc_t::type = type;
             ::astra_stream_desc_t::subtype = subtype;
         }
 
-        stream_description(const ::astra_stream_desc_t& desc)
+        StreamDescription(const ::astra_stream_desc_t& desc)
         {
             *this = desc;
         }
 
-        stream_description& operator=(const ::astra_stream_desc_t& desc)
+        StreamDescription& operator=(const ::astra_stream_desc_t& desc)
         {
             ::astra_stream_desc_t::type = desc.type;
             ::astra_stream_desc_t::subtype = desc.subtype;
@@ -55,12 +55,12 @@ namespace astra {
         void set_subtype(astra_stream_subtype_t subtype) { ::astra_stream_desc_t::subtype = subtype; }
     };
 
-    inline bool operator==(const stream_description& lhs, const stream_description& rhs)
+    inline bool operator==(const StreamDescription& lhs, const StreamDescription& rhs)
     {
         return lhs.type() == rhs.type() && lhs.subtype() == rhs.subtype();
     }
 
-    inline bool operator!=(const stream_description& lhs, const stream_description& rhs)
+    inline bool operator!=(const StreamDescription& lhs, const StreamDescription& rhs)
     {
         return !(lhs == rhs);
     }

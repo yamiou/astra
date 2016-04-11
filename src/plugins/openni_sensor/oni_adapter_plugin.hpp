@@ -36,7 +36,7 @@ namespace orbbec { namespace ni {
                                public openni::OpenNI::DeviceDisconnectedListener
     {
     public:
-        oni_adapter_plugin(astra::pluginservice_proxy* pluginService)
+        oni_adapter_plugin(astra::PluginServiceProxy* pluginService)
             : plugin_base(pluginService, "openni_sensor")
         {
             register_for_host_events();

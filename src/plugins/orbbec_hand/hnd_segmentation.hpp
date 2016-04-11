@@ -102,14 +102,14 @@ namespace astra { namespace hand {
                                       const cv::Point& center,
                                       const float& radius,
                                       const scaling_coordinate_mapper& mapper,
-                                      std::vector<astra::vector2i>& points);
+                                      std::vector<astra::Vector2i>& points);
 
         float get_max_sequential_circumference_percentage(cv::Mat& matDepth,
                                                           cv::Mat& matSegmentation,
                                                           const cv::Point& center,
                                                           const float& radius,
                                                           const scaling_coordinate_mapper& mapper,
-                                                          std::vector<astra::vector2i>& points);
+                                                          std::vector<astra::Vector2i>& points);
 
         float get_percent_natural_edges(cv::Mat& matDepth,
                                         cv::Mat& matSegmentation,

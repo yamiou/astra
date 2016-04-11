@@ -25,7 +25,7 @@ namespace astra { namespace hand {
 
     const char HANDPLUGIN_CONFIG_FILE[] = "plugins/orbbec_hand.toml";
 
-    plugin::plugin(pluginservice_proxy* pluginProxy)
+    plugin::plugin(PluginServiceProxy* pluginProxy)
         : plugin_base(pluginProxy, "orbbec_hand")
     {
         settings_ = parse_settings(HANDPLUGIN_CONFIG_FILE);
@@ -79,7 +79,7 @@ namespace astra { namespace hand {
         if (streamDesc.type == ASTRA_STREAM_DEPTH &&
             streamTrackerMap_.find(streamHandle) == streamTrackerMap_.end())
         {
-            stream_description depthDescription = streamDesc;
+            StreamDescription depthDescription = streamDesc;
 
             hand_tracker* tracker = new hand_tracker(pluginService(),
                                                      setHandle,

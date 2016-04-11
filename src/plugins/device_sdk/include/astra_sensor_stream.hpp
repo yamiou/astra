@@ -54,7 +54,7 @@ namespace astra { namespace devices {
     {
     public:
         using shared_ptr = std::shared_ptr<sensor_stream>;
-        using stream_mode = astra::imagestream_mode;
+        using stream_mode = astra::ImageStreamMode;
         using mode_collection =  std::vector<stream_mode>;
         using mode_const_iterator = mode_collection::const_iterator;
         using listener_ptr = stream_listener*;

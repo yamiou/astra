@@ -68,9 +68,9 @@ namespace astra { namespace plugins {
     class stream : public stream_callback_listener
     {
     public:
-        stream(pluginservice_proxy& pluginService,
+        stream(PluginServiceProxy& pluginService,
                astra_streamset_t streamSet,
-               stream_description description)
+               StreamDescription description)
             : pluginService_(pluginService),
               streamSet_(streamSet),
               description_(description)
@@ -98,11 +98,11 @@ namespace astra { namespace plugins {
             eventHandler_ = handler;
         }
 
-        inline const stream_description& description() { return description_; }
+        inline const StreamDescription& description() { return description_; }
         inline astra_stream_t get_handle() { return streamHandle_; }
 
     protected:
-        inline pluginservice_proxy& pluginService() const { return pluginService_; }
+        inline PluginServiceProxy& pluginService() const { return pluginService_; }
     private:
         virtual void connection_added(astra_stream_t stream,
                                       astra_streamconnection_t connection) override final;
@@ -156,7 +156,7 @@ namespace astra { namespace plugins {
                                astra_parameter_data_t inData,
                                astra_parameter_bin_t& parameterBin) {};
 
-        void create_stream(stream_description& description)
+        void create_stream(StreamDescription& description)
         {
             assert(streamHandle_ == nullptr);
 
@@ -169,9 +169,9 @@ namespace astra { namespace plugins {
         }
 
         bool registered_{false};
-        pluginservice_proxy& pluginService_;
+        PluginServiceProxy& pluginService_;
         astra_streamset_t streamSet_{nullptr};
-        stream_description description_;
+        StreamDescription description_;
         astra_stream_t streamHandle_{nullptr};
         stream_event_handler* eventHandler_{nullptr};
     };

@@ -22,9 +22,9 @@ ASTRA_BEGIN_DECLS
 
 ASTRA_LOCAL astra_streamservice_proxy_t* __astra_api_proxy_ptr = nullptr;
 
-static astra::streamservice_proxy* get_api_proxy()
+static astra::StreamServiceProxy* get_api_proxy()
 {
-    return reinterpret_cast<astra::streamservice_proxy*>(__astra_api_proxy_ptr);
+    return reinterpret_cast<astra::StreamServiceProxy*>(__astra_api_proxy_ptr);
 }
 
 ASTRA_API_PROXY astra_streamservice_proxy_t* astra_api_get_proxy()

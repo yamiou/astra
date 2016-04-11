@@ -24,7 +24,7 @@
 namespace orbbec { namespace ni {
 
     device_streamset::device_streamset(std::string name,
-                                       astra::pluginservice_proxy& pluginService,
+                                       astra::PluginServiceProxy& pluginService,
                                        const char* uri)
         : pluginService_(pluginService),
           uri_(uri)
@@ -132,7 +132,7 @@ namespace orbbec { namespace ni {
         bool enableColor = true;
         if (enableColor && oniDevice_.hasSensor(openni::SENSOR_COLOR))
         {
-            colorstream* stream = astra::plugins::make_stream<colorstream>(pluginService_,
+            ColorStream* stream = astra::plugins::make_stream<ColorStream>(pluginService_,
                                                   streamSetHandle_,
                                                   oniDevice_, *this);
 

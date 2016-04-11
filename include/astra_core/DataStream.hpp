@@ -23,13 +23,13 @@
 
 namespace astra {
 
-    class datastream
+    class DataStream
     {
     public:
-        datastream()
+        DataStream()
         {}
 
-        datastream(astra_streamconnection_t connection)
+        DataStream(astra_streamconnection_t connection)
             : connection_(connection)
         {
             if(connection_ != nullptr)

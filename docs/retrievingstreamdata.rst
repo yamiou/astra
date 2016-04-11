@@ -13,7 +13,7 @@ Low Level
 +----------------+------------------------------------------------------------------------+
 |Stream Type     |Description                                                             |
 +================+========================================================================+
-|colorstream     | RGB pixel data from the sensor.  The ``data`` array included           |
+|ColorStream     | RGB pixel data from the sensor.  The ``data`` array included           |
 |                | in each ``colorframe`` contains values ranging from 0-255              |
 |                | for each color component of each pixel.                                |
 +----------------+------------------------------------------------------------------------+
@@ -29,7 +29,7 @@ Higher-Level
 +================+========================================================================+
 |pointstream     | World coordinates (XYZ) computed from the depth data.                  |
 |                | The ``data`` array included in each ``pointframe`` is an               |
-|                | array of ``astra:vector3f`` elements to more easily                    |
+|                | array of ``astra:Vector3f`` elements to more easily                    |
 |                | access the ``x``, ``y`` and ``z`` values for each pixel.               |
 +----------------+------------------------------------------------------------------------+
 |handstream      | Hand points computed from the depth data. On each ``handframe``,       |

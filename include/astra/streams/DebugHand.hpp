@@ -25,11 +25,11 @@ namespace astra {
 
     using DebugHandViewType = astra_debug_hand_view_type_t;
 
-    class debug_handstream : public datastream
+    class DebugHandStream : public DataStream
     {
     public:
-        explicit debug_handstream(astra_streamconnection_t connection)
-            : datastream(connection),
+        explicit DebugHandStream(astra_streamconnection_t connection)
+            : DataStream(connection),
               debugHandStream_(connection)
         { }
 
@@ -45,7 +45,7 @@ namespace astra {
             astra_debug_handstream_set_use_mouse_probe(debugHandStream_, useMouseProbe);
         }
 
-        void set_mouse_position(vector2f position)
+        void set_mouse_position(Vector2f position)
         {
             astra_debug_handstream_set_mouse_position(debugHandStream_, position);
         }
@@ -71,11 +71,11 @@ namespace astra {
         astra_debug_handstream_t debugHandStream_;
     };
 
-    class debug_handframe : public imageframe<rgb_pixel, ASTRA_STREAM_DEBUG_HAND>
+    class DebugHandFrame : public ImageFrame<rgb_pixel, ASTRA_STREAM_DEBUG_HAND>
     {
     public:
-        debug_handframe(astra_imageframe_t frame)
-            : imageframe(frame, ASTRA_PIXEL_FORMAT_RGB888)
+        DebugHandFrame(astra_imageframe_t frame)
+            : ImageFrame(frame, ASTRA_PIXEL_FORMAT_RGB888)
         {}
     };
 }

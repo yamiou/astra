@@ -18,13 +18,13 @@
 
 namespace orbbec { namespace ni {
 
-    colorstream::colorstream(astra::pluginservice_proxy& pluginService,
+    ColorStream::ColorStream(astra::PluginServiceProxy& pluginService,
                              astra_streamset_t streamSet,
                              openni::Device& oniDevice,
                              stream_listener& listener)
         : devicestream(pluginService,
                        streamSet,
-                       astra::stream_description(
+                       astra::StreamDescription(
                            ASTRA_STREAM_COLOR,
                            DEFAULT_SUBTYPE),
                        oniDevice,

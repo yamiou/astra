@@ -19,13 +19,13 @@
 
 namespace astra { namespace xs {
 
-    point_processor::point_processor(pluginservice_proxy& pluginService,
+    point_processor::point_processor(PluginServiceProxy& pluginService,
                                      astra_streamset_t streamset,
-                                     stream_description& depthDesc)
+                                     StreamDescription& depthDesc)
         : streamset_(plugins::get_uri_for_streamset(pluginService, streamset)),
           setHandle_(streamset),
           reader_(streamset_.create_reader()),
-          depthStream_(reader_.stream<depthstream>(depthDesc.subtype())),
+          depthStream_(reader_.stream<DepthStream>(depthDesc.subtype())),
           pluginService_(pluginService)
     {
         depthStream_.start();
@@ -34,9 +34,9 @@ namespace astra { namespace xs {
 
     point_processor::~point_processor() = default;
 
-    void point_processor::on_frame_ready(stream_reader& reader, frame& frame)
+    void point_processor::on_frame_ready(StreamReader& reader, Frame& frame)
     {
-        depthframe depthFrame = frame.get<depthframe>();
+        DepthFrame depthFrame = frame.get<DepthFrame>();
 
         create_point_stream_if_necessary(depthFrame);
 
@@ -47,7 +47,7 @@ namespace astra { namespace xs {
         }
     }
 
-    void point_processor::create_point_stream_if_necessary(depthframe& depthFrame)
+    void point_processor::create_point_stream_if_necessary(DepthFrame& depthFrame)
     {
         if (pointStream_ != nullptr)
         {
@@ -60,15 +60,15 @@ namespace astra { namespace xs {
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
 
-        auto ps = plugins::make_stream<pointstream>(pluginService_, setHandle_, width, height);
-        pointStream_ = std::unique_ptr<pointstream>(std::move(ps));
+        auto ps = plugins::make_stream<PointStream>(pluginService_, setHandle_, width, height);
+        pointStream_ = std::unique_ptr<PointStream>(std::move(ps));
 
         LOG_INFO("astra.xs.point_processor", "created point stream");
 
         depthConversionCache_ = depthStream_.depth_to_world_data();
     }
 
-    void point_processor::update_pointframe_from_depth(depthframe& depthFrame)
+    void point_processor::update_pointframe_from_depth(DepthFrame& depthFrame)
     {
         //use same frameIndex as source depth frame
         astra_frame_index_t frameIndex = depthFrame.frameIndex();
@@ -88,15 +88,15 @@ namespace astra { namespace xs {
 
             pointFrameWrapper->frame.metadata = metadata;
 
-            vector3f* p_points = reinterpret_cast<vector3f*>(pointFrameWrapper->frame.data);
+            Vector3f* p_points = reinterpret_cast<Vector3f*>(pointFrameWrapper->frame.data);
             calculate_point_frame(depthFrame, p_points);
 
             pointStream_->end_write();
         }
     }
 
-    void point_processor::calculate_point_frame(depthframe& depthFrame,
-                                                vector3f* p_points)
+    void point_processor::calculate_point_frame(DepthFrame& depthFrame,
+                                                Vector3f* p_points)
     {
         int width = depthFrame.resolutionX();
         int height = depthFrame.resolutionY();
@@ -109,7 +109,7 @@ namespace astra { namespace xs {
             for (int x = 0; x < width; ++x, ++p_points, ++p_depth)
             {
                 uint16_t depth = *p_depth;
-                vector3f& point = *p_points;
+                Vector3f& point = *p_points;
 
                 float normalizedX = static_cast<float>(x) / conversionData.resolutionX - .5f;
                 float normalizedY = .5f - static_cast<float>(y) / conversionData.resolutionY;

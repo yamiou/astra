@@ -24,16 +24,16 @@
 
 namespace orbbec { namespace ni {
 
-    class colorstream : public devicestream<astra_imageframe_wrapper_t>
+    class ColorStream : public devicestream<astra_imageframe_wrapper_t>
     {
     public:
-        colorstream(astra::pluginservice_proxy& pluginService,
+        ColorStream(astra::PluginServiceProxy& pluginService,
                     astra_streamset_t streamSet,
                     openni::Device& oniDevice,
                     stream_listener& listener);
 
-        colorstream(const colorstream&) = delete;
-        colorstream& operator=(const colorstream&) = delete;
+        ColorStream(const ColorStream&) = delete;
+        ColorStream& operator=(const ColorStream&) = delete;
     };
 }}
 

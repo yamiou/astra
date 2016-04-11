@@ -30,7 +30,7 @@ enum ColorMode
     MODE_IR_RGB,
 };
 
-class MultiFrameListener : public astra::frame_listener
+class MultiFrameListener : public astra::FrameListener
 {
 public:
     using BufferPtr = std::unique_ptr<uint8_t[]>;
@@ -98,9 +98,9 @@ public:
                   << std::endl;
     }
 
-    void update_depth(astra::frame& frame)
+    void update_depth(astra::Frame& frame)
     {
-        astra::pointframe pointFrame = frame.get<astra::pointframe>();
+        astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
 
         if (!pointFrame.is_valid())
         {
@@ -135,9 +135,9 @@ public:
         depthView_.texture.update(depthView_.buffer.get());
     }
 
-    void update_color(astra::frame& frame)
+    void update_color(astra::Frame& frame)
     {
-        astra::colorframe colorFrame = frame.get<astra::colorframe>();
+        astra::ColorFrame colorFrame = frame.get<astra::ColorFrame>();
 
         if (!colorFrame.is_valid())
         {
@@ -170,9 +170,9 @@ public:
         colorView_.texture.update(colorView_.buffer.get());
     }
 
-    void update_ir_16(astra::frame& frame)
+    void update_ir_16(astra::Frame& frame)
     {
-        astra::infraredframe_16 irFrame = frame.get<astra::infraredframe_16>();
+        astra::InfraredFrame16 irFrame = frame.get<astra::InfraredFrame16>();
 
         if (!irFrame.is_valid())
         {
@@ -208,9 +208,9 @@ public:
         colorView_.texture.update(colorView_.buffer.get());
     }
 
-    void update_ir_rgb(astra::frame& frame)
+    void update_ir_rgb(astra::Frame& frame)
     {
-        astra::infraredframe_rgb irFrame = frame.get<astra::infraredframe_rgb>();
+        astra::InfraredFrameRgb irFrame = frame.get<astra::InfraredFrameRgb>();
 
         if (!irFrame.is_valid())
         {
@@ -243,8 +243,8 @@ public:
         colorView_.texture.update(colorView_.buffer.get());
     }
 
-    virtual void on_frame_ready(astra::stream_reader& reader,
-                                astra::frame& frame) override
+    virtual void on_frame_ready(astra::StreamReader& reader,
+                                astra::Frame& frame) override
     {
         update_depth(frame);
 
@@ -338,12 +338,12 @@ private:
     bool isPaused_{ false };
 };
 
-astra::depthstream configure_depth(astra::stream_reader& reader)
+astra::DepthStream configure_depth(astra::StreamReader& reader)
 {
-    auto depthStream = reader.stream<astra::depthstream>();
+    auto depthStream = reader.stream<astra::DepthStream>();
 
     //We don't have to set the mode to start the stream, but if you want to here is how:
-    astra::imagestream_mode depthMode;
+    astra::ImageStreamMode depthMode;
 
     depthMode.set_width(640);
     depthMode.set_height(480);
@@ -355,11 +355,11 @@ astra::depthstream configure_depth(astra::stream_reader& reader)
     return depthStream;
 }
 
-astra::infraredstream configure_ir(astra::stream_reader& reader, bool useRGB)
+astra::InfraredStream configure_ir(astra::StreamReader& reader, bool useRGB)
 {
-    auto irStream = reader.stream<astra::infraredstream>();
+    auto irStream = reader.stream<astra::InfraredStream>();
 
-    astra::imagestream_mode irMode;
+    astra::ImageStreamMode irMode;
 
     irMode.set_width(640);
     irMode.set_height(480);
@@ -379,11 +379,11 @@ astra::infraredstream configure_ir(astra::stream_reader& reader, bool useRGB)
     return irStream;
 }
 
-astra::colorstream configure_color(astra::stream_reader& reader)
+astra::ColorStream configure_color(astra::StreamReader& reader)
 {
-    auto colorStream = reader.stream<astra::colorstream>();
+    auto colorStream = reader.stream<astra::ColorStream>();
 
-    astra::imagestream_mode colorMode;
+    astra::ImageStreamMode colorMode;
 
     colorMode.set_width(640);
     colorMode.set_height(480);
@@ -412,10 +412,10 @@ int main(int argc, char** argv)
     bool is_fullscreen = false;
     sf::RenderWindow window(windowed_mode, "Stream Viewer");
 
-    astra::streamset streamset;
-    astra::stream_reader reader = streamset.create_reader();
+    astra::StreamSet streamSet;
+    astra::StreamReader reader = streamSet.create_reader();
 
-    reader.stream<astra::pointstream>().start();
+    reader.stream<astra::PointStream>().start();
 
     auto depthStream = configure_depth(reader);
     depthStream.start();

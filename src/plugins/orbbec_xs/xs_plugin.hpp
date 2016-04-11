@@ -28,7 +28,7 @@ namespace astra { namespace xs {
     class plugin : public astra::plugins::plugin_base
     {
     public:
-        plugin(pluginservice_proxy* pluginProxy)
+        plugin(PluginServiceProxy* pluginProxy)
             : plugin_base(pluginProxy, "orbbec_xs")
         {
             LOG_INFO("astra.xs.plugin", "Initializing xs plugin");

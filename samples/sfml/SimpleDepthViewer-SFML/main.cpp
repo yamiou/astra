@@ -23,11 +23,11 @@
 #include <key_handler.h>
 #include <sstream>
 
-class depthframe_listener : public astra::frame_listener
+class depthframe_listener : public astra::FrameListener
 {
 public:
-    depthframe_listener(const astra::coordinate_mapper& coordinate_mapper)
-        : coordinate_mapper_(coordinate_mapper)
+    depthframe_listener(const astra::CoordinateMapper& CoordinateMapper)
+        : CoordinateMapper_(CoordinateMapper)
     {
         lastTimepoint_ = clock_type::now();
         font_.loadFromFile("Inconsolata.otf");
@@ -74,10 +74,10 @@ public:
                   << std::endl;
     }
 
-    virtual void on_frame_ready(astra::stream_reader& reader,
-                                astra::frame& frame) override
+    virtual void on_frame_ready(astra::StreamReader& reader,
+                                astra::Frame& frame) override
     {
-        astra::pointframe pointFrame = frame.get<astra::pointframe>();
+        astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
 
         int width = pointFrame.resolutionX();
         int height = pointFrame.resolutionY();
@@ -107,9 +107,9 @@ public:
         texture_.update(displayBuffer_.get());
     }
 
-    void copy_depth_data(astra::frame& frame)
+    void copy_depth_data(astra::Frame& frame)
     {
-        astra::depthframe depthFrame = frame.get<astra::depthframe>();
+        astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
 
         if (depthFrame.is_valid())
         {
@@ -169,7 +169,7 @@ public:
         int z = depthData_[index];
 
         float worldX, worldY, worldZ;
-        coordinate_mapper_.convert_depth_to_world(static_cast<float>(mouseX),
+        CoordinateMapper_.convert_depth_to_world(static_cast<float>(mouseX),
                                                   static_cast<float>(mouseY),
                                                   static_cast<float>(z),
                                                   &worldX,
@@ -239,7 +239,7 @@ private:
     sf::Sprite sprite_;
     sf::Font font_;
 
-    const astra::coordinate_mapper& coordinate_mapper_;
+    const astra::CoordinateMapper& CoordinateMapper_;
 
     int displayWidth_{0};
     int displayHeight_{0};
@@ -278,17 +278,16 @@ int main(int argc, char** argv)
     sf::VideoMode windowed_mode(1280, 1024);
     bool is_fullscreen = false;
 
-    astra::streamset streamset;
-    astra::stream_reader reader = streamset.create_reader();
+    astra::StreamSet streamSet;
+    astra::StreamReader reader = streamSet.create_reader();
+    reader.stream<astra::PointStream>().start();
 
-    reader.stream<astra::pointstream>().start();
-
-    auto depthStream = reader.stream<astra::depthstream>();
+    auto depthStream = reader.stream<astra::DepthStream>();
 
     depthStream.start();
 
-    auto coordinate_mapper = depthStream.coordinateMapper();
-    depthframe_listener listener(coordinate_mapper);
+    auto coordinateMapper = depthStream.coordinateMapper();
+    depthframe_listener listener(coordinateMapper);
 
     reader.add_listener(listener);
 

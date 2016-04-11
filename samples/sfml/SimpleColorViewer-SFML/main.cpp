@@ -24,7 +24,7 @@
 #include <cstring>
 #include <key_handler.h>
 
-class my_frame_listener : public astra::frame_listener
+class my_frame_listener : public astra::FrameListener
 {
 public:
     my_frame_listener()
@@ -73,10 +73,10 @@ public:
             << std::endl;
     }
 
-    virtual void on_frame_ready(astra::stream_reader& reader,
-        astra::frame& frame) override
+    virtual void on_frame_ready(astra::StreamReader& reader,
+        astra::Frame& frame) override
     {
-        astra::colorframe colorFrame = frame.get<astra::colorframe>();
+        astra::ColorFrame colorFrame = frame.get<astra::ColorFrame>();
 
         int width = colorFrame.resolutionX();
         int height = colorFrame.resolutionY();
@@ -134,10 +134,10 @@ int main(int argc, char** argv)
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Color Viewer");
 
-    astra::streamset streamset;
-    astra::stream_reader reader = streamset.create_reader();
+    astra::StreamSet streamSet;
+    astra::StreamReader reader = streamSet.create_reader();
 
-    reader.stream<astra::colorstream>().start();
+    reader.stream<astra::ColorStream>().start();
 
     my_frame_listener listener;
     reader.add_listener(listener);
