@@ -1,40 +1,43 @@
 set (_projname "astra")
 
+set(INCLUDE_PATH "../../include/astra")
+
 set(${_projname}_SOURCES
-  ../../include/astra/vector.hpp
-  ../../include/astra/vector2f.hpp
-  ../../include/astra/vector2i.hpp
-  ../../include/astra/vector3f.hpp
-  ../../include/astra/vector3i.hpp
-  ../../include/astra/astra.hpp
-  ../../include/astra/capi/astra.h
-  ../../include/astra/capi/astra_ctypes.h
-  ../../include/astra/capi/streams/color_capi.h
-  ../../include/astra/capi/streams/color_types.h
-  ../../include/astra/capi/streams/depth_capi.h
-  ../../include/astra/capi/streams/depth_parameters.h
-  ../../include/astra/capi/streams/depth_types.h
-  ../../include/astra/capi/streams/hand_capi.h
-  ../../include/astra/capi/streams/hand_parameters.h
-  ../../include/astra/capi/streams/hand_types.h
-  ../../include/astra/capi/streams/image_capi.h
-  ../../include/astra/capi/streams/image_parameters.h
-  ../../include/astra/capi/streams/image_types.h
-  ../../include/astra/capi/streams/infrared_capi.h
-  ../../include/astra/capi/streams/infrared_types.h
-  ../../include/astra/capi/streams/point_capi.h
-  ../../include/astra/capi/streams/point_types.h
-  ../../include/astra/capi/streams/skeleton_capi.h
-  ../../include/astra/capi/streams/skeleton_types.h
-  ../../include/astra/capi/streams/stream_types.h
-  ../../include/astra/streams/astra_color.hpp
-  ../../include/astra/streams/astra_debug_hand.hpp
-  ../../include/astra/streams/astra_depth.hpp
-  ../../include/astra/streams/astra_hand.hpp
-  ../../include/astra/streams/astra_image.hpp
-  ../../include/astra/streams/astra_infrared.hpp
-  ../../include/astra/streams/astra_point.hpp
-  ../../include/astra/streams/astra_skeleton.hpp
+  ${INCLUDE_PATH}/Vector.hpp
+  ${INCLUDE_PATH}/Vector2f.hpp
+  ${INCLUDE_PATH}/Vector2i.hpp
+  ${INCLUDE_PATH}/Vector3f.hpp
+  ${INCLUDE_PATH}/Vector3i.hpp
+  ${INCLUDE_PATH}/astra.hpp
+  ${INCLUDE_PATH}/capi/astra.h
+  ${INCLUDE_PATH}/capi/astra_ctypes.h
+  ${INCLUDE_PATH}/capi/streams/color_capi.h
+  ${INCLUDE_PATH}/capi/streams/color_types.h
+  ${INCLUDE_PATH}/capi/streams/depth_capi.h
+  ${INCLUDE_PATH}/capi/streams/depth_parameters.h
+  ${INCLUDE_PATH}/capi/streams/depth_types.h
+  ${INCLUDE_PATH}/capi/streams/hand_capi.h
+  ${INCLUDE_PATH}/capi/streams/hand_parameters.h
+  ${INCLUDE_PATH}/capi/streams/hand_types.h
+  ${INCLUDE_PATH}/capi/streams/image_capi.h
+  ${INCLUDE_PATH}/capi/streams/image_parameters.h
+  ${INCLUDE_PATH}/capi/streams/image_types.h
+  ${INCLUDE_PATH}/capi/streams/infrared_capi.h
+  ${INCLUDE_PATH}/capi/streams/infrared_types.h
+  ${INCLUDE_PATH}/capi/streams/point_capi.h
+  ${INCLUDE_PATH}/capi/streams/point_types.h
+  ${INCLUDE_PATH}/capi/streams/skeleton_capi.h
+  ${INCLUDE_PATH}/capi/streams/skeleton_types.h
+  ${INCLUDE_PATH}/capi/streams/stream_types.h
+  ${INCLUDE_PATH}/streams/Color.hpp
+  ${INCLUDE_PATH}/streams/DebugHand.hpp
+  ${INCLUDE_PATH}/streams/depth.hpp
+  ${INCLUDE_PATH}/streams/Hand.hpp
+  ${INCLUDE_PATH}/streams/Image.hpp
+  ${INCLUDE_PATH}/streams/Infrared.hpp
+  ${INCLUDE_PATH}/streams/Point.hpp
+  ${INCLUDE_PATH}/streams/Skeleton.hpp
+  astra_generic_stream_api.hpp
   astra_depth.cpp
   astra_color.cpp
   astra_infrared.cpp
@@ -43,7 +46,6 @@ set(${_projname}_SOURCES
   astra_point.cpp
   astra_skeleton.cpp
   astra.cpp
-  astra_generic_stream_api.hpp
   )
 
 add_library(${_projname} SHARED ${${_projname}_SOURCES})

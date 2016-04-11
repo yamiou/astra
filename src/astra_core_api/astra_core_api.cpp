@@ -16,7 +16,7 @@
 //
 // Be excellent to each other.
 #include "astra_core_api.h"
-#include <astra_core/astra_streamservice_proxy.hpp>
+#include <astra_core/StreamServiceProxy.hpp>
 
 ASTRA_BEGIN_DECLS
 

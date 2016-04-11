@@ -18,7 +18,7 @@
 #define ASTRA_DATASTREAM_HPP
 
 #include "capi/astra_core.h"
-#include <astra_core/astra_stream_description.hpp>
+#include <astra_core/StreamDescription.hpp>
 #include <stdexcept>
 
 namespace astra {

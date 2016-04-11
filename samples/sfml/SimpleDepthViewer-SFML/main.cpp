@@ -275,14 +275,16 @@ int main(int argc, char** argv)
 #endif
 
     sf::VideoMode fullscreen_mode = sf::VideoMode::getFullscreenModes()[0];
-    sf::VideoMode windowed_mode(1280, 960);
+    sf::VideoMode windowed_mode(1280, 1024);
     bool is_fullscreen = false;
 
     astra::streamset streamset;
     astra::stream_reader reader = streamset.create_reader();
 
     reader.stream<astra::pointstream>().start();
+
     auto depthStream = reader.stream<astra::depthstream>();
+
     depthStream.start();
 
     auto coordinate_mapper = depthStream.coordinateMapper();

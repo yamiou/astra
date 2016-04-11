@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef VECTOR2F_H
-#define VECTOR2F_H
+#ifndef ASTRA_VECTOR2F_HPP
+#define ASTRA_VECTOR2F_HPP
 
 #include <cmath>
 #include "capi/astra_ctypes.h"
@@ -187,4 +187,4 @@ namespace astra
 
 }
 
-#endif // VECTOR2F_H
+#endif // ASTRA_VECTOR2F_HPP

@@ -20,7 +20,7 @@
 #include <opencv2/core/affine.hpp>
 #include "hnd_tracking_data.hpp"
 #include "hnd_scaling_coordinate_mapper.hpp"
-#include <astra_core/plugins/astra_plugin_logging.hpp>
+#include <astra_core/plugins/PluginLogging.hpp>
 #include "hnd_settings.hpp"
 #include <unordered_map>
 #include "hnd_trajectory_analyzer.hpp"

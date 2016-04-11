@@ -14,43 +14,41 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef ASTRA_INFRARED_HPP
-#define ASTRA_INFRARED_HPP
+#ifndef ASTRA_POINT_HPP
+#define ASTRA_POINT_HPP
 
 #include <astra_core/astra_core.hpp>
 #include <astra/capi/astra_ctypes.h>
-#include <astra/capi/streams/infrared_capi.h>
-#include <astra/streams/astra_image.hpp>
-#include <astra/vector.hpp>
+#include <astra/capi/streams/point_capi.h>
+#include <astra/streams/Image.hpp>
 
 namespace astra {
 
-    class infraredstream : public imagestream
+    class pointstream : public datastream
     {
     public:
-        explicit infraredstream(astra_streamconnection_t connection)
-            : imagestream(connection)
-        { }
+        pointstream()
+        {}
 
-        static const astra_stream_type_t id = ASTRA_STREAM_INFRARED;
+        explicit pointstream(astra_streamconnection_t connection)
+            : datastream(connection)
+        {
+            pointStream_ = reinterpret_cast<astra_pointstream_t>(connection);
+        }
+
+        static const astra_stream_type_t id = ASTRA_STREAM_POINT;
+
+    private:
+        astra_pointstream_t pointStream_;
     };
 
-    class infraredframe_16 : public imageframe<uint16_t, ASTRA_STREAM_INFRARED>
+    class pointframe : public imageframe<vector3f, ASTRA_STREAM_POINT>
     {
     public:
-        infraredframe_16(astra_imageframe_t frame)
-            : imageframe(frame, ASTRA_PIXEL_FORMAT_GRAY16)
+        pointframe(astra_imageframe_t frame)
+            : imageframe(frame, ASTRA_PIXEL_FORMAT_POINT)
         {}
     };
-
-    class infraredframe_rgb : public imageframe<rgb_pixel, ASTRA_STREAM_INFRARED>
-    {
-    public:
-        infraredframe_rgb(astra_imageframe_t frame)
-            : imageframe(frame, ASTRA_PIXEL_FORMAT_RGB888)
-        {}
-    };
-
 }
 
-#endif /* ASTRA_INFRARED_HPP */
+#endif // ASTRA_POINT_HPP

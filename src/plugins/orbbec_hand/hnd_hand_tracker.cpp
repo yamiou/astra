@@ -23,7 +23,7 @@
 #include "hnd_segmentation.hpp"
 #include <astra/capi/streams/hand_types.h>
 #include <astra/capi/astra_ctypes.h>
-#include <astra_core/plugins/astra_plugin.hpp>
+#include <astra_core/plugins/Plugin.hpp>
 #include <Shiny.h>
 
 namespace astra { namespace hand {

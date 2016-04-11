@@ -19,7 +19,7 @@
 
 #include <string>
 #include "capi/astra_core.h"
-#include "astra_stream_reader.hpp"
+#include "StreamReader.hpp"
 #include <stdexcept>
 
 namespace astra {

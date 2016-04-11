@@ -8,20 +8,20 @@ include_directories(
 
 set(${_projname}_SOURCES
   ../../include/astra_core/astra_core.hpp
-  ../../include/astra_core/astra_datastream.hpp
-  ../../include/astra_core/astra_frame.hpp
-  ../../include/astra_core/astra_frame_listener.hpp
-  ../../include/astra_core/plugins/astra_plugin_base.hpp
-  ../../include/astra_core/plugins/astra_plugin.hpp
-  ../../include/astra_core/plugins/astra_pluginservice_proxy.hpp
-  ../../include/astra_core/plugins/astra_single_bin_stream.hpp
-  ../../include/astra_core/plugins/astra_plugin_stream.hpp
-  ../../include/astra_core/plugins/astra_stream_bin.hpp
-  ../../include/astra_core/plugins/astra_stream_callback_listener.hpp
-  ../../include/astra_core/astra_streamservice_proxy.hpp
-  ../../include/astra_core/astra_stream_description.hpp
-  ../../include/astra_core/astra_stream_reader.hpp
-  ../../include/astra_core/astra_streamset.hpp
+  ../../include/astra_core/DataStream.hpp
+  ../../include/astra_core/Frame.hpp
+  ../../include/astra_core/FrameListener.hpp
+  ../../include/astra_core/plugins/PluginBase.hpp
+  ../../include/astra_core/plugins/Plugin.hpp
+  ../../include/astra_core/plugins/PluginServiceProxy.hpp
+  ../../include/astra_core/plugins/SingleBinStream.hpp
+  ../../include/astra_core/plugins/PluginStream.hpp
+  ../../include/astra_core/plugins/StreamBin.hpp
+  ../../include/astra_core/plugins/StreamCallbackListener.hpp
+  ../../include/astra_core/StreamServiceProxy.hpp
+  ../../include/astra_core/StreamDescription.hpp
+  ../../include/astra_core/StreamReader.hpp
+  ../../include/astra_core/StreamSet.hpp
   ../../include/astra_core/capi/astra_core.h
   ../../include/astra_core/capi/astra_defines.h
   ../../include/astra_core/capi/astra_streamservice_proxy.h
@@ -105,13 +105,13 @@ elseif(ASTRA_UNIX OR ASTRA_OSX)
 endif()
 
 set(${_projname}_SOURCES_GEN
-  ../../include/astra_core/astra_streamservice_proxy.hpp.lpp
+  ../../include/astra_core/StreamServiceProxy.hpp.lpp
   ../../include/astra_core/capi/astra_core.h.lpp
   ../../include/astra_core/capi/astra_streamservice_proxy.h.lpp
   ../../include/astra_core/capi/plugins/astra_plugin_callbacks.h.lpp
   ../../include/astra_core/capi/plugins/astra_pluginservice_proxy.h.lpp
-  ../../include/astra_core/plugins/astra_pluginservice_proxy.hpp.lpp
-  ../../include/astra_core/plugins/astra_stream_callback_listener.hpp.lpp
+  ../../include/astra_core/plugins/PluginServiceProxy.hpp.lpp
+  ../../include/astra_core/plugins/StreamCallbackListener.hpp.lpp
   astra.cpp.lpp
   astra_context.cpp.lpp
   astra_context.hpp.lpp
@@ -140,11 +140,16 @@ target_link_libraries(${_projname} astra_core_api ${CMAKE_DL_LIBS})
 
 add_subdirectory(tests)
 
-add_custom_target(copytoml_astra ALL
+add_custom_target(copytoml_astra ALL)
+
+include(CopyIfNotExist)
+copy_if_not_exist(copytoml_astra "astra.toml" "$<TARGET_FILE_DIR:${_projname}>/astra.toml")
+
+#add_custom_target(copytoml_astra ALL
   #astra.toml
-  COMMAND ${CMAKE_COMMAND} -E copy
-  "${PROJECT_SOURCE_DIR}/src/astra_core/astra.toml"
-  "$<TARGET_FILE_DIR:${_projname}>")
+#  COMMAND ${CMAKE_COMMAND} -E copy
+#  "${PROJECT_SOURCE_DIR}/src/astra_core/astra.toml"
+#  "$<TARGET_FILE_DIR:${_projname}>")
 
 set_target_properties(copytoml_astra PROPERTIES FOLDER CMakeCopyTargets)
 

@@ -14,12 +14,12 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef ASTRA_STREAM_READER_HPP
-#define ASTRA_STREAM_READER_HPP
+#ifndef ASTRA_STREAMREADER_HPP
+#define ASTRA_STREAMREADER_HPP
 
 #include "capi/astra_core.h"
-#include <astra_core/astra_frame_listener.hpp>
-#include <astra_core/astra_frame.hpp>
+#include <astra_core/FrameListener.hpp>
+#include <astra_core/Frame.hpp>
 #include <memory>
 #include <vector>
 #include <algorithm>
@@ -269,4 +269,4 @@ namespace astra {
     }
 }
 
-#endif // ASTRA_STREAM_READER_HPP
+#endif // ASTRA_STREAMREADER_HPP

@@ -20,7 +20,7 @@
 #include <vector>
 #include <memory>
 
-#include <astra/streams/astra_image.hpp>
+#include <astra/streams/Image.hpp>
 #include "astra_device_status.hpp"
 #include "astra_stream_state.hpp"
 

@@ -14,15 +14,15 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef ASTRA_PLUGIN_BASE_HPP
-#define ASTRA_PLUGIN_BASE_HPP
+#ifndef ASTRA_PLUGINBASE_HPP
+#define ASTRA_PLUGINBASE_HPP
 
 #include <cassert>
 
 #include "../capi/astra_types.h"
 #include "../capi/astra_host_events.h"
-#include "astra_pluginservice_proxy.hpp"
-#include "astra_plugin_logging.hpp"
+#include "PluginServiceProxy.hpp"
+#include "PluginLogging.hpp"
 
 namespace astra { namespace plugins {
 

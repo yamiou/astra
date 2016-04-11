@@ -20,7 +20,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <astra/astra.hpp>
 #include <astra/capi/streams/stream_types.h>
-#include <astra_core/plugins/astra_plugin.hpp>
+#include <astra_core/plugins/Plugin.hpp>
 
 #include "hnd_depth_utility.hpp"
 #include "hnd_tracked_point.hpp"

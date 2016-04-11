@@ -19,7 +19,7 @@
 
 #include <Shiny.h>
 #include <OpenNI.h>
-#include <astra/streams/astra_image.hpp>
+#include <astra/streams/Image.hpp>
 #include <astra/capi/streams/image_parameters.h>
 #include <astra/capi/streams/image_types.h>
 #include <astra/capi/streams/image_capi.h>

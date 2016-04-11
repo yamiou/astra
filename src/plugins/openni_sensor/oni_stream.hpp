@@ -19,8 +19,8 @@
 
 #include <astra_core/astra_core.hpp>
 #include <astra_core/capi/plugins/astra_plugin.h>
-#include <astra_core/plugins/astra_plugin_stream.hpp>
-#include <astra_core/plugins/astra_stream_bin.hpp>
+#include <astra_core/plugins/PluginStream.hpp>
+#include <astra_core/plugins/StreamBin.hpp>
 #include <OpenNI.h>
 #include <Shiny.h>
 

@@ -18,8 +18,8 @@
 #define OPENNIPLUGIN_H
 
 #include <astra_core/astra_core.hpp>
-#include <astra_core/plugins/astra_plugin_base.hpp>
-#include <astra_core/plugins/astra_plugin_logging.hpp>
+#include <astra_core/plugins/PluginBase.hpp>
+#include <astra_core/plugins/PluginLogging.hpp>
 #include "oni_devicestream.hpp"
 #include "oni_device_streamset.hpp"
 #include <memory>

@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef VECTOR2I_H
-#define VECTOR2I_H
+#ifndef ASTRA_VECTOR2I_HPP
+#define ASTRA_VECTOR2I_HPP
 
 #include <cmath>
 #include <cstdint>
@@ -196,4 +196,4 @@ namespace astra
     }
 }
 
-#endif // VECTOR2I_H
+#endif // ASTRA_VECTOR2I_HPP

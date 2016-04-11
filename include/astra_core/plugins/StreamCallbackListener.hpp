@@ -1,4 +1,4 @@
-﻿/* THIS FILE AUTO-GENERATED FROM astra_stream_callback_listener.hpp.lpp. DO NOT EDIT. */
+﻿/* THIS FILE AUTO-GENERATED FROM StreamCallbackListener.hpp.lpp. DO NOT EDIT. */
 // This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
 // Copyright (c) 2015 Orbbec 3D
 //

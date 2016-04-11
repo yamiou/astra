@@ -17,7 +17,7 @@
 #ifndef XS_POINT_PROCESSOR_H
 #define XS_POINT_PROCESSOR_H
 
-#include <astra_core/plugins/astra_plugin.hpp>
+#include <astra_core/plugins/Plugin.hpp>
 #include <astra/astra.hpp>
 #include "xs_pointstream.hpp"
 

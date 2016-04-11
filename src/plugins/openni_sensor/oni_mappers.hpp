@@ -19,7 +19,7 @@
 
 #include <tuple>
 #include <OpenNI.h>
-#include <astra/streams/astra_image.hpp>
+#include <astra/streams/Image.hpp>
 #include <cstdint>
 
 namespace orbbec { namespace ni {

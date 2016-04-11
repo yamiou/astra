@@ -20,8 +20,8 @@
 #include <astra_core/astra_core.hpp>
 #include <astra/capi/astra_ctypes.h>
 #include <astra/capi/streams/depth_capi.h>
-#include <astra/streams/astra_image.hpp>
-#include <astra/vector.hpp>
+#include <astra/streams/Image.hpp>
+#include <astra/Vector.hpp>
 
 namespace astra {
 

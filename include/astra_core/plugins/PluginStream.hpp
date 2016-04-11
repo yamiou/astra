@@ -18,10 +18,10 @@
 #define ASTRA_PLUGIN_STREAM_HPP
 
 #include <astra_core/astra_core.hpp>
-#include <astra_core/plugins/astra_plugin_logging.hpp>
-#include <astra_core/plugins/astra_pluginservice_proxy.hpp>
-#include <astra_core/plugins/astra_stream_callback_listener.hpp>
-#include <astra_core/plugins/astra_stream_event_handler.hpp>
+#include <astra_core/plugins/PluginLogging.hpp>
+#include <astra_core/plugins/PluginServiceProxy.hpp>
+#include <astra_core/plugins/StreamCallbackListener.hpp>
+#include <astra_core/plugins/StreamEventHandler.hpp>
 #include <system_error>
 #include <cassert>
 #include <unordered_set>

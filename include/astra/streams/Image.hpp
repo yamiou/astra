@@ -17,12 +17,12 @@
 #ifndef ASTRA_IMAGE_HPP
 #define ASTRA_IMAGE_HPP
 
-#include <astra_core/astra_core.hpp>
 #include <stdexcept>
-#include <astra/capi/astra_ctypes.h>
-#include <astra/capi/streams/image_capi.h>
 #include <iostream>
 #include <cstdint>
+#include <astra_core/astra_core.hpp>
+#include <astra/capi/astra_ctypes.h>
+#include <astra/capi/streams/image_capi.h>
 
 namespace astra {
 

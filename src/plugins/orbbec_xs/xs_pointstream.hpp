@@ -17,7 +17,7 @@
 #ifndef XS_POINTSTREAM_H
 #define XS_POINTSTREAM_H
 
-#include <astra_core/plugins/astra_single_bin_stream.hpp>
+#include <astra_core/plugins/SingleBinStream.hpp>
 #include <astra/capi/streams/point_types.h>
 #include <astra/capi/astra_ctypes.h>
 #include <astra/capi/streams/stream_types.h>

@@ -18,7 +18,7 @@
 #define HND_SCALING_COORDINATE_MAPPER_H
 
 #include <opencv2/core/core.hpp>
-#include <astra/streams/astra_depth.hpp>
+#include <astra/streams/depth.hpp>
 #include <Shiny.h>
 
 namespace astra { namespace hand {

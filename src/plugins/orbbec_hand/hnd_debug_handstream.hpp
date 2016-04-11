@@ -17,7 +17,7 @@
 #ifndef HND_DEBUG_HANDSTREAM_H
 #define HND_DEBUG_HANDSTREAM_H
 
-#include <astra_core/plugins/astra_single_bin_stream.hpp>
+#include <astra_core/plugins/SingleBinStream.hpp>
 #include <astra/capi/astra_ctypes.h>
 #include <astra/capi/streams/stream_types.h>
 #include <astra/vector.hpp>

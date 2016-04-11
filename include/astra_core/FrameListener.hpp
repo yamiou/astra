@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef ASTRA_FRAME_LISTENER_HPP
-#define ASTRA_FRAME_LISTENER_HPP
+#ifndef ASTRA_FRAMELISTENER_HPP
+#define ASTRA_FRAMELISTENER_HPP
 
 namespace astra {
 
@@ -35,4 +35,4 @@ namespace astra {
     }
 }
 
-#endif // ASTRA_FRAME_LISTENER_HPP
+#endif // ASTRA_FRAMELISTENER_HPP

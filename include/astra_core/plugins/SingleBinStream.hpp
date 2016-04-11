@@ -14,11 +14,11 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef ASTRA_SINGLE_BIN_STREAM_HPP
-#define ASTRA_SINGLE_BIN_STREAM_HPP
+#ifndef ASTRA_SINGLEBIN_STREAM_HPP
+#define ASTRA_SINGLEBIN_STREAM_HPP
 
-#include "astra_plugin_stream.hpp"
-#include "astra_stream_bin.hpp"
+#include "PluginStream.hpp"
+#include "StreamBin.hpp"
 #include <memory>
 
 namespace astra { namespace plugins {
@@ -36,8 +36,8 @@ namespace astra { namespace plugins {
                      description)
         {
             bin_ = std::make_unique<bin_type>(pluginService,
-                                               get_handle(),
-                                               sizeof(TFrameType) + bufferSize);
+                                              get_handle(),
+                                              sizeof(TFrameType) + bufferSize);
         }
 
         using frame_type = TFrameType;
@@ -75,4 +75,4 @@ namespace astra { namespace plugins {
     };
 }}
 
-#endif /* ASTRA_SINGLE_BIN_STREAM_HPP */
+#endif /* ASTRA_SINGLEBIN_STREAM_HPP */

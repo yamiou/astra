@@ -17,7 +17,7 @@
 #ifndef ASTRA_PLUGIN_LOGGING_HPP
 #define ASTRA_PLUGIN_LOGGING_HPP
 
-#include <astra_core/plugins/astra_pluginservice_proxy.hpp>
+#include <astra_core/plugins/PluginServiceProxy.hpp>
 #include <cstdarg>
 
 #if defined(_MSC_VER)  // Visual C++

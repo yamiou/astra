@@ -17,9 +17,9 @@
 #ifndef ONI_DEVICE_STREAMSET_H
 #define ONI_DEVICE_STREAMSET_H
 
-#include <astra_core/astra_streamset.hpp>
+#include <astra_core/StreamSet.hpp>
 #include <astra_core/capi/plugins/astra_plugin.h>
-#include <astra_core/plugins/astra_plugin_logging.hpp>
+#include <astra_core/plugins/PluginLogging.hpp>
 #include <OpenNI.h>
 #include <memory>
 #include <vector>

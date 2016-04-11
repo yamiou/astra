@@ -17,11 +17,11 @@
 #ifndef ASTRA_HAND_HPP
 #define ASTRA_HAND_HPP
 
-#include <astra_core/astra_core.hpp>
 #include <stdexcept>
+#include <astra_core/astra_core.hpp>
 #include <astra/capi/astra_ctypes.h>
 #include <astra/capi/streams/hand_capi.h>
-#include <astra/vector.hpp>
+#include <astra/Vector.hpp>
 
 namespace astra {
 

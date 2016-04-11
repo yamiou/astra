@@ -17,11 +17,11 @@
 #ifndef ASTRA_SKELETON_HPP
 #define ASTRA_SKELETON_HPP
 
-#include <astra_core/astra_core.hpp>
 #include <stdexcept>
+#include <astra_core/astra_core.hpp>
 #include <astra/capi/astra_ctypes.h>
 #include <astra/capi/streams/skeleton_capi.h>
-#include <astra/vector.hpp>
+#include <astra/Vector.hpp>
 
 namespace astra {
 

@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef VECTOR3F_H
-#define VECTOR3F_H
+#ifndef ASTRA_VECTOR3F_HPP
+#define ASTRA_VECTOR3F_HPP
 
 #include <cmath>
 #include "capi/astra_ctypes.h"
@@ -203,4 +203,4 @@ namespace astra {
     }
 }
 
-#endif /* VECTOR3F_H */
+#endif /* ASTRA_VECTOR3F_HPP */

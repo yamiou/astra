@@ -19,7 +19,7 @@
 
 #include "../capi/astra_types.h"
 #include <astra_core/capi/plugins/astra_plugin.h>
-#include <astra_core/plugins/astra_pluginservice_proxy.hpp>
+#include <astra_core/plugins/PluginServiceProxy.hpp>
 
 namespace astra { namespace plugins {
 

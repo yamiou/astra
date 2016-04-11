@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef ASTRA_STREAM_DESCRIPTION_HPP
-#define ASTRA_STREAM_DESCRIPTION_HPP
+#ifndef ASTRA_STREAMDESCRIPTION_HPP
+#define ASTRA_STREAMDESCRIPTION_HPP
 
 #include "capi/astra_core.h"
 #include <cassert>
@@ -66,4 +66,4 @@ namespace astra {
     }
 }
 
-#endif // ASTRA_STREAM_DESCRIPTION_HPP
+#endif // ASTRA_STREAMDESCRIPTION_HPP

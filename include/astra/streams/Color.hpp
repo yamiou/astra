@@ -14,41 +14,48 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef ASTRA_POINT_HPP
-#define ASTRA_POINT_HPP
+#ifndef ASTRA_COLOR_HPP
+#define ASTRA_COLOR_HPP
 
 #include <astra_core/astra_core.hpp>
 #include <astra/capi/astra_ctypes.h>
-#include <astra/capi/streams/point_capi.h>
-#include <astra/streams/astra_image.hpp>
+#include <astra/capi/streams/color_capi.h>
+#include <astra/streams/Image.hpp>
 
 namespace astra {
 
-    class pointstream : public datastream
+    class colorstream : public imagestream
     {
     public:
-        pointstream()
-        {}
 
-        explicit pointstream(astra_streamconnection_t connection)
-            : datastream(connection)
+        explicit colorstream(astra_streamconnection_t connection)
+            : imagestream(connection)
         {
-            pointStream_ = reinterpret_cast<astra_pointstream_t>(connection);
+            colorStream_ = reinterpret_cast<astra_colorstream_t>(connection);
         }
 
-        static const astra_stream_type_t id = ASTRA_STREAM_POINT;
+        static const astra_stream_type_t id = ASTRA_STREAM_COLOR;
+
 
     private:
-        astra_pointstream_t pointStream_;
+        astra_colorstream_t colorStream_;
     };
 
-    class pointframe : public imageframe<vector3f, ASTRA_STREAM_POINT>
+    class colorframe : public imageframe<rgb_pixel, ASTRA_STREAM_COLOR>
     {
     public:
-        pointframe(astra_imageframe_t frame)
-            : imageframe(frame, ASTRA_PIXEL_FORMAT_POINT)
+        colorframe(astra_imageframe_t frame)
+            : imageframe(frame, ASTRA_PIXEL_FORMAT_RGB888)
+        {}
+    };
+
+    class rawcolorframe : public imageframe<uint8_t, ASTRA_STREAM_COLOR>
+    {
+    public:
+        rawcolorframe(astra_imageframe_t frame)
+            : imageframe(frame, ASTRA_PIXEL_FORMAT_RGB888)
         {}
     };
 }
 
-#endif // ASTRA_POINT_HPP
+#endif // ASTRA_COLOR_HPP

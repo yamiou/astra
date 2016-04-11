@@ -17,7 +17,7 @@
 #ifndef MOCK_DEVICE_STREAM_H
 #define MOCK_DEVICE_STREAM_H
 
-#include <astra/streams/astra_image.hpp>
+#include <astra/streams/Image.hpp>
 #include <astra/capi/streams/image_parameters.h>
 #include <astra/capi/streams/image_types.h>
 #include <astra/capi/streams/image_capi.h>

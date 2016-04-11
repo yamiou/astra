@@ -21,7 +21,7 @@
 #include "hnd_segmentation.hpp"
 #include "hnd_constants.hpp"
 #include <Shiny.h>
-#include <astra_core/plugins/astra_plugin_logging.hpp>
+#include <astra_core/plugins/PluginLogging.hpp>
 
 #define MAX_DEPTH 10000
 

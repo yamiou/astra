@@ -14,16 +14,12 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef ASTRA_PLUGIN_HPP
-#define ASTRA_PLUGIN_HPP
+#ifndef ASTRA_VECTOR_HPP
+#define ASTRA_VECTOR_HPP
 
-#include <astra_core/capi/plugins/astra_plugin.h>
-#include <astra_core/astra_streamservice_proxy.hpp>
-#include <astra_core/plugins/astra_pluginservice_proxy.hpp>
-#include <astra_core/plugins/astra_plugin_base.hpp>
-#include <astra_core/plugins/astra_plugin_logging.hpp>
-#include <astra_core/plugins/astra_stream_callback_listener.hpp>
-#include <astra_core/plugins/astra_plugin_stream.hpp>
-#include <astra_core/plugins/astra_single_bin_stream.hpp>
+#include "Vector2i.hpp"
+#include "Vector2f.hpp"
+#include "Vector3i.hpp"
+#include "Vector3f.hpp"
 
-#endif /* ASTRA_PLUGIN_HPP */
+#endif // ASTRA_VECTOR_H
