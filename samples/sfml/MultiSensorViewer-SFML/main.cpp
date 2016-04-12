@@ -17,7 +17,7 @@
 #include <SFML/Graphics.hpp>
 #include <astra_core/astra_core.hpp>
 #include <astra/astra.hpp>
-#include "../../common/LitDepthVisualizer.hpp"
+#include "LitDepthVisualizer.hpp"
 #include <chrono>
 #include <iostream>
 #include <iomanip>

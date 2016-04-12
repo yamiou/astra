@@ -22,7 +22,7 @@
 #include <SFML/Graphics.hpp>
 #include <astra_core/astra_core.hpp>
 #include <astra/astra.hpp>
-#include "../../common/LitDepthVisualizer.hpp"
+#include "LitDepthVisualizer.hpp"
 #include <key_handler.h>
 
 class sfLine : public sf::Drawable
