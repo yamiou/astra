@@ -49,7 +49,7 @@ namespace astra { namespace xs {
 
     void point_processor::create_point_stream_if_necessary(const DepthFrame& depthFrame)
     {
-        if (!pointStream_) { return; }
+        if (pointStream_) { return; }
 
         //TODO check for changes in depthFrame width and height and update bin size
         LOG_INFO("astra.xs.point_processor", "creating point stream");
