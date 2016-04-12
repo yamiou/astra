@@ -14,11 +14,11 @@ Low Level
 |Stream Type     |Description                                                             |
 +================+========================================================================+
 |ColorStream     | RGB pixel data from the sensor.  The ``data`` array included           |
-|                | in each ``colorframe`` contains values ranging from 0-255              |
+|                | in each ``ColorFrame`` contains values ranging from 0-255              |
 |                | for each color component of each pixel.                                |
 +----------------+------------------------------------------------------------------------+
-|depthstream     | Depth data from the sensor. The ``data`` array included in each        |
-|                | ``depthframe`` contains values in millimeters for each pixel           |
+|DepthStream     | Depth data from the sensor. The ``data`` array included in each        |
+|                | ``DepthFrame`` contains values in millimeters for each pixel           |
 |                | within the sensor's field of view.                                     |
 +----------------+------------------------------------------------------------------------+
 
@@ -27,16 +27,16 @@ Higher-Level
 +----------------+------------------------------------------------------------------------+
 |Stream Type     |Description                                                             |
 +================+========================================================================+
-|pointstream     | World coordinates (XYZ) computed from the depth data.                  |
-|                | The ``data`` array included in each ``pointframe`` is an               |
+|PointStream     | World coordinates (XYZ) computed from the depth data.                  |
+|                | The ``data`` array included in each ``PointFrame`` is an               |
 |                | array of ``astra:Vector3f`` elements to more easily                    |
 |                | access the ``x``, ``y`` and ``z`` values for each pixel.               |
 +----------------+------------------------------------------------------------------------+
-|handstream      | Hand points computed from the depth data. On each ``handframe``,       |
+|HandStream      | Hand points computed from the depth data. On each ``HandFrame``,       |
 |                | the number of points detected at any given time can be retrieved       |
-|                | through the ``handframe::handpoint_count`` function, and a             |
-|                | ``astra::handpointList`` can be retrieved through the                  |
-|                | ``handframe::handpoints`` function.                                    |
+|                | through the ``HandFrame::handpoint_count`` function, and a             |
+|                | ``astra::HandFrame::HandPointList`` can be retrieved through the       |
+|                | ``HandFrame::handpoints`` function.                                    |
 +----------------+------------------------------------------------------------------------+
 
 Getting the Data
@@ -50,17 +50,17 @@ The polling method for getting frame data is the most direct method for getting 
 .. code-block:: c++
    :emphasize-lines: 8,9
 
-   astra::Astra::initialize();
+   astra::initialize();
 
    astra::StreamSet streamSet;
    astra::StreamReader reader = streamSet.create_reader();
 
-   reader.stream<astra::depthstream>().start();
+   reader.stream<astra::DepthStream>().start();
 
-   astra::frame frame = reader.get_latest_frame();
-   const auto depthFrame = frame.get<astra::depthframe>();
+   astra::Frame frame = reader.get_latest_frame();
+   const auto depthFrame = frame.get<astra::DepthFrame>();
 
-   astra::Astra::terminate();
+   astra::terminate();
 
 
 - Retrieving a depth frame using the polling method
@@ -68,16 +68,16 @@ The polling method for getting frame data is the most direct method for getting 
 Listening
 ---------
 
-The listening method for getting frame data requires a small amount of additional setup, but allows the developer to delegate the handling of a frame to one or more separate classes. The |sdkname| SDK provides an abstract class called ``frame_listener`` which implements a single function called ``frame_listener::on_frame_ready``. ``frame_listener::on_frame_ready`` is called as soon as the frame is ready for processing and passed a reference to that frame.
+The listening method for getting frame data requires a small amount of additional setup, but allows the developer to delegate the handling of a frame to one or more separate classes. The |sdkname| SDK provides an abstract class called ``FrameListener`` which implements a single function called ``FrameListener::on_frame_ready``. ``FrameListener::on_frame_ready`` is called as soon as the frame is ready for processing and passed a reference to that frame.
 
 .. code-block:: c++
 
-   class depthframeListener : public astra::frame_listener
+   class DepthFrameListener : public astra::FrameListener
    {
       virtual void on_frame_ready(astra::StreamReader& reader,
-                                astra::frame& frame) override
+                                  astra::Frame& frame) override
       {
-         const astra::depthframe depthFrame = frame.get<astra::depthframe>();
+         const astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
 
          if (depthFrame.is_valid())
          {
@@ -88,20 +88,20 @@ The listening method for getting frame data requires a small amount of additiona
 
 - An example of a listener class derived from ``frame_listener``
 
-After defining a listener class, in order to use it you must instantiate the listener in your application and add it to the ``StreamReader`` using the ``StreamReader::addListener`` function.
+After defining a listener class, in order to use it you must instantiate the listener in your application and add it to the ``StreamReader`` using the ``StreamReader::add_listener`` function.
 
 .. code-block:: c++
    :emphasize-lines: 8,9
 
-   astra::Astra::initialize();
+   astra::initialize();
 
    astra::StreamSet streamSet;
    astra::StreamReader reader = streamSet.create_reader();
 
-   reader.stream<astra::depthstream>().start();
+   reader.stream<astra::DepthStream>().start();
 
-   depthframeListener listener;
-   reader.addListener(listener);
+   DepthFrameListener listener;
+   reader.add_listener(listener);
 
    while(true)
    {
@@ -110,7 +110,7 @@ After defining a listener class, in order to use it you must instantiate the lis
 
 - Example usage of a listener. In practice, the loop over ``astra_temp_update`` should only execute until the application is closed or another application-specific event takes place.
 
-Once the listener is added, we need to pump the SDK's event loop using the ``astra_temp_update`` function. Doing this allows the SDK to check if a frame is available, and if so will, in this case, call the ``depthframeListener::on_frame_ready`` function and pass along a reference to the latest frame.
+Once the listener is added, we need to pump the SDK's event loop using the ``astra_temp_update`` function. Doing this allows the SDK to check if a frame is available, and if so will, in this case, call the ``DepthFrameListener::on_frame_ready`` function and pass along a reference to the latest frame.
 
 For a more practical example of a listener, continue on to our :doc:`Simple Depth Reader Tutorial <simpledepthreader>`.
 
