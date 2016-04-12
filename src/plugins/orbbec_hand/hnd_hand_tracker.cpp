@@ -112,7 +112,7 @@ namespace astra { namespace hand {
         track_points(matDepth_, matDepthFullSize_, matVelocitySignal_, pointFrame.data());
 
         //use same frameIndex as source depth frame
-        astra_frame_index_t frameIndex = depthFrame.frameIndex();
+        astra_frame_index_t frameIndex = depthFrame.frame_index();
 
         if (handStream_->has_connections())
         {

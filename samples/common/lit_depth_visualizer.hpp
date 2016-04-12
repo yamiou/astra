@@ -160,8 +160,8 @@ namespace samples { namespace common {
     {
         const Vector3f* positionMap = pointFrame.data();
 
-        const int width = pointFrame.resolutionX();
-        const int height = pointFrame.resolutionY();
+        const int width = pointFrame.width();
+        const int height = pointFrame.height();
 
         const int numPixels = width * height;
 
@@ -274,8 +274,8 @@ namespace samples { namespace common {
     {
         calculate_normals(pointFrame);
 
-        const size_t width = pointFrame.resolutionX();
-        const size_t height = pointFrame.resolutionY();
+        const size_t width = pointFrame.width();
+        const size_t height = pointFrame.height();
 
         prepare_buffer(width, height);
 

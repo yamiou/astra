@@ -69,8 +69,8 @@ public:
     {
         astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
 
-        int width = depthFrame.resolutionX();
-        int height = depthFrame.resolutionY();
+        int width = depthFrame.width();
+        int height = depthFrame.height();
         depthWidth_ = width;
         depthHeight_ = height;
         /*
@@ -106,8 +106,8 @@ public:
     {
         astra::DebugHandFrame handFrame = frame.get<astra::DebugHandFrame>();
 
-        int width = handFrame.resolutionX();
-        int height = handFrame.resolutionY();
+        int width = handFrame.width();
+        int height = handFrame.height();
 
         init_texture(width, height);
 

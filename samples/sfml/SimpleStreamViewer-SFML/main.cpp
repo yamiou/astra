@@ -109,8 +109,8 @@ public:
             return;
         }
 
-        int depthWidth = pointFrame.resolutionX();
-        int depthHeight = pointFrame.resolutionY();
+        int depthWidth = pointFrame.width();
+        int depthHeight = pointFrame.height();
 
         init_texture(depthWidth, depthHeight, depthView_);
 
@@ -146,8 +146,8 @@ public:
             return;
         }
 
-        int colorWidth = colorFrame.resolutionX();
-        int colorHeight = colorFrame.resolutionY();
+        int colorWidth = colorFrame.width();
+        int colorHeight = colorFrame.height();
 
         init_texture(colorWidth, colorHeight, colorView_);
 
@@ -181,8 +181,8 @@ public:
             return;
         }
 
-        int irWidth = irFrame.resolutionX();
-        int irHeight = irFrame.resolutionY();
+        int irWidth = irFrame.width();
+        int irHeight = irFrame.height();
 
         init_texture(irWidth, irHeight, colorView_);
 
@@ -219,8 +219,8 @@ public:
             return;
         }
 
-        int irWidth = irFrame.resolutionX();
-        int irHeight = irFrame.resolutionY();
+        int irWidth = irFrame.width();
+        int irHeight = irFrame.height();
 
         init_texture(irWidth, irHeight, colorView_);
 
@@ -347,7 +347,7 @@ astra::DepthStream configure_depth(astra::StreamReader& reader)
 
     depthMode.set_width(640);
     depthMode.set_height(480);
-    depthMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_DEPTH_MM);
+    depthMode.set_pixel_format(astra_pixel_formats::ASTRA_PIXEL_FORMAT_DEPTH_MM);
     depthMode.set_fps(30);
 
     depthStream.set_mode(depthMode);
@@ -365,11 +365,11 @@ astra::InfraredStream configure_ir(astra::StreamReader& reader, bool useRGB)
     irMode.set_height(480);
     if (useRGB)
     {
-        irMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_RGB888);
+        irMode.set_pixel_format(astra_pixel_formats::ASTRA_PIXEL_FORMAT_RGB888);
     }
     else
     {
-        irMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_GRAY16);
+        irMode.set_pixel_format(astra_pixel_formats::ASTRA_PIXEL_FORMAT_GRAY16);
     }
 
     irMode.set_fps(30);
@@ -387,7 +387,7 @@ astra::ColorStream configure_color(astra::StreamReader& reader)
 
     colorMode.set_width(640);
     colorMode.set_height(480);
-    colorMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_RGB888);
+    colorMode.set_pixel_format(astra_pixel_formats::ASTRA_PIXEL_FORMAT_RGB888);
     colorMode.set_fps(30);
 
     colorStream.set_mode(colorMode);

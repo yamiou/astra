@@ -43,12 +43,12 @@ public:
     {
         if (colorFrame.is_valid())
         {
-            int width = colorFrame.resolutionX();
-            int height = colorFrame.resolutionY();
-            int frameIndex = colorFrame.frameIndex();
+            int width = colorFrame.width();
+            int height = colorFrame.height();
+            int frameIndex = colorFrame.frame_index();
 
             if (width != lastWidth_ || height != lastHeight_){
-                buffer_ = buffer_ptr(new astra::RgbPixel[colorFrame.numberOfPixels()]);
+                buffer_ = buffer_ptr(new astra::RgbPixel[colorFrame.length()]);
                 lastWidth_ = width;
                 lastHeight_ = height;
             }
@@ -80,9 +80,9 @@ int main(int argc, char** argv)
     reader.stream<astra::ColorStream>().start();
 
     std::cout << "colorStream -- hFov: "
-              << reader.stream<astra::ColorStream>().horizontalFieldOfView()
+              << reader.stream<astra::ColorStream>().hFov()
               << " vFov: "
-              << reader.stream<astra::ColorStream>().verticalFieldOfView()
+              << reader.stream<astra::ColorStream>().vFov()
               << std::endl;
 
     reader.add_listener(listener);

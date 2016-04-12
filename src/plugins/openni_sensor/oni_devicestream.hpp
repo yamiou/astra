@@ -184,9 +184,9 @@ namespace orbbec { namespace ni {
                 LOG_INFO("orbbec.ni.devicestream", "mode change requested: %ux%ux%u@%u pf:%u",
                          mode.width(),
                          mode.height(),
-                         mode.bytesPerPixel(),
+                         mode.bytes_per_pixel(),
                          mode.fps(),
-                         mode.pixelFormat());
+                         mode.pixel_format());
 
                 auto rc = oniStream_.setVideoMode(oniMode);
 
@@ -206,17 +206,17 @@ namespace orbbec { namespace ni {
         {
             mode_ = mode;
             oniMode_ = convert_mode(mode);
-            assert(mode_.pixelFormat() != 0);
+            assert(mode_.pixel_format() != 0);
 
             bufferLength_ =
                 mode_.width() *
                 mode_.height() *
-                mode_.bytesPerPixel();
+                mode_.bytes_per_pixel();
 
             LOG_INFO("orbbec.ni.devicestream", "bin swap: %ux%ux%u len: %u",
                      mode_.width(),
                      mode_.height(),
-                     mode_.bytesPerPixel(),
+                     mode_.bytes_per_pixel(),
                      bufferLength_);
 
             bin_ = std::make_unique<bin_type>(pluginService(),
@@ -238,7 +238,7 @@ namespace orbbec { namespace ni {
 
             auto& md = wrapper->frame.metadata;
 
-            md.pixelFormat = mode_.pixelFormat();
+            md.pixelFormat = mode_.pixel_format();
             md.width = mode_.width();
             md.height = mode_.height();
         }

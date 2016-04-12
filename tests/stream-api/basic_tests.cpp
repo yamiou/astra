@@ -35,8 +35,8 @@ TEST_CASE("Can start depth stream", "[c++-stream-api]") {
     astra::StreamReader reader = streamSet.create_reader();
     astra::DepthStream depthStream = reader.stream<astra::DepthStream>();
     depthStream.start();
-    float hFOV = depthStream.horizontalFieldOfView();
-    float vFOV = depthStream.verticalFieldOfView();
+    float hFOV = depthStream.hFov();
+    float vFOV = depthStream.vFov();
 
     REQUIRE(hFOV > 0);
     REQUIRE(vFOV > 0);
@@ -49,8 +49,8 @@ TEST_CASE("Can start color stream", "[c++-stream-api]") {
 
     reader.stream<astra::ColorStream>().start();
 
-    float hFOV = reader.stream<astra::ColorStream>().horizontalFieldOfView();
-    float vFOV = reader.stream<astra::ColorStream>().verticalFieldOfView();
+    float hFOV = reader.stream<astra::ColorStream>().hFov();
+    float vFOV = reader.stream<astra::ColorStream>().vFov();
 
     REQUIRE(hFOV > 0);
     REQUIRE(vFOV > 0);

@@ -51,7 +51,7 @@ namespace astra {
             set_width(width);
             set_height(height);
             set_fps(fps);
-            set_pixelFormat(format);
+            set_pixel_format(format);
         }
 
         ImageStreamMode(const ::astra_imagestream_mode_t& mode)
@@ -64,7 +64,7 @@ namespace astra {
             set_width(mode.width);
             set_height(mode.height);
             set_fps(mode.fps);
-            set_pixelFormat(mode.pixelFormat);
+            set_pixel_format(mode.pixelFormat);
 
             return *this;
         }
@@ -75,10 +75,10 @@ namespace astra {
         const std::uint8_t fps() const { return astra_imagestream_mode_t::fps; }
         void set_fps(std::uint8_t fps) { astra_imagestream_mode_t::fps = fps; }
 
-        const std::uint8_t bytesPerPixel() const
+        const std::uint8_t bytes_per_pixel() const
         {
             std::uint8_t bpp;
-            astra_pixelformat_get_bytes_per_pixel(pixelFormat(), &bpp);
+            astra_pixelformat_get_bytes_per_pixel(pixel_format(), &bpp);
             return bpp;
         }
 
@@ -88,8 +88,8 @@ namespace astra {
         const std::uint32_t height() const { return astra_imagestream_mode_t::height; }
         void set_height(std::uint32_t height) { astra_imagestream_mode_t::height = height; }
 
-        astra_pixel_format_t pixelFormat() const { return astra_imagestream_mode_t::pixelFormat; }
-        void set_pixelFormat(astra_pixel_format_t format) { astra_imagestream_mode_t::pixelFormat = format; }
+        astra_pixel_format_t pixel_format() const { return astra_imagestream_mode_t::pixelFormat; }
+        void set_pixel_format(astra_pixel_format_t format) { astra_imagestream_mode_t::pixelFormat = format; }
 
         friend std::ostream& operator<<(std::ostream& os, const ImageStreamMode& ism);
     };
@@ -99,9 +99,9 @@ namespace astra {
         return
             lhs.width() == rhs.width() &&
             lhs.height() == rhs.height() &&
-            lhs.pixelFormat() == rhs.pixelFormat() &&
+            lhs.pixel_format() == rhs.pixel_format() &&
             lhs.fps() == rhs.fps() &&
-            lhs.bytesPerPixel() && rhs.bytesPerPixel();
+            lhs.bytes_per_pixel() && rhs.bytes_per_pixel();
     }
 
     inline bool operator!=(const ImageStreamMode& lhs, const ImageStreamMode& rhs)
@@ -115,11 +115,11 @@ namespace astra {
            << "x"
            << ism.height()
            << "x"
-           << static_cast<int>(ism.bytesPerPixel())
+           << static_cast<int>(ism.bytes_per_pixel())
            << "@"
            << static_cast<int>(ism.fps())
            << " pf:"
-           << ism.pixelFormat();
+           << ism.pixel_format();
 
         return os;
     }
@@ -132,7 +132,7 @@ namespace astra {
               imageStream_(reinterpret_cast<astra_imagestream_t>(connection))
         {}
 
-        float horizontalFieldOfView()
+        float hFov() const
         {
             float hFov = 0.0f;
             astra_imagestream_get_hfov(imageStream_, &hFov);
@@ -140,7 +140,7 @@ namespace astra {
             return hFov;
         }
 
-        float verticalFieldOfView()
+        float vFov() const
         {
             float vFov = 0.0f;
             astra_imagestream_get_vfov(imageStream_, &vFov);
@@ -148,7 +148,7 @@ namespace astra {
             return vFov;
         }
 
-        bool mirroring_enabled()
+        bool mirroring_enabled() const
         {
             bool mirroring = false;
             astra_imagestream_get_mirroring(imageStream_, &mirroring);
@@ -161,7 +161,7 @@ namespace astra {
             astra_imagestream_set_mirroring(imageStream_, mirroring);
         }
 
-        std::vector<ImageStreamMode> available_modes()
+        std::vector<ImageStreamMode> available_modes() const
         {
             astra_result_token_t token;
             std::size_t count = 0;
@@ -214,10 +214,10 @@ namespace astra {
 
         const bool is_valid() const { return imageFrame_ != nullptr; }
 
-        const int resolutionX() const { throwIfInvalidFrame(); return metadata_.width; }
-        const int resolutionY() const { throwIfInvalidFrame(); return metadata_.height; }
+        const int width() const { throwIfInvalidFrame(); return metadata_.width; }
+        const int height() const { throwIfInvalidFrame(); return metadata_.height; }
 
-        const std::uint8_t bytesPerPixel() const
+        const std::uint8_t bytes_per_pixel() const
         {
             throwIfInvalidFrame();
 
@@ -226,16 +226,16 @@ namespace astra {
             return bpp;
         }
 
-        const astra_frame_index_t frameIndex() const { throwIfInvalidFrame(); return frameIndex_; }
+        const astra_frame_index_t frame_index() const { throwIfInvalidFrame(); return frameIndex_; }
         const astra_imageframe_t handle() const { return imageFrame_; }
 
-        static const astra_stream_type_t streamType() { return TStreamType; }
+        static astra_stream_type_t stream_type() { return TStreamType; }
 
         const TDataType* data() const { throwIfInvalidFrame(); return dataPtr_; }
-        const size_t byteLength() const { throwIfInvalidFrame(); return byteLength_; }
-        const size_t numberOfPixels() const { throwIfInvalidFrame(); return metadata_.width * metadata_.height; }
+        const size_t byte_length() const { throwIfInvalidFrame(); return byteLength_; }
+        const size_t length() const { throwIfInvalidFrame(); return metadata_.width * metadata_.height; }
 
-        void copy_to(TDataType* buffer)
+        void copy_to(TDataType* buffer) const
         {
             throwIfInvalidFrame();
             astra_imageframe_copy_data(imageFrame_, buffer);

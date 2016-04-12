@@ -77,7 +77,7 @@ namespace orbbec { namespace ni {
         std::uint8_t bpp;
 
         std::tie(format, bpp) = convert_format(oniMode.getPixelFormat());
-        mode.set_pixelFormat(format);
+        mode.set_pixel_format(format);
 
         return mode;
     }
@@ -90,7 +90,7 @@ namespace orbbec { namespace ni {
 
         openni::PixelFormat format;
 
-        std::tie(format, std::ignore) = convert_format(mode.pixelFormat());
+        std::tie(format, std::ignore) = convert_format(mode.pixel_format());
         oniMode.setPixelFormat(format);
 
         return oniMode;

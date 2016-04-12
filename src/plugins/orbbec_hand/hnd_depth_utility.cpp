@@ -68,8 +68,8 @@ namespace astra { namespace hand {
                                                  cv::Mat& matVelocitySignal)
     {
         PROFILE_FUNC();
-        int width = depthFrame.resolutionX();
-        int height = depthFrame.resolutionY();
+        int width = depthFrame.width();
+        int height = depthFrame.height();
 
         depthframe_to_matrix(depthFrame, width, height, matDepthFullSize);
 

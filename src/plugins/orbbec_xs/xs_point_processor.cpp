@@ -57,8 +57,8 @@ namespace astra { namespace xs {
         //TODO check for changes in depthFrame width and height and update bin size
         LOG_INFO("astra.xs.point_processor", "creating point stream");
 
-        int width = depthFrame.resolutionX();
-        int height = depthFrame.resolutionY();
+        int width = depthFrame.width();
+        int height = depthFrame.height();
 
         auto ps = plugins::make_stream<PointStream>(pluginService_, setHandle_, width, height);
         pointStream_ = std::unique_ptr<PointStream>(std::move(ps));
@@ -71,7 +71,7 @@ namespace astra { namespace xs {
     void point_processor::update_pointframe_from_depth(DepthFrame& depthFrame)
     {
         //use same frameIndex as source depth frame
-        astra_frame_index_t frameIndex = depthFrame.frameIndex();
+        astra_frame_index_t frameIndex = depthFrame.frame_index();
 
         astra_imageframe_wrapper_t* pointFrameWrapper = pointStream_->begin_write(frameIndex);
 
@@ -82,8 +82,8 @@ namespace astra { namespace xs {
 
             astra_image_metadata_t metadata;
 
-            metadata.width = depthFrame.resolutionX();
-            metadata.height = depthFrame.resolutionY();
+            metadata.width = depthFrame.width();
+            metadata.height = depthFrame.height();
             metadata.pixelFormat = ASTRA_PIXEL_FORMAT_POINT;
 
             pointFrameWrapper->frame.metadata = metadata;
@@ -98,8 +98,8 @@ namespace astra { namespace xs {
     void point_processor::calculate_point_frame(DepthFrame& depthFrame,
                                                 Vector3f* p_points)
     {
-        int width = depthFrame.resolutionX();
-        int height = depthFrame.resolutionY();
+        int width = depthFrame.width();
+        int height = depthFrame.height();
         const int16_t* p_depth = depthFrame.data();
 
         const conversion_cache_t conversionData = depthConversionCache_;

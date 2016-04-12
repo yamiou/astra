@@ -106,8 +106,8 @@ In order to use a ``frame_listener`` with our example...
 
       int16_t get_middle_value(astra::depthframe& depthFrame)
       {
-          int width = depthFrame.resolutionX();
-          int height = depthFrame.resolutionY();
+          int width = depthFrame.width();
+          int height = depthFrame.height();
 
           size_t middleIndex = ((width * (height / 2.0f)) + (width / 2.0f));
 

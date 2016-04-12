@@ -80,8 +80,8 @@ public:
     {
         astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
 
-        int width = pointFrame.resolutionX();
-        int height = pointFrame.resolutionY();
+        int width = pointFrame.width();
+        int height = pointFrame.height();
 
         init_texture(width, height);
 
@@ -114,8 +114,8 @@ public:
 
         if (depthFrame.is_valid())
         {
-            int width = depthFrame.resolutionX();
-            int height = depthFrame.resolutionY();
+            int width = depthFrame.width();
+            int height = depthFrame.height();
             if (depthData_ == nullptr || width != depthWidth_ || height != depthHeight_)
             {
                 depthWidth_ = width;

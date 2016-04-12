@@ -48,14 +48,14 @@ public:
     {
         if (depthFrame.is_valid())
         {
-            int width = depthFrame.resolutionX();
-            int height = depthFrame.resolutionY();
-            int frameIndex = depthFrame.frameIndex();
+            int width = depthFrame.width();
+            int height = depthFrame.height();
+            int frameIndex = depthFrame.frame_index();
 
             //determine if buffer needs to be reallocated
             if (width != lastWidth_ || height != lastHeight_)
             {
-                buffer_ = buffer_ptr(new int16_t[depthFrame.numberOfPixels()]);
+                buffer_ = buffer_ptr(new int16_t[depthFrame.length()]);
                 lastWidth_ = width;
                 lastHeight_ = height;
             }
@@ -125,9 +125,9 @@ int main(int argc, char** argv)
     reader.stream<astra::DepthStream>().start();
 
     std::cout << "depthStream -- hFov: "
-              << reader.stream<astra::DepthStream>().horizontalFieldOfView()
+              << reader.stream<astra::DepthStream>().hFov()
               << " vFov: "
-              << reader.stream<astra::DepthStream>().verticalFieldOfView()
+              << reader.stream<astra::DepthStream>().vFov()
               << std::endl;
 
     reader.add_listener(listener);

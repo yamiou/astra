@@ -104,8 +104,8 @@ public:
     {
         astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
 
-        int width = pointFrame.resolutionX();
-        int height = pointFrame.resolutionY();
+        int width = pointFrame.width();
+        int height = pointFrame.height();
 
         init_texture(width, height);
 

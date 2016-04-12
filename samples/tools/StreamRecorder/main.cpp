@@ -151,8 +151,8 @@ private:
         if (!pointFrame.is_valid()) {
             return;
         }
-        int width = pointFrame.resolutionX();
-        int height = pointFrame.resolutionY();
+        int width = pointFrame.width();
+        int height = pointFrame.height();
 
         init_texture(width, height);
 

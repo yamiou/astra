@@ -78,8 +78,8 @@ public:
     {
         astra::ColorFrame colorFrame = frame.get<astra::ColorFrame>();
 
-        int width = colorFrame.resolutionX();
-        int height = colorFrame.resolutionY();
+        int width = colorFrame.width();
+        int height = colorFrame.height();
 
         init_texture(width, height);
 
