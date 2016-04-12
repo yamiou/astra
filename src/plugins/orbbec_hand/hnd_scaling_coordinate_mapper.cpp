@@ -16,7 +16,6 @@
 // Be excellent to each other.
 #include "hnd_scaling_coordinate_mapper.hpp"
 #include <opencv2/core/core.hpp>
-#include <astra/streams/depth.hpp>
 #include <Shiny.h>
 
 namespace astra { namespace hand {

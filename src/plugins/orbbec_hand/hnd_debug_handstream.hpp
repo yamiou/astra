@@ -20,7 +20,7 @@
 #include <astra_core/plugins/SingleBinStream.hpp>
 #include <astra/capi/astra_ctypes.h>
 #include <astra/capi/streams/stream_types.h>
-#include <astra/vector.hpp>
+#include <astra/Vector.hpp>
 
 namespace astra { namespace hand {
 
