@@ -41,7 +41,7 @@ namespace astra {
         astra_colorstream_t colorStream_;
     };
 
-    class ColorFrame : public ImageFrame<rgb_pixel, ASTRA_STREAM_COLOR>
+    class ColorFrame : public ImageFrame<RgbPixel, ASTRA_STREAM_COLOR>
     {
     public:
         ColorFrame(astra_imageframe_t frame)

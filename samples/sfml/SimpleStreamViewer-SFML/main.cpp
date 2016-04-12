@@ -121,7 +121,7 @@ public:
 
         visualizer_.update(pointFrame);
 
-        astra_rgb_pixel_t* vizBuffer = visualizer_.get_output();
+        astra::RgbPixel* vizBuffer = visualizer_.get_output();
         uint8_t* buffer = depthView_.buffer.get();
         for (int i = 0; i < depthWidth * depthHeight; i++)
         {
@@ -156,7 +156,7 @@ public:
             return;
         }
 
-        const astra::rgb_pixel* color = colorFrame.data();
+        const astra::RgbPixel* color = colorFrame.data();
         uint8_t* buffer = colorView_.buffer.get();
         for(int i = 0; i < colorWidth * colorHeight; i++)
         {
@@ -229,7 +229,7 @@ public:
             return;
         }
 
-        const astra::rgb_pixel* irRGB = irFrame.data();
+        const astra::RgbPixel* irRGB = irFrame.data();
         uint8_t* buffer = colorView_.buffer.get();
         for (int i = 0; i < irWidth * irHeight; i++)
         {

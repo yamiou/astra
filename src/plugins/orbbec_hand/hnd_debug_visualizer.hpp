@@ -101,7 +101,7 @@ namespace astra { namespace hand {
 
         void overlay_mask(const cv::Mat& matMask,
                           _astra_imageframe& imageFrame,
-                          const rgb_pixel& maskColor,
+                          const RgbPixel& maskColor,
                           const pixel_type targetValue)
         {
             assert(matMask.cols == imageFrame.metadata.width);
@@ -110,7 +110,7 @@ namespace astra { namespace hand {
             int width = matMask.cols;
             int height = matMask.rows;
 
-            rgb_pixel* colorData = static_cast<rgb_pixel*>(imageFrame.data);
+            RgbPixel* colorData = static_cast<RgbPixel*>(imageFrame.data);
 
             for (int y = 0; y < height; ++y)
             {
@@ -137,7 +137,7 @@ namespace astra { namespace hand {
             int width = matDepth.cols;
             int height = matDepth.rows;
 
-            rgb_pixel* colorData = static_cast<rgb_pixel*>(imageFrame.data);
+            RgbPixel* colorData = static_cast<RgbPixel*>(imageFrame.data);
 
             for (int y = 0; y < height; ++y)
             {
@@ -152,7 +152,7 @@ namespace astra { namespace hand {
                     {
                         value = 0;
                     }
-                    rgb_pixel color(0, value, value);
+                    RgbPixel color(0, value, value);
 
                     *colorData = color;
                 }
@@ -174,7 +174,7 @@ namespace astra { namespace hand {
             int width = matVelocity.cols;
             int height = matVelocity.rows;
 
-            rgb_pixel* colorData = static_cast<rgb_pixel*>(imageFrame.data);
+            RgbPixel* colorData = static_cast<RgbPixel*>(imageFrame.data);
 
             for (int y = 0; y < height; ++y)
             {
@@ -185,7 +185,7 @@ namespace astra { namespace hand {
 
                     uint8_t velocityValue = static_cast<uint8_t>(255 * sqrt(min(1.0f, abs(velocity / maxScale))));
 
-                    rgb_pixel color(0, velocityValue, 0);
+                    RgbPixel color(0, velocityValue, 0);
                     if (velocity < 0)
                     {
                         color.r = velocityValue;

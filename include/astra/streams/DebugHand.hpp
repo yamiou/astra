@@ -71,7 +71,7 @@ namespace astra {
         astra_debug_handstream_t debugHandStream_;
     };
 
-    class DebugHandFrame : public ImageFrame<rgb_pixel, ASTRA_STREAM_DEBUG_HAND>
+    class DebugHandFrame : public ImageFrame<RgbPixel, ASTRA_STREAM_DEBUG_HAND>
     {
     public:
         DebugHandFrame(astra_imageframe_t frame)

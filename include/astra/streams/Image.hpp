@@ -26,13 +26,13 @@
 
 namespace astra {
 
-    struct rgb_pixel : public astra_rgb_pixel_t
+    struct RgbPixel : public astra_rgb_pixel_t
     {
-        rgb_pixel()
-            : rgb_pixel(0, 0, 0)
+        RgbPixel()
+            : RgbPixel(0, 0, 0)
         {}
 
-        rgb_pixel(std::uint8_t r, std::uint8_t g, std::uint8_t b)
+        RgbPixel(std::uint8_t r, std::uint8_t g, std::uint8_t b)
         {
             ::astra_rgb_pixel_t::r = r;
             ::astra_rgb_pixel_t::g = g;

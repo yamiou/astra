@@ -111,14 +111,14 @@ public:
 
         init_texture(width, height);
 
-        const astra::rgb_pixel* imagePtr = handFrame.data();
+        const astra::RgbPixel* imagePtr = handFrame.data();
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
             {
                 int index = (x + y * width);
                 int index4 = index * 4;
-                astra::rgb_pixel rgb = imagePtr[index];
+                astra::RgbPixel rgb = imagePtr[index];
 
                 displayBuffer_[index4] = rgb.r;
                 displayBuffer_[index4 + 1] = rgb.g;

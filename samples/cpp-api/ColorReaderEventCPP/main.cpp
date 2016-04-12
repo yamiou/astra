@@ -22,7 +22,7 @@
 class SampleFrameListener : public astra::FrameListener
 {
 private:
-    using buffer_ptr = std::unique_ptr<astra::rgb_pixel []>;
+    using buffer_ptr = std::unique_ptr<astra::RgbPixel []>;
     buffer_ptr buffer_;
     unsigned int lastWidth_;
     unsigned int lastHeight_;
@@ -48,14 +48,14 @@ public:
             int frameIndex = colorFrame.frameIndex();
 
             if (width != lastWidth_ || height != lastHeight_){
-                buffer_ = buffer_ptr(new astra::rgb_pixel[colorFrame.numberOfPixels()]);
+                buffer_ = buffer_ptr(new astra::RgbPixel[colorFrame.numberOfPixels()]);
                 lastWidth_ = width;
                 lastHeight_ = height;
             }
             colorFrame.copy_to(buffer_.get());
 
             size_t index = ((width * (height / 2.0f)) + (width / 2.0f));
-            astra::rgb_pixel middle = buffer_[index];
+            astra::RgbPixel middle = buffer_[index];
 
             std::cout << "color frameIndex: " << frameIndex
                       << " r: " << static_cast<int>(middle.r)

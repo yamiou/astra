@@ -83,7 +83,7 @@ public:
 
         init_texture(width, height);
 
-        const astra_rgb_pixel_t* colorData = colorFrame.data();
+        const astra::RgbPixel* colorData = colorFrame.data();
 
         for (int i = 0; i < width * height; i++)
         {

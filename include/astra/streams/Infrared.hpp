@@ -43,7 +43,7 @@ namespace astra {
         {}
     };
 
-    class InfraredFrameRgb : public ImageFrame<rgb_pixel, ASTRA_STREAM_INFRARED>
+    class InfraredFrameRgb : public ImageFrame<RgbPixel, ASTRA_STREAM_INFRARED>
     {
     public:
         InfraredFrameRgb(astra_imageframe_t frame)

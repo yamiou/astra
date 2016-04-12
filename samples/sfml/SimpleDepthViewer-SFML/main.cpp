@@ -96,7 +96,7 @@ public:
 
         visualizer_.update(pointFrame);
 
-        astra_rgb_pixel_t* vizBuffer = visualizer_.get_output();
+        astra::RgbPixel* vizBuffer = visualizer_.get_output();
         for (int i = 0; i < width * height; i++)
         {
             int rgbaOffset = i * 4;

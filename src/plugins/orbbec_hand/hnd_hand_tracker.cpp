@@ -493,11 +493,11 @@ namespace astra { namespace hand {
     }
 
     void mark_image_pixel(_astra_imageframe& imageFrame,
-                          rgb_pixel color,
+                          RgbPixel color,
                           astra::Vector2i p)
     {
         PROFILE_FUNC();
-        rgb_pixel* colorData = static_cast<rgb_pixel*>(imageFrame.data);
+        RgbPixel* colorData = static_cast<RgbPixel*>(imageFrame.data);
         int index = p.x + p.y * imageFrame.metadata.width;
         colorData[index] = color;
     }
@@ -509,7 +509,7 @@ namespace astra { namespace hand {
         float resizeFactor = matDepthFullSize_.cols / static_cast<float>(matDepth_.cols);
         scaling_coordinate_mapper mapper(depthStream_.depth_to_world_data(), resizeFactor);
 
-        rgb_pixel color(255, 0, 255);
+        RgbPixel color(255, 0, 255);
 
         auto segmentationSettings = settings_.pointProcessorSettings.segmentationSettings;
         float foregroundRadius1 = segmentationSettings.circumferenceTestSettings.foregroundRadius1;
@@ -534,7 +534,7 @@ namespace astra { namespace hand {
         }
 
         cv::Point spawnPosition = get_spawn_position();
-        rgb_pixel spawnColor(255, 0, 255);
+        RgbPixel spawnColor(255, 0, 255);
 
         mark_image_pixel(imageFrame, spawnColor, Vector2i(spawnPosition.x, spawnPosition.y));
     }
@@ -544,10 +544,10 @@ namespace astra { namespace hand {
         PROFILE_FUNC();
         float maxVelocity_ = 0.1;
 
-        rgb_pixel foregroundColor(0, 0, 255);
-        rgb_pixel searchedColor(128, 255, 0);
-        rgb_pixel searchedColor2(0, 128, 255);
-        rgb_pixel testPassColor(0, 255, 128);
+        RgbPixel foregroundColor(0, 0, 255);
+        RgbPixel searchedColor(128, 255, 0);
+        RgbPixel searchedColor2(0, 128, 255);
+        RgbPixel testPassColor(0, 255, 128);
 
         debug_handview_type view = debugimagestream_->view_type();
 

@@ -35,17 +35,17 @@ namespace samples { namespace common {
             ambientColor_ = {30, 30, 30};
         }
 
-        void set_light_color(const astra_rgb_pixel_t& color)
+        void set_light_color(const RgbPixel& color)
         {
             lightColor_ = color;
         }
 
-        void set_light_direction(const astra_vector3f_t& direction)
+        void set_light_direction(const Vector3f& direction)
         {
             lightVector_ = direction;
         }
 
-        void set_ambient_color(const astra_rgb_pixel_t& color)
+        void set_ambient_color(const RgbPixel& color)
         {
             ambientColor_ = color;
         }
@@ -57,7 +57,7 @@ namespace samples { namespace common {
 
         void update(PointFrame& pointFrame);
 
-        astra_rgb_pixel_t* get_output() { return outputBuffer_.get(); }
+        RgbPixel* get_output() { return outputBuffer_.get(); }
 
     private:
         using VectorMapPtr = std::unique_ptr<Vector3f[]>;
@@ -67,13 +67,13 @@ namespace samples { namespace common {
 
         Vector3f lightVector_;
         unsigned int blurRadius_{1};
-        astra_rgb_pixel_t lightColor_;
-        astra_rgb_pixel_t ambientColor_;
+        RgbPixel lightColor_;
+        RgbPixel ambientColor_;
 
         size_t outputWidth_;
         size_t outputHeight_;
 
-        using BufferPtr = std::unique_ptr<astra_rgb_pixel_t[]>;
+        using BufferPtr = std::unique_ptr<RgbPixel[]>;
         BufferPtr outputBuffer_{nullptr};
 
         void prepare_buffer(size_t width, size_t height);
@@ -264,10 +264,10 @@ namespace samples { namespace common {
         {
             outputWidth_ = width;
             outputHeight_ = height;
-            outputBuffer_ = std::make_unique<astra_rgb_pixel_t[]>(outputWidth_ * outputHeight_);
+            outputBuffer_ = std::make_unique<RgbPixel[]>(outputWidth_ * outputHeight_);
         }
 
-        std::fill(outputBuffer_.get(), outputBuffer_.get()+outputWidth_*outputHeight_, astra_rgb_pixel_t{0,0,0});
+        std::fill(outputBuffer_.get(), outputBuffer_.get()+outputWidth_*outputHeight_, RgbPixel(0,0,0));
     }
 
     void lit_depth_visualizer::update(astra::PointFrame& pointFrame)
