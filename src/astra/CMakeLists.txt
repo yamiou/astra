@@ -31,7 +31,7 @@ set(${_projname}_SOURCES
   ${INCLUDE_PATH}/capi/streams/stream_types.h
   ${INCLUDE_PATH}/streams/Color.hpp
   ${INCLUDE_PATH}/streams/DebugHand.hpp
-  ${INCLUDE_PATH}/streams/depth.hpp
+  ${INCLUDE_PATH}/streams/Depth.hpp
   ${INCLUDE_PATH}/streams/Hand.hpp
   ${INCLUDE_PATH}/streams/Image.hpp
   ${INCLUDE_PATH}/streams/Infrared.hpp
