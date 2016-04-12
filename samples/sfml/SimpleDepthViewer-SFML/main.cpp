@@ -23,13 +23,13 @@
 #include <key_handler.h>
 #include <sstream>
 
-class depthframe_listener : public astra::FrameListener
+class DepthFrameListener : public astra::FrameListener
 {
 public:
-    depthframe_listener(const astra::CoordinateMapper& CoordinateMapper)
-        : CoordinateMapper_(CoordinateMapper)
+    DepthFrameListener(const astra::CoordinateMapper& coordinateMapper)
+        : coordinateMapper_(coordinateMapper)
     {
-        lastTimepoint_ = clock_type::now();
+        prev_ = ClockType::now();
         font_.loadFromFile("Inconsolata.otf");
     }
 
@@ -43,7 +43,7 @@ public:
             // texture is RGBA
             int byteLength = displayWidth_ * displayHeight_ * 4;
 
-            displayBuffer_ = buffer_ptr(new uint8_t[byteLength]);
+            displayBuffer_ = BufferPtr(new uint8_t[byteLength]);
             memset(displayBuffer_.get(), 0, byteLength);
 
             texture_.create(displayWidth_, displayHeight_);
@@ -54,22 +54,23 @@ public:
 
     void check_fps()
     {
-        const double frameWeight = 0.2;
+        const float frameWeight = .2f;
 
-        auto newTimepoint = clock_type::now();
-        auto frameDuration = std::chrono::duration_cast<duration_type>(newTimepoint - lastTimepoint_);
+        const ClockType::time_point now = ClockType::now();
+        const float elapsedMillis = std::chrono::duration_cast<DurationType>(now - prev_).count();
 
-        frameDuration_ = frameDuration * frameWeight + frameDuration_ * (1 - frameWeight);
-        lastTimepoint_ = newTimepoint;
+        elapsedMillis_ = elapsedMillis * frameWeight + elapsedMillis_ * (1.f - frameWeight);
+        prev_ = now;
 
-        double fps = 1.0 / frameDuration_.count();
+        const double fps = 1000.f / elapsedMillis;
 
-        auto precision = std::cout.precision();
+        const auto precision = std::cout.precision();
+
         std::cout << std::fixed
                   << std::setprecision(1)
                   << fps << " fps ("
-                  << std::setprecision(2)
-                  << frameDuration.count() * 1000 << " ms)"
+                  << std::setprecision(1)
+                  << elapsedMillis_ << " ms)"
                   << std::setprecision(precision)
                   << std::endl;
     }
@@ -123,7 +124,7 @@ public:
                 // texture is RGBA
                 int byteLength = depthWidth_ * depthHeight_ * sizeof(uint16_t);
 
-                depthData_ = depth_ptr(new int16_t[byteLength]);
+                depthData_ = DepthPtr(new int16_t[byteLength]);
             }
             depthFrame.copy_to(depthData_.get());
         }
@@ -169,12 +170,12 @@ public:
         int z = depthData_[index];
 
         float worldX, worldY, worldZ;
-        CoordinateMapper_.convert_depth_to_world(static_cast<float>(mouseX),
-                                                  static_cast<float>(mouseY),
-                                                  static_cast<float>(z),
-                                                  &worldX,
-                                                  &worldY,
-                                                  &worldZ);
+        coordinateMapper_.convert_depth_to_world(static_cast<float>(mouseX),
+                                                 static_cast<float>(mouseY),
+                                                 static_cast<float>(z),
+                                                 &worldX,
+                                                 &worldY,
+                                                 &worldZ);
 
         std::stringstream str;
         str << std::fixed << std::setprecision(0)
@@ -230,35 +231,35 @@ public:
 private:
     samples::common::lit_depth_visualizer visualizer_;
 
-    using duration_type = std::chrono::duration<double>;
-    duration_type frameDuration_{0.0};
+    using DurationType = std::chrono::milliseconds;
+    using ClockType = std::chrono::high_resolution_clock;
 
-    using clock_type = std::chrono::system_clock;
-    std::chrono::time_point<clock_type> lastTimepoint_;
+    ClockType::time_point prev_;
+    float elapsedMillis_{.0f};
+
     sf::Texture texture_;
     sf::Sprite sprite_;
     sf::Font font_;
 
-    const astra::CoordinateMapper& CoordinateMapper_;
+    const astra::CoordinateMapper& coordinateMapper_;
 
     int displayWidth_{0};
     int displayHeight_{0};
 
-    using buffer_ptr = std::unique_ptr<uint8_t[]>;
-    buffer_ptr displayBuffer_{ nullptr };
+    using BufferPtr = std::unique_ptr<uint8_t[]>;
+    BufferPtr displayBuffer_{nullptr};
 
     int depthWidth_{0};
     int depthHeight_{0};
 
-    using depth_ptr = std::unique_ptr<int16_t[]>;
-    depth_ptr depthData_{nullptr};
+    using DepthPtr = std::unique_ptr<int16_t[]>;
+    DepthPtr depthData_{nullptr};
 
     float mouseNormX_{0};
     float mouseNormY_{0};
     bool isPaused_{false};
     bool isMouseOverlayEnabled_{true};
 };
-
 
 int main(int argc, char** argv)
 {
@@ -283,11 +284,10 @@ int main(int argc, char** argv)
     reader.stream<astra::PointStream>().start();
 
     auto depthStream = reader.stream<astra::DepthStream>();
-
     depthStream.start();
 
     auto coordinateMapper = depthStream.coordinateMapper();
-    depthframe_listener listener(coordinateMapper);
+    DepthFrameListener listener(coordinateMapper);
 
     reader.add_listener(listener);
 

@@ -24,12 +24,12 @@
 #include <cstring>
 #include <key_handler.h>
 
-class my_frame_listener : public astra::FrameListener
+class ColorFrameListener : public astra::FrameListener
 {
 public:
-    my_frame_listener()
+    ColorFrameListener()
     {
-        lastTimepoint_ = clock_type::now();
+        prev_ = ClockType::now();
     }
 
     void init_texture(int width, int height)
@@ -53,28 +53,28 @@ public:
 
     void check_fps()
     {
-        const double frameWeight = 0.2;
+        const float frameWeight = .2f;
 
-        auto newTimepoint = clock_type::now();
-        auto frameDuration = std::chrono::duration_cast<duration_type>(newTimepoint - lastTimepoint_);
+        const ClockType::time_point now = ClockType::now();
+        const float elapsedMillis = std::chrono::duration_cast<DurationType>(now - prev_).count();
 
-        frameDuration_ = frameDuration * frameWeight + frameDuration_ * (1 - frameWeight);
-        lastTimepoint_ = newTimepoint;
+        elapsedMillis_ = elapsedMillis * frameWeight + elapsedMillis_ * (1.f - frameWeight);
+        prev_ = now;
 
-        double fps = 1.0 / frameDuration_.count();
+        const float fps = 1000.f / elapsedMillis;
 
-        auto precision = std::cout.precision();
+        const auto precision = std::cout.precision();
+
         std::cout << std::fixed
-            << std::setprecision(1)
-            << fps << " fps ("
-            << std::setprecision(2)
-            << frameDuration.count() * 1000 << " ms)"
-            << std::setprecision(precision)
-            << std::endl;
+                  << std::setprecision(1)
+                  << fps << " fps ("
+                  << std::setprecision(1)
+                  << elapsedMillis_ << " ms)"
+                  << std::setprecision(precision)
+                  << std::endl;
     }
 
-    virtual void on_frame_ready(astra::StreamReader& reader,
-        astra::Frame& frame) override
+    virtual void on_frame_ready(astra::StreamReader& reader, astra::Frame& frame) override
     {
         astra::ColorFrame colorFrame = frame.get<astra::ColorFrame>();
 
@@ -93,6 +93,7 @@ public:
             displayBuffer_[rgbaOffset + 2] = colorData[i].b;
             displayBuffer_[rgbaOffset + 3] = 255;
         }
+
         texture_.update(displayBuffer_.get());
         check_fps();
     }
@@ -102,29 +103,27 @@ public:
         if (displayBuffer_ != nullptr)
         {
             float imageScale = window.getView().getSize().x / displayWidth_;
-
             sprite_.setScale(imageScale, imageScale);
-
             window.draw(sprite_);
         }
     }
 
 private:
-    using duration_type = std::chrono::duration<double>;
-    duration_type frameDuration_{ 0.0 };
+    using DurationType = std::chrono::milliseconds;
+    using ClockType = std::chrono::high_resolution_clock;
 
-    using clock_type = std::chrono::system_clock;
-    std::chrono::time_point<clock_type> lastTimepoint_;
+    ClockType::time_point prev_;
+    float elapsedMillis_{.0f};
+
     sf::Texture texture_;
     sf::Sprite sprite_;
 
-    using BufferPtr = std::unique_ptr < uint8_t[] >;
-    BufferPtr displayBuffer_{ nullptr };
-    int displayWidth_{ 0 };
-    int displayHeight_{ 0 };
+    using BufferPtr = std::unique_ptr<uint8_t[]>;
+    BufferPtr displayBuffer_{nullptr};
+
+    int displayWidth_{0};
+    int displayHeight_{0};
 };
-
-
 
 int main(int argc, char** argv)
 {
@@ -139,7 +138,7 @@ int main(int argc, char** argv)
 
     reader.stream<astra::ColorStream>().start();
 
-    my_frame_listener listener;
+    ColorFrameListener listener;
     reader.add_listener(listener);
 
     while (window.isOpen())
