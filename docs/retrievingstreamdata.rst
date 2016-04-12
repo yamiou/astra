@@ -58,7 +58,7 @@ The polling method for getting frame data is the most direct method for getting 
    reader.stream<astra::depthstream>().start();
 
    astra::frame frame = reader.get_latest_frame();
-   auto depthFrame = frame.get<astra::depthframe>();
+   const auto depthFrame = frame.get<astra::depthframe>();
 
    astra::Astra::terminate();
 
@@ -77,7 +77,7 @@ The listening method for getting frame data requires a small amount of additiona
       virtual void on_frame_ready(astra::StreamReader& reader,
                                 astra::frame& frame) override
       {
-         astra::depthframe depthFrame = frame.get<astra::depthframe>();
+         const astra::depthframe depthFrame = frame.get<astra::depthframe>();
 
          if (depthFrame.is_valid())
          {

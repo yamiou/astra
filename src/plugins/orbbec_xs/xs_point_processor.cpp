@@ -36,7 +36,7 @@ namespace astra { namespace xs {
 
     void point_processor::on_frame_ready(StreamReader& reader, Frame& frame)
     {
-        DepthFrame depthFrame = frame.get<DepthFrame>();
+        const DepthFrame depthFrame = frame.get<DepthFrame>();
 
         create_point_stream_if_necessary(depthFrame);
 
@@ -47,12 +47,9 @@ namespace astra { namespace xs {
         }
     }
 
-    void point_processor::create_point_stream_if_necessary(DepthFrame& depthFrame)
+    void point_processor::create_point_stream_if_necessary(const DepthFrame& depthFrame)
     {
-        if (pointStream_ != nullptr)
-        {
-            return;
-        }
+        if (!pointStream_) { return; }
 
         //TODO check for changes in depthFrame width and height and update bin size
         LOG_INFO("astra.xs.point_processor", "creating point stream");
@@ -68,7 +65,7 @@ namespace astra { namespace xs {
         depthConversionCache_ = depthStream_.depth_to_world_data();
     }
 
-    void point_processor::update_pointframe_from_depth(DepthFrame& depthFrame)
+    void point_processor::update_pointframe_from_depth(const DepthFrame& depthFrame)
     {
         //use same frameIndex as source depth frame
         astra_frame_index_t frameIndex = depthFrame.frame_index();
@@ -95,7 +92,7 @@ namespace astra { namespace xs {
         }
     }
 
-    void point_processor::calculate_point_frame(DepthFrame& depthFrame,
+    void point_processor::calculate_point_frame(const DepthFrame& depthFrame,
                                                 Vector3f* p_points)
     {
         int width = depthFrame.width();

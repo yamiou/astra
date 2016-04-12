@@ -76,7 +76,7 @@ public:
 
     virtual void on_frame_ready(astra::StreamReader& reader, astra::Frame& frame) override
     {
-        astra::ColorFrame colorFrame = frame.get<astra::ColorFrame>();
+        const astra::ColorFrame colorFrame = frame.get<astra::ColorFrame>();
 
         int width = colorFrame.width();
         int height = colorFrame.height();

@@ -112,7 +112,7 @@ public:
 
     void process_depth(astra::Frame& frame)
     {
-        astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
+        const astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
 
         const int width = pointFrame.width();
         const int height = pointFrame.height();
@@ -177,7 +177,7 @@ public:
 
     void process_hand_frame(astra::Frame& frame)
     {
-        astra::handframe handFrame = frame.get<astra::handframe>();
+        const astra::HandFrame handFrame = frame.get<astra::HandFrame>();
 
         handPoints_ = handFrame.handpoints();
 
@@ -186,7 +186,7 @@ public:
         {
             if (handPoint.status() == HAND_STATUS_TRACKING)
             {
-                update_hand_trace(handPoint.trackingId(), handPoint.depthPosition());
+                update_hand_trace(handPoint.tracking_id(), handPoint.depth_position());
             }
         }
     }
@@ -226,9 +226,9 @@ public:
                          const float radius,
                          const float x,
                          const float y,
-                         const astra::handpoint& handPoint)
+                         const astra::HandPoint& handPoint)
     {
-        const auto trackingId = handPoint.trackingId();
+        const auto trackingId = handPoint.tracking_id();
 
         std::stringstream str;
         str << trackingId;
@@ -247,9 +247,9 @@ public:
                             const float radius,
                             const float x,
                             const float y,
-                            const astra::handpoint& handPoint)
+                            const astra::HandPoint& handPoint)
     {
-        const auto worldPosition = handPoint.worldPosition();
+        const auto worldPosition = handPoint.world_position();
 
         std::stringstream str;
         str << std::fixed
@@ -314,7 +314,7 @@ public:
                 color = trackingColor;
             }
 
-            const astra::Vector2i& p = handPoint.depthPosition();
+            const astra::Vector2i& p = handPoint.depth_position();
 
             const float circleX = (p.x + .5f) * depthScale;
             const float circleY = (p.y + .5f) * depthScale;
@@ -363,7 +363,7 @@ private:
     using BufferPtr = std::unique_ptr<uint8_t[]>;
     BufferPtr displayBuffer_{nullptr};
 
-    std::vector<astra::handpoint> handPoints_;
+    std::vector<astra::HandPoint> handPoints_;
 
     PointMap pointMap_;
 
@@ -384,7 +384,7 @@ int main(int argc, char** argv)
     astra::StreamReader reader = streamSet.create_reader();
 
     reader.stream<astra::PointStream>().start();
-    reader.stream<astra::handstream>().start();
+    reader.stream<astra::HandStream>().start();
 
     HandFrameListener listener;
 

@@ -77,7 +77,7 @@ namespace astra { namespace serialization {
         return true;
     }
 
-    bool FrameStreamWriter::write(DepthFrame& depthFrame)
+    bool FrameStreamWriter::write(const DepthFrame& depthFrame)
     {
         bool isSuccessful = true;
 

@@ -33,7 +33,7 @@ public:
     virtual void on_frame_ready(astra::StreamReader& reader,
                                 astra::Frame& frame) override
     {
-        astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
+        const astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
 
         if (depthFrame.is_valid())
         {
@@ -43,7 +43,7 @@ public:
         }
     }
 
-    void print_depth(astra::DepthFrame& depthFrame,
+    void print_depth(const astra::DepthFrame& depthFrame,
                      const astra::CoordinateMapper& mapper)
     {
         if (depthFrame.is_valid())

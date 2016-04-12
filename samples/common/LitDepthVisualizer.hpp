@@ -55,9 +55,9 @@ namespace samples { namespace common {
             blurRadius_ = radius;
         }
 
-        void update(PointFrame& pointFrame);
+        void update(const PointFrame& pointFrame);
 
-        RgbPixel* get_output() { return outputBuffer_.get(); }
+        RgbPixel* get_output() const { return outputBuffer_.get(); }
 
     private:
         using VectorMapPtr = std::unique_ptr<Vector3f[]>;
@@ -77,7 +77,7 @@ namespace samples { namespace common {
         BufferPtr outputBuffer_{nullptr};
 
         void prepare_buffer(size_t width, size_t height);
-        void calculate_normals(PointFrame& pointFrame);
+        void calculate_normals(const PointFrame& pointFrame);
     };
 
     void box_blur(const Vector3f* in,
@@ -156,7 +156,7 @@ namespace samples { namespace common {
         }
     }
 
-    void LitDepthVisualizer::calculate_normals(PointFrame& pointFrame)
+    void LitDepthVisualizer::calculate_normals(const PointFrame& pointFrame)
     {
         const Vector3f* positionMap = pointFrame.data();
 
@@ -270,7 +270,7 @@ namespace samples { namespace common {
         std::fill(outputBuffer_.get(), outputBuffer_.get()+outputWidth_*outputHeight_, RgbPixel(0,0,0));
     }
 
-    void LitDepthVisualizer::update(astra::PointFrame& pointFrame)
+    void LitDepthVisualizer::update(const astra::PointFrame& pointFrame)
     {
         calculate_normals(pointFrame);
 

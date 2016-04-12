@@ -31,7 +31,7 @@ public:
     virtual void on_frame_ready(astra::StreamReader& reader,
                                 astra::Frame& frame) override
     {
-        astra::ColorFrame colorFrame = frame.get<astra::ColorFrame>();
+        const astra::ColorFrame colorFrame = frame.get<astra::ColorFrame>();
 
         if (colorFrame.is_valid())
         {
@@ -39,7 +39,7 @@ public:
         }
     }
 
-    void print_color(astra::ColorFrame& colorFrame)
+    void print_color(const astra::ColorFrame& colorFrame)
     {
         if (colorFrame.is_valid())
         {

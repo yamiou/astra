@@ -86,8 +86,8 @@ namespace astra { namespace hand {
         if (handStream_->has_connections() ||
             debugimagestream_->has_connections())
         {
-            DepthFrame depthFrame = frame.get<DepthFrame>();
-            PointFrame pointFrame = frame.get<PointFrame>();
+            const DepthFrame depthFrame = frame.get<DepthFrame>();
+            const PointFrame pointFrame = frame.get<PointFrame>();
             update_tracking(depthFrame, pointFrame);
         }
 
@@ -101,7 +101,7 @@ namespace astra { namespace hand {
         pointProcessor_.reset();
     }
 
-    void hand_tracker::update_tracking(DepthFrame& depthFrame, PointFrame& pointFrame)
+    void hand_tracker::update_tracking(const DepthFrame& depthFrame, const PointFrame& pointFrame)
     {
         PROFILE_FUNC();
         if (!debugimagestream_->pause_input())

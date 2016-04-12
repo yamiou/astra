@@ -97,7 +97,7 @@ namespace astra {
 
         static const astra_stream_type_t id = ASTRA_STREAM_DEPTH;
 
-        conversion_cache_t depth_to_world_data()
+        conversion_cache_t depth_to_world_data() const
         {
             conversion_cache_t data;
             astra_depthstream_get_depth_to_world_data(depthStream_, &data);
@@ -105,7 +105,7 @@ namespace astra {
             return data;
         }
 
-        bool registration_enabled()
+        bool registration_enabled() const
         {
             bool enabled = false;
             astra_depthstream_get_registration(depthStream_, &enabled);
@@ -118,7 +118,7 @@ namespace astra {
             astra_depthstream_set_registration(depthStream_, enable);
         }
 
-        const CoordinateMapper& coordinateMapper() { return coordinateMapper_; };
+        const CoordinateMapper& coordinateMapper() const { return coordinateMapper_; };
 
     private:
         astra_depthstream_t depthStream_;

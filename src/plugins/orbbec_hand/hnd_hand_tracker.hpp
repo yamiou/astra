@@ -55,7 +55,7 @@ namespace astra { namespace hand {
         void overlay_circle(_astra_imageframe& imageFrame);
         void update_debug_image_frame(_astra_imageframe& astraColorframe);
         void generate_hand_debug_image_frame(astra_frame_index_t frameIndex);
-        void update_tracking(DepthFrame& depthFrame, PointFrame& pointFrame);
+        void update_tracking(const DepthFrame& depthFrame, const PointFrame& pointFrame);
         void update_hand_frame(std::vector<tracked_point>& internaltracked_points, _astra_handframe& frame);
 
         void debug_probe_point(tracking_matrices& matrices);

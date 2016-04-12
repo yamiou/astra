@@ -43,9 +43,7 @@ namespace astra {
     class ImageStreamMode : private ::astra_imagestream_mode_t
     {
     public:
-        ImageStreamMode()
-        {}
-
+        ImageStreamMode() = default;
         ImageStreamMode(std::uint32_t width, std::uint32_t height, std::uint8_t fps, astra_pixel_format_t format)
         {
             set_width(width);
@@ -72,7 +70,7 @@ namespace astra {
         operator ::astra_imagestream_mode_t*() { return this; }
         operator const ::astra_imagestream_mode_t*() const { return this; }
 
-        const std::uint8_t fps() const { return astra_imagestream_mode_t::fps; }
+        std::uint8_t fps() const { return astra_imagestream_mode_t::fps; }
         void set_fps(std::uint8_t fps) { astra_imagestream_mode_t::fps = fps; }
 
         const std::uint8_t bytes_per_pixel() const
@@ -82,10 +80,10 @@ namespace astra {
             return bpp;
         }
 
-        const std::uint32_t width() const { return astra_imagestream_mode_t::width; }
+        std::uint32_t width() const { return astra_imagestream_mode_t::width; }
         void set_width(std::uint32_t width) { astra_imagestream_mode_t::width = width; }
 
-        const std::uint32_t height() const { return astra_imagestream_mode_t::height; }
+        std::uint32_t height() const { return astra_imagestream_mode_t::height; }
         void set_height(std::uint32_t height) { astra_imagestream_mode_t::height = height; }
 
         astra_pixel_format_t pixel_format() const { return astra_imagestream_mode_t::pixelFormat; }
@@ -214,30 +212,30 @@ namespace astra {
 
         const bool is_valid() const { return imageFrame_ != nullptr; }
 
-        const int width() const { throwIfInvalidFrame(); return metadata_.width; }
-        const int height() const { throwIfInvalidFrame(); return metadata_.height; }
+        const int width() const { throw_if_invalid_frame(); return metadata_.width; }
+        const int height() const { throw_if_invalid_frame(); return metadata_.height; }
 
         const std::uint8_t bytes_per_pixel() const
         {
-            throwIfInvalidFrame();
+            throw_if_invalid_frame();
 
             std::uint8_t bpp;
             astra_pixelformat_get_bytes_per_pixel(metadata_.pixelFormat, &bpp);
             return bpp;
         }
 
-        const astra_frame_index_t frame_index() const { throwIfInvalidFrame(); return frameIndex_; }
+        const astra_frame_index_t frame_index() const { throw_if_invalid_frame(); return frameIndex_; }
         const astra_imageframe_t handle() const { return imageFrame_; }
 
         static astra_stream_type_t stream_type() { return TStreamType; }
 
-        const TDataType* data() const { throwIfInvalidFrame(); return dataPtr_; }
-        const size_t byte_length() const { throwIfInvalidFrame(); return byteLength_; }
-        const size_t length() const { throwIfInvalidFrame(); return metadata_.width * metadata_.height; }
+        const TDataType* data() const { throw_if_invalid_frame(); return dataPtr_; }
+        const size_t byte_length() const { throw_if_invalid_frame(); return byteLength_; }
+        const size_t length() const { throw_if_invalid_frame(); return metadata_.width * metadata_.height; }
 
         void copy_to(TDataType* buffer) const
         {
-            throwIfInvalidFrame();
+            throw_if_invalid_frame();
             astra_imageframe_copy_data(imageFrame_, buffer);
         }
 
@@ -257,12 +255,9 @@ namespace astra {
         }
 
     private:
-        void throwIfInvalidFrame() const
+        void throw_if_invalid_frame() const
         {
-            if (!imageFrame_)
-            {
-                throw std::logic_error("Cannot operate on an invalid frame");
-            }
+            if (!imageFrame_) { throw std::logic_error("Cannot operate on an invalid frame"); }
         }
 
         astra_imageframe_t imageFrame_{nullptr};
@@ -270,7 +265,6 @@ namespace astra {
         astra_frame_index_t frameIndex_;
 
         TDataType* dataPtr_;
-
         size_t byteLength_;
     };
 }

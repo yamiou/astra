@@ -82,7 +82,7 @@ In order to use a ``frame_listener`` with our example...
       virtual void on_frame_ready(astra::StreamReader& reader,
                                   astra::frame& frame) override
       {
-          astra::depthframe depthFrame = frame.get<astra::depthframe>();
+          const astra::depthframe depthFrame = frame.get<astra::depthframe>();
 
           if (depthFrame.is_valid())
           {
@@ -96,15 +96,15 @@ In order to use a ``frame_listener`` with our example...
           }
       }
 
-      void print_depth_frame(astra::depthframe& depthFrame)
+      void print_depth_frame(const astra::depthframe& depthFrame)
       {
-          int frameIndex = depthFrame.frameIndex();
+          int frameIndex = depthFrame.frame_index();
           short middleValue = get_middle_value(depthFrame);
 
          std::printf("Depth frameIndex: %d value: %d \n", frameIndex, middleValue);
       }
 
-      int16_t get_middle_value(astra::depthframe& depthFrame)
+      int16_t get_middle_value(const astra::depthframe& depthFrame)
       {
           int width = depthFrame.width();
           int height = depthFrame.height();

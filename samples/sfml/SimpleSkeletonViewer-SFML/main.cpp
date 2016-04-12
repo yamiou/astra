@@ -55,7 +55,7 @@ public:
 
     void processDepth(astra::Frame& frame)
     {
-        astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
+        const astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
 
         int width = depthFrame.width();
         int height = depthFrame.height();

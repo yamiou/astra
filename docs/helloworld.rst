@@ -181,7 +181,7 @@ In order to access streams from the Astra and get to the frames, we'll need a ``
       reader.stream<astra::depthstream>().start();
 
       astra::frame frame = reader.get_latest_frame();
-      auto depthFrame = frame.get<astra::depthframe>();
+      const auto depthFrame = frame.get<astra::depthframe>();
 
       astra::Astra::terminate();
 
@@ -210,7 +210,7 @@ In order to access streams from the Astra and get to the frames, we'll need a ``
       reader.stream<astra::depthstream>().start();
 
       astra::frame frame = reader.get_latest_frame();
-      auto depthFrame = frame.get<astra::depthframe>();
+      const auto depthFrame = frame.get<astra::depthframe>();
 
       int frameIndex = depthFrame.frameIndex();
       int16_t pixelValue = depthFrame.data()[0];
@@ -263,7 +263,7 @@ The following code is highly similar to the code from our last example, except w
       do
       {
          astra::frame frame = reader.get_latest_frame();
-         auto depthFrame = frame.get<astra::depthframe>();
+         const auto depthFrame = frame.get<astra::depthframe>();
 
          int frameIndex = depthFrame.frameIndex();
          int16_t pixelValue = depthFrame.data()[0];

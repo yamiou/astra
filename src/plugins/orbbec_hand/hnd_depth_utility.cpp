@@ -62,7 +62,7 @@ namespace astra { namespace hand {
         }
     }
 
-    void depth_utility::depth_to_velocity_signal(DepthFrame& depthFrame,
+    void depth_utility::depth_to_velocity_signal(const DepthFrame& depthFrame,
                                                  cv::Mat& matDepth,
                                                  cv::Mat& matDepthFullSize,
                                                  cv::Mat& matVelocitySignal)
@@ -118,7 +118,7 @@ namespace astra { namespace hand {
         //analyze_velocities(matDepth, matDepthVelErode_);
     }
 
-    void depth_utility::depthframe_to_matrix(DepthFrame& depthFrameSrc,
+    void depth_utility::depthframe_to_matrix(const DepthFrame& depthFrameSrc,
                                              const int width,
                                              const int height,
                                              cv::Mat& matTarget)

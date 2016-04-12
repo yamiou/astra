@@ -67,7 +67,7 @@ public:
 
     void processDepth(astra::Frame& frame)
     {
-        astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
+        const astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
 
         int width = depthFrame.width();
         int height = depthFrame.height();
@@ -97,14 +97,14 @@ public:
 
     void processHandFrame(astra::Frame& frame)
     {
-        astra::handframe handFrame = frame.get<astra::handframe>();
+        const astra::HandFrame handFrame = frame.get<astra::HandFrame>();
 
         handPoints_ = handFrame.handpoints();
     }
 
     void processdebug_handframe(astra::Frame& frame)
     {
-        astra::DebugHandFrame handFrame = frame.get<astra::DebugHandFrame>();
+        const astra::DebugHandFrame handFrame = frame.get<astra::DebugHandFrame>();
 
         int width = handFrame.width();
         int height = handFrame.height();
@@ -164,9 +164,9 @@ public:
         window.draw(text);
     }
 
-    void drawHandLabel(sf::RenderWindow& window, float radius, float x, float y, astra::handpoint& handPoint)
+    void drawHandLabel(sf::RenderWindow& window, float radius, float x, float y, astra::HandPoint& handPoint)
     {
-        int32_t trackingId = handPoint.trackingId();
+        int32_t trackingId = handPoint.tracking_id();
         std::stringstream str;
         str << trackingId;
         if (handPoint.status() == HAND_STATUS_LOST)
@@ -182,9 +182,9 @@ public:
         drawShadowText(window, label, sf::Color::White, x, y - radius - 10);
     }
 
-    void drawHandPosition(sf::RenderWindow& window, float radius, float x, float y, astra::handpoint& handPoint)
+    void drawHandPosition(sf::RenderWindow& window, float radius, float x, float y, astra::HandPoint& handPoint)
     {
-        auto worldPosition = handPoint.worldPosition();
+        auto worldPosition = handPoint.world_position();
         std::stringstream str;
         str << std::fixed << std::setprecision(0);
         str << worldPosition.x << "," << worldPosition.y << "," << worldPosition.z;
@@ -216,7 +216,7 @@ public:
                 color = candidateColor;
             }
 
-            const astra::Vector2i& p = handPoint.depthPosition();
+            const astra::Vector2i& p = handPoint.depth_position();
 
             float circleX = (p.x + 0.5) * depthScale;
             float circleY = (p.y + 0.5) * depthScale;
@@ -334,7 +334,7 @@ private:
     using BufferPtr = std::unique_ptr < uint8_t[] > ;
     BufferPtr displayBuffer_;
 
-    std::vector<astra::handpoint> handPoints_;
+    std::vector<astra::HandPoint> handPoints_;
     astra::DebugHandViewType viewType_;
     int depthWidth_{ 1 };
     int depthHeight_{ 1 };
@@ -468,7 +468,7 @@ int main(int argc, char** argv)
     debug_frame_listener listener;
 
     reader.stream<astra::DepthStream>().start();
-    auto handStream = reader.stream<astra::handstream>();
+    auto handStream = reader.stream<astra::HandStream>();
     handStream.start();
     handStream.set_include_candidate_points(true);
 

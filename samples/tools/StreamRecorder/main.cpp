@@ -50,7 +50,7 @@ public:
         printf("closed file\n");
     }
 
-    void add_frame(DepthFrame& depthFrame) {
+    void add_frame(const DepthFrame& depthFrame) {
         if (!depthFrame.is_valid()) {
             return;
         }
@@ -146,7 +146,7 @@ private:
                   << std::endl;
     }
 
-    void visualize_frame(PointFrame& pointFrame)
+    void visualize_frame(const PointFrame& pointFrame)
     {
         if (!pointFrame.is_valid()) {
             return;
@@ -173,8 +173,8 @@ private:
     virtual void on_frame_ready(StreamReader& reader,
                                 Frame& frame) override
     {
-        PointFrame pointFrame = frame.get<PointFrame>();
-        DepthFrame depthFrame = frame.get<DepthFrame>();
+        const PointFrame pointFrame = frame.get<PointFrame>();
+        const DepthFrame depthFrame = frame.get<DepthFrame>();
 
         if (recorder_ != nullptr) {
             recorder_->add_frame(depthFrame);

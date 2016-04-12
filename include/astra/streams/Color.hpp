@@ -27,7 +27,6 @@ namespace astra {
     class ColorStream : public ImageStream
     {
     public:
-
         explicit ColorStream(astra_streamconnection_t connection)
             : ImageStream(connection)
         {

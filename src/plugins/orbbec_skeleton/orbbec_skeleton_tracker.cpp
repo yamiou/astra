@@ -97,7 +97,7 @@ namespace orbbec { namespace skeleton {
             return; // don't waste cycles if no one is listening
 
         LOG_TRACE("orbbec.skeleton.skeleton_tracker", "generating skeleton frame");
-        astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
+        const astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
 
         if (!depthFrame.is_valid())
             return;

@@ -78,7 +78,7 @@ public:
     virtual void on_frame_ready(astra::StreamReader& reader,
                                 astra::Frame& frame) override
     {
-        astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
+        const astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
 
         int width = pointFrame.width();
         int height = pointFrame.height();
@@ -110,7 +110,7 @@ public:
 
     void copy_depth_data(astra::Frame& frame)
     {
-        astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
+        const astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
 
         if (depthFrame.is_valid())
         {

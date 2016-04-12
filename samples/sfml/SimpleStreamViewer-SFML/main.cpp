@@ -100,7 +100,7 @@ public:
 
     void update_depth(astra::Frame& frame)
     {
-        astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
+        const astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
 
         if (!pointFrame.is_valid())
         {
@@ -134,7 +134,7 @@ public:
 
     void update_color(astra::Frame& frame)
     {
-        astra::ColorFrame colorFrame = frame.get<astra::ColorFrame>();
+        const astra::ColorFrame colorFrame = frame.get<astra::ColorFrame>();
 
         if (!colorFrame.is_valid())
         {
@@ -167,7 +167,7 @@ public:
 
     void update_ir_16(astra::Frame& frame)
     {
-        astra::InfraredFrame16 irFrame = frame.get<astra::InfraredFrame16>();
+        const astra::InfraredFrame16 irFrame = frame.get<astra::InfraredFrame16>();
 
         if (!irFrame.is_valid())
         {
@@ -202,7 +202,7 @@ public:
 
     void update_ir_rgb(astra::Frame& frame)
     {
-        astra::InfraredFrameRgb irFrame = frame.get<astra::InfraredFrameRgb>();
+        const astra::InfraredFrameRgb irFrame = frame.get<astra::InfraredFrameRgb>();
 
         if (!irFrame.is_valid())
         {

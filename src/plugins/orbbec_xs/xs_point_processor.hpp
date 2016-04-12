@@ -33,10 +33,10 @@ namespace astra { namespace xs {
         virtual void on_frame_ready(StreamReader& reader, Frame& frame) override;
 
     private:
-        void create_point_stream_if_necessary(DepthFrame& depthFrame);
+        void create_point_stream_if_necessary(const DepthFrame& depthFrame);
 
-        void update_pointframe_from_depth(DepthFrame& depthFrame);
-        void calculate_point_frame(DepthFrame& depthFrame,
+        void update_pointframe_from_depth(const DepthFrame& depthFrame);
+        void calculate_point_frame(const DepthFrame& depthFrame,
                                    Vector3f* p_points);
 
         StreamSet streamset_;

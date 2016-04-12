@@ -60,7 +60,7 @@ namespace astra {
             astra_debug_handstream_set_lock_spawn_point(debugHandStream_, lockSpawnPoint);
         }
 
-        DebugHandViewType get_view_type()
+        DebugHandViewType get_view_type() const
         {
             DebugHandViewType view;
             astra_debug_handstream_get_view_type(debugHandStream_, &view);

@@ -56,12 +56,12 @@ The designers of the SDK are also experienced 3D sensor developers themselves, a
    astra::frame frame = reader.get_latest_frame();
 
    //Low-Level Streams
-   auto depthFrame = frame.get<astra::depthframe>();
-   auto colorFrame = frame.get<astra::colorframe>();
+   const auto depthFrame = frame.get<astra::depthframe>();
+   const auto colorFrame = frame.get<astra::colorframe>();
 
    //High-Level Streams
-   auto handFrame = frame.get<astra::handframe>();
-   auto pointFrame = frame.get<astra::pointframe>();
+   const auto handFrame = frame.get<astra::handframe>();
+   const auto pointFrame = frame.get<astra::pointframe>();
 
    astra::Astra::terminate();
 
