@@ -43,9 +43,9 @@ namespace orbbec { namespace mocks {
     public:
         using wrapper_type = TFrameWrapper;
 
-        device_stream(astra::pluginservice_proxy& pluginService,
+        device_stream(astra::PluginServiceProxy& pluginService,
                       astra_streamset_t streamSet,
-                      astra::stream_description desc,
+                      astra::StreamDescription desc,
                       orbbec::mocks::stream_listener& listener,
                       astra::devices::sensor_stream::shared_ptr stream);
 
@@ -104,9 +104,9 @@ namespace orbbec { namespace mocks {
 namespace orbbec { namespace mocks {
 
     template<typename TFrameWrapper>
-    device_stream<TFrameWrapper>::device_stream(astra::pluginservice_proxy& pluginService,
+    device_stream<TFrameWrapper>::device_stream(astra::PluginServiceProxy& pluginService,
                                                 astra_streamset_t streamSet,
-                                                astra::stream_description desc,
+                                                astra::StreamDescription desc,
                                                 orbbec::mocks::stream_listener& listener,
                                                 astra::devices::sensor_stream::shared_ptr stream)
         : orbbec::mocks::mock_stream(pluginService,
@@ -237,17 +237,17 @@ namespace orbbec { namespace mocks {
     template<typename TFrameWrapper>
     void device_stream<TFrameWrapper>::set_mode(const astra::ImageStreamMode& mode)
     {
-        assert(mode.pixelFormat() != 0);
+        assert(mode.pixel_format() != 0);
 
         bufferLength_ =
             mode.width() *
             mode.height() *
-            mode.bytesPerPixel();
+            mode.bytes_per_pixel();
 
         LOG_INFO("orbbec.mocks.device_stream", "bin change: %ux%ux%u len: %u",
                  mode.width(),
                  mode.height(),
-                 mode.bytesPerPixel(),
+                 mode.bytes_per_pixel(),
                  bufferLength_);
 
         bin_ = std::make_unique<bin_type>(pluginService(),
@@ -270,7 +270,7 @@ namespace orbbec { namespace mocks {
 
         const auto& mode = deviceStream_->active_mode();
 
-        md.pixelFormat = mode.pixelFormat();
+        md.pixelFormat = mode.pixel_format();
         md.width = mode.width();
         md.height = mode.height();
     }
@@ -301,9 +301,9 @@ namespace orbbec { namespace mocks {
             LOG_INFO("orbbec.mocks.device_stream", "mode: %ux%ux%u@%u pf:%u",
                      mode.width(),
                      mode.height(),
-                     mode.bytesPerPixel(),
+                     mode.bytes_per_pixel(),
                      mode.fps(),
-                     mode.pixelFormat());
+                     mode.pixel_format());
         }
 
         set_mode(deviceStream_->active_mode());
@@ -371,9 +371,9 @@ namespace orbbec { namespace mocks {
     class image_stream : public device_stream<::astra_imageframe_wrapper_t>
     {
     public:
-        image_stream(astra::pluginservice_proxy& pluginService,
+        image_stream(astra::PluginServiceProxy& pluginService,
                      astra_streamset_t streamSet,
-                     astra::stream_description desc,
+                     astra::StreamDescription desc,
                      orbbec::mocks::stream_listener& listener,
                      astra::devices::sensor_stream::shared_ptr deviceStream)
             : device_stream(pluginService, streamSet, desc, listener, deviceStream)

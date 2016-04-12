@@ -23,7 +23,7 @@
 namespace orbbec { namespace mocks {
 
     device_streamset::device_streamset(const std::string& name,
-                                       astra::pluginservice_proxy& pluginService,
+                                       astra::PluginServiceProxy& pluginService,
                                        const char* uri)
         : pluginService_(pluginService),
           uri_(uri)
@@ -114,7 +114,7 @@ namespace orbbec { namespace mocks {
                 {
                     image_stream* stream = astra::plugins::make_stream<image_stream>(pluginService_,
                                                                                      streamSetHandle_,
-                                                                                     astra::stream_description(
+                                                                                     astra::StreamDescription(
                                                                                          ASTRA_STREAM_COLOR,
                                                                                          DEFAULT_SUBTYPE),
                                                                                      *this,
@@ -144,7 +144,7 @@ namespace orbbec { namespace mocks {
                 {
                     image_stream* stream = astra::plugins::make_stream<image_stream>(pluginService_,
                                                                                      streamSetHandle_,
-                                                                                     astra::stream_description(
+                                                                                     astra::StreamDescription(
                                                                                          ASTRA_STREAM_DEPTH,
                                                                                          DEFAULT_SUBTYPE),
                                                                                      *this,
@@ -174,7 +174,7 @@ namespace orbbec { namespace mocks {
                 {
                     image_stream* stream = astra::plugins::make_stream<image_stream>(pluginService_,
                                                                                      streamSetHandle_,
-                                                                                     astra::stream_description(
+                                                                                     astra::StreamDescription(
                                                                                          ASTRA_STREAM_INFRARED,
                                                                                          DEFAULT_SUBTYPE),
                                                                                      *this,

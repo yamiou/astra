@@ -31,9 +31,9 @@ namespace orbbec { namespace mocks {
     class mock_stream : public astra::plugins::stream
     {
     public:
-        inline mock_stream(astra::pluginservice_proxy& pluginService,
+        inline mock_stream(astra::PluginServiceProxy& pluginService,
                            astra_streamset_t streamSet,
-                           astra::stream_description desc,
+                           astra::StreamDescription desc,
                            stream_listener& listener);
 
         inline astra_status_t read(astra_frame_index_t frameIndex);
@@ -65,9 +65,9 @@ namespace orbbec { namespace mocks {
 
 namespace orbbec { namespace mocks {
 
-    mock_stream::mock_stream(astra::pluginservice_proxy& pluginService,
+    mock_stream::mock_stream(astra::PluginServiceProxy& pluginService,
                              astra_streamset_t streamSet,
-                             astra::stream_description desc,
+                             astra::StreamDescription desc,
                              orbbec::mocks::stream_listener& listener)
         : astra::plugins::stream(pluginService,
                                  streamSet,

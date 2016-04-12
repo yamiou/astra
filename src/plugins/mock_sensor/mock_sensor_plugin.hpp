@@ -33,7 +33,7 @@ namespace orbbec { namespace mocks {
     class mock_sensor_plugin : public astra::plugins::plugin_base
     {
     public:
-        mock_sensor_plugin(astra::pluginservice_proxy* pluginService)
+        mock_sensor_plugin(astra::PluginServiceProxy* pluginService)
             : plugin_base(pluginService, "mock_sensor")
         {
             register_for_host_events();

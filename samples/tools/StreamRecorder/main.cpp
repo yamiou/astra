@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#include <astra/streams/astra_depth.hpp>
+#include <astra/streams/Depth.hpp>
 #include <astra_core/capi/plugins/astra_plugin.h>
 #include <astra_core/capi/astra_core.h>
 #include <astra_core/capi/astra_types.h>
@@ -50,7 +50,7 @@ public:
         printf("closed file\n");
     }
 
-    void add_frame(depthframe& depthFrame) {
+    void add_frame(DepthFrame& depthFrame) {
         if (!depthFrame.is_valid()) {
             return;
         }
@@ -71,13 +71,13 @@ private:
 class Viewer : public FrameListener
 {
 public:
-    Viewer(streamset& streamset) :
+    Viewer(StreamSet& streamset) :
         reader_(streamset.create_reader())
     {
         lastTimepoint_ = clock_type::now();
 
-        reader_.stream<depthstream>().start();
-        reader_.stream<pointstream>().start();
+        reader_.stream<DepthStream>().start();
+        reader_.stream<PointStream>().start();
 
         reader_.add_listener(*this);
     }
@@ -146,7 +146,7 @@ private:
                   << std::endl;
     }
 
-    void visualize_frame(pointframe& pointFrame)
+    void visualize_frame(PointFrame& pointFrame)
     {
         if (!pointFrame.is_valid()) {
             return;
@@ -158,7 +158,7 @@ private:
 
         visualizer_.update(pointFrame);
 
-        astra_RgbPixel_t* vizBuffer = visualizer_.get_output();
+        astra_rgb_pixel_t* vizBuffer = visualizer_.get_output();
         for (int i = 0; i < width * height; i++)
         {
             int rgbaOffset = i * 4;
@@ -171,10 +171,10 @@ private:
     }
 
     virtual void on_frame_ready(StreamReader& reader,
-                                frame& frame) override
+                                Frame& frame) override
     {
-        pointframe pointFrame = frame.get<pointframe>();
-        depthframe depthFrame = frame.get<depthframe>();
+        PointFrame pointFrame = frame.get<PointFrame>();
+        DepthFrame depthFrame = frame.get<DepthFrame>();
 
         if (recorder_ != nullptr) {
             recorder_->add_frame(depthFrame);
@@ -227,7 +227,7 @@ int main(int argc, char** argv)
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Stream Recorder");
 
-    streamset streamset;
+    StreamSet streamset;
 
 /*
     streamset streamPlayer("stream_player");

@@ -17,8 +17,8 @@
 #ifndef PLAYBACKSTREAM_H
 #define PLAYBACKSTREAM_H
 
-#include <astra_core/plugins/astra_plugin_stream.hpp>
-#include <astra_core/plugins/astra_stream_bin.hpp>
+#include <astra_core/plugins/PluginStream.hpp>
+#include <astra_core/plugins/StreamBin.hpp>
 #include <astra_core/capi/plugins/astra_plugin.h>
 #include <astra/capi/streams/image_parameters.h>
 #include <common/serialization/FrameStreamReader.h>
@@ -31,12 +31,12 @@ namespace astra { namespace plugins { namespace streamplayer {
     class PlaybackStreamBase : public stream
     {
     public:
-        PlaybackStreamBase(pluginservice_proxy& pluginService,
-                            astra_streamset_t streamSet,
-                            stream_description desc)
-                            : stream(pluginService,
-                            streamSet,
-                            desc) { }
+        PlaybackStreamBase(PluginServiceProxy& pluginService,
+                           astra_streamset_t streamSet,
+                           StreamDescription desc)
+            : stream(pluginService,
+                     streamSet,
+                     desc) { }
 
         virtual ~PlaybackStreamBase() { };
 
@@ -54,9 +54,9 @@ namespace astra { namespace plugins { namespace streamplayer {
         using wrapper_type = TFrameWrapper;
 
         PlaybackStream(FrameStreamReader& depthStreamParser,
-                        pluginservice_proxy& pluginService,
-                        astra_streamset_t streamSet,
-                        stream_description desc);
+                       PluginServiceProxy& pluginService,
+                       astra_streamset_t streamSet,
+                       StreamDescription desc);
 
         virtual ~PlaybackStream();
 
@@ -96,13 +96,13 @@ namespace astra { namespace plugins { namespace streamplayer {
 
     template<typename TFrameWrapper>
     PlaybackStream<TFrameWrapper>::PlaybackStream(FrameStreamReader& frameStreamReader,
-                                                    pluginservice_proxy& pluginService,
-                                                    astra_streamset_t streamSet,
-                                                    stream_description desc) :
-                                                    PlaybackStreamBase(pluginService,
-                                                    streamSet,
-                                                    desc),
-                                                    m_frameStreamReader(frameStreamReader)
+                                                  PluginServiceProxy& pluginService,
+                                                  astra_streamset_t streamSet,
+                                                  StreamDescription desc) :
+        PlaybackStreamBase(pluginService,
+                           streamSet,
+                           desc),
+        m_frameStreamReader(frameStreamReader)
     {
 
     }

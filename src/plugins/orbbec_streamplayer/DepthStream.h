@@ -22,7 +22,7 @@
 #include <astra/capi/streams/stream_types.h>
 #include <common/serialization/FrameStreamReader.h>
 #include "PlaybackStream.h"
-#include <astra_core/astra_stream_description.hpp>
+#include <astra_core/StreamDescription.hpp>
 #include <cstring>
 
 using namespace astra::serialization;
@@ -34,11 +34,15 @@ namespace astra { namespace plugins { namespace streamplayer
         {
         public:
             DepthStream(FrameStreamReader& streamParser,
-                             pluginservice_proxy& pluginService,
-                             astra_streamset_t streamSet)
-                             : PlaybackStream(streamParser, pluginService, streamSet, stream_description(
-                                  ASTRA_STREAM_DEPTH,
-                                  DEFAULT_SUBTYPE)) { }
+                        PluginServiceProxy& pluginService,
+                        astra_streamset_t streamSet)
+                : PlaybackStream(streamParser,
+                                 pluginService,
+                                 streamSet,
+                                 StreamDescription(ASTRA_STREAM_DEPTH,
+                                                   DEFAULT_SUBTYPE))
+            { }
+
             virtual ~DepthStream() {}
 
             virtual astra_status_t on_open() override

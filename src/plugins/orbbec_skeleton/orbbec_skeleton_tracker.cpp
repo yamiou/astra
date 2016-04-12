@@ -91,7 +91,7 @@ namespace orbbec { namespace skeleton {
         }
     }
 
-    void skeleton_tracker::on_frame_ready(astra::stream_reader& reader, astra::frame& frame)
+    void skeleton_tracker::on_frame_ready(astra::StreamReader& reader, astra::Frame& frame)
     {
         if (!skeletonStream_->has_connections())
             return; // don't waste cycles if no one is listening
@@ -103,7 +103,7 @@ namespace orbbec { namespace skeleton {
             return;
 
         // do something cool
-        astra_skeletonframe_wrapper_t* skeletonFrame = skeletonStream_->begin_write(depthFrame.frameIndex());
+        astra_skeletonframe_wrapper_t* skeletonFrame = skeletonStream_->begin_write(depthFrame.frame_index());
 
         if (skeletonFrame != nullptr)
         {

@@ -17,7 +17,7 @@
 #ifndef ORBBEC_SKELETONSTREAM_HPP
 #define ORBBEC_SKELETONSTREAM_HPP
 
-#include <astra_core/plugins/astra_plugin.hpp>
+#include <astra_core/plugins/Plugin.hpp>
 #include <astra/astra.hpp>
 #include <astra/capi/astra_ctypes.h>
 #include <astra/capi/streams/skeleton_types.h>
@@ -27,13 +27,13 @@ namespace orbbec { namespace skeleton {
     class skeletonstream : public astra::plugins::single_bin_stream<astra_skeletonframe_wrapper_t>
     {
     public:
-        skeletonstream(astra::pluginservice_proxy& pluginService,
+        skeletonstream(astra::PluginServiceProxy& pluginService,
                        astra_streamset_t streamSet,
                        size_t skeletonCount)
             : single_bin_stream(pluginService,
                                 streamSet,
-                                astra::stream_description(ASTRA_STREAM_SKELETON,
-                                                          DEFAULT_SUBTYPE),
+                                astra::StreamDescription(ASTRA_STREAM_SKELETON,
+                                                         DEFAULT_SUBTYPE),
                                 sizeof(astra_skeleton_t) * skeletonCount)
 
         {

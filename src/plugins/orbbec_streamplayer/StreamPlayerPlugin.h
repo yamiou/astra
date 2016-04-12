@@ -17,7 +17,7 @@
 #ifndef STREAMPLAYERPLUGIN_H
 #define STREAMPLAYERPLUGIN_H
 
-#include <astra_core/plugins/astra_plugin.hpp>
+#include <astra_core/plugins/Plugin.hpp>
 #include "PlaybackStreamSet.h"
 
 namespace astra { namespace plugins { namespace streamplayer {
@@ -25,7 +25,7 @@ namespace astra { namespace plugins { namespace streamplayer {
     class StreamPlayerPlugin : public plugin_base
     {
     public:
-        StreamPlayerPlugin(pluginservice_proxy* pluginProxy);
+        StreamPlayerPlugin(PluginServiceProxy* pluginProxy);
 
         virtual ~StreamPlayerPlugin();
         virtual void temp_update() override;

@@ -37,7 +37,7 @@ namespace orbbec { namespace mocks {
     {
     public:
         device_streamset(const std::string& name,
-                         astra::pluginservice_proxy& pluginService,
+                         astra::PluginServiceProxy& pluginService,
                          const char* uri);
 
         virtual ~device_streamset();
@@ -61,7 +61,7 @@ namespace orbbec { namespace mocks {
         astra_status_t close_sensor_streams();
         void add_stream(mock_stream* stream);
 
-        astra::pluginservice_proxy& pluginService_;
+        astra::PluginServiceProxy& pluginService_;
 
         astra_streamset_t streamSetHandle_;
 

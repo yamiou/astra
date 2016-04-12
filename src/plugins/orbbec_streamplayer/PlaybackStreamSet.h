@@ -33,7 +33,7 @@ namespace astra { namespace plugins { namespace streamplayer {
     class PlaybackStreamSetBase
     {
     public:
-        PlaybackStreamSetBase(pluginservice_proxy& pluginService, std::string uri)
+        PlaybackStreamSetBase(PluginServiceProxy& pluginService, std::string uri)
             : m_pluginService(pluginService),
               m_uri(uri)
         {
@@ -48,7 +48,7 @@ namespace astra { namespace plugins { namespace streamplayer {
         virtual astra_status_t close() = 0;
         virtual astra_status_t read() = 0;
     protected:
-        pluginservice_proxy& m_pluginService;
+        PluginServiceProxy& m_pluginService;
         astra_streamset_t m_streamSetHandle;
         std::string m_uri;
 
@@ -61,11 +61,9 @@ namespace astra { namespace plugins { namespace streamplayer {
     class PlaybackStreamSet : public PlaybackStreamSetBase
     {
     public:
-        PlaybackStreamSet(pluginservice_proxy& pluginService, std::string uri) :
-            PlaybackStreamSetBase(pluginService, uri)
-        {
-
-        }
+        PlaybackStreamSet(PluginServiceProxy& pluginService, std::string uri)
+            : PlaybackStreamSetBase(pluginService, uri)
+        {}
 
         virtual ~PlaybackStreamSet()
         {

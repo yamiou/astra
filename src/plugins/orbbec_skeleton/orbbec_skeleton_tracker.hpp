@@ -17,7 +17,7 @@
 #ifndef ORBBEC_SKELETON_TRACKER_HPP
 #define ORBBEC_SKELETON_TRACKER_HPP
 
-#include <astra_core/plugins/astra_plugin.hpp>
+#include <astra_core/plugins/Plugin.hpp>
 #include <astra/astra.hpp>
 #include <astra/capi/astra_ctypes.h>
 #include <astra/capi/streams/skeleton_types.h>
@@ -26,13 +26,13 @@
 
 namespace orbbec { namespace skeleton {
 
-    class skeleton_tracker : public astra::frame_listener,
+    class skeleton_tracker : public astra::FrameListener,
                              public astra::plugins::stream_event_handler
     {
     public:
         static const size_t MAX_SKELETONS;
 
-        skeleton_tracker(astra::pluginservice_proxy& pluginService,
+        skeleton_tracker(astra::PluginServiceProxy& pluginService,
                          astra_streamset_t streamSet,
                          astra_stream_t sourceStream)
             : sourceStreamHandle_(sourceStream),
@@ -40,7 +40,7 @@ namespace orbbec { namespace skeleton {
               reader_(sensor_.create_reader()),
               pluginService_(pluginService)
         {
-            depthStream_ = reader_.stream<astra::depthstream>();
+            depthStream_ = reader_.stream<astra::DepthStream>();
             depthStream_.start();
 
             reader_.add_listener(*this);
@@ -63,7 +63,7 @@ namespace orbbec { namespace skeleton {
 
         astra_stream_t sourceStream() { return sourceStreamHandle_; }
 
-        virtual void on_frame_ready(astra::stream_reader& reader, astra::frame& frame) override;
+        virtual void on_frame_ready(astra::StreamReader& reader, astra::Frame& frame) override;
 
         virtual void on_set_parameter(astra::plugins::stream* stream,
                                       astra_streamconnection_t connection,
@@ -78,10 +78,10 @@ namespace orbbec { namespace skeleton {
 
     private:
         astra_stream_t sourceStreamHandle_;
-        astra::depthstream depthStream_{nullptr};
-        astra::streamset sensor_;
-        astra::stream_reader reader_;
-        astra::pluginservice_proxy& pluginService_;
+        astra::DepthStream depthStream_{nullptr};
+        astra::StreamSet sensor_;
+        astra::StreamReader reader_;
+        astra::PluginServiceProxy& pluginService_;
 
         std::uint16_t zMin_{0};
         std::uint16_t zMax_{65535};
