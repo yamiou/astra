@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#ifndef LITDEPTHVISUALIZER_H
-#define LITDEPTHVISUALIZER_H
+#ifndef LITDEPTHVISUALIZER_HPP
+#define LITDEPTHVISUALIZER_HPP
 
 #include <astra/astra.hpp>
 #include <cstring>
@@ -25,10 +25,10 @@ namespace samples { namespace common {
 
     using namespace astra;
 
-    class lit_depth_visualizer
+    class LitDepthVisualizer
     {
     public:
-        lit_depth_visualizer()
+        LitDepthVisualizer()
             : lightVector_(0.44022f, -0.17609f, 0.88045f)
         {
             lightColor_ = {210, 210, 210};
@@ -156,7 +156,7 @@ namespace samples { namespace common {
         }
     }
 
-    void lit_depth_visualizer::calculate_normals(PointFrame& pointFrame)
+    void LitDepthVisualizer::calculate_normals(PointFrame& pointFrame)
     {
         const Vector3f* positionMap = pointFrame.data();
 
@@ -258,7 +258,7 @@ namespace samples { namespace common {
         box_blur_fast(normalMap_.get(), blurNormalMap_.get(), width, height);
     }
 
-    void lit_depth_visualizer::prepare_buffer(size_t width, size_t height)
+    void LitDepthVisualizer::prepare_buffer(size_t width, size_t height)
     {
         if (outputBuffer_ == nullptr || width != outputWidth_ || height != outputHeight_)
         {
@@ -270,7 +270,7 @@ namespace samples { namespace common {
         std::fill(outputBuffer_.get(), outputBuffer_.get()+outputWidth_*outputHeight_, RgbPixel(0,0,0));
     }
 
-    void lit_depth_visualizer::update(astra::PointFrame& pointFrame)
+    void LitDepthVisualizer::update(astra::PointFrame& pointFrame)
     {
         calculate_normals(pointFrame);
 
@@ -337,4 +337,4 @@ namespace samples { namespace common {
     }
 }}
 
-#endif /* LITDEPTHVISUALIZER_H */
+#endif /* LITDEPTHVISUALIZER_HPP */

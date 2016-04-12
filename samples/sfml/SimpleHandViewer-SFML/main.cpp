@@ -14,45 +14,46 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#include <SFML/Graphics.hpp>
-#include <astra_core/astra_core.hpp>
-#include <astra/astra.hpp>
-#include "../../common/lit_depth_visualizer.hpp"
 #include <sstream>
 #include <iomanip>
 #include <deque>
 #include <unordered_map>
+#include <chrono>
+#include <SFML/Graphics.hpp>
+#include <astra_core/astra_core.hpp>
+#include <astra/astra.hpp>
+#include "../../common/LitDepthVisualizer.hpp"
 #include <key_handler.h>
 
 class sfLine : public sf::Drawable
 {
 public:
     sfLine(const sf::Vector2f& point1, const sf::Vector2f& point2, sf::Color color, float thickness)
-        : color(color)
+        : color_(color)
     {
-        sf::Vector2f direction = point2 - point1;
-        sf::Vector2f unitDirection = direction / std::sqrt(direction.x*direction.x + direction.y*direction.y);
-        sf::Vector2f unitPerpendicular(-unitDirection.y, unitDirection.x);
+        const sf::Vector2f direction = point2 - point1;
+        const sf::Vector2f unitDirection = direction / std::sqrt(direction.x*direction.x + direction.y*direction.y);
+        const sf::Vector2f normal(-unitDirection.y, unitDirection.x);
 
-        sf::Vector2f offset = (thickness / 2.f)*unitPerpendicular;
+        const sf::Vector2f offset = (thickness / 2.f) * normal;
 
-        vertices[0].position = point1 + offset;
-        vertices[1].position = point2 + offset;
-        vertices[2].position = point2 - offset;
-        vertices[3].position = point1 - offset;
+        vertices_[0].position = point1 + offset;
+        vertices_[1].position = point2 + offset;
+        vertices_[2].position = point2 - offset;
+        vertices_[3].position = point1 - offset;
 
         for (int i = 0; i<4; ++i)
-            vertices[i].color = color;
+            vertices_[i].color = color;
     }
 
     void draw(sf::RenderTarget &target, sf::RenderStates states) const
     {
-        target.draw(vertices, 4, sf::Quads);
+        target.draw(vertices_, 4, sf::Quads);
     }
 
 private:
-    sf::Vertex vertices[4];
-    sf::Color color;
+    sf::Vertex vertices_[4];
+    sf::Color color_;
 };
 
 class HandFrameListener : public astra::FrameListener
@@ -64,6 +65,7 @@ public:
     HandFrameListener()
     {
         font_.loadFromFile("Inconsolata.otf");
+        prev_ = ClockType::now();
     }
 
     HandFrameListener(const HandFrameListener&) = delete;
@@ -75,10 +77,10 @@ public:
         {
             depthWidth_ = width;
             depthHeight_ = height;
-            int byteLength = depthWidth_ * depthHeight_ * 4;
+            const int byteLength = depthWidth_ * depthHeight_ * 4;
 
             displayBuffer_ = BufferPtr(new uint8_t[byteLength]);
-            memset(displayBuffer_.get(), 0, byteLength);
+            std::fill(&displayBuffer_[0], &displayBuffer_[0] + byteLength, 0);
 
             texture_.create(depthWidth_, depthHeight_);
             sprite_.setTexture(texture_);
@@ -88,33 +90,41 @@ public:
 
     void check_fps()
     {
-        double fpsFactor = 0.02;
+        const float frameWeight = .2f;
 
-        std::clock_t newTimepoint= std::clock();
-        long double frameDuration = (newTimepoint - lastTimepoint_) / static_cast<long double>(CLOCKS_PER_SEC);
+        const ClockType::time_point now = ClockType::now();
+        const float elapsedMillis = std::chrono::duration_cast<DurationType>(now - prev_).count();
 
-        frameDuration_ = frameDuration * fpsFactor + frameDuration_ * (1 - fpsFactor);
-        lastTimepoint_ = newTimepoint;
-        double fps = 1.0 / frameDuration_;
+        elapsedMillis_ = elapsedMillis * frameWeight + elapsedMillis_ * (1.f - frameWeight);
+        prev_ = now;
 
-        printf("FPS: %3.1f (%3.4Lf ms)\n", fps, frameDuration_ * 1000);
+        const float fps = 1000.f / elapsedMillis;
+        const auto precision = std::cout.precision();
+
+        std::cout << std::fixed
+                  << std::setprecision(1)
+                  << fps << " fps ("
+                  << std::setprecision(1)
+                  << elapsedMillis_ << " ms)"
+                  << std::setprecision(precision)
+                  << std::endl;
     }
 
-    void processDepth(astra::Frame& frame)
+    void process_depth(astra::Frame& frame)
     {
         astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
 
-        int width = pointFrame.width();
-        int height = pointFrame.height();
+        const int width = pointFrame.width();
+        const int height = pointFrame.height();
 
         init_texture(width, height);
 
         visualizer_.update(pointFrame);
-        astra::RgbPixel* vizBuffer = visualizer_.get_output();
+        const astra::RgbPixel* vizBuffer = visualizer_.get_output();
 
         for (int i = 0; i < width * height; i++)
         {
-            int rgbaOffset = i * 4;
+            const int rgbaOffset = i * 4;
             displayBuffer_[rgbaOffset] = vizBuffer[i].r;
             displayBuffer_[rgbaOffset + 1] = vizBuffer[i].b;
             displayBuffer_[rgbaOffset + 2] = vizBuffer[i].g;
@@ -124,7 +134,7 @@ public:
         texture_.update(displayBuffer_.get());
     }
 
-    void updateHandTrace(int trackingId, const astra::Vector2i& position)
+    void update_hand_trace(int trackingId, const astra::Vector2i& position)
     {
         auto it = pointMap_.find(trackingId);
         if (it == pointMap_.end())
@@ -134,7 +144,7 @@ public:
             {
                 list.push_back(position);
             }
-            pointMap_.insert(std::make_pair(trackingId, list));
+            pointMap_.insert({trackingId, list});
         }
         else
         {
@@ -146,7 +156,7 @@ public:
         }
     }
 
-    void shortenHandTraces()
+    void shorten_hand_traces()
     {
         auto it = pointMap_.begin();
 
@@ -165,18 +175,18 @@ public:
         }
     }
 
-    void processHandFrame(astra::Frame& frame)
+    void process_hand_frame(astra::Frame& frame)
     {
         astra::handframe handFrame = frame.get<astra::handframe>();
 
         handPoints_ = handFrame.handpoints();
 
-        shortenHandTraces();
-        for (auto handPoint : handPoints_)
+        shorten_hand_traces();
+        for (const auto& handPoint : handPoints_)
         {
             if (handPoint.status() == HAND_STATUS_TRACKING)
             {
-                updateHandTrace(handPoint.trackingId(), handPoint.depthPosition());
+                update_hand_trace(handPoint.trackingId(), handPoint.depthPosition());
             }
         }
     }
@@ -184,24 +194,23 @@ public:
     virtual void on_frame_ready(astra::StreamReader& reader,
                                 astra::Frame& frame) override
     {
-        processDepth(frame);
-        processHandFrame(frame);
+        process_depth(frame);
+        process_hand_frame(frame);
 
         check_fps();
     }
 
-    void drawCircle(sf::RenderWindow& window, float radius, float x, float y, sf::Color color)
+    void draw_circle(sf::RenderWindow& window, float radius, float x, float y, sf::Color color)
     {
         sf::CircleShape shape(radius);
-
         shape.setFillColor(color);
-
         shape.setOrigin(radius, radius);
         shape.setPosition(x, y);
+
         window.draw(shape);
     }
 
-    void drawShadowText(sf::RenderWindow& window, sf::Text& text, sf::Color color, int x, int y)
+    void draw_shadow_text(sf::RenderWindow& window, sf::Text& text, sf::Color color, int x, int y)
     {
         text.setColor(sf::Color::Black);
         text.setPosition(x + 5, y + 5);
@@ -209,142 +218,158 @@ public:
 
         text.setColor(color);
         text.setPosition(x, y);
+
         window.draw(text);
     }
 
-    void drawHandLabel(sf::RenderWindow& window, float radius, float x, float y, astra::handpoint& handPoint)
+    void draw_hand_label(sf::RenderWindow& window,
+                         const float radius,
+                         const float x,
+                         const float y,
+                         const astra::handpoint& handPoint)
     {
-        int32_t trackingId = handPoint.trackingId();
+        const auto trackingId = handPoint.trackingId();
+
         std::stringstream str;
         str << trackingId;
-        if (handPoint.status() == HAND_STATUS_LOST)
-        {
-            str << " Lost";
-        }
+        if (handPoint.status() == HAND_STATUS_LOST) { str << "Lost"; }
+
         sf::Text label(str.str(), font_);
-        int characterSize = 60;
+        const int characterSize = 60;
         label.setCharacterSize(characterSize);
 
-        auto bounds = label.getLocalBounds();
-        label.setOrigin(bounds.left + bounds.width / 2.0, characterSize);
-        drawShadowText(window, label, sf::Color::White, x, y - radius - 10);
+        const auto bounds = label.getLocalBounds();
+        label.setOrigin(bounds.left + bounds.width / 2.f, characterSize);
+        draw_shadow_text(window, label, sf::Color::White, x, y - radius - 10);
     }
 
-    void drawHandPosition(sf::RenderWindow& window, float radius, float x, float y, astra::handpoint& handPoint)
+    void draw_hand_position(sf::RenderWindow& window,
+                            const float radius,
+                            const float x,
+                            const float y,
+                            const astra::handpoint& handPoint)
     {
-        auto worldPosition = handPoint.worldPosition();
+        const auto worldPosition = handPoint.worldPosition();
+
         std::stringstream str;
-        str << std::fixed << std::setprecision(0);
-        str << worldPosition.x << "," << worldPosition.y << "," << worldPosition.z;
+        str << std::fixed
+            << std::setprecision(0)
+            << worldPosition.x << ", "
+            << worldPosition.y << ", "
+            << worldPosition.z;
+
         sf::Text label(str.str(), font_);
-        int characterSize = 60;
+        const int characterSize = 60;
         label.setCharacterSize(characterSize);
 
-        auto bounds = label.getLocalBounds();
-        label.setOrigin(bounds.left + bounds.width / 2.0, 0);
-        drawShadowText(window, label, sf::Color::White, x, y + radius + 10);
+        const auto bounds = label.getLocalBounds();
+        label.setOrigin(bounds.left + bounds.width / 2.f, 0);
+        draw_shadow_text(window, label, sf::Color::White, x, y + radius + 10);
     }
 
-    void drawHandTrace(sf::RenderWindow& window, const PointList& pointList, const sf::Color& color, const float depthScale)
+    void draw_hand_trace(sf::RenderWindow& window,
+                         const PointList& pointList,
+                         const sf::Color& color,
+                         const float depthScale)
     {
-        if (pointList.size() < 2)
-        {
-            return;
-        }
+        if (pointList.size() < 2) { return; }
 
-        float thickness = 4;
+        const float thickness = 4;
         auto it = pointList.begin();
+        astra::Vector2i previousPoint = *it;
 
-        astra::Vector2i lastPoint = *it;
         while (it != pointList.end())
         {
-            astra::Vector2i currentPoint = *it;
+            const astra::Vector2i currentPoint = *it;
             ++it;
 
-            sf::Vector2f p1((lastPoint.x + 0.5) * depthScale,
-                            (lastPoint.y + 0.5) * depthScale);
-            sf::Vector2f p2((currentPoint.x + 0.5) * depthScale,
-                            (currentPoint.y + 0.5) * depthScale);
-            lastPoint = currentPoint;
-            sfLine line(p1, p2, color, thickness);
-            window.draw(line);
+            const sf::Vector2f p1((previousPoint.x + .5f) * depthScale,
+                                  (previousPoint.y + .5f) * depthScale);
+            const sf::Vector2f p2((currentPoint.x + .5f) * depthScale,
+                                  (currentPoint.y + .5f) * depthScale);
+            previousPoint = currentPoint;
+
+            window.draw(sfLine(p1, p2, color, thickness));
         }
     }
 
-    void drawhandpoints(sf::RenderWindow& window, float depthScale)
+    void draw_hand_points(sf::RenderWindow& window, const float depthScale)
     {
-        float radius = 16;
-        sf::Color candidateColor(255, 255, 0);
-        sf::Color lostColor(255, 0, 0);
-        sf::Color trackingColor(0, 139, 69);
+        const float radius = 16;
+        const sf::Color candidateColor(255, 255, 0);
+        const sf::Color lostColor(255, 0, 0);
+        const sf::Color trackingColor(0, 139, 69);
 
-        for (auto handPoint : handPoints_)
+        for (const auto& handPoint : handPoints_)
         {
-            sf::Color color = trackingColor;
-            if (handPoint.status() == HAND_STATUS_LOST)
+            sf::Color color;
+
+            switch(handPoint.status())
             {
+            case HAND_STATUS_LOST:
                 color = lostColor;
-            }
-            else if (handPoint.status() == HAND_STATUS_CANDIDATE)
-            {
+            case HAND_STATUS_CANDIDATE:
                 color = candidateColor;
+            default:
+                color = trackingColor;
             }
 
             const astra::Vector2i& p = handPoint.depthPosition();
 
-            float circleX = (p.x + 0.5) * depthScale;
-            float circleY = (p.y + 0.5) * depthScale;
+            const float circleX = (p.x + .5f) * depthScale;
+            const float circleY = (p.y + .5f) * depthScale;
 
-            drawCircle(window, radius, circleX, circleY, color);
+            draw_circle(window, radius, circleX, circleY, color);
+            draw_hand_label(window, radius, circleX, circleY, handPoint);
 
-            drawHandLabel(window, radius, circleX, circleY, handPoint);
             if (handPoint.status() == HAND_STATUS_TRACKING)
             {
-                drawHandPosition(window, radius, circleX, circleY, handPoint);
+                draw_hand_position(window, radius, circleX, circleY, handPoint);
             }
         }
 
-        sf::Color lineColor(0, 0, 255);
-        for (auto it : pointMap_)
+        const sf::Color lineColor(0, 0, 255);
+        for (const auto& kvp : pointMap_)
         {
-            PointList& list = it.second;
-            drawHandTrace(window, list, lineColor, depthScale);
+            const PointList& list = kvp.second;
+            draw_hand_trace(window, list, lineColor, depthScale);
         }
     }
 
-    void drawTo(sf::RenderWindow& window)
+    void draw_to(sf::RenderWindow& window)
     {
-        if (displayBuffer_ != nullptr)
+        if (displayBuffer_)
         {
-            float depthScale = window.getView().getSize().x / depthWidth_;
-
+            const float depthScale = window.getView().getSize().x / depthWidth_;
             sprite_.setScale(depthScale, depthScale);
-
             window.draw(sprite_);
-
-            drawhandpoints(window, depthScale);
+            draw_hand_points(window, depthScale);
         }
     }
 
 private:
-    samples::common::lit_depth_visualizer visualizer_;
+    samples::common::LitDepthVisualizer visualizer_;
 
-    long double frameDuration_{ 0 };
-    std::clock_t lastTimepoint_ { 0 };
+    using DurationType = std::chrono::milliseconds;
+    using ClockType = std::chrono::high_resolution_clock;
+
+    ClockType::time_point prev_;
+    float elapsedMillis_{.0f};
+
     sf::Texture texture_;
     sf::Sprite sprite_;
     sf::Font font_;
 
-    using BufferPtr = std::unique_ptr < uint8_t[] >;
-    BufferPtr displayBuffer_{ nullptr };
+    using BufferPtr = std::unique_ptr<uint8_t[]>;
+    BufferPtr displayBuffer_{nullptr};
 
     std::vector<astra::handpoint> handPoints_;
 
     PointMap pointMap_;
 
-    int depthWidth_ { 0 };
-    int depthHeight_ { 0 };
-    int maxTraceLength_{ 15 };
+    int depthWidth_{0};
+    int depthHeight_{0};
+    int maxTraceLength_{15};
 };
 
 int main(int argc, char** argv)
@@ -393,7 +418,7 @@ int main(int argc, char** argv)
         // clear the window with black color
         window.clear(sf::Color::Black);
 
-        listener.drawTo(window);
+        listener.draw_to(window);
         window.display();
 
         if (!shouldContinue)

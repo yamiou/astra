@@ -16,7 +16,7 @@
 // Be excellent to each other.
 #include <SFML/Graphics.hpp>
 #include <astra/astra.hpp>
-#include "../../common/lit_depth_visualizer.hpp"
+#include "../../common/LitDepthVisualizer.hpp"
 #include <chrono>
 #include <iostream>
 #include <iomanip>
@@ -229,7 +229,7 @@ public:
     }
 
 private:
-    samples::common::lit_depth_visualizer visualizer_;
+    samples::common::LitDepthVisualizer visualizer_;
 
     using DurationType = std::chrono::milliseconds;
     using ClockType = std::chrono::high_resolution_clock;

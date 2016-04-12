@@ -1,7 +1,7 @@
 set (_projname "SimpleHandViewer-SFML")
 
 set (${_projname}_SOURCES
-  ../../common/lit_depth_visualizer.hpp
+  ../../common/LitDepthVisualizer.hpp
   main.cpp
   ${SAMPLE_COMMON_DIR}/key_handler.h
   )

@@ -26,7 +26,7 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "lit_depth_visualizer.hpp"
+#include "LitDepthVisualizer.hpp"
 #include <common/serialization/FrameStreamWriter.h>
 #include <common/serialization/FrameOutputStream.h>
 
@@ -185,7 +185,7 @@ private:
         //check_fps();
     }
 
-    samples::common::lit_depth_visualizer visualizer_;
+    samples::common::LitDepthVisualizer visualizer_;
 
     using duration_type = std::chrono::duration<double>;
     duration_type frameDuration_{0.0};
