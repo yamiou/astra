@@ -44,8 +44,8 @@ Building the Samples
 ========================
 Windows
 -------
-#. In an Explorer window, locate |sdkname|-samples.sln under /samples/vs2013 inside the folder where the SDK was extracted.
-#. Open |sdkname|-samples.sln in Visual Studio 2013 or later.
+#. In an Explorer window, locate |sdkname|-samples.sln under /samples/vs2013 or /samples/vs2015 inside the folder where the SDK was extracted.
+#. Open |sdkname|-samples.sln in Visual Studio 2013 or Visual Studio 2015, as appropriate.
 #. In Visual Studio, build the solution by either choosing the menu item **BUILD -> Build Solution** or using the **Ctrl+Shift+B** shortcut.
 #. Sit tight and in under a minute on most computers the samples should be ready to run.
 #. To start a sample in Visual Studio 2013+, set any of the sample projects as the **Startup Project** by right-clicking the project and selecting "Set as StartUp Project". Then, start debugging either through the menu item **DEBUG -> Start Debugging** or by using the **F5** function key.

@@ -53,10 +53,10 @@ Now you can run the pre-built binaries from the Astra SDK bin/ directory.
 
 Windows:
 =======
-If you want to run the pre-compiled samples and don't have VS2013 installed,
-you must install the Visual C++ Redistributable Packages for Visual Studio 2013 from
-http://www.microsoft.com/en-us/download/details.aspx?id=40784
-(Not required if VS2013 is installed.)
+If you want to run the pre-compiled samples and don't have Visual Studio installed,
+you must install the Visual C++ Redistributable Packages.
+For VS2013: https://www.microsoft.com/en-us/download/details.aspx?id=40784
+For VS2015: https://www.microsoft.com/en-us/download/details.aspx?id=48145
 
 Sample keyboard shortcuts
 ==========
@@ -97,15 +97,15 @@ Now you can run the samples in the samples/bin/ directory.
 Windows:
 =======
 Requirements:
-* Visual Studio 2013 or later. The VS 2013 Community version is a free download:
+* Visual Studio 2013 or later. The VS 2015 Community version is a free download:
 https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx
 * Windows 7 or later. Tested on Windows 10, Windows 8.1, Windows 7.
 
-The provided Visual Studio 2013 solution is already configured to run out of the box.
+The provided Visual Studio 2013/2015 solution is already configured to run out of the box.
 
-In the sdk/samples/vs2013 folder, open astra-samples.sln. Change the configuration to Release. Build the solution.
+In the sdk/samples/vs2013 or sdk/samples/vs2015 folder, open astra-samples.sln. Change the configuration to Release. Build the solution.
 
-The samples compile to sdk/samples/vs2013/bin/Debug/ or Release/, depending upon your build configuration.
+The samples compile to sdk/samples/vs201x/bin/Debug/ or Release/, depending upon your build configuration.
 
 Tips:
 =========
