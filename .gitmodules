@@ -7,8 +7,8 @@
 [submodule "android/astraapktest"]
 	path = android/astraapktest
 	url = https://bitbucket.org/orbicsoft/sensekitapktest.git
-[submodule "samples-aux/vs2013"]
-	path = samples-aux/vs2013
+[submodule "samples-aux/thirdparty-bin"]
+	path = samples-aux/thirdparty-bin
 	url = https://bitbucket.org/orbicsoft/sdk-win-thirdparty-bin.git
 [submodule "vendor/openni2"]
 	path = vendor/openni2
