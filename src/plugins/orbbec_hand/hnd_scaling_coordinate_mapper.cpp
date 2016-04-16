@@ -15,7 +15,6 @@
 //
 // Be excellent to each other.
 #include "hnd_scaling_coordinate_mapper.hpp"
-#include <opencv2/core/core.hpp>
 #include <Shiny.h>
 
 namespace astra { namespace hand {
@@ -32,8 +31,8 @@ namespace astra { namespace hand {
         worldZ = depthZ;
     }
 
-    cv::Point3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
-                                          float depthX, float depthY, float depthZ)
+    Vector3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
+                                       float depthX, float depthY, float depthZ)
     {
         float worldX, worldY, worldZ;
 
@@ -41,11 +40,11 @@ namespace astra { namespace hand {
                                  depthX, depthY, depthZ,
                                  worldX, worldY, worldZ);
 
-        return cv::Point3f(worldX, worldY, worldZ);
+        return Vector3f(worldX, worldY, worldZ);
     }
 
-    cv::Point3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
-                                          int depthX, int depthY, float depthZ)
+    Vector3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
+                                       int depthX, int depthY, float depthZ)
     {
         return cv_convert_depth_to_world(depthToWorldData,
                                          static_cast<float>(depthX),
@@ -53,33 +52,33 @@ namespace astra { namespace hand {
                                          depthZ);
     }
 
-    cv::Point3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
-                                          const cv::Point3f& depth)
+    Vector3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
+                                       const Vector3f& depth)
     {
         return cv_convert_depth_to_world(depthToWorldData, depth.x, depth.y, depth.z);
     }
 
-    cv::Point3f cv_convert_world_to_depth(const conversion_cache_t& depthToWorldData,
-                                          float worldX, float worldY, float worldZ)
+    Vector3f cv_convert_world_to_depth(const conversion_cache_t& depthToWorldData,
+                                       float worldX, float worldY, float worldZ)
     {
         float depthX = depthToWorldData.coeffX * worldX / worldZ + depthToWorldData.halfResX;
         float depthY = depthToWorldData.halfResY - depthToWorldData.coeffY * worldY / worldZ;
         float depthZ = worldZ;
 
-        return cv::Point3f(depthX, depthY, depthZ);
+        return Vector3f(depthX, depthY, depthZ);
     }
 
-    cv::Point3f cv_convert_world_to_depth(const conversion_cache_t& depthToWorldData,
-                                          const cv::Point3f& world)
+    Vector3f cv_convert_world_to_depth(const conversion_cache_t& depthToWorldData,
+                                       const Vector3f& world)
     {
         return cv_convert_world_to_depth(depthToWorldData, world.x, world.y, world.z);
     }
 
 
-    cv::Point scaling_coordinate_mapper::offset_pixel_location_by_mm(const cv::Point& position,
-                                                                     float offsetX,
-                                                                     float offsetY,
-                                                                     float depthZ) const
+    Point2i scaling_coordinate_mapper::offset_pixel_location_by_mm(const Point2i& position,
+                                                                   float offsetX,
+                                                                   float offsetY,
+                                                                   float depthZ) const
     {
         if (depthZ == 0)
         {
@@ -101,6 +100,6 @@ namespace astra { namespace hand {
         const float yFactor = depthToWorldData.resolutionY / (scaledDepth * depthToWorldData.yzFactor);
         const float finalDepthY = position.y - offsetY * yFactor;
 
-        return cv::Point(static_cast<int>(finalDepthX), static_cast<int>(finalDepthY));
+        return Point2i(static_cast<int>(finalDepthX), static_cast<int>(finalDepthY));
     }
 }}

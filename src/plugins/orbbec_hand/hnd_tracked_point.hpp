@@ -17,21 +17,21 @@
 #ifndef HND_TRACKED_POINT_H
 #define HND_TRACKED_POINT_H
 
-#include <opencv2/core/affine.hpp>
 #include "hnd_tracking_data.hpp"
+#include "hnd_point.hpp"
 
 namespace astra { namespace hand {
 
     struct tracked_point
     {
     public:
-        cv::Point position;
-        cv::Point3f worldPosition;
-        cv::Point3f worldDeltaPosition;
-        cv::Point fullSizePosition;
-        cv::Point3f fullSizeWorldPosition;
-        cv::Point3f fullSizeWorldDeltaPosition;
-        cv::Point3f steadyWorldPosition;
+        Point2i position;
+        Vector3f worldPosition;
+        Vector3f worldDeltaPosition;
+        Point2i fullSizePosition;
+        Vector3f fullSizeWorldPosition;
+        Vector3f fullSizeWorldDeltaPosition;
+        Vector3f steadyWorldPosition;
         int trackingId;
         int inactiveFrameCount;
         int failedTestCount;
@@ -41,7 +41,7 @@ namespace astra { namespace hand {
         tracking_status trackingStatus;
         float referenceAreaSqrt;
 
-        tracked_point(cv::Point position, cv::Point3f worldPosition, int trackingId) :
+        tracked_point(Point2i position, Vector3f worldPosition, int trackingId) :
             position(position),
             worldPosition(worldPosition),
             worldDeltaPosition(),

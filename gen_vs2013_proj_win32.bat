@@ -1,19 +1,45 @@
-@echo off
-if not exist build-vc12-x86 mkdir build-vc12-x86
-cd build-vc12-x86
+@ECHO OFF
+SETLOCAL EnableExtensions EnableDelayedExpansion
 
 REM Update your dependency directories below as necessary
 
-cmake -G"Visual Studio 12" -DOpenCV_DIR="D:/libs/opencv-2.4.10/build" -DSFML_ROOT="D:/libs/SFML-2.3.2-vc12-32" -DPROTOBUF_SRC_ROOT_FOLDER="C:/libs/protobuf-2.6.1" .. && goto :copy_files
+SET SFMLPATH=C:\libs\SFML-2.3.2-vc12-32
+SET PROTOPATH=C:\libs\protobuf-2.6.1
 
-REM only if cmake failed...
-GOTO end
+SET MSVCNAME=2013
+SET MSVCVERSION=12
+SET ARCH=x86
+SET BUILDPATH=build\vs%MSVCVERSION%\%ARCH%
+SET GENERATOR=Visual Studio %MSVCVERSION% %MSVCNAME%
 
-:copy_files
-xcopy ..\samples-aux\thirdparty-bin\vs2013\copy_to_bin32_dir\*.* .\bin\Debug\ /E /Y
-xcopy ..\samples-aux\thirdparty-bin\vs2013\copy_to_bin32_dir\*.* .\bin\Release\ /E /Y
-xcopy ..\samples-aux\thirdparty-bin\vs2013\copy_to_bin32_dir\*.* .\bin\RelWithDebInfo\ /E /Y
-echo Done!
+SET ASTRADIR=%~dp1
+SET EXTRAARGS=
 
-:end
-cd ..
+PUSHD
+
+CD %ASTRADIR%
+
+IF NOT EXIST %BUILDPATH% (
+   MD %BUILDPATH%  || GOTO :ERROR
+)
+
+CD %BUILDPATH%
+
+cmake -G"%GENERATOR%" ^
+      -DSFML_ROOT="%SFMLPATH%" ^
+      -DPROTOBUF_SRC_ROOT_FOLDER="%PROTOPATH%" ^
+      %EXTRAARGS% "%ASTRADIR%" || GOTO :ERROR
+
+ECHO Copying files
+
+FOR %%G IN (bin\Debug bin\Release bin\RelWithDebInfo bin\MinSizeRel) DO (
+    xcopy %ASTRADIR%\samples-aux\thirdparty-bin\vs%MSVCVERSION%\copy_to_bin32_dir\*.* %%G /E /Y
+) || GOTO :ERROR
+
+ECHO Done!
+
+:ERROR
+ECHO Something went wrong...
+
+:END
+POPD

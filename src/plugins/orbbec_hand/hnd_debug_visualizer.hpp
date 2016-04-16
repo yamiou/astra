@@ -42,7 +42,7 @@ namespace astra { namespace hand {
             for (auto iter = points.begin(); iter != points.end(); ++iter)
             {
                 tracked_point tracked = *iter;
-                cv::Point position = tracked.position;
+                Point2i position = tracked.position;
 
                 bool isActivePoint = tracked.pointType == tracked_point_type::active_point;
                 bool isLostTrackingPoint = isActivePoint && tracked.trackingStatus == tracking_status::lost;
@@ -99,22 +99,22 @@ namespace astra { namespace hand {
             }
         }
 
-        void overlay_mask(const cv::Mat& matMask,
+        void overlay_mask(const BitmapMask& matMask,
                           _astra_imageframe& imageFrame,
                           const RgbPixel& maskColor,
                           const pixel_type targetValue)
         {
-            assert(matMask.cols == imageFrame.metadata.width);
-            assert(matMask.rows == imageFrame.metadata.height);
+            assert(matMask.width() == imageFrame.metadata.width);
+            assert(matMask.height() == imageFrame.metadata.height);
 
-            int width = matMask.cols;
-            int height = matMask.rows;
+            int width = matMask.width();
+            int height = matMask.height();
 
             RgbPixel* colorData = static_cast<RgbPixel*>(imageFrame.data);
 
             for (int y = 0; y < height; ++y)
             {
-                const char* maskRow = matMask.ptr<char>(y);
+                const auto* maskRow = matMask.data(y);
 
                 for (int x = 0; x < width; ++x, ++maskRow, ++colorData)
                 {
@@ -128,20 +128,20 @@ namespace astra { namespace hand {
             }
         }
 
-        void show_depth_matrix(const cv::Mat& matDepth,
+        void show_depth_matrix(const BitmapF& matDepth,
                                _astra_imageframe& imageFrame)
         {
-            assert(matDepth.cols == imageFrame.metadata.width);
-            assert(matDepth.rows == imageFrame.metadata.height);
+            assert(matDepth.width() == imageFrame.metadata.width);
+            assert(matDepth.height() == imageFrame.metadata.height);
 
-            int width = matDepth.cols;
-            int height = matDepth.rows;
+            int width = matDepth.width();
+            int height = matDepth.height();
 
             RgbPixel* colorData = static_cast<RgbPixel*>(imageFrame.data);
 
             for (int y = 0; y < height; ++y)
             {
-                const float* depthRow = matDepth.ptr<float>(y);
+                const float* depthRow = matDepth.data(y);
 
                 for (int x = 0; x < width; ++x, ++depthRow, ++colorData)
                 {
@@ -159,26 +159,26 @@ namespace astra { namespace hand {
             }
         }
 
-        void show_velocity_matrix(const cv::Mat& matVelocity,
+        void show_velocity_matrix(const BitmapF& matVelocity,
                                   float maxScale,
                                   _astra_imageframe& imageFrame)
         {
-            assert(matVelocity.cols == imageFrame.metadata.width);
-            assert(matVelocity.rows == imageFrame.metadata.height);
+            assert(matVelocity.width() == imageFrame.metadata.width);
+            assert(matVelocity.height() == imageFrame.metadata.height);
 
             if (maxScale == 0)
             {
                 throw new std::invalid_argument("maxScale cannot be 0");
             }
 
-            int width = matVelocity.cols;
-            int height = matVelocity.rows;
+            const int width = matVelocity.width();
+            const int height = matVelocity.height();
 
             RgbPixel* colorData = static_cast<RgbPixel*>(imageFrame.data);
 
             for (int y = 0; y < height; ++y)
             {
-                const float* velocityRow = matVelocity.ptr<float>(y);
+                const float* velocityRow = matVelocity.data(y);
                 for (int x = 0; x < width; ++x, ++velocityRow, ++colorData)
                 {
                     float velocity = *velocityRow;
@@ -198,33 +198,31 @@ namespace astra { namespace hand {
         }
 
         template<typename T>
-        void show_norm_array(const cv::Mat& mat,
-                             const cv::Mat& mask,
+        void show_norm_array(const Bitmap<T>& mat,
+                             const BitmapMask& mask,
                              _astra_imageframe& imageFrame)
         {
-            assert(mat.cols == imageFrame.metadata.width);
-            assert(mat.rows == imageFrame.metadata.height);
+            assert(mat.width() == imageFrame.metadata.width);
+            assert(mat.height() == imageFrame.metadata.height);
 
-            int width = mat.cols;
-            int height = mat.rows;
+            int width = mat.width();
+            int height = mat.height();
 
-            double min, max;
-            cv::Point minLoc, maxLoc;
+            MinMaxLoc<T> minMaxLoc;
 
-            bool emptyMask = mask.empty();
+            bool emptyMask = all_zero(mask);
 
             if (!emptyMask)
             {
                 assert(mat.size() == mask.size());
-                cv::minMaxLoc(mat, &min, &max, &minLoc, &maxLoc, mask);
+                minMaxLoc = find_min_max_loc(mat, mask);
             }
             else
             {
-                cv::minMaxLoc(mat, &min, &max, &minLoc, &maxLoc);
+                minMaxLoc = find_min_max_loc(mat);
             }
 
-
-            double range = max - min;
+            double range = minMaxLoc.max - minMaxLoc.min;
             bool rangeZero = abs(range) < 0.00001;
 
             uint8_t* colorData = static_cast<uint8_t*>(imageFrame.data);
@@ -234,11 +232,11 @@ namespace astra { namespace hand {
 
             for (int y = 0; y < height; ++y)
             {
-                const T* dataRow = mat.ptr<T>(y);
+                const T* dataRow = mat.data(y);
                 const uint8_t* maskRow = nullptr;
                 if (!emptyMask)
                 {
-                    maskRow = mask.ptr<uint8_t>(y);
+                    maskRow = mask.data(y);
                 }
 
                 for (int x = 0; x < width; ++x, ++dataRow, colorData += bytesPerPixel)
@@ -261,7 +259,7 @@ namespace astra { namespace hand {
                     }
                     else
                     {
-                        value = 55 + 200 * ((*dataRow - min) / range);
+                        value = 55 + 200 * ((*dataRow - minMaxLoc.min) / range);
                     }
                     *(colorData) = value;
                     *(colorData + 1) = value;

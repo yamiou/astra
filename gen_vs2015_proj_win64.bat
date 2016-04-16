@@ -1,19 +1,45 @@
-@echo off
-if not exist build-vc14-x64 mkdir build-vc14-x64
-cd build-vc14-x64
+@ECHO OFF
+SETLOCAL EnableExtensions EnableDelayedExpansion
 
 REM Update your dependency directories below as necessary
 
-cmake -G"Visual Studio 14" -Ax64 -DASTRA_HAND=Off -DOpenCV_DIR="D:/libs/opencv-2.4.11/opencv/build" -DSFML_ROOT="D:/libs/SFML-2.3.2-vc14-64" -DPROTOBUF_SRC_ROOT_FOLDER="D:/libs/protobuf-2.6.1" .. && goto :copy_files
+SET SFMLPATH=C:\libs\SFML-2.3.2-vc14-64
+SET PROTOPATH=C:\libs\protobuf-2.6.1
 
-REM only if cmake failed...
-GOTO end
-:copy_files
-echo Copying files
-xcopy ..\samples-aux\thirdparty-bin\vs2015\copy_to_bin64_dir\*.* .\bin\Debug\ /E /Y
-xcopy ..\samples-aux\thirdparty-bin\vs2015\copy_to_bin64_dir\*.* .\bin\Release\ /E /Y
-xcopy ..\samples-aux\thirdparty-bin\vs2015\copy_to_bin64_dir\*.* .\bin\RelWithDebInfo\ /E /Y
-echo Done!
+SET MSVCNAME=2015
+SET MSVCVERSION=14
+SET ARCH=x64
+SET BUILDPATH=build\vs%MSVCVERSION%\%ARCH%
+SET GENERATOR=Visual Studio %MSVCVERSION% %MSVCNAME%
 
-:end
-cd ..
+SET ASTRADIR=%~dp1
+SET EXTRAARGS=-A%ARCH%
+
+PUSHD
+
+CD %ASTRADIR%
+
+IF NOT EXIST %BUILDPATH% (
+   MD %BUILDPATH%  || GOTO :ERROR
+)
+
+CD %BUILDPATH%
+
+cmake -G"%GENERATOR%" ^
+      -DSFML_ROOT="%SFMLPATH%" ^
+      -DPROTOBUF_SRC_ROOT_FOLDER="%PROTOPATH%" ^
+      %EXTRAARGS% "%ASTRADIR%" || GOTO :ERROR
+
+ECHO Copying files
+
+FOR %%G IN (bin\Debug bin\Release bin\RelWithDebInfo bin\MinSizeRel) DO (
+    xcopy %ASTRADIR%\samples-aux\thirdparty-bin\vs%MSVCVERSION%\copy_to_bin64_dir\*.* %%G /E /Y
+) || GOTO :ERROR
+
+ECHO Done!
+
+:ERROR
+ECHO Something went wrong...
+
+:END
+POPD

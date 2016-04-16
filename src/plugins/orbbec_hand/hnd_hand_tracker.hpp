@@ -17,7 +17,6 @@
 #ifndef HND_HAND_TRACKER_H
 #define HND_HAND_TRACKER_H
 
-#include <opencv2/imgproc/imgproc.hpp>
 #include <astra/astra.hpp>
 #include <astra/capi/streams/stream_types.h>
 #include <astra_core/plugins/Plugin.hpp>
@@ -31,6 +30,7 @@
 #include "hnd_debug_visualizer.hpp"
 #include "hnd_settings.hpp"
 #include <memory>
+#include "hnd_bitmap.hpp"
 
 namespace astra { namespace hand {
 
@@ -48,7 +48,7 @@ namespace astra { namespace hand {
         void create_streams(PluginServiceProxy& pluginService, astra_streamset_t streamSet);
         void reset();
         void generate_hand_frame(astra_frame_index_t frameIndex);
-        static void copy_position(cv::Point3f& source, astra_vector3f_t& target);
+        static void copy_position(Vector3f& source, astra_vector3f_t& target);
         static astra_handstatus_t convert_hand_status(tracking_status status, tracked_point_type type);
         static void reset_hand_point(astra_handpoint_t& point);
 
@@ -61,12 +61,12 @@ namespace astra { namespace hand {
         void debug_probe_point(tracking_matrices& matrices);
         void debug_spawn_point(tracking_matrices& matrices);
 
-        void track_points(cv::Mat& matDepth,
-                          cv::Mat& matDepthFullSize,
-                          cv::Mat& matForeground,
-                          const Vector3f* worldPoints);
-        cv::Point get_mouse_probe_position();
-        cv::Point get_spawn_position();
+        void track_points(BitmapF& matDepth,
+                          BitmapF& matDepthFullSize,
+                          BitmapMask& matForeground,
+                          const astra::Vector3f* worldPoints);
+        Point2i get_mouse_probe_position();
+        Point2i get_spawn_position();
 
         //fields
 
@@ -88,37 +88,37 @@ namespace astra { namespace hand {
         using handstream_ptr = std::unique_ptr<handstream>;
         handstream_ptr handStream_;
 
-        cv::Mat matDepth_;
-        cv::Mat matDepthFullSize_;
-        cv::Mat matDepthWindow_;
-        cv::Mat matVelocitySignal_;
-        cv::Mat matArea_;
-        cv::Mat matAreaSqrt_;
-        cv::Mat layerIntegralArea_;
-        cv::Mat debugUpdateSegmentation_;
-        cv::Mat debugCreateSegmentation_;
-        cv::Mat debugRefineSegmentation_;
-        cv::Mat updateForegroundSearched_;
-        cv::Mat createForegroundSearched_;
-        cv::Mat debugUpdateScore_;
-        cv::Mat debugCreateScore_;
-        cv::Mat debugRefineScore_;
-        cv::Mat debugUpdateScoreValue_;
-        cv::Mat debugCreateScoreValue_;
-        cv::Mat debugRefineScoreValue_;
-        cv::Mat debugCreateTestPassMap_;
-        cv::Mat debugUpdateTestPassMap_;
-        cv::Mat debugRefineTestPassMap_;
+        BitmapF matDepth_;
+        BitmapF matDepthFullSize_;
+        BitmapF matDepthWindow_;
+        BitmapMask matVelocitySignal_;
+        BitmapF matArea_;
+        BitmapF matAreaSqrt_;
+        BitmapF layerIntegralArea_;
+        BitmapMask debugUpdateSegmentation_;
+        BitmapMask debugCreateSegmentation_;
+        BitmapMask debugRefineSegmentation_;
+        BitmapMask updateForegroundSearched_;
+        BitmapMask createForegroundSearched_;
+        BitmapF debugUpdateScore_;
+        BitmapF debugCreateScore_;
+        BitmapF debugRefineScore_;
+        BitmapF debugUpdateScoreValue_;
+        BitmapF debugCreateScoreValue_;
+        BitmapF debugRefineScoreValue_;
+        BitmapMask debugCreateTestPassMap_;
+        BitmapMask debugUpdateTestPassMap_;
+        BitmapMask debugRefineTestPassMap_;
 
-        cv::Mat layerSegmentation_;
-        cv::Mat layerScore_;
-        cv::Mat layerEdgeDistance_;
-        cv::Mat layerTestPassMap_;
+        BitmapMask layerSegmentation_;
+        BitmapF layerScore_;
+        BitmapF layerEdgeDistance_;
+        BitmapMask layerTestPassMap_;
 
-        cv::Mat refineForegroundSearched_;
-        cv::Mat refineSegmentation_;
-        cv::Mat refineScore_;
-        cv::Mat refineEdgeDistance_;
+        BitmapMask refineForegroundSearched_;
+        BitmapMask refineSegmentation_;
+        BitmapF refineScore_;
+        BitmapF refineEdgeDistance_;
 
         astra::Vector3f* worldPoints_{nullptr};
         int numWorldPoints_{0};

@@ -17,6 +17,7 @@
 #include "hnd_depth_utility.hpp"
 #include <astra/astra.hpp>
 #include "hnd_tracking_data.hpp"
+#include "hnd_morphology.hpp"
 #include <cmath>
 #include <Shiny.h>
 
@@ -34,9 +35,8 @@ namespace astra { namespace hand {
         maxDepth_(settings.maxDepth)
     {
         PROFILE_FUNC();
-        rectElement_ = cv::getStructuringElement(cv::MORPH_RECT,
-                                                 cv::Size(erodeSize_ * 2 + 1, erodeSize_ * 2 + 1),
-                                                 cv::Point(erodeSize_, erodeSize_));
+        rectElement_ = get_structuring_element(MorphShape::Rect,
+                                               Size2i(erodeSize_ * 2 + 1, erodeSize_ * 2 + 1));
 
         reset();
     }
@@ -49,12 +49,26 @@ namespace astra { namespace hand {
     void depth_utility::reset()
     {
         PROFILE_FUNC();
-        matDepthFilled_ = cv::Mat::zeros(processingHeight_, processingWidth_, CV_32FC1);
-        matDepthFilledMask_ = cv::Mat::zeros(processingHeight_, processingWidth_, CV_8UC1);
-        matDepthPrevious_ = cv::Mat::zeros(processingHeight_, processingWidth_, CV_32FC1);
-        matDepthAvg_ = cv::Mat::zeros(processingHeight_, processingWidth_, CV_32FC1);
-        matDepthVel_.create(processingHeight_, processingWidth_, CV_32FC1);
-        matDepthVelErode_.create(processingHeight_, processingWidth_, CV_32FC1);
+
+        Size2i size(processingWidth_, processingHeight_);
+
+        matDepthFilled_.recreate(size);
+        matDepthFilled_.fill(0.f);
+
+        matDepthFilledMask_.recreate(size);
+        matDepthFilledMask_.fill(0);
+
+        matDepthPrevious_.recreate(size);
+        matDepthPrevious_.fill(0.f);
+
+        matDepthAvg_.recreate(size);
+        matDepthAvg_.fill(0.f);
+
+        matDepthVel_.recreate(size);
+        matDepthVel_.fill(0.f);
+
+        matDepthVelErode_.recreate(size);
+        matDepthVelErode_.fill(0.f);
 
         for (int i = 0; i < NUM_DEPTH_VEL_CHUNKS; i++)
         {
@@ -62,14 +76,66 @@ namespace astra { namespace hand {
         }
     }
 
+    void depth_utility::accumulate_averages(const BitmapF& input,
+                                            const BitmapF& prevInput,
+                                            const BitmapMask& mask,
+                                            const float alpha,
+                                            const float jumpThreshold,
+                                            BitmapF& accumulated)
+    {
+        assert(input.width() == accumulated.width());
+        assert(input.height() == accumulated.height());
+
+        const float oneMinusAlpha = 1.0f - alpha;
+
+        const unsigned width = input.width();
+        const unsigned height = input.height();
+
+        const float* inputData = input.data();
+        const auto* prevInputData = prevInput.data();
+        const MaskType* maskData = mask.data();
+        float* accumulatedData = accumulated.data();
+
+        for(unsigned y = 0; y < height; ++y)
+        {
+            for (unsigned x = 0; x < width; ++x, ++inputData, ++prevInputData, ++maskData, ++accumulatedData)
+            {
+                //update running average
+                *accumulatedData = oneMinusAlpha * (*accumulatedData) +
+                                   alpha * (*inputData);
+
+                const fill_mask_type mergeMask = fill_mask_type(*maskData);
+                const bool updatedValue = mergeMask == fill_mask_type::normal;
+                const bool indeterminateValues = *inputData == 0.0f || *prevInputData == 0.0f;
+
+                if (!updatedValue || indeterminateValues)
+                {
+                    *accumulatedData = *inputData;
+                }
+                else
+                {
+                    const float currentValue = *inputData;
+                    const float previousValue = *prevInputData;
+                    const float percentChange = (currentValue - previousValue) / previousValue;
+                    const bool isIncreasing = percentChange > 0.0f;
+
+                    if (isIncreasing && std::fabs(percentChange) > jumpThreshold)
+                    {
+                        *accumulatedData = *inputData;
+                    }
+                }
+            }
+        }
+    }
+
     void depth_utility::depth_to_velocity_signal(const DepthFrame& depthFrame,
-                                                 cv::Mat& matDepth,
-                                                 cv::Mat& matDepthFullSize,
-                                                 cv::Mat& matVelocitySignal)
+                                                 BitmapF& matDepth,
+                                                 BitmapF& matDepthFullSize,
+                                                 BitmapMask& matVelocitySignal)
     {
         PROFILE_FUNC();
-        int width = depthFrame.width();
-        int height = depthFrame.height();
+        const int width = depthFrame.width();
+        const int height = depthFrame.height();
 
         depthframe_to_matrix(depthFrame, width, height, matDepthFullSize);
 
@@ -80,40 +146,55 @@ namespace astra { namespace hand {
         }
         else
         {
-            matDepth.create(processingHeight_, processingWidth_, CV_32FC1);
+            matDepth.recreate(processingWidth_, processingHeight_);
             //convert to the target processing size with nearest neighbor
-            cv::resize(matDepthFullSize, matDepth, matDepth.size(), 0, 0, CV_INTER_NN);
+            resize(matDepthFullSize, matDepth);
         }
 
-        matVelocitySignal = cv::Mat::zeros(processingHeight_, processingWidth_, CV_8UC1);
+        matVelocitySignal.recreate(matDepth.size());
+        matVelocitySignal.fill(0);
 
         //fill 0 depth pixels with the value from the previous frame
         fill_zero_values(matDepth, matDepthFilled_, matDepthFilledMask_, matDepthPrevious_);
 
-        //accumulate current frame to average using smoothing factor
-
-        cv::accumulateWeighted(matDepthFilled_, matDepthAvg_, depthSmoothingFactor_);
-
-        filter_zero_values_and_jumps(matDepthFilled_,
-                                     matDepthPrevious_,
-                                     matDepthAvg_,
-                                     matDepthFilledMask_,
-                                     maxDepthJumpPercent_);
+        accumulate_averages(matDepthFilled_,
+                            matDepthPrevious_,
+                            matDepthFilledMask_,
+                            depthSmoothingFactor_,
+                            maxDepthJumpPercent_,
+                            matDepthAvg_);
 
         //current minus average, scaled by average = velocity as a percent change
 
-        matDepthVel_ = (matDepthFilled_ - matDepthAvg_) / matDepthAvg_;
+        auto* velocityData = matDepthVel_.data();
+        const float* t0Data = matDepthAvg_.data();
+        const float* t1Data = matDepthFilled_.data();
 
+        // abstractly:
+        //matDepthVel_ = (matDepthFilled_ - matDepthAvg_) / matDepthAvg_;
+        for (unsigned y = 0; y < matDepthVel_.height(); ++y)
+        {
+            for(unsigned x = 0; x < matDepthVel_.width(); ++x, ++velocityData, ++t0Data, ++t1Data)
+            {
+                float t0Value = *t0Data + std::numeric_limits<float>::epsilon();
+                float t1Value = *t1Data;
+                // percentage of the previous velocities
+                float percentVelocity = ((t1Value - t0Value) + std::numeric_limits<float>::epsilon()) / t0Value;
+
+                *velocityData = percentVelocity;
+            }
+        }
+
+        // scales velocity by depth, removed signed velocities
         adjust_velocities_for_depth(matDepth, matDepthVel_);
 
-        //erode to eliminate single pixel velocity artifacts
-        matDepthVelErode_ = cv::abs(matDepthVel_);
-        cv::erode(matDepthVelErode_, matDepthVelErode_, rectElement_);
-        //cv::dilate(matDepthVelErode_, matDepthVelErode_, rectElement_);
+        erode(matDepthVel_, matDepthVelErode_, rectElement_);
 
         threshold_velocity_signal(matDepthVelErode_,
                                   matVelocitySignal,
                                   velocityThresholdFactor_);
+
+        copy_to(matDepth, matDepthPrevious_);
 
         //analyze_velocities(matDepth, matDepthVelErode_);
     }
@@ -121,17 +202,17 @@ namespace astra { namespace hand {
     void depth_utility::depthframe_to_matrix(const DepthFrame& depthFrameSrc,
                                              const int width,
                                              const int height,
-                                             cv::Mat& matTarget)
+                                             BitmapF& matTarget)
     {
         PROFILE_FUNC();
         //ensure initialized
-        matTarget.create(height, width, CV_32FC1);
+        matTarget.recreate(width, height);
 
         const int16_t* depthData = depthFrameSrc.data();
 
         for (int y = 0; y < height; ++y)
         {
-            float* row = matTarget.ptr<float>(y);
+            float* row = matTarget.data(y);
             for (int x = 0; x < width; ++x)
             {
                 float depth = static_cast<float>(*depthData);
@@ -142,34 +223,34 @@ namespace astra { namespace hand {
         }
     }
 
-    void depth_utility::fill_zero_values(cv::Mat& matDepth,
-                                         cv::Mat& matDepthFilled,
-                                         cv::Mat& matDepthFilledMask,
-                                         cv::Mat& matDepthPrevious)
+    void depth_utility::fill_zero_values(BitmapF& matDepth,
+                                         BitmapF& matDepthFilled,
+                                         BitmapMask& matDepthFilledMask,
+                                         BitmapF& matDepthPrevious)
     {
         PROFILE_FUNC();
-        int width = matDepth.cols;
-        int height = matDepth.rows;
+        const int width = matDepth.width();
+        const int height = matDepth.height();
 
         for (int y = 0; y < height; ++y)
         {
-            float* depthRow = matDepth.ptr<float>(y);
-            float* prevDepthRow = matDepthPrevious.ptr<float>(y);
-            float* filledDepthRow = matDepthFilled.ptr<float>(y);
-            uint8_t* filledDepthMaskRow = matDepthFilledMask.ptr<uint8_t>(y);
+            const auto* depthRow = matDepth.data(y);
+            const auto* prevDepthRow = matDepthPrevious.data(y);
+            auto* filledDepthRow = matDepthFilled.data(y);
+            auto* filledDepthMaskRow = matDepthFilledMask.data(y);
 
             for (int x = 0; x < width; ++x)
             {
-                float depth = *depthRow;
+                auto depth = *depthRow;
 
                 if (depth == 0)
                 {
                     depth = *prevDepthRow;
-                    *filledDepthMaskRow = static_cast<uint8_t>(fill_mask_type::filled);
+                    *filledDepthMaskRow = static_cast<MaskType>(fill_mask_type::filled);
                 }
                 else
                 {
-                    *filledDepthMaskRow = static_cast<uint8_t>(fill_mask_type::normal);
+                    *filledDepthMaskRow = static_cast<MaskType>(fill_mask_type::normal);
                 }
 
                 *filledDepthRow = depth;
@@ -182,22 +263,22 @@ namespace astra { namespace hand {
         }
     }
 
-    void depth_utility::filter_zero_values_and_jumps(cv::Mat& matDepth,
-                                                     cv::Mat& matDepthPrevious,
-                                                     cv::Mat& matDepthAvg,
-                                                     cv::Mat& matDepthFilledMask,
+    void depth_utility::filter_zero_values_and_jumps(BitmapF& matDepth,
+                                                     BitmapF& matDepthPrevious,
+                                                     BitmapF& matDepthAvg,
+                                                     BitmapMask& matDepthFilledMask,
                                                      const float maxDepthJumpPercent)
     {
         PROFILE_FUNC();
-        int width = matDepth.cols;
-        int height = matDepth.rows;
+        const int width = matDepth.width();
+        const int height = matDepth.width();
 
         for (int y = 0; y < height; ++y)
         {
-            float* depthRow = matDepth.ptr<float>(y);
-            float* prevDepthRow = matDepthPrevious.ptr<float>(y);
-            float* avgRow = matDepthAvg.ptr<float>(y);
-            uint8_t* filledDepthMaskRow = matDepthFilledMask.ptr<uint8_t>(y);
+            auto* depthRow = matDepth.data(y);
+            auto* prevDepthRow = matDepthPrevious.data(y);
+            auto* avgRow = matDepthAvg.data(y);
+            auto* filledDepthMaskRow = matDepthFilledMask.data(y);
 
             for (int x = 0; x < width; ++x, ++depthRow, ++prevDepthRow, ++filledDepthMaskRow)
             {
@@ -231,23 +312,23 @@ namespace astra { namespace hand {
         }
     }
 
-    void depth_utility::threshold_velocity_signal(cv::Mat& matVelocityFiltered,
-                                                  cv::Mat& matVelocitySignal,
+    void depth_utility::threshold_velocity_signal(BitmapF& matVelocityFiltered,
+                                                  BitmapMask& matVelocitySignal,
                                                   const float velocityThresholdFactor)
     {
         PROFILE_FUNC();
-        int width = matVelocitySignal.cols;
-        int height = matVelocitySignal.rows;
+        const int width = matVelocitySignal.width();
+        const int height = matVelocitySignal.height();
 
         for (int y = 0; y < height; ++y)
         {
-            float* velFilteredRow = matVelocityFiltered.ptr<float>(y);
-            uint8_t* velocitySignalRow = matVelocitySignal.ptr<uint8_t>(y);
+            auto* velFilteredRow = matVelocityFiltered.data(y);
+            auto* velocitySignalRow = matVelocitySignal.data(y);
 
             for (int x = 0; x < width; ++x, ++velFilteredRow, ++velocitySignalRow)
             {
                 //matVelocityFiltered is already abs(vel)
-                float velFiltered = *velFilteredRow;
+                const float velFiltered = *velFilteredRow;
 
                 if (velFiltered > velocityThresholdFactor)
                 {
@@ -261,7 +342,7 @@ namespace astra { namespace hand {
         }
     }
 
-    void depth_utility::adjust_velocities_for_depth(cv::Mat& matDepth, cv::Mat& matVelocityFiltered)
+    void depth_utility::adjust_velocities_for_depth(BitmapF& matDepth, BitmapF& matVelocityFiltered)
     {
         PROFILE_FUNC();
         if (depthAdjustmentFactor_ == 0)
@@ -269,24 +350,26 @@ namespace astra { namespace hand {
             return;
         }
 
-        int width = matDepth.cols;
-        int height = matDepth.rows;
+        const int width = matDepth.width();
+        const int height = matDepth.height();
 
         for (int y = 0; y < height; ++y)
         {
-            float* depthRow = matDepth.ptr<float>(y);
-            float* velFilteredRow = matVelocityFiltered.ptr<float>(y);
+            auto* depthRow = matDepth.data(y);
+            auto* velFilteredRow = matVelocityFiltered.data(y);
 
             for (int x = 0; x < width; ++x, ++depthRow, ++velFilteredRow)
             {
-                float depth = *depthRow;
+                const float depth = *depthRow;
                 if (depth != 0.0f)
                 {
                     float& velFiltered = *velFilteredRow;
+
                     if (depth > minDepth_ && depth < maxDepth_)
                     {
                         float depthM = depth / 1000.0f;
-                        velFiltered /= depthM * depthAdjustmentFactor_;
+                        // scale by depth, constant, remove signed velocities
+                        velFiltered = std::fabs(velFiltered / (depthM * depthAdjustmentFactor_));
                     }
                     else
                     {
@@ -310,11 +393,11 @@ namespace astra { namespace hand {
         return std::min(NUM_DEPTH_VEL_CHUNKS - 1, static_cast<int>(NUM_DEPTH_VEL_CHUNKS * normDepth));
     }
 
-    void depth_utility::analyze_velocities(cv::Mat& matDepth, cv::Mat& matVelocityFiltered)
+    void depth_utility::analyze_velocities(BitmapF& matDepth, BitmapF& matVelocityFiltered)
     {
         PROFILE_FUNC();
-        int width = matDepth.cols;
-        int height = matDepth.rows;
+        int width = matDepth.width();
+        int height = matDepth.height();
 
         for (int i = 0; i < NUM_DEPTH_VEL_CHUNKS; i++)
         {
@@ -324,8 +407,8 @@ namespace astra { namespace hand {
 
         for (int y = 0; y < height; ++y)
         {
-            float* depthRow = matDepth.ptr<float>(y);
-            float* velFilteredRow = matVelocityFiltered.ptr<float>(y);
+            float* depthRow = matDepth.data(y);
+            float* velFilteredRow = matVelocityFiltered.data(y);
 
             for (int x = 0; x < width; ++x, ++depthRow, ++velFilteredRow)
             {

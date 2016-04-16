@@ -39,17 +39,20 @@ namespace astra { namespace hand {
         const astra::Vector3f* fullSizeWorldPoints = matrices.fullSizeWorldPoints;
         astra::Vector3f* worldPoints = matrices.worldPoints;
         auto depthToWorldData = matrices.depthToWorldData;
-        cv::Mat& areaMatrix = matrices.area;
-        cv::Mat& areaSqrtMatrix = matrices.areaSqrt;
+        BitmapF& areaMatrix = matrices.area;
+        BitmapF& areaSqrtMatrix = matrices.areaSqrt;
 
-        cv::Size depthSize = matrices.depth.size();
+        Size2i depthSize = matrices.depth.size();
 
-        areaMatrix = cv::Mat::zeros(depthSize, CV_32FC1);
-        areaSqrtMatrix = cv::Mat::zeros(depthSize, CV_32FC1);
+        areaMatrix.recreate(depthSize);
+        areaMatrix.fill(0.f);
 
-        int fullSizeWidth = matrices.depthFullSize.cols;
-        int width = depthSize.width;
-        int height = depthSize.height;
+        areaSqrtMatrix.recreate(depthSize);
+        areaSqrtMatrix.fill(0.f);
+
+        int fullSizeWidth = matrices.depthFullSize.width();
+        int width = depthSize.width();
+        int height = depthSize.height();
 
         float offsetX = mapper.offsetX();
         float offsetY = mapper.offsetY();
@@ -58,13 +61,13 @@ namespace astra { namespace hand {
 
         for (int y = 0; y < height; ++y)
         {
-            float* areaRow = areaMatrix.ptr<float>(y);
-            float* areaSqrtRow = areaSqrtMatrix.ptr<float>(y);
+            float* areaRow = areaMatrix.data(y);
+            float* areaSqrtRow = areaSqrtMatrix.data(y);
 
             for (int x = 0; x < width; ++x, ++worldPoints, ++areaRow, ++areaSqrtRow)
             {
                 int fullSizeIndex = (x + y * fullSizeWidth) * intScale;
-                const Vector3f& p = fullSizeWorldPoints[fullSizeIndex];
+                const astra::Vector3f& p = fullSizeWorldPoints[fullSizeIndex];
                 *worldPoints = p;
                 const float depth = p.z;
 
@@ -139,8 +142,8 @@ namespace astra { namespace hand {
                                                tracked_point& trackedPoint)
     {
         PROFILE_FUNC();
-        const float width = matrices.depth.cols;
-        const float height = matrices.depth.rows;
+        const float width = matrices.depth.width();
+        const float height = matrices.depth.height();
 
         ++trackedPoint.inactiveFrameCount;
 
@@ -152,7 +155,7 @@ namespace astra { namespace hand {
                                           settings_.segmentationSettings,
                                           TEST_PHASE_UPDATE);
 
-        cv::Point newTargetPoint = segmentation::track_point_from_seed(updatetracking_data);
+        Point2i newTargetPoint = segmentation::track_point_from_seed(updatetracking_data);
 
         validate_and_update_tracked_point(matrices, scalingMapper, trackedPoint, newTargetPoint);
 
@@ -160,7 +163,7 @@ namespace astra { namespace hand {
 
         auto xyDelta = trackedPoint.worldDeltaPosition;
         xyDelta.z = 0;
-        double xyDeltaNorm = cv::norm(xyDelta);
+        double xyDeltaNorm = xyDelta.length();
         if (trackedPoint.trackingStatus != tracking_status::tracking &&
             newTargetPoint == segmentation::INVALID_POINT &&
             xyDeltaNorm > settings_.secondChanceMinDistance)
@@ -169,9 +172,9 @@ namespace astra { namespace hand {
             float maxSegmentationDist = settings_.segmentationSettings.maxSegmentationDist;
             auto estimatedWorldPosition = trackedPoint.worldPosition + movementDirection * maxSegmentationDist;
 
-            cv::Point3f estimatedPosition = scalingMapper.convert_world_to_depth(estimatedWorldPosition);
+            Vector3f estimatedPosition = scalingMapper.convert_world_to_depth(estimatedWorldPosition);
 
-            cv::Point seedPosition;
+            Point2i seedPosition;
             seedPosition.x = MAX(0, MIN(width - 1, static_cast<int>(estimatedPosition.x)));
             seedPosition.y = MAX(0, MIN(height - 1, static_cast<int>(estimatedPosition.y)));
 
@@ -220,7 +223,7 @@ namespace astra { namespace hand {
             trackedPoint.fullSizePosition.x = (trackedPoint.position.x + 0.5) * resizeFactor;
             trackedPoint.fullSizePosition.y = (trackedPoint.position.y + 0.5) * resizeFactor;
 
-            bool resizeNeeded = matrices.depthFullSize.cols != matrices.depth.cols;
+            bool resizeNeeded = matrices.depthFullSize.width() != matrices.depth.width();
 
             bool processRefinedPosition = false;
 
@@ -228,13 +231,13 @@ namespace astra { namespace hand {
                 trackedPoint.trackingStatus == tracking_status::tracking &&
                 trackedPoint.pointType == tracked_point_type::active_point)
             {
-                cv::Point3f refinedWorldPosition = trackedPoint.worldPosition;
+                Vector3f refinedWorldPosition = trackedPoint.worldPosition;
                 if (processRefinedPosition)
                 {
                     refinedWorldPosition = get_refined_high_res_position(matrices, trackedPoint);
                 }
 
-                cv::Point3f smoothedWorldPosition = smooth_world_positions(trackedPoint.fullSizeWorldPosition, refinedWorldPosition);
+                Vector3f smoothedWorldPosition = smooth_world_positions(trackedPoint.fullSizeWorldPosition, refinedWorldPosition);
 
                 update_tracked_point_from_world_position(trackedPoint,
                                                          smoothedWorldPosition,
@@ -279,8 +282,8 @@ namespace astra { namespace hand {
         }
     }
 
-    cv::Point3f point_processor::get_refined_high_res_position(tracking_matrices& matrices,
-                                                               const tracked_point& trackedPoint)
+    Vector3f point_processor::get_refined_high_res_position(tracking_matrices& matrices,
+                                                            const tracked_point& trackedPoint)
     {
         PROFILE_FUNC();
         assert(trackedPoint.pointType == tracked_point_type::active_point);
@@ -290,28 +293,28 @@ namespace astra { namespace hand {
             return trackedPoint.worldPosition;
         }
 
-        int fullWidth = matrices.depthFullSize.cols;
-        int fullHeight = matrices.depthFullSize.rows;
-        int processingWidth = matrices.depth.cols;
-        int processingHeight = matrices.depth.rows;
+        int fullWidth = matrices.depthFullSize.width();
+        int fullHeight = matrices.depthFullSize.height();
+        int processingWidth = matrices.depth.width();
+        int processingHeight = matrices.depth.height();
 
         int fullSizeX = trackedPoint.fullSizePosition.x;
         int fullSizeY = trackedPoint.fullSizePosition.y;
         int windowLeft = MAX(0, MIN(fullWidth - processingWidth, fullSizeX - processingWidth / 2));
         int windowTop = MAX(0, MIN(fullHeight - processingHeight, fullSizeY - processingHeight / 2));
 
-        cv::Point roiPosition(fullSizeX - windowLeft, fullSizeY - windowTop);
+        Point2i roiPosition(fullSizeX - windowLeft, fullSizeY - windowTop);
 
-        float referenceAreaSqrt = matrices.areaSqrt.at<float>(roiPosition);
+        float referenceAreaSqrt = matrices.areaSqrt.at(roiPosition);
         if (referenceAreaSqrt == 0)
         {
             return trackedPoint.worldPosition;
         }
 
         //Create a window into the full size data
-        cv::Mat roi = matrices.depthFullSize(cv::Rect(windowLeft, windowTop, processingWidth, processingHeight));
+        auto roi = matrices.depthFullSize.submap(windowLeft, windowTop, processingWidth, processingHeight);
         //copyTo for now so .at works with local coords in functions that use it
-        roi.copyTo(matrices.depth);
+        copy_to(roi, matrices.depth);
 
         //initialize_common_calculations(matrices);
         scaling_coordinate_mapper roiMapper(matrices.depthToWorldData, 1.0, windowLeft, windowTop);
@@ -326,7 +329,7 @@ namespace astra { namespace hand {
                                               settings_.segmentationSettings,
                                               TEST_PHASE_UPDATE);
 
-        cv::Point targetPoint = segmentation::track_point_from_seed(refinementtracking_data);
+        Point2i targetPoint = segmentation::track_point_from_seed(refinementtracking_data);
 
         if (targetPoint == segmentation::INVALID_POINT)
         {
@@ -336,28 +339,28 @@ namespace astra { namespace hand {
         int refinedFullSizeX = targetPoint.x + windowLeft;
         int refinedFullSizeY = targetPoint.y + windowTop;
 
-        float refinedDepth = matrices.depthFullSize.at<float>(refinedFullSizeY, refinedFullSizeX);
+        float refinedDepth = matrices.depthFullSize.at(refinedFullSizeY, refinedFullSizeX);
 
         if (refinedDepth == 0)
         {
             refinedDepth = trackedPoint.worldPosition.z;
         }
 
-        cv::Point3f refinedWorldPosition = cv_convert_depth_to_world(matrices.depthToWorldData,
-                                                                     refinedFullSizeX,
-                                                                     refinedFullSizeY,
-                                                                     refinedDepth);
+        Vector3f refinedWorldPosition = cv_convert_depth_to_world(matrices.depthToWorldData,
+                                                                  refinedFullSizeX,
+                                                                  refinedFullSizeY,
+                                                                  refinedDepth);
 
         return refinedWorldPosition;
     }
 
-    cv::Point3f point_processor::smooth_world_positions(const cv::Point3f& oldWorldPosition,
-                                                        const cv::Point3f& newWorldPosition)
+    Vector3f point_processor::smooth_world_positions(const Vector3f& oldWorldPosition,
+                                                     const Vector3f& newWorldPosition)
     {
         PROFILE_FUNC();
         float smoothingFactor = settings_.pointSmoothingFactor;
 
-        float delta = cv::norm(newWorldPosition - oldWorldPosition);
+        float delta = (newWorldPosition - oldWorldPosition).length();
         if (delta < settings_.pointSmoothingDeadZone)
         {
             float factorRamp = delta / settings_.pointSmoothingDeadZone;
@@ -369,16 +372,16 @@ namespace astra { namespace hand {
     }
 
     void point_processor::update_tracked_point_from_world_position(tracked_point& trackedPoint,
-                                                                   const cv::Point3f& newWorldPosition,
+                                                                   const Vector3f& newWorldPosition,
                                                                    const float resizeFactor,
                                                                    const conversion_cache_t& depthToWorldData)
     {
         PROFILE_FUNC();
-        cv::Point3f fullSizeDepthPosition = cv_convert_world_to_depth(depthToWorldData, newWorldPosition);
+        Vector3f fullSizeDepthPosition = cv_convert_world_to_depth(depthToWorldData, newWorldPosition);
 
-        trackedPoint.fullSizePosition = cv::Point(fullSizeDepthPosition.x, fullSizeDepthPosition.y);
+        trackedPoint.fullSizePosition = Point2i(fullSizeDepthPosition.x, fullSizeDepthPosition.y);
 
-        cv::Point3f deltaPosition = newWorldPosition - trackedPoint.fullSizeWorldPosition;
+        Vector3f deltaPosition = newWorldPosition - trackedPoint.fullSizeWorldPosition;
         trackedPoint.fullSizeWorldPosition = newWorldPosition;
         trackedPoint.fullSizeWorldDeltaPosition = deltaPosition;
     }
@@ -402,20 +405,20 @@ namespace astra { namespace hand {
         trackedPoint.failedTestCount = 0;
     }
 
-    void point_processor::update_tracked_point_data(tracking_matrices& matrices, scaling_coordinate_mapper& scalingMapper, tracked_point& trackedPoint, const cv::Point& newTargetPoint)
+    void point_processor::update_tracked_point_data(tracking_matrices& matrices, scaling_coordinate_mapper& scalingMapper, tracked_point& trackedPoint, const Point2i& newTargetPoint)
     {
         PROFILE_FUNC();
-        float depth = matrices.depth.at<float>(newTargetPoint);
-        cv::Point3f worldPosition = scalingMapper.convert_depth_to_world(newTargetPoint.x, newTargetPoint.y, depth);
+        float depth = matrices.depth.at(newTargetPoint);
+        Vector3f worldPosition = scalingMapper.convert_depth_to_world(newTargetPoint.x, newTargetPoint.y, depth);
 
-        cv::Point3f deltaPosition = worldPosition - trackedPoint.worldPosition;
+        Vector3f deltaPosition = worldPosition - trackedPoint.worldPosition;
         trackedPoint.worldPosition = worldPosition;
         trackedPoint.worldDeltaPosition = deltaPosition;
 
         trackedPoint.position = newTargetPoint;
-        trackedPoint.referenceAreaSqrt = matrices.areaSqrt.at<float>(trackedPoint.position);
+        trackedPoint.referenceAreaSqrt = matrices.areaSqrt.at(trackedPoint.position);
 
-        auto steadyDist = cv::norm(worldPosition - trackedPoint.steadyWorldPosition);
+        auto steadyDist = (worldPosition - trackedPoint.steadyWorldPosition).length();
 
         if (steadyDist > settings_.steadyDeadBandRadius)
         {
@@ -427,7 +430,7 @@ namespace astra { namespace hand {
     void point_processor::validate_and_update_tracked_point(tracking_matrices& matrices,
                                                             scaling_coordinate_mapper& scalingMapper,
                                                             tracked_point& trackedPoint,
-                                                            const cv::Point& newTargetPoint)
+                                                            const Point2i& newTargetPoint)
     {
         PROFILE_FUNC();
         if(trackedPoint.trackingStatus == tracking_status::dead)
@@ -517,7 +520,7 @@ namespace astra { namespace hand {
             {
                 tracked_point& otherTracked = *otherIter;
                 bool bothNotDead = tracked.trackingStatus != tracking_status::dead && otherTracked.trackingStatus != tracking_status::dead;
-                float pointDist = cv::norm(tracked.worldPosition - otherTracked.worldPosition);
+                float pointDist = (tracked.worldPosition - otherTracked.worldPosition).length();
                 if (tracked.trackingId != otherTracked.trackingId &&
                     bothNotDead &&
                     pointDist < settings_.mergePointDistance)
@@ -568,11 +571,11 @@ namespace astra { namespace hand {
     }
 
     void point_processor::update_tracked_or_create_new_point_from_seed(tracking_matrices& matrices,
-                                                                       const cv::Point& seedPosition)
+                                                                       const Point2i& seedPosition)
     {
         PROFILE_FUNC();
-        float referenceDepth = matrices.depth.at<float>(seedPosition);
-        float referenceAreaSqrt = matrices.areaSqrt.at<float>(seedPosition);
+        float referenceDepth = matrices.depth.at(seedPosition);
+        float referenceAreaSqrt = matrices.areaSqrt.at(seedPosition);
         if (referenceDepth == 0 || referenceAreaSqrt == 0 || seedPosition == segmentation::INVALID_POINT)
         {
             //Cannot expect to properly segment when the seedPosition has zero depth
@@ -580,7 +583,7 @@ namespace astra { namespace hand {
         }
 
         auto scalingMapper = get_scaling_mapper(matrices);
-        cv::Point3f referenceWorldPosition =
+        Vector3f referenceWorldPosition =
             scalingMapper.convert_depth_to_world(seedPosition.x,
                                                  seedPosition.y,
                                                  referenceDepth);
@@ -593,7 +596,7 @@ namespace astra { namespace hand {
                                           settings_.segmentationSettings,
                                           TEST_PHASE_CREATE);
 
-        cv::Point targetPoint = segmentation::track_point_from_seed(createtracking_data);
+        Point2i targetPoint = segmentation::track_point_from_seed(createtracking_data);
 
         const test_behavior outputTestLog = TEST_BEHAVIOR_NONE;
 
@@ -608,18 +611,18 @@ namespace astra { namespace hand {
 
         bool existingPoint = false;
 
-        float depth = matrices.depth.at<float>(targetPoint);
+        float depth = matrices.depth.at(targetPoint);
 
-        cv::Point3f worldPosition = scalingMapper.convert_depth_to_world(targetPoint.x,
-                                                                         targetPoint.y,
-                                                                         depth);
+        Vector3f worldPosition = scalingMapper.convert_depth_to_world(targetPoint.x,
+                                                                      targetPoint.y,
+                                                                      depth);
 
         for (auto iter = trackedPoints_.begin(); iter != trackedPoints_.end(); ++iter)
         {
             tracked_point& trackedPoint = *iter;
             if (trackedPoint.trackingStatus != tracking_status::dead)
             {
-                float dist = cv::norm(trackedPoint.worldPosition - worldPosition);
+                float dist = (trackedPoint.worldPosition - worldPosition).length();
                 float maxDist = settings_.maxMatchDistDefault;
                 bool lostPoint = trackedPoint.trackingStatus == tracking_status::lost;
                 if (lostPoint && trackedPoint.pointType == tracked_point_type::active_point)
@@ -633,10 +636,10 @@ namespace astra { namespace hand {
                     {
                         //Recover a lost point -- move it to the recovery position
                         trackedPoint.position = targetPoint;
-                        trackedPoint.referenceAreaSqrt = matrices.areaSqrt.at<float>(trackedPoint.position);
+                        trackedPoint.referenceAreaSqrt = matrices.areaSqrt.at(trackedPoint.position);
 
                         trackedPoint.worldPosition = worldPosition;
-                        trackedPoint.worldDeltaPosition = cv::Point3f();
+                        trackedPoint.worldDeltaPosition = Vector3f();
 
                         LOG_TRACE("point_processor", "createCycle: Recovered #%d",
                                   trackedPoint.trackingId);

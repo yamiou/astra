@@ -104,6 +104,7 @@ namespace astra { namespace hand {
     void hand_tracker::update_tracking(const DepthFrame& depthFrame, const PointFrame& pointFrame)
     {
         PROFILE_FUNC();
+
         if (!debugimagestream_->pause_input())
         {
             depthUtility_.depth_to_velocity_signal(depthFrame, matDepth_, matDepthFullSize_, matVelocitySignal_);
@@ -125,36 +126,77 @@ namespace astra { namespace hand {
         }
     }
 
-    void hand_tracker::track_points(cv::Mat& matDepth,
-                                    cv::Mat& matDepthFullSize,
-                                    cv::Mat& matVelocitySignal,
-                                    const Vector3f* fullSizeWorldPoints)
+    void hand_tracker::track_points(BitmapF& matDepth,
+                                    BitmapF& matDepthFullSize,
+                                    BitmapMask& matVelocitySignal,
+                                    const astra::Vector3f* fullSizeWorldPoints)
     {
         PROFILE_FUNC();
 
-        layerSegmentation_ = cv::Mat::zeros(matDepth.size(), CV_8UC1);
-        layerScore_ = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-        layerEdgeDistance_ = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-        debugUpdateSegmentation_ = cv::Mat::zeros(matDepth.size(), CV_8UC1);
-        debugCreateSegmentation_ = cv::Mat::zeros(matDepth.size(), CV_8UC1);
-        debugRefineSegmentation_ = cv::Mat::zeros(matDepth.size(), CV_8UC1);
-        updateForegroundSearched_ = cv::Mat::zeros(matDepth.size(), CV_8UC1);
-        createForegroundSearched_ = cv::Mat::zeros(matDepth.size(), CV_8UC1);
-        refineForegroundSearched_ = cv::Mat::zeros(matDepth.size(), CV_8UC1);
-        debugUpdateScore_ = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-        debugCreateScore_ = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-        matDepthWindow_ = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-        refineSegmentation_ = cv::Mat::zeros(matDepth.size(), CV_8UC1);
-        refineScore_ = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-        refineEdgeDistance_ = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-        debugUpdateScoreValue_ = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-        debugCreateScoreValue_ = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-        debugRefineScoreValue_ = cv::Mat::zeros(matDepth.size(), CV_32FC1);
-        debugCreateTestPassMap_ = cv::Mat::zeros(matDepth.size(), CV_8UC1);
-        debugUpdateTestPassMap_ = cv::Mat::zeros(matDepth.size(), CV_8UC1);
-        debugRefineTestPassMap_ = cv::Mat::zeros(matDepth.size(), CV_8UC1);
+        layerSegmentation_.recreate(matDepth.size());
+        layerSegmentation_.fill(0);
 
-        int numPoints = matDepth.cols * matDepth.rows;
+        layerScore_.recreate(matDepth.size());
+        layerScore_.fill(0.f);
+
+        layerEdgeDistance_.recreate(matDepth.size());
+        layerEdgeDistance_.fill(0.f);
+
+        debugUpdateSegmentation_.recreate(matDepth.size());
+        debugUpdateSegmentation_.fill(0);
+
+        debugCreateSegmentation_.recreate(matDepth.size());
+        debugCreateSegmentation_.fill(0);
+
+        debugRefineSegmentation_.recreate(matDepth.size());
+        debugRefineSegmentation_.fill(0);
+
+        updateForegroundSearched_.recreate(matDepth.size());
+        updateForegroundSearched_.fill(0);
+
+        createForegroundSearched_.recreate(matDepth.size());
+        createForegroundSearched_.fill(0);
+
+        refineForegroundSearched_.recreate(matDepth.size());
+        refineForegroundSearched_.fill(0);
+
+        debugUpdateScore_.recreate(matDepth.size());
+        debugUpdateScore_.fill(0.f);
+
+        debugCreateScore_.recreate(matDepth.size());
+        debugCreateScore_.fill(0.f);
+
+        matDepthWindow_.recreate(matDepth.size());
+        matDepthWindow_.fill(0.f);
+
+        refineSegmentation_.recreate(matDepth.size());
+        refineSegmentation_.fill(0);
+
+        refineScore_.recreate(matDepth.size());
+        refineScore_.fill(0.f);
+
+        refineEdgeDistance_.recreate(matDepth.size());
+        refineEdgeDistance_.fill(0.f);
+
+        debugUpdateScoreValue_.recreate(matDepth.size());
+        debugUpdateScoreValue_.fill(0.f);
+
+        debugCreateScoreValue_.recreate(matDepth.size());
+        debugCreateScoreValue_.fill(0.f);
+
+        debugRefineScoreValue_.recreate(matDepth.size());
+        debugRefineScoreValue_.fill(0.f);
+
+        debugCreateTestPassMap_.recreate(matDepth.size());
+        debugCreateTestPassMap_.fill(0);
+
+        debugUpdateTestPassMap_.recreate(matDepth.size());
+        debugUpdateTestPassMap_.fill(0);
+
+        debugRefineTestPassMap_.recreate(matDepth.size());
+        debugRefineTestPassMap_.fill(0);
+
+        int numPoints = matDepth.width()* matDepth.height();
         if (worldPoints_ == nullptr || numWorldPoints_ != numPoints)
         {
             if (worldPoints_ != nullptr)
@@ -231,8 +273,8 @@ namespace astra { namespace hand {
         //add new points (unless already tracking)
         if (!debugimagestream_->use_mouse_probe())
         {
-            cv::Point seedPosition;
-            cv::Point nextSearchStart(0, 0);
+            Point2i seedPosition;
+            Point2i nextSearchStart(0, 0);
             while (segmentation::find_next_velocity_seed_pixel(matVelocitySignal, createForegroundSearched_, seedPosition, nextSearchStart))
             {
                 pointProcessor_.update_tracked_or_create_new_point_from_seed(createMatrices, seedPosition);
@@ -282,13 +324,13 @@ namespace astra { namespace hand {
             return;
         }
 
-        cv::Point probePosition = get_mouse_probe_position();
+        Point2i probePosition = get_mouse_probe_position();
 
-        cv::Mat& matDepth = matrices.depth;
+        BitmapF& matDepth = matrices.depth;
 
-        float depth = matDepth.at<float>(probePosition);
-        float score = debugCreateScoreValue_.at<float>(probePosition);
-        float edgeDist = layerEdgeDistance_.at<float>(probePosition);
+        float depth = matDepth.at(probePosition);
+        float score = debugCreateScoreValue_.at(probePosition);
+        float edgeDist = layerEdgeDistance_.at(probePosition);
 
         auto segmentationSettings = settings_.pointProcessorSettings.segmentationSettings;
 
@@ -341,12 +383,12 @@ namespace astra { namespace hand {
         {
             pointProcessor_.initialize_common_calculations(matrices);
         }
-        cv::Point seedPosition = get_spawn_position();
+        Point2i seedPosition = get_spawn_position();
 
         pointProcessor_.update_tracked_or_create_new_point_from_seed(matrices, seedPosition);
     }
 
-    cv::Point hand_tracker::get_spawn_position()
+    Point2i hand_tracker::get_spawn_position()
     {
         auto normPosition = debugimagestream_->mouse_norm_position();
 
@@ -357,15 +399,15 @@ namespace astra { namespace hand {
 
         int x = MAX(0, MIN(processingSizeWidth_, normPosition.x * processingSizeWidth_));
         int y = MAX(0, MIN(processingSizeHeight_, normPosition.y * processingSizeHeight_));
-        return cv::Point(x, y);
+        return Point2i(x, y);
     }
 
-    cv::Point hand_tracker::get_mouse_probe_position()
+    Point2i hand_tracker::get_mouse_probe_position()
     {
         auto normPosition = debugimagestream_->mouse_norm_position();
         int x = MAX(0, MIN(processingSizeWidth_, normPosition.x * processingSizeWidth_));
         int y = MAX(0, MIN(processingSizeHeight_, normPosition.y * processingSizeHeight_));
-        return cv::Point(x, y);
+        return Point2i(x, y);
     }
 
     void hand_tracker::generate_hand_frame(astra_frame_index_t frameIndex)
@@ -451,7 +493,7 @@ namespace astra { namespace hand {
         }
     }
 
-    void hand_tracker::copy_position(cv::Point3f& source, astra_vector3f_t& target)
+    void hand_tracker::copy_position(Vector3f& source, astra_vector3f_t& target)
     {
         PROFILE_FUNC();
         target.x = source.x;
@@ -506,7 +548,7 @@ namespace astra { namespace hand {
     {
         PROFILE_FUNC();
 
-        float resizeFactor = matDepthFullSize_.cols / static_cast<float>(matDepth_.cols);
+        float resizeFactor = matDepthFullSize_.width() / static_cast<float>(matDepth_.width());
         scaling_coordinate_mapper mapper(depthStream_.depth_to_world_data(), resizeFactor);
 
         RgbPixel color(255, 0, 255);
@@ -515,7 +557,7 @@ namespace astra { namespace hand {
         float foregroundRadius1 = segmentationSettings.circumferenceTestSettings.foregroundRadius1;
         float foregroundRadius2 = segmentationSettings.circumferenceTestSettings.foregroundRadius2;
 
-        cv::Point probePosition = get_mouse_probe_position();
+        Point2i probePosition = get_mouse_probe_position();
 
         std::vector<astra::Vector2i> points;
 
@@ -533,7 +575,7 @@ namespace astra { namespace hand {
             mark_image_pixel(imageFrame, color, p);
         }
 
-        cv::Point spawnPosition = get_spawn_position();
+        Point2i spawnPosition = get_spawn_position();
         RgbPixel spawnColor(255, 0, 255);
 
         mark_image_pixel(imageFrame, spawnColor, Vector2i(spawnPosition.x, spawnPosition.y));
@@ -576,14 +618,14 @@ namespace astra { namespace hand {
                                                   colorFrame);
             break;
         case DEBUG_HAND_VIEW_UPDATE_SEGMENTATION:
-            debugVisualizer_.show_norm_array<char>(debugUpdateSegmentation_,
-                                                   debugUpdateSegmentation_,
-                                                   colorFrame);
+            debugVisualizer_.show_norm_array<MaskType>(debugUpdateSegmentation_,
+                                                       debugUpdateSegmentation_,
+                                                       colorFrame);
             break;
         case DEBUG_HAND_VIEW_CREATE_SEGMENTATION:
-            debugVisualizer_.show_norm_array<char>(debugCreateSegmentation_,
-                                                   debugCreateSegmentation_,
-                                                   colorFrame);
+            debugVisualizer_.show_norm_array<MaskType>(debugCreateSegmentation_,
+                                                       debugCreateSegmentation_,
+                                                       colorFrame);
             break;
         case DEBUG_HAND_VIEW_UPDATE_SEARCHED:
         case DEBUG_HAND_VIEW_CREATE_SEARCHED:
@@ -605,9 +647,9 @@ namespace astra { namespace hand {
                                                colorFrame);
             break;
         case DEBUG_HAND_VIEW_TEST_PASS_MAP:
-            debugVisualizer_.show_norm_array<char>(debugCreateTestPassMap_,
-                                                   debugCreateTestPassMap_,
-                                                   colorFrame);
+            debugVisualizer_.show_norm_array<MaskType>(debugCreateTestPassMap_,
+                                                       debugCreateTestPassMap_,
+                                                       colorFrame);
             break;
         }
 

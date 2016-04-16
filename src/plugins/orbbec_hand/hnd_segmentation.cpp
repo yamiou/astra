@@ -17,6 +17,7 @@
 #include "hnd_tracking_data.hpp"
 #include <queue>
 #include "hnd_scaling_coordinate_mapper.hpp"
+#include "hnd_morphology.hpp"
 #include <cmath>
 #include "hnd_segmentation.hpp"
 #include "hnd_constants.hpp"
@@ -40,15 +41,15 @@ namespace astra { namespace hand { namespace segmentation {
         { }
     };
 
-    static void enqueue_neighbors(cv::Mat& matVisited,
+    static void enqueue_neighbors(BitmapMask& matVisited,
                                   std::queue<point_ttl>& pointQueue,
                                   const point_ttl& pt)
     {
         PROFILE_FUNC();
         const int& x = pt.x;
         const int& y = pt.y;
-        const int width = matVisited.cols;
-        const int height = matVisited.rows;
+        const int width = matVisited.width();
+        const int height = matVisited.height();
 
         if (x < 1 || x > width - 2 ||
             y < 1 || y > height - 2)
@@ -58,28 +59,28 @@ namespace astra { namespace hand { namespace segmentation {
 
         const float& ttlRef = pt.ttl;
 
-        char& rightVisited = matVisited.at<char>(y, x+1);
+        auto& rightVisited = matVisited.at(x+1, y);
         if (0 == rightVisited)
         {
             rightVisited = 1;
             pointQueue.push(point_ttl(x+1, y, ttlRef));
         }
 
-        char& leftVisited = matVisited.at<char>(y, x-1);
+        auto& leftVisited = matVisited.at(x-1, y);
         if (0 == leftVisited)
         {
             leftVisited = 1;
             pointQueue.push(point_ttl(x-1, y, ttlRef));
         }
 
-        char& downVisited = matVisited.at<char>(y+1, x);
+        auto& downVisited = matVisited.at(x, y+1);
         if (0 == downVisited)
         {
             downVisited = 1;
             pointQueue.push(point_ttl(x, y+1, ttlRef));
         }
 
-        char& upVisited = matVisited.at<char>(y-1, x);
+        auto& upVisited = matVisited.at(x, y-1);
         if (0 == upVisited)
         {
             upVisited = 1;
@@ -87,8 +88,8 @@ namespace astra { namespace hand { namespace segmentation {
         }
     }
 
-    static cv::Point find_nearest_in_range_pixel(tracking_data& data,
-                                                 cv::Mat& matVisited)
+    static Point2i find_nearest_in_range_pixel(tracking_data& data,
+                                               BitmapMask& matVisited)
     {
         PROFILE_FUNC();
         assert(matVisited.size() == data.matrices.depth.size());
@@ -101,8 +102,8 @@ namespace astra { namespace hand { namespace segmentation {
         const float minDepth = data.referenceWorldPosition.z - data.settings.segmentationBandwidthDepthNear;
         const float maxDepth = data.referenceWorldPosition.z + data.settings.segmentationBandwidthDepthFar;
         const float maxSegmentationDist = data.settings.maxSegmentationDist;
-        cv::Mat& depthMatrix = data.matrices.depth;
-        cv::Mat& searchedMatrix = data.matrices.foregroundSearched;
+        BitmapF& depthMatrix = data.matrices.depth;
+        BitmapMask& searchedMatrix = data.matrices.foregroundSearched;
 
         std::queue<point_ttl> pointQueue;
 
@@ -110,7 +111,7 @@ namespace astra { namespace hand { namespace segmentation {
                                   data.seedPosition.y,
                                   maxSegmentationDist));
 
-        matVisited.at<char>(data.seedPosition) = 1;
+        matVisited.at(data.seedPosition) = 1;
 
         while (!pointQueue.empty())
         {
@@ -125,15 +126,15 @@ namespace astra { namespace hand { namespace segmentation {
                 continue;
             }
 
-            searchedMatrix.at<char>(y, x) =
+            searchedMatrix.at(x, y) =
                 pixel_type::searched_from_out_of_range;
 
-            float depth = depthMatrix.at<float>(y, x);
+            float depth = depthMatrix.at(x, y);
             bool pointInRange = depth != 0 && depth > minDepth && depth < maxDepth;
 
             if (pointInRange)
             {
-                return cv::Point(x, y);
+                return Point2i(x, y);
             }
 
             ttlRef -= referenceAreaSqrt;
@@ -149,12 +150,12 @@ namespace astra { namespace hand { namespace segmentation {
         PROFILE_FUNC();
         const float& maxSegmentationDist = data.settings.maxSegmentationDist;
         const segmentation_velocity_policy& velocitySignalPolicy = data.velocityPolicy;
-        const float seedDepth = data.matrices.depth.at<float>(data.seedPosition);
+        const float seedDepth = data.matrices.depth.at(data.seedPosition);
         const float referenceAreaSqrt = data.referenceAreaSqrt;
-        cv::Mat& depthMatrix = data.matrices.depth;
-        cv::Mat& velocitySignalMatrix = data.matrices.velocitySignal;
-        cv::Mat& segmentationMatrix = data.matrices.layerSegmentation;
-        cv::Mat& searchedMatrix = data.matrices.foregroundSearched;
+        BitmapF& depthMatrix = data.matrices.depth;
+        BitmapMask& velocitySignalMatrix = data.matrices.velocitySignal;
+        BitmapMask& segmentationMatrix = data.matrices.layerSegmentation;
+        BitmapMask& searchedMatrix = data.matrices.foregroundSearched;
 
         std::queue<point_ttl> pointQueue;
 
@@ -168,9 +169,10 @@ namespace astra { namespace hand { namespace segmentation {
         const float minDepth = data.referenceWorldPosition.z - bandwidthDepth;
         const float maxDepth = data.referenceWorldPosition.z + data.settings.segmentationBandwidthDepthFar;
 
-        cv::Mat matVisited = cv::Mat::zeros(depthMatrix.size(), CV_8UC1);
+        BitmapMask matVisited(depthMatrix.size());
+        matVisited.fill(0);
 
-        cv::Point seedPosition = data.seedPosition;
+        Point2i seedPosition = data.seedPosition;
 
         bool seedInRange = seedDepth != 0 && seedDepth > minDepth && seedDepth < maxDepth;
         if (!seedInRange)
@@ -187,7 +189,7 @@ namespace astra { namespace hand { namespace segmentation {
                                   seedPosition.y,
                                   maxSegmentationDist));
 
-        matVisited.at<char>(seedPosition) = 1;
+        matVisited.at(seedPosition) = 1;
 
         while (!pointQueue.empty())
         {
@@ -198,32 +200,32 @@ namespace astra { namespace hand { namespace segmentation {
             float& ttlRef = pt.ttl;
 
             if (velocitySignalPolicy == VELOCITY_POLICY_RESET_TTL &&
-                velocitySignalMatrix.at<char>(y, x) == pixel_type::foreground)
+                velocitySignalMatrix.at(x, y) == pixel_type::foreground)
             {
                 ttlRef = maxSegmentationDist;
             }
 
-            float depth = depthMatrix.at<float>(y, x);
+            float depth = depthMatrix.at(x, y);
             bool pointOutOfRange = depth == 0 ||
                 depth < minDepth ||
                         depth > maxDepth;
 
             if (ttlRef <= 0)
             {
-                segmentationMatrix.at<char>(y, x) = pixel_type::foreground_out_of_range_edge;
+                segmentationMatrix.at(x, y) = pixel_type::foreground_out_of_range_edge;
                 continue;
             }
             else if (pointOutOfRange)
             {
-                segmentationMatrix.at<char>(y, x) = pixel_type::foreground_natural_edge;
+                segmentationMatrix.at(x, y) = pixel_type::foreground_natural_edge;
                 continue;
             }
 
             totalDepth += depth;
             ++depthCount;
 
-            searchedMatrix.at<char>(y, x) = pixel_type::searched;
-            segmentationMatrix.at<char>(y, x) = pixel_type::foreground;
+            searchedMatrix.at(x, y) = pixel_type::searched;
+            segmentationMatrix.at(x, y) = pixel_type::foreground;
 
             ttlRef -= referenceAreaSqrt;
 
@@ -244,17 +246,18 @@ namespace astra { namespace hand { namespace segmentation {
     void calculate_layer_score(tracking_data& data, const float layerAverageDepth)
     {
         PROFILE_FUNC();
-        cv::Mat& edgeDistanceMatrix = data.matrices.layerEdgeDistance;
+        BitmapF& edgeDistanceMatrix = data.matrices.layerEdgeDistance;
         const float depthFactor = data.settings.depthScoreFactor;
         const float heightFactor = data.settings.heightScoreFactor;
         const float edgeDistanceFactor = data.settings.edgeDistanceScoreFactor;
         const float targetEdgeDist = data.settings.targetEdgeDistance;
-        cv::Mat& layerScoreMatrix = data.matrices.layerScore;
+        BitmapF& layerScoreMatrix = data.matrices.layerScore;
         const float pointInertiaFactor = data.settings.pointInertiaFactor;
         const float pointInertiaRadius = data.settings.pointInertiaRadius;
         const astra::Vector3f* worldPoints = data.matrices.worldPoints;
 
-        layerScoreMatrix = cv::Mat::zeros(data.matrices.depth.size(), CV_32FC1);
+        layerScoreMatrix.recreate(data.matrices.depth.size());
+        layerScoreMatrix.fill(0.f);
 
         scaling_coordinate_mapper mapper = get_scaling_mapper(data.matrices);
 
@@ -262,8 +265,8 @@ namespace astra { namespace hand { namespace segmentation {
                                                  data.referenceWorldPosition.y,
                                                  data.referenceWorldPosition.z);
 
-        int width = data.matrices.depth.cols;
-        int height = data.matrices.depth.rows;
+        int width = data.matrices.depth.width();
+        int height = data.matrices.depth.height();
 
         int edgeRadius = mapper.scale() * width / 32;
         int minX = edgeRadius - 1;
@@ -273,8 +276,8 @@ namespace astra { namespace hand { namespace segmentation {
 
         for (int y = 0; y < height; y++)
         {
-            float* edgeDistanceRow = edgeDistanceMatrix.ptr<float>(y);
-            float* layerScoreRow = layerScoreMatrix.ptr<float>(y);
+            float* edgeDistanceRow = edgeDistanceMatrix.data(y);
+            float* layerScoreRow = layerScoreMatrix.data(y);
 
             for (int x = 0; x < width; ++x,
                      ++worldPoints,
@@ -319,13 +322,13 @@ namespace astra { namespace hand { namespace segmentation {
 
 
     bool test_point_in_range(tracking_matrices& matrices,
-                             const cv::Point& targetPoint,
+                             const Point2i& targetPoint,
                              test_behavior outputLog)
     {
         PROFILE_FUNC();
         if (targetPoint == segmentation::INVALID_POINT ||
-            targetPoint.x < 0 || targetPoint.x >= matrices.depth.cols ||
-            targetPoint.y < 0 || targetPoint.y >= matrices.depth.rows)
+            targetPoint.x < 0 || targetPoint.x >= matrices.depth.width() ||
+            targetPoint.y < 0 || targetPoint.y >= matrices.depth.height())
         {
             if (outputLog == TEST_BEHAVIOR_LOG)
             {
@@ -348,7 +351,7 @@ namespace astra { namespace hand { namespace segmentation {
 
     float get_point_area(tracking_matrices& matrices,
                          area_test_settings& settings,
-                         const cv::Point& point)
+                         const Point2i& point)
     {
         PROFILE_FUNC();
         auto scalingMapper = get_scaling_mapper(matrices);
@@ -366,9 +369,9 @@ namespace astra { namespace hand { namespace segmentation {
 
 
     float get_point_area_integral(tracking_matrices& matrices,
-                                  cv::Mat& integralArea,
+                                  BitmapF& integralArea,
                                   area_test_settings& settings,
-                                  const cv::Point& point)
+                                  const Point2i& point)
     {
         //PROFILE_FUNC();
         auto scalingMapper = get_scaling_mapper(matrices);
@@ -421,7 +424,7 @@ namespace astra { namespace hand { namespace segmentation {
 
     bool test_point_area(tracking_matrices& matrices,
                          area_test_settings& settings,
-                         const cv::Point& targetPoint,
+                         const Point2i& targetPoint,
                          test_phase phase,
                          test_behavior outputLog)
     {
@@ -433,9 +436,9 @@ namespace astra { namespace hand { namespace segmentation {
 
 
     bool test_point_area_integral(tracking_matrices& matrices,
-                                  cv::Mat& integralArea,
+                                  BitmapF& integralArea,
                                   area_test_settings& settings,
-                                  const cv::Point& targetPoint,
+                                  const Point2i& targetPoint,
                                   test_phase phase,
                                   test_behavior outputLog)
     {
@@ -445,28 +448,28 @@ namespace astra { namespace hand { namespace segmentation {
         return test_point_area_core(area, settings, phase, outputLog);
     }
 
-    float get_percent_natural_edges(cv::Mat& matDepth,
-                                    cv::Mat& matSegmentation,
-                                    const cv::Point& center,
+    float get_percent_natural_edges(BitmapF& matDepth,
+                                    BitmapMask& matSegmentation,
+                                    const Point2i& center,
                                     const float bandwidth,
                                     const scaling_coordinate_mapper& mapper)
     {
         PROFILE_FUNC();
-        int width = matDepth.cols;
-        int height = matDepth.rows;
+        int width = matDepth.width();
+        int height = matDepth.height();
         if (center.x < 0 || center.y < 0 ||
             center.x >= width || center.y >= height)
         {
             return 0;
         }
 
-        float startingDepth = matDepth.at<float>(center);
+        float startingDepth = matDepth.at(center);
 
-        cv::Point topLeft = mapper.offset_pixel_location_by_mm(center, -bandwidth, bandwidth, startingDepth);
+        Point2i  topLeft = mapper.offset_pixel_location_by_mm(center, -bandwidth, bandwidth, startingDepth);
 
         int offsetX = center.x - topLeft.x;
         int offsetY = center.y - topLeft.y;
-        cv::Point bottomRight(center.x + offsetX, center.y + offsetY);
+        Point2i bottomRight(center.x + offsetX, center.y + offsetY);
 
         int32_t x0 = MAX(0, topLeft.x);
         int32_t y0 = MAX(0, topLeft.y);
@@ -478,7 +481,7 @@ namespace astra { namespace hand { namespace segmentation {
 
         for (int y = y0; y <= y1; y++)
         {
-            char* segmentationRow = matSegmentation.ptr<char>(y);
+            auto* segmentationRow = matSegmentation.data(y);
 
             segmentationRow += x0;
             for (int x = x0; x <= x1; ++x, ++segmentationRow)
@@ -507,7 +510,7 @@ namespace astra { namespace hand { namespace segmentation {
 
     bool test_natural_edges(tracking_matrices& matrices,
                             natural_edge_test_settings& settings,
-                            const cv::Point& targetPoint,
+                            const Point2i& targetPoint,
                             test_phase phase,
                             test_behavior outputLog)
     {
@@ -544,7 +547,7 @@ namespace astra { namespace hand { namespace segmentation {
 
     bool test_foreground_radius_percentage(tracking_matrices& matrices,
                                            circumference_test_settings& settings,
-                                           const cv::Point& targetPoint,
+                                           const Point2i& targetPoint,
                                            test_phase phase,
                                            test_behavior outputLog)
     {
@@ -613,23 +616,25 @@ namespace astra { namespace hand { namespace segmentation {
         return passed;
     }
 
-    cv::Mat& calculate_integral_area(tracking_matrices& matrices)
+    BitmapF& calculate_integral_area(tracking_matrices& matrices)
     {
         PROFILE_FUNC();
-        cv::Mat& segmentationMatrix = matrices.layerSegmentation;
-        cv::Mat& areaMatrix = matrices.area;
-        cv::Mat& integralAreaMatrix = matrices.layerIntegralArea;
-        integralAreaMatrix = cv::Mat::zeros(matrices.depth.size(), CV_32FC1);
+        BitmapMask& segmentationMatrix = matrices.layerSegmentation;
+        BitmapF& areaMatrix = matrices.area;
+        BitmapF& integralAreaMatrix = matrices.layerIntegralArea;
 
-        int width = matrices.depth.cols;
-        int height = matrices.depth.rows;
+        integralAreaMatrix.recreate(matrices.depth.size());
+        integralAreaMatrix.fill(0.f);
+
+        int width = matrices.depth.width();
+        int height = matrices.depth.height();
 
         float* lastIntegralAreaRow = nullptr;
         for (int y = 0; y < height; y++)
         {
-            char* segmentationRow = segmentationMatrix.ptr<char>(y);
-            float* areaRow = areaMatrix.ptr<float>(y);
-            float* integralAreaRow = integralAreaMatrix.ptr<float>(y);
+            auto* segmentationRow = segmentationMatrix.data(y);
+            float* areaRow = areaMatrix.data(y);
+            float* integralAreaRow = integralAreaMatrix.data(y);
             float* integralAreaRowStart = integralAreaRow;
 
             float leftArea = 0;
@@ -669,7 +674,7 @@ namespace astra { namespace hand { namespace segmentation {
         return integralAreaMatrix;
     }
 
-    bool test_single_point(tracking_data& data, cv::Point seedPosition)
+    bool test_single_point(tracking_data& data, Point2i seedPosition)
     {
         auto matrices = data.matrices;
 
@@ -717,13 +722,14 @@ namespace astra { namespace hand { namespace segmentation {
     {
         PROFILE_FUNC();
         auto matrices = data.matrices;
-        cv::Mat& segmentationMatrix = matrices.layerSegmentation;
-        cv::Mat& testPassMatrix = matrices.layerTestPassMap;
+        BitmapMask& segmentationMatrix = matrices.layerSegmentation;
 
-        testPassMatrix = cv::Mat::zeros(segmentationMatrix.size(), CV_8UC1);
+        BitmapMask& testPassMatrix = matrices.layerTestPassMap;
+        testPassMatrix.recreate(data.matrices.depth.size());
+        testPassMatrix.fill(0);
 
-        int width = matrices.depth.cols;
-        int height = matrices.depth.rows;
+        int width = matrices.depth.width();
+        int height = matrices.depth.height();
 
         auto areaTestSettings = data.settings.areaTestSettings;
         auto circumferenceTestSettings = data.settings.circumferenceTestSettings;
@@ -752,9 +758,9 @@ namespace astra { namespace hand { namespace segmentation {
 
         for (int y = 0; y <= maxY; y += yskip)
         {
-            char* segmentationRow = segmentationMatrix.ptr<char>(y);
-            char* testPassRow = testPassMatrix.ptr<char>(y);
-            char* testPassRowNext = testPassMatrix.ptr<char>(y+1);
+            auto* segmentationRow = segmentationMatrix.data(y);
+            auto* testPassRow = testPassMatrix.data(y);
+            auto* testPassRowNext = testPassMatrix.data(y+1);
 
             for (int x = 0; x < width; x += xskip,
                      segmentationRow += xskip,
@@ -767,7 +773,7 @@ namespace astra { namespace hand { namespace segmentation {
                     continue;
                 }
 
-                cv::Point seedPosition(x, y);
+                Point2i seedPosition(x, y);
                 bool validPointArea = test_point_area_integral(matrices,
                                                                integralArea,
                                                                areaTestSettings,
@@ -812,23 +818,30 @@ namespace astra { namespace hand { namespace segmentation {
         return status;
     }
 
-    cv::Point track_point_from_seed(tracking_data& data)
+    Point2i track_point_from_seed(tracking_data& data)
     {
         PROFILE_FUNC();
-        cv::Size size = data.matrices.depth.size();
-        data.matrices.layerSegmentation = cv::Mat::zeros(size, CV_8UC1);
-        data.matrices.layerEdgeDistance = cv::Mat::zeros(size, CV_32FC1);
-        data.matrices.layerScore = cv::Mat::zeros(size, CV_32FC1);
+
+        Size2i size = data.matrices.depth.size();
+        data.matrices.layerSegmentation.recreate(size);
+        data.matrices.layerSegmentation.fill(0);
+
+        data.matrices.layerEdgeDistance.recreate(size);
+        data.matrices.layerEdgeDistance.fill(0.f);
+
+        data.matrices.layerScore.recreate(size);
+        data.matrices.layerScore.fill(0.f);
+
         const bool debugLayersEnabled = data.matrices.debugLayersEnabled;
 
         const float layerAverageDepth = segment_foreground_and_get_average_depth(data);
 
-        if (layerAverageDepth == 0.0f || data.matrices.layerSegmentation.empty())
+        if (layerAverageDepth == 0.0f || all_zero(data.matrices.layerSegmentation))
         {
             return INVALID_POINT;
         }
 
-        cv::Mat& matScore = data.matrices.layerScore;
+        BitmapF& matScore = data.matrices.layerScore;
 
         calculate_edge_distance(data.matrices.layerSegmentation,
                                 data.matrices.areaSqrt,
@@ -839,16 +852,13 @@ namespace astra { namespace hand { namespace segmentation {
 
         calculate_layer_score(data, layerAverageDepth);
 
-        double min, max;
-        cv::Point minLoc, maxLoc;
+        auto minMaxLoc = find_min_max_loc(matScore, data.matrices.layerSegmentation);
 
-        cv::minMaxLoc(matScore, &min, &max, &minLoc, &maxLoc, data.matrices.layerSegmentation);
-
-        bool foundPoint = maxLoc.x != -1 && maxLoc.y != -1;
+        bool foundPoint = minMaxLoc.maxLoc.x != -1 && minMaxLoc.maxLoc.y != -1;
 
         if (foundPoint)
         {
-            bool passesTests = test_single_point(data, maxLoc);
+            bool passesTests = test_single_point(data, minMaxLoc.maxLoc);
 
             if (!passesTests)
             {
@@ -862,7 +872,7 @@ namespace astra { namespace hand { namespace segmentation {
                 }
                 else
                 {
-                    cv::minMaxLoc(matScore, &min, &max, &minLoc, &maxLoc, data.matrices.layerTestPassMap);
+                    minMaxLoc = find_min_max_loc(matScore, data.matrices.layerTestPassMap);
                 }
             }
         }
@@ -871,22 +881,24 @@ namespace astra { namespace hand { namespace segmentation {
         {
             ++data.matrices.layerCount;
 
-            cv::Mat layerCountMat = cv::Mat(size, CV_8UC1, cv::Scalar(data.matrices.layerCount));
+            BitmapMask layerCountMat(size);
+            layerCountMat.fill(data.matrices.layerCount);
 
-            cv::bitwise_or(layerCountMat,
-                           data.matrices.debugSegmentation,
-                           data.matrices.debugSegmentation,
-                           data.matrices.layerSegmentation);
+            bitwise_or(layerCountMat,
+                       data.matrices.debugSegmentation,
+                       data.matrices.debugSegmentation,
+                       data.matrices.layerSegmentation);
 
-            cv::bitwise_or(layerCountMat,
-                           data.matrices.debugTestPassMap,
-                           data.matrices.debugTestPassMap,
-                           data.matrices.layerTestPassMap);
+            bitwise_or(layerCountMat,
+                       data.matrices.debugTestPassMap,
+                       data.matrices.debugTestPassMap,
+                       data.matrices.layerTestPassMap);
 
-            cv::Mat scoreMask;
-            cv::inRange(matScore, 1, INT_MAX, scoreMask);
-            matScore.copyTo(data.matrices.debugScoreValue, scoreMask);
-            cv::normalize(matScore, data.matrices.debugScore, 0, 1, cv::NORM_MINMAX, -1, scoreMask);
+            BitmapMask scoreMask;
+            in_range(matScore, scoreMask, 1, INT_MAX);
+            copy_to(matScore, data.matrices.debugScoreValue, scoreMask);
+
+            range_normalize(matScore, data.matrices.debugScore, 0, 1, scoreMask);
         }
 
         if (!foundPoint)
@@ -894,19 +906,19 @@ namespace astra { namespace hand { namespace segmentation {
             return INVALID_POINT;
         }
 
-        return maxLoc;
+        return minMaxLoc.maxLoc;
     }
 
-    bool find_next_velocity_seed_pixel(cv::Mat& velocitySignalMatrix,
-                                       cv::Mat& searchedMatrix,
-                                       cv::Point& foregroundPosition,
-                                       cv::Point& nextSearchStart)
+    bool find_next_velocity_seed_pixel(BitmapMask& velocitySignalMatrix,
+                                       BitmapMask& searchedMatrix,
+                                       Point2i& foregroundPosition,
+                                       Point2i& nextSearchStart)
     {
         PROFILE_FUNC();
-        assert(velocitySignalMatrix.cols == searchedMatrix.cols);
-        assert(velocitySignalMatrix.rows == searchedMatrix.rows);
-        int width = velocitySignalMatrix.cols;
-        int height = velocitySignalMatrix.rows;
+        assert(velocitySignalMatrix.size() == searchedMatrix.size());
+
+        int width = velocitySignalMatrix.width();
+        int height = velocitySignalMatrix.height();
 
         int startX = MAX(0, MIN(width - 1, nextSearchStart.x));
         const int startY = MAX(0, MIN(height - 1, nextSearchStart.y));
@@ -915,8 +927,8 @@ namespace astra { namespace hand { namespace segmentation {
         {
             for (int x = startX; x < width; x++)
             {
-                pixel_type velocitySignal = static_cast<pixel_type>(*velocitySignalMatrix.ptr<uint8_t>(y, x));
-                pixel_type searched = static_cast<pixel_type>(*searchedMatrix.ptr<uint8_t>(y, x));
+                pixel_type velocitySignal = static_cast<pixel_type>(velocitySignalMatrix.at(x, y));
+                pixel_type searched = static_cast<pixel_type>(searchedMatrix.at(x, y));
                 if (velocitySignal == pixel_type::foreground && searched != pixel_type::searched)
                 {
                     foregroundPosition.x = x;
@@ -948,45 +960,50 @@ namespace astra { namespace hand { namespace segmentation {
         return false;
     }
 
-    void calculate_edge_distance(cv::Mat& segmentationMatrix,
-                                 cv::Mat& areaSqrtMatrix,
-                                 cv::Mat& edgeDistanceMatrix,
+    void calculate_edge_distance(BitmapMask& segmentationMatrix,
+                                 BitmapF& areaSqrtMatrix,
+                                 BitmapF& edgeDistanceMatrix,
                                  const float maxEdgeDistance)
     {
         PROFILE_FUNC();
-        cv::Mat eroded;
-        cv::Mat crossElement = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
+        BitmapF eroded;
+        BitmapMask crossElement = get_structuring_element(MorphShape::Cross, Size2i(3, 3));
 
-        edgeDistanceMatrix = cv::Mat::zeros(segmentationMatrix.size(), CV_32FC1);
-        cv::Mat ones = cv::Mat::ones(segmentationMatrix.size(), CV_32FC1);
-        segmentationMatrix.copyTo(eroded);
+        edgeDistanceMatrix.recreate(segmentationMatrix.size());
+        edgeDistanceMatrix.fill(0.f);
+
+        BitmapF ones(segmentationMatrix.size());
+        ones.fill(1.f);
+
+        convert_to(segmentationMatrix, eroded);
 
         //close small holes
         int dilateCount = 1;
         for (int i = 0; i < dilateCount; i++)
         {
-            cv::dilate(eroded, eroded, crossElement);
+            dilate(eroded, eroded, crossElement);
         }
 
         int nonZeroCount = 0;
-        const int imageLength = eroded.cols * eroded.rows;
+        const int imageLength = eroded.width() * eroded.height();
         int iterations = 0;
-        const int maxIterations = segmentationMatrix.cols / 2;
+        const int maxIterations = segmentationMatrix.width() / 2;
         bool done;
+
         do
         {
             PROFILE_BEGIN(edge_dist_loop);
             //erode makes the image smaller
-            cv::erode(eroded, eroded, crossElement);
+            erode(eroded, eroded, crossElement);
             //accumulate the eroded image to the edgeDistance buffer
-            cv::add(areaSqrtMatrix, edgeDistanceMatrix, edgeDistanceMatrix, eroded, CV_32FC1);
+            scalar_add(areaSqrtMatrix, edgeDistanceMatrix, edgeDistanceMatrix, eroded);
 
-            nonZeroCount = cv::countNonZero(eroded);
+            nonZeroCount = count_non_zero(eroded);
             done = (nonZeroCount == 0);
-            double min, max;
 
-            cv::minMaxLoc(edgeDistanceMatrix, &min, &max);
-            if (max > maxEdgeDistance)
+            auto minMax = find_min_max(edgeDistanceMatrix);
+
+            if (minMax.max > maxEdgeDistance)
             {
                 done = true;
             }
@@ -996,16 +1013,16 @@ namespace astra { namespace hand { namespace segmentation {
         } while (!done && nonZeroCount < imageLength && ++iterations < maxIterations);
     }
 
-    void get_circumference_points(cv::Mat& matDepth,
-                                  const cv::Point& center,
+    void get_circumference_points(BitmapF& matDepth,
+                                  const Point2i& center,
                                   const float& radius,
                                   const scaling_coordinate_mapper& mapper,
                                   std::vector<astra::Vector2i>& points)
     {
         PROFILE_FUNC();
 
-        int width = matDepth.cols;
-        int height = matDepth.rows;
+        int width = matDepth.width();
+        int height = matDepth.height();
         if (center.x < 0 || center.x >= width ||
             center.y < 0 || center.y >= height ||
             radius < 1)
@@ -1013,13 +1030,13 @@ namespace astra { namespace hand { namespace segmentation {
             return;
         }
 
-        float referenceDepth = matDepth.at<float>(center);
+        float referenceDepth = matDepth.at(center);
         if (referenceDepth == 0)
         {
             return;
         }
 
-        cv::Point offsetRight = mapper.offset_pixel_location_by_mm(center, radius, 0, referenceDepth);
+        Point2i offsetRight = mapper.offset_pixel_location_by_mm(center, radius, 0, referenceDepth);
 
         //http://en.wikipedia.org/wiki/Midpoint_circle_algorithm
         int pixelRadius = offsetRight.x - center.x;
@@ -1198,9 +1215,9 @@ namespace astra { namespace hand { namespace segmentation {
         //PROFILE_END();
     }
 
-    float get_max_sequential_circumference_percentage(cv::Mat& matDepth,
-                                                      cv::Mat& matSegmentation,
-                                                      const cv::Point& center,
+    float get_max_sequential_circumference_percentage(BitmapF& matDepth,
+                                                      BitmapMask& matSegmentation,
+                                                      const Point2i& center,
                                                       const float& radius,
                                                       const scaling_coordinate_mapper& mapper,
                                                       std::vector<astra::Vector2i>& points)
@@ -1219,7 +1236,7 @@ namespace astra { namespace hand { namespace segmentation {
         for (auto p : points)
         {
             bool isForeground =
-                matSegmentation.at<uint8_t>(p.y, p.x) == pixel_type::foreground;
+                matSegmentation.at(p.x, p.y) == pixel_type::foreground;
             if (isForeground)
             {
                 ++foregroundCount;
@@ -1265,40 +1282,40 @@ namespace astra { namespace hand { namespace segmentation {
         return percentForeground;
     }
 
-    float count_neighborhood_area(cv::Mat& matSegmentation,
-                                  cv::Mat& matDepth,
-                                  cv::Mat& matArea,
-                                  const cv::Point& center,
+    float count_neighborhood_area(BitmapMask& matSegmentation,
+                                  BitmapF& matDepth,
+                                  BitmapF& matArea,
+                                  const Point2i& center,
                                   const float bandwidth,
                                   const float bandwidthDepth,
                                   const scaling_coordinate_mapper& mapper)
     {
         PROFILE_FUNC();
         if (center.x < 0 || center.y < 0 ||
-            center.x >= matDepth.cols || center.y >= matDepth.rows)
+            center.x >= matDepth.width() || center.y >= matDepth.height())
         {
             return 0;
         }
 
-        float startingDepth = matDepth.at<float>(center);
+        float startingDepth = matDepth.at(center);
 
-        cv::Point topLeft = mapper.offset_pixel_location_by_mm(center, -bandwidth, bandwidth, startingDepth);
+        Point2i topLeft = mapper.offset_pixel_location_by_mm(center, -bandwidth, bandwidth, startingDepth);
 
         int offsetX = center.x - topLeft.x;
         int offsetY = center.y - topLeft.y;
-        cv::Point bottomRight(center.x + offsetX, center.y + offsetY);
+        Point2i bottomRight(center.x + offsetX, center.y + offsetY);
 
         int32_t x0 = MAX(0, topLeft.x);
         int32_t y0 = MAX(0, topLeft.y);
-        int32_t x1 = MIN(matDepth.cols - 1, bottomRight.x);
-        int32_t y1 = MIN(matDepth.rows - 1, bottomRight.y);
+        int32_t x1 = MIN(matDepth.width() - 1, bottomRight.x);
+        int32_t y1 = MIN(matDepth.height() - 1, bottomRight.y);
 
         float area = 0;
 
         for (int y = y0; y <= y1; y++)
         {
-            char* segmentationRow = matSegmentation.ptr<char>(y);
-            float* areaRow = matArea.ptr<float>(y);
+            auto* segmentationRow = matSegmentation.data(y);
+            float* areaRow = matArea.data(y);
 
             segmentationRow += x0;
             areaRow += x0;
@@ -1316,28 +1333,28 @@ namespace astra { namespace hand { namespace segmentation {
     }
 
 
-    float count_neighborhood_area_integral(cv::Mat& matDepth,
-                                           cv::Mat& matAreaIntegral,
-                                           const cv::Point& center,
+    float count_neighborhood_area_integral(BitmapF& matDepth,
+                                           BitmapF& matAreaIntegral,
+                                           const Point2i& center,
                                            const float bandwidth,
                                            const scaling_coordinate_mapper& mapper)
     {
         //PROFILE_FUNC();
-        int width = matDepth.cols;
-        int height = matDepth.rows;
+        int width = matDepth.width();
+        int height = matDepth.height();
         if (center.x < 0 || center.y < 0 ||
             center.x >= width || center.y >= height)
         {
             return 0;
         }
 
-        float startingDepth = matDepth.at<float>(center);
+        float startingDepth = matDepth.at(center);
 
-        cv::Point topLeft = mapper.offset_pixel_location_by_mm(center, -bandwidth, bandwidth, startingDepth);
+        Point2i topLeft = mapper.offset_pixel_location_by_mm(center, -bandwidth, bandwidth, startingDepth);
 
         int offsetX = center.x - topLeft.x;
         int offsetY = center.y - topLeft.y;
-        cv::Point bottomRight(center.x + offsetX, center.y + offsetY);
+        Point2i bottomRight(center.x + offsetX, center.y + offsetY);
 
         //subtract one from topLeft because formula below is exclusive on the lower bounds
         int32_t x0 = MAX(0, topLeft.x-1);
@@ -1347,10 +1364,10 @@ namespace astra { namespace hand { namespace segmentation {
 
         float area = 0;
 
-        area += matAreaIntegral.at<float>(y1, x1);
-        area += matAreaIntegral.at<float>(y0, x0);
-        area -= matAreaIntegral.at<float>(y0, x1);
-        area -= matAreaIntegral.at<float>(y1, x0);
+        area += matAreaIntegral.at(x1, y1);
+        area += matAreaIntegral.at(x0, y0);
+        area -= matAreaIntegral.at(x1, y0);
+        area -= matAreaIntegral.at(x0, y1);
 
         return area;
     }

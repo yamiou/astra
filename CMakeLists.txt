@@ -281,10 +281,7 @@ if (MSVC)
     )
   foreach(INSTALL_PATH ${INSTALL_PATHS})
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/thirdparty-bin/${VS_DIR}/${SAMPLE_DEPENDENCY_DIR}/
-      DESTINATION ${INSTALL_PATH}
-      PATTERN "opencv_core2410d.dll" EXCLUDE
-      PATTERN "opencv_imgproc2410d.dll" EXCLUDE
-      )
+      DESTINATION ${INSTALL_PATH})
   endforeach()
 
   #prepare to generate Visual Studio solution for installation

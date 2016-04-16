@@ -17,7 +17,7 @@
 #ifndef HND_SCALING_COORDINATE_MAPPER_H
 #define HND_SCALING_COORDINATE_MAPPER_H
 
-#include <opencv2/core/core.hpp>
+#include "hnd_point.hpp"
 #include <astra/streams/Depth.hpp>
 #include <Shiny.h>
 
@@ -29,20 +29,20 @@ namespace astra { namespace hand {
                                   float depthX, float depthY, float depthZ,
                                   float& worldX, float& worldY, float& worldZ);
 
-    cv::Point3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
-                                          int depthX, int depthY, float depthZ);
+    Vector3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
+                                       int depthX, int depthY, float depthZ);
 
-    cv::Point3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
-                                          float depthX, float depthY, float depthZ);
+    Vector3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
+                                       float depthX, float depthY, float depthZ);
 
-    cv::Point3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
-                                          const cv::Point3f& depth);
+    Vector3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
+                                       const Vector3f& depth);
 
-    cv::Point3f cv_convert_world_to_depth(const conversion_cache_t& depthToWorldData,
-                                          float worldX, float worldY, float worldZ);
+    Vector3f cv_convert_world_to_depth(const conversion_cache_t& depthToWorldData,
+                                       float worldX, float worldY, float worldZ);
 
-    cv::Point3f cv_convert_world_to_depth(const conversion_cache_t& depthToWorldData,
-                                          const cv::Point3f& world);
+    Vector3f cv_convert_world_to_depth(const conversion_cache_t& depthToWorldData,
+                                          const Vector3f& world);
 
     class scaling_coordinate_mapper
     {
@@ -57,7 +57,7 @@ namespace astra { namespace hand {
               offsetY_(offsetY)
         { }
 
-        inline cv::Point3f convert_depth_to_world(int depthX, int depthY, float depthZ) const
+        inline Vector3f convert_depth_to_world(int depthX, int depthY, float depthZ) const
         {
             PROFILE_FUNC();
             depthX = static_cast<int>((depthX + offsetX_) * scale_);
@@ -78,7 +78,7 @@ namespace astra { namespace hand {
                                      worldX, worldY, worldZ);
         }
 
-        inline cv::Point3f convert_depth_to_world(float depthX, float depthY, float depthZ) const
+        inline Vector3f convert_depth_to_world(float depthX, float depthY, float depthZ) const
         {
             PROFILE_FUNC();
             depthX = (depthX + offsetX_) * scale_;
@@ -87,16 +87,16 @@ namespace astra { namespace hand {
             return cv_convert_depth_to_world(depthToWorldData_, depthX, depthY, depthZ);
         }
 
-        inline cv::Point3f convert_depth_to_world(cv::Point3f depthPosition) const
+        inline Vector3f convert_depth_to_world(Vector3f depthPosition) const
         {
             PROFILE_FUNC();
             return convert_depth_to_world(depthPosition.x, depthPosition.y, depthPosition.z);
         }
 
-        inline cv::Point3f convert_world_to_depth(cv::Point3f worldPosition) const
+        inline Vector3f convert_world_to_depth(Vector3f worldPosition) const
         {
             PROFILE_FUNC();
-            cv::Point3f depth = cv_convert_world_to_depth(depthToWorldData_, worldPosition);
+            Vector3f depth = cv_convert_world_to_depth(depthToWorldData_, worldPosition);
 
             depth.x = (depth.x / scale_) - offsetX_;
             depth.y = (depth.y / scale_) - offsetY_;
@@ -104,10 +104,10 @@ namespace astra { namespace hand {
             return depth;
         }
 
-        cv::Point offset_pixel_location_by_mm(const cv::Point& position,
-                                              float offsetX,
-                                              float offsetY,
-                                              float depthZ) const;
+        Point2i offset_pixel_location_by_mm(const Point2i& position,
+                                            float offsetX,
+                                            float offsetY,
+                                            float depthZ) const;
 
         inline float scale() const { return scale_; }
         inline float offsetX() const { return offsetX_; }

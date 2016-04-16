@@ -41,24 +41,24 @@ namespace astra { namespace hand {
 
     private:
         float get_delta_angle(float x, float y);
-        bool is_valid_heading_dist(const cv::Point3f& currentWorldPosition);
-        float get_degree_difference(cv::Point3f& v1, cv::Point3f& v2);
+        bool is_valid_heading_dist(const Vector3f& currentWorldPosition);
+        float get_degree_difference(Vector3f& v1, Vector3f& v2);
 
         int trackingId_;
 
         bool pointSteady_;
         int numSteadyFrames_;
-        cv::Point3f accumulatedDeltaHeading_;
-        cv::Point3f lastAccumulatedDeltaHeading_;
+        Vector3f accumulatedDeltaHeading_;
+        Vector3f lastAccumulatedDeltaHeading_;
         bool avgDeltaHeadingValid_;
         bool lastAvgDeltaHeadingValid_;
         bool isTrackingHeading_;
-        cv::Point3f headingTrackStart_;
+        Vector3f headingTrackStart_;
         bool isInflecting_;
         int numWaveInflections_;
         bool isWaveGesture_;
         int framesSinceInflection_;
-        cv::Point3f recentDeltaHeading_;
+        Vector3f recentDeltaHeading_;
 
         float maxSteadyDelta_;
         int minSteadyFrames_;

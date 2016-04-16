@@ -65,12 +65,12 @@ namespace astra { namespace hand {
 
         isWaveGesture_ = false;
         isInflecting_ = false;
-        lastAccumulatedDeltaHeading_ = cv::Point3f();
+        lastAccumulatedDeltaHeading_ = Vector3f();
         lastAvgDeltaHeadingValid_ = false;
         avgDeltaHeadingValid_ = false;
         isTrackingHeading_ = false;
         numWaveInflections_ = 0;
-        recentDeltaHeading_ = cv::Point3f();
+        recentDeltaHeading_ = Vector3f();
     }
 
     void trajectory_analyzer::set_for_next_inflection()
@@ -96,13 +96,13 @@ namespace astra { namespace hand {
             reset_wave();
         }
 
-        cv::Point3f deltaPosition = point.fullSizeWorldDeltaPosition;
+        Vector3f deltaPosition = point.fullSizeWorldDeltaPosition;
 
-        float delta = static_cast<float>(cv::norm(deltaPosition));
+        float delta = static_cast<float>(deltaPosition.length());
 
         if (delta > maxSteadyDelta_)
         {
-            cv::Point3f deltaPositionNullY = deltaPosition;
+            Vector3f deltaPositionNullY = deltaPosition;
             deltaPositionNullY.y = 0;
 
             if (!isTrackingHeading_)
@@ -119,7 +119,7 @@ namespace astra { namespace hand {
 
                 avgDeltaHeadingValid_ = is_valid_heading_dist(point.fullSizeWorldPosition);
 
-                float headingDist = static_cast<float>(cv::norm(point.fullSizeWorldPosition - headingTrackStart_));
+                float headingDist = static_cast<float>((point.fullSizeWorldPosition - headingTrackStart_).length());
 
                 LOG_TRACE("trajectory_analyzer", "#%d dist %f v1: %d v2: %d", trackingId_, headingDist, avgDeltaHeadingValid_, lastAvgDeltaHeadingValid_);
 
@@ -195,17 +195,17 @@ namespace astra { namespace hand {
         return degrees;
     }
 
-    bool trajectory_analyzer::is_valid_heading_dist(const cv::Point3f& currentWorldPosition)
+    bool trajectory_analyzer::is_valid_heading_dist(const Vector3f& currentWorldPosition)
     {
-        float headingDist = static_cast<float>(cv::norm(currentWorldPosition - headingTrackStart_));
+        float headingDist = static_cast<float>((currentWorldPosition - headingTrackStart_).length());
         bool validDist = headingDist > minHeadingDist_;
         return validDist;
     }
 
-    float trajectory_analyzer::get_degree_difference(cv::Point3f& v1, cv::Point3f& v2)
+    float trajectory_analyzer::get_degree_difference(Vector3f& v1, Vector3f& v2)
     {
-        float len1 = static_cast<float>(cv::norm(v1));
-        float len2 = static_cast<float>(cv::norm(v2));
+        float len1 = static_cast<float>(v1.length());
+        float len2 = static_cast<float>(v2.length());
 
         if (len1 < EPSILON || len2 < EPSILON)
         {

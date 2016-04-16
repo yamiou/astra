@@ -17,7 +17,7 @@
 #ifndef HND_TRACKING_DATA_H
 #define HND_TRACKING_DATA_H
 
-#include <opencv2/core/core.hpp>
+#include "hnd_bitmap.hpp"
 #include "hnd_scaling_coordinate_mapper.hpp"
 #include "hnd_settings.hpp"
 #include <cstdint>
@@ -85,21 +85,21 @@ namespace astra { namespace hand {
 
     struct tracking_matrices
     {
-        cv::Mat& depthFullSize;
-        cv::Mat& depth;
-        cv::Mat& area;
-        cv::Mat& areaSqrt;
-        cv::Mat& velocitySignal;
-        cv::Mat& layerSegmentation;
-        cv::Mat& layerScore;
-        cv::Mat& layerEdgeDistance;
-        cv::Mat& layerIntegralArea;
-        cv::Mat& layerTestPassMap;
-        cv::Mat& foregroundSearched;
-        cv::Mat& debugSegmentation;
-        cv::Mat& debugScore;
-        cv::Mat& debugScoreValue;
-        cv::Mat& debugTestPassMap;
+        BitmapF& depthFullSize;
+        BitmapF& depth;
+        BitmapF& area;
+        BitmapF& areaSqrt;
+        BitmapMask& velocitySignal;
+        BitmapMask& layerSegmentation;
+        BitmapF& layerScore;
+        BitmapF& layerEdgeDistance;
+        BitmapF& layerIntegralArea;
+        BitmapMask& layerTestPassMap;
+        BitmapMask& foregroundSearched;
+        BitmapMask& debugSegmentation;
+        BitmapF& debugScore;
+        BitmapF& debugScoreValue;
+        BitmapMask& debugTestPassMap;
         bool enableTestPassMap;
         const astra::Vector3f* fullSizeWorldPoints;
         astra::Vector3f* worldPoints;
@@ -109,21 +109,21 @@ namespace astra { namespace hand {
         const conversion_cache_t depthToWorldData;
         std::vector<astra::Vector2i> layerCirclePoints;
 
-        tracking_matrices(cv::Mat& depthFullSize,
-                          cv::Mat& depth,
-                          cv::Mat& area,
-                          cv::Mat& areaSqrt,
-                          cv::Mat& velocitySignal,
-                          cv::Mat& foregroundSearched,
-                          cv::Mat& layerSegmentation,
-                          cv::Mat& layerScore,
-                          cv::Mat& layerEdgeDistance,
-                          cv::Mat& layerIntegralArea,
-                          cv::Mat& layerTestPassMap,
-                          cv::Mat& debugSegmentation,
-                          cv::Mat& debugScore,
-                          cv::Mat& debugScoreValue,
-                          cv::Mat& debugTestPassMap,
+        tracking_matrices(BitmapF& depthFullSize,
+                          BitmapF& depth,
+                          BitmapF& area,
+                          BitmapF& areaSqrt,
+                          BitmapMask& velocitySignal,
+                          BitmapMask& foregroundSearched,
+                          BitmapMask& layerSegmentation,
+                          BitmapF& layerScore,
+                          BitmapF& layerEdgeDistance,
+                          BitmapF& layerIntegralArea,
+                          BitmapMask& layerTestPassMap,
+                          BitmapMask& debugSegmentation,
+                          BitmapF& debugScore,
+                          BitmapF& debugScoreValue,
+                          BitmapMask& debugTestPassMap,
                           bool enableTestPassMap,
                           const astra::Vector3f* fullSizeWorldPoints,
                           astra::Vector3f* worldPoints,
@@ -158,7 +158,7 @@ namespace astra { namespace hand {
 
     inline float get_resize_factor(tracking_matrices& matrices)
     {
-        float resizeFactor = matrices.depthFullSize.cols / static_cast<float>(matrices.depth.cols);
+        float resizeFactor = matrices.depthFullSize.width() / static_cast<float>(matrices.depth.width());
 
         return resizeFactor;
     }
@@ -173,16 +173,16 @@ namespace astra { namespace hand {
     struct tracking_data
     {
         tracking_matrices& matrices;
-        const cv::Point& seedPosition;
-        const cv::Point3f referenceWorldPosition;
+        const Point2i& seedPosition;
+        const Vector3f referenceWorldPosition;
         const float referenceAreaSqrt;
         const segmentation_velocity_policy velocityPolicy;
         const segmentation_settings settings;
         const test_phase phase;
 
         tracking_data(tracking_matrices& matrices,
-                      const cv::Point& seedPosition,
-                      const cv::Point3f referenceWorldPosition,
+                      const Point2i& seedPosition,
+                      const Vector3f referenceWorldPosition,
                       const float referenceAreaSqrt,
                       const segmentation_velocity_policy velocityPolicy,
                       const segmentation_settings settings,

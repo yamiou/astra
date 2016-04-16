@@ -17,10 +17,18 @@
 #ifndef HND_DEPTH_UTILITY_H
 #define HND_DEPTH_UTILITY_H
 
-#include <opencv2/imgproc/imgproc.hpp>
 #include <astra/astra.hpp>
 #include "hnd_settings.hpp"
+#include "hnd_bitmap.hpp"
 #include <cstdint>
+
+#ifndef MIN
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#endif
+
+#ifndef MAX
+#define MAX(a,b) (((a)>(b))?(a):(b))
+#endif
 
 namespace astra { namespace hand {
 
@@ -31,62 +39,69 @@ namespace astra { namespace hand {
         virtual ~depth_utility();
 
         void depth_to_velocity_signal(const DepthFrame& depthFrame,
-                                      cv::Mat& matDepth,
-                                      cv::Mat& matDepthFullSize,
-                                      cv::Mat& matVelocitySignal);
+                                      BitmapF& matDepth,
+                                      BitmapF& matDepthFullSize,
+                                      BitmapMask& matVelocitySignal);
         void reset();
 
-        const cv::Mat& matDepthVel() const { return matDepthVel_; }
-        const cv::Mat& matDepthAvg() const { return matDepthAvg_; }
-        const cv::Mat& matDepthVelErode() const { return matDepthVelErode_; }
-        const cv::Mat& matDepthFilled() const { return matDepthFilled_; }
+        const BitmapF& matDepthVel() const { return matDepthVel_; }
+        const BitmapF& matDepthAvg() const { return matDepthAvg_; }
+        const BitmapF& matDepthVelErode() const { return matDepthVelErode_; }
+        const BitmapF& matDepthFilled() const { return matDepthFilled_; }
 
     private:
         enum class fill_mask_type : std::uint8_t
         {
             normal = 0,
-                filled = 1
-                };
+            filled = 1
+        };
 
         static void depthframe_to_matrix(const DepthFrame& depthFrameSrc,
                                          const int width,
                                          const int height,
-                                         cv::Mat& matTarget);
+                                         BitmapF& matTarget);
 
-        static void fill_zero_values(cv::Mat& matDepth,
-                                     cv::Mat& matDepthFilled,
-                                     cv::Mat& matDepthFilledMask,
-                                     cv::Mat& matDepthPrevious);
+        static void accumulate_averages(const BitmapF& input,
+                                        const BitmapF& prevInput,
+                                        const BitmapMask& mask,
+                                        const float alpha,
+                                        const float jumpThreshold,
+                                        BitmapF& accumulated);
 
-        static void filter_zero_values_and_jumps(cv::Mat& depthCurrent,
-                                                 cv::Mat& depthPrev,
-                                                 cv::Mat& depthAvg,
-                                                 cv::Mat& matDepthFilledMask,
+        static void fill_zero_values(BitmapF& matDepth,
+                                     BitmapF& matDepthFilled,
+                                     BitmapMask& matDepthFilledMask,
+                                     BitmapF& matDepthPrevious);
+
+        static void filter_zero_values_and_jumps(BitmapF& depthCurrent,
+                                                 BitmapF& depthPrev,
+                                                 BitmapF& depthAvg,
+                                                 BitmapMask& matDepthFilledMask,
                                                  const float maxDepthJumpPercent);
-        void threshold_velocity_signal(cv::Mat& matVelocityFiltered,
-                                       cv::Mat& matVelocitySignal,
+        void threshold_velocity_signal(BitmapF& matVelocityFiltered,
+                                       BitmapMask& matVelocitySignal,
                                        const float velocityThresholdFactor);
 
-        void adjust_velocities_for_depth(cv::Mat& matDepth,
-                                         cv::Mat& matVelocityFiltered);
+        void adjust_velocities_for_depth(BitmapF& matDepth,
+                                         BitmapF& matVelocityFiltered);
 
         int depth_to_chunk_index(float depth);
 
-        void analyze_velocities(cv::Mat& matDepth,
-                                cv::Mat& matVelocityFiltered);
+        void analyze_velocities(BitmapF& matDepth,
+                                BitmapF& matVelocityFiltered);
 
         const float processingWidth_;
         const float processingHeight_;
 
-        cv::Mat rectElement_;
-        cv::Mat rectElement2_;
-        cv::Mat matDepthOriginal_;
-        cv::Mat matDepthPrevious_;
-        cv::Mat matDepthFilled_;
-        cv::Mat matDepthFilledMask_;
-        cv::Mat matDepthAvg_;
-        cv::Mat matDepthVel_;
-        cv::Mat matDepthVelErode_;
+        BitmapMask rectElement_;
+        BitmapMask rectElement2_;
+        BitmapF matDepthOriginal_;
+        BitmapF matDepthPrevious_;
+        BitmapF matDepthFilled_;
+        BitmapMask matDepthFilledMask_;
+        BitmapF matDepthAvg_;
+        BitmapF matDepthVel_;
+        BitmapF matDepthVelErode_;
 
         float depthSmoothingFactor_;
         float velocityThresholdFactor_;
