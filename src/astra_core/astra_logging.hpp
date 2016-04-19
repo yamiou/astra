@@ -26,7 +26,15 @@
 #define ELPP_STACKTRACE_ON_CRASH
 #endif
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpessimizing-move"
+#endif
 #include "easylogging++.h"
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
 #include <astra_core/capi/astra_types.h>
 
 #define INITIALIZE_LOGGING INITIALIZE_EASYLOGGINGPP
