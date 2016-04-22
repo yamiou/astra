@@ -15,8 +15,8 @@
 //
 // Be excellent to each other.
 #include <jni.h>
-#include <astra_core/Astra.h>
-#include <astra_core/astra_host_events.h>
+#include <astra_core/astra_core.hpp>
+#include <astra_core/capi/astra_host_events.h>
 #include "astra_wrapper.h"
 
 #ifdef __cplusplus
