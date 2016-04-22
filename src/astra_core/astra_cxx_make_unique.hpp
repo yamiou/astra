@@ -46,8 +46,6 @@
 
 // If user hasn't specified COMPILER_SUPPORTS_MAKE_UNIQUE then try to figure out
 // based on compiler version if std::make_unique is provided.
-#define VALUE_TO_STRING(x) #x
-#define VALUE(x) VALUE_TO_STRING(x)
 
 #if !defined(COMPILER_SUPPORTS_MAKE_UNIQUE)
    #if defined(_MSC_VER)
