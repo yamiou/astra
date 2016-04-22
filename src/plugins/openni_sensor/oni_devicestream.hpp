@@ -188,8 +188,12 @@ namespace orbbec { namespace ni {
                          mode.fps(),
                          mode.pixel_format());
 
+                const bool wasStarted = is_started();
+                if (wasStarted)
+                {
+                    stop();
+                }
                 auto rc = oniStream_.setVideoMode(oniMode);
-
                 if (rc == openni::Status::STATUS_OK)
                 {
                     LOG_INFO("orbbec.ni.devicestream", "stream mode changed");
@@ -197,6 +201,11 @@ namespace orbbec { namespace ni {
                 else
                 {
                     LOG_WARN("orbbec.ni.devicestream", "failed to change stream mode.");
+                }
+
+                if (wasStarted)
+                {
+                    start();
                 }
                 break;
             }
