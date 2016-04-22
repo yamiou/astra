@@ -23,6 +23,7 @@
 #include "hnd_constants.hpp"
 #include <Shiny.h>
 #include <astra_core/plugins/PluginLogging.hpp>
+#include <limits>
 
 #define MAX_DEPTH 10000
 
@@ -895,7 +896,7 @@ namespace astra { namespace hand { namespace segmentation {
                        data.matrices.layerTestPassMap);
 
             BitmapMask scoreMask;
-            in_range(matScore, scoreMask, 1, INT_MAX);
+            in_range(matScore, scoreMask, 1, std::numeric_limits<int>::max());
             copy_to(matScore, data.matrices.debugScoreValue, scoreMask);
 
             range_normalize(matScore, data.matrices.debugScore, 0, 1, scoreMask);
