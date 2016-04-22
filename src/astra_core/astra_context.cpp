@@ -24,7 +24,7 @@
 namespace astra {
 
     context::context()
-          : impl_(std::make_unique<context_impl>()),
+          : impl_(astra::make_unique<context_impl>()),
             proxy_(create_stream_proxy(this))
             {}
 

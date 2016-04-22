@@ -22,7 +22,7 @@
 namespace astra
 {
     plugin_service::plugin_service(streamset_catalog& catalog)
-        : impl_(std::make_unique<plugin_service_impl>(catalog)),
+        : impl_(astra::make_unique<plugin_service_impl>(catalog)),
           proxy_(create_plugin_proxy(this))
     {}
 

@@ -120,7 +120,7 @@ namespace orbbec { namespace ni {
         std::stringstream sstream;
         sstream << "device/sensor" << streamsets_.size();
 
-        streamset_ptr streamSet = std::make_unique<device_streamset>(sstream.str(),
+        streamset_ptr streamSet = astra::make_unique<device_streamset>(sstream.str(),
                                                                      pluginService(),
                                                                      oniUri);
         streamSet->open();

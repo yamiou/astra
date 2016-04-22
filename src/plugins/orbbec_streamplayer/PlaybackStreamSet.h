@@ -80,7 +80,7 @@ namespace astra { namespace plugins { namespace streamplayer {
             try
             {
                 m_frameStream = std::unique_ptr<FrameInputStream>(open_frame_input_stream(STREAMPLAYERPLUGIN_FILE_PATH));
-                m_frameStreamReader = std::make_unique<FrameStreamReader>(m_frameStream.get());
+                m_frameStreamReader = astra::make_unique<FrameStreamReader>(m_frameStream.get());
 
                 open_stream();
 

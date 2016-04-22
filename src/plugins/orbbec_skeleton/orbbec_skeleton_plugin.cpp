@@ -29,7 +29,7 @@ namespace orbbec { namespace skeleton {
             return; // if new stream is not depth, we don't care.
 
         LOG_DEBUG("orbbec.skeleton.skeleton_plugin", "creating skeleton tracker for %p", streamHandle);
-        skeletonTrackers_.push_back(std::make_unique<skeleton_tracker>(pluginService(),
+        skeletonTrackers_.push_back(astra::make_unique<skeleton_tracker>(pluginService(),
                                                                        setHandle,
                                                                        streamHandle));
     }

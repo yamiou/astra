@@ -116,7 +116,7 @@ namespace astra {
     streamset_connection* streamset::add_new_connection()
     {
         LOG_TRACE("astra.streamset","new connection to %s", uri_.c_str());
-        streamset_connectionPtr ptr = std::make_unique<streamset_connection>(this);
+        streamset_connectionPtr ptr = astra::make_unique<streamset_connection>(this);
         streamset_connection* conn = ptr.get();
         connections_.push_back(std::move(ptr));
 

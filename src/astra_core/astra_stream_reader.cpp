@@ -251,7 +251,7 @@ namespace astra {
 
         //frameList_ empty or all frames locked already
 
-        FramePtr newFrame = std::make_unique<_astra_reader_frame>();
+        FramePtr newFrame = astra::make_unique<_astra_reader_frame>();
         newFrame->id = frameList_.size();
         newFrame->status = ASTRA_FRAME_STATUS_AVAILABLE;
         newFrame->reader = get_handle();

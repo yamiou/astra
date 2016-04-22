@@ -21,7 +21,7 @@
 namespace astra {
 
     plugin_manager::plugin_manager(streamset_catalog& catalog)
-        : pluginService_(std::make_unique<plugin_service>(catalog)),
+        : pluginService_(astra::make_unique<plugin_service>(catalog)),
           pluginServiceProxy_(pluginService_->proxy())
     {}
 

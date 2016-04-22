@@ -46,23 +46,26 @@
 
 // If user hasn't specified COMPILER_SUPPORTS_MAKE_UNIQUE then try to figure out
 // based on compiler version if std::make_unique is provided.
+#define VALUE_TO_STRING(x) #x
+#define VALUE(x) VALUE_TO_STRING(x)
+
 #if !defined(COMPILER_SUPPORTS_MAKE_UNIQUE)
    #if defined(_MSC_VER)
       // std::make_unique was added in MSVC 12.0
       #if _MSC_VER >= 1800 // MSVC 12.0 (Visual Studio 2013)
          #define COMPILER_SUPPORTS_MAKE_UNIQUE
       #endif
-   #elif defined(__clang__)
+      #elif defined(__clang__)
       // std::make_unique was added in clang 3.4, but not until Xcode 6.
       // Annoyingly, Apple makes the clang version defines match the version
       // of Xcode, not the version of clang.
       #define CLANG_VERSION (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
-      #if defined(__APPLE__) && CLANG_VERSION >= 60000
+      #if defined(__apple_build_version__) && CLANG_VERSION >= 60000 && __cplusplus > 201103L
          #define COMPILER_SUPPORTS_MAKE_UNIQUE
-      #elif !defined(__APPLE__) && CLANG_VERSION >= 30400
+      #elif !defined(__apple_build_version__) && CLANG_VERSION >= 30400 && __cplusplus > 201103L
          #define COMPILER_SUPPORTS_MAKE_UNIQUE
       #endif
-   #elif defined(__GNUC__)
+      #elif defined(__GNUC__)
       // std::make_unique was added in gcc 4.9, for standards versions greater
       // than -std=c++11.
       #define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
@@ -76,9 +79,18 @@
 
 // If the compiler supports std::make_unique, then pull in <memory> to get it.
 #include <memory>
+#include <utility>
+
+namespace astra {
+
+    template<typename T, typename... Args>
+    auto make_unique(Args&&... args) -> std::unique_ptr<T>
+    {
+        return std::make_unique<T>(std::forward<Args>(args)...);
+    }
+}
 
 #else
-
 // Otherwise, the compiler doesn't provide it, so implement it ourselves.
 
 #include <cstddef>

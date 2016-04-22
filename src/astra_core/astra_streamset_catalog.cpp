@@ -54,7 +54,7 @@ namespace astra {
         streamset* streamSet;
         if (it == streamSets_.end())
         {
-            streamset_ptr ssPtr = std::make_unique<streamset>(uri);
+            streamset_ptr ssPtr = astra::make_unique<streamset>(uri);
             streamSet = ssPtr.get();
 
             auto added = ssPtr->register_for_stream_registered_event(
@@ -69,7 +69,7 @@ namespace astra {
                     on_stream_unregistering(args);
                 });
 
-            streamSets_.insert(std::make_pair(uri, std::make_unique<streamset_entry>(std::move(ssPtr), added, removed)));
+            streamSets_.insert(std::make_pair(uri, astra::make_unique<streamset_entry>(std::move(ssPtr), added, removed)));
         }
         else
         {

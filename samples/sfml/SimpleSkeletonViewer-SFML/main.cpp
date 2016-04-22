@@ -108,7 +108,7 @@ public:
         if (mapper_ == nullptr)
         {
             auto& mapper = reader.stream<astra::DepthStream>().coordinateMapper();
-            mapper_ = std::make_unique<astra::CoordinateMapper>(mapper);
+            mapper_ = astra::make_unique<astra::CoordinateMapper>(mapper);
         }
 
         processDepth(frame);

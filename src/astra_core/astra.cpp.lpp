@@ -33,7 +33,7 @@ ASTRA_API astra_status_t astra_initialize()
         return ASTRA_STATUS_SUCCESS;
 
     g_initialized = true;
-    g_contextPtr = std::make_unique<astra::context>();
+    g_contextPtr = astra::make_unique<astra::context>();
 
     return g_contextPtr->initialize();
 }

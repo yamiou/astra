@@ -57,9 +57,9 @@
       // Annoyingly, Apple makes the clang version defines match the version
       // of Xcode, not the version of clang.
       #define CLANG_VERSION (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
-      #if defined(__APPLE__) && CLANG_VERSION >= 60000
+      #if defined(__apple_build_verion__) && CLANG_VERSION >= 60000 && __cplusplus > 201103L
          #define COMPILER_SUPPORTS_MAKE_UNIQUE
-      #elif !defined(__APPLE__) && CLANG_VERSION >= 30400
+      #elif !defined(__apple_build_verion__) && CLANG_VERSION >= 30400 && __cplusplus > 201103L
          #define COMPILER_SUPPORTS_MAKE_UNIQUE
       #endif
    #elif defined(__GNUC__)
@@ -76,6 +76,16 @@
 
 // If the compiler supports std::make_unique, then pull in <memory> to get it.
 #include <memory>
+#include <utility>
+
+namespace astra {
+
+    template<typename T, typename... Args>
+    auto make_unique(Args&&... args) -> std::unique_ptr<T>
+    {
+        return std::make_unique<T>(std::forward<Args>(args)...);
+    }
+}
 
 #else
 
@@ -153,7 +163,7 @@ template<class T, class... Args>
 
 #endif
 
-} // namespace std
+} // namespace astra
 
 #endif // !COMPILER_SUPPORTS_MAKE_UNIQUE
 

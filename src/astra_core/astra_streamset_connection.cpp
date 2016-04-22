@@ -22,7 +22,7 @@ namespace astra {
 
     stream_reader* streamset_connection::create_reader()
     {
-        ReaderPtr reader = std::make_unique<stream_reader>(*this);
+        ReaderPtr reader = astra::make_unique<stream_reader>(*this);
         stream_reader* rawPtr = reader.get();
 
         readers_.push_back(std::move(reader));

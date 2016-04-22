@@ -35,9 +35,9 @@ namespace astra { namespace plugins {
                      streamSet,
                      description)
         {
-            bin_ = std::make_unique<bin_type>(pluginService,
-                                              get_handle(),
-                                              sizeof(TFrameType) + bufferSize);
+            bin_ = astra::make_unique<bin_type>(pluginService,
+                                                get_handle(),
+                                                sizeof(TFrameType) + bufferSize);
         }
 
         using frame_type = TFrameType;

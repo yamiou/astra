@@ -228,7 +228,7 @@ namespace orbbec { namespace ni {
                      mode_.bytes_per_pixel(),
                      bufferLength_);
 
-            bin_ = std::make_unique<bin_type>(pluginService(),
+            bin_ = astra::make_unique<bin_type>(pluginService(),
                                               get_handle(),
                                               bufferLength_);
 

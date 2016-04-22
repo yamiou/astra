@@ -58,7 +58,7 @@ namespace orbbec { namespace mocks {
 
         set_active_mode(*modes_begin());
 
-        generator_ = std::make_unique<depth_generator>(active_mode().width(), active_mode().height());
+        generator_ = astra::make_unique<depth_generator>(active_mode().width(), active_mode().height());
 
         return device_status_value::ok;
     }

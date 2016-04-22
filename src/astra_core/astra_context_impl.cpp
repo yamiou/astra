@@ -53,7 +53,7 @@ namespace astra {
         LOG_INFO("context", "configuration path: %s", configPath.c_str());
         LOG_INFO("context", "log file path: %s", logPath.c_str());
 
-        pluginManager_ = std::make_unique<plugin_manager>(setCatalog_);
+        pluginManager_ = astra::make_unique<plugin_manager>(setCatalog_);
 
 #if !__ANDROID__
         std::string pluginsPath = filesystem::combine_paths(environment::lib_path(),

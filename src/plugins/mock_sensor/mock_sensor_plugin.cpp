@@ -60,7 +60,7 @@ namespace orbbec { namespace mocks {
             std::stringstream sstream;
             sstream << "device/mock_sensor" << streamsets_.size();
 
-            streamset_ptr streamSet = std::make_unique<device_streamset>(sstream.str(),
+            streamset_ptr streamSet = astra::make_unique<device_streamset>(sstream.str(),
                                                                          pluginService(),
                                                                          mockUri);
             streamSet->open();

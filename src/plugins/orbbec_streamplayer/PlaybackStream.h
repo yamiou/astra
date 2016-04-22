@@ -121,7 +121,7 @@ namespace astra { namespace plugins { namespace streamplayer {
             return ASTRA_STATUS_SUCCESS;
         }
 
-        m_bin = std::make_unique<stream_bin<wrapper_type> >(
+        m_bin = astra::make_unique<stream_bin<wrapper_type> >(
             pluginService(),
             get_handle(),
             m_frameStreamReader.get_buffer_length() - sizeof(wrapper_type));

@@ -38,7 +38,7 @@ namespace astra { namespace serialization {
 
         m_fileSize = get_file_size(m_fileDescriptor);
 
-        m_inputStream = std::make_unique<FileInputStream>(m_fileDescriptor);
+        m_inputStream = astra::make_unique<FileInputStream>(m_fileDescriptor);
     }
 
     int ProtoFrameInputStream::get_file_descriptor(FILE* file)
@@ -76,7 +76,7 @@ namespace astra { namespace serialization {
         if (filePos != 0)
         {
             fseek(m_file, 0, SEEK_SET);
-            m_inputStream = std::make_unique<FileInputStream>(m_fileDescriptor);
+            m_inputStream = astra::make_unique<FileInputStream>(m_fileDescriptor);
         }
 
         bool isSuccessful = proto::read_delimited_to(m_inputStream.get(), &m_streamHeaderMessage);
@@ -143,7 +143,7 @@ namespace astra { namespace serialization {
         int offset = get_stream_header_size() + 4;
 
         fseek(m_file, offset, SEEK_SET);
-        m_inputStream = std::make_unique<FileInputStream>(m_fileDescriptor);
+        m_inputStream = astra::make_unique<FileInputStream>(m_fileDescriptor);
         m_positionOffset = ftell(m_file);
 
         return isSuccessful;
@@ -164,7 +164,7 @@ namespace astra { namespace serialization {
         }
 
         fseek(m_file, offset, SEEK_CUR);
-        m_inputStream = std::make_unique<FileInputStream>(m_fileDescriptor);
+        m_inputStream = astra::make_unique<FileInputStream>(m_fileDescriptor);
         m_positionOffset = ftell(m_file);
 
         return isSuccessful;

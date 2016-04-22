@@ -33,7 +33,7 @@ namespace astra { namespace xs {
 
             StreamDescription depthDescription = streamDesc;
 
-            auto ppPtr = std::make_unique<point_processor>(pluginService(),
+            auto ppPtr = astra::make_unique<point_processor>(pluginService(),
                                                            setHandle,
                                                            depthDescription);
 

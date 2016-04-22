@@ -167,8 +167,8 @@ namespace samples { namespace common {
 
         if (normalMap_ == nullptr || normalMapLength_ != numPixels)
         {
-            normalMap_ = std::make_unique<Vector3f[]>(numPixels);
-            blurNormalMap_ = std::make_unique<Vector3f[]>(numPixels);
+            normalMap_ = astra::make_unique<Vector3f[]>(numPixels);
+            blurNormalMap_ = astra::make_unique<Vector3f[]>(numPixels);
 
             std::fill(blurNormalMap_.get(), blurNormalMap_.get() + numPixels, Vector3f::zero());
 
@@ -264,7 +264,7 @@ namespace samples { namespace common {
         {
             outputWidth_ = width;
             outputHeight_ = height;
-            outputBuffer_ = std::make_unique<RgbPixel[]>(outputWidth_ * outputHeight_);
+            outputBuffer_ = astra::make_unique<RgbPixel[]>(outputWidth_ * outputHeight_);
         }
 
         std::fill(outputBuffer_.get(), outputBuffer_.get()+outputWidth_*outputHeight_, RgbPixel(0,0,0));

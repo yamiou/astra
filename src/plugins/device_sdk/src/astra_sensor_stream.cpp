@@ -207,7 +207,7 @@ namespace astra { namespace devices {
 
         if (it != availableModes_.end())
         {
-            activeMode_ = std::make_unique<stream_mode>(*it);
+            activeMode_ = astra::make_unique<stream_mode>(*it);
             on_active_mode_changed();
 
             return device_status_value::ok;
