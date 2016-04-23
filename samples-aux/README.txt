@@ -1,4 +1,4 @@
-Astra SDK v0.4.0 Preview
+Astra SDK v0.5.0
 Copyright (c) 2015 Orbbec
 www.orbbec3d.com
 
@@ -6,6 +6,29 @@ For help and support, check https://3dclub.orbbec3d.com.
 
 What's New
 ==========
+
+v0.5.0 2016/04/25
+This release cleans up the API and library organization a bit. There are a few breaking changes in this release from v0.4 but they should be relatively quick to update existing code.
+* BREAKING: Library names:
+  * astra -> astra_core
+  * astraul -> astra
+  * astra_api -> astra_core_api
+* BREAKING: C++ API stylistic changes: standardize on namespace::ClassName::method_name
+* BREAKING: Besides the predictable stylistic changes, a few C++ method renames:
+  * DepthStream/ColorStream/etc horizontalFieldOfView -> hFov, verticalFieldOfView -> vFov
+  * DepthFrame/ColorFrame/etc resolutionX/resolutionY -> width/height
+  * DepthFrame/ColorFrame/etc numberOfPixels -> length
+* BREAKING: C++ header filenames renamed according to namespace.hpp or Class.hpp.
+  * Main header to include: <Astra/Astra.h> & <AstraUL/AstraUL.h> -> just <astra/astra.hpp>.
+  * Don't need to explicitly include astra_core.hpp.
+* BREAKING: astra::Astra::{initialize(),terminate()} -> astra::{initialize(),terminate()}
+* Cleanup: Removed the OpenCV dependency and reimplemented the necessary functionality internally.
+* Cleanup: Add const as appropriate in the C++ API
+* Fix: Cycling start/stop on a stream multiple times no longer crashes
+* Fix: SXGA depth & color support now work
+* Enhancement: StreamSet and StreamReader have improved copy-semantics and default ctor, allowing simpler storage as a class field.
+* Enhancement: Add VS2015 support
+* Enhancement: Add MultiSensorViewer-SFML sample demonstrating multi-sensor support
 
 v0.4.0 2015/10/14
 * Add official support for Win64 and OS X 10.8+
