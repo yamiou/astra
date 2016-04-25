@@ -22,13 +22,15 @@ This release cleans up the API and library organization a bit. There are a few b
   * Main header to include: <Astra/Astra.h> & <AstraUL/AstraUL.h> -> just <astra/astra.hpp>.
   * Don't need to explicitly include astra_core.hpp.
 * BREAKING: astra::Astra::{initialize(),terminate()} -> astra::{initialize(),terminate()}
-* Cleanup: Removed the OpenCV dependency and reimplemented the necessary functionality internally.
 * Cleanup: Add const as appropriate in the C++ API
 * Fix: Cycling start/stop on a stream multiple times no longer crashes
 * Fix: SXGA depth & color support now work
 * Enhancement: StreamSet and StreamReader have improved copy-semantics and default ctor, allowing simpler storage as a class field.
 * Enhancement: Add VS2015 support
 * Enhancement: Add MultiSensorViewer-SFML sample demonstrating multi-sensor support
+* Enhancement: Removed the dependency on OpenCV and reimplemented the necessary functionality internally.
+* Enhancement (OSX): libusb, SFML are now distributed with the SDK, and rpaths are automatically setup. No more brew installing! (Except CMake maybe.)
+* Enhancement (OSX): Building the samples also copies the Astra SDK and SFML binaries to the lib dir, allowing simpler copy-only deployment: Just copy bin/ and lib/.
 
 v0.4.0 2015/10/14
 * Add official support for Win64 and OS X 10.8+
@@ -60,19 +62,13 @@ Simply plug in your sensor and then run any of the executable files in the bin/ 
 We recommend starting with SimpleStreamViewer-SFML and SimpleHandViewer-SFML.
 In the hand viewer, wave left and right at the sensor a few times to start hand tracking.
 
-OS-specific prerequisites instructions:
+OS-specific instructions:
 
 OS X:
 =======
 Requires:
 * OS X 10.8+
 * Xcode 6.2+
-* homebrew from http://brew.sh/
-
-At the terminal command line:
-$ brew install sfml libusb
-
-Now you can run the pre-built binaries from the Astra SDK bin/ directory.
 
 Windows:
 =======
@@ -106,8 +102,9 @@ Building the samples from source
 OS X:
 =======
 
-Make sure you have already run the commands above to install sample prerequisites.
-You will also need to install CMake 3.2+ with this command:
+The sample build system uses CMake 3.2+. The easiest way to
+get CMake if you don't have it is through homebrew (http://brew.sh/)
+Once you have homebrew, you can install CMake 3.2+ with this command:
 $ brew install cmake
 
 Then, in the terminal, change directories to the Astra SDK samples/ directory, then:

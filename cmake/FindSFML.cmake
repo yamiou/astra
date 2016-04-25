@@ -76,6 +76,10 @@ set(FIND_SFML_PATHS
 # find the SFML include directory
 find_path(SFML_INCLUDE_DIR SFML/Config.hpp
           PATH_SUFFIXES include
+          PATHS ${FIND_SFML_PATHS}
+          NO_DEFAULT_PATH)
+find_path(SFML_INCLUDE_DIR SFML/Config.hpp
+          PATH_SUFFIXES include
           PATHS ${FIND_SFML_PATHS})
 
 # check the version number
@@ -128,37 +132,37 @@ foreach(FIND_SFML_COMPONENT ${SFML_FIND_COMPONENTS})
         find_library(SFML_${FIND_SFML_COMPONENT_UPPER}_LIBRARY_RELEASE
                      NAMES ${FIND_SFML_COMPONENT_NAME}
                      PATH_SUFFIXES lib64 lib
-                     PATHS ${FIND_SFML_PATHS})
+                     PATHS ${FIND_SFML_PATHS} NO_DEFAULT_PATH)
 
         # debug library
         find_library(SFML_${FIND_SFML_COMPONENT_UPPER}_LIBRARY_DEBUG
                      NAMES ${FIND_SFML_COMPONENT_NAME}-d
                      PATH_SUFFIXES lib64 lib
-                     PATHS ${FIND_SFML_PATHS})
+                     PATHS ${FIND_SFML_PATHS} NO_DEFAULT_PATH)
     else()
         # static release library
         find_library(SFML_${FIND_SFML_COMPONENT_UPPER}_LIBRARY_STATIC_RELEASE
                      NAMES ${FIND_SFML_COMPONENT_NAME}-s
                      PATH_SUFFIXES lib64 lib
-                     PATHS ${FIND_SFML_PATHS})
+                     PATHS ${FIND_SFML_PATHS} NO_DEFAULT_PATH)
 
         # static debug library
         find_library(SFML_${FIND_SFML_COMPONENT_UPPER}_LIBRARY_STATIC_DEBUG
                      NAMES ${FIND_SFML_COMPONENT_NAME}-s-d
                      PATH_SUFFIXES lib64 lib
-                     PATHS ${FIND_SFML_PATHS})
+                     PATHS ${FIND_SFML_PATHS} NO_DEFAULT_PATH)
 
         # dynamic release library
         find_library(SFML_${FIND_SFML_COMPONENT_UPPER}_LIBRARY_DYNAMIC_RELEASE
                      NAMES ${FIND_SFML_COMPONENT_NAME}
                      PATH_SUFFIXES lib64 lib
-                     PATHS ${FIND_SFML_PATHS})
+                     PATHS ${FIND_SFML_PATHS} NO_DEFAULT_PATH)
 
         # dynamic debug library
         find_library(SFML_${FIND_SFML_COMPONENT_UPPER}_LIBRARY_DYNAMIC_DEBUG
                      NAMES ${FIND_SFML_COMPONENT_NAME}-d
                      PATH_SUFFIXES lib64 lib
-                     PATHS ${FIND_SFML_PATHS})
+                     PATHS ${FIND_SFML_PATHS} NO_DEFAULT_PATH)
 
         # choose the entries that fit the requested link type
         if(SFML_STATIC_LIBRARIES)
@@ -181,7 +185,7 @@ foreach(FIND_SFML_COMPONENT ${SFML_FIND_COMPONENTS})
     if (SFML_${FIND_SFML_COMPONENT_UPPER}_LIBRARY_DEBUG OR SFML_${FIND_SFML_COMPONENT_UPPER}_LIBRARY_RELEASE)
         # library found
         set(SFML_${FIND_SFML_COMPONENT_UPPER}_FOUND TRUE)
-        
+
         # if both are found, set SFML_XXX_LIBRARY to contain both
         if (SFML_${FIND_SFML_COMPONENT_UPPER}_LIBRARY_DEBUG AND SFML_${FIND_SFML_COMPONENT_UPPER}_LIBRARY_RELEASE)
             set(SFML_${FIND_SFML_COMPONENT_UPPER}_LIBRARY debug     ${SFML_${FIND_SFML_COMPONENT_UPPER}_LIBRARY_DEBUG}
@@ -240,6 +244,7 @@ if(SFML_STATIC_LIBRARIES)
 
     # macro that searches for a 3rd-party library
     macro(find_sfml_dependency output friendlyname)
+        find_library(${output} NAMES ${ARGN} PATHS ${FIND_SFML_PATHS} PATH_SUFFIXES lib NO_DEFAULT_PATH)
         find_library(${output} NAMES ${ARGN} PATHS ${FIND_SFML_PATHS} PATH_SUFFIXES lib)
         if(${${output}} STREQUAL "${output}-NOTFOUND")
             unset(output)
@@ -305,7 +310,7 @@ if(SFML_STATIC_LIBRARIES)
     # sfml-graphics
     list(FIND SFML_FIND_COMPONENTS "graphics" FIND_SFML_GRAPHICS_COMPONENT)
     if(NOT ${FIND_SFML_GRAPHICS_COMPONENT} EQUAL -1)
-    
+
         # find libraries
         find_sfml_dependency(FREETYPE_LIBRARY "FreeType" freetype)
         find_sfml_dependency(GLEW_LIBRARY "GLEW" glew GLEW glew32 glew32s glew64 glew64s)
