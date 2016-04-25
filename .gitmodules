@@ -6,7 +6,7 @@
 	url = https://github.com/philsquared/Catch.git
 [submodule "android/astraapktest"]
 	path = android/astraapktest
-	url = https://bitbucket.org/orbicsoft/sensekitapktest.git
+	url = https://bitbucket.org/orbicsoft/astra-sdk-android-example.git
 [submodule "samples-aux/thirdparty-bin"]
 	path = samples-aux/thirdparty-bin
 	url = https://bitbucket.org/orbicsoft/sdk-win-thirdparty-bin.git
