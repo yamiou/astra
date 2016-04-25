@@ -47,7 +47,7 @@ elseif(ASTRA_UNIX)
   set(CMAKE_INSTALL_RPATH "$ORIGIN/..;$ORIGIN/openni2")
 endif()
 
-include_directories ("$ENV{OPENNI2_INCLUDE}")
+include_directories ("${CMAKE_SOURCE_DIR}/vendor/openni2/include")
 
 include_directories(${_projname} ${SHINY_INCLUDE_DIR})
 
