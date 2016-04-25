@@ -64,6 +64,13 @@ function(install_sample _targetname)
   endif()
 endfunction()
 
+if (ASTRA_OSX)
+  install(
+    FILES scripts/build_samples.sh
+    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+    DESTINATION samples/)
+endif()
+
 include_directories(${ASTRA_INCLUDE_DIR})
 
 get_filename_component(SAMPLE_COMMON_DIR "./common" ABSOLUTE)
