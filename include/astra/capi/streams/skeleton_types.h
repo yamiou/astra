@@ -66,9 +66,9 @@ struct _astra_skeletonframe {
 #if defined(_MSC_VER)
 #pragma warning( push )
 #pragma warning( disable : 4200 )
-#elif defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wc99-extensions"
+#elif defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc99-extensions"
 #endif
 
 typedef struct _astra_skeletonframe_wrapper {
@@ -78,8 +78,8 @@ typedef struct _astra_skeletonframe_wrapper {
 
 #if defined(_MSC_VER)
 #pragma warning( pop )
-#elif defined(__GNUC__)
-#pragma GCC diagnostic pop
+#elif defined(__clang__)
+#pragma clang diagnostic pop
 #endif
 
 typedef struct _astra_skeletonframe* astra_skeletonframe_t;
