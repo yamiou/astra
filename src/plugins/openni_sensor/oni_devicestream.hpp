@@ -1,12 +1,28 @@
+// This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
+// Copyright (c) 2015 Orbbec 3D
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Be excellent to each other.
 #ifndef ONI_DEVICESTREAM_H
 #define ONI_DEVICESTREAM_H
 
 #include <Shiny.h>
 #include <OpenNI.h>
-#include <AstraUL/streams/Image.h>
-#include <AstraUL/streams/image_parameters.h>
-#include <AstraUL/streams/image_types.h>
-#include <AstraUL/streams/image_capi.h>
+#include <astra/streams/Image.hpp>
+#include <astra/capi/streams/image_parameters.h>
+#include <astra/capi/streams/image_types.h>
+#include <astra/capi/streams/image_capi.h>
 #include <memory>
 #include <cstring>
 #include <vector>
@@ -168,12 +184,16 @@ namespace orbbec { namespace ni {
                 LOG_INFO("orbbec.ni.devicestream", "mode change requested: %ux%ux%u@%u pf:%u",
                          mode.width(),
                          mode.height(),
-                         mode.bytesPerPixel(),
+                         mode.bytes_per_pixel(),
                          mode.fps(),
-                         mode.pixelFormat());
+                         mode.pixel_format());
 
+                const bool wasStarted = is_started();
+                if (wasStarted)
+                {
+                    stop();
+                }
                 auto rc = oniStream_.setVideoMode(oniMode);
-
                 if (rc == openni::Status::STATUS_OK)
                 {
                     LOG_INFO("orbbec.ni.devicestream", "stream mode changed");
@@ -181,6 +201,11 @@ namespace orbbec { namespace ni {
                 else
                 {
                     LOG_WARN("orbbec.ni.devicestream", "failed to change stream mode.");
+                }
+
+                if (wasStarted)
+                {
+                    start();
                 }
                 break;
             }
@@ -190,20 +215,20 @@ namespace orbbec { namespace ni {
         {
             mode_ = mode;
             oniMode_ = convert_mode(mode);
-            assert(mode_.pixelFormat() != 0);
+            assert(mode_.pixel_format() != 0);
 
             bufferLength_ =
                 mode_.width() *
                 mode_.height() *
-                mode_.bytesPerPixel();
+                mode_.bytes_per_pixel();
 
             LOG_INFO("orbbec.ni.devicestream", "bin swap: %ux%ux%u len: %u",
                      mode_.width(),
                      mode_.height(),
-                     mode_.bytesPerPixel(),
+                     mode_.bytes_per_pixel(),
                      bufferLength_);
 
-            bin_ = std::make_unique<bin_type>(pluginService(),
+            bin_ = astra::make_unique<bin_type>(pluginService(),
                                               get_handle(),
                                               bufferLength_);
 
@@ -222,7 +247,7 @@ namespace orbbec { namespace ni {
 
             auto& md = wrapper->frame.metadata;
 
-            md.pixelFormat = mode_.pixelFormat();
+            md.pixelFormat = mode_.pixel_format();
             md.width = mode_.width();
             md.height = mode_.height();
         }
@@ -336,7 +361,7 @@ namespace orbbec { namespace ni {
         }
 
     private:
-        using bin_type = astra::plugins::StreamBin<wrapper_type>;
+        using bin_type = astra::plugins::stream_bin<wrapper_type>;
         std::unique_ptr<bin_type> bin_;
 
         std::vector<astra_streamconnection_t> connections_;
@@ -417,7 +442,7 @@ namespace orbbec { namespace ni {
             //          oniVideoMode.getResolutionX(),
             //          oniVideoMode.getResolutionY());
 
-            if (oniVideoMode != oniMode_)
+            if (bin_ == nullptr || oniVideoMode != oniMode_)
             {
                 change_mode(convert_mode(oniVideoMode));
             }

@@ -15,13 +15,9 @@ endif()
 # Version
 string (TIMESTAMP BUILD_DATE "%Y%m%dT%H%M%SZ" UTC)
 set (Astra_VERSION_MAJOR 0)
-set (Astra_VERSION_MINOR 4)
+set (Astra_VERSION_MINOR 5)
 set (Astra_VERSION_PATCH 0)
 set (Astra_VERSION_BUILD 0)
-
-include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
 
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   set(ASTRA_CLANG ON)
@@ -31,6 +27,12 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   set(ASTRA_INTELC ON)
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   set(ASTRA_MSVC ON)
+endif()
+
+if (NOT ASTRA_MSVC)
+  include(CheckCXXCompilerFlag)
+  CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+  CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
 endif()
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -77,8 +79,15 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(ASTRA_DOCS FALSE CACHE BOOL "Build documentation")
 set(ASTRA_XS TRUE CACHE BOOL "Build extra stream support plugin")
 set(ASTRA_HAND TRUE CACHE BOOL "Build hand tracking plugin")
-set(ASTRA_STREAMPLAYER FALSE CACHE BOOL "Build experimental stream playback plugin")
+set(ASTRA_STREAMPLAYER FALSE CACHE BOOL "Build experimental stream playback plugin (not working)")
 set(ASTRA_MOCK_DEVICE FALSE CACHE BOOL "Build mock test device plugin")
+set(ASTRA_SKELETON FALSE CACHE BOOL "Build experimental skeleton support (not working)")
+
+if (ASTRA_EXPERIMENTAL)
+  set(ASTRA_STREAMPLAYER TRUE)
+  set(ASTRA_MOCK_DEVICE TRUE)
+  set(ASTRA_SKELETON TRUE)
+endif()
 
 if (ASTRA_DOCS)
   add_subdirectory(docs)
@@ -93,9 +102,9 @@ endif()
 #Override FindAstra equivalents
 set(ASTRA_SDK_BUILD TRUE)
 set(ASTRA_LIBRARIES
-  Astra
-  AstraAPI
-  AstraUL
+  astra_core
+  astra_core_api
+  astra
   )
 set(ASTRA_INCLUDE_DIR
   ${PROJECT_SOURCE_DIR}/include
@@ -110,13 +119,44 @@ set(SAMPLE_DIR_FOLDER "samples/")
 set (SDK_DEPENDENT_TARGET "SDK_dependent")
 add_custom_target(${SDK_DEPENDENT_TARGET})
 
-set(SHINY_INCLUDE "${PROJECT_SOURCE_DIR}/vendor/shinyprofiler/include")
-set(CATCH_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/vendor/catch/include" CACHE INTERNAL "Path to include folder for Catch")
+set(SHINY_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/vendor/shinyprofiler/include"
+  CACHE
+  INTERNAL
+  "Path to include folder for Shiny")
+
+set(CATCH_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/vendor/catch/include"
+  CACHE
+  INTERNAL
+  "Path to include folder for Catch")
+
+set(TINYDIR_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/vendor/tinydir"
+  CACHE
+  INTERNAL
+  "Path to include folder for tinydir")
+
+set(CPPTOML_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/vendor/cpptoml"
+  CACHE
+  INTERNAL
+  "Path to include folder for cpptoml")
+
+set(EASYLOGGINGPP_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/vendor/easyloggingpp"
+  CACHE
+  INTERNAL
+  "Path to include folder for easylogging++")
 
 if (ASTRA_64)
   set(SAMPLE_DEPENDENCY_DIR "copy_to_bin64_dir")
 else()
   set(SAMPLE_DEPENDENCY_DIR "copy_to_bin32_dir")
+endif()
+if (MSVC)
+  if (MSVC_VERSION EQUAL 1800)
+    set(VS_DIR "vs2013")
+  elseif(MSVC_VERSION EQUAL 1900)
+    set(VS_DIR "vs2015")
+  else()
+    error("MSVC other than VS2013 (VC12) or VS2015 (VC14) are not supported")
+  endif()
 endif()
 
 function(install_lib _targetname)
@@ -129,10 +169,10 @@ function(install_lib _targetname)
   if (MSVC)
     install_pdb(${_targetname} bin/)
     set(INSTALL_PATHS
-      samples/vs2013/${SAMPLE_DEPENDENCY_DIR}/${extrapath}
-      samples/vs2013/bin/Debug/${extrapath}
-      samples/vs2013/bin/Release/${extrapath}
-    )
+      samples/${VS_DIR}/${SAMPLE_DEPENDENCY_DIR}/${extrapath}
+      samples/${VS_DIR}/bin/Debug/${extrapath}
+      samples/${VS_DIR}/bin/Release/${extrapath}
+      )
     foreach(INSTALL_PATH ${INSTALL_PATHS})
       install(TARGETS ${_targetname}
         RUNTIME DESTINATION ${INSTALL_PATH}
@@ -147,10 +187,10 @@ function(install_file _targetfile basepath)
   if (MSVC)
     set(INSTALL_PATHS
       bin/${extrapath}
-      samples/vs2013/${SAMPLE_DEPENDENCY_DIR}/${extrapath}
-      samples/vs2013/bin/Debug/${extrapath}
-      samples/vs2013/bin/Release/${extrapath}
-    )
+      samples/${VS_DIR}/${SAMPLE_DEPENDENCY_DIR}/${extrapath}
+      samples/${VS_DIR}/bin/Debug/${extrapath}
+      samples/${VS_DIR}/bin/Release/${extrapath}
+      )
     foreach(INSTALL_PATH ${INSTALL_PATHS})
       install(FILES ${_targetfile}
         DESTINATION ${INSTALL_PATH}
@@ -159,7 +199,7 @@ function(install_file _targetfile basepath)
   else()
     install(FILES ${_targetfile}
       DESTINATION ${basepath}/${extrapath}
-    )
+      )
   endif()
 endfunction()
 
@@ -168,10 +208,10 @@ function(install_dir _targetdir basepath)
   if (MSVC)
     set(INSTALL_PATHS
       bin/${extrapath}
-      samples/vs2013/${SAMPLE_DEPENDENCY_DIR}/${extrapath}
-      samples/vs2013/bin/Debug/${extrapath}
-      samples/vs2013/bin/Release/${extrapath}
-    )
+      samples/${VS_DIR}/${SAMPLE_DEPENDENCY_DIR}/${extrapath}
+      samples/${VS_DIR}/bin/Debug/${extrapath}
+      samples/${VS_DIR}/bin/Release/${extrapath}
+      )
     foreach(INSTALL_PATH ${INSTALL_PATHS})
       install(DIRECTORY ${_targetdir}
         DESTINATION ${INSTALL_PATH}
@@ -180,7 +220,7 @@ function(install_dir _targetdir basepath)
   else()
     install(DIRECTORY ${_targetdir}
       DESTINATION ${basepath}/${extrapath}
-    )
+      )
   endif()
 endfunction()
 
@@ -198,13 +238,15 @@ MESSAGE("CMAKE_INSTALL_PREFIX : ${CMAKE_INSTALL_PREFIX}")
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include
   DESTINATION .
   PATTERN "*.lpp" EXCLUDE
-  PATTERN "include/AstraUL/Plugins" EXCLUDE
+  PATTERN "include/astra/Plugins" EXCLUDE
+  PATTERN ".pp-modification-cache.cl" EXCLUDE
   )
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples
   DESTINATION .
   PATTERN "build" EXCLUDE
   PATTERN ".gitignore" EXCLUDE
+  PATTERN "samples/scripts" EXCLUDE
   PATTERN "samples/plugins/orbbec_skeleton" EXCLUDE
   PATTERN "samples/sfml/SimpleSkeletonViewer-SFML" EXCLUDE
   PATTERN "samples/tools/StreamRecorder" EXCLUDE
@@ -223,64 +265,69 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake
   )
 
 if (MSVC)
-  #copy third party build files to install vs2013 directory
-  #Lack of a trailing / is important here, thirdparty ends up in samples/vs2013/
-  install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013/thirdparty
-    DESTINATION samples/vs2013/
+  #copy third party build files to install Visual Studio directory
+  #Lack of a trailing / is important here, thirdparty ends up in samples/${VS_DIR}/
+  install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/thirdparty-bin/${VS_DIR}/thirdparty
+    DESTINATION samples/${VS_DIR}/
     PATTERN "build" EXCLUDE
     PATTERN ".gitignore" EXCLUDE
     PATTERN ".git" EXCLUDE
     )
 
-  #copy samples runtime files to all the places vs2013 would want them
+  #copy samples runtime files to all the places Visual Studio would want them
   set(INSTALL_PATHS
     bin/
-    samples/vs2013/${SAMPLE_DEPENDENCY_DIR}/
-    samples/vs2013/bin/Debug/
-    samples/vs2013/bin/Release/
-  )
+    samples/${VS_DIR}/${SAMPLE_DEPENDENCY_DIR}/
+    samples/${VS_DIR}/bin/Debug/
+    samples/${VS_DIR}/bin/Release/
+    )
   foreach(INSTALL_PATH ${INSTALL_PATHS})
-   install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/vs2013/${SAMPLE_DEPENDENCY_DIR}/
-     DESTINATION ${INSTALL_PATH}
-     PATTERN "opencv_core2410d.dll" EXCLUDE
-     PATTERN "opencv_imgproc2410d.dll" EXCLUDE
-     )
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples-aux/thirdparty-bin/${VS_DIR}/${SAMPLE_DEPENDENCY_DIR}/
+      DESTINATION ${INSTALL_PATH})
   endforeach()
 
-  #prepare to generate vs2013 solution for installation
+  #prepare to generate Visual Studio solution for installation
   set(SAMPLES_SOURCE_DIR "${PROJECT_BINARY_DIR}/sdk/samples")
-  set(SAMPLES_BUILD_TEMP_DIR "${PROJECT_BINARY_DIR}/temp/vs2013/")
+  set(SAMPLES_BUILD_TEMP_DIR "${PROJECT_BINARY_DIR}/temp/${VS_DIR}/")
 
   #This doesn't replace anything except line endings for Windows CRLF style
   configure_file("${PROJECT_SOURCE_DIR}/samples-aux/README.txt"
     "${PROJECT_BINARY_DIR}/temp/README.txt"
     @ONLY
     NEWLINE_STYLE CRLF)
+  configure_file("${PROJECT_SOURCE_DIR}/LICENSE.txt"
+    "${PROJECT_BINARY_DIR}/temp/LICENSE.txt"
+    @ONLY
+    NEWLINE_STYLE CRLF)
 
-  #install the CRLF line ending readme
-  install(FILES ${PROJECT_BINARY_DIR}/temp/README.txt
+  #install the CRLF line ending readme and license
+  install(FILES
+    ${PROJECT_BINARY_DIR}/temp/README.txt
+    ${PROJECT_BINARY_DIR}/temp/LICENSE.txt
     DESTINATION .
     )
 
-  #Configure VS2013 project generation & cleanup script
+  #Configure Visual Studio project generation & cleanup script
   configure_file("${PROJECT_SOURCE_DIR}/samples-aux/InstallVS.cmake.in"
     "${PROJECT_BINARY_DIR}/InstallVS.cmake"
     @ONLY)
-  #Run the script at install time to generate VS2013 projects for the samples
+  #Run the script at install time to generate VS projects for the samples
   #also de-cmake-ifies the projects and makes everything a relative directory
   install(SCRIPT "${PROJECT_BINARY_DIR}/InstallVS.cmake")
 
-  #install the sample VS2013 projects
+  #install the sample VS projects
   install(DIRECTORY ${SAMPLES_BUILD_TEMP_DIR}
-    DESTINATION samples/vs2013
+    DESTINATION samples/${VS_DIR}
     PATTERN "build" EXCLUDE
     PATTERN ".gitignore" EXCLUDE
     )
   #remove temporary build dir
   install(CODE "file(REMOVE_RECURSE ${SAMPLES_BUILD_TEMP_DIR})")
 else()
-  #for non-MSVC platforms, just install the readme directly
-  install(FILES ${PROJECT_SOURCE_DIR}/samples-aux/README.txt
+  #for non-MSVC platforms, just install the readme and license directly
+  install(FILES
+    ${PROJECT_SOURCE_DIR}/samples-aux/README.txt
+    ${PROJECT_SOURCE_DIR}/LICENSE.txt
     DESTINATION .
     )
 endif()
@@ -298,9 +345,16 @@ message("CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME}")
 string(TOLOWER "${CMAKE_SYSTEM_NAME}" system_name_lower)
 if (system_name_lower STREQUAL "darwin")
   if (ASTRA_64)
-    set(CMAKE_SYSTEM_NAME "osx-x64")
+    set(CMAKE_SYSTEM_NAME "darwin-x64")
   else()
     error("32-bit OS X not supported")
+  endif()
+  message("Setting CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME}")
+elseif(system_name_lower STREQUAL "windows")
+  if (ASTRA_64)
+    set(CMAKE_SYSTEM_NAME "${VS_DIR}-win64")
+  else()
+    set(CMAKE_SYSTEM_NAME "${VS_DIR}-win32")
   endif()
   message("Setting CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME}")
 endif()

@@ -47,15 +47,15 @@ elseif(ASTRA_UNIX)
   set(CMAKE_INSTALL_RPATH "$ORIGIN/..;$ORIGIN/openni2")
 endif()
 
-include_directories ("$ENV{OPENNI2_INCLUDE}")
+include_directories ("${CMAKE_SOURCE_DIR}/vendor/openni2/include")
 
-include_directories(${_projname} ${SHINY_INCLUDE})
+include_directories(${_projname} ${SHINY_INCLUDE_DIR})
 
 add_library(${_projname} SHARED ${${_projname}_SOURCES} ${${_projname}_HEADERS})
 
 set_target_properties(${_projname} PROPERTIES FOLDER "plugins")
 
-target_link_libraries(${_projname} AstraAPI Shiny ${OpenNI2_LIBRARY})
+target_link_libraries(${_projname} astra_core_api Shiny ${OpenNI2_LIBRARY})
 
 install_lib(${_projname} "Plugins/")
 

@@ -1,24 +1,40 @@
+// This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
+// Copyright (c) 2015 Orbbec 3D
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Be excellent to each other.
 #ifndef MOCK_STREAM_H
 #define MOCK_STREAM_H
 
 #include <memory>
 
-#include <Astra/Astra.h>
-#include <Astra/Plugins/plugin_capi.h>
-#include <Astra/Plugins/Stream.h>
-#include <Astra/Plugins/StreamBin.h>
+#include <astra_core/astra_core.hpp>
+#include <astra_core/capi/plugins/astra_plugin.h>
+#include <astra_core/plugins/PluginStream.hpp>
+#include <astra_core/plugins/StreamBin.hpp>
 
 #include "mock_stream_listener.hpp"
 
 namespace orbbec { namespace mocks {
 
-    class stream : public astra::plugins::Stream
+    class mock_stream : public astra::plugins::stream
     {
     public:
-        inline stream(astra::PluginServiceProxy& pluginService,
-                      astra_streamset_t streamSet,
-                      astra::StreamDescription desc,
-                      stream_listener& listener);
+        inline mock_stream(astra::PluginServiceProxy& pluginService,
+                           astra_streamset_t streamSet,
+                           astra::StreamDescription desc,
+                           stream_listener& listener);
 
         inline astra_status_t read(astra_frame_index_t frameIndex);
         inline astra_status_t open();
@@ -49,17 +65,17 @@ namespace orbbec { namespace mocks {
 
 namespace orbbec { namespace mocks {
 
-    stream::stream(astra::PluginServiceProxy& pluginService,
-                   astra_streamset_t streamSet,
-                   astra::StreamDescription desc,
-                   orbbec::mocks::stream_listener& listener)
-        : Stream(pluginService,
-                 streamSet,
-                 desc),
+    mock_stream::mock_stream(astra::PluginServiceProxy& pluginService,
+                             astra_streamset_t streamSet,
+                             astra::StreamDescription desc,
+                             orbbec::mocks::stream_listener& listener)
+        : astra::plugins::stream(pluginService,
+                                 streamSet,
+                                 desc),
           listener_(listener)
     {}
 
-    astra_status_t stream::read(astra_frame_index_t frameIndex)
+    astra_status_t mock_stream::read(astra_frame_index_t frameIndex)
     {
         if (!is_open() || !is_started())
             return astra_status_t::ASTRA_STATUS_INVALID_OPERATION;
@@ -67,7 +83,7 @@ namespace orbbec { namespace mocks {
         return on_read(frameIndex);
     }
 
-    astra_status_t stream::open()
+    astra_status_t mock_stream::open()
     {
         if (is_open())
             return astra_status_t::ASTRA_STATUS_SUCCESS;
@@ -83,7 +99,7 @@ namespace orbbec { namespace mocks {
         return rc;
     }
 
-    astra_status_t stream::close()
+    astra_status_t mock_stream::close()
     {
         if (!is_open())
             return astra_status_t::ASTRA_STATUS_SUCCESS;
@@ -106,7 +122,7 @@ namespace orbbec { namespace mocks {
         return rc;
     }
 
-    astra_status_t stream::start()
+    astra_status_t mock_stream::start()
     {
         if (isStarted_)
             return astra_status_t::ASTRA_STATUS_SUCCESS;
@@ -122,7 +138,7 @@ namespace orbbec { namespace mocks {
         return rc;
     }
 
-    astra_status_t stream::stop()
+    astra_status_t mock_stream::stop()
     {
         if (!isStarted_)
             return astra_status_t::ASTRA_STATUS_SUCCESS;

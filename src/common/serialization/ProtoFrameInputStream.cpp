@@ -1,6 +1,22 @@
+// This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
+// Copyright (c) 2015 Orbbec 3D
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Be excellent to each other.
 #include "ProtoFrameInputStream.h"
 
-#include <Astra/astra_cxx_make_unique.hpp>
+#include <astra_core/astra_cxx_make_unique.hpp>
 #include "FrameDescription.pb.h"
 #include "Frame.pb.h"
 
@@ -22,7 +38,7 @@ namespace astra { namespace serialization {
 
         m_fileSize = get_file_size(m_fileDescriptor);
 
-        m_inputStream = std::make_unique<FileInputStream>(m_fileDescriptor);
+        m_inputStream = astra::make_unique<FileInputStream>(m_fileDescriptor);
     }
 
     int ProtoFrameInputStream::get_file_descriptor(FILE* file)
@@ -60,7 +76,7 @@ namespace astra { namespace serialization {
         if (filePos != 0)
         {
             fseek(m_file, 0, SEEK_SET);
-            m_inputStream = std::make_unique<FileInputStream>(m_fileDescriptor);
+            m_inputStream = astra::make_unique<FileInputStream>(m_fileDescriptor);
         }
 
         bool isSuccessful = proto::read_delimited_to(m_inputStream.get(), &m_streamHeaderMessage);
@@ -127,7 +143,7 @@ namespace astra { namespace serialization {
         int offset = get_stream_header_size() + 4;
 
         fseek(m_file, offset, SEEK_SET);
-        m_inputStream = std::make_unique<FileInputStream>(m_fileDescriptor);
+        m_inputStream = astra::make_unique<FileInputStream>(m_fileDescriptor);
         m_positionOffset = ftell(m_file);
 
         return isSuccessful;
@@ -148,7 +164,7 @@ namespace astra { namespace serialization {
         }
 
         fseek(m_file, offset, SEEK_CUR);
-        m_inputStream = std::make_unique<FileInputStream>(m_fileDescriptor);
+        m_inputStream = astra::make_unique<FileInputStream>(m_fileDescriptor);
         m_positionOffset = ftell(m_file);
 
         return isSuccessful;

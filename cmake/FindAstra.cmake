@@ -11,7 +11,7 @@
 # This script defines the following variables:
 # - ASTRA_LIBRARIES:    the list of all core Astra libraries
 # - ASTRA_FOUND:        true if all the required modules are found
-# - ASTRA_INCLUDE_DIR:  the path where Astra headers are located (the directory containing the Astra/Astra.h file)
+# - ASTRA_INCLUDE_DIR:  the path where Astra headers are located (the directory containing the astra_core/Astra.h file)
 # - ASTRA_LIB_DIR:      the path where Astra libs are located
 # - ASTRA_PLUGIN_LIBRARIES: the list of all plugin libraries
 # - ASTRA_TOML:         a list TOML configuration files for Astra
@@ -43,14 +43,14 @@ set(ASTRA_FOUND TRUE) # will be set to false if one of the required modules is n
 
 if (NOT ASTRA_SDK_BUILD)
   # find the Astra include directory
-  find_path(ASTRA_INCLUDE_DIR Astra/Astra.h
+  find_path(ASTRA_INCLUDE_DIR astra_core/astra_core.hpp
     PATH_SUFFIXES include
     PATHS ${FIND_ASTRA_PATHS})
 
   set(ASTRA_FIND_COMPONENTS
-    Astra
-    AstraAPI
-    AstraUL
+    astra_core
+    astra_core_api
+    astra
     )
 
   MARK_AS_ADVANCED(ASTRA_LIB_DIR)

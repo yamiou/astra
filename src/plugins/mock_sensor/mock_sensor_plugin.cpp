@@ -1,4 +1,20 @@
-﻿#include <AstraUL/astraul_ctypes.h>
+// This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
+// Copyright (c) 2015 Orbbec 3D
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Be excellent to each other.
+#include <astra/capi/astra_ctypes.h>
 #include <cstring>
 #include <sstream>
 
@@ -44,7 +60,7 @@ namespace orbbec { namespace mocks {
             std::stringstream sstream;
             sstream << "device/mock_sensor" << streamsets_.size();
 
-            streamset_ptr streamSet = std::make_unique<device_streamset>(sstream.str(),
+            streamset_ptr streamSet = astra::make_unique<device_streamset>(sstream.str(),
                                                                          pluginService(),
                                                                          mockUri);
             streamSet->open();
@@ -57,7 +73,7 @@ namespace orbbec { namespace mocks {
         device_streamset* mock_sensor_plugin::find_device(const char* mockUri)
         {
             auto it = std::find_if(streamsets_.begin(), streamsets_.end(),
-                                   [&mockUri] (streamset_ptr& setPtr) -> bool
+                                   [&mockUri](const streamset_ptr& setPtr) -> bool
                                    {
                                        return setPtr->get_uri() == mockUri;
                                    });

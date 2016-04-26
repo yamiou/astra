@@ -27,8 +27,7 @@ Our first step will be to set up a skeleton application as a starting point for 
 .. code-block:: c++
    :linenos:
 
-   #include <Astra/Astra.h>
-   #include <AstraUL/AstraUL.h>
+   #include <astra/astra.hpp>
 
    #include <cstdio>
    #include <iostream>
@@ -37,11 +36,11 @@ Our first step will be to set up a skeleton application as a starting point for 
    {
       std::cout << "hit enter to exit program" << std::endl;
       std::cin.get();
+
       return 0;
    }
 
-- Line 1 - Astra.h must be included in all applications. It is the core of |sdkname| and is required for all C++ based |sdkname| applications.
-- Line 2 - Most applications will also require AstraUL.h, which defines convenient ways to read and manipulate the most common types of sensor data like color, depth, and hand positions.
+- Line 1 - astra.hpp must be included in all applications. It is the core of |sdkname| and is required for all C++ based |sdkname| applications.
 - Lines 9-10 - We'll use `std::cin.get() <http://en.cppreference.com/w/cpp/io/basic_istream/get>`_ to make sure we have an opportunity to see our handiwork before our application closes its window.
 
 Initializing and Terminating |sdkname|
@@ -52,19 +51,20 @@ Add the two new lines below:
 
 .. code-block:: c++
    :linenos:
-   :lineno-start: 7
+   :lineno-start: 6
    :emphasize-lines: 3,7
 
    int main(int argc, char** argv)
    {
-      astra::Astra::initialize();
+      astra::initialize();
 
       // what will go here? you'll find out soon!
 
-      astra::Astra::terminate();
+      astra::terminate();
 
       std::cout << "hit enter to exit program" << std::endl;
       std::cin.get();
+
       return 0;
    }
 
@@ -86,19 +86,20 @@ Between our initialization and termination bookends, let's declare a ``StreamSet
 
 .. code-block:: c++
    :linenos:
-   :lineno-start: 7
+   :lineno-start: 6
    :emphasize-lines: 5
 
    int main(int argc, char** argv)
    {
-      astra::Astra::initialize();
+      astra::initialize();
 
       astra::StreamSet streamSet;
 
-      astra::Astra::terminate();
+      astra::terminate();
 
       std::cout << "hit enter to exit program" << std::endl;
       std::cin.get();
+
       return 0;
    }
 
@@ -120,60 +121,62 @@ In order to access streams from the Astra and get to the frames, we'll need a ``
 
 .. code-block:: c++
    :linenos:
-   :lineno-start: 7
+   :lineno-start: 6
    :emphasize-lines: 6
 
    int main(int argc, char** argv)
    {
-      astra::Astra::initialize();
+      astra::initialize();
 
       astra::StreamSet streamSet;
       astra::StreamReader reader = streamSet.create_reader();
 
-      astra::Astra::terminate();
+      astra::terminate();
 
       std::cout << "hit enter to exit program" << std::endl;
       std::cin.get();
+
       return 0;
    }
 
-- Line 12 - Creates a ``StreamReader``
+- Line 11 - Creates a ``StreamReader``
 
 2. Next we start the depth stream using the ``StreamReader`` that we created in the previous step. Starting the depth stream tells |sdkname| that we're interested in getting depth data from our ``StreamSet``.
 
 .. code-block:: c++
    :linenos:
-   :lineno-start: 7
+   :lineno-start: 6
    :emphasize-lines: 8
 
    int main(int argc, char** argv)
    {
-      astra::Astra::initialize();
+      astra::initialize();
 
       astra::StreamSet streamSet;
       astra::StreamReader reader = streamSet.create_reader();
 
       reader.stream<astra::DepthStream>().start();
 
-      astra::Astra::terminate();
+      astra::terminate();
 
       std::cout << "hit enter to exit program" << std::endl;
       std::cin.get();
+
       return 0;
    }
 
-- Line 14 - Starts the depth stream
+- Line 13 - Starts the depth stream
 
 3. With our depth stream stared, let's pull the latest depth frame from our depth stream. To do this, we'll need to first retrieve the latest ``Frame`` through our ``StreamReader``, then call ``get<T>`` to get the depth frame data from our frame.
 
 .. code-block:: c++
    :linenos:
-   :lineno-start: 7
+   :lineno-start: 6
    :emphasize-lines: 10,11
 
    int main(int argc, char** argv)
    {
-      astra::Astra::initialize();
+      astra::initialize();
 
       astra::StreamSet streamSet;
       astra::StreamReader reader = streamSet.create_reader();
@@ -181,28 +184,29 @@ In order to access streams from the Astra and get to the frames, we'll need a ``
       reader.stream<astra::DepthStream>().start();
 
       astra::Frame frame = reader.get_latest_frame();
-      auto depthFrame = frame.get<astra::DepthFrame>();
+      const auto depthFrame = frame.get<astra::DepthFrame>();
 
-      astra::Astra::terminate();
+      astra::terminate();
 
       std::cout << "hit enter to exit program" << std::endl;
       std::cin.get();
+
       return 0;
    }
 
-- Line 16 - Retrieves the latest frame
-- Line 17 - Gets the depth frame from the latest frame
+- Line 15 - Retrieves the latest frame
+- Line 16 - Gets the depth frame from the latest frame
 
 4. The only remaining task is to print some data from the depth frame that we just retrieved.
 
 .. code-block:: c++
    :linenos:
-   :lineno-start: 7
+   :lineno-start: 6
    :emphasize-lines: 13,14,16-20
 
    int main(int argc, char** argv)
    {
-      astra::Astra::initialize();
+      astra::initialize();
 
       astra::StreamSet streamSet;
       astra::StreamReader reader = streamSet.create_reader();
@@ -210,10 +214,10 @@ In order to access streams from the Astra and get to the frames, we'll need a ``
       reader.stream<astra::DepthStream>().start();
 
       astra::Frame frame = reader.get_latest_frame();
-      auto depthFrame = frame.get<astra::DepthFrame>();
+      const auto depthFrame = frame.get<astra::DepthFrame>();
 
-      int frameIndex = depthFrame.frameIndex();
-      int16_t pixelValue = depthFrame.data()[0];
+      const int frameIndex = depthFrame.frame_index();
+      const short pixelValue = depthFrame.data()[0];
 
       std::cout << std::endl
                 << "Depth frameIndex: " << frameIndex
@@ -221,23 +225,24 @@ In order to access streams from the Astra and get to the frames, we'll need a ``
                 << std::endl
                 << std::endl;
 
-      astra::Astra::terminate();
+      astra::terminate();
 
       std::cout << "hit enter to exit program" << std::endl;
       std::cin.get();
+
       return 0;
    }
 
-- Line 19 - Gets a copy of the frame index from our depth frame
-- Line 20 - Gets a copy of the value within the first pixel of our depth frame's data
-- Line 22-26 - Prints the two aforementioned values to the console
-- Line 28-29 - Pauses execution so we can soak in our success
+- Line 18 - Gets a copy of the frame index from our depth frame
+- Line 19 - Gets a copy of the value within the first pixel of our depth frame's data
+- Line 21-25 - Prints the two aforementioned values to the console
+- Line 27-28 - Pauses execution so we can soak in our success
 
 You can go ahead and run your application now to test that everything works. Just like before, a console window should pop up and display diagnostic information. Then, you should see a line with the frame data that we retrieved. Press enter when you're done.
 
 You just retrieved your first frame from |sdkname|! There's one more task before you graduate from our |sdkname| crash course, and that's working with a sequence of frames.
 
-Consuming a StreamSet Stream
+Consuming a StreamSet stream
 ============================
 Now that you know how to create a ``StreamReader`` and get a frame from it, you're ready to work with a stream of frames. To do this, we only need to make a small change and loop over our call to the ``StreamReader``'s ``get_latest_frame`` function. In this particular case, we're going to get the first 100 frames from our depth stream and print the value of each frame's first pixel to the console.
 
@@ -245,28 +250,27 @@ The following code is highly similar to the code from our last example, except w
 
 .. code-block:: c++
    :linenos:
-   :lineno-start: 7
-   :emphasize-lines: 10,11,13,14,27,28
+   :lineno-start: 6
+   :emphasize-lines: 10,11
 
    int main(int argc, char** argv)
    {
-      astra::Astra::initialize();
+      astra::initialize();
 
       astra::StreamSet streamSet;
       astra::StreamReader reader = streamSet.create_reader();
 
       reader.stream<astra::DepthStream>().start();
 
-      int maxFramesToProcess = 100;
+      const int maxFramesToProcess = 100;
       int count = 0;
 
-      do
-      {
-         astra::Frame frame = reader.get_latest_frame();
-         auto depthFrame = frame.get<astra::DepthFrame>();
+      do {
+         astra::frame frame = reader.get_latest_frame();
+         const auto depthFrame = frame.get<astra::depthframe>();
 
-         int frameIndex = depthFrame.frameIndex();
-         int16_t pixelValue = depthFrame.data()[0];
+         const int frameIndex = depthFrame.frame_index();
+         const short pixelValue = depthFrame.data()[0];
 
          std::cout << std::endl
                    << "Depth frameIndex: " << frameIndex
@@ -280,16 +284,17 @@ The following code is highly similar to the code from our last example, except w
       std::cout << "Press any key to continue...";
       std::cin.get();
 
-      astra::Astra::terminate();
+      astra::terminate();
 
       std::cout << "hit enter to exit program" << std::endl;
       std::cin.get();
+
       return 0;
    }
 
-- Line 16 - Stores the maximum number of frames we're going to process in the loop
-- Line 17 - Sentinel to count the number of frames that we've processed
-- Line 19-34 - The frame processing loop
+- Line 15 - Stores the maximum number of frames we're going to process in the loop
+- Line 16 - Sentinel to count the number of frames that we've processed
+- Line 18-32 - The frame processing loop
 
 Compile and run. While the program is running and the Astra is focused on you, move around a bit and watch the data values on the frames change.
 

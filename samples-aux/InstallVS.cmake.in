@@ -2,23 +2,25 @@ set(PROJECT_SOURCE_DIR "@PROJECT_SOURCE_DIR@")
 set(SAMPLES_SOURCE_DIR "@SAMPLES_SOURCE_DIR@")
 set(PROJECT_BINARY_DIR "@PROJECT_BINARY_DIR@")
 set(SAMPLES_BUILD_TEMP_DIR "@SAMPLES_BUILD_TEMP_DIR@")
-set(CMAKE_GENERATOR "Visual Studio 12 2013")
+set(CMAKE_GENERATOR "@CMAKE_GENERATOR@")
 set(CMAKE_GENERATOR_PLATFORM @CMAKE_GENERATOR_PLATFORM@)
+set(CLISP_EXECUTABLE "@CLISP_EXECUTABLE@")
+set(CMAKE_COMMAND "@CMAKE_COMMAND@")
 set(ASTRA_64 @ASTRA_64@)
 set(ASTRA_32 @ASTRA_32@)
+set(VS_DIR @VS_DIR@)
 
-MESSAGE("Configuring sdk sample VS2013 projects...")
-MESSAGE("SAMPLES_SOURCE_DIR: ${SAMPLES_SOURCE_DIR}")
+MESSAGE("Configuring sdk sample ${VS_DIR} projects...")
 
 file(REMOVE_RECURSE ${SAMPLES_BUILD_TEMP_DIR})
 
 if (ASTRA_64)
   set(SFML_LIB_DIR "SFML-min-64")
-  set(CMAKECACHE_IN "CMakeCache.txt.x64.in")
+  set(CMAKECACHE_IN "CMakeCache.txt.${VS_DIR}.x64.in")
   set(ARCH "-A${CMAKE_GENERATOR_PLATFORM}")
 else()
   set(SFML_LIB_DIR "SFML-min-32")
-  set(CMAKECACHE_IN "CMakeCache.txt.x86.in")
+  set(CMAKECACHE_IN "CMakeCache.txt.${VS_DIR}.x86.in")
   set(ARCH "")
 endif()
 
@@ -26,8 +28,11 @@ configure_file("${PROJECT_SOURCE_DIR}/samples-aux/${CMAKECACHE_IN}"
   "${SAMPLES_BUILD_TEMP_DIR}/CMakeCache.txt"
   @ONLY)
 
-execute_process(COMMAND cmake.exe -G${CMAKE_GENERATOR} ${ARCH} "${SAMPLES_BUILD_TEMP_DIR}"
-  WORKING_DIRECTORY ${SAMPLES_SOURCE_DIR})
+execute_process(
+  COMMAND ${CMAKE_COMMAND}
+  -G${CMAKE_GENERATOR} ${ARCH} "${SAMPLES_BUILD_TEMP_DIR}"
+  WORKING_DIRECTORY
+  ${SAMPLES_SOURCE_DIR})
 
 MESSAGE("Deleting CMake generated directories and files...")
 
@@ -63,9 +68,9 @@ if(NOT "${FOUND_DIRS_TO_DELETE}" STREQUAL "")
   file(REMOVE_RECURSE ${FOUND_DIRS_TO_DELETE})
 endif()
 
-MESSAGE("Removing CMake from VS2013 projects...")
+MESSAGE("Removing CMake from ${VS_DIR} projects...")
 
-execute_process(COMMAND clisp.exe "parse-replace.cl" "${SAMPLES_BUILD_TEMP_DIR}" "${SAMPLES_SOURCE_DIR}"
+execute_process(COMMAND ${CLISP_EXECUTABLE} "parse-replace.cl" "${SAMPLES_BUILD_TEMP_DIR}" "${SAMPLES_SOURCE_DIR}"
   WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/lpp/")
 
-MESSAGE("Done configuring sdk sample VS2013 projects.") 
+MESSAGE("Done configuring sdk sample ${VS_DIR} projects.")

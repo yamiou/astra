@@ -1,3 +1,19 @@
+// This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
+// Copyright (c) 2015 Orbbec 3D
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Be excellent to each other.
 #include "pb_util.h"
 
 #include "google/protobuf/message_lite.h"
@@ -8,11 +24,7 @@
 using namespace google::protobuf;
 using namespace google::protobuf::io;
 
-/*
-This code is credited to Kenton Varda, author of ProtoBuf and Cap'n Proto, from the following Stackoverflow article:
-http://stackoverflow.com/questions/22881876/protocol-buffers-how-to-serialize-and-deserialize-multiple-messages-into-a-file
-*/
-
+// http://stackoverflow.com/questions/22881876/protocol-buffers-how-to-serialize-and-deserialize-multiple-messages-into-a-file
 
 namespace astra { namespace serialization { namespace proto {
 

@@ -1,3 +1,19 @@
+// This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
+// Copyright (c) 2015 Orbbec 3D
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Be excellent to each other.
 #include "mock_device_streamset.hpp"
 #include "mock_device.hpp"
 #include "astra_sensor.hpp"
@@ -24,6 +40,9 @@ namespace orbbec { namespace mocks {
     {
         close();
         streams_.clear();
+
+        LOG_DEBUG("orbbec.mocks.device_streamset", "destroying streamset for device %s", uri_.c_str());
+
         pluginService_.destroy_stream_set(streamSetHandle_);
     }
 
@@ -32,11 +51,11 @@ namespace orbbec { namespace mocks {
         if (isOpen_)
             return astra_status_t::ASTRA_STATUS_SUCCESS;
 
-        LOG_INFO("orbbec.mocks.device_streamset", "opening device: %s", uri_.c_str());
+        LOG_DEBUG("orbbec.mocks.device_streamset", "opening device: %s", uri_.c_str());
 
         open_sensor_streams();
 
-        LOG_INFO("orbbec.mocks.device_streamset", "opened device: %s", uri_.c_str());
+        LOG_DEBUG("orbbec.mocks.device_streamset", "opened device: %s", uri_.c_str());
 
         isOpen_ = true;
 
@@ -74,7 +93,7 @@ namespace orbbec { namespace mocks {
         return astra_status_t::ASTRA_STATUS_SUCCESS;
     }
 
-    void device_streamset::add_stream(stream* stream)
+    void device_streamset::add_stream(mock_stream* stream)
     {
         streams_.push_back(stream_ptr(stream));
     }
@@ -174,14 +193,14 @@ namespace orbbec { namespace mocks {
         return astra_status_t::ASTRA_STATUS_SUCCESS;
     }
 
-    void device_streamset::on_started(stream* stream)
+    void device_streamset::on_started(mock_stream* stream)
     {
         LOG_INFO("orbbec.mocks.device_streamset",
                  "adding stream type %u to active streams",
                  stream->description().type());
     }
 
-    void device_streamset::on_stopped(stream* stream)
+    void device_streamset::on_stopped(mock_stream* stream)
     {
         LOG_INFO("orbbec.mocks.device_streamset",
                  "removing stream type %u from active streams",

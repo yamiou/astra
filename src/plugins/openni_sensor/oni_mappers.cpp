@@ -1,3 +1,19 @@
+// This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
+// Copyright (c) 2015 Orbbec 3D
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Be excellent to each other.
 #include "oni_mappers.hpp"
 
 namespace orbbec { namespace ni {
@@ -61,7 +77,7 @@ namespace orbbec { namespace ni {
         std::uint8_t bpp;
 
         std::tie(format, bpp) = convert_format(oniMode.getPixelFormat());
-        mode.set_pixelFormat(format);
+        mode.set_pixel_format(format);
 
         return mode;
     }
@@ -74,7 +90,7 @@ namespace orbbec { namespace ni {
 
         openni::PixelFormat format;
 
-        std::tie(format, std::ignore) = convert_format(mode.pixelFormat());
+        std::tie(format, std::ignore) = convert_format(mode.pixel_format());
         oniMode.setPixelFormat(format);
 
         return oniMode;

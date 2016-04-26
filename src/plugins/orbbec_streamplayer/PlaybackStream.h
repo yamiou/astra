@@ -1,10 +1,26 @@
+// This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
+// Copyright (c) 2015 Orbbec 3D
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Be excellent to each other.
 #ifndef PLAYBACKSTREAM_H
 #define PLAYBACKSTREAM_H
 
-#include <Astra/Plugins/Stream.h>
-#include <Astra/Plugins/StreamBin.h>
-#include <Astra/Plugins/plugin_capi.h>
-#include <AstraUL/streams/image_parameters.h>
+#include <astra_core/plugins/PluginStream.hpp>
+#include <astra_core/plugins/StreamBin.hpp>
+#include <astra_core/capi/plugins/astra_plugin.h>
+#include <astra/capi/streams/image_parameters.h>
 #include <common/serialization/FrameStreamReader.h>
 #include <cstring>
 
@@ -12,15 +28,15 @@ using namespace astra::serialization;
 
 namespace astra { namespace plugins { namespace streamplayer {
 
-    class PlaybackStreamBase : public Stream
+    class PlaybackStreamBase : public stream
     {
     public:
         PlaybackStreamBase(PluginServiceProxy& pluginService,
-                            astra_streamset_t streamSet,
-                            StreamDescription desc)
-                            : Stream(pluginService,
-                            streamSet,
-                            desc) { }
+                           astra_streamset_t streamSet,
+                           StreamDescription desc)
+            : stream(pluginService,
+                     streamSet,
+                     desc) { }
 
         virtual ~PlaybackStreamBase() { };
 
@@ -38,9 +54,9 @@ namespace astra { namespace plugins { namespace streamplayer {
         using wrapper_type = TFrameWrapper;
 
         PlaybackStream(FrameStreamReader& depthStreamParser,
-                        PluginServiceProxy& pluginService,
-                        astra_streamset_t streamSet,
-                        StreamDescription desc);
+                       PluginServiceProxy& pluginService,
+                       astra_streamset_t streamSet,
+                       StreamDescription desc);
 
         virtual ~PlaybackStream();
 
@@ -74,19 +90,19 @@ namespace astra { namespace plugins { namespace streamplayer {
 
         int m_frameIndex{ 0 };
 
-        using BinType = StreamBin<wrapper_type>;
+        using BinType = stream_bin<wrapper_type>;
         std::unique_ptr<BinType> m_bin;
     };
 
     template<typename TFrameWrapper>
     PlaybackStream<TFrameWrapper>::PlaybackStream(FrameStreamReader& frameStreamReader,
-                                                    PluginServiceProxy& pluginService,
-                                                    astra_streamset_t streamSet,
-                                                    StreamDescription desc) :
-                                                    PlaybackStreamBase(pluginService,
-                                                    streamSet,
-                                                    desc),
-                                                    m_frameStreamReader(frameStreamReader)
+                                                  PluginServiceProxy& pluginService,
+                                                  astra_streamset_t streamSet,
+                                                  StreamDescription desc) :
+        PlaybackStreamBase(pluginService,
+                           streamSet,
+                           desc),
+        m_frameStreamReader(frameStreamReader)
     {
 
     }
@@ -105,7 +121,7 @@ namespace astra { namespace plugins { namespace streamplayer {
             return ASTRA_STATUS_SUCCESS;
         }
 
-        m_bin = std::make_unique<StreamBin<wrapper_type> >(
+        m_bin = astra::make_unique<stream_bin<wrapper_type> >(
             pluginService(),
             get_handle(),
             m_frameStreamReader.get_buffer_length() - sizeof(wrapper_type));

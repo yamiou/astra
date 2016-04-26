@@ -1,10 +1,26 @@
+// This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
+// Copyright (c) 2015 Orbbec 3D
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Be excellent to each other.
 #ifndef ONI_STREAM_H
 #define ONI_STREAM_H
 
-#include <Astra/Astra.h>
-#include <Astra/Plugins/plugin_capi.h>
-#include <Astra/Plugins/Stream.h>
-#include <Astra/Plugins/StreamBin.h>
+#include <astra_core/astra_core.hpp>
+#include <astra_core/capi/plugins/astra_plugin.h>
+#include <astra_core/plugins/PluginStream.hpp>
+#include <astra_core/plugins/StreamBin.hpp>
 #include <OpenNI.h>
 #include <Shiny.h>
 
@@ -12,16 +28,16 @@
 
 namespace orbbec { namespace ni {
 
-    class stream : public astra::plugins::Stream
+    class stream : public astra::plugins::stream
     {
     public:
         stream(astra::PluginServiceProxy& pluginService,
                astra_streamset_t streamSet,
                astra::StreamDescription desc,
                stream_listener& listener)
-            : Stream(pluginService,
-                     streamSet,
-                     desc),
+            : astra::plugins::stream(pluginService,
+                                     streamSet,
+                                     desc),
               listener_(listener)
         {
             PROFILE_FUNC();

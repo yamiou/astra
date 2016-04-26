@@ -13,12 +13,12 @@ elseif(ASTRA_UNIX)
   set(CMAKE_INSTALL_RPATH "$ORIGIN")
 endif()
 
-add_subdirectory(Astra)
-add_subdirectory(AstraUL)
-add_subdirectory(AstraAPI)
+add_subdirectory(astra_core)
+add_subdirectory(astra)
+add_subdirectory(astra_core_api)
 add_subdirectory(plugins)
 
-if (NOT ASTRA_ANDROID)
+if (NOT ASTRA_ANDROID AND ASTRA_STREAMPLAYER)
   add_subdirectory(common)
 endif()
 
@@ -36,14 +36,14 @@ add_custom_target(${_projname} ALL
   COMMAND ${CLISP_EXECUTABLE} "lpp.cl" "../src"
   WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/lpp/")
 
-add_dependencies(Astra ${_projname})
-add_dependencies(AstraUL ${_projname})
-add_dependencies(AstraAPI ${_projname})
+add_dependencies(astra_core ${_projname})
+add_dependencies(astra ${_projname})
+add_dependencies(astra_core_api ${_projname})
 add_dependencies(openni_sensor ${_projname})
 
-add_dependencies(${SDK_DEPENDENT_TARGET} Astra)
-add_dependencies(${SDK_DEPENDENT_TARGET} AstraUL)
-add_dependencies(${SDK_DEPENDENT_TARGET} AstraAPI)
+add_dependencies(${SDK_DEPENDENT_TARGET} astra_core)
+add_dependencies(${SDK_DEPENDENT_TARGET} astra)
+add_dependencies(${SDK_DEPENDENT_TARGET} astra_core_api)
 add_dependencies(${SDK_DEPENDENT_TARGET} openni_sensor)
 
 if (ASTRA_XS AND ASTRA_HAND)
@@ -54,6 +54,11 @@ endif()
 if (ASTRA_XS)
   add_dependencies(${SDK_DEPENDENT_TARGET} orbbec_xs)
   add_dependencies(orbbec_xs ${_projname})
+endif()
+
+if (ASTRA_SKELETON)
+  add_dependencies(${SDK_DEPENDENT_TARGET} orbbec_skeleton)
+  add_dependencies(orbbec_skeleton ${_projname})
 endif()
 
 if (NOT ASTRA_ANDROID)
@@ -67,5 +72,7 @@ if (NOT ASTRA_ANDROID)
     add_dependencies(${SDK_DEPENDENT_TARGET} copytoml_hand)
   endif()
 
-  add_dependencies(${SDK_DEPENDENT_TARGET} FrameSerialization)
+  if (ASTRA_STREAMPLAYER)
+    add_dependencies(${SDK_DEPENDENT_TARGET} FrameSerialization)
+  endif()
 endif()

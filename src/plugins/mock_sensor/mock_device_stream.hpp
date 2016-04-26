@@ -1,11 +1,27 @@
+// This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
+// Copyright (c) 2015 Orbbec 3D
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Be excellent to each other.
 #ifndef MOCK_DEVICE_STREAM_H
 #define MOCK_DEVICE_STREAM_H
 
-#include <AstraUL/streams/Image.h>
-#include <AstraUL/streams/image_parameters.h>
-#include <AstraUL/streams/image_types.h>
-#include <AstraUL/streams/image_capi.h>
-#include <AstraUL/Plugins/stream_types.h>
+#include <astra/streams/Image.hpp>
+#include <astra/capi/streams/image_parameters.h>
+#include <astra/capi/streams/image_types.h>
+#include <astra/capi/streams/image_capi.h>
+#include <astra/capi/streams/stream_types.h>
 
 #include <chrono>
 #include <memory>
@@ -21,7 +37,7 @@
 namespace orbbec { namespace mocks {
 
     template<typename TFrameWrapper>
-    class device_stream : public stream,
+    class device_stream : public mock_stream,
                           public astra::devices::stream_listener
     {
     public:
@@ -73,7 +89,7 @@ namespace orbbec { namespace mocks {
 
         astra::devices::sensor_stream::shared_ptr deviceStream_;
 
-        using bin_type = astra::plugins::StreamBin<wrapper_type>;
+        using bin_type = astra::plugins::stream_bin<wrapper_type>;
         std::unique_ptr<bin_type> bin_;
 
         size_t bufferLength_{0};
@@ -93,10 +109,10 @@ namespace orbbec { namespace mocks {
                                                 astra::StreamDescription desc,
                                                 orbbec::mocks::stream_listener& listener,
                                                 astra::devices::sensor_stream::shared_ptr stream)
-        : orbbec::mocks::stream(pluginService,
-                                streamSet,
-                                desc,
-                                listener),
+        : orbbec::mocks::mock_stream(pluginService,
+                                     streamSet,
+                                     desc,
+                                     listener),
           deviceStream_(stream)
     {
         deviceStream_->add_listener(this);
@@ -221,20 +237,20 @@ namespace orbbec { namespace mocks {
     template<typename TFrameWrapper>
     void device_stream<TFrameWrapper>::set_mode(const astra::ImageStreamMode& mode)
     {
-        assert(mode.pixelFormat() != 0);
+        assert(mode.pixel_format() != 0);
 
         bufferLength_ =
             mode.width() *
             mode.height() *
-            mode.bytesPerPixel();
+            mode.bytes_per_pixel();
 
         LOG_INFO("orbbec.mocks.device_stream", "bin change: %ux%ux%u len: %u",
                  mode.width(),
                  mode.height(),
-                 mode.bytesPerPixel(),
+                 mode.bytes_per_pixel(),
                  bufferLength_);
 
-        bin_ = std::make_unique<bin_type>(pluginService(),
+        bin_ = astra::make_unique<bin_type>(pluginService(),
                                           get_handle(),
                                           bufferLength_);
 
@@ -254,7 +270,7 @@ namespace orbbec { namespace mocks {
 
         const auto& mode = deviceStream_->active_mode();
 
-        md.pixelFormat = mode.pixelFormat();
+        md.pixelFormat = mode.pixel_format();
         md.width = mode.width();
         md.height = mode.height();
     }
@@ -285,9 +301,9 @@ namespace orbbec { namespace mocks {
             LOG_INFO("orbbec.mocks.device_stream", "mode: %ux%ux%u@%u pf:%u",
                      mode.width(),
                      mode.height(),
-                     mode.bytesPerPixel(),
+                     mode.bytes_per_pixel(),
                      mode.fps(),
-                     mode.pixelFormat());
+                     mode.pixel_format());
         }
 
         set_mode(deviceStream_->active_mode());

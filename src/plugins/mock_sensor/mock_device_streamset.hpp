@@ -1,9 +1,25 @@
+// This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
+// Copyright (c) 2015 Orbbec 3D
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Be excellent to each other.
 #ifndef MOCK_DEVICE_STREAMSET_H
 #define MOCK_DEVICE_STREAMSET_H
 
-#include <Astra/StreamSet.h>
-#include <Astra/Plugins/plugin_capi.h>
-#include <Astra/Plugins/PluginLogger.h>
+#include <astra_core/StreamSet.hpp>
+#include <astra_core/capi/plugins/astra_plugin.h>
+#include <astra_core/plugins/PluginLogging.hpp>
 
 #include <functional>
 #include <memory>
@@ -32,8 +48,8 @@ namespace orbbec { namespace mocks {
 
         std::string get_uri() { return uri_; }
 
-        virtual void on_started(stream* stream) override;
-        virtual void on_stopped(stream* stream) override;
+        virtual void on_started(mock_stream* stream) override;
+        virtual void on_stopped(mock_stream* stream) override;
 
         device_streamset(const device_streamset&) = delete;
         device_streamset& operator=(const device_streamset&) = delete;
@@ -43,7 +59,7 @@ namespace orbbec { namespace mocks {
 
         astra_status_t open_sensor_streams();
         astra_status_t close_sensor_streams();
-        void add_stream(stream* stream);
+        void add_stream(mock_stream* stream);
 
         astra::PluginServiceProxy& pluginService_;
 
@@ -53,7 +69,7 @@ namespace orbbec { namespace mocks {
 
         astra::devices::device::shared_ptr device_;
 
-        using stream_ptr = std::unique_ptr<stream>;
+        using stream_ptr = std::unique_ptr<mocks::mock_stream>;
         std::vector<stream_ptr> streams_;
 
         astra_frame_index_t frameIndex_{0};

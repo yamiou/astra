@@ -1,25 +1,41 @@
+// This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
+// Copyright (c) 2015 Orbbec 3D
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Be excellent to each other.
 #include <SFML/Graphics.hpp>
-#include <Astra/Astra.h>
-#include <AstraUL/AstraUL.h>
+#include <astra/astra.hpp>
 #include <iostream>
+#include <cstring>
 
-class SkeletonFrameListener : public astra::FrameReadyListener
+class skeleton_visualizer : public astra::FrameListener
 {
 public:
     void init_texture(int width, int height)
     {
-        if (m_displayBuffer == nullptr || width != m_depthWidth || height != m_depthHeight)
+        if (displayBuffer_ == nullptr || width != depthWidth_ || height != depthHeight_)
         {
-            m_depthWidth = width;
-            m_depthHeight = height;
-            int byteLength = m_depthWidth * m_depthHeight * 4;
+            depthWidth_ = width;
+            depthHeight_ = height;
+            int byteLength = depthWidth_ * depthHeight_ * 4;
 
-            m_displayBuffer = BufferPtr(new uint8_t[byteLength]);
-            memset(m_displayBuffer.get(), 0, byteLength);
+            displayBuffer_ = BufferPtr(new uint8_t[byteLength]);
+            std::memset(displayBuffer_.get(), 0, byteLength);
 
-            m_texture.create(m_depthWidth, m_depthHeight);
-            m_sprite.setTexture(m_texture);
-            m_sprite.setPosition(0, 0);
+            texture_.create(depthWidth_, depthHeight_);
+            sprite_.setTexture(texture_);
+            sprite_.setPosition(0, 0);
         }
     }
 
@@ -28,21 +44,21 @@ public:
         double fpsFactor = 0.02;
 
         std::clock_t newTimepoint= std::clock();
-        long double frameDuration = (newTimepoint - m_lastTimepoint) / static_cast<long double>(CLOCKS_PER_SEC);
+        long double frameDuration = (newTimepoint - lastTimepoint_) / static_cast<long double>(CLOCKS_PER_SEC);
 
-        m_frameDuration = frameDuration * fpsFactor + m_frameDuration * (1 - fpsFactor);
-        m_lastTimepoint = newTimepoint;
-        double fps = 1.0 / m_frameDuration;
+        frameDuration_ = frameDuration * fpsFactor + frameDuration_ * (1 - fpsFactor);
+        lastTimepoint_ = newTimepoint;
+        double fps = 1.0 / frameDuration_;
 
-        printf("FPS: %3.1f (%3.4Lf ms)\n", fps, m_frameDuration * 1000);
+        printf("FPS: %3.1f (%3.4Lf ms)\n", fps, frameDuration_ * 1000);
     }
 
     void processDepth(astra::Frame& frame)
     {
-        astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
+        const astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
 
-        int width = depthFrame.resolutionX();
-        int height = depthFrame.resolutionY();
+        int width = depthFrame.width();
+        int height = depthFrame.height();
 
         init_texture(width, height);
 
@@ -57,31 +73,31 @@ public:
                 int16_t depth = depthPtr[index];
                 uint8_t value = depth % 255;
 
-                m_displayBuffer[index4] = value;
-                m_displayBuffer[index4 + 1] = value;
-                m_displayBuffer[index4 + 2] = value;
-                m_displayBuffer[index4 + 3] = 255;
+                displayBuffer_[index4] = value;
+                displayBuffer_[index4 + 1] = value;
+                displayBuffer_[index4 + 2] = value;
+                displayBuffer_[index4 + 3] = 255;
             }
         }
 
-        m_texture.update(m_displayBuffer.get());
+        texture_.update(displayBuffer_.get());
     }
 
     void processSkeletons(astra::Frame& frame)
     {
-        astra::SkeletonFrame skeletonFrame = frame.get<astra::SkeletonFrame>();
+        astra::skeletonframe skeletonFrame = frame.get<astra::skeletonframe>();
 
-        m_skeletons = skeletonFrame.skeletons();
-        m_jointPositions.clear();
+        skeletons_ = skeletonFrame.skeletons();
+        jointPositions_.clear();
 
-        for (auto skeleton : m_skeletons)
+        for (auto skeleton : skeletons_)
         {
             for(auto joint : skeleton.joints())
             {
                 auto depthPosition =
-                    m_mapper->convert_world_to_depth(joint.position());
+                    mapper_->convert_world_to_depth(joint.position());
 
-                m_jointPositions.push_back(depthPosition);
+                jointPositions_.push_back(depthPosition);
             }
         }
     }
@@ -89,10 +105,10 @@ public:
     virtual void on_frame_ready(astra::StreamReader& reader,
                                 astra::Frame& frame) override
     {
-        if (m_mapper == nullptr)
+        if (mapper_ == nullptr)
         {
             auto& mapper = reader.stream<astra::DepthStream>().coordinateMapper();
-            m_mapper = std::make_unique<astra::CoordinateMapper>(mapper);
+            mapper_ = astra::make_unique<astra::CoordinateMapper>(mapper);
         }
 
         processDepth(frame);
@@ -101,7 +117,7 @@ public:
         check_fps();
     }
 
-    void drawCircle(sf::RenderWindow& window, float radius, float x, float y, sf::Color color)
+    void draw_circle(sf::RenderWindow& window, float radius, float x, float y, sf::Color color)
     {
         sf::CircleShape shape(radius);
 
@@ -112,14 +128,14 @@ public:
         window.draw(shape);
     }
 
-    void drawSkeletons(sf::RenderWindow& window, float depthScale)
+    void draw_skeletons(sf::RenderWindow& window, float depthScale)
     {
         float radius = 16;
         sf::Color trackingColor(10, 10, 200);
 
-        for (auto position : m_jointPositions)
+        for (auto position : jointPositions_)
         {
-            drawCircle(window,
+            draw_circle(window,
                        radius,
                        position.x * depthScale,
                        position.y * depthScale,
@@ -127,51 +143,53 @@ public:
         }
     }
 
-    void drawTo(sf::RenderWindow& window)
+    void draw_to(sf::RenderWindow& window)
     {
-        if (m_displayBuffer != nullptr)
+        if (displayBuffer_ != nullptr)
         {
-            float depthScale = window.getView().getSize().x / m_depthWidth;
+            float depthScale = window.getView().getSize().x / depthWidth_;
 
-            m_sprite.setScale(depthScale, depthScale);
+            sprite_.setScale(depthScale, depthScale);
 
-            window.draw(m_sprite);
+            window.draw(sprite_);
 
-            drawSkeletons(window, depthScale);
+            draw_skeletons(window, depthScale);
         }
     }
 
 private:
-    long double m_frameDuration{ 0 };
-    std::clock_t m_lastTimepoint { 0 };
-    sf::Texture m_texture;
-    sf::Sprite m_sprite;
+    long double frameDuration_{ 0 };
+    std::clock_t lastTimepoint_ { 0 };
+    sf::Texture texture_;
+    sf::Sprite sprite_;
 
     using BufferPtr = std::unique_ptr < uint8_t[] >;
-    BufferPtr m_displayBuffer{ nullptr };
+    BufferPtr displayBuffer_{ nullptr };
 
-    std::unique_ptr<astra::CoordinateMapper> m_mapper;
-    std::vector<astra::Skeleton> m_skeletons;
-    std::vector<astra::Vector3f> m_jointPositions;
+    std::unique_ptr<astra::CoordinateMapper> mapper_;
+    std::vector<astra::skeleton> skeletons_;
+    std::vector<astra::Vector3f> jointPositions_;
 
-    int m_depthWidth{0};
-    int m_depthHeight{0};
+    int depthWidth_{0};
+    int depthHeight_{0};
 };
 
 int main(int argc, char** argv)
 {
-    astra::Astra::initialize();
+    astra::initialize();
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Skeleton Viewer");
 
-    astra::Sensor sensor;
+    astra::StreamSet sensor;
     astra::StreamReader reader = sensor.create_reader();
 
-    SkeletonFrameListener listener;
+    skeleton_visualizer listener;
 
     reader.stream<astra::DepthStream>().start();
-    reader.stream<astra::SkeletonStream>().start();
-    reader.addListener(listener);
+    reader.stream<astra::skeletonstream>().start();
+    reader.stream<astra::skeletonstream>().set_zMin(5);
+    reader.stream<astra::skeletonstream>().set_zMax(1000);
+    reader.add_listener(listener);
 
     while (window.isOpen())
     {
@@ -189,11 +207,11 @@ int main(int argc, char** argv)
         // clear the window with black color
         window.clear(sf::Color::Black);
 
-        listener.drawTo(window);
+        listener.draw_to(window);
         window.display();
     }
 
-    astra::Astra::terminate();
+    astra::terminate();
 
     return 0;
 }

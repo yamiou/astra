@@ -1,7 +1,20 @@
-﻿// Orbbec (c) 2015
-
-#include <Astra/astra_capi.h>
-#include <AstraUL/skul_capi.h>
+// This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
+// Copyright (c) 2015 Orbbec 3D
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Be excellent to each other.
+#include <astra/capi/astra.h>
 #include <stdio.h>
 #include <key_handler.h>
 
@@ -53,11 +66,11 @@ void runHandStream(astra_reader_t reader)
 
             print_hand_frame(handFrame);
 
-            astra_colorframe_t handDebugImageFrame;
-            astra_frame_get_debug_handframe(frame, &handDebugImageFrame);
+            astra_colorframe_t handDebugimageframe;
+            astra_frame_get_debug_handframe(frame, &handDebugimageframe);
 
             astra_image_metadata_t metadata;
-            astra_colorframe_get_metadata(handDebugImageFrame, &metadata);
+            astra_colorframe_get_metadata(handDebugimageframe, &metadata);
 
             astra_reader_close_frame(&frame);
         }
@@ -82,9 +95,9 @@ int main(int argc, char* argv[])
     astra_reader_get_handstream(reader, &handStream);
     astra_stream_start(handStream);
 
-    astra_colorstream_t handDebugImageStream;
-    astra_reader_get_debug_handstream(reader, &handDebugImageStream);
-    astra_stream_start(handDebugImageStream);
+    astra_colorstream_t handDebugimagestream;
+    astra_reader_get_debug_handstream(reader, &handDebugimagestream);
+    astra_stream_start(handDebugimagestream);
 
     runHandStream(reader);
 

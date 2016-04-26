@@ -35,7 +35,7 @@ Higher-Level
 |HandStream      | Hand points computed from the depth data. On each ``HandFrame``,       |
 |                | the number of points detected at any given time can be retrieved       |
 |                | through the ``HandFrame::handpoint_count`` function, and a             |
-|                | ``astra::HandPointList`` can be retrieved through the                  |
+|                | ``astra::HandFrame::HandPointList`` can be retrieved through the       |
 |                | ``HandFrame::handpoints`` function.                                    |
 +----------------+------------------------------------------------------------------------+
 
@@ -50,7 +50,7 @@ The polling method for getting frame data is the most direct method for getting 
 .. code-block:: c++
    :emphasize-lines: 8,9
 
-   astra::Astra::initialize();
+   astra::initialize();
 
    astra::StreamSet streamSet;
    astra::StreamReader reader = streamSet.create_reader();
@@ -58,9 +58,9 @@ The polling method for getting frame data is the most direct method for getting 
    reader.stream<astra::DepthStream>().start();
 
    astra::Frame frame = reader.get_latest_frame();
-   auto depthFrame = frame.get<astra::DepthFrame>();
+   const auto depthFrame = frame.get<astra::DepthFrame>();
 
-   astra::Astra::terminate();
+   astra::terminate();
 
 
 - Retrieving a depth frame using the polling method
@@ -68,16 +68,16 @@ The polling method for getting frame data is the most direct method for getting 
 Listening
 ---------
 
-The listening method for getting frame data requires a small amount of additional setup, but allows the developer to delegate the handling of a frame to one or more separate classes. The |sdkname| SDK provides an abstract class called ``FrameReadyListener`` which implements a single function called ``FrameReadyListener::on_frame_ready``. ``FrameReadyListener::on_frame_ready`` is called as soon as the frame is ready for processing and passed a reference to that frame.
+The listening method for getting frame data requires a small amount of additional setup, but allows the developer to delegate the handling of a frame to one or more separate classes. The |sdkname| SDK provides an abstract class called ``FrameListener`` which implements a single function called ``FrameListener::on_frame_ready``. ``FrameListener::on_frame_ready`` is called as soon as the frame is ready for processing and passed a reference to that frame.
 
 .. code-block:: c++
 
-   class DepthFrameListener : public astra::FrameReadyListener
+   class DepthFrameListener : public astra::FrameListener
    {
       virtual void on_frame_ready(astra::StreamReader& reader,
-                                astra::Frame& frame) override
+                                  astra::Frame& frame) override
       {
-         astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
+         const astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
 
          if (depthFrame.is_valid())
          {
@@ -86,14 +86,14 @@ The listening method for getting frame data requires a small amount of additiona
       }
    };
 
-- An example of a listener class derived from ``FrameReadyListener``
+- An example of a listener class derived from ``frame_listener``
 
-After defining a listener class, in order to use it you must instantiate the listener in your application and add it to the ``StreamReader`` using the ``StreamReader::addListener`` function.
+After defining a listener class, in order to use it you must instantiate the listener in your application and add it to the ``StreamReader`` using the ``StreamReader::add_listener`` function.
 
 .. code-block:: c++
    :emphasize-lines: 8,9
 
-   astra::Astra::initialize();
+   astra::initialize();
 
    astra::StreamSet streamSet;
    astra::StreamReader reader = streamSet.create_reader();
@@ -101,7 +101,7 @@ After defining a listener class, in order to use it you must instantiate the lis
    reader.stream<astra::DepthStream>().start();
 
    DepthFrameListener listener;
-   reader.addListener(listener);
+   reader.add_listener(listener);
 
    while(true)
    {

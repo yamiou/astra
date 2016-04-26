@@ -1,9 +1,0 @@
-#ifndef ASTRA_PLATFORM_UNIX_H
-#define ASTRA_PLATFORM_UNIX_H
-
-#define ASTRA_PLATFORM ASTRA_PLATFORM_UNIX
-#define ASTRA_UNIXISH
-
-#include <unistd.h>
-
-#endif /* ASTRA_PLATFORM_UNIX_H */

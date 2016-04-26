@@ -1,35 +1,50 @@
+// This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
+// Copyright (c) 2015 Orbbec 3D
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Be excellent to each other.
 #include <SFML/Graphics.hpp>
-#include <Astra/Astra.h>
-#include <AstraUL/AstraUL.h>
+#include <astra/astra.hpp>
 #include <sstream>
 #include <iomanip>
 #include <cstring>
 
-class HandDebugFrameListener : public astra::FrameReadyListener
+class debug_frame_listener : public astra::FrameListener
 {
 public:
-    HandDebugFrameListener()
+    debug_frame_listener()
     {
-        m_font.loadFromFile("Inconsolata.otf");
+        font_.loadFromFile("Inconsolata.otf");
     }
 
-    HandDebugFrameListener(const HandDebugFrameListener&) = delete;
-    HandDebugFrameListener& operator=(const HandDebugFrameListener&) = delete;
+    debug_frame_listener(const debug_frame_listener&) = delete;
+    debug_frame_listener& operator=(const debug_frame_listener&) = delete;
 
     void init_texture(int width, int height)
     {
-        if (m_displayBuffer == nullptr || width != m_displayWidth || height != m_displayHeight)
+        if (displayBuffer_ == nullptr || width != displayWidth_ || height != displayHeight_)
         {
-            m_displayWidth = width;
-            m_displayHeight = height;
-            int byteLength = m_displayWidth * m_displayHeight * 4;
+            displayWidth_ = width;
+            displayHeight_ = height;
+            int byteLength = displayWidth_ * displayHeight_ * 4;
 
-            m_displayBuffer = BufferPtr(new uint8_t[byteLength]);
-	    std::memset(m_displayBuffer.get(), 0, byteLength);
+            displayBuffer_ = BufferPtr(new uint8_t[byteLength]);
+	    std::memset(displayBuffer_.get(), 0, byteLength);
 
-            m_texture.create(m_displayWidth, m_displayHeight);
-            m_sprite.setTexture(m_texture);
-            m_sprite.setPosition(0, 0);
+            texture_.create(displayWidth_, displayHeight_);
+            sprite_.setTexture(texture_);
+            sprite_.setPosition(0, 0);
         }
     }
 
@@ -38,26 +53,26 @@ public:
         double fpsFactor = 0.02;
 
         std::clock_t newTimepoint = std::clock();
-        long double frameDuration = (newTimepoint - m_lastTimepoint) / static_cast<long double>(CLOCKS_PER_SEC);
+        long double frameDuration = (newTimepoint - lastTimepoint_) / static_cast<long double>(CLOCKS_PER_SEC);
 
-        m_frameDuration = frameDuration * fpsFactor + m_frameDuration * (1 - fpsFactor);
-        m_lastTimepoint = newTimepoint;
-        double fps = 1.0 / m_frameDuration;
+        frameDuration_ = frameDuration * fpsFactor + frameDuration_ * (1 - fpsFactor);
+        lastTimepoint_ = newTimepoint;
+        double fps = 1.0 / frameDuration_;
 
-        if (m_outputFPS)
+        if (outputFPS_)
         {
-            printf("FPS: %3.1f (%3.4Lf ms)\n", fps, m_frameDuration * 1000);
+            printf("FPS: %3.1f (%3.4Lf ms)\n", fps, frameDuration_ * 1000);
         }
     }
 
     void processDepth(astra::Frame& frame)
     {
-        astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
+        const astra::DepthFrame depthFrame = frame.get<astra::DepthFrame>();
 
-        int width = depthFrame.resolutionX();
-        int height = depthFrame.resolutionY();
-        m_depthWidth = width;
-        m_depthHeight = height;
+        int width = depthFrame.width();
+        int height = depthFrame.height();
+        depthWidth_ = width;
+        depthHeight_ = height;
         /*
         init_texture(width, height);
 
@@ -69,60 +84,60 @@ public:
         int index = (x + y * width);
         int16_t depth = depthPtr[index];
         uint8_t value = depth % 255;
-        m_displayBuffer[index * 4] = value;
-        m_displayBuffer[index * 4 + 1] = value;
-        m_displayBuffer[index * 4 + 2] = value;
-        m_displayBuffer[index * 4 + 3] = 255;
+        displayBuffer_[index * 4] = value;
+        displayBuffer_[index * 4 + 1] = value;
+        displayBuffer_[index * 4 + 2] = value;
+        displayBuffer_[index * 4 + 3] = 255;
         }
         }
 
-        m_texture.update(m_displayBuffer.get());
+        texture_.update(displayBuffer_.get());
         */
     }
 
     void processHandFrame(astra::Frame& frame)
     {
-        astra::HandFrame handFrame = frame.get<astra::HandFrame>();
+        const astra::HandFrame handFrame = frame.get<astra::HandFrame>();
 
-        m_handPoints = handFrame.handpoints();
+        handPoints_ = handFrame.handpoints();
     }
 
-    void processDebugHandFrame(astra::Frame& frame)
+    void processdebug_handframe(astra::Frame& frame)
     {
-        astra::DebugHandFrame handFrame = frame.get<astra::DebugHandFrame>();
+        const astra::DebugHandFrame handFrame = frame.get<astra::DebugHandFrame>();
 
-        int width = handFrame.resolutionX();
-        int height = handFrame.resolutionY();
+        int width = handFrame.width();
+        int height = handFrame.height();
 
         init_texture(width, height);
 
-        const astra::RGBPixel* imagePtr = handFrame.data();
+        const astra::RgbPixel* imagePtr = handFrame.data();
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
             {
                 int index = (x + y * width);
                 int index4 = index * 4;
-                astra::RGBPixel rgb = imagePtr[index];
+                astra::RgbPixel rgb = imagePtr[index];
 
-                m_displayBuffer[index4] = rgb.r;
-                m_displayBuffer[index4 + 1] = rgb.g;
-                m_displayBuffer[index4 + 2] = rgb.b;
-                m_displayBuffer[index4 + 3] = 255;
+                displayBuffer_[index4] = rgb.r;
+                displayBuffer_[index4 + 1] = rgb.g;
+                displayBuffer_[index4 + 2] = rgb.b;
+                displayBuffer_[index4 + 3] = 255;
             }
         }
 
-        m_texture.update(m_displayBuffer.get());
+        texture_.update(displayBuffer_.get());
     }
 
     virtual void on_frame_ready(astra::StreamReader& reader,
-        astra::Frame& frame) override
+                                astra::Frame& frame) override
     {
         processDepth(frame);
         processHandFrame(frame);
-        processDebugHandFrame(frame);
+        processdebug_handframe(frame);
 
-        m_viewType = reader.stream<astra::DebugHandStream>().get_view_type();
+        viewType_ = reader.stream<astra::DebugHandStream>().get_view_type();
 
         check_fps();
     }
@@ -151,14 +166,14 @@ public:
 
     void drawHandLabel(sf::RenderWindow& window, float radius, float x, float y, astra::HandPoint& handPoint)
     {
-        int32_t trackingId = handPoint.trackingId();
+        int32_t trackingId = handPoint.tracking_id();
         std::stringstream str;
         str << trackingId;
         if (handPoint.status() == HAND_STATUS_LOST)
         {
             str << " Lost";
         }
-        sf::Text label(str.str(), m_font);
+        sf::Text label(str.str(), font_);
         int characterSize = 60;
         label.setCharacterSize(characterSize);
 
@@ -169,11 +184,11 @@ public:
 
     void drawHandPosition(sf::RenderWindow& window, float radius, float x, float y, astra::HandPoint& handPoint)
     {
-        auto worldPosition = handPoint.worldPosition();
+        auto worldPosition = handPoint.world_position();
         std::stringstream str;
         str << std::fixed << std::setprecision(0);
         str << worldPosition.x << "," << worldPosition.y << "," << worldPosition.z;
-        sf::Text label(str.str(), m_font);
+        sf::Text label(str.str(), font_);
         int characterSize = 60;
         label.setCharacterSize(characterSize);
 
@@ -182,13 +197,13 @@ public:
         drawShadowText(window, label, sf::Color::White, x, y + radius + 10);
     }
 
-    void drawHandPoints(sf::RenderWindow& window, float depthScale)
+    void drawhandpoints(sf::RenderWindow& window, float depthScale)
     {
         sf::Color candidateColor(255, 255, 0);
         sf::Color lostColor(255, 0, 0);
         sf::Color trackingColor(128, 138, 0);
 
-        for (auto handPoint : m_handPoints)
+        for (auto handPoint : handPoints_)
         {
             sf::Color color = trackingColor;
             astra_handstatus_t status = handPoint.status();
@@ -201,19 +216,19 @@ public:
                 color = candidateColor;
             }
 
-            const astra::Vector2i& p = handPoint.depthPosition();
+            const astra::Vector2i& p = handPoint.depth_position();
 
             float circleX = (p.x + 0.5) * depthScale;
             float circleY = (p.y + 0.5) * depthScale;
-            if (m_showCircles)
+            if (showCircles_)
             {
-                drawCircle(window, m_circleRadius, circleX, circleY, color);
+                drawCircle(window, circleRadius_, circleX, circleY, color);
             }
 
-            drawHandLabel(window, m_circleRadius, circleX, circleY, handPoint);
+            drawHandLabel(window, circleRadius_, circleX, circleY, handPoint);
             if (status == HAND_STATUS_TRACKING)
             {
-                drawHandPosition(window, m_circleRadius, circleX, circleY, handPoint);
+                drawHandPosition(window, circleRadius_, circleX, circleY, handPoint);
             }
         }
     }
@@ -269,8 +284,8 @@ public:
 
     void drawDebugViewName(sf::RenderWindow& window)
     {
-        std::string viewName = getViewName(m_viewType);
-        sf::Text text(viewName, m_font);
+        std::string viewName = getViewName(viewType_);
+        sf::Text text(viewName, font_);
         int characterSize = 60;
         text.setCharacterSize(characterSize);
         text.setStyle(sf::Text::Bold);
@@ -283,16 +298,16 @@ public:
 
     void drawTo(sf::RenderWindow& window)
     {
-        if (m_displayBuffer != nullptr)
+        if (displayBuffer_ != nullptr)
         {
-            float debugScale = window.getView().getSize().x / m_displayWidth;
-            float depthScale = window.getView().getSize().x / m_depthWidth;
+            float debugScale = window.getView().getSize().x / displayWidth_;
+            float depthScale = window.getView().getSize().x / depthWidth_;
 
-            m_sprite.setScale(debugScale, debugScale);
+            sprite_.setScale(debugScale, debugScale);
 
-            window.draw(m_sprite);
+            window.draw(sprite_);
 
-            drawHandPoints(window, depthScale);
+            drawhandpoints(window, depthScale);
 
             drawDebugViewName(window);
         }
@@ -300,34 +315,34 @@ public:
 
     void toggle_output_fps()
     {
-        m_outputFPS = !m_outputFPS;
+        outputFPS_ = !outputFPS_;
     }
 
     void toggle_circles()
     {
-        m_showCircles = !m_showCircles;
+        showCircles_ = !showCircles_;
     }
 
 private:
-    long double m_frameDuration{ 0 };
-    std::clock_t m_lastTimepoint{ 0 };
-    sf::Texture m_texture;
-    sf::Sprite m_sprite;
+    long double frameDuration_{ 0 };
+    std::clock_t lastTimepoint_{ 0 };
+    sf::Texture texture_;
+    sf::Sprite sprite_;
 
-    sf::Font m_font;
+    sf::Font font_;
 
     using BufferPtr = std::unique_ptr < uint8_t[] > ;
-    BufferPtr m_displayBuffer;
+    BufferPtr displayBuffer_;
 
-    std::vector<astra::HandPoint> m_handPoints;
-    astra::DebugHandViewType m_viewType;
-    int m_depthWidth{ 1 };
-    int m_depthHeight{ 1 };
-    int m_displayWidth{ 1 };
-    int m_displayHeight{ 1 };
-    bool m_outputFPS{ false };
-    float m_circleRadius { 16 };
-    bool m_showCircles { true };
+    std::vector<astra::HandPoint> handPoints_;
+    astra::DebugHandViewType viewType_;
+    int depthWidth_{ 1 };
+    int depthHeight_{ 1 };
+    int displayWidth_{ 1 };
+    int displayHeight_{ 1 };
+    bool outputFPS_{ false };
+    float circleRadius_ { 16 };
+    bool showCircles_ { true };
 };
 
 void request_view_mode(astra::StreamReader& reader, astra::DebugHandViewType view)
@@ -368,7 +383,7 @@ void toggle_spawn_lock(astra::StreamReader& reader)
     reader.stream<astra::DebugHandStream>().set_lock_spawn_point(g_lockSpawnPoint);
 }
 
-void process_key_input(astra::StreamReader& reader, HandDebugFrameListener& listener, sf::Event::KeyEvent key)
+void process_key_input(astra::StreamReader& reader, debug_frame_listener& listener, sf::Event::KeyEvent key)
 {
     if (key.code == sf::Keyboard::F)
     {
@@ -443,14 +458,14 @@ void process_key_input(astra::StreamReader& reader, HandDebugFrameListener& list
 
 int main(int argc, char** argv)
 {
-    astra::Astra::initialize();
+    astra::initialize();
 
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Hand Debug Viewer");
 
-    astra::StreamSet streamset;
-    astra::StreamReader reader = streamset.create_reader();
+    astra::StreamSet streamSet;
+    astra::StreamReader reader = streamSet.create_reader();
 
-    HandDebugFrameListener listener;
+    debug_frame_listener listener;
 
     reader.stream<astra::DepthStream>().start();
     auto handStream = reader.stream<astra::HandStream>();
@@ -458,7 +473,7 @@ int main(int argc, char** argv)
     handStream.set_include_candidate_points(true);
 
     reader.stream<astra::DebugHandStream>().start();
-    reader.addListener(listener);
+    reader.add_listener(listener);
 
     while (window.isOpen())
     {
@@ -508,7 +523,7 @@ int main(int argc, char** argv)
         window.display();
     }
 
-    astra::Astra::terminate();
+    astra::terminate();
 
     return 0;
 }

@@ -46,22 +46,22 @@ The designers of the SDK are also experienced 3D sensor developers themselves, a
    astra::StreamReader reader = streamSet.create_reader();
 
    // Low-Level Streams
-   reader.stream<astra::DepthStream>().start();
+   reader.stream<astra::depthstream>().start();
    reader.stream<astra::ColorStream>().start();
 
    //High-Level Streams
-   reader.stream<astra::HandStream>().start();
-   reader.stream<astra::PointStream>().start();
+   reader.stream<astra::handstream>().start();
+   reader.stream<astra::pointstream>().start();
 
-   astra::Frame frame = reader.get_latest_frame();
+   astra::frame frame = reader.get_latest_frame();
 
    //Low-Level Streams
-   auto depthFrame = frame.get<astra::DepthFrame>();
-   auto colorFrame = frame.get<astra::ColorFrame>();
+   const auto depthFrame = frame.get<astra::depthframe>();
+   const auto colorFrame = frame.get<astra::colorframe>();
 
    //High-Level Streams
-   auto handFrame = frame.get<astra::HandFrame>();
-   auto pointFrame = frame.get<astra::PointFrame>();
+   const auto handFrame = frame.get<astra::handframe>();
+   const auto pointFrame = frame.get<astra::pointframe>();
 
    astra::Astra::terminate();
 
@@ -76,13 +76,12 @@ The |sdkname| SDK exposes its functionality through a core C API and also provid
 Currently Supported
 -------------------
 - Languages: C, C++11
-- Platforms: Windows, Android
+- Platforms: Windows, OSX, Linux, Android
 
 Planned Support
 ---------------
 - Languages: Java, C#
 - Frameworks: Processing, OpenFrameworks, Unity, Cinder
-- Platforms: Linux, OSX
 
 Mobile
 ======

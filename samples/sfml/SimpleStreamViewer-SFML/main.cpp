@@ -1,7 +1,23 @@
+// This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
+// Copyright (c) 2015 Orbbec 3D
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Be excellent to each other.
 #include <SFML/Graphics.hpp>
-#include <Astra/Astra.h>
-#include <AstraUL/AstraUL.h>
-#include "../../common/LitDepthVisualizer.h"
+#include <astra_core/astra_core.hpp>
+#include <astra/astra.hpp>
+#include "LitDepthVisualizer.hpp"
 #include <chrono>
 #include <iostream>
 #include <iomanip>
@@ -14,172 +30,164 @@ enum ColorMode
     MODE_IR_RGB,
 };
 
-class MultiFrameListener : public astra::FrameReadyListener
+class MultiFrameListener : public astra::FrameListener
 {
 public:
     using BufferPtr = std::unique_ptr<uint8_t[]>;
 
-    struct stream_view
+    struct StreamView
     {
-        sf::Sprite sprite;
-        sf::Texture texture;
-        BufferPtr buffer;
-        int width{0};
-        int height{0};
+        sf::Sprite sprite_;
+        sf::Texture texture_;
+        BufferPtr buffer_;
+        int width_{0};
+        int height_{0};
     };
 
     MultiFrameListener()
     {
-        m_lastTimepoint = clock_type::now();
+        prev_ = ClockType::now();
     }
 
-    void init_texture(int width, int height, stream_view& view)
+    void init_texture(int width, int height, StreamView& view)
     {
-        if (view.buffer == nullptr || width != view.width || height != view.height)
+        if (view.buffer_ == nullptr || width != view.width_ || height != view.height_)
         {
-            view.width = width;
-            view.height = height;
+            view.width_ = width;
+            view.height_ = height;
 
             // texture is RGBA
-            int byteLength = width * height * 4;
+            const int byteLength = width * height * 4;
 
-            view.buffer = BufferPtr(new uint8_t[byteLength]);
+            view.buffer_ = BufferPtr(new uint8_t[byteLength]);
 
             clear_view(view);
 
-            view.texture.create(width, height);
-            view.sprite.setTexture(view.texture);
-            view.sprite.setPosition(0, 0);
+            view.texture_.create(width, height);
+            view.sprite_.setTexture(view.texture_);
+            view.sprite_.setPosition(0, 0);
         }
     }
 
-    void clear_view(stream_view& view)
+    void clear_view(StreamView& view)
     {
-        int byteLength = view.width * view.height * 4;
-
-        memset(view.buffer.get(), 0, byteLength);
+        const int byteLength = view.width_ * view.height_ * 4;
+        std::fill(&view.buffer_[0], &view.buffer_[0] + byteLength, 0);
     }
 
     void check_fps()
     {
-        const double frameWeight = 0.2;
+        const float frameWeight = .2f;
 
-        auto newTimepoint = clock_type::now();
-        auto frameDuration = std::chrono::duration_cast<duration_type>(newTimepoint - m_lastTimepoint);
+        const ClockType::time_point now = ClockType::now();
+        const float elapsedMillis = std::chrono::duration_cast<DurationType>(now - prev_).count();
 
-        m_frameDuration = frameDuration * frameWeight + m_frameDuration * (1 - frameWeight);
-        m_lastTimepoint = newTimepoint;
+        elapsedMillis_ = elapsedMillis * frameWeight + elapsedMillis_ * (1.f - frameWeight);
+        prev_ = now;
 
-        double fps = 1.0 / m_frameDuration.count();
+        const float fps = 1000.f / elapsedMillis;
 
-        auto precision = std::cout.precision();
+        const auto precision = std::cout.precision();
+
         std::cout << std::fixed
                   << std::setprecision(1)
                   << fps << " fps ("
-                  << std::setprecision(2)
-                  << frameDuration.count() * 1000 << " ms)"
+                  << std::setprecision(1)
+                  << elapsedMillis_ << " ms)"
                   << std::setprecision(precision)
                   << std::endl;
     }
 
     void update_depth(astra::Frame& frame)
     {
-        astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
+        const astra::PointFrame pointFrame = frame.get<astra::PointFrame>();
 
         if (!pointFrame.is_valid())
         {
-            clear_view(m_depthView);
-            m_depthView.texture.update(m_depthView.buffer.get());
+            clear_view(depthView_);
+            depthView_.texture_.update(&depthView_.buffer_[0]);
             return;
         }
 
-        int depthWidth = pointFrame.resolutionX();
-        int depthHeight = pointFrame.resolutionY();
+        const int depthWidth = pointFrame.width();
+        const int depthHeight = pointFrame.height();
 
-        init_texture(depthWidth, depthHeight, m_depthView);
+        init_texture(depthWidth, depthHeight, depthView_);
 
-        if (m_isPaused)
-        {
-            return;
-        }
+        if (isPaused_) { return; }
 
-        m_visualizer.update(pointFrame);
+        visualizer_.update(pointFrame);
 
-        astra_rgb_pixel_t* vizBuffer = m_visualizer.get_output();
-        uint8_t* buffer = m_depthView.buffer.get();
+        astra::RgbPixel* vizBuffer = visualizer_.get_output();
+        uint8_t* buffer = &depthView_.buffer_[0];
         for (int i = 0; i < depthWidth * depthHeight; i++)
         {
-            int rgbaOffset = i * 4;
+            const int rgbaOffset = i * 4;
             buffer[rgbaOffset] = vizBuffer[i].r;
             buffer[rgbaOffset + 1] = vizBuffer[i].g;
             buffer[rgbaOffset + 2] = vizBuffer[i].b;
             buffer[rgbaOffset + 3] = 255;
         }
 
-        m_depthView.texture.update(m_depthView.buffer.get());
+        depthView_.texture_.update(&depthView_.buffer_[0]);
     }
 
     void update_color(astra::Frame& frame)
     {
-        astra::ColorFrame colorFrame = frame.get<astra::ColorFrame>();
+        const astra::ColorFrame colorFrame = frame.get<astra::ColorFrame>();
 
         if (!colorFrame.is_valid())
         {
-            clear_view(m_colorView);
-            m_colorView.texture.update(m_colorView.buffer.get());
+            clear_view(colorView_);
+            colorView_.texture_.update(&colorView_.buffer_[0]);
             return;
         }
 
-        int colorWidth = colorFrame.resolutionX();
-        int colorHeight = colorFrame.resolutionY();
+        const int colorWidth = colorFrame.width();
+        const int colorHeight = colorFrame.height();
 
-        init_texture(colorWidth, colorHeight, m_colorView);
+        init_texture(colorWidth, colorHeight, colorView_);
 
-        if (m_isPaused)
-        {
-            return;
-        }
+        if (isPaused_) { return; }
 
-        const astra::RGBPixel* color = colorFrame.data();
-        uint8_t* buffer = m_colorView.buffer.get();
+        const astra::RgbPixel* color = colorFrame.data();
+        uint8_t* buffer = &colorView_.buffer_[0];
+
         for(int i = 0; i < colorWidth * colorHeight; i++)
         {
-            int rgbaOffset = i * 4;
+            const int rgbaOffset = i * 4;
             buffer[rgbaOffset] = color[i].r;
             buffer[rgbaOffset + 1] = color[i].g;
             buffer[rgbaOffset + 2] = color[i].b;
             buffer[rgbaOffset + 3] = 255;
         }
 
-        m_colorView.texture.update(m_colorView.buffer.get());
+        colorView_.texture_.update(&colorView_.buffer_[0]);
     }
 
     void update_ir_16(astra::Frame& frame)
     {
-        astra::InfraredFrame16 irFrame = frame.get<astra::InfraredFrame16>();
+        const astra::InfraredFrame16 irFrame = frame.get<astra::InfraredFrame16>();
 
         if (!irFrame.is_valid())
         {
-            clear_view(m_colorView);
-            m_colorView.texture.update(m_colorView.buffer.get());
+            clear_view(colorView_);
+            colorView_.texture_.update(&colorView_.buffer_[0]);
             return;
         }
 
-        int irWidth = irFrame.resolutionX();
-        int irHeight = irFrame.resolutionY();
+        const int irWidth = irFrame.width();
+        const int irHeight = irFrame.height();
 
-        init_texture(irWidth, irHeight, m_colorView);
+        init_texture(irWidth, irHeight, colorView_);
 
-        if (m_isPaused)
-        {
-            return;
-        }
+        if (isPaused_) { return; }
 
         const uint16_t* ir_values = irFrame.data();
-        uint8_t* buffer = m_colorView.buffer.get();
+        uint8_t* buffer = &colorView_.buffer_[0];
         for (int i = 0; i < irWidth * irHeight; i++)
         {
-            int rgbaOffset = i * 4;
+            const int rgbaOffset = i * 4;
             const uint16_t value = ir_values[i];
             const uint8_t red = static_cast<uint8_t>(value >> 2);
             const uint8_t blue = 0x66 - red / 2;
@@ -189,42 +197,39 @@ public:
             buffer[rgbaOffset + 3] = 255;
         }
 
-        m_colorView.texture.update(m_colorView.buffer.get());
+        colorView_.texture_.update(&colorView_.buffer_[0]);
     }
 
     void update_ir_rgb(astra::Frame& frame)
     {
-        astra::InfraredFrameRGB irFrame = frame.get<astra::InfraredFrameRGB>();
+        const astra::InfraredFrameRgb irFrame = frame.get<astra::InfraredFrameRgb>();
 
         if (!irFrame.is_valid())
         {
-            clear_view(m_colorView);
-            m_colorView.texture.update(m_colorView.buffer.get());
+            clear_view(colorView_);
+            colorView_.texture_.update(&colorView_.buffer_[0]);
             return;
         }
 
-        int irWidth = irFrame.resolutionX();
-        int irHeight = irFrame.resolutionY();
+        int irWidth = irFrame.width();
+        int irHeight = irFrame.height();
 
-        init_texture(irWidth, irHeight, m_colorView);
+        init_texture(irWidth, irHeight, colorView_);
 
-        if (m_isPaused)
-        {
-            return;
-        }
+        if (isPaused_) { return; }
 
-        const astra::RGBPixel* irRGB = irFrame.data();
-        uint8_t* buffer = m_colorView.buffer.get();
+        const astra::RgbPixel* irRGB = irFrame.data();
+        uint8_t* buffer = &colorView_.buffer_[0];
         for (int i = 0; i < irWidth * irHeight; i++)
         {
-            int rgbaOffset = i * 4;
+            const int rgbaOffset = i * 4;
             buffer[rgbaOffset] = irRGB[i].r;
             buffer[rgbaOffset + 1] = irRGB[i].g;
             buffer[rgbaOffset + 2] = irRGB[i].b;
             buffer[rgbaOffset + 3] = 255;
         }
 
-        m_colorView.texture.update(m_colorView.buffer.get());
+        colorView_.texture_.update(&colorView_.buffer_[0]);
     }
 
     virtual void on_frame_ready(astra::StreamReader& reader,
@@ -232,7 +237,7 @@ public:
     {
         update_depth(frame);
 
-        switch (m_colorMode)
+        switch (colorMode_)
         {
         case MODE_COLOR:
             update_color(frame);
@@ -248,78 +253,80 @@ public:
         check_fps();
     }
 
-    void drawTo(sf::RenderWindow& window)
+    void draw_to(sf::RenderWindow& window, sf::Vector2f origin, sf::Vector2f size)
     {
-        int viewSize = (int)(window.getView().getSize().x / 2.0f);
+        const int viewSize = (int)(size.x / 2.0f);
+        const sf::Vector2f windowSize = window.getView().getSize();
 
-        if (m_depthView.buffer != nullptr)
+        if (depthView_.buffer_ != nullptr)
         {
-            float depthScale = viewSize / (float)m_depthView.width;
-            float height = m_depthView.height * depthScale;
-            int horzCenter = window.getView().getCenter().y - height / 2.0f;
-            m_depthView.sprite.setScale(depthScale, depthScale);
-            m_depthView.sprite.setPosition(0, horzCenter);
-            window.draw(m_depthView.sprite);
+            const float depthScale = viewSize / (float)depthView_.width_;
+            const int horzCenter = origin.y * windowSize.y;
+
+            depthView_.sprite_.setScale(depthScale, depthScale);
+            depthView_.sprite_.setPosition(origin.x * windowSize.x, horzCenter);
+            window.draw(depthView_.sprite_);
         }
 
-        if (m_colorView.buffer != nullptr)
+        if (colorView_.buffer_ != nullptr)
         {
-            float colorScale = viewSize / (float)m_colorView.width;
-            float height = m_colorView.height * colorScale;
-            int horzCenter = window.getView().getCenter().y - height / 2.0f;
-            m_colorView.sprite.setScale(colorScale, colorScale);
+            const float colorScale = viewSize / (float)colorView_.width_;
+            const int horzCenter = origin.y * windowSize.y;
 
-            if (m_overlayDepth)
+            colorView_.sprite_.setScale(colorScale, colorScale);
+
+            if (overlayDepth_)
             {
-                m_colorView.sprite.setPosition(0, horzCenter);
-                m_colorView.sprite.setColor(sf::Color(255, 255, 255, 128));
+                colorView_.sprite_.setPosition(origin.x * windowSize.x, horzCenter);
+                colorView_.sprite_.setColor(sf::Color(255, 255, 255, 128));
             }
             else
             {
-                m_colorView.sprite.setPosition(viewSize, horzCenter);
-                m_colorView.sprite.setColor(sf::Color(255, 255, 255, 255));
+                colorView_.sprite_.setPosition(origin.x * windowSize.x + viewSize, horzCenter);
+                colorView_.sprite_.setColor(sf::Color(255, 255, 255, 255));
             }
-            window.draw(m_colorView.sprite);
+
+            window.draw(colorView_.sprite_);
         }
     }
 
     void toggle_depth_overlay()
     {
-        m_overlayDepth = !m_overlayDepth;
+        overlayDepth_ = !overlayDepth_;
     }
 
-    bool get_overlayDepth() const
+    bool get_overlay_depth() const
     {
-        return m_overlayDepth;
+        return overlayDepth_;
     }
 
-    void toggle_Paused()
+    void toggle_paused()
     {
-        m_isPaused = !m_isPaused;
+        isPaused_ = !isPaused_;
     }
 
-    bool get_isPaused() const
+    bool is_paused() const
     {
-        return m_isPaused;
+        return isPaused_;
     }
 
-    ColorMode get_mode() const { return m_colorMode; }
-    void set_mode(ColorMode mode) { m_colorMode = mode; }
+    ColorMode get_mode() const { return colorMode_; }
+    void set_mode(ColorMode mode) { colorMode_ = mode; }
 
 private:
-    samples::common::LitDepthVisualizer m_visualizer;
+    samples::common::LitDepthVisualizer visualizer_;
 
-    using duration_type = std::chrono::duration<double>;
-    duration_type m_frameDuration{0.0};
+    using DurationType = std::chrono::milliseconds;
+    using ClockType = std::chrono::high_resolution_clock;
 
-    using clock_type = std::chrono::system_clock;
-    std::chrono::time_point<clock_type> m_lastTimepoint;
+    ClockType::time_point prev_;
+    float elapsedMillis_{.0f};
 
-    stream_view m_depthView;
-    stream_view m_colorView;
-    ColorMode m_colorMode;
-    bool m_overlayDepth{ false };
-    bool m_isPaused{ false };
+    StreamView depthView_;
+    StreamView colorView_;
+    ColorMode colorMode_;
+    bool overlayDepth_{ false };
+    bool isPaused_{ false };
 };
 
 astra::DepthStream configure_depth(astra::StreamReader& reader)
@@ -331,7 +338,7 @@ astra::DepthStream configure_depth(astra::StreamReader& reader)
 
     depthMode.set_width(640);
     depthMode.set_height(480);
-    depthMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_DEPTH_MM);
+    depthMode.set_pixel_format(astra_pixel_formats::ASTRA_PIXEL_FORMAT_DEPTH_MM);
     depthMode.set_fps(30);
 
     depthStream.set_mode(depthMode);
@@ -344,20 +351,19 @@ astra::InfraredStream configure_ir(astra::StreamReader& reader, bool useRGB)
     auto irStream = reader.stream<astra::InfraredStream>();
 
     astra::ImageStreamMode irMode;
-
     irMode.set_width(640);
     irMode.set_height(480);
+
     if (useRGB)
     {
-        irMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_RGB888);
+        irMode.set_pixel_format(astra_pixel_formats::ASTRA_PIXEL_FORMAT_RGB888);
     }
     else
     {
-        irMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_GRAY16);
+        irMode.set_pixel_format(astra_pixel_formats::ASTRA_PIXEL_FORMAT_GRAY16);
     }
 
     irMode.set_fps(30);
-
     irStream.set_mode(irMode);
 
     return irStream;
@@ -368,10 +374,9 @@ astra::ColorStream configure_color(astra::StreamReader& reader)
     auto colorStream = reader.stream<astra::ColorStream>();
 
     astra::ImageStreamMode colorMode;
-
     colorMode.set_width(640);
     colorMode.set_height(480);
-    colorMode.set_pixelFormat(astra_pixel_formats::ASTRA_PIXEL_FORMAT_RGB888);
+    colorMode.set_pixel_format(astra_pixel_formats::ASTRA_PIXEL_FORMAT_RGB888);
     colorMode.set_fps(30);
 
     colorStream.set_mode(colorMode);
@@ -381,7 +386,7 @@ astra::ColorStream configure_color(astra::StreamReader& reader)
 
 int main(int argc, char** argv)
 {
-    astra::Astra::initialize();
+    astra::initialize();
 
     set_key_handler();
 
@@ -391,13 +396,14 @@ int main(int argc, char** argv)
     auto fullscreenStyle = sf::Style::Fullscreen;
 #endif
 
-    sf::VideoMode fullscreen_mode = sf::VideoMode::getFullscreenModes()[0];
-    sf::VideoMode windowed_mode(1800, 675);
-    bool is_fullscreen = false;
-    sf::RenderWindow window(windowed_mode, "Stream Viewer");
+    const sf::VideoMode fullScreenMode = sf::VideoMode::getFullscreenModes()[0];
+    const sf::VideoMode windowedMode(1800, 675);
 
-    astra::StreamSet streamset;
-    astra::StreamReader reader = streamset.create_reader();
+    bool isFullScreen = false;
+    sf::RenderWindow window(windowedMode, "Stream Viewer");
+
+    astra::StreamSet streamSet;
+    astra::StreamReader reader = streamSet.create_reader();
 
     reader.stream<astra::PointStream>().start();
 
@@ -412,7 +418,7 @@ int main(int argc, char** argv)
     MultiFrameListener listener;
     listener.set_mode(MODE_COLOR);
 
-    reader.addListener(listener);
+    reader.add_listener(listener);
 
     while (window.isOpen())
     {
@@ -434,15 +440,15 @@ int main(int argc, char** argv)
                         window.close();
                         break;
                     case sf::Keyboard::F:
-                        if (is_fullscreen)
+                        if (isFullScreen)
                         {
-                            is_fullscreen = false;
-                            window.create(windowed_mode, "Stream Viewer", sf::Style::Default);
+                            isFullScreen = false;
+                            window.create(windowedMode, "Stream Viewer", sf::Style::Default);
                         }
                         else
                         {
-                            is_fullscreen = true;
-                            window.create(fullscreen_mode, "Stream Viewer", fullscreenStyle);
+                            isFullScreen = true;
+                            window.create(fullScreenMode, "Stream Viewer", fullscreenStyle);
                         }
                         break;
                     case sf::Keyboard::R:
@@ -450,7 +456,7 @@ int main(int argc, char** argv)
                         break;
                     case sf::Keyboard::M:
                         {
-                            bool newMirroring = !depthStream.mirroring_enabled();
+                            const bool newMirroring = !depthStream.mirroring_enabled();
                             depthStream.enable_mirroring(newMirroring);
                             colorStream.enable_mirroring(newMirroring);
                             irStream.enable_mirroring(newMirroring);
@@ -470,12 +476,13 @@ int main(int argc, char** argv)
                         break;
                     case sf::Keyboard::O:
                         listener.toggle_depth_overlay();
-                        if (listener.get_overlayDepth()) {
+                        if (listener.get_overlay_depth())
+                        {
                             depthStream.enable_registration(true);
                         }
                         break;
                     case sf::Keyboard::P:
-                        listener.toggle_Paused();
+                        listener.toggle_paused();
                         break;
                     case sf::Keyboard::C:
                         if (event.key.control)
@@ -501,8 +508,7 @@ int main(int argc, char** argv)
 
         // clear the window with black color
         window.clear(sf::Color::Black);
-
-        listener.drawTo(window);
+        listener.draw_to(window, sf::Vector2f(0.f, 0.f), sf::Vector2f(window.getSize().x, window.getSize().y));
         window.display();
 
         if (!shouldContinue)
@@ -511,6 +517,6 @@ int main(int argc, char** argv)
         }
     }
 
-    astra::Astra::terminate();
+    astra::terminate();
     return 0;
 }

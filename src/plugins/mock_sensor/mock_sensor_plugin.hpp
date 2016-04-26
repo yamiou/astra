@@ -1,24 +1,40 @@
-﻿#ifndef MOCKSENSORPLUGIN_H
+// This file is part of the Orbbec Astra SDK [https://orbbec3d.com]
+// Copyright (c) 2015 Orbbec 3D
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Be excellent to each other.
+#ifndef MOCKSENSORPLUGIN_H
 #define MOCKSENSORPLUGIN_H
 
-#include <Astra/Astra.h>
-#include <Astra/Plugins/PluginBase.h>
-#include <Astra/Plugins/PluginLogger.h>
+#include <astra_core/astra_core.hpp>
+#include <astra_core/plugins/PluginBase.hpp>
+#include <astra_core/plugins/PluginLogging.hpp>
 #include "mock_device_stream.hpp"
 #include "mock_device_streamset.hpp"
 #include <memory>
 #include <vector>
-#include <AstraUL/streams/depth_types.h>
-#include <AstraUL/streams/color_types.h>
-#include <AstraUL/Plugins/stream_types.h>
+#include <astra/capi/streams/depth_types.h>
+#include <astra/capi/streams/color_types.h>
+#include <astra/capi/streams/stream_types.h>
 
 namespace orbbec { namespace mocks {
 
-    class mock_sensor_plugin : public astra::PluginBase
+    class mock_sensor_plugin : public astra::plugins::plugin_base
     {
     public:
         mock_sensor_plugin(astra::PluginServiceProxy* pluginService)
-            : PluginBase(pluginService, "mock_sensor")
+            : plugin_base(pluginService, "mock_sensor")
         {
             register_for_host_events();
 
