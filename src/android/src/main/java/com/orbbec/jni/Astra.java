@@ -2,9 +2,9 @@ package com.orbbec.jni;
 
 public class Astra {
     static {
-        System.loadLibrary("Astra");
-        System.loadLibrary("AstraAPI");
-        System.loadLibrary("AstraUL");
+        System.loadLibrary("astra");
+        System.loadLibrary("astra_core");
+        System.loadLibrary("astra_core_api");
         System.loadLibrary("astra_jni");
     }
     public static native void initialize();
