@@ -295,9 +295,15 @@ if (MSVC)
     "${PROJECT_BINARY_DIR}/temp/README.txt"
     @ONLY
     NEWLINE_STYLE CRLF)
+  configure_file("${PROJECT_SOURCE_DIR}/LICENSE.txt"
+    "${PROJECT_BINARY_DIR}/temp/LICENSE.txt"
+    @ONLY
+    NEWLINE_STYLE CRLF)
 
-  #install the CRLF line ending readme
-  install(FILES ${PROJECT_BINARY_DIR}/temp/README.txt
+  #install the CRLF line ending readme and license
+  install(FILES
+    ${PROJECT_BINARY_DIR}/temp/README.txt
+    ${PROJECT_BINARY_DIR}/temp/LICENSE.txt
     DESTINATION .
     )
 
@@ -318,8 +324,10 @@ if (MSVC)
   #remove temporary build dir
   install(CODE "file(REMOVE_RECURSE ${SAMPLES_BUILD_TEMP_DIR})")
 else()
-  #for non-MSVC platforms, just install the readme directly
-  install(FILES ${PROJECT_SOURCE_DIR}/samples-aux/README.txt
+  #for non-MSVC platforms, just install the readme and license directly
+  install(FILES
+    ${PROJECT_SOURCE_DIR}/samples-aux/README.txt
+    ${PROJECT_SOURCE_DIR}/LICENSE.txt
     DESTINATION .
     )
 endif()
