@@ -76,13 +76,12 @@ The |sdkname| SDK exposes its functionality through a core C API and also provid
 Currently Supported
 -------------------
 - Languages: C, C++11
-- Platforms: Windows, Android
+- Platforms: Windows, OSX, Linux, Android
 
 Planned Support
 ---------------
 - Languages: Java, C#
 - Frameworks: Processing, OpenFrameworks, Unity, Cinder
-- Platforms: Linux, OSX
 
 Mobile
 ======
