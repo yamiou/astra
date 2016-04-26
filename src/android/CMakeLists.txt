@@ -3,19 +3,20 @@ set(JNI_LIB_DESTINATION "${JNI_LIB_ROOT}/armeabi-v7a/")
 
 make_directory(${JNI_LIB_DESTINATION})
 
+message(STATUS ${CMAKE_SOURCE_DIR}/vendor/openni2/android-armeabi-v7a/lib)
 add_custom_target(AstraAndroid ALL
-  COMMAND ${CMAKE_COMMAND}
-  -D"INPATH=${CMAKE_SOURCE_DIR}/vendor/openni2/android-armeabi-v7a"
-  -D"OUTPATH=${JNI_LIB_DESTINATION}"
-  -D"PATTERN=*.so"
-  -P "CopyFiles.cmake"
   COMMAND ${CMAKE_COMMAND}
   -D"INPATH=${CMAKE_BINARY_DIR}/lib/"
   -D"OUTPATH=${JNI_LIB_DESTINATION}"
   -D"PATTERN=*.so"
   -P "CopyFiles.cmake"
   COMMAND ${CMAKE_COMMAND}
-  -D"INPATH=${CMAKE_BINARY_DIR}/bin/Plugins/"
+  -D"INPATH=${CMAKE_SOURCE_DIR}/vendor/openni2/android-armeabi-v7a/"
+  -D"OUTPATH=${JNI_LIB_DESTINATION}"
+  -D"PATTERN=*.so"
+  -P "CopyFiles.cmake"
+  COMMAND ${CMAKE_COMMAND}
+  -D"INPATH=${CMAKE_BINARY_DIR}/libs/Plugins/"
   -D"OUTPATH=${JNI_LIB_DESTINATION}"
   -D"PATTERN=*.so"
   -P "CopyFiles.cmake"
