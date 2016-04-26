@@ -1,5 +1,5 @@
 Astra SDK v0.5.0
-Copyright (c) 2015 Orbbec
+Copyright (c) 2015-2016 Orbbec
 https://www.orbbec3d.com
 
 For help and support, visit us at https://3dclub.orbbec3d.com.
@@ -7,9 +7,9 @@ For help and support, visit us at https://3dclub.orbbec3d.com.
 What's New
 ==========
 
-v0.5.0 2016/04/25
+v0.5.0 2016/04/26
 
-   This release cleans up the API and library organization a bit. There are a few breaking changes in this release
+This release cleans up the API and library organization a bit. There are a few breaking changes in this release
 from v0.4 but they should be relatively quick to update existing code.
 
 * BREAKING: Library names:
