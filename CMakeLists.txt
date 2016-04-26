@@ -239,6 +239,7 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/include
   DESTINATION .
   PATTERN "*.lpp" EXCLUDE
   PATTERN "include/astra/Plugins" EXCLUDE
+  PATTERN ".pp-modification-cache.cl" EXCLUDE
   )
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/samples
