@@ -22,12 +22,8 @@ find_package(Astra REQUIRED)
 
 if (NOT ASTRA_SDK_BUILD)
   #copy Astra SDK binaries to lib dir
-  if (NOT ASTRA_ANDROID)
-    if (ASTRA_OSX OR ASTRA_UNIX)
-      set(ASTRA_LIB_COPY_TARGET ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
-    else(ASTRA_WINDOWS)
-      set(ASTRA_LIB_COPY_TARGET ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-    endif()
+  if (ASTRA_OSX)
+    set(ASTRA_LIB_COPY_TARGET ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
     add_custom_target(copy-astra-libs ALL
       COMMAND ${CMAKE_COMMAND} -E copy_directory
       ${ASTRA_LIB_DIR}/

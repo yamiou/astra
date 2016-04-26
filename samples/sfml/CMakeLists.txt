@@ -49,14 +49,14 @@ if (ASTRA_SDK_BUILD)
   install_file(${PROJECT_SOURCE_DIR}/vendor/Inconsolata.otf bin)
 endif()
 
-add_custom_target(copy-sample-files ALL
-  COMMAND ${CMAKE_COMMAND} -E copy
-  "${PROJECT_SOURCE_DIR}/vendor/Inconsolata.otf"
-  ${FONT_TARGET_DIR})
-
-set_target_properties(copy-sample-files PROPERTIES FOLDER CMakeCopyTargets)
-
 if (ASTRA_OSX)
+  add_custom_target(copy-sample-files ALL
+    COMMAND ${CMAKE_COMMAND} -E copy
+    "${PROJECT_SOURCE_DIR}/vendor/Inconsolata.otf"
+    ${FONT_TARGET_DIR})
+
+  set_target_properties(copy-sample-files PROPERTIES FOLDER CMakeCopyTargets)
+
   add_custom_command(TARGET copy-sample-files POST_BUILD
     COMMAND cp
     -R
