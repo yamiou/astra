@@ -19,6 +19,7 @@
 
 #include <astra_core/capi/astra_core.h>
 #include "astra_ctypes.h"
+#include "streams/image_capi.h"
 #include "streams/depth_capi.h"
 #include "streams/color_capi.h"
 #include "streams/infrared_capi.h"

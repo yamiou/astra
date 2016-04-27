@@ -20,6 +20,7 @@
 #include <astra_core/capi/astra_defines.h>
 #include <astra_core/capi/astra_types.h>
 #include <astra/capi/streams/image_types.h>
+#include <stdbool.h>
 
 ASTRA_BEGIN_DECLS
 
@@ -70,41 +71,10 @@ ASTRA_API_EX astra_status_t astra_imageframe_copy_data(astra_imageframe_t imageF
 
 ASTRA_API_EX astra_status_t astra_imageframe_get_metadata(astra_imageframe_t imageFrame,
                                                           astra_image_metadata_t* metadata);
-ASTRA_END_DECLS
 
-inline void astra_pixelformat_get_bytes_per_pixel(astra_pixel_format_t format,
-                                                  uint8_t* bpp)
-{
-    switch(format)
-    {
-    case astra_pixel_formats::ASTRA_PIXEL_FORMAT_RGB888:
-        *bpp = 3;
-        break;
-    case astra_pixel_formats::ASTRA_PIXEL_FORMAT_YUV422:
-        *bpp = 2;
-        break;
-    case astra_pixel_formats::ASTRA_PIXEL_FORMAT_GRAY8:
-        *bpp = 1;
-        break;
-    case astra_pixel_formats::ASTRA_PIXEL_FORMAT_GRAY16:
-        *bpp = 2;
-        break;
-    case astra_pixel_formats::ASTRA_PIXEL_FORMAT_DEPTH_MM:
-        *bpp = 2;
-        break;
-    case astra_pixel_formats::ASTRA_PIXEL_FORMAT_UNKNOWN:
-        *bpp = 1;
-        break;
-    case astra_pixel_formats::ASTRA_PIXEL_FORMAT_YUYV:
-        *bpp = 2;
-        break;
-    case astra_pixel_formats::ASTRA_PIXEL_FORMAT_POINT:
-        *bpp = 12;
-        break;
-    default:
-        *bpp = 1;
-        break;
-    }
-}
+ASTRA_API_EX void astra_pixelformat_get_bytes_per_pixel(astra_pixel_format_t format,
+                                                        uint8_t* bpp);
+
+ASTRA_END_DECLS
 
 #endif // IMAGE_CAPI_H
