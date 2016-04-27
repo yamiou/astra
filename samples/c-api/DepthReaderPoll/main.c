@@ -41,7 +41,7 @@ void print_depth(astra_depthframe_t depthFrame)
 
     astra_frame_index_t frameIndex;
     astra_depthframe_get_frameindex(depthFrame, &frameIndex);
-    printf("index %d value %d\n", frameIndex, middle);
+    printf("depth frameIndex %d value %d\n", frameIndex, middle);
 }
 
 int main(int argc, char* argv[])

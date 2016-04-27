@@ -14,7 +14,6 @@
 // limitations under the License.
 //
 // Be excellent to each other.
-#include <astra_core/capi/astra_core.h>
 #include <astra/capi/astra.h>
 #include <stdio.h>
 #include <key_handler.h>
@@ -37,7 +36,7 @@ void print_depth(astra_depthframe_t depthFrame)
     astra_frame_index_t frameIndex;
     astra_depthframe_get_frameindex(depthFrame, &frameIndex);
 
-	printf("index:  %d  value:  %d \n", frameIndex, middle);
+    printf("depth frameIndex:  %d  value:  %d \n", frameIndex, middle);
 }
 
 void frame_ready(void* clientTag, astra_reader_t reader, astra_reader_frame_t frame)
