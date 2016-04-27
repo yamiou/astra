@@ -40,30 +40,30 @@ The designers of the SDK are also experienced 3D sensor developers themselves, a
 .. code-block:: c++
    :linenos:
 
-   astra::Astra::initialize();
+   astra::initialize();
 
    astra::StreamSet streamSet; //By default, a StreamSet will address the Astra
    astra::StreamReader reader = streamSet.create_reader();
 
    // Low-Level Streams
-   reader.stream<astra::depthstream>().start();
+   reader.stream<astra::DepthStream>().start();
    reader.stream<astra::ColorStream>().start();
 
    //High-Level Streams
-   reader.stream<astra::handstream>().start();
-   reader.stream<astra::pointstream>().start();
+   reader.stream<astra::HandStream>().start();
+   reader.stream<astra::PointStream>().start();
 
-   astra::frame frame = reader.get_latest_frame();
+   astra::Frame frame = reader.get_latest_frame();
 
    //Low-Level Streams
-   const auto depthFrame = frame.get<astra::depthframe>();
-   const auto colorFrame = frame.get<astra::colorframe>();
+   const auto depthFrame = frame.get<astra::DepthFrame>();
+   const auto colorFrame = frame.get<astra::ColorFrame>();
 
    //High-Level Streams
-   const auto handFrame = frame.get<astra::handframe>();
-   const auto pointFrame = frame.get<astra::pointframe>();
+   const auto handFrame = frame.get<astra::HandFrame>();
+   const auto pointFrame = frame.get<astra::PointFrame>();
 
-   astra::Astra::terminate();
+   astra::terminate();
 
 First, take note where we create our ``StreamSet`` object on line 1. Without any additional configuration, it will default to addressing the Astra sensor. In the lines below, you can see that, regardless of the stream type, the same API calls are made to interact with each stream.
 
