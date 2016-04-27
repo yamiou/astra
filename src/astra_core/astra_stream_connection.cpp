@@ -74,13 +74,12 @@ namespace astra {
         if (is_started() && bin_ != nullptr)
         {
             currentFrame_ = bin_->lock_front_buffer();
+            locked_ = true;
         }
         else
         {
             currentFrame_ = nullptr;
         }
-
-        locked_ = true;
 
         return currentFrame_;
     }
@@ -93,6 +92,8 @@ namespace astra {
         {
             LOG_WARN("astra.stream_connection", "%x stream_connection::unlock() not locked", this);
             assert(locked_);
+
+            return;
         }
 
         if (is_started() && bin_ != nullptr)
