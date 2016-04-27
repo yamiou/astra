@@ -43,14 +43,14 @@ enum astra_joint_status {
 
 const size_t ASTRA_MAX_JOINTS = 20;
 
-typedef struct _astra_skeleton_joint {
+typedef struct {
     int32_t trackingId;
     astra_joint_status status;
     astra_joint_type jointType;
     astra_vector3f_t position;
 } astra_skeleton_joint_t;
 
-typedef struct _astra_skeleton {
+typedef struct {
     int32_t trackingId;
     size_t jointCount;
     astra_skeleton_status status;
@@ -71,7 +71,7 @@ struct _astra_skeletonframe {
 #pragma clang diagnostic ignored "-Wc99-extensions"
 #endif
 
-typedef struct _astra_skeletonframe_wrapper {
+typedef struct {
     _astra_skeletonframe frame;
     char frame_data[];
 } astra_skeletonframe_wrapper_t;

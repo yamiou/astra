@@ -19,23 +19,23 @@
 
 #include <stdint.h>
 
-typedef struct _astra_vector2i {
+typedef struct {
     int32_t x;
     int32_t y;
 } astra_vector2i_t;
 
-typedef struct _astra_vector2f {
+typedef struct {
     float x;
     float y;
 } astra_vector2f_t;
 
-typedef struct _astra_vector3f {
+typedef struct {
     float x;
     float y;
     float z;
 } astra_vector3f_t;
 
-typedef struct _astra_vector3i {
+typedef struct {
     int32_t x;
     int32_t y;
     int32_t z;
