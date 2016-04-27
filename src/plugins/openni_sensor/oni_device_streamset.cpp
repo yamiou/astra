@@ -146,9 +146,9 @@ namespace orbbec { namespace ni {
 
         if (oniDevice_.hasSensor(openni::SENSOR_DEPTH))
         {
-depthstream* stream = astra::plugins::make_stream<depthstream>(pluginService_,
-                                                  streamSetHandle_,
-                                                  oniDevice_, *this);
+            depthstream* stream = astra::plugins::make_stream<depthstream>(pluginService_,
+                                                                           streamSetHandle_,
+                                                                           oniDevice_, *this);
 
             astra_status_t rc = ASTRA_STATUS_SUCCESS;
             rc = stream->open();
@@ -160,10 +160,10 @@ depthstream* stream = astra::plugins::make_stream<depthstream>(pluginService_,
 
         if (oniDevice_.hasSensor(openni::SENSOR_IR))
         {
-infrared_stream* stream = astra::plugins::make_stream<infrared_stream>(pluginService_,
-                                                          streamSetHandle_,
-                                                          oniDevice_,
-                                                          *this);
+            infrared_stream* stream = astra::plugins::make_stream<infrared_stream>(pluginService_,
+                                                                                   streamSetHandle_,
+                                                                                   oniDevice_,
+                                                                                   *this);
 
             astra_status_t rc = ASTRA_STATUS_SUCCESS;
             rc = stream->open();
