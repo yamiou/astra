@@ -83,32 +83,32 @@ public:
 
     void check_fps()
     {
-        const double frameWeight = 0.2;
+        const float frameWeight = 0.5;
 
         auto newTimepoint = clock_type::now();
-        auto frameDuration = std::chrono::duration_cast<duration_type>(newTimepoint - lastTimepoint_);
+        float frameDuration = std::chrono::duration_cast<duration_type>(newTimepoint - lastTimepoint_).count();
 
         frameDuration_ = frameDuration * frameWeight + frameDuration_ * (1 - frameWeight);
         lastTimepoint_ = newTimepoint;
 
-        double fps = 1.0 / frameDuration_.count();
+        double fps = 1.0 / frameDuration_;
 
         auto precision = std::cout.precision();
         std::cout << std::fixed
                   << std::setprecision(1)
                   << fps << " fps ("
                   << std::setprecision(2)
-                  << frameDuration.count() * 1000 << " ms)"
+                  << frameDuration_ * 1000.0 << " ms)"
                   << std::setprecision(precision)
                   << std::endl;
     }
 
 private:
-    using duration_type = std::chrono::duration < double > ;
-    duration_type frameDuration_{ 0.0 };
+    using duration_type = std::chrono::duration<float>;
+    float frameDuration_{ 0.0 };
 
     using clock_type = std::chrono::system_clock;
-    std::chrono::time_point<clock_type> lastTimepoint_;
+    std::chrono::time_point<clock_type> lastTimepoint_{clock_type::now()};
 };
 
 int main(int argc, char** argv)
@@ -122,7 +122,8 @@ int main(int argc, char** argv)
 
     SampleFrameListener listener;
 
-    reader.stream<astra::DepthStream>().start();
+    auto depthStream = reader.stream<astra::DepthStream>();
+    depthStream.start();
 
     std::cout << "depthStream -- hFov: "
               << reader.stream<astra::DepthStream>().hFov()
