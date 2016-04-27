@@ -97,9 +97,9 @@ namespace astra {
 
         static const astra_stream_type_t id = ASTRA_STREAM_DEPTH;
 
-        conversion_cache_t depth_to_world_data() const
+        astra_conversion_cache_t depth_to_world_data() const
         {
-            conversion_cache_t data;
+            astra_conversion_cache_t data;
             astra_depthstream_get_depth_to_world_data(depthStream_, &data);
 
             return data;

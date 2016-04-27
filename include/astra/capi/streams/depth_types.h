@@ -29,7 +29,7 @@ typedef struct {
     int resolutionY;
     int halfResX;
     int halfResY;
-} conversion_cache_t;
+} astra_conversion_cache_t;
 
 typedef astra_streamconnection_t astra_depthstream_t;
 typedef struct _astra_imageframe* astra_depthframe_t;

@@ -38,7 +38,7 @@ namespace orbbec { namespace ni {
         depthstream& operator=(const depthstream&) = delete;
 
     private:
-        conversion_cache_t conversionCache_;
+        astra_conversion_cache_t conversionCache_;
 
         void refresh_conversion_cache(float horizontalFov,
                                       float verticalFov,

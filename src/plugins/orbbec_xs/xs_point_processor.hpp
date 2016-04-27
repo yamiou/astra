@@ -48,7 +48,7 @@ namespace astra { namespace xs {
         using PointStreamPtr = std::unique_ptr<PointStream>;
         PointStreamPtr pointStream_;
 
-        conversion_cache_t depthConversionCache_;
+        astra_conversion_cache_t depthConversionCache_;
     };
 }}
 

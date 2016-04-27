@@ -19,7 +19,7 @@
 
 namespace astra { namespace hand {
 
-    void convert_depth_to_world_f(const conversion_cache_t& depthToWorldData,
+    void convert_depth_to_world_f(const astra_conversion_cache_t& depthToWorldData,
                                   float depthX, float depthY, float depthZ,
                                   float& worldX, float& worldY, float& worldZ)
     {
@@ -31,7 +31,7 @@ namespace astra { namespace hand {
         worldZ = depthZ;
     }
 
-    Vector3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
+    Vector3f cv_convert_depth_to_world(const astra_conversion_cache_t& depthToWorldData,
                                        float depthX, float depthY, float depthZ)
     {
         float worldX, worldY, worldZ;
@@ -43,7 +43,7 @@ namespace astra { namespace hand {
         return Vector3f(worldX, worldY, worldZ);
     }
 
-    Vector3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
+    Vector3f cv_convert_depth_to_world(const astra_conversion_cache_t& depthToWorldData,
                                        int depthX, int depthY, float depthZ)
     {
         return cv_convert_depth_to_world(depthToWorldData,
@@ -52,13 +52,13 @@ namespace astra { namespace hand {
                                          depthZ);
     }
 
-    Vector3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
+    Vector3f cv_convert_depth_to_world(const astra_conversion_cache_t& depthToWorldData,
                                        const Vector3f& depth)
     {
         return cv_convert_depth_to_world(depthToWorldData, depth.x, depth.y, depth.z);
     }
 
-    Vector3f cv_convert_world_to_depth(const conversion_cache_t& depthToWorldData,
+    Vector3f cv_convert_world_to_depth(const astra_conversion_cache_t& depthToWorldData,
                                        float worldX, float worldY, float worldZ)
     {
         float depthX = depthToWorldData.coeffX * worldX / worldZ + depthToWorldData.halfResX;
@@ -68,7 +68,7 @@ namespace astra { namespace hand {
         return Vector3f(depthX, depthY, depthZ);
     }
 
-    Vector3f cv_convert_world_to_depth(const conversion_cache_t& depthToWorldData,
+    Vector3f cv_convert_world_to_depth(const astra_conversion_cache_t& depthToWorldData,
                                        const Vector3f& world)
     {
         return cv_convert_world_to_depth(depthToWorldData, world.x, world.y, world.z);
@@ -85,7 +85,7 @@ namespace astra { namespace hand {
             return position;
         }
 
-        const conversion_cache_t& depthToWorldData = depthToWorldData_;
+        const astra_conversion_cache_t& depthToWorldData = depthToWorldData_;
 
         const float scaledDepth = depthZ * scale_;
 

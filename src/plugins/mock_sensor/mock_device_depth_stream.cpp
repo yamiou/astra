@@ -26,7 +26,7 @@ namespace orbbec { namespace mocks {
                                    float verticalFov,
                                    int resolutionX,
                                    int resolutionY,
-                                   conversion_cache_t& cache)
+                                   astra_conversion_cache_t& cache)
     {
         cache.xzFactor = std::tan(horizontalFov / 2) * 2;
         cache.yzFactor = std::tan(verticalFov / 2) * 2;
@@ -118,7 +118,7 @@ namespace orbbec { namespace mocks {
             *size = sizeof(bool);
             break;
         case ASTRA_PARAMETER_DEPTH_CONVERSION_CACHE:
-            *size = sizeof(conversion_cache_t);
+            *size = sizeof(astra_conversion_cache_t);
             break;
         default:
             return base_stream::on_get_property_size(id, size);

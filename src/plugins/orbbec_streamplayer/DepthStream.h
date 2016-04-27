@@ -63,7 +63,7 @@ namespace astra { namespace plugins { namespace streamplayer
                 {
                 case ASTRA_PARAMETER_DEPTH_CONVERSION_CACHE:
                 {
-                    size_t resultByteLength = sizeof(conversion_cache_t);
+                    size_t resultByteLength = sizeof(astra_conversion_cache_t);
 
                     astra_parameter_data_t parameterData;
                     astra_status_t rc = pluginService().get_parameter_bin(resultByteLength,
@@ -71,7 +71,7 @@ namespace astra { namespace plugins { namespace streamplayer
                                                                                  &parameterData);
                     if (rc == ASTRA_STATUS_SUCCESS)
                     {
-		      std::memcpy(parameterData, &m_conversionCache, resultByteLength);
+                        std::memcpy(parameterData, &m_conversionCache, resultByteLength);
                     }
 
                     break;
@@ -98,7 +98,7 @@ namespace astra { namespace plugins { namespace streamplayer
                 m_conversionCache.coeffY = m_conversionCache.resolutionY / m_conversionCache.yzFactor;
             }
 
-            conversion_cache_t m_conversionCache;
+            astra_conversion_cache_t m_conversionCache;
         };
 
 }}}

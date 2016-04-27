@@ -25,29 +25,29 @@ namespace astra { namespace hand {
 
     class scaling_coordinate_mapper;
 
-    void convert_depth_to_world_f(const conversion_cache_t& depthToWorldData,
+    void convert_depth_to_world_f(const astra_conversion_cache_t& depthToWorldData,
                                   float depthX, float depthY, float depthZ,
                                   float& worldX, float& worldY, float& worldZ);
 
-    Vector3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
+    Vector3f cv_convert_depth_to_world(const astra_conversion_cache_t& depthToWorldData,
                                        int depthX, int depthY, float depthZ);
 
-    Vector3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
+    Vector3f cv_convert_depth_to_world(const astra_conversion_cache_t& depthToWorldData,
                                        float depthX, float depthY, float depthZ);
 
-    Vector3f cv_convert_depth_to_world(const conversion_cache_t& depthToWorldData,
+    Vector3f cv_convert_depth_to_world(const astra_conversion_cache_t& depthToWorldData,
                                        const Vector3f& depth);
 
-    Vector3f cv_convert_world_to_depth(const conversion_cache_t& depthToWorldData,
+    Vector3f cv_convert_world_to_depth(const astra_conversion_cache_t& depthToWorldData,
                                        float worldX, float worldY, float worldZ);
 
-    Vector3f cv_convert_world_to_depth(const conversion_cache_t& depthToWorldData,
+    Vector3f cv_convert_world_to_depth(const astra_conversion_cache_t& depthToWorldData,
                                           const Vector3f& world);
 
     class scaling_coordinate_mapper
     {
     public:
-        scaling_coordinate_mapper(const conversion_cache_t depthToWorldData,
+        scaling_coordinate_mapper(const astra_conversion_cache_t depthToWorldData,
                                   const float scale,
                                   const float offsetX = 0,
                                   const float offsetY = 0)
@@ -114,7 +114,7 @@ namespace astra { namespace hand {
         inline float offsetY() const { return offsetY_; }
 
     private:
-        const conversion_cache_t depthToWorldData_;
+        const astra_conversion_cache_t depthToWorldData_;
         const float scale_;
         const float offsetX_;
         const float offsetY_;

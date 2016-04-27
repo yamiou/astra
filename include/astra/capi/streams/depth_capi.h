@@ -36,7 +36,7 @@ ASTRA_API_EX astra_status_t astra_reader_get_depthstream(astra_reader_t reader,
                                                          astra_depthstream_t* depthStream);
 
 ASTRA_API_EX astra_status_t astra_depthstream_get_depth_to_world_data(astra_depthstream_t depthStream,
-                                                                      conversion_cache_t* conversion_data);
+                                                                      astra_conversion_cache_t* conversionData);
 
 ASTRA_API_EX astra_status_t astra_depthstream_get_hfov(astra_depthstream_t depthStream,
                                                        float* hFov);

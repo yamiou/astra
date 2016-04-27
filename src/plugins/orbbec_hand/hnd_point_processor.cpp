@@ -374,7 +374,7 @@ namespace astra { namespace hand {
     void point_processor::update_tracked_point_from_world_position(tracked_point& trackedPoint,
                                                                    const Vector3f& newWorldPosition,
                                                                    const float resizeFactor,
-                                                                   const conversion_cache_t& depthToWorldData)
+                                                                   const astra_conversion_cache_t& depthToWorldData)
     {
         PROFILE_FUNC();
         Vector3f fullSizeDepthPosition = cv_convert_world_to_depth(depthToWorldData, newWorldPosition);

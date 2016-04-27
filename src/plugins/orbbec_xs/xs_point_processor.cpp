@@ -99,7 +99,7 @@ namespace astra { namespace xs {
         int height = depthFrame.height();
         const int16_t* p_depth = depthFrame.data();
 
-        const conversion_cache_t conversionData = depthConversionCache_;
+        const astra_conversion_cache_t conversionData = depthConversionCache_;
 
         for (int y = 0; y < height; ++y)
         {

@@ -106,7 +106,7 @@ namespace astra { namespace hand {
         bool debugLayersEnabled;
         int layerCount;
         const astra::CoordinateMapper& fullSizeMapper;
-        const conversion_cache_t depthToWorldData;
+        const astra_conversion_cache_t depthToWorldData;
         std::vector<astra::Vector2i> layerCirclePoints;
 
         tracking_matrices(BitmapF& depthFullSize,
@@ -129,7 +129,7 @@ namespace astra { namespace hand {
                           astra::Vector3f* worldPoints,
                           bool debugLayersEnabled,
                           const astra::CoordinateMapper& fullSizeMapper,
-                          const conversion_cache_t depthToWorldData)
+                          const astra_conversion_cache_t depthToWorldData)
         :
             depthFullSize(depthFullSize),
             depth(depth),

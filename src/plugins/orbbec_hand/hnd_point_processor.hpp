@@ -70,7 +70,7 @@ namespace astra { namespace hand {
         void update_tracked_point_from_world_position(tracked_point& trackedPoint,
                                                       const Vector3f& newWorldPosition,
                                                       const float resizeFactor,
-                                                      const conversion_cache_t& depthToWorldData);
+                                                      const astra_conversion_cache_t& depthToWorldData);
 
         point_processor_settings& settings_;
 

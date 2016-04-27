@@ -209,7 +209,7 @@ namespace astra { namespace hand {
             worldPoints_ = new astra::Vector3f[numPoints];
         }
 
-        const conversion_cache_t depthToWorldData = depthStream_.depth_to_world_data();
+        const astra_conversion_cache_t depthToWorldData = depthStream_.depth_to_world_data();
 
         bool debugLayersEnabled = debugimagestream_->has_connections();
         bool enabledTestPassMap = debugimagestream_->view_type() == DEBUG_HAND_VIEW_TEST_PASS_MAP;

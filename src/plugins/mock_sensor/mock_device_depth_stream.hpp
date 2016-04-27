@@ -52,7 +52,7 @@ namespace orbbec { namespace mocks {
         void refresh_conversion_cache();
 
         std::unique_ptr<depth_generator> generator_;
-        conversion_cache_t conversionCache_;
+        astra_conversion_cache_t conversionCache_;
 
     };
 }}

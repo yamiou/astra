@@ -92,7 +92,7 @@ namespace orbbec { namespace ni {
         {
         case ASTRA_PARAMETER_DEPTH_CONVERSION_CACHE:
         {
-            std::size_t resultByteLength = sizeof(conversion_cache_t);
+            std::size_t resultByteLength = sizeof(astra_conversion_cache_t);
 
             astra_parameter_data_t parameterData;
             astra_status_t rc = pluginService().get_parameter_bin(resultByteLength,

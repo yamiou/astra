@@ -26,11 +26,11 @@
 #include <unordered_map>
 #include <Shiny.h>
 
-using ConversionMap = std::unordered_map<astra_depthstream_t, conversion_cache_t>;
+using ConversionMap = std::unordered_map<astra_depthstream_t, astra_conversion_cache_t>;
 
 ConversionMap g_astra_conversion_map;
 
-conversion_cache_t astra_depth_fetch_conversion_cache(astra_depthstream_t depthStream)
+astra_conversion_cache_t astra_depth_fetch_conversion_cache(astra_depthstream_t depthStream)
 {
     PROFILE_FUNC();
     auto it = g_astra_conversion_map.find(depthStream);
@@ -42,10 +42,10 @@ conversion_cache_t astra_depth_fetch_conversion_cache(astra_depthstream_t depthS
     else
     {
         PROFILE_BEGIN(depth_cache_get);
-        conversion_cache_t conversionCache;
+        astra_conversion_cache_t conversionCache;
         astra_stream_get_parameter_fixed(depthStream,
                                          ASTRA_PARAMETER_DEPTH_CONVERSION_CACHE,
-                                         sizeof(conversion_cache_t),
+                                         sizeof(astra_conversion_cache_t),
                                          reinterpret_cast<astra_parameter_data_t*>(&conversionCache));
         g_astra_conversion_map.insert(std::make_pair(depthStream, conversionCache));
         PROFILE_END();
@@ -60,7 +60,7 @@ ASTRA_API_EX astra_status_t astra_convert_depth_to_world(astra_depthstream_t dep
                                                          float* pWorldX, float* pWorldY, float* pWorldZ)
 {
     PROFILE_FUNC();
-    conversion_cache_t conversionCache = astra_depth_fetch_conversion_cache(depthStream);
+    astra_conversion_cache_t conversionCache = astra_depth_fetch_conversion_cache(depthStream);
 
     PROFILE_BEGIN(depth_to_world_math);
     float normalizedX = depthX / conversionCache.resolutionX - .5f;
@@ -80,7 +80,7 @@ ASTRA_API_EX astra_status_t astra_convert_world_to_depth(astra_depthstream_t dep
                                                          float* pDepthX, float* pDepthY, float* pDepthZ)
 {
     PROFILE_FUNC();
-    conversion_cache_t conversionCache = astra_depth_fetch_conversion_cache(depthStream);
+    astra_conversion_cache_t conversionCache = astra_depth_fetch_conversion_cache(depthStream);
 
     *pDepthX = conversionCache.coeffX * worldX / worldZ + conversionCache.halfResX;
     *pDepthY = conversionCache.halfResY - conversionCache.coeffY * worldY / worldZ;
@@ -101,10 +101,10 @@ ASTRA_API_EX astra_status_t astra_reader_get_depthstream(astra_reader_t reader,
 }
 
 ASTRA_API_EX astra_status_t astra_depthstream_get_depth_to_world_data(astra_depthstream_t depthStream,
-                                                                      conversion_cache_t* conversion_data)
+                                                                      astra_conversion_cache_t* conversionData)
 {
-    conversion_cache_t conversionCache = astra_depth_fetch_conversion_cache(depthStream);
-    memcpy(conversion_data, &conversionCache, sizeof(conversion_cache_t));
+    astra_conversion_cache_t conversionCache = astra_depth_fetch_conversion_cache(depthStream);
+    memcpy(conversionData, &conversionCache, sizeof(astra_conversion_cache_t));
 
     return ASTRA_STATUS_SUCCESS;
 }
