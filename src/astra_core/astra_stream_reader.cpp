@@ -97,17 +97,17 @@ namespace astra {
 
     astra_frame_t* stream_reader::get_subframe(astra_stream_desc_t& desc)
     {
-        if (!locked_)
-            return nullptr;
+        if (!locked_) { return nullptr; }
 
         stream_connection* connection = find_stream_of_type(desc);
 
-        if (connection == nullptr)
+        if (!connection)
         {
+            LOG_WARN("astra.stream_reader", "%p attempt to read unconnected type %u stream", this, desc.type);
             return nullptr;
         }
 
-        return connection->lock();
+        return connection->is_started() ? connection->lock() : nullptr;
     }
 
     astra_callback_id_t stream_reader::register_frame_ready_callback(astra_frame_ready_callback_t callback,
