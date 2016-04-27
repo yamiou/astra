@@ -54,8 +54,8 @@ namespace astra
     }
 
     astra_status_t plugin_service_impl::register_stream_registered_callback(stream_registered_callback_t callback,
-                                                                    void* clientTag,
-                                                                    CallbackId& callbackId)
+                                                                            void* clientTag,
+                                                                            CallbackId& callbackId)
     {
         auto thunk = [clientTag, callback](stream_registered_event_args args)
             {
@@ -71,8 +71,8 @@ namespace astra
     }
 
     astra_status_t plugin_service_impl::register_stream_unregistering_callback(stream_unregistering_callback_t callback,
-                                                                       void* clientTag,
-                                                                       CallbackId& callbackId)
+                                                                               void* clientTag,
+                                                                               CallbackId& callbackId)
     {
         auto thunk = [clientTag, callback](stream_unregistering_event_args args)
             {
@@ -102,8 +102,8 @@ namespace astra
     }
 
     astra_status_t plugin_service_impl::create_stream(astra_streamset_t setHandle,
-                                                   astra_stream_desc_t desc,
-                                                   astra_stream_t& handle)
+                                                      astra_stream_desc_t desc,
+                                                      astra_stream_t& handle)
     {
         streamset* set = streamset::get_ptr(setHandle);
         stream* stream = set->register_stream(desc);
@@ -163,7 +163,7 @@ namespace astra
     }
 
     astra_status_t plugin_service_impl::get_streamset_uri(astra_streamset_t setHandle,
-                                                       const char*& uri)
+                                                          const char*& uri)
     {
         assert(setHandle != nullptr);
 
@@ -174,9 +174,9 @@ namespace astra
     }
 
     astra_status_t plugin_service_impl::create_stream_bin(astra_stream_t streamHandle,
-                                                       size_t lengthInBytes,
-                                                       astra_bin_t& binHandle,
-                                                       astra_frame_t*& binBuffer)
+                                                          size_t lengthInBytes,
+                                                          astra_bin_t& binHandle,
+                                                          astra_frame_t*& binBuffer)
     {
         stream* actualStream = stream::get_ptr(streamHandle);
         stream_bin* bin = actualStream->create_bin(lengthInBytes);
@@ -194,8 +194,8 @@ namespace astra
     }
 
     astra_status_t plugin_service_impl::destroy_stream_bin(astra_stream_t streamHandle,
-                                                        astra_bin_t& binHandle,
-                                                        astra_frame_t*& binBuffer)
+                                                           astra_bin_t& binHandle,
+                                                           astra_frame_t*& binBuffer)
     {
         stream* actualStream = stream::get_ptr(streamHandle);
         stream_bin* bin = stream_bin::get_ptr(binHandle);
@@ -223,7 +223,7 @@ namespace astra
     }
 
     astra_status_t plugin_service_impl::cycle_bin_buffers(astra_bin_t binHandle,
-                                                       astra_frame_t*& binBuffer)
+                                                          astra_frame_t*& binBuffer)
     {
         assert(binHandle != nullptr);
 
@@ -234,7 +234,7 @@ namespace astra
     }
 
     astra_status_t plugin_service_impl::link_connection_to_bin(astra_streamconnection_t connection,
-                                                            astra_bin_t binHandle)
+                                                               astra_bin_t binHandle)
     {
         stream_connection* underlyingConnection = stream_connection::get_ptr(connection);
         stream_bin* bin = stream_bin::get_ptr(binHandle);
@@ -262,8 +262,8 @@ namespace astra
     }
 
     astra_status_t plugin_service_impl::get_parameter_bin(size_t byteSize,
-                                                       astra_parameter_bin_t& binHandle,
-                                                       astra_parameter_data_t& parameterData)
+                                                          astra_parameter_bin_t& binHandle,
+                                                          astra_parameter_data_t& parameterData)
     {
         //TODO pooling
         parameter_bin* parameterBin = new parameter_bin(byteSize);
@@ -275,20 +275,20 @@ namespace astra
     }
 
     astra_status_t plugin_service_impl::log(const char* channel,
-                              astra_log_severity_t logLevel,
-                              const char* fileName,
-                              int lineNo,
-                              const char* func,
-                              const char* format,
-                              va_list args)
+                                            astra_log_severity_t logLevel,
+                                            const char* fileName,
+                                            int lineNo,
+                                            const char* func,
+                                            const char* format,
+                                            va_list args)
     {
         astra::log_vargs(channel, logLevel, fileName, lineNo, func, format, args);
         return ASTRA_STATUS_SUCCESS;
     }
 
     astra_status_t plugin_service_impl::register_host_event_callback(host_event_callback_t callback,
-                                                                  void* clientTag,
-                                                                  CallbackId& callbackId)
+                                                                     void* clientTag,
+                                                                     CallbackId& callbackId)
     {
         auto thunk = [clientTag, callback](astra_event_id id, const void* data, size_t dataSize)
             {
