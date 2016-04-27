@@ -8,6 +8,12 @@ add_custom_target(AstraAndroid ALL
   -D"INPATH=${CMAKE_BINARY_DIR}/lib/"
   -D"OUTPATH=${JNI_LIB_DESTINATION}"
   -D"PATTERN=*.so"
+  -D"EXCLUDE=Plugins/*"
+  -P "CopyFiles.cmake"
+  COMMAND ${CMAKE_COMMAND}
+  -D"INPATH=${CMAKE_BINARY_DIR}/lib/Plugins/"
+  -D"OUTPATH=${JNI_LIB_DESTINATION}"
+  -D"PATTERN=*.so"
   -P "CopyFiles.cmake"
   COMMAND ${CMAKE_COMMAND}
   -D"INPATH=${CMAKE_SOURCE_DIR}/vendor/openni2/android-armeabi-v7a/"
