@@ -259,8 +259,8 @@ namespace astra {
     }
 
     astra_status_t context_impl::reader_open_frame(astra_reader_t reader,
-                                                       int timeoutMillis,
-                                                       astra_reader_frame_t& frame)
+                                                   int timeoutMillis,
+                                                   astra_reader_frame_t& frame)
     {
         if (reader == nullptr)
         {
@@ -304,9 +304,9 @@ namespace astra {
     }
 
     astra_status_t context_impl::reader_register_frame_ready_callback(astra_reader_t reader,
-                                                                          astra_frame_ready_callback_t callback,
-                                                                          void* clientTag,
-                                                                          astra_reader_callback_id_t& callbackId)
+                                                                      astra_frame_ready_callback_t callback,
+                                                                      void* clientTag,
+                                                                      astra_reader_callback_id_t& callbackId)
     {
         assert(reader != nullptr);
         callbackId = nullptr;
