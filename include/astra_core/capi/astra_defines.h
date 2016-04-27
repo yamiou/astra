@@ -18,8 +18,8 @@
 #define ASTRA_DEFINES_H
 
 #ifdef  __cplusplus
-# define ASTRA_BEGIN_DECLS  extern "C" {
-# define ASTRA_END_DECLS    }
+# define ASTRA_BEGIN_DECLS extern "C" {
+# define ASTRA_END_DECLS   }
 #else
 # define ASTRA_BEGIN_DECLS
 # define ASTRA_END_DECLS
