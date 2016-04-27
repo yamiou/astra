@@ -78,6 +78,13 @@ namespace astra {
         }
         else
         {
+            LOG_WARN("astra.stream_connection",
+                     "connection %p type %u: lock() is unavailable, bin = %p, started = %s",
+                     this,
+                     get_description().type,
+                     bin_,
+                     is_started() ? "yes" : "no");
+
             currentFrame_ = nullptr;
         }
 

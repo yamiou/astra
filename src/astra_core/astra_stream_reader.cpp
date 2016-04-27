@@ -25,17 +25,16 @@
 #include "astra_cxx_compatibility.hpp"
 
 namespace astra {
-    using namespace std::placeholders;
 
     stream_reader::stream_reader(streamset_connection& connection)
         : connection_(connection),
           scFrameReadyCallback_(nullptr)
-    {
-    }
+    {}
 
     stream_reader::~stream_reader()
     {
         LOG_TRACE("astra.stream_reader", "destroying reader: %p", this);
+
         for (auto& pair : streamMap_)
         {
             reader_connection_data* data = pair.second;
@@ -49,12 +48,8 @@ namespace astra {
 
     stream_connection* stream_reader::find_stream_of_type(astra_stream_desc_t& desc)
     {
-        auto it = streamMap_.find(desc);
-
-        if (it != streamMap_.end())
-        {
-            return it->second->connection;
-        }
+        const auto it = streamMap_.find(desc);
+        if (it != streamMap_.end()) { return it->second->connection; }
 
         return nullptr;
     }
@@ -73,10 +68,7 @@ namespace astra {
     {
         stream_connection* connection = find_stream_of_type(desc);
 
-        if (connection)
-        {
-            return connection;
-        }
+        if (connection) { return connection; }
 
         connection = connection_.get_streamSet()->create_stream_connection(desc);
 
@@ -324,8 +316,9 @@ namespace astra {
                 //LOG_INFO("astra.stream_reader", "locking: %u", data->connection->get_stream()->get_description().type);
                 if (data->connection->is_started())
                 {
-                    //LOG_INFO("astra.stream_reader", "locked: %u", data->connection->get_stream()->get_description().type);
+                    //LOG_INFO("astra.stream_reader", "locking: %u", data->connection->get_stream()->get_description().type);
                     data->connection->lock();
+                    //LOG_INFO("astra.stream_reader", "locked: %u", data->connection->get_stream()->get_description().type);
                 }
             }
             //LOG_INFO("astra.stream_reader", "locked run end");
