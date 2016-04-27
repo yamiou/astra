@@ -84,40 +84,36 @@ namespace orbbec { namespace ni {
     astra_status_t device_streamset::read()
     {
         PROFILE_BLOCK(streamset_read);
-        if (!isOpen_ || niActiveStreams_.size() == 0)
-            return ASTRA_STATUS_SUCCESS;
+        if (!isOpen_ || niActiveStreams_.empty()) { return ASTRA_STATUS_SUCCESS; }
 
         int streamIndex = -1;
-        int timeout = openni::TIMEOUT_NONE;
-        int i = 0;
+        auto oniTimeout = openni::TIMEOUT_NONE;
         openni::Status rc;
 
-        for(i = 0; i < niActiveStreams_.size(); i++)
+        // Until more sophisticated time-stamping is implemented,
+        // We choose the arrival of a frame for "oldest" active
+        // stream to increment the frame index
+
+        bool primaryActiveRead = false;
+        bool newFrame = false;
+        for(int i = 0; i < niActiveStreams_.size(); i++)
         {
-            rc = openni::OpenNI::waitForAnyStream(&niActiveStreams_.data()[i],
-                                                  1,
-                                                  &streamIndex,
-                                                  timeout);
+            auto* ptr = &niActiveStreams_[i];
+            rc = openni::OpenNI::waitForAnyStream(ptr, 1, &streamIndex, oniTimeout);
+
             if (streamIndex != -1)
             {
-                auto stream = astraActiveStreams_[i];
+                auto* stream = astraActiveStreams_[i];
                 stream->read(frameIndex_);
-            }
 
-            if (streamIndex == 0)
-            {
-                //only increment frameIndex with primary stream
-                //TODO this won't work when streams have different target FPS
-                frameIndex_++;
+                newFrame = true;
+                if (i == 0) { primaryActiveRead = true; }
             }
         }
 
-        if (rc == openni::STATUS_TIME_OUT)
-        {
-            return ASTRA_STATUS_TIMEOUT;
-        }
+        if (primaryActiveRead) { frameIndex_++; }
 
-        return ASTRA_STATUS_SUCCESS;
+        return !newFrame || rc == openni::STATUS_TIME_OUT ? ASTRA_STATUS_TIMEOUT :  ASTRA_STATUS_SUCCESS;
     }
 
     void device_streamset::add_stream(stream* stream)
@@ -178,7 +174,7 @@ namespace orbbec { namespace ni {
 
     void device_streamset::on_started(stream* stream)
     {
-        auto niHandle = stream->get_stream();
+        auto* niHandle = stream->get_stream();
 
         LOG_INFO("orbbec.ni.device_streamset",
                  "adding stream type %u to active streams",
