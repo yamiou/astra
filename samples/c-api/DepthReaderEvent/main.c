@@ -56,15 +56,11 @@ int main(int argc, char* argv[])
 
     astra_streamsetconnection_t sensor;
 
-    //client connects to daemon host, registers interest in certain sensor URI
     astra_streamset_open("device/default", &sensor);
 
     astra_reader_t reader;
     astra_reader_create(sensor, &reader);
 
-    //client -> daemon resolves stream type to plugin, notifies plugin client added
-    //client service starts pulling (or daemon starts pushing) when data is available
-    //client service stores latest frame until requested (via open or event)
     astra_depthstream_t depthStream;
     astra_reader_get_depthstream(reader, &depthStream);
     astra_stream_start(depthStream);
